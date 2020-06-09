@@ -5,19 +5,15 @@ models onto mobile devices. It works cross-Platform and is supported on Java,
 C++ (WIP), and Swift (WIP). The TFLite Support project consists of the following
 major components:
 
-*   **TFLite Support Util Library**:
-    a cross-platform library that helps to deploy TFLite models onto mobile
-    devices.
-*   **TFLite Model Metadata**:
-    (metadata populator and metadata extractor library): includes both human and
-    machine readable information about what a model does and how to use the
-    model.
-*   **TFLite Support Codegen Tool**:
-    an executable that generates model wrapper automatically based on the
-    Support Library and the metadata.
-*   **TFLite Support Task Library**:
-    a flexible and ready-to-use library for common machine learning model types,
-    such as classification and detection.
+*   **TFLite Support Util Library**: a cross-platform library that helps to
+    deploy TFLite models onto mobile devices.
+*   **TFLite Model Metadata**: (metadata populator and metadata extractor
+    library): includes both human and machine readable information about what a
+    model does and how to use the model.
+*   **TFLite Support Codegen Tool**: an executable that generates model wrapper
+    automatically based on the Support Library and the metadata.
+*   **TFLite Support Task Library**: a flexible and ready-to-use library for
+    common machine learning model types, such as classification and detection.
 
 TFLite Support library serves different tiers of deployment requirements from
 easy onboarding to fully customizable. There are three major use cases that
