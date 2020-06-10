@@ -37,3 +37,14 @@ TFLite Support targets at:
     structures to perform pre/post processing and data conversion. It is also
     designed to match the behavior of TensorFlow modules, such as TF.Image and
     TF.text, ensuring consistency from training to inferencing.
+
+## Build Instructions
+
+We use Bazel to build the project. When you're building the Java (Android)
+Utils, you need to set up following env variables correctly:
+
+*   `ANDROID_NDK_HOME`
+*   `ANDROID_SDK_HOME`
+*   `ANDROID_NDK_API_LEVEL`
+*   `ANDROID_SDK_API_LEVEL`
+*   `ANDROID_BUILD_TOOLS_VERSION`

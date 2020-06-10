@@ -1,0 +1,66 @@
+# This file is based on tensorflow's (v2.2.0) .bazelrc found here:
+# https://github.com/tensorflow/tensorflow/blob/v2.2.0/.bazelrc
+
+# Sets the default Apple platform to macOS.
+
+build --apple_platform_type=macos
+
+# Enable using platform specific build settings
+build --enable_platform_specific_config
+
+# Flag to enable remote config. Required starting from TF 2.2.
+common --experimental_repo_remote_exec
+
+# For workaround https://github.com/bazelbuild/bazel/issues/8772 with Bazel >= 0.29.1
+build --java_toolchain=//third_party/toolchains/java:tf_java_toolchain
+build --host_java_toolchain=//third_party/toolchains/java:tf_java_toolchain
+
+# Suppress C++ compiler warnings, otherwise build logs become 10s of MBs.
+build:android --copt=-w
+build:linux --copt=-w
+build:macos --copt=-w
+build:windows --copt=/w
+
+# Android workspace configurations. Should be replaced by an interative configure in the future.
+build --action_env ANDROID_NDK_HOME
+build --action_env ANDROID_NDK_API_LEVEL
+build --action_env ANDROID_BUILD_TOOLS_VERSION
+build --action_env ANDROID_SDK_API_LEVEL
+build --action_env ANDROID_SDK_HOME
+
+# Android configs. Bazel needs to have --cpu and --fat_apk_cpu both set to the
+# target CPU to build transient dependencies correctly. See
+# https://docs.bazel.build/versions/master/user-manual.html#flag--fat_apk_cpu
+
+build:android --crosstool_top=//external:android/crosstool
+build:android --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build:android_arm --config=android
+build:android_arm --cpu=armeabi-v7a
+build:android_arm --fat_apk_cpu=armeabi-v7a
+build:android_arm64 --config=android
+build:android_arm64 --cpu=arm64-v8a
+build:android_arm64 --fat_apk_cpu=arm64-v8a
+build:android_x86 --config=android
+build:android_x86 --cpu=x86
+build:android_x86 --fat_apk_cpu=x86
+build:android_x86_64 --config=android
+build:android_x86_64 --cpu=x86_64
+build:android_x86_64 --fat_apk_cpu=x86_64
+
+# By default, build TF in C++ 14 mode.
+build:android --cxxopt=-std=c++14
+build:android --host_cxxopt=-std=c++14
+build:ios --cxxopt=-std=c++14
+build:ios --host_cxxopt=-std=c++14
+build:linux --cxxopt=-std=c++14
+build:linux --host_cxxopt=-std=c++14
+build:macos --cxxopt=-std=c++14
+build:macos --host_cxxopt=-std=c++14
+build:windows --cxxopt=/std:c++14
+build:windows --host_cxxopt=/std:c++14
+
+# Config to use a mostly-static build and disable modular op registration
+# support (this will revert to loading TensorFlow with RTLD_GLOBAL in Python).
+# By default, TensorFlow will build with a dependence on
+# //tensorflow:libtensorflow_framework.so.
+build:monolithic --define framework_shared_object=false
