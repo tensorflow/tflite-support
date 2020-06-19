@@ -1,7 +1,13 @@
+tensorflow_lite_support/opensource/BUILD
 tensorflow_lite_support/opensource/WORKSPACE
 tensorflow_lite_support/third_party/android/BUILD
 tensorflow_lite_support/third_party/android/android.bzl.tpl
 tensorflow_lite_support/third_party/android/android_configure.BUILD.tpl
 tensorflow_lite_support/third_party/android/android_configure.bzl
+tensorflow_lite_support/third_party/com_google_absl.BUILD
+tensorflow_lite_support/third_party/pybind11.BUILD
+tensorflow_lite_support/third_party/python_runtime/BUILD
+tensorflow_lite_support/third_party/six.BUILD
 tensorflow_lite_support/third_party/toolchains/java/BUILD
+tensorflow_lite_support/tools/ci_build/build_all.sh
 tensorflow_lite_support/tools/ci_build/common.sh
