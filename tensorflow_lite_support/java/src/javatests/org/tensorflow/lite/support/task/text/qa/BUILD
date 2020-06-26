@@ -9,10 +9,10 @@ licenses(["notice"])  # Apache License 2.0
 android_library(
     name = "test_assets",
     assets = [
-        "//third_party/tensorflow_lite_support/cc/testdata:albert_model",
-        "//third_party/tensorflow_lite_support/cc/testdata:mobile_bert_model",
+        "//third_party/tensorflow_lite_support/cc/test/testdata/task/text:albert_model",
+        "//third_party/tensorflow_lite_support/cc/test/testdata/task/text:mobile_bert_model",
     ],
-    assets_dir = "text",
+    assets_dir = ".",
     manifest = "AndroidManifest.xml",
 )
 
