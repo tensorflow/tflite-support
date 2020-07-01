@@ -12,6 +12,29 @@ http_archive(
     ],
 )
 
+# Apple and Swift rules.
+# https://github.com/bazelbuild/rules_apple/releases
+http_archive(
+    name = "build_bazel_rules_apple",
+    sha256 = "ee9e6073aeb5a65c100cb9c44b0017c937706a4ae03176e14a7e78620a198079",
+    strip_prefix = "rules_apple-5131f3d46794bf227d296c82f30c2499c9de3c5b",
+    urls = [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_apple/archive/5131f3d46794bf227d296c82f30c2499c9de3c5b.tar.gz",
+        "https://github.com/bazelbuild/rules_apple/archive/5131f3d46794bf227d296c82f30c2499c9de3c5b.tar.gz",
+    ],
+)
+
+# https://github.com/bazelbuild/rules_swift/releases
+http_archive(
+    name = "build_bazel_rules_swift",
+    sha256 = "d0833bc6dad817a367936a5f902a0c11318160b5e80a20ece35fb85a5675c886",
+    strip_prefix = "rules_swift-3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8",
+    urls = [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_swift/archive/3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8.tar.gz",
+        "https://github.com/bazelbuild/rules_swift/archive/3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8.tar.gz",
+    ],
+)
+
 http_archive(
     name = "org_tensorflow",
     sha256 = "bb8b10da8184ce747f0348ea5b0d0aaf9e9bbe63cf68363d0e1bcdb72b4d3315",
