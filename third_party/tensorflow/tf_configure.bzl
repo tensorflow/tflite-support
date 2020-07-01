@@ -9,7 +9,7 @@ def _tpl(repository_ctx, tpl, substitutions = {}, out = None):
         out = tpl
     repository_ctx.template(
         out,
-        Label("//third_party/tensorflow:%s.tpl" % tpl),
+        Label("@org_tensorflow//tensorflow:%s.tpl" % tpl),
         substitutions,
     )
 
