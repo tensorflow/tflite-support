@@ -38,6 +38,10 @@ namespace {
 // of 1.0.0.
 enum class SchemaMembers {
   kAssociatedFileTypeVocabulary = 0,
+  kSubGraphMetadataInputProcessUnits = 1,
+  kSubGraphMetadataOutputProcessUnits = 2,
+  kProcessUnitOptionsBertTokenizerOptions = 3,
+  kProcessUnitOptionsSentencePieceTokenizerOptions = 4
 };
 
 // Helper class to compare semantic versions in terms of three integers, major,
@@ -86,10 +90,21 @@ Version GetMemberVersion(SchemaMembers member) {
   switch (member) {
     case SchemaMembers::kAssociatedFileTypeVocabulary:
       return Version(1, 0, 1);
+    case SchemaMembers::kSubGraphMetadataInputProcessUnits:
+      return Version(1, 1, 0);
+    case SchemaMembers::kSubGraphMetadataOutputProcessUnits:
+      return Version(1, 1, 0);
+    case SchemaMembers::kProcessUnitOptionsBertTokenizerOptions:
+      return Version(1, 1, 0);
+    case SchemaMembers::kProcessUnitOptionsSentencePieceTokenizerOptions:
+      return Version(1, 1, 0);
     default:
+      // Should never happen.
       TFLITE_LOG(FATAL) << "Unsupported schema member: "
                         << static_cast<int>(member);
   }
+  // Should never happen.
+  return Version(0, 0, 0);
 }
 
 // Updates min_version if it precedes the new_version.
@@ -100,78 +115,120 @@ inline void UpdateMinimumVersion(const Version& new_version,
   }
 }
 
-void UpdateMinimumVersionForAssociatedFile(
-    const tflite::AssociatedFile* associated_file, Version* min_version) {
-  if (associated_file == nullptr) return;
+template <typename T>
+void UpdateMinimumVersionForTable(const T* table, Version* min_version);
 
-  if (associated_file->type() == AssociatedFileType_VOCABULARY) {
+template <typename T>
+void UpdateMinimumVersionForArray(
+    const flatbuffers::Vector<flatbuffers::Offset<T>>* array,
+    Version* min_version) {
+  if (array == nullptr) return;
+
+  for (int i = 0; i < array->size(); ++i) {
+    UpdateMinimumVersionForTable<T>(array->Get(i), min_version);
+  }
+}
+
+template <>
+void UpdateMinimumVersionForTable<tflite::AssociatedFile>(
+    const tflite::AssociatedFile* table, Version* min_version) {
+  if (table == nullptr) return;
+
+  if (table->type() == AssociatedFileType_VOCABULARY) {
     UpdateMinimumVersion(
         GetMemberVersion(SchemaMembers::kAssociatedFileTypeVocabulary),
         min_version);
   }
 }
 
-void UpdateMinimumVersionForAssociatedFileArray(
-    const flatbuffers::Vector<flatbuffers::Offset<tflite::AssociatedFile>>*
-        associated_files,
-    Version* min_version) {
-  if (associated_files == nullptr) return;
+template <>
+void UpdateMinimumVersionForTable<tflite::ProcessUnit>(
+    const tflite::ProcessUnit* table, Version* min_version) {
+  if (table == nullptr) return;
 
-  for (int i = 0; i < associated_files->size(); ++i) {
-    UpdateMinimumVersionForAssociatedFile(associated_files->Get(i),
-                                          min_version);
+  tflite::ProcessUnitOptions process_unit_type = table->options_type();
+  if (process_unit_type == ProcessUnitOptions_BertTokenizerOptions) {
+    UpdateMinimumVersion(
+        GetMemberVersion(
+            SchemaMembers::kProcessUnitOptionsBertTokenizerOptions),
+        min_version);
+  }
+  if (process_unit_type == ProcessUnitOptions_SentencePieceTokenizerOptions) {
+    UpdateMinimumVersion(
+        GetMemberVersion(
+            SchemaMembers::kProcessUnitOptionsSentencePieceTokenizerOptions),
+        min_version);
   }
 }
 
-void UpdateMinimumVersionForTensorMetadata(
-    const tflite::TensorMetadata* tensor_metadata, Version* min_version) {
-  if (tensor_metadata == nullptr) return;
+template <>
+void UpdateMinimumVersionForTable<tflite::TensorMetadata>(
+    const tflite::TensorMetadata* table, Version* min_version) {
+  if (table == nullptr) return;
 
   // Checks the associated_files field.
-  UpdateMinimumVersionForAssociatedFileArray(
-      tensor_metadata->associated_files(), min_version);
+  UpdateMinimumVersionForArray<tflite::AssociatedFile>(
+      table->associated_files(), min_version);
+
+  // Checks the process_units field.
+  UpdateMinimumVersionForArray<tflite::ProcessUnit>(table->process_units(),
+                                                    min_version);
 }
 
-void UpdateMinimumVersionForTensorMetadataArray(
-    const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
-        tensor_metadata_array,
-    Version* min_version) {
-  if (tensor_metadata_array == nullptr) return;
-
-  for (int i = 0; i < tensor_metadata_array->size(); ++i) {
-    UpdateMinimumVersionForTensorMetadata(tensor_metadata_array->Get(i),
-                                          min_version);
-  }
-}
-
-void UpdateMinimumVersionForSubGraphMetadata(
-    const tflite::SubGraphMetadata* subgraph_metadata, Version* min_version) {
-  if (subgraph_metadata == nullptr) return;
+template <>
+void UpdateMinimumVersionForTable<tflite::SubGraphMetadata>(
+    const tflite::SubGraphMetadata* table, Version* min_version) {
+  if (table == nullptr) return;
 
   // Checks in the input/output metadata arrays.
-  UpdateMinimumVersionForTensorMetadataArray(
-      subgraph_metadata->input_tensor_metadata(), min_version);
-  UpdateMinimumVersionForTensorMetadataArray(
-      subgraph_metadata->output_tensor_metadata(), min_version);
+  UpdateMinimumVersionForArray<tflite::TensorMetadata>(
+      table->input_tensor_metadata(), min_version);
+  UpdateMinimumVersionForArray<tflite::TensorMetadata>(
+      table->output_tensor_metadata(), min_version);
 
   // Checks the associated_files field.
-  UpdateMinimumVersionForAssociatedFileArray(
-      subgraph_metadata->associated_files(), min_version);
+  UpdateMinimumVersionForArray<tflite::AssociatedFile>(
+      table->associated_files(), min_version);
+
+  // Checks for the input_process_units field.
+  if (table->input_process_units() != nullptr) {
+    UpdateMinimumVersion(
+        GetMemberVersion(SchemaMembers::kSubGraphMetadataInputProcessUnits),
+        min_version);
+    UpdateMinimumVersionForArray<tflite::ProcessUnit>(
+        table->input_process_units(), min_version);
+  }
+
+  // Checks for the output_process_units field.
+  if (table->output_process_units() != nullptr) {
+    UpdateMinimumVersion(
+        GetMemberVersion(SchemaMembers::kSubGraphMetadataOutputProcessUnits),
+        min_version);
+    UpdateMinimumVersionForArray<tflite::ProcessUnit>(
+        table->output_process_units(), min_version);
+  }
 }
 
-void UpdateMinimumVersionForModelMetadata(
-    const tflite::ModelMetadata& model_metadata, Version* min_version) {
+template <>
+void UpdateMinimumVersionForTable<tflite::ModelMetadata>(
+    const tflite::ModelMetadata* table, Version* min_version) {
+  if (table == nullptr) {
+    // Should never happen, because VerifyModelMetadataBuffer has verified it.
+    TFLITE_LOG(FATAL) << "The ModelMetadata object is null.";
+    return;
+  }
+
   // Checks the subgraph_metadata field.
-  if (model_metadata.subgraph_metadata() != nullptr) {
-    for (int i = 0; i < model_metadata.subgraph_metadata()->size(); ++i) {
-      UpdateMinimumVersionForSubGraphMetadata(
-          model_metadata.subgraph_metadata()->Get(i), min_version);
+  if (table->subgraph_metadata() != nullptr) {
+    for (int i = 0; i < table->subgraph_metadata()->size(); ++i) {
+      UpdateMinimumVersionForTable<tflite::SubGraphMetadata>(
+          table->subgraph_metadata()->Get(i), min_version);
     }
   }
 
   // Checks the associated_files field.
-  UpdateMinimumVersionForAssociatedFileArray(model_metadata.associated_files(),
-                                             min_version);
+  UpdateMinimumVersionForArray<tflite::AssociatedFile>(
+      table->associated_files(), min_version);
 }
 
 }  // namespace
@@ -196,15 +253,17 @@ TfLiteStatus GetMinimumMetadataParserVersion(const uint8_t* buffer_data,
   const tflite::ModelMetadata* model_metadata = GetModelMetadata(buffer_data);
 
   // All tables in the metadata schema should have their dedicated
-  // UpdateMinimumVersionFor**() methods, respectively. We'll gradually add
-  // these methods when new fields show up in later schema versions.
+  // UpdateMinimumVersionForTable<Foo>() methods, respectively. We'll gradually
+  // add these methods when new fields show up in later schema versions.
   //
-  // UpdateMinimumVersionFor<Foo>() takes a const pointer of Foo. The pointer
-  // can be a nullptr if Foo is not populated into the corresponding table of
-  // the Flatbuffer object. In this case, UpdateMinimumVersionFor<Foo>() will be
-  // skipped. An exception is UpdateMinimumVersionForModelMetadata(), where
-  // ModelMetadata is the root table, and it won't be null.
-  UpdateMinimumVersionForModelMetadata(*model_metadata, &min_version);
+  // UpdateMinimumVersionForTable<Foo>() takes a const pointer of Foo. The
+  // pointer can be a nullptr if Foo is not populated into the corresponding
+  // table of the Flatbuffer object. In this case,
+  // UpdateMinimumVersionFor<Foo>() will be skipped. An exception is
+  // UpdateMinimumVersionForModelMetadata(), where ModelMetadata is the root
+  // table, and it won't be null.
+  UpdateMinimumVersionForTable<tflite::ModelMetadata>(model_metadata,
+                                                      &min_version);
 
   *min_version_str = min_version.ToString();
   return kTfLiteOk;
