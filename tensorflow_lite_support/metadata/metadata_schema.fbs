@@ -50,7 +50,7 @@ namespace tflite;
 // for which they were added.
 //
 // LINT.IfChange
-// Schema Semantic version: 1.0.1
+// Schema Semantic version: 1.1.0
 // LINT.ThenChange(//tensorflow_lite_support/\
 //     metadata/java/src/java/org/tensorflow/lite/support/metadata/\
 //     MetadataParser.java)
@@ -62,6 +62,10 @@ file_identifier "M001";
 
 // History:
 // 1.0.1 - Added VOCABULARY type to AssociatedFileType.
+// 1.1.0 - Added BertTokenizerOptions to ProcessUnitOptions.
+//         Added SentencePieceTokenizerOptions to ProcessUnitOptions.
+//         Added input_process_units to SubGraphMetadata.
+//         Added output_process_units to SubGraphMetadata.
 
 // File extension of any written files.
 file_extension "tflitemeta";
@@ -414,11 +418,34 @@ table ScoreThresholdingOptions {
   global_score_threshold:float;
 }
 
+// Performs Bert tokenization as in tf.text.BertTokenizer
+// (https://github.com/tensorflow/text/blob/3599f6fcd2b780a2dc413b90fb9315464f10b314/docs/api_docs/python/text/BertTokenizer.md)
+// Added in: 1.1.0
+table BertTokenizerOptions {
+  // The vocabulary files used in the BertTokenizer.
+  vocab_file:[AssociatedFile];
+}
+
+// Performs SentencePiece tokenization as in tf.text.SentencepieceTokenizer
+// (https://github.com/tensorflow/text/blob/3599f6fcd2b780a2dc413b90fb9315464f10b314/docs/api_docs/python/text/SentencepieceTokenizer.md).
+// Added in: 1.1.0
+table SentencePieceTokenizerOptions {
+  // The SentencePiece model files used in the SentencePieceTokenizer.
+  sentencePiece_model:[AssociatedFile];
+
+  // The optional vocabulary model files used in the SentencePieceTokenizer.
+  vocab_file:[AssociatedFile];
+}
+
 // Options that are used when processing the tensor.
 union ProcessUnitOptions {
   NormalizationOptions,
   ScoreCalibrationOptions,
   ScoreThresholdingOptions,
+  // Added in: 1.1.0
+  BertTokenizerOptions,
+  // Added in: 1.1.0
+  SentencePieceTokenizerOptions
 }
 
 // A process unit that is used to process the tensor out-of-graph.
@@ -519,6 +546,22 @@ table SubGraphMetadata {
 
   // A list of associated files of this subgraph.
   associated_files:[AssociatedFile];
+
+  // Input process units of the subgraph. Some models may have complex pre and
+  // post processing logics where the process units do not work on one tensor at
+  // a time, but in a similar way of a TFLite graph. For example, in the
+  // MobileBert model (https://www.tensorflow.org/lite/models/bert_qa/overview),
+  // the inputs are: ids / mask / segment ids;
+  // the outputs are: end logits / start logits.
+  // The preprocessing converts the query string and the context string to the
+  // model inputs, and the post-processing converts the model outputs to the
+  // answer string.
+  // Added in: 1.1.0
+  input_process_units:[ProcessUnit];
+
+  // Output process units of the subgraph.
+  // Added in: 1.1.0
+  output_process_units:[ProcessUnit];
 }
 
 table ModelMetadata {
