@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.ZipException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -70,6 +72,15 @@ public final class ZipFileTest {
     ZipException exception =
         assertThrows(ZipException.class, () -> ZipFile.createFrom(modelChannel));
     assertThat(exception).hasMessageThat().isEqualTo("The archive is not a ZIP archive.");
+  }
+
+  @Test
+  public void getFileNames_correctFileName() throws Exception {
+    ByteBufferChannel modelChannel = loadModel(MODEL_PATH);
+    ZipFile zipFile = ZipFile.createFrom(modelChannel);
+    Set<String> expectedSet = new HashSet<>();
+    expectedSet.add(VALID_LABEL_FILE_NAME);
+    assertThat(zipFile.getFileNames()).isEqualTo(expectedSet);
   }
 
   @Test

@@ -41,7 +41,9 @@ enum class SchemaMembers {
   kSubGraphMetadataInputProcessUnits = 1,
   kSubGraphMetadataOutputProcessUnits = 2,
   kProcessUnitOptionsBertTokenizerOptions = 3,
-  kProcessUnitOptionsSentencePieceTokenizerOptions = 4
+  kProcessUnitOptionsSentencePieceTokenizerOptions = 4,
+  kSubGraphMetadataInputTensorGroups = 5,
+  kSubGraphMetadataOutputTensorGroups = 6,
 };
 
 // Helper class to compare semantic versions in terms of three integers, major,
@@ -98,6 +100,10 @@ Version GetMemberVersion(SchemaMembers member) {
       return Version(1, 1, 0);
     case SchemaMembers::kProcessUnitOptionsSentencePieceTokenizerOptions:
       return Version(1, 1, 0);
+    case SchemaMembers::kSubGraphMetadataInputTensorGroups:
+      return Version(1, 2, 0);
+    case SchemaMembers::kSubGraphMetadataOutputTensorGroups:
+      return Version(1, 2, 0);
     default:
       // Should never happen.
       TFLITE_LOG(FATAL) << "Unsupported schema member: "
@@ -206,6 +212,20 @@ void UpdateMinimumVersionForTable<tflite::SubGraphMetadata>(
         min_version);
     UpdateMinimumVersionForArray<tflite::ProcessUnit>(
         table->output_process_units(), min_version);
+  }
+
+  // Checks for the input_tensor_groups field.
+  if (table->input_tensor_groups() != nullptr) {
+    UpdateMinimumVersion(
+        GetMemberVersion(SchemaMembers::kSubGraphMetadataInputTensorGroups),
+        min_version);
+  }
+
+  // Checks for the output_tensor_groups field.
+  if (table->output_tensor_groups() != nullptr) {
+    UpdateMinimumVersion(
+        GetMemberVersion(SchemaMembers::kSubGraphMetadataOutputTensorGroups),
+        min_version);
   }
 }
 
