@@ -13,5 +13,6 @@ package_group(
     packages = [
         "//research/kernel/softskills/...",
         "//tensorflow_lite_support/...",
+        "//third_party/py/tensorflow_examples/...",
     ],
 )
