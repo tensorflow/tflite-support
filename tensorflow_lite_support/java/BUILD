@@ -16,6 +16,7 @@ android_library(
         exclude = ["src/java/org/tensorflow/lite/support/task/**/*.java"],
     ),
     javacopts = JAVACOPTS,
+    manifest = "AndroidManifest.xml",
     deps = [
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite",

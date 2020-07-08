@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipException;
 
 /**
@@ -95,6 +96,15 @@ final class ZipFile implements Closeable {
     long start = entry.getDataOffset();
     long remaining = entry.getSize();
     return new BoundedInputStream(archive, start, remaining);
+  }
+
+  /**
+   * Exposes the file names of the included files.
+   *
+   * @return the file names of the included files
+   */
+  public Set<String> getFileNames() {
+    return nameMap.keySet();
   }
 
   private ZipFile(ByteBufferChannel channel, Map<String, List<ZipEntry>> nameMap) {
