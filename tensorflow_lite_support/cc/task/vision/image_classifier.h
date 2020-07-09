@@ -96,7 +96,7 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
   // Performs sanity checks on the provided ImageClassifierOptions.
   static absl::Status SanityCheckOptions(const ImageClassifierOptions& options);
 
-  // Initializes the ObjectDetector from the provided ImageClassifierOptions,
+  // Initializes the ImageClassifier from the provided ImageClassifierOptions,
   // whose ownership is transferred to this object.
   absl::Status Init(std::unique_ptr<ImageClassifierOptions> options);
 
