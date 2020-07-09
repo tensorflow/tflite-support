@@ -164,6 +164,12 @@ http_archive(
     ],
 )
 
+http_archive(
+    name = "libyuv",
+    urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/refs/heads/master.tar.gz"],
+    build_file = "//third_party:libyuv.BUILD",
+)
+
 
 load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 
