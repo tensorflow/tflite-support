@@ -23,10 +23,12 @@ limitations under the License.
 
 #include "absl/memory/memory.h"
 #include "absl/strings/str_cat.h"
+#include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
 #include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow/lite/string_util.h"
 #include "tensorflow/lite/type_to_tflitetype.h"
+#include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
 namespace support {
@@ -154,6 +156,25 @@ std::string GetStringAtIndex(const TfLiteTensor* labels, int index);
 
 // Loads binary content of a file into a string.
 std::string LoadBinaryContent(const char* filename);
+
+// Gets the tensor from a vector of tensors with name specified inside metadata.
+template <typename TensorType>
+static TensorType* FindTensorByName(
+    const std::vector<TensorType*>& tensors,
+    const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
+        tensor_metadatas,
+    const std::string& name) {
+  if (tensor_metadatas == nullptr ||
+      tensor_metadatas->size() != tensors.size()) {
+    return nullptr;
+  }
+  for (int i = 0; i < tensor_metadatas->size(); i++) {
+    if (strcmp(name.data(), tensor_metadatas->Get(i)->name()->c_str()) == 0) {
+      return tensors[i];
+    }
+  }
+  return nullptr;
+}
 
 }  // namespace core
 }  // namespace task

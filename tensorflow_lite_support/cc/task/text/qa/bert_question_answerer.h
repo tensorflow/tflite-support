@@ -39,6 +39,21 @@ namespace qa {
 // branch of Albert models use SentencePiece tokenizer, respectively.
 //
 // Factory methods:
+//   CreateQuestionAnswererWithMetadata(path_to_model_with_metadata)
+//   CreateQuestionAnswererWithMetadataFromBinary(
+//                                          model_with_metadata_buffer_data,
+//                                          model_with_metadata_buffer_size)
+//     Generic API to create the QuestionAnswerer for bert models with metadata
+//     populated. The API expects a Bert based TFLite model with metadata
+//     containing the following information:
+//       - input_process_units for Wordpiece/Sentencepiece Tokenizer. Wordpiece
+//         Tokenizer can be used for a MobileBert[0] model, Sentencepiece
+//         Tokenizer Tokenizer can be used for an Albert[1] model
+//       - 3 input tensors with names "ids", "mask" and "segment_ids"
+//       - 2 output tensors with names "end_logits" and "start_logits"
+//      [0]: https://tfhub.dev/tensorflow/lite-model/mobilebert/1/default/1
+//      [1]: https://tfhub.dev/tensorflow/lite-model/albert_lite_base/squadv1/1
+//
 //   CreateBertQuestionAnswerer(path_to_model, path_to_vocab)
 //     Creates a BertQuestionAnswerer from TFLite model file and vocab file for
 //     WordPiece tokenizer. Used in C++ environment.
@@ -62,8 +77,16 @@ namespace qa {
 //                                          spmodel_buffer_size)
 //     Creates an AlbertQuestionAnswerer from TFLite model file buffer and
 //     SentencePiece model file buffer. Used in Jave (JNI) environment.
+//
+
 class BertQuestionAnswerer : public QuestionAnswerer {
  public:
+  static constexpr char kIdsTensorName[] = "ids";
+  static constexpr char kMaskTensorName[] = "mask";
+  static constexpr char kSegmentIdsTensorName[] = "segment_ids";
+  static constexpr char kEndLogitsTensorName[] = "end_logits";
+  static constexpr char kStartLogitsTensorName[] = "start_logits";
+
   // TODO(b/150904655): add support to parameterize.
   static constexpr int kMaxQueryLen = 64;
   static constexpr int kMaxSeqLen = 384;
@@ -73,6 +96,18 @@ class BertQuestionAnswerer : public QuestionAnswerer {
   static constexpr int kOutputOffset = 1;
   static constexpr int kNumLiteThreads = 4;
   static constexpr bool kUseLowerCase = true;
+
+  // Constant for model metadata
+  static constexpr int kTokenizerProcessUnitIndex = 0;
+
+  static StatusOr<std::unique_ptr<QuestionAnswerer>>
+  CreateQuestionAnswererWithMetadata(
+      const std::string& path_to_model_with_metadata);
+
+  static StatusOr<std::unique_ptr<QuestionAnswerer>>
+  CreateQuestionAnswererWithMetadataFromBinary(
+      const char* model_with_metadata_buffer_data,
+      size_t model_with_metadata_buffer_size);
 
   static StatusOr<std::unique_ptr<QuestionAnswerer>> CreateBertQuestionAnswerer(
       const std::string& path_to_model, const std::string& path_to_vocab);
@@ -110,12 +145,20 @@ class BertQuestionAnswerer : public QuestionAnswerer {
       const std::string& lowercased_context,
       const std::string& lowercased_query) override;
 
-  void InitializeVocab(const std::string& path_to_vocab);
-  void InitializeVocabFromBinary(const char* vocab_buffer_data,
-                                 size_t vocab_buffer_size);
-  void InitializeSPModel(const std::string& path_to_spmodel);
-  void InitializeSPModelFromBinary(const char* spmodel_buffer_data,
-                                   size_t spmodel_buffer_size);
+  // Initialize API with a BertTokenizer from the vocabulary file.
+  void InitializeBertTokenizer(const std::string& path_to_vocab);
+  // Initialize API with a BertTokenizer from the vocabulary buffer.
+  void InitializeBertTokenizerFromBinary(const char* vocab_buffer_data,
+                                         size_t vocab_buffer_size);
+
+  // Initialize API with a SentencepieceTokenizer from the model file.
+  void InitializeSentencepieceTokenizer(const std::string& path_to_spmodel);
+  // Initialize API with a SentencepieceTokenizer from the model buffer.
+  void InitializeSentencepieceTokenizerFromBinary(
+      const char* spmodel_buffer_data, size_t spmodel_buffer_size);
+
+  // Initialize the API with the tokenizer set in the metadata.
+  absl::Status InitializeFromMetadata();
 
   std::string ConvertIndexToString(int start, int end);
 

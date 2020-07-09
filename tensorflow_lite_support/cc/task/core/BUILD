@@ -71,8 +71,10 @@ cc_library(
         "task_utils.h",
     ],
     deps = [
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
+        "@flatbuffers",
         "@org_tensorflow//tensorflow/lite:string_util",
         "@org_tensorflow//tensorflow/lite:type_to_tflitetype",
         "@org_tensorflow//tensorflow/lite/kernels:op_macros",

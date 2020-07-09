@@ -19,6 +19,9 @@ limitations under the License.
 #include "absl/strings/str_split.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
+#include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
+#include "tensorflow_lite_support/cc/text/tokenizers/tokenizer_utils.h"
+#include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
 namespace support {
@@ -26,12 +29,43 @@ namespace task {
 namespace text {
 namespace qa {
 
+using ::tflite::support::task::core::FindTensorByName;
 using ::tflite::support::task::core::PopulateTensor;
 using ::tflite::support::task::core::PopulateVector;
 using ::tflite::support::task::core::ReverseSortIndices;
 using ::tflite::support::text::tokenizer::BertTokenizer;
+using ::tflite::support::text::tokenizer::CreateTokenizerFromMetadata;
 using ::tflite::support::text::tokenizer::SentencePieceTokenizer;
 using ::tflite::support::text::tokenizer::TokenizerResult;
+
+StatusOr<std::unique_ptr<QuestionAnswerer>>
+BertQuestionAnswerer::CreateQuestionAnswererWithMetadata(
+    const std::string& path_to_model_with_metadata) {
+  std::unique_ptr<BertQuestionAnswerer> api_to_init;
+  ASSIGN_OR_RETURN(
+      api_to_init,
+      core::TaskAPIFactory::CreateFromFile<BertQuestionAnswerer>(
+          path_to_model_with_metadata,
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          kNumLiteThreads));
+  RETURN_IF_ERROR(api_to_init->InitializeFromMetadata());
+  return api_to_init;
+}
+
+StatusOr<std::unique_ptr<QuestionAnswerer>>
+BertQuestionAnswerer::CreateQuestionAnswererWithMetadataFromBinary(
+    const char* model_with_metadata_buffer_data,
+    size_t model_with_metadata_buffer_size) {
+  std::unique_ptr<BertQuestionAnswerer> api_to_init;
+  ASSIGN_OR_RETURN(
+      api_to_init,
+      core::TaskAPIFactory::CreateFromBuffer<BertQuestionAnswerer>(
+          model_with_metadata_buffer_data, model_with_metadata_buffer_size,
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          kNumLiteThreads));
+  RETURN_IF_ERROR(api_to_init->InitializeFromMetadata());
+  return api_to_init;
+}
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
 BertQuestionAnswerer::CreateBertQuestionAnswerer(
@@ -43,7 +77,7 @@ BertQuestionAnswerer::CreateBertQuestionAnswerer(
           path_to_model,
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
-  api_to_init->InitializeVocab(path_to_vocab);
+  api_to_init->InitializeBertTokenizer(path_to_vocab);
   return api_to_init;
 }
 
@@ -58,7 +92,8 @@ BertQuestionAnswerer::CreateBertQuestionAnswererFromBinary(
           model_buffer_data, model_buffer_size,
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
-  api_to_init->InitializeVocabFromBinary(vocab_buffer_data, vocab_buffer_size);
+  api_to_init->InitializeBertTokenizerFromBinary(vocab_buffer_data,
+                                                 vocab_buffer_size);
   return api_to_init;
 }
 
@@ -72,7 +107,7 @@ BertQuestionAnswerer::CreateAlbertQuestionAnswerer(
           path_to_model,
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
-  api_to_init->InitializeSPModel(path_to_spmodel);
+  api_to_init->InitializeSentencepieceTokenizer(path_to_spmodel);
   return api_to_init;
 }
 
@@ -87,8 +122,8 @@ BertQuestionAnswerer::CreateAlbertQuestionAnswererFromBinary(
           model_buffer_data, model_buffer_size,
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
-  api_to_init->InitializeSPModelFromBinary(spmodel_buffer_data,
-                                           spmodel_buffer_size);
+  api_to_init->InitializeSentencepieceTokenizerFromBinary(spmodel_buffer_data,
+                                                          spmodel_buffer_size);
   return api_to_init;
 }
 
@@ -102,6 +137,24 @@ std::vector<QaAnswer> BertQuestionAnswerer::Answer(
 absl::Status BertQuestionAnswerer::Preprocess(
     const std::vector<TfLiteTensor*>& input_tensors, const std::string& context,
     const std::string& query) {
+  auto* input_tensor_metadatas =
+      GetMetadataExtractor()->GetInputTensorMetadata();
+  TfLiteTensor* ids_tensor =
+      input_tensor_metadatas
+          ? FindTensorByName(input_tensors, input_tensor_metadatas,
+                             kIdsTensorName)
+          : input_tensors[0];
+  TfLiteTensor* mask_tensor =
+      input_tensor_metadatas
+          ? FindTensorByName(input_tensors, input_tensor_metadatas,
+                             kMaskTensorName)
+          : input_tensors[1];
+  TfLiteTensor* segment_ids_tensor =
+      input_tensor_metadatas
+          ? FindTensorByName(input_tensors, input_tensor_metadatas,
+                             kSegmentIdsTensorName)
+          : input_tensors[2];
+
   token_to_orig_map_.clear();
 
   // The orig_tokens is used for recovering the answer string from the index,
@@ -196,12 +249,12 @@ absl::Status BertQuestionAnswerer::Preprocess(
   input_mask.insert(input_mask.end(), zeros_to_pad, 0);
   segment_ids.insert(segment_ids.end(), zeros_to_pad, 0);
 
-  // input_tensors[0]: input_ids INT32[1, 384]
-  PopulateTensor(input_ids, input_tensors[0]);
-  // input_tensors[1]: input_mask INT32[1, 384]
-  PopulateTensor(input_mask, input_tensors[1]);
-  // input_tensors[2]: segment_ids INT32[1, 384]
-  PopulateTensor(segment_ids, input_tensors[2]);
+  // input_ids INT32[1, 384]
+  PopulateTensor(input_ids, ids_tensor);
+  // input_mask INT32[1, 384]
+  PopulateTensor(input_mask, mask_tensor);
+  // segment_ids INT32[1, 384]
+  PopulateTensor(segment_ids, segment_ids_tensor);
 
   return absl::OkStatus();
 }
@@ -210,15 +263,27 @@ StatusOr<std::vector<QaAnswer>> BertQuestionAnswerer::Postprocess(
     const std::vector<const TfLiteTensor*>& output_tensors,
     const std::string& /*lowercased_context*/,
     const std::string& /*lowercased_query*/) {
-  // convert output tensors back to string, float maps back here
+  auto* output_tensor_metadatas =
+      GetMetadataExtractor()->GetOutputTensorMetadata();
+
+  const TfLiteTensor* end_logits_tensor =
+      output_tensor_metadatas
+          ? FindTensorByName(output_tensors, output_tensor_metadatas,
+                             kEndLogitsTensorName)
+          : output_tensors[0];
+  const TfLiteTensor* start_logits_tensor =
+      output_tensor_metadatas
+          ? FindTensorByName(output_tensors, output_tensor_metadatas,
+                             kStartLogitsTensorName)
+          : output_tensors[1];
 
   std::vector<float> end_logits;
   std::vector<float> start_logits;
 
-  // output_tensors[0]: end_logits FLOAT[1, 384]
-  PopulateVector(output_tensors[0], &end_logits);
-  // output_tensors[1]: start_logits FLOAT[1, 384]
-  PopulateVector(output_tensors[1], &start_logits);
+  // end_logits FLOAT[1, 384]
+  PopulateVector(end_logits_tensor, &end_logits);
+  // start_logits FLOAT[1, 384]
+  PopulateVector(start_logits_tensor, &start_logits);
 
   auto start_indices = ReverseSortIndices(start_logits);
   auto end_indices = ReverseSortIndices(end_logits);
@@ -261,22 +326,29 @@ std::string BertQuestionAnswerer::ConvertIndexToString(int start, int end) {
                        orig_tokens_.begin() + end_index + 1, " ");
 }
 
-void BertQuestionAnswerer::InitializeVocab(const std::string& path_to_vocab) {
+absl::Status BertQuestionAnswerer::InitializeFromMetadata() {
+  ASSIGN_OR_RETURN(tokenizer_,
+                   CreateTokenizerFromMetadata(*GetMetadataExtractor()));
+  return absl::OkStatus();
+}
+
+void BertQuestionAnswerer::InitializeBertTokenizer(
+    const std::string& path_to_vocab) {
   tokenizer_ = absl::make_unique<BertTokenizer>(path_to_vocab);
 }
 
-void BertQuestionAnswerer::InitializeVocabFromBinary(
+void BertQuestionAnswerer::InitializeBertTokenizerFromBinary(
     const char* vocab_buffer_data, size_t vocab_buffer_size) {
   tokenizer_ =
       absl::make_unique<BertTokenizer>(vocab_buffer_data, vocab_buffer_size);
 }
 
-void BertQuestionAnswerer::InitializeSPModel(
+void BertQuestionAnswerer::InitializeSentencepieceTokenizer(
     const std::string& path_to_spmodel) {
   tokenizer_ = absl::make_unique<SentencePieceTokenizer>(path_to_spmodel);
 }
 
-void BertQuestionAnswerer::InitializeSPModelFromBinary(
+void BertQuestionAnswerer::InitializeSentencepieceTokenizerFromBinary(
     const char* spmodel_buffer_data, size_t spmodel_buffer_size) {
   tokenizer_ = absl::make_unique<SentencePieceTokenizer>(spmodel_buffer_data,
                                                          spmodel_buffer_size);

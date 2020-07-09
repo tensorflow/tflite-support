@@ -61,6 +61,16 @@ class SimpleCleanUp {
  private:
   std::function<void()> callback_;
 };
+
+// Util to get item from src_vector specified by index.
+template <typename T>
+const T* GetItemFromVector(
+    const flatbuffers::Vector<flatbuffers::Offset<T>>* src_vector, int index) {
+  if (src_vector == nullptr || index < 0 || index >= src_vector->size()) {
+    return nullptr;
+  }
+  return src_vector->Get(index);
+}
 }  // namespace
 
 /* static */
@@ -271,13 +281,8 @@ ModelMetadataExtractor::GetInputTensorMetadata() const {
 
 const tflite::TensorMetadata* ModelMetadataExtractor::GetInputTensorMetadata(
     int index) const {
-  const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
-      input_tensor_metadata = GetInputTensorMetadata();
-  if (input_tensor_metadata == nullptr || index < 0 ||
-      index >= input_tensor_metadata->size()) {
-    return nullptr;
-  }
-  return input_tensor_metadata->Get(index);
+  return GetItemFromVector<tflite::TensorMetadata>(GetInputTensorMetadata(),
+                                                   index);
 }
 
 int ModelMetadataExtractor::GetInputTensorCount() const {
@@ -299,19 +304,58 @@ ModelMetadataExtractor::GetOutputTensorMetadata() const {
 
 const tflite::TensorMetadata* ModelMetadataExtractor::GetOutputTensorMetadata(
     int index) const {
-  const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
-      output_tensor_metadata = GetOutputTensorMetadata();
-  if (output_tensor_metadata == nullptr || index < 0 ||
-      index >= output_tensor_metadata->size()) {
-    return nullptr;
-  }
-  return output_tensor_metadata->Get(index);
+  return GetItemFromVector<tflite::TensorMetadata>(GetOutputTensorMetadata(),
+                                                   index);
 }
 
 int ModelMetadataExtractor::GetOutputTensorCount() const {
   const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
       output_tensor_metadata = GetOutputTensorMetadata();
   return output_tensor_metadata == nullptr ? 0 : output_tensor_metadata->size();
+}
+
+const Vector<flatbuffers::Offset<tflite::ProcessUnit>>*
+ModelMetadataExtractor::GetInputProcessUnits() const {
+  if (model_metadata_ == nullptr ||
+      model_metadata_->subgraph_metadata() == nullptr) {
+    return nullptr;
+  }
+  return model_metadata_->subgraph_metadata()
+      ->Get(kDefaultSubgraphIndex)
+      ->input_process_units();
+}
+
+const tflite::ProcessUnit* ModelMetadataExtractor::GetInputProcessUnit(
+    int index) const {
+  return GetItemFromVector<tflite::ProcessUnit>(GetInputProcessUnits(), index);
+}
+
+int ModelMetadataExtractor::GetInputProcessUnitsCount() const {
+  const Vector<flatbuffers::Offset<tflite::ProcessUnit>>* input_process_units =
+      GetInputProcessUnits();
+  return input_process_units == nullptr ? 0 : input_process_units->size();
+}
+
+const Vector<flatbuffers::Offset<tflite::ProcessUnit>>*
+ModelMetadataExtractor::GetOutputProcessUnits() const {
+  if (model_metadata_ == nullptr ||
+      model_metadata_->subgraph_metadata() == nullptr) {
+    return nullptr;
+  }
+  return model_metadata_->subgraph_metadata()
+      ->Get(kDefaultSubgraphIndex)
+      ->output_process_units();
+}
+
+const tflite::ProcessUnit* ModelMetadataExtractor::GetOutputProcessUnit(
+    int index) const {
+  return GetItemFromVector<tflite::ProcessUnit>(GetOutputProcessUnits(), index);
+}
+
+int ModelMetadataExtractor::GetOutputProcessUnitsCount() const {
+  const Vector<flatbuffers::Offset<tflite::ProcessUnit>>* output_process_units =
+      GetOutputProcessUnits();
+  return output_process_units == nullptr ? 0 : output_process_units->size();
 }
 
 }  // namespace metadata

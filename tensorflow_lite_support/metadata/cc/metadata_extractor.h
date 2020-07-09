@@ -104,6 +104,32 @@ class ModelMetadataExtractor {
   // In particular, 0 is returned when there is no metadata.
   int GetOutputTensorCount() const;
 
+  // Gets the input process units from SubgraphMetadata.input_process_units,
+  // could be nullptr.
+  const flatbuffers::Vector<flatbuffers::Offset<tflite::ProcessUnit>>*
+  GetInputProcessUnits() const;
+
+  // Gets the input process unit specified by the given index, or nullptr in
+  // case there is no input process unit or the index is out of range.
+  const tflite::ProcessUnit* GetInputProcessUnit(int index) const;
+
+  // Gets the count of input process units. In particular, 0 is returned when
+  // there is no input process units.
+  int GetInputProcessUnitsCount() const;
+
+  // Gets the output process units from SubgraphMetadata.output_process_units,
+  // could be nullptr.
+  const flatbuffers::Vector<flatbuffers::Offset<tflite::ProcessUnit>>*
+  GetOutputProcessUnits() const;
+
+  // Gets the output process unit specified by the given index, or nullptr in
+  // case there is no output process unit or the index is out of range.
+  const tflite::ProcessUnit* GetOutputProcessUnit(int index) const;
+
+  // Gets the count of output process units. In particular, 0 is returned when
+  // there is no output process units.
+  int GetOutputProcessUnitsCount() const;
+
  private:
   static constexpr int kDefaultSubgraphIndex = 0;
   // Private default constructor, called from CreateFromModel().

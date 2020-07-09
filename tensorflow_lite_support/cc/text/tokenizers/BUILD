@@ -149,3 +149,22 @@ android_library(
         ":sentencepiece_runtime",  # build_cleaner: skip
     ],
 )
+
+cc_library(
+    name = "tokenizer_utils",
+    srcs = ["tokenizer_utils.cc"],
+    hdrs = [
+        "tokenizer_utils.h",
+    ],
+    deps = [
+        ":bert_tokenizer",
+        ":sentencepiece_tokenizer",
+        ":tokenizer",
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
+        "//tensorflow_lite_support/metadata/cc:metadata_extractor",
+        "@com_google_absl//absl/status",
+    ],
+)
