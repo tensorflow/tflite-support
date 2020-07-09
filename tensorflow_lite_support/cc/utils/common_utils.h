@@ -13,15 +13,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package org.tensorflow.lite.support.metadata;
+#ifndef TENSORFLOW_LITE_SUPPORT_CC_UTILS_COMMON_UTILS_H_
+#define TENSORFLOW_LITE_SUPPORT_CC_UTILS_COMMON_UTILS_H_
 
-/** Information about the metadata parser that this metadata extractor library is depending on. */
-public final class MetadataParser {
-  /**
-   * The version of the metadata parser that this metadata extractor library is depending on. The
-   * value should match the value of "Schema Semantic version" in metadata_schema.fbs.
-   */
-  public static final String VERSION = "1.2.0";
+#include <string>
+#include <vector>
 
-  private MetadataParser() {}
-}
+namespace tflite {
+namespace support {
+namespace utils {
+
+// read a vocab file, create a vector of strings
+std::vector<std::string> LoadVocabFromFile(const std::string& path_to_vocab);
+
+std::vector<std::string> LoadVocabFromBuffer(const char* vocab_buffer_data,
+                                             const size_t vocab_buffer_size);
+}  // namespace utils
+}  // namespace support
+}  // namespace tflite
+
+#endif  // TENSORFLOW_LITE_SUPPORT_CC_UTILS_COMMON_UTILS_H_
