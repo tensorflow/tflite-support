@@ -12,12 +12,35 @@ http_archive(
     ],
 )
 
+# Apple and Swift rules.
+# https://github.com/bazelbuild/rules_apple/releases
+http_archive(
+    name = "build_bazel_rules_apple",
+    sha256 = "ee9e6073aeb5a65c100cb9c44b0017c937706a4ae03176e14a7e78620a198079",
+    strip_prefix = "rules_apple-5131f3d46794bf227d296c82f30c2499c9de3c5b",
+    urls = [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_apple/archive/5131f3d46794bf227d296c82f30c2499c9de3c5b.tar.gz",
+        "https://github.com/bazelbuild/rules_apple/archive/5131f3d46794bf227d296c82f30c2499c9de3c5b.tar.gz",
+    ],
+)
+
+# https://github.com/bazelbuild/rules_swift/releases
+http_archive(
+    name = "build_bazel_rules_swift",
+    sha256 = "d0833bc6dad817a367936a5f902a0c11318160b5e80a20ece35fb85a5675c886",
+    strip_prefix = "rules_swift-3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8",
+    urls = [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_swift/archive/3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8.tar.gz",
+        "https://github.com/bazelbuild/rules_swift/archive/3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8.tar.gz",
+    ],
+)
+
 http_archive(
     name = "org_tensorflow",
-    sha256 = "bb8b10da8184ce747f0348ea5b0d0aaf9e9bbe63cf68363d0e1bcdb72b4d3315",
-    strip_prefix = "tensorflow-5d49dc5526324443931a33cc84d66c8bcae9cea2",
+    sha256 = "972ec45352161e4308a1b203956eedfb56e22cc6ce4f4ec95f7b087aeb00559e",
+    strip_prefix = "tensorflow-2.3.0-rc0",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/5d49dc5526324443931a33cc84d66c8bcae9cea2.zip",  # 2020-06-13
+        "https://github.com/tensorflow/tensorflow/archive/v2.3.0-rc0.tar.gz",
     ],
 )
 
@@ -47,17 +70,6 @@ http_archive(
 )
 
 http_archive(
-    name = "com_google_absl",
-    build_file = "//third_party:com_google_absl.BUILD",
-    sha256 = "f368a8476f4e2e0eccf8a7318b98dafbe30b2600f4e3cf52636e5eb145aba06a",
-    strip_prefix = "abseil-cpp-df3ea785d8c30a9503321a3d35ee7d35808f190d",
-    urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/abseil/abseil-cpp/archive/df3ea785d8c30a9503321a3d35ee7d35808f190d.tar.gz",
-        "https://github.com/abseil/abseil-cpp/archive/df3ea785d8c30a9503321a3d35ee7d35808f190d.tar.gz",
-    ],
-)
-
-http_archive(
     name = "six_archive",
     build_file = "//third_party:six.BUILD",
     sha256 = "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73",
@@ -68,11 +80,94 @@ http_archive(
     ],
 )
 
+http_archive(
+    name = "com_google_sentencepiece",
+    strip_prefix = "sentencepiece-1.0.0",
+    sha256 = "c05901f30a1d0ed64cbcf40eba08e48894e1b0e985777217b7c9036cac631346",
+    urls = [
+        "https://github.com/google/sentencepiece/archive/1.0.0.zip",
+    ],
+)
+
+http_archive(
+    name = "org_tensorflow_text",
+    sha256 = "f64647276f7288d1b1fe4c89581d51404d0ce4ae97f2bcc4c19bd667549adca8",
+    strip_prefix = "text-2.2.0",
+    urls = [
+        "https://github.com/tensorflow/text/archive/v2.2.0.zip",
+    ],
+    patches = ["@//third_party:tensorflow_text_fix_local_config_tf.patch"],
+    patch_args = ["-p1"],
+    repo_mapping = {"@com_google_re2": "@com_googlesource_code_re2"},
+)
+
+http_archive(
+    name = "com_googlesource_code_re2",
+    sha256 = "d070e2ffc5476c496a6a872a6f246bfddce8e7797d6ba605a7c8d72866743bf9",
+    strip_prefix = "re2-506cfa4bffd060c06ec338ce50ea3468daa6c814",
+    urls = [
+        "https://github.com/google/re2/archive/506cfa4bffd060c06ec338ce50ea3468daa6c814.tar.gz",
+    ],
+)
+
+# ABSL cpp library lts_2020_02_25
+# Needed for absl/status
+http_archive(
+    name = "com_google_absl",
+    build_file = "//third_party:com_google_absl.BUILD",
+    urls = [
+        "https://github.com/abseil/abseil-cpp/archive/20200225.tar.gz",
+    ],
+    # Remove after https://github.com/abseil/abseil-cpp/issues/326 is solved.
+    patches = [
+        "@//third_party:com_google_absl_f863b622fe13612433fdf43f76547d5edda0c93001.diff"
+    ],
+    patch_args = [
+        "-p1",
+    ],
+    strip_prefix = "abseil-cpp-20200225",
+    sha256 = "728a813291bdec2aa46eab8356ace9f75ac2ed9dfe2df5ab603c4e6c09f1c353"
+)
+
+http_archive(
+    name = "com_google_glog",
+    sha256 = "1ee310e5d0a19b9d584a855000434bb724aa744745d5b8ab1855c85bff8a8e21",
+    strip_prefix = "glog-028d37889a1e80e8a07da1b8945ac706259e5fd8",
+    urls = [
+        "https://mirror.bazel.build/github.com/google/glog/archive/028d37889a1e80e8a07da1b8945ac706259e5fd8.tar.gz",
+        "https://github.com/google/glog/archive/028d37889a1e80e8a07da1b8945ac706259e5fd8.tar.gz",
+    ],
+)
+
+
+http_archive(
+    name = "zlib",
+    build_file = "//third_party:zlib.BUILD",
+    sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
+    strip_prefix = "zlib-1.2.11",
+    urls = [
+        "http://mirror.bazel.build/zlib.net/fossils/zlib-1.2.11.tar.gz",
+        "http://zlib.net/fossils/zlib-1.2.11.tar.gz",  # 2017-01-15
+    ],
+)
+
+http_archive(
+    name = "org_libzip",
+    build_file = "//third_party:libzip.BUILD",
+    sha256 = "a5d22f0c87a2625450eaa5e10db18b8ee4ef17042102d04c62e311993a2ba363",
+    strip_prefix = "libzip-rel-1-5-1",
+    urls = [
+        # Bazel does not like the official download link at libzip.org,
+        # so use the GitHub release tag.
+        "https://mirror.bazel.build/github.com/nih-at/libzip/archive/rel-1-5-1.zip",
+        "https://github.com/nih-at/libzip/archive/rel-1-5-1.zip",
+    ],
+)
+
+
 load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 
 flatbuffers()
-
-
 # Set up TF.
 load("@org_tensorflow//tensorflow:workspace.bzl", "tf_workspace")
 tf_workspace(tf_repo_name="@org_tensorflow")

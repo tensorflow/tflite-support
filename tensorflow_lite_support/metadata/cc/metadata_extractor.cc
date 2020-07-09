@@ -21,7 +21,7 @@ limitations under the License.
 #include "absl/status/status.h"
 #include "absl/strings/str_format.h"
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
-#include "third_party/libzip/lib/zip.h"
+#include "lib/zip.h"
 #include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow/lite/tools/verifier.h"
