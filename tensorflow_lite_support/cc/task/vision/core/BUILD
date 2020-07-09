@@ -24,7 +24,6 @@ cc_library(
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_utils",
         "//tensorflow_lite_support/cc/task/vision/utils:image_tensor_specs",
         "//tensorflow_lite_support/metadata:metadata_schema_cc",
-        "@com_google_absl//absl/base:core_headers",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/time",
@@ -39,7 +38,6 @@ cc_library(
     deps = [
         "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:statusor",
-        "@com_google_absl//absl/base:core_headers",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
