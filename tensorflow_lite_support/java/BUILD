@@ -5,12 +5,12 @@ load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
 load("@build_bazel_rules_android//android:rules.bzl", "android_library")
 
 package(
-    default_visibility = ["//tensorflow_lite_support:users"],
+    default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
 )
 
 android_library(
-    name = "tensorflow-lite-support",
+    name = "tensorflowlite_support",
     srcs = glob(
         ["src/java/org/tensorflow/lite/support/**/*.java"],
         exclude = ["src/java/org/tensorflow/lite/support/task/**/*.java"],
@@ -29,15 +29,14 @@ alias(
     actual = ":tensorflow-lite-support",
 )
 
-# This alias matches the style of lite/java naming for android_library targets. We keep the
-# `tensorflow-lite-support` variant to match the associated .aar library name output style.
+# This alias matches the associated .aar library name output style.
 alias(
-    name = "tensorflowlite_support",
-    actual = ":tensorflow-lite-support",
+    name = "tensorflow-lite-support",
+    actual = ":tensorflowlite_support",
 )
 
 java_library(
-    name = "tensorflow-lite-support-precondition",
+    name = "tensorflowlite_support_precondition_lib",
     srcs = ["src/java/org/tensorflow/lite/support/common/SupportPreconditions.java"],
     javacopts = JAVACOPTS,
     deps = [
@@ -46,7 +45,7 @@ java_library(
 )
 
 android_library(
-    name = "tensorflow-lite-support-precondition-lib-android",
+    name = "tensorflowlite_support_precondition",
     srcs = ["src/java/org/tensorflow/lite/support/common/SupportPreconditions.java"],
     javacopts = JAVACOPTS,
     manifest = "AndroidManifest.xml",
