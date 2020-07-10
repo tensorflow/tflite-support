@@ -12,8 +12,6 @@ major components:
     model does and how to use the model.
 *   **TFLite Support Codegen Tool**: an executable that generates model wrapper
     automatically based on the Support Library and the metadata.
-*   **TFLite Support Task Library**: a flexible and ready-to-use library for
-    common machine learning model types, such as classification and detection.
 
 TFLite Support library serves different tiers of deployment requirements from
 easy onboarding to fully customizable. There are three major use cases that
@@ -24,12 +22,6 @@ TFLite Support targets at:
     model interface (contains ready-to-use APIs) simply by passing the model to
     the codegen tool. The automatic codegen strategy is designed based on the
     TFLite metadata.
-
-*   **Provide optimized model interface for popular ML tasks**. \
-    The model interfaces provided by the TFLite Support Task Library are
-    specifically optimized compared to the codegen version in terms of both
-    usability and performance. Users can also swap their own custom models with
-    the default models in each task.
 
 *   **Provide the flexibility to customize model interface and build inference
     pipelines**. \
