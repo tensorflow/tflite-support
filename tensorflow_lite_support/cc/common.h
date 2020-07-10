@@ -101,6 +101,9 @@ enum class TfLiteSupportStatus {
   // none was found or it was empty.
   // E.g. current task requires labels but none were found.
   kMetadataMissingLabelsError,
+  // The ProcessingUnit for tokenizer is not correctly configured.
+  // E.g BertTokenizer doesn't have a valid vocab file associated.
+  kMetadataInvalidTokenizerError,
 
   // Input tensor(s) error codes.
 

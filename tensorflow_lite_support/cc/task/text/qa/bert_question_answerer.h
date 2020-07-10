@@ -97,9 +97,6 @@ class BertQuestionAnswerer : public QuestionAnswerer {
   static constexpr int kNumLiteThreads = 4;
   static constexpr bool kUseLowerCase = true;
 
-  // Constant for model metadata
-  static constexpr int kTokenizerProcessUnitIndex = 0;
-
   static StatusOr<std::unique_ptr<QuestionAnswerer>>
   CreateQuestionAnswererWithMetadata(
       const std::string& path_to_model_with_metadata);

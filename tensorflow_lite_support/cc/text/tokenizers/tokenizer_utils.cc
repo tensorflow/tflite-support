@@ -24,7 +24,6 @@ limitations under the License.
 
 namespace tflite::support::text::tokenizer {
 
-using ::absl::StatusCode;
 using ::tflite::ProcessUnit;
 using ::tflite::SentencePieceTokenizerOptions;
 using ::tflite::support::CreateStatusWithPayload;
@@ -35,7 +34,9 @@ StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromMetadata(
       metadata_extractor.GetInputProcessUnit(kTokenizerProcessUnitIndex);
   if (tokenizer_process_unit == nullptr) {
     return CreateStatusWithPayload(
-        StatusCode::kNotFound, "No input process unit found from metadata.");
+        absl::StatusCode::kInvalidArgument,
+        "No input process unit found from metadata.",
+        TfLiteSupportStatus::kMetadataInvalidTokenizerError);
   }
   if (tokenizer_process_unit->options_type() ==
       ProcessUnitOptions_BertTokenizerOptions) {
@@ -45,8 +46,9 @@ StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromMetadata(
     if (options->vocab_file() == nullptr || options->vocab_file()->size() < 1 ||
         options->vocab_file()->Get(0)->name() == nullptr) {
       return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          "Invalid vocab_file from input process unit.");
+          absl::StatusCode::kInvalidArgument,
+          "Invalid vocab_file from input process unit.",
+          TfLiteSupportStatus::kMetadataInvalidTokenizerError);
     }
     ASSIGN_OR_RETURN(vocab_buffer,
                      metadata_extractor.GetAssociatedFile(
@@ -64,8 +66,9 @@ StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromMetadata(
         options->sentencePiece_model()->size() < 1 ||
         options->sentencePiece_model()->Get(0)->name() == nullptr) {
       return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          "Invalid sentencePiece_model from input process unit.");
+          absl::StatusCode::kInvalidArgument,
+          "Invalid sentencePiece_model from input process unit.",
+          TfLiteSupportStatus::kMetadataInvalidTokenizerError);
     }
     ASSIGN_OR_RETURN(
         model_buffer,
@@ -74,12 +77,13 @@ StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromMetadata(
     // TODO(b/160647204): Extract sentence piece model vocabulary
     return absl::make_unique<SentencePieceTokenizer>(model_buffer.data(),
                                                      model_buffer.size());
+  } else {
+    return CreateStatusWithPayload(
+        absl::StatusCode::kNotFound,
+        absl::StrCat("Incorrect options_type:",
+                     tokenizer_process_unit->options_type()),
+        TfLiteSupportStatus::kMetadataInvalidTokenizerError);
   }
-
-  return CreateStatusWithPayload(
-      StatusCode::kNotFound,
-      absl::StrCat("Incorrect options_type:",
-                   tokenizer_process_unit->options_type()));
 }
 
 }  // namespace tflite::support::text::tokenizer
