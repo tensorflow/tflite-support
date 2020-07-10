@@ -30,7 +30,7 @@ android_local_test(
         ":test_lib",  # unuseddeps: keep
         "//tensorflow_lite_support/metadata:metadata_schema_fbs_android",
         "//tensorflow_lite_support/metadata:schema_fbs_android",
-        "//tensorflow_lite_support/metadata/java:tensorflow-lite-support-metadata",
+        "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
         "//third_party/java/checker_framework_annotations",
         "//third_party/java/jakarta_commons_io",
         "//third_party/java/truth:truth-android",
@@ -47,7 +47,7 @@ android_local_test(
     tags = ["no_oss"],
     test_class = "org.tensorflow.lite.support.metadata.ByteBufferChannelTest",
     deps = [
-        "//tensorflow_lite_support/metadata/java:tensorflow-lite-support-metadata",
+        "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
         "//third_party/java/truth:truth-android",
     ],
 )
@@ -64,7 +64,7 @@ android_local_test(
     test_class = "org.tensorflow.lite.support.metadata.ZipFileTest",
     deps = [
         ":test_lib",
-        "//tensorflow_lite_support/metadata/java:tensorflow-lite-support-metadata",
+        "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
         "//third_party/java/jakarta_commons_io",
         "//third_party/java/truth:truth-android",
     ],
@@ -79,7 +79,7 @@ android_local_test(
     tags = ["no_oss"],
     test_class = "org.tensorflow.lite.support.metadata.BoundedInputStreamTest",
     deps = [
-        "//tensorflow_lite_support/metadata/java:tensorflow-lite-support-metadata",
+        "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
         "//third_party/java/truth:truth-android",
     ],
 )
@@ -92,7 +92,7 @@ java_test(
     tags = ["no_oss"],
     test_class = "org.tensorflow.lite.support.metadata.MetadataParserTest",
     deps = [
-        "//tensorflow_lite_support/metadata/java:tensorflow-lite-support-metadata-lib",
+        "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata_lib",
         "//third_party/java/junit",
         "//third_party/java/truth",
     ],
