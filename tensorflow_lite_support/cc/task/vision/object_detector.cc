@@ -33,6 +33,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/class_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils.h"
+#include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {

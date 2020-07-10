@@ -22,7 +22,6 @@ limitations under the License.
 #include "absl/strings/string_view.h"
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/experimental/support/metadata/metadata_schema_generated.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
@@ -31,6 +30,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
+#include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
 namespace support {

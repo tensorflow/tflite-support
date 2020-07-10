@@ -26,6 +26,7 @@ cc_library(
         "//tensorflow_lite_support/cc/task/vision/proto:object_detector_options_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_utils",
         "//tensorflow_lite_support/metadata:metadata_schema_cc",
+        "//tensorflow_lite_support/metadata/cc:metadata_extractor",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
@@ -60,6 +61,8 @@ cc_library(
         "//tensorflow_lite_support/cc/task/vision/proto:image_classifier_options_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_utils",
         "//tensorflow_lite_support/cc/task/vision/utils:score_calibration",
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
+        "//tensorflow_lite_support/metadata/cc:metadata_extractor",
         "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/status",
@@ -69,7 +72,6 @@ cc_library(
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/experimental/support/metadata:metadata_schema_cc",
     ],
 )
 
@@ -93,6 +95,7 @@ cc_library(
         "//tensorflow_lite_support/cc/task/vision/proto:image_segmenter_options_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/proto:segmentations_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_utils",
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
         "//tensorflow_lite_support/metadata/cc:metadata_extractor",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
@@ -101,6 +104,5 @@ cc_library(
         "@flatbuffers",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/experimental/support/metadata:metadata_schema_cc",
     ],
 )
