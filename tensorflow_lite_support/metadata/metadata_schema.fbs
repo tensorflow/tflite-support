@@ -50,7 +50,7 @@ namespace tflite;
 // for which they were added.
 //
 // LINT.IfChange
-// Schema Semantic version: 1.2.0
+// Schema Semantic version: 1.2.1
 // LINT.ThenChange(//tensorflow_lite_support/\
 //     metadata/java/src/java/org/tensorflow/lite/support/metadata/\
 //     MetadataParser.java)
@@ -68,6 +68,7 @@ file_identifier "M001";
 //         Added output_process_units to SubGraphMetadata.
 // 1.2.0 - Added input_tensor_group to SubGraphMetadata.
 //         Added output_tensor_group to SubGraphMetadata.
+// 1.2.1 - Added RegexTokenizerOptions to ProcessUnitOptions.
 
 // File extension of any written files.
 file_extension "tflitemeta";
@@ -448,6 +449,19 @@ table SentencePieceTokenizerOptions {
   vocab_file:[AssociatedFile];
 }
 
+// Splits strings by the occurrences of pattern and converts the tokens into
+// ids. For example, given
+//   pattern: "\W+",
+//   string: "Words, words, words.",
+// the tokens after split are: "Words", "words", "words", "".
+// And then the tokens can be converted into ids according to the vocab_file.
+// Added in: 1.2.1
+table RegexTokenizerOptions {
+  pattern:string;
+  // The vocabulary files used to convert this tokens into ids.
+  vocab_file:[AssociatedFile];
+}
+
 // Options that are used when processing the tensor.
 union ProcessUnitOptions {
   NormalizationOptions,
@@ -456,7 +470,9 @@ union ProcessUnitOptions {
   // Added in: 1.1.0
   BertTokenizerOptions,
   // Added in: 1.1.0
-  SentencePieceTokenizerOptions
+  SentencePieceTokenizerOptions,
+  // Added in: 1.2.1
+  RegexTokenizerOptions
 }
 
 // A process unit that is used to process the tensor out-of-graph.
