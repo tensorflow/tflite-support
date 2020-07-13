@@ -222,12 +222,15 @@ class MetadataPopulator(object):
     Raises:
       ValueError: The metadata to be populated is empty.
       ValueError: The metadata does not have the expected flatbuffer identifer.
-      ValueError: Error occurs when getting the minimum metadata parser version.
+      ValueError: Cannot get minimum metadata parser version.
+      ValueError: The number of SubgraphMetadata is not 1.
+      ValueError: The number of input/output tensors does not match the number
+        of input/output tensor metadata.
     """
     if not metadata_buf:
       raise ValueError("The metadata to be populated is empty.")
 
-    _assert_metadata_buffer_identifier(metadata_buf)
+    self._validate_metadata(metadata_buf)
 
     # Gets the minimum metadata parser version of the metadata_buf.
     min_version = _pywrap_metadata_version.GetMinimumMetadataParserVersion(
@@ -252,7 +255,12 @@ class MetadataPopulator(object):
 
     Raises:
       IOError: File not found.
+      ValueError: The metadata to be populated is empty.
       ValueError: The metadata does not have the expected flatbuffer identifer.
+      ValueError: Cannot get minimum metadata parser version.
+      ValueError: The number of SubgraphMetadata is not 1.
+      ValueError: The number of input/output tensors does not match the number
+        of input/output tensor metadata.
     """
     _assert_exist(metadata_file)
     with open(metadata_file, "rb") as f:
@@ -398,6 +406,40 @@ class MetadataPopulator(object):
     else:
       with open(self._model_file, "wb") as f:
         f.write(model_buf)
+
+  def _validate_metadata(self, metadata_buf):
+    """Validates the metadata to be populated."""
+    _assert_metadata_buffer_identifier(metadata_buf)
+
+    # Verify the number of SubgraphMetadata is exactly one.
+    # TFLite currently only support one subgraph.
+    model_meta = _metadata_fb.ModelMetadata.GetRootAsModelMetadata(
+        metadata_buf, 0)
+    if model_meta.SubgraphMetadataLength() != 1:
+      raise ValueError("The number of SubgraphMetadata should be exactly one, "
+                       "but got {0}.".format(
+                           model_meta.SubgraphMetadataLength()))
+
+    # Verify if the number of tensor metadata matches the number of tensors.
+    with open(self._model_file, "rb") as f:
+      model_buf = f.read()
+    model = _schema_fb.Model.GetRootAsModel(model_buf, 0)
+
+    num_input_tensors = model.Subgraphs(0).InputsLength()
+    num_input_meta = model_meta.SubgraphMetadata(0).InputTensorMetadataLength()
+    if num_input_tensors != num_input_meta:
+      raise ValueError(
+          "The number of input tensors ({0}) should match the number of "
+          "input tensor metadata ({1})".format(num_input_tensors,
+                                               num_input_meta))
+    num_output_tensors = model.Subgraphs(0).OutputsLength()
+    num_output_meta = model_meta.SubgraphMetadata(
+        0).OutputTensorMetadataLength()
+    if num_output_tensors != num_output_meta:
+      raise ValueError(
+          "The number of output tensors ({0}) should match the number of "
+          "output tensor metadata ({1})".format(num_output_tensors,
+                                                num_output_meta))
 
 
 class _MetadataPopulatorWithBuffer(MetadataPopulator):

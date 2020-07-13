@@ -2,6 +2,12 @@
   "name": "Mobilenet_quantized",
   "subgraph_metadata": [
     {
+      "input_tensor_metadata": [
+        {
+        },
+        {
+        }
+      ],
       "output_tensor_metadata": [
         {
           "associated_files": [
