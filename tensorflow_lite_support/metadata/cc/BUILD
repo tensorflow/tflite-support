@@ -12,28 +12,6 @@ stamp_metadata_parser_version(
 )
 
 cc_library(
-    name = "metadata_extractor",
-    srcs = ["metadata_extractor.cc"],
-    hdrs = ["metadata_extractor.h"],
-    deps = [
-        "//tensorflow_lite_support/cc:common",
-        "//tensorflow_lite_support/cc/port:status_macros",
-        "//tensorflow_lite_support/cc/port:statusor",
-        "//tensorflow_lite_support/metadata:metadata_schema_cc",
-        "@com_google_absl//absl/container:flat_hash_map",
-        "@com_google_absl//absl/memory",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/strings:str_format",
-        "@flatbuffers",
-        "@org_libzip//:zip",
-        "@org_tensorflow//tensorflow/lite:framework",
-        "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
-        "@org_tensorflow//tensorflow/lite/tools:verifier",
-    ],
-)
-
-cc_library(
     name = "metadata_version",
     srcs = ["metadata_version.cc"],
     hdrs = [
