@@ -9,11 +9,12 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files(["AndroidManifest.xml"])
+
 android_library(
     name = "tensorflowlite_support",
     srcs = glob(
         ["src/java/org/tensorflow/lite/support/**/*.java"],
-        exclude = ["src/java/org/tensorflow/lite/support/task/**/*.java"],
     ),
     javacopts = JAVACOPTS,
     manifest = "AndroidManifest.xml",
