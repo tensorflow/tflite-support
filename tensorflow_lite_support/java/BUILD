@@ -19,6 +19,7 @@ android_library(
     javacopts = JAVACOPTS,
     manifest = "AndroidManifest.xml",
     deps = [
+        "@com_google_auto_value",
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
     ],

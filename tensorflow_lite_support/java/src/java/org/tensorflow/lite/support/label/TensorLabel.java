@@ -198,7 +198,7 @@ public class TensorLabel {
     List<Category> result = new ArrayList<>();
     int i = 0;
     for (String label : labels) {
-      result.add(new Category(label, data[i]));
+      result.add(Category.create(label, data[i]));
       i += 1;
     }
     return result;

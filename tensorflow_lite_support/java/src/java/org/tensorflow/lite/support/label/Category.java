@@ -15,48 +15,23 @@ limitations under the License.
 
 package org.tensorflow.lite.support.label;
 
-import java.util.Objects;
+import com.google.auto.value.AutoValue;
+import org.tensorflow.lite.annotations.UsedByReflection;
 
 /**
  * Category is a util class, contains a label and a float value. Typically it's used as result of
  * classification tasks.
  */
-public final class Category {
-  private final String label;
-  private final float score;
+@AutoValue
+@UsedByReflection("ClassifierJNI")
+public abstract class Category {
 
-  /** Constructs a Category. */
-  public Category(String label, float score) {
-    this.label = label;
-    this.score = score;
+  @UsedByReflection("ClassifierJNI")
+  public static Category create(String label, float score) {
+    return new AutoValue_Category(label, score);
   }
 
-  /** Gets the reference of category's label. */
-  public String getLabel() {
-    return label;
-  }
+  public abstract String getLabel();
 
-  /** Gets the score of the category. */
-  public float getScore() {
-    return score;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (o instanceof Category) {
-      Category other = (Category) o;
-      return (other.getLabel().equals(this.label) && other.getScore() == this.score);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(label, score);
-  }
-
-  @Override
-  public String toString() {
-    return "<Category \"" + label + "\" (score=" + score + ")>";
-  }
+  public abstract float getScore();
 }
