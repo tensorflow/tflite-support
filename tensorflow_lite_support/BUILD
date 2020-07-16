@@ -16,3 +16,20 @@ package_group(
         "//third_party/py/tensorflow_examples/...",
     ],
 )
+
+# Config setting for determining if we are building for Android.
+config_setting(
+    name = "android",
+    values = {"crosstool_top": "//external:android/crosstool"},
+    visibility = ["//visibility:public"],
+)
+
+# Config setting for determining if we are building for macos.
+config_setting(
+    name = "macos",
+    values = {
+        "apple_platform_type": "macos",
+        "cpu": "darwin",
+    },
+    visibility = ["//visibility:public"],
+)
