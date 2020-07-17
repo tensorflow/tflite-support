@@ -20,6 +20,7 @@ import static org.tensorflow.lite.support.metadata.Preconditions.checkArgument;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Set;
 import java.util.zip.ZipException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.tensorflow.lite.schema.Tensor;
@@ -163,6 +164,17 @@ public class MetadataExtractor {
   public InputStream getAssociatedFile(String fileName) {
     assertZipFile();
     return zipFile.getRawInputStream(fileName);
+  }
+
+  /**
+   * Gets the file names of the associated files.
+   *
+   * @return the file names of the associated files
+   * @throws IllegalStateException if the model is not a zip file
+   */
+  public Set<String> getAssociatedFileNames() {
+    assertZipFile();
+    return zipFile.getFileNames();
   }
 
   /** Gets the count of input tensors in the model. */

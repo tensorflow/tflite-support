@@ -29,7 +29,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Test;
@@ -154,6 +156,28 @@ public class MetadataExtractorTest {
       assertThat(exception)
           .hasMessageThat()
           .contains("This model does not contain associated files, and is not a Zip file.");
+    }
+
+    @Test
+    public void getAssociatedFileNames_nonZipModel_throwsException() throws Exception {
+      // Creates a model flatbuffer with metadata.
+      ByteBuffer modelWithMetadata = createModelByteBuffer();
+
+      MetadataExtractor metadataExtractor = new MetadataExtractor(modelWithMetadata);
+      IllegalStateException exception =
+          assertThrows(IllegalStateException.class, metadataExtractor::getAssociatedFileNames);
+      assertThat(exception)
+          .hasMessageThat()
+          .contains("This model does not contain associated files, and is not a Zip file.");
+    }
+
+    @Test
+    public void getAssociatedFileNames_validFileNames() throws Exception {
+      ByteBuffer mobileNetBuffer = loadMobileNetBuffer();
+      MetadataExtractor mobileNetMetadataExtractor = new MetadataExtractor(mobileNetBuffer);
+      Set<String> expectedSet = new HashSet<>();
+      expectedSet.add(VALID_LABEL_FILE_NAME);
+      assertThat(mobileNetMetadataExtractor.getAssociatedFileNames()).isEqualTo(expectedSet);
     }
 
     @Test
