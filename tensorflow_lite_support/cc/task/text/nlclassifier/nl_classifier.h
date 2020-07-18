@@ -16,7 +16,20 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_NL_CLASSIFIER_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_NL_CLASSIFIER_H_
 
+#include <stddef.h>
+#include <string.h>
+
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "absl/status/status.h"
+#include "absl/status/statusor.h"
+#include "flatbuffers/flatbuffers.h"  // from @flatbuffers
+#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/core/api/op_resolver.h"
+#include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/string_type.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/base_task_api.h"
@@ -33,8 +46,7 @@ struct NLClassifierOptions {
   int input_tensor_index = 0;
   int output_score_tensor_index = 0;
   // By default there is no output label tensor. The label file can be attached
-  // to the output score tensor metadata. See NLClassifier for more
-  // information.
+  // to the output score tensor metadata.
   int output_label_tensor_index = -1;
   std::string input_tensor_name = "INPUT";
   std::string output_score_tensor_name = "OUTPUT_SCORE";
@@ -93,15 +105,30 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
   std::vector<core::Category> Classify(const std::string& text);
 
  protected:
+  static constexpr int kOutputTensorIndex = 0;
+  static constexpr int kOutputTensorLabelFileIndex = 0;
+
+  absl::Status Initialize(const NLClassifierOptions& options);
   const NLClassifierOptions& GetOptions() const;
-  void SetOptions(const NLClassifierOptions& options);
-  void SetLabelsVector(std::unique_ptr<std::vector<std::string>> labels_vector);
+
+  // Try to extract attached label file from metadata and initialize
+  // labels_vector_, return error if metadata type is incorrect or no label file
+  // is attached in metadata.
+  absl::Status TrySetLabelFromMetadata(const TensorMetadata* metadata);
+
+  // Pass through the input text into model's input tensor.
   absl::Status Preprocess(const std::vector<TfLiteTensor*>& input_tensors,
                           const std::string& input) override;
 
+  // Extract model output and create results with output label tensor or label
+  // file attached in metadata. If no output label tensor or label file is
+  // found, use output score index as labels.
   StatusOr<std::vector<core::Category>> Postprocess(
       const std::vector<const TfLiteTensor*>& output_tensors,
       const std::string& input) override;
+
+  std::vector<core::Category> BuildResults(const TfLiteTensor* scores,
+                                           const TfLiteTensor* labels);
 
   // Gets the tensor from a vector of tensors by checking tensor name first and
   // tensor index second, return nullptr if no tensor is found.
@@ -110,7 +137,7 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
       const std::vector<TensorType*>& tensors,
       const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
           metadata_array,
-      const std::string& name, int index)  {
+      const std::string& name, int index) {
     if (metadata_array != nullptr && metadata_array->size() == tensors.size()) {
       for (int i = 0; i < metadata_array->size(); i++) {
         if (strcmp(name.data(), metadata_array->Get(i)->name()->c_str()) == 0) {
@@ -126,10 +153,6 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
     }
     return index >= 0 && index < tensors.size() ? tensors[index] : nullptr;
   }
-
-  // Set options and validate model with options.
-  static absl::Status CheckStatusAndSetOptions(
-      const NLClassifierOptions& options, NLClassifier* nl_classifier);
 
  private:
   NLClassifierOptions options_;

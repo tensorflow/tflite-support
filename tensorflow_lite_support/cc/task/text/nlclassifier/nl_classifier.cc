@@ -15,8 +15,24 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
 
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "absl/algorithm/container.h"
+#include "absl/status/status.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/string_view.h"
+#include "flatbuffers/flatbuffers.h"  // from @flatbuffers
+#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/core/api/op_resolver.h"
+#include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
 #include "tensorflow_lite_support/cc/common.h"
+#include "tensorflow_lite_support/cc/port/status_macros.h"
+#include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/core/category.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
 #include "tensorflow_lite_support/cc/utils/common_utils.h"
@@ -40,13 +56,42 @@ using ::tflite::support::utils::LoadVocabFromBuffer;
 
 const NLClassifierOptions& NLClassifier::GetOptions() const { return options_; }
 
-void NLClassifier::SetOptions(const NLClassifierOptions& options) {
-  options_ = options;
-}
-
-void NLClassifier::SetLabelsVector(
-    std::unique_ptr<std::vector<std::string>> labels_vector) {
-  labels_vector_ = std::move(labels_vector);
+absl::Status NLClassifier::TrySetLabelFromMetadata(
+    const TensorMetadata* metadata) {
+  if (metadata == nullptr) {
+    return CreateStatusWithPayload(absl::StatusCode::kInvalidArgument,
+                                   "Metadata not found for output tensor",
+                                   TfLiteSupportStatus::kMetadataNotFoundError);
+  }
+  const auto* associated_files = metadata->associated_files();
+  if (associated_files == nullptr || associated_files->size() == 0) {
+    return CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        "No label file found for tensor metadata.",
+        TfLiteSupportStatus::kMetadataMissingLabelsError);
+  }
+  const tflite::AssociatedFile* associated_file =
+      associated_files->Get(kOutputTensorLabelFileIndex);
+  if (associated_file->type() != AssociatedFileType_TENSOR_AXIS_LABELS) {
+    return CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        "Incorrect label type found for tensor metadata.",
+        TfLiteSupportStatus::kMetadataMissingLabelsError);
+  }
+  StatusOr<absl::string_view> label_buffer =
+      GetMetadataExtractor()->GetAssociatedFile(
+          associated_files->Get(kOutputTensorIndex)->name()->str());
+  if (label_buffer.ok()) {
+    labels_vector_ =
+        absl::make_unique<std::vector<std::string>>(LoadVocabFromBuffer(
+            label_buffer.value().data(), label_buffer.value().size()));
+    return absl::OkStatus();
+  } else {
+    return CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        "Failed to extract label file from metadata.",
+        TfLiteSupportStatus::kMetadataMissingLabelsError);
+  }
 }
 
 std::vector<core::Category> NLClassifier::Classify(const std::string& text) {
@@ -68,15 +113,20 @@ absl::Status NLClassifier::Preprocess(
 StatusOr<std::vector<core::Category>> NLClassifier::Postprocess(
     const std::vector<const TfLiteTensor*>& output_tensors,
     const std::string& /*input*/) {
-  auto scores = FindTensorWithNameOrIndex(
-      output_tensors, GetMetadataExtractor()->GetOutputTensorMetadata(),
-      options_.output_score_tensor_name, options_.output_score_tensor_index);
-  auto labels_tensor = FindTensorWithNameOrIndex(
-      output_tensors, GetMetadataExtractor()->GetInputTensorMetadata(),
-      options_.output_label_tensor_name, options_.output_label_tensor_index);
+  return BuildResults(
+      FindTensorWithNameOrIndex(
+          output_tensors, GetMetadataExtractor()->GetOutputTensorMetadata(),
+          options_.output_score_tensor_name,
+          options_.output_score_tensor_index),
+      FindTensorWithNameOrIndex(
+          output_tensors, GetMetadataExtractor()->GetInputTensorMetadata(),
+          options_.output_label_tensor_name,
+          options_.output_label_tensor_index));
+}
 
-  bool use_index_as_labels =
-      (labels_vector_ == nullptr) && (labels_tensor == nullptr);
+std::vector<core::Category> NLClassifier::BuildResults(
+    const TfLiteTensor* scores, const TfLiteTensor* labels) {
+  bool use_index_as_labels = (labels_vector_ == nullptr) && (labels == nullptr);
   // Some models output scores with transposed shape [1, categories]
   int categories =
       scores->dims->size == 2 ? scores->dims->data[1] : scores->dims->data[0];
@@ -92,7 +142,7 @@ StatusOr<std::vector<core::Category>> NLClassifier::Postprocess(
     if (use_index_as_labels) {
       label = std::to_string(index);
     } else if (labels_vector_ == nullptr) {
-      label = GetStringAtIndex(labels_tensor, index);
+      label = GetStringAtIndex(labels, index);
     } else {
       label = (*labels_vector_)[index];
     }
@@ -108,14 +158,11 @@ StatusOr<std::vector<core::Category>> NLClassifier::Postprocess(
 
   return predictions;
 }
-
-absl::Status NLClassifier::CheckStatusAndSetOptions(
-    const NLClassifierOptions& options, NLClassifier* nl_classifier) {
-  nl_classifier->SetOptions(options);
+absl::Status NLClassifier::Initialize(const NLClassifierOptions& options) {
+  options_ = options;
   // input tensor should be type STRING
   auto input_tensor = FindTensorWithNameOrIndex(
-      nl_classifier->GetInputTensors(),
-      nl_classifier->GetMetadataExtractor()->GetInputTensorMetadata(),
+      GetInputTensors(), GetMetadataExtractor()->GetInputTensorMetadata(),
       options.input_tensor_name, options.input_tensor_index);
   if (input_tensor == nullptr) {
     return CreateStatusWithPayload(
@@ -136,10 +183,9 @@ absl::Status NLClassifier::CheckStatusAndSetOptions(
 
   // output score tensor should be type
   // UINT8/INT8/INT16(quantized) or FLOAT32/FLOAT64(dequantized)
-  std::vector<const TfLiteTensor*> output_tensors =
-      nl_classifier->GetOutputTensors();
+  std::vector<const TfLiteTensor*> output_tensors = GetOutputTensors();
   const Vector<Offset<TensorMetadata>>* output_tensor_metadatas =
-      nl_classifier->GetMetadataExtractor()->GetOutputTensorMetadata();
+      GetMetadataExtractor()->GetOutputTensorMetadata();
 
   const auto scores = FindTensorWithNameOrIndex(
       output_tensors, output_tensor_metadatas, options.output_score_tensor_name,
@@ -171,33 +217,28 @@ absl::Status NLClassifier::CheckStatusAndSetOptions(
     for (const auto& metadata : *output_tensor_metadatas) {
       if (metadata->name() &&
           metadata->name()->string_view() == options.output_score_tensor_name) {
-        const auto associated_files = metadata->associated_files();
-        if (associated_files && associated_files->size() >= 0 &&
-            associated_files->Get(0)->name()) {
-          StatusOr<absl::string_view> label_buffer =
-              nl_classifier->GetMetadataExtractor()->GetAssociatedFile(
-                  associated_files->Get(0)->name()->str());
-          if (label_buffer.ok()) {
-            nl_classifier->SetLabelsVector(
-                absl::make_unique<std::vector<std::string>>(LoadVocabFromBuffer(
-                    label_buffer.value().data(), label_buffer.value().size())));
-          }
+        if (TrySetLabelFromMetadata(metadata).ok()) {
+          return absl::OkStatus();
         }
       }
     }
   }
 
-  // output label tensor should be type STRING if the one exists
-  auto labels = FindTensorWithNameOrIndex(
-      output_tensors, output_tensor_metadatas, options.output_label_tensor_name,
-      options.output_label_tensor_index);
-  if (labels != nullptr && labels->type != kTfLiteString) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrCat("Type mismatch for label tensor ", scores->name,
-                     ". Requested STRING, got ",
-                     TfLiteTypeGetName(scores->type), "."),
-        TfLiteSupportStatus::kInvalidOutputTensorTypeError);
+  // If labels_vector_ is not set up from metadata, try register output label
+  // tensor from options.
+  if (labels_vector_ == nullptr) {
+    // output label tensor should be type STRING if the one exists
+    auto labels = FindTensorWithNameOrIndex(
+        output_tensors, output_tensor_metadatas,
+        options.output_label_tensor_name, options.output_label_tensor_index);
+    if (labels != nullptr && labels->type != kTfLiteString) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrCat("Type mismatch for label tensor ", scores->name,
+                       ". Requested STRING, got ",
+                       TfLiteTypeGetName(scores->type), "."),
+          TfLiteSupportStatus::kInvalidOutputTensorTypeError);
+    }
   }
   return absl::OkStatus();
 }
@@ -211,7 +252,7 @@ StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateNLClassifier(
       nl_classifier,
       core::TaskAPIFactory::CreateFromBuffer<NLClassifier>(
           model_buffer_data, model_buffer_size, std::move(resolver)));
-  RETURN_IF_ERROR(CheckStatusAndSetOptions(options, nl_classifier.get()));
+  RETURN_IF_ERROR(nl_classifier->Initialize(options));
   return std::move(nl_classifier);
 }
 
@@ -222,7 +263,7 @@ StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateNLClassifier(
   ASSIGN_OR_RETURN(nl_classifier,
                    core::TaskAPIFactory::CreateFromFile<NLClassifier>(
                        path_to_model, std::move(resolver)));
-  RETURN_IF_ERROR(CheckStatusAndSetOptions(options, nl_classifier.get()));
+  RETURN_IF_ERROR(nl_classifier->Initialize(options));
   return std::move(nl_classifier);
 }
 
@@ -233,7 +274,7 @@ StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateNLClassifier(
   ASSIGN_OR_RETURN(nl_classifier,
                    core::TaskAPIFactory::CreateFromFileDescriptor<NLClassifier>(
                        fd, std::move(resolver)));
-  RETURN_IF_ERROR(CheckStatusAndSetOptions(options, nl_classifier.get()));
+  RETURN_IF_ERROR(nl_classifier->Initialize(options));
   return std::move(nl_classifier);
 }
 
