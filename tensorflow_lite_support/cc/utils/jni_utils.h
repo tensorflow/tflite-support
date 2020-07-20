@@ -28,7 +28,15 @@ namespace tflite {
 namespace support {
 namespace utils {
 
+const char kIllegalArgumentException[] = "java/lang/IllegalArgumentException";
 const char kIllegalStateException[] = "java/lang/IllegalStateException";
+const char kNullPointerException[] = "java/lang/NullPointerException";
+const char kIndexOutOfBoundsException[] = "java/lang/IndexOutOfBoundsException";
+const char kUnsupportedOperationException[] =
+    "java/lang/UnsupportedOperationException";
+const char kAssertionError[] = "java/lang/AssertionError";
+
+constexpr int kInvalidPointer = 0;
 
 // Check if t is nullptr, throw IllegalStateException if it is.
 // Used to verify different types of jobjects are correctly created from jni.
@@ -41,7 +49,8 @@ T CheckNotNull(JNIEnv* env, T&& t) {
   return std::forward<T>(t);
 }
 
-// Convert a vector<T> into an Java ArrayList using a converter.
+// Converts a std::vector<T> into a Java ArrayList using a converter, which
+// processes a single element in the vector before adding it to the ArrayList.
 template <typename T>
 jobject ConvertVectorToArrayList(JNIEnv* env, const std::vector<T>& results,
                                  std::function<jobject(T)> converter) {
@@ -67,6 +76,9 @@ std::vector<std::string> StringListToVector(JNIEnv* env, jobject list_object);
 
 // Gets a mapped file buffer from a java object representing a file.
 absl::string_view GetMappedFileBuffer(JNIEnv* env, const jobject& file_buffer);
+
+void ThrowException(JNIEnv* env, const char* clazz, const char* fmt, ...);
+
 }  // namespace utils
 }  // namespace support
 }  // namespace tflite
