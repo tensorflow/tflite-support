@@ -24,7 +24,7 @@ namespace support {
 
 // Name (aka type URL key) of the `absl::Status` payload which contains a
 // stringified `TfLiteSupportStatus` code (see below).
-inline constexpr absl::string_view kTfLiteSupportPayload =
+constexpr absl::string_view kTfLiteSupportPayload =
     "tflite::support::TfLiteSupportStatus";
 
 // Error codes for TensorFlow Lite Support (TFLS) C++ APIs.
