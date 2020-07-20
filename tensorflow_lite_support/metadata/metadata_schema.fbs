@@ -307,11 +307,11 @@ table Content {
   //
   // The output tensor of scores of the above object detection model has shape
   // [1, 10], where
-  // dimension 0 is the batch axis;
-  // dimension 1 is the scores of the 10 detected objects.
-  // Since the content dimension (dimension 1) is overlapped with the index
-  // dimension (also dimension 0), set "range" to the number of dimensions,
-  // which is {min=2; max=2;} in this example to denote this special case.
+  // dimension 0: the batch axis;
+  // dimension 1: the scores of the 10 detected objects.
+  // Set "range" to the number of dimensions which is {min=2; max=2;} to denote
+  // that every element in the tensor is an individual content object, i.e. a
+  // score in this example.
   //
   // Another example is the pose estimation model
   // (https://www.tensorflow.org/lite/models/pose_estimation/overview).
