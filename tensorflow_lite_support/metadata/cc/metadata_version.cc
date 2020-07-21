@@ -44,6 +44,7 @@ enum class SchemaMembers {
   kProcessUnitOptionsSentencePieceTokenizerOptions = 4,
   kSubGraphMetadataInputTensorGroups = 5,
   kSubGraphMetadataOutputTensorGroups = 6,
+  kProcessUnitOptionsRegexTokenizerOptions = 7,
 };
 
 // Helper class to compare semantic versions in terms of three integers, major,
@@ -104,6 +105,8 @@ Version GetMemberVersion(SchemaMembers member) {
       return Version(1, 2, 0);
     case SchemaMembers::kSubGraphMetadataOutputTensorGroups:
       return Version(1, 2, 0);
+    case SchemaMembers::kProcessUnitOptionsRegexTokenizerOptions:
+      return Version(1, 2, 1);
     default:
       // Should never happen.
       TFLITE_LOG(FATAL) << "Unsupported schema member: "
@@ -163,6 +166,12 @@ void UpdateMinimumVersionForTable<tflite::ProcessUnit>(
     UpdateMinimumVersion(
         GetMemberVersion(
             SchemaMembers::kProcessUnitOptionsSentencePieceTokenizerOptions),
+        min_version);
+  }
+  if (process_unit_type == ProcessUnitOptions_RegexTokenizerOptions) {
+    UpdateMinimumVersion(
+        GetMemberVersion(
+            SchemaMembers::kProcessUnitOptionsRegexTokenizerOptions),
         min_version);
   }
 }
