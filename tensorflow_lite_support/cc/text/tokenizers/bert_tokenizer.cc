@@ -65,9 +65,8 @@ WordpieceTokenizerResult BertTokenizer::TokenizeWordpiece(
   std::vector<int>& wp_absolute_end_offset = result.wp_end_offset;
 
   std::vector<absl::string_view> tokens;
-  // NO lint as int64 is not defined in tensorflow lite scope
-  std::vector<long long> begin_offsets;  // NOLINT
-  std::vector<long long> end_offsets;    // NOLINT
+  std::vector<tensorflow::int64> begin_offsets;
+  std::vector<tensorflow::int64> end_offsets;
 
   // Run through tokenize function
   tensorflow::text::RegexSplit(input, delim_re_, true, include_delim_re_,
