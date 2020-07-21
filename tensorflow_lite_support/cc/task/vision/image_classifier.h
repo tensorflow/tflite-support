@@ -51,13 +51,24 @@ namespace vision {
 //    - only RGB inputs are supported (`channels` is required to be 3).
 //    - if type is kTfLiteFloat32, NormalizationOptions are required to be
 //      attached to the metadata for input normalization.
-// At least one output tensor with `N `classes and either 2 or 4 dimensions:
+// At least one output tensor with:
 //   (kTfLiteUInt8/kTfLiteFloat32)
-//    - `[1 x N]`
-//    - `[1 x 1 x 1 x N]`
+//    -  `N `classes and either 2 or 4 dimensions, i.e. `[1 x N]` or
+//       `[1 x 1 x 1 x N]`
+//    - optional (but recommended) label map(s) as AssociatedFile-s with type
+//      TENSOR_AXIS_LABELS, containing one label per line. The first such
+//      AssociatedFile (if any) is used to fill the `class_name` field of the
+//      results. The `display_name` field is filled from the AssociatedFile (if
+//      any) whose locale matches the `display_names_locale` field of the
+//      `ImageClassifierOptions` used at creation time ("en" by default, i.e.
+//      English). If none of these are available, only the `index` field of the
+//      results will be filled.
 //
 // An example of such model can be found at:
 // https://tfhub.dev/bohemian-visual-recognition-alliance/lite-model/models/mushroom-identification_v1/1
+//
+// A CLI demo is available at `examples/vision/desktop/image_classifier_demo.cc`
+// and provides example usage.
 class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
  public:
   using BaseVisionTaskApi::BaseVisionTaskApi;
@@ -71,11 +82,29 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Performs actual classification on the provided FrameBuffer.
+  //
+  // The FrameBuffer can be of any size and any of the supported formats, i.e.
+  // RGBA, RGB, NV12, NV21, YV12, YV21. It is automatically pre-processed before
+  // inference in order to (and in this order):
+  // - resize it (with bilinear interpolation, aspect-ratio *not* preserved) to
+  //   the dimensions of the model input tensor,
+  // - convert it to the colorspace of the input tensor (i.e. RGB, which is the
+  //   only supported colorspace for now),
+  // - rotate it according to its `Orientation` so that inference is performed
+  //   on an "upright" image.
   StatusOr<ClassificationResult> Classify(const FrameBuffer& frame_buffer);
 
   // Same as above, except that the classification is performed based on the
-  // input region of interest. Note: the region of interest is not clamped, so
-  // this method will fail if the region is out of bounds.
+  // input region of interest. Cropping according to this region of interest is
+  // prepended to the pre-processing operations.
+  //
+  // IMPORTANT: as a consequence of cropping occurring first, the provided
+  // region of interest is expressed in the unrotated frame of reference
+  // coordinates system, i.e. in `[0, frame_buffer.width) x [0,
+  // frame_buffer.height)`, which are the dimensions of the underlying
+  // `frame_buffer` data before any `Orientation` flag gets applied. Also, the
+  // region of interest is not clamped, so this method will return a non-ok
+  // status if the region is out of these bounds.
   StatusOr<ClassificationResult> Classify(const FrameBuffer& frame_buffer,
                                           const BoundingBox& roi);
 

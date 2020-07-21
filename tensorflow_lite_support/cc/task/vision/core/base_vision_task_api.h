@@ -94,7 +94,24 @@ class BaseVisionTaskApi
 
   // Performs image preprocessing on the input frame buffer over the region of
   // interest so that it fits model requirements (e.g. upright 224x224 RGB) and
-  // populate the corresponding input tensor.
+  // populate the corresponding input tensor. This is performed by (in this
+  // order):
+  // - cropping the frame buffer to the region of interest (which, in most
+  //   cases, just covers the entire input image),
+  // - resizing it (with bilinear interpolation, aspect-ratio *not* preserved)
+  //   to the dimensions of the model input tensor,
+  // - converting it to the colorspace of the input tensor (i.e. RGB, which is
+  //   the only supported colorspace for now),
+  // - rotating it according to its `Orientation` so that inference is performed
+  //   on an "upright" image.
+  //
+  // IMPORTANT: as a consequence of cropping occurring first, the provided
+  // region of interest is expressed in the unrotated frame of reference
+  // coordinates system, i.e. in `[0, frame_buffer.width) x [0,
+  // frame_buffer.height)`, which are the dimensions of the underlying
+  // `frame_buffer` data before any `Orientation` flag gets applied. Also, the
+  // region of interest is not clamped, so this method will return a non-ok
+  // status if the region is out of these bounds.
   absl::Status Preprocess(const std::vector<TfLiteTensor*>& input_tensors,
                           const FrameBuffer& frame_buffer,
                           const BoundingBox& roi) override {

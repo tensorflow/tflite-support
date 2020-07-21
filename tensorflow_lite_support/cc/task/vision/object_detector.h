@@ -54,10 +54,14 @@ namespace vision {
 //  (kTfLiteFloat32)
 //   - classes tensor of size `[num_results]`, each value representing the
 //     integer index of a class.
-//   - if label maps are attached to the metadata as TENSOR_VALUE_LABELS
-//     associated files, they are used to populate the `class_name` and
-//     (optional) `display_name` fields of the detection results; otherwise
-//     these are left empty and only the `index` field is set.
+//    - optional (but recommended) label map(s) can be attached as
+//      AssociatedFile-s with type TENSOR_VALUE_LABELS, containing one label per
+//      line. The first such AssociatedFile (if any) is used to fill the
+//      `class_name` field of the results. The `display_name` field is filled
+//      from the AssociatedFile (if any) whose locale matches the
+//      `display_names_locale` field of the `ObjectDetectorOptions` used at
+//      creation time ("en" by default, i.e. English). If none of these are
+//      available, only the `index` field of the results will be filled.
 //  (kTfLiteFloat32)
 //   - scores tensor of size `[num_results]`, each value representing the score
 //     of the detected object.
@@ -66,6 +70,9 @@ namespace vision {
 //
 // An example of such model can be found at:
 // https://tfhub.dev/google/lite-model/object_detection/mobile_object_localizer_v1/1/metadata/1
+//
+// A CLI demo is available at `examples/vision/desktop/object_detector_demo.cc`
+// and provides example usage.
 class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
  public:
   using BaseVisionTaskApi::BaseVisionTaskApi;
@@ -79,6 +86,33 @@ class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Performs actual detection on the provided FrameBuffer.
+  //
+  // The FrameBuffer can be of any size and any of the supported formats, i.e.
+  // RGBA, RGB, NV12, NV21, YV12, YV21. It is automatically pre-processed
+  // before inference in order to (and in this order):
+  // - resize it (with bilinear interpolation, aspect-ratio *not* preserved) to
+  //   the dimensions of the model input tensor,
+  // - convert it to the colorspace of the input tensor (i.e. RGB, which is the
+  //   only supported colorspace for now),
+  // - rotate it according to its `Orientation` so that inference is performed
+  //   on an "upright" image.
+  //
+  // IMPORTANT: the returned bounding boxes are expressed in the unrotated input
+  // frame of reference coordinates system, i.e. in `[0, frame_buffer.width) x
+  // [0, frame_buffer.height)`, which are the dimensions of the underlying
+  // `frame_buffer` data before any `Orientation` flag gets applied.
+  //
+  // In particular, this implies that the returned bounding boxes may not be
+  // directly suitable for display if the input image is displayed *with* the
+  // `Orientation` flag taken into account according to the EXIF specification
+  // (http://jpegclub.org/exif_orientation.html): it may first need to be
+  // rotated. This is typically true when consuming camera frames on Android or
+  // iOS.
+  //
+  // For example, if the input `frame_buffer` has its `Orientation` flag set to
+  // `kLeftBottom` (i.e. the image will be rotated 90° clockwise during
+  // preprocessing to make it "upright"), then the same 90° clockwise rotation
+  // needs to be applied to the bounding box for display.
   StatusOr<DetectionResult> Detect(const FrameBuffer& frame_buffer);
 
  protected:
