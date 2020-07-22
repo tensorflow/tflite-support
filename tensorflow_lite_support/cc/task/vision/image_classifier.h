@@ -67,8 +67,9 @@ namespace vision {
 // An example of such model can be found at:
 // https://tfhub.dev/bohemian-visual-recognition-alliance/lite-model/models/mushroom-identification_v1/1
 //
-// A CLI demo is available at `examples/vision/desktop/image_classifier_demo.cc`
-// and provides example usage.
+// A CLI demo tool is available for easily trying out this API, and provides
+// example usage. See:
+// examples/task/vision/desktop/image_classifier_demo.cc
 class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
  public:
   using BaseVisionTaskApi::BaseVisionTaskApi;

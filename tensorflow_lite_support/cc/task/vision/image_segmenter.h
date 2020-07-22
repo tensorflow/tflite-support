@@ -65,8 +65,9 @@ namespace vision {
 // An example of such model can be found at:
 // https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1
 //
-// A CLI demo is available at `examples/vision/desktop/image_segmenter_demo.cc`
-// and provides example usage.
+// A CLI demo tool is available for easily trying out this API, and provides
+// example usage. See:
+// examples/task/vision/desktop/image_segmenter_demo.cc
 class ImageSegmenter : public BaseVisionTaskApi<SegmentationResult> {
  public:
   using BaseVisionTaskApi::BaseVisionTaskApi;

@@ -71,8 +71,9 @@ namespace vision {
 // An example of such model can be found at:
 // https://tfhub.dev/google/lite-model/object_detection/mobile_object_localizer_v1/1/metadata/1
 //
-// A CLI demo is available at `examples/vision/desktop/object_detector_demo.cc`
-// and provides example usage.
+// A CLI demo tool is available for easily trying out this API, and provides
+// example usage. See:
+// examples/task/vision/desktop/object_detector_demo.cc
 class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
  public:
   using BaseVisionTaskApi::BaseVisionTaskApi;
