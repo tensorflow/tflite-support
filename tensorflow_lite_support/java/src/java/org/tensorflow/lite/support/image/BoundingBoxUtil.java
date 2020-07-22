@@ -206,10 +206,10 @@ public final class BoundingBoxUtil {
       float h = values[3];
 
       return new RectF(
-        left, top, left+w, top+h);
+        left, top, left + w, top + h);
     } else {
       return new RectF(
-        values[0] * width, values[1] * height, (float) width, (float) height);
+        values[0] * width, values[1] * height, width * values[2], height * values[3]);
     }
   }
 
@@ -229,6 +229,7 @@ public final class BoundingBoxUtil {
       return new RectF(
         left, top, right, bottom);
     } else {
+      // TODO: add conversion for CoordinateType.RATIO
       throw new IllegalArgumentException("BoundingBox.Type Center is not supported with CoordinateType CoordinateType.RATIO");
     }
   }
