@@ -19,6 +19,7 @@ limitations under the License.
 #include "tensorflow/lite/op_resolver.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
+#include "tensorflow_lite_support/java/src/native/task/text/nlclassifier/nl_classifier_jni_utils.h"
 
 namespace tflite {
 namespace task {
@@ -33,7 +34,7 @@ namespace {
 using ::tflite::support::task::core::Category;
 using ::tflite::support::task::text::nlclassifier::NLClassifier;
 using ::tflite::support::task::text::nlclassifier::NLClassifierOptions;
-using ::tflite::support::utils::ConvertVectorToArrayList;
+using ::tflite::support::task::text::nlclassifier::RunClassifier;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::JStringToString;
 
@@ -108,25 +109,7 @@ Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_initJniWithByteBuff
 extern "C" JNIEXPORT jobject JNICALL
 Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_classifyNative(
     JNIEnv* env, jclass thiz, jlong native_handle, jstring text) {
-  auto* question_answerer = reinterpret_cast<NLClassifier*>(native_handle);
-
-  auto results = question_answerer->Classify(JStringToString(env, text));
-  jclass category_class =
-      env->FindClass("org/tensorflow/lite/support/label/Category");
-  jmethodID category_init =
-      env->GetMethodID(category_class, "<init>", "(Ljava/lang/String;F)V");
-
-  return ConvertVectorToArrayList<Category>(
-      env, results,
-      [env, category_class, category_init](const Category& category) {
-        jstring class_name = env->NewStringUTF(category.class_name.data());
-        // Convert double to float as Java interface exposes float as scores.
-        jobject jcategory =
-            env->NewObject(category_class, category_init, class_name,
-                           static_cast<float>(category.score));
-        env->DeleteLocalRef(class_name);
-        return jcategory;
-      });
+  return RunClassifier(env, native_handle, text);
 }
 
 }  // namespace

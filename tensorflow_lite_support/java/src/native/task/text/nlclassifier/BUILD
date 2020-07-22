@@ -32,11 +32,47 @@ cc_library(
         "nl_classifier_jni.cc",
     ],
     deps = [
+        ":nl_classifier_jni_utils",
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
         "//tensorflow_lite_support/cc/utils:jni_utils",
-        "//third_party/java/jdk:jni",
+        "//tensorflow_lite_support/java/jni",
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
     ],
     alwayslink = 1,
+)
+
+tflite_jni_binary(
+    name = "libbert_nl_classifier_jni.so",
+    srcs = [
+        "bert_nl_classifier_jni.cc",
+    ],
+    deps = [
+        ":nl_classifier_jni_utils",
+        "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier",
+        "//tensorflow_lite_support/cc/utils:jni_utils",
+        "//tensorflow_lite_support/java/jni",
+    ],
+)
+
+cc_library(
+    name = "bert_nl_classifier_native",
+    srcs = [
+        ":libbert_nl_classifier_jni.so",
+    ],
+)
+
+cc_library(
+    name = "nl_classifier_jni_utils",
+    srcs = [
+        "nl_classifier_jni_utils.cc",
+    ],
+    hdrs = [
+        "nl_classifier_jni_utils.h",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
+        "//tensorflow_lite_support/cc/utils:jni_utils",
+        "//tensorflow_lite_support/java/jni",
+    ],
 )
