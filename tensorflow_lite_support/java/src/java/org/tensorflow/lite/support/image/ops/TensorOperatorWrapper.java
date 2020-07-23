@@ -21,6 +21,7 @@ import org.tensorflow.lite.support.common.SupportPreconditions;
 import org.tensorflow.lite.support.common.TensorOperator;
 import org.tensorflow.lite.support.image.ImageOperator;
 import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 /**
  * The adapter that makes a TensorOperator able to run with TensorImage.
@@ -49,8 +50,12 @@ public class TensorOperatorWrapper implements ImageOperator {
   @NonNull
   public TensorImage apply(@NonNull TensorImage image) {
     SupportPreconditions.checkNotNull(image, "Op cannot apply on null image.");
-    image.load(tensorOp.apply(image.getTensorBuffer()));
-    return image;
+    TensorBuffer resBuffer = tensorOp.apply(image.getTensorBuffer());
+    // Some ops may change the data type of the underlying TensorBuffer, such as CastOp. Therefore,
+    // need to create a new TensorImage with the correct data type.
+    TensorImage resImage = new TensorImage(resBuffer.getDataType());
+    resImage.load(resBuffer);
+    return resImage;
   }
 
   @Override
