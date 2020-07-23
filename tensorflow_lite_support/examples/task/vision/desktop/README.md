@@ -9,8 +9,7 @@ Vision Task APIs.
 
 You will need:
 
-* a TFLite image classification model (e.g. [aiy/vision/classifier/birds_V1]
-(https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/2),
+* a TFLite image classification model (e.g. [aiy/vision/classifier/birds_V1][1],
 a bird classification model available on TensorFlow Hub),
 * a PNG, JPEG or GIF image to run classification on, e.g.:
 
@@ -23,7 +22,7 @@ In the console, run:
 ```bash
 # Download the model:
 curl \
-  -L https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/2?lite-format=tflite \
+  -L 'https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/2?lite-format=tflite' \
   -o /tmp/aiy_vision_classifier_birds_V1_2.tflite
 
 # Run the classification tool:
@@ -66,9 +65,8 @@ following example. It will soon be updated on tfhub.dev with a fix.
 
 You will need:
 
-* a TFLite object detection model (e.g. [ssd_mobilenet_v1]
-(https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/1),
-a generic object detection model available on TensorFlow Hub),
+* a TFLite object detection model (e.g. [ssd_mobilenet_v1][2], a generic object
+detection model available on TensorFlow Hub),
 * a PNG, JPEG or GIF image to run detection on, e.g.:
 
 ![dogs](g3doc/dogs.jpg)
@@ -80,7 +78,7 @@ In the console, run:
 ```bash
 # Download the model:
 curl \
-  -L https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/1?lite-format=tflite \
+  -L 'https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/1?lite-format=tflite' \
   -o /tmp/ssd_mobilenet_v1_1_metadata_1.tflite
 
 # Run the detection tool:
@@ -126,9 +124,8 @@ below. It will soon be updated on tfhub.dev with a fix.
 
 You will need:
 
-* a TFLite image segmentation model (e.g. [deeplab_v3]
-(https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1),
-a generic segmentation model available on TensorFlow Hub),
+* a TFLite image segmentation model (e.g. [deeplab_v3][3], a generic
+segmentation model available on TensorFlow Hub),
 * a PNG, JPEG or GIF image to run segmentation on, e.g.:
 
 ![plane](g3doc/plane.jpg)
@@ -140,7 +137,7 @@ In the console, run:
 ```bash
 # Download the model:
 curl \
-  -L https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1?lite-format=tflite \
+  -L 'https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1?lite-format=tflite' \
   -o /tmp/deeplabv3_1_metadata_1.tflite
 
 # Run the segmentation tool:
@@ -179,3 +176,7 @@ this legend.
 And `/tmp/segmentation-output.jpg` should contain the segmentation mask:
 
 ![segmentation-output](g3doc/segmentation-output.png)
+
+[1]: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/2
+[2]: https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/1
+[3]: https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1
