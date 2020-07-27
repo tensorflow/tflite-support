@@ -1,0 +1,25 @@
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
+
+package(
+    default_visibility = ["//tensorflow_lite_support:users"],
+    licenses = ["notice"],  # Apache 2.0
+)
+
+tflite_jni_binary(
+    name = "libbert_question_answerer_jni.so",
+    srcs = [
+        "bert_question_answerer_jni.cc",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc/task/text/qa:bert_question_answerer",
+        "//tensorflow_lite_support/cc/utils:jni_utils",
+        "//tensorflow_lite_support/java/jni",
+    ],
+)
+
+cc_library(
+    name = "bert_question_answerer_native",
+    srcs = [
+        ":libbert_question_answerer_jni.so",
+    ],
+)
