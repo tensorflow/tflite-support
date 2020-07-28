@@ -26,7 +26,6 @@ limitations under the License.
 #include "absl/flags/parse.h"
 #include "absl/status/status.h"
 #include "absl/strings/str_format.h"
-#include "tensorflow/core/platform/init_main.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
@@ -40,7 +39,8 @@ limitations under the License.
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' image classifier model.");
 ABSL_FLAG(std::string, image_path, "",
-          "Absolute path to the image to classify. The image EXIF orientation "
+          "Absolute path to the image to classify. The image must be RGB or "
+          "RGBA (grayscale is not supported). The image EXIF orientation "
           "flag, if any, is NOT taken into account.");
 ABSL_FLAG(int32, max_results, 5,
           "Maximum number of classification results to display.");
@@ -116,10 +116,20 @@ absl::Status Classify() {
                    ImageClassifier::CreateFromOptions(options));
 
   // Load image in a FrameBuffer.
-  ASSIGN_OR_RETURN(RgbImageData image,
+  ASSIGN_OR_RETURN(ImageData image,
                    DecodeImageFromFile(absl::GetFlag(FLAGS_image_path)));
-  std::unique_ptr<FrameBuffer> frame_buffer =
-      CreateFromRgbRawBuffer(image.pixel_data, {image.width, image.height});
+  std::unique_ptr<FrameBuffer> frame_buffer;
+  if (image.channels == 3) {
+    frame_buffer =
+        CreateFromRgbRawBuffer(image.pixel_data, {image.width, image.height});
+  } else if (image.channels == 4) {
+    frame_buffer =
+        CreateFromRgbaRawBuffer(image.pixel_data, {image.width, image.height});
+  } else {
+    return absl::InvalidArgumentError(absl::StrFormat(
+        "Expected image with 3 (RGB) or 4 (RGBA) channels, found %d",
+        image.channels));
+  }
 
   // Run classification and display results.
   ASSIGN_OR_RETURN(ClassificationResult result,
@@ -127,7 +137,7 @@ absl::Status Classify() {
   DisplayResult(result);
 
   // Cleanup and return.
-  RgbImageDataFree(&image);
+  ImageDataFree(&image);
   return absl::OkStatus();
 }
 
@@ -153,10 +163,6 @@ int main(int argc, char** argv) {
                  "are mutually exclusive.\n";
     return 1;
   }
-
-  // We need to call this to set up global state for Tensorflow, which is used
-  // internally for decoding various image formats (JPEG, PNG, etc).
-  tensorflow::port::InitMain(argv[0], &argc, &argv);
 
   // Run classification.
   absl::Status status = tflite::support::task::vision::Classify();

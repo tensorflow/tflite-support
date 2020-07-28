@@ -170,6 +170,13 @@ http_archive(
     build_file = "//third_party:libyuv.BUILD",
 )
 
+http_archive(
+    name = "stblib",
+    strip_prefix = "stb-master",
+    urls = ["https://github.com/nothings/stb/archive/master.zip"],
+    build_file = "//third_party:stblib.BUILD",
+)
+
 
 load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 

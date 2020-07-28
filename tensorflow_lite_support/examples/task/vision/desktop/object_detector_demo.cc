@@ -29,7 +29,6 @@ limitations under the License.
 #include "absl/status/status.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_format.h"
-#include "tensorflow/core/platform/init_main.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
@@ -44,7 +43,8 @@ limitations under the License.
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' object detector model.");
 ABSL_FLAG(std::string, image_path, "",
-          "Absolute path to the image to perform detection on. The image EXIF "
+          "Absolute path to the image to run detection on. The image must be "
+          "RGB or RGBA (grayscale is not supported). The image EXIF "
           "orientation flag, if any, is NOT taken into account.");
 ABSL_FLAG(std::string, output_png, "",
           "Absolute path to a file where to draw the detection results on top "
@@ -111,7 +111,7 @@ ObjectDetectorOptions BuildOptions() {
 }
 
 absl::Status EncodeResultToPngFile(const DetectionResult& result,
-                                   const RgbImageData* image) {
+                                   const ImageData* image) {
   for (int index = 0; index < result.detections_size(); ++index) {
     // Get bounding box as left, top, right, bottom.
     const BoundingBox& box = result.detections(index).bounding_box();
@@ -127,7 +127,7 @@ absl::Status EncodeResultToPngFile(const DetectionResult& result,
     // is applied.
     for (int y = std::max(0, top); y < std::min(image->height, bottom); ++y) {
       for (int x = std::max(0, left); x < std::min(image->width, right); ++x) {
-        int pixel_index = 3 * (image->width * y + x);
+        int pixel_index = image->channels * (image->width * y + x);
         if (x < left + kLineThickness || x > right - kLineThickness ||
             y < top + kLineThickness || y > bottom - kLineThickness) {
           image->pixel_data[pixel_index] = r;
@@ -139,7 +139,7 @@ absl::Status EncodeResultToPngFile(const DetectionResult& result,
   }
   // Encode to PNG and return.
   RETURN_IF_ERROR(
-      EncodeRgbImageToPngFile(*image, absl::GetFlag(FLAGS_output_png)));
+      EncodeImageToPngFile(*image, absl::GetFlag(FLAGS_output_png)));
   std::cout << absl::StrFormat("Results saved to: %s\n",
                                absl::GetFlag(FLAGS_output_png));
   return absl::OkStatus();
@@ -183,10 +183,20 @@ absl::Status Detect() {
                    ObjectDetector::CreateFromOptions(options));
 
   // Load image in a FrameBuffer.
-  ASSIGN_OR_RETURN(RgbImageData image,
+  ASSIGN_OR_RETURN(ImageData image,
                    DecodeImageFromFile(absl::GetFlag(FLAGS_image_path)));
-  std::unique_ptr<FrameBuffer> frame_buffer =
-      CreateFromRgbRawBuffer(image.pixel_data, {image.width, image.height});
+  std::unique_ptr<FrameBuffer> frame_buffer;
+  if (image.channels == 3) {
+    frame_buffer =
+        CreateFromRgbRawBuffer(image.pixel_data, {image.width, image.height});
+  } else if (image.channels == 4) {
+    frame_buffer =
+        CreateFromRgbaRawBuffer(image.pixel_data, {image.width, image.height});
+  } else {
+    return absl::InvalidArgumentError(absl::StrFormat(
+        "Expected image with 3 (RGB) or 4 (RGBA) channels, found %d",
+        image.channels));
+  }
 
   // Run object detection and draw results on input image.
   ASSIGN_OR_RETURN(DetectionResult result,
@@ -197,7 +207,7 @@ absl::Status Detect() {
   DisplayResult(result);
 
   // Cleanup and return.
-  RgbImageDataFree(&image);
+  ImageDataFree(&image);
   return absl::OkStatus();
 }
 
@@ -231,10 +241,6 @@ int main(int argc, char** argv) {
                  "are mutually exclusive.\n";
     return 1;
   }
-
-  // We need to call this to set up global state for Tensorflow, which is used
-  // internally for decoding various image formats (JPEG, PNG, etc).
-  tensorflow::port::InitMain(argv[0], &argc, &argv);
 
   // Run detection.
   absl::Status status = tflite::support::task::vision::Detect();

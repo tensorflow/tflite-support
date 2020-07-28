@@ -10,6 +10,7 @@ tensorflow_lite_support/third_party/libzip.BUILD
 tensorflow_lite_support/third_party/pybind11.BUILD
 tensorflow_lite_support/third_party/python_runtime/BUILD
 tensorflow_lite_support/third_party/six.BUILD
+tensorflow_lite_support/third_party/stblib.BUILD
 tensorflow_lite_support/third_party/toolchains/java/BUILD
 tensorflow_lite_support/third_party/zlib.BUILD
 tensorflow_lite_support/tools/ci_build/build_all.sh

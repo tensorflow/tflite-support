@@ -28,7 +28,6 @@ limitations under the License.
 #include "absl/status/status.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_format.h"
-#include "tensorflow/core/platform/init_main.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
@@ -41,7 +40,8 @@ limitations under the License.
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' image segmenter model.");
 ABSL_FLAG(std::string, image_path, "",
-          "Absolute path to the image to segment. The image EXIF orientation "
+          "Absolute path to the image to segment. The image must be RGB or "
+          "RGBA (grayscale is not supported). The image EXIF orientation "
           "flag, if any, is NOT taken into account.");
 ABSL_FLAG(std::string, output_mask_png, "",
           "Absolute path to the output category mask (confidence masks outputs "
@@ -75,9 +75,10 @@ absl::Status EncodeMaskToPngFile(const SegmentationResult& result) {
   // Create RgbImageData for the output mask.
   uint8* pixel_data = static_cast<uint8*>(
       malloc(segmentation.width() * segmentation.height() * 3 * sizeof(uint8)));
-  RgbImageData mask = {.pixel_data = pixel_data,
-                       .width = segmentation.width(),
-                       .height = segmentation.height()};
+  ImageData mask = {.pixel_data = pixel_data,
+                    .width = segmentation.width(),
+                    .height = segmentation.height(),
+                    .channels = 3};
 
   // Populate RgbImageData from the raw mask and ColoredLabel-s.
   for (int i = 0; i < segmentation.width() * segmentation.height(); ++i) {
@@ -90,12 +91,12 @@ absl::Status EncodeMaskToPngFile(const SegmentationResult& result) {
 
   // Encode mask as PNG.
   RETURN_IF_ERROR(
-      EncodeRgbImageToPngFile(mask, absl::GetFlag(FLAGS_output_mask_png)));
+      EncodeImageToPngFile(mask, absl::GetFlag(FLAGS_output_mask_png)));
   std::cout << absl::StrFormat("Category mask saved to: %s\n",
                                absl::GetFlag(FLAGS_output_mask_png));
 
   // Cleanup and return.
-  RgbImageDataFree(&mask);
+  ImageDataFree(&mask);
   return absl::OkStatus();
 }
 
@@ -138,10 +139,20 @@ absl::Status Segment() {
                    ImageSegmenter::CreateFromOptions(options));
 
   // Load image in a FrameBuffer.
-  ASSIGN_OR_RETURN(RgbImageData image,
+  ASSIGN_OR_RETURN(ImageData image,
                    DecodeImageFromFile(absl::GetFlag(FLAGS_image_path)));
-  std::unique_ptr<FrameBuffer> frame_buffer =
-      CreateFromRgbRawBuffer(image.pixel_data, {image.width, image.height});
+  std::unique_ptr<FrameBuffer> frame_buffer;
+  if (image.channels == 3) {
+    frame_buffer =
+        CreateFromRgbRawBuffer(image.pixel_data, {image.width, image.height});
+  } else if (image.channels == 4) {
+    frame_buffer =
+        CreateFromRgbaRawBuffer(image.pixel_data, {image.width, image.height});
+  } else {
+    return absl::InvalidArgumentError(absl::StrFormat(
+        "Expected image with 3 (RGB) or 4 (RGBA) channels, found %d",
+        image.channels));
+  }
 
   // Run segmentation and save category mask.
   ASSIGN_OR_RETURN(SegmentationResult result,
@@ -152,7 +163,7 @@ absl::Status Segment() {
   RETURN_IF_ERROR(DisplayColorLegend(result));
 
   // Cleanup and return.
-  RgbImageDataFree(&image);
+  ImageDataFree(&image);
   return absl::OkStatus();
 }
 
@@ -180,10 +191,6 @@ int main(int argc, char** argv) {
     std::cerr << "Argument 'output_mask_png' must end with '.png' or '.PNG'\n";
     return 1;
   }
-
-  // We need to call this to set up global state for Tensorflow, which is used
-  // internally for decoding various image formats (JPEG, PNG, etc).
-  tensorflow::port::InitMain(argv[0], &argc, &argv);
 
   // Run segmentation.
   absl::Status status = tflite::support::task::vision::Segment();

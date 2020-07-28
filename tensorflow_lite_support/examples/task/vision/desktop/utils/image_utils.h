@@ -25,26 +25,31 @@ namespace support {
 namespace task {
 namespace vision {
 
-// Interleaved RGB image with pixels stored as a row-major flattened array.
-struct RgbImageData {
+// Image data with pixels stored as a row-major flattened array.
+// Channels can be:
+// 1 : grayscale
+// 3 : RGB, interleaved
+// 4 : RGBA, interleaved
+struct ImageData {
   uint8* pixel_data;
   int width;
   int height;
+  int channels;
 };
 
-// Decodes image file and returns the corresponding RGB image if no error
-// occurred. Supported formats are JPEG, PNG, GIF and BMP. If decoding
-// succeeded, the caller must manage deletion of the underlying pixel data using
-// `RgbImageDataFree`.
-StatusOr<RgbImageData> DecodeImageFromFile(absl::string_view file_name);
+// Decodes image file and returns the corresponding image if no error
+// occurred. If decoding succeeded, the caller must manage deletion of the
+// underlying pixel data using `ImageDataFree`.
+// Supports a wide range of image formats, listed in `stb_image/stb_image.h`.
+StatusOr<ImageData> DecodeImageFromFile(const std::string& file_name);
 
-// Encodes the image provided as an RgbImageData as lossless PNG to the provided
+// Encodes the image provided as an ImageData as lossless PNG to the provided
 // path.
-absl::Status EncodeRgbImageToPngFile(const RgbImageData& image_data,
-                                     absl::string_view image_path);
+absl::Status EncodeImageToPngFile(const ImageData& image_data,
+                                  const std::string& image_path);
 
 // Releases image pixel data memory.
-void RgbImageDataFree(RgbImageData* image);
+void ImageDataFree(ImageData* image);
 
 }  // namespace vision
 }  // namespace task

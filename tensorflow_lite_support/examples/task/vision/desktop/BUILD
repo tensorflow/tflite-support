@@ -22,7 +22,6 @@ cc_binary(
         "@com_google_absl//absl/flags:parse",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings:str_format",
-        "@org_tensorflow//tensorflow/core:lib",
     ],
 )
 
@@ -45,7 +44,6 @@ cc_binary(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
-        "@org_tensorflow//tensorflow/core:lib",
     ],
 )
 
@@ -66,6 +64,5 @@ cc_binary(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
-        "@org_tensorflow//tensorflow/core:lib",
     ],
 )
