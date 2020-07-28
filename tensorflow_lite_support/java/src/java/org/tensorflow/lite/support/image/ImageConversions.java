@@ -53,7 +53,7 @@ class ImageConversions {
               buffer.getDataType()));
     }
     int[] shape = buffer.getShape();
-    TensorImage.checkImageTensorShape(shape);
+    TensorBufferContainer.assertRGBImageShape(shape);
     int h = shape[shape.length - 3];
     int w = shape[shape.length - 2];
     if (bitmap.getWidth() != w || bitmap.getHeight() != h) {

@@ -15,12 +15,11 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image;
 
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
+
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import java.nio.ByteBuffer;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.tensorflow.lite.DataType;
-import org.tensorflow.lite.support.common.SupportPreconditions;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 /**
@@ -32,12 +31,16 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
  *
  * <p>Details of data storage: a {@link TensorImage} object may have 2 potential sources of truth: a
  * {@link Bitmap} or a {@link TensorBuffer}. {@link TensorImage} maintains the state and only
- * convert one to the other when needed.
+ * converts one to the other when needed. A typical use case of {@link TensorImage} is to first load
+ * a {@link Bitmap} image, then process it using {@link ImageProcessor}, and finally get the
+ * underlying {@link ByteBuffer} of the {@link TensorBuffer} and feed it into the TFLite
+ * interpreter.
  *
- * <p>IMPORTANT: The container doesn't own its data. Callers should not modify data objects those
- * are passed to {@link ImageContainer#set(Bitmap)} or {@link ImageContainer#set(TensorBuffer)}.
+ * <p>IMPORTANT: to achieve the best performance, {@link TensorImage} avoids copying data whenever
+ * it's possible. Therefore, it doesn't own its data. Callers should not modify data objects those
+ * are passed to {@link TensorImage#load(Bitmap)} or {@link TensorImage#load(TensorBuffer)}.
  *
- * <p>IMPORTANT: All methods are not proved thread-safe.
+ * <p>IMPORTANT: all methods are not proved thread-safe.
  *
  * @see ImageProcessor which is often used for transforming a {@link TensorImage}.
  */
@@ -46,41 +49,45 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 // TODO(b/138905544): Support directly loading RGBBytes, YUVBytes and other types if necessary.
 public class TensorImage {
 
-  private final ImageContainer container;
+  private final DataType dataType;
+  private ImageContainer container = null;
 
   /**
-   * Initialize a TensorImage object.
+   * Initializes a {@link TensorImage} object.
    *
-   * Note: The data type of this TensorImage is UINT8, which means it could naturally accept Bitmaps
-   * whose pixel value range is [0, 255]. However, any image with float value pixels will not be
-   * loaded correctly. In those cases, please use {@link TensorImage(DataType)}.
+   * <p>Note: the data type of this {@link TensorImage} is {@link DataType#UINT8}. Use {@link
+   * #TensorImage(DataType)} if other data types are preferred.
    */
   public TensorImage() {
     this(DataType.UINT8);
   }
 
   /**
-   * Initializes a TensorImage object with data type specified.
+   * Initializes a {@link TensorImage} object with the specified data type.
    *
-   * <p>Note: The shape of a TensorImage is not fixed. It is determined when {@code load} methods
-   * called, and could be change later.
+   * <p>When getting a {@link TensorBuffer} or a {@link ByteBuffer} from this {@link TensorImage},
+   * such as using {@link #getTensorBuffer} and {@link #getBuffer}, the data values will be
+   * converted to the specified data type.
    *
-   * @param dataType the expected internal data type of underlying tensor. The type is always fixed
-   *     during the lifetime of the {@link TensorImage}. To convert the data type, use {@link
-   *     TensorImage#createFrom(TensorImage, DataType)} to create a copy and convert data type at
-   *     the same time.
+   * <p>Note: the shape of a {@link TensorImage} is not fixed. It can be adjusted to the shape of
+   * the image being loaded to this {@link TensorImage}.
+   *
+   * @param dataType the expected data type of the resulting {@link TensorBuffer}. The type is
+   *     always fixed during the lifetime of the {@link TensorImage}. To convert the data type, use
+   *     {@link #createFrom(TensorImage, DataType)} to create a copy and convert data type at the
+   *     same time.
    * @throws IllegalArgumentException if {@code dataType} is neither {@link DataType#UINT8} nor
-   *     {@link DataType#FLOAT32}.
+   *     {@link DataType#FLOAT32}
    */
   public TensorImage(DataType dataType) {
-    SupportPreconditions.checkArgument(
+    checkArgument(
         dataType == DataType.UINT8 || dataType == DataType.FLOAT32,
         "Illegal data type for TensorImage: Only FLOAT32 and UINT8 are accepted");
-    container = new ImageContainer(dataType);
+    this.dataType = dataType;
   }
 
   /**
-   * Initializes a {@link TensorImage} object with a {@link Bitmap}.
+   * Initializes a {@link TensorImage} object of {@link DataType#UINT8} with a {@link Bitmap} .
    *
    * @see TensorImage#load(Bitmap) for reusing the object when it's expensive to create objects
    *     frequently, because every call of {@code fromBitmap} creates a new {@link TensorImage}.
@@ -92,290 +99,181 @@ public class TensorImage {
   }
 
   /**
-   * Creates a deep-copy of a given {@link TensorImage} and converts internal tensor data type.
+   * Creates a deep-copy of a given {@link TensorImage} with the desired data type.
    *
-   * <p>If the given {@code dataType} is different with {@code src.getDataType()}, an implicit data
-   * conversion will be applied. Converting data from {@link DataType#FLOAT32} to {@link
-   * DataType#UINT8} may involve default float->int conversion and value clamping, because {@link
-   * DataType#UINT8} stores value from 0 to 255 (inclusively).
-   *
-   * @param src the TensorImage to copy from.
-   * @param dataType the expected data type of newly created {@link TensorImage}.
-   * @return a TensorImage whose data is copied from {@code src} and data type is {@code dataType}.
+   * @param src the {@link TensorImage} to copy from
+   * @param dataType the expected data type of newly created {@link TensorImage}
+   * @return a {@link TensorImage} whose data is copied from {@code src} and data type is {@code
+   *     dataType}
    */
-  @NonNull
-  public static TensorImage createFrom(@NonNull TensorImage src, DataType dataType) {
+  public static TensorImage createFrom(TensorImage src, DataType dataType) {
     TensorImage dst = new TensorImage(dataType);
-    if (src.container.isBufferUpdated) {
-      dst.container.set(TensorBuffer.createFrom(src.getTensorBuffer(), dataType));
-    } else if (src.container.isBitmapUpdated) {
-      Bitmap srcBitmap = src.getBitmap();
-      dst.container.set(srcBitmap.copy(srcBitmap.getConfig(), srcBitmap.isMutable()));
-    }
+    dst.container = src.container.clone();
     return dst;
   }
 
   /**
-   * Loads a Bitmap image object into TensorImage.
+   * Loads a {@link Bitmap} image object into this {@link TensorImage}.
    *
-   * Important: When loading a bitmap, DO NOT MODIFY the bitmap from the caller side anymore. The
-   * {@code TensorImage} object will rely on the bitmap. It will probably modify the bitmap as well.
+   * <p>Note: if the {@link TensorImage} has data type other than {@link DataType#UINT8}, numeric
+   * casting and clamping will be applied when calling {@link #getTensorBuffer} and {@link
+   * #getBuffer}, where the {@link Bitmap} will be converted into a {@link TensorBuffer}.
+   *
+   * <p>Important: when loading a bitmap, DO NOT MODIFY the bitmap from the caller side anymore. The
+   * {@link TensorImage} object will rely on the bitmap. It will probably modify the bitmap as well.
    * In this method, we perform a zero-copy approach for that bitmap, by simply holding its
    * reference. Use {@code bitmap.copy(bitmap.getConfig(), true)} to create a copy if necessary.
    *
-   * Note: To get the best performance, please load images in the same shape to avoid memory
+   * <p>Note: to get the best performance, please load images in the same shape to avoid memory
    * re-allocation.
    *
-   * @throws IllegalArgumentException if {@code bitmap} is not in ARGB_8888.
+   * @throws IllegalArgumentException if {@code bitmap} is not in ARGB_8888
    */
-  public void load(@NonNull Bitmap bitmap) {
-    SupportPreconditions.checkNotNull(bitmap, "Cannot load null bitmap.");
-    SupportPreconditions.checkArgument(
-        bitmap.getConfig().equals(Config.ARGB_8888), "Only supports loading ARGB_8888 bitmaps.");
-    container.set(bitmap);
+  public void load(Bitmap bitmap) {
+    container = BitmapContainer.create(bitmap);
   }
 
   /**
-   * Loads a float array as RGB pixels into TensorImage, representing the pixels inside.
+   * Loads a float array as RGB pixels into this {@link TensorImage}, representing the pixels
+   * inside.
    *
-   * <p>Note: If the TensorImage has data type {@link DataType#UINT8}, numeric casting and clamping
-   * will be applied.
+   * <p>Note: if the {@link TensorImage} has a data type other than {@link DataType#FLOAT32},
+   * numeric casting and clamping will be applied when calling {@link #getTensorBuffer} and {@link
+   * #getBuffer}.
    *
-   * @param pixels The RGB pixels representing the image.
-   * @param shape The shape of the image, should either in form (h, w, 3), or in form (1, h, w, 3).
+   * @param pixels the RGB pixels representing the image
+   * @param shape the shape of the image, should either in form (h, w, 3), or in form (1, h, w, 3)
+   * @throws IllegalArgumentException if the shape is neither (h, w, 3) nor (1, h, w, 3)
    */
-  public void load(@NonNull float[] pixels, @NonNull int[] shape) {
-    checkImageTensorShape(shape);
+  public void load(float[] pixels, int[] shape) {
     TensorBuffer buffer = TensorBuffer.createDynamic(getDataType());
     buffer.loadArray(pixels, shape);
     load(buffer);
   }
 
   /**
-   * Loads an uint8 array as RGB pixels into TensorImage, representing the pixels inside.
+   * Loads an int array as RGB pixels into this {@link TensorImage}, representing the pixels inside.
    *
-   * <p>Note: If the TensorImage has data type {@link DataType#UINT8}, all pixel values will clamp
-   * into [0, 255].
+   * <p>Note: numeric casting and clamping will be applied to convert the values into the data type
+   * of this {@link TensorImage} when calling {@link #getTensorBuffer} and {@link #getBuffer}.
    *
-   * @param pixels The RGB pixels representing the image.
-   * @param shape The shape of the image, should either in form (h, w, 3), or in form (1, h, w, 3).
+   * @param pixels the RGB pixels representing the image
+   * @param shape the shape of the image, should either in form (h, w, 3), or in form (1, h, w, 3)
+   * @throws IllegalArgumentException if the shape is neither (h, w, 3) nor (1, h, w, 3)
    */
-  public void load(@NonNull int[] pixels, @NonNull int[] shape) {
-    checkImageTensorShape(shape);
+  public void load(int[] pixels, int[] shape) {
     TensorBuffer buffer = TensorBuffer.createDynamic(getDataType());
     buffer.loadArray(pixels, shape);
     load(buffer);
   }
 
   /**
-   * Loads a TensorBuffer containing pixel values. The color layout should be RGB.
+   * Loads a {@link TensorBuffer} containing pixel values. The color layout should be RGB.
    *
-   * @param buffer The TensorBuffer to load. Its shape should be either (h, w, 3) or (1, h, w, 3).
+   * <p>Note: if the data type of {@code buffer} does not match that of this {@link TensorImage},
+   * numeric casting and clamping will be applied when calling {@link #getTensorBuffer} and {@link
+   * #getBuffer}.
+   *
+   * @param buffer the {@link TensorBuffer} to be loaded. Its shape should be either (h, w, 3) or
+   *     (1, h, w, 3)
+   * @throws IllegalArgumentException if the shape is neither (h, w, 3) nor (1, h, w, 3)
    */
   public void load(TensorBuffer buffer) {
-    checkImageTensorShape(buffer.getShape());
-    container.set(buffer);
+    container = TensorBufferContainer.create(buffer);
   }
 
   /**
-   * Returns a bitmap representation of this TensorImage.
+   * Returns a {@link Bitmap} representation of this {@link TensorImage}.
    *
-   * <p>Important: It's only a reference. DO NOT MODIFY. We don't create a copy here for performance
+   * <p>Important: it's only a reference. DO NOT MODIFY. We don't create a copy here for performance
    * concern, but if modification is necessary, please make a copy.
    *
-   * @return a reference to a Bitmap in ARGB_8888 config. "A" channel is always opaque.
-   * @throws IllegalStateException if the TensorImage never loads data, or if the TensorImage is
-   *     holding a float-value image in {@code TensorBuffer}.
+   * @return a reference to a {@link Bitmap} in ARGB_8888 config. "A" channel is always opaque
+   * @throws IllegalStateException if the {@link TensorImage} never loads data, or if the {@link
+   *     TensorImage} is holding a float-value image in {@code TensorBuffer}
    */
-  @NonNull
   public Bitmap getBitmap() {
+    if (container == null) {
+      throw new IllegalStateException("No image has been loaded yet.");
+    }
+
     return container.getBitmap();
   }
 
   /**
-   * Returns a ByteBuffer representation of this TensorImage.
+   * Returns a {@link ByteBuffer} representation of this {@link TensorImage} with the expected data
+   * type.
    *
-   * <p>Important: It's only a reference. DO NOT MODIFY. We don't create a copy here for performance
+   * <p>Numeric casting and clamping will be applied if the stored data is different from the data
+   * type of the {@link TensorImage}.
+   *
+   * <p>Important: it's only a reference. DO NOT MODIFY. We don't create a copy here for performance
    * concern, but if modification is necessary, please make a copy.
    *
    * <p>It's essentially a short cut for {@code getTensorBuffer().getBuffer()}.
    *
-   * @return a reference to a ByteBuffer which holds the image data.
-   * @throws IllegalStateException if the TensorImage never loads data.
+   * @return a reference to a {@link ByteBuffer} which holds the image data
+   * @throws IllegalStateException if the {@link TensorImage} never loads data
    */
-  @NonNull
   public ByteBuffer getBuffer() {
-    return container.getTensorBuffer().getBuffer();
+    return getTensorBuffer().getBuffer();
   }
 
   /**
-   * Returns a ByteBuffer representation of this TensorImage.
+   * Returns a {@link TensorBuffer} representation of this {@link TensorImage} with the expected
+   * data type.
    *
-   * <p>Important: It's only a reference. DO NOT MODIFY. We don't create a copy here for performance
+   * <p>Numeric casting and clamping will be applied if the stored data is different from the data
+   * type of the {@link TensorImage}.
+   *
+   * <p>Important: it's only a reference. DO NOT MODIFY. We don't create a copy here for performance
    * concern, but if modification is necessary, please make a copy.
    *
-   * @return a reference to a TensorBuffer which holds the image data.
-   * @throws IllegalStateException if the TensorImage never loads data.
+   * @return a reference to a {@link TensorBuffer} which holds the image data
+   * @throws IllegalStateException if the {@link TensorImage} never loads data
    */
-  @NonNull
   public TensorBuffer getTensorBuffer() {
-    return container.getTensorBuffer();
+    if (container == null) {
+      throw new IllegalStateException("No image has been loaded yet.");
+    }
+
+    return container.getTensorBuffer(dataType);
   }
 
   /**
-   * Gets the current data type.
+   * Gets the data type of this {@link TensorImage}.
    *
-   * @return a data type. Currently only UINT8 and FLOAT32 are possible.
+   * @return a data type. Currently only {@link DataType#UINT8} and {@link DataType#FLOAT32} are
+   *     supported.
    */
   public DataType getDataType() {
-    return container.getDataType();
+    return dataType;
   }
 
   /**
    * Gets the image width.
    *
-   * @throws IllegalStateException if the TensorImage never loads data.
-   * @throws IllegalArgumentException if the container data is corrupted.
+   * @throws IllegalStateException if the {@link TensorImage} never loads data
+   * @throws IllegalArgumentException if the underlying data is corrupted
    */
   public int getWidth() {
+    if (container == null) {
+      throw new IllegalStateException("No image has been loaded yet.");
+    }
+
     return container.getWidth();
   }
 
   /**
    * Gets the image height.
    *
-   * @throws IllegalStateException if the TensorImage never loads data.
-   * @throws IllegalArgumentException if the container data is corrupted.
+   * @throws IllegalStateException if the {@link TensorImage} never loads data
+   * @throws IllegalArgumentException if the underlying data is corrupted
    */
   public int getHeight() {
+    if (container == null) {
+      throw new IllegalStateException("No image has been loaded yet.");
+    }
     return container.getHeight();
-  }
-
-  // Requires tensor shape [h, w, 3] or [1, h, w, 3].
-  static void checkImageTensorShape(int[] shape) {
-    SupportPreconditions.checkArgument(
-        (shape.length == 3 || (shape.length == 4 && shape[0] == 1))
-            && shape[shape.length - 3] > 0
-            && shape[shape.length - 2] > 0
-            && shape[shape.length - 1] == 3,
-        "Only supports image shape in (h, w, c) or (1, h, w, c), and channels representing R, G, B"
-            + " in order.");
-  }
-
-  // Handles RGB image data storage strategy of TensorBuffer.
-  private static class ImageContainer {
-
-    private TensorBuffer bufferImage;
-    private boolean isBufferUpdated;
-    private Bitmap bitmapImage;
-    private boolean isBitmapUpdated;
-
-    private final DataType dataType;
-
-    private static final int ARGB_8888_ELEMENT_BYTES = 4;
-
-    ImageContainer(DataType dataType) {
-      this.dataType = dataType;
-    }
-
-    // Internal method to set the image source-of-truth with a bitmap. The bitmap has to be
-    // ARGB_8888.
-    void set(Bitmap bitmap) {
-      bitmapImage = bitmap;
-      isBufferUpdated = false;
-      isBitmapUpdated = true;
-    }
-
-    // Internal method to set the image source-of-truth with a TensorBuffer.
-    void set(TensorBuffer buffer) {
-      bufferImage = buffer;
-      isBitmapUpdated = false;
-      isBufferUpdated = true;
-    }
-
-    int getWidth() {
-      SupportPreconditions.checkState(
-          isBitmapUpdated || isBufferUpdated,
-          "Both buffer and bitmap data are obsolete. Forgot to call TensorImage#load?");
-      if (isBitmapUpdated) {
-        return bitmapImage.getWidth();
-      }
-      return getBufferDimensionSize(-2);
-    }
-
-    int getHeight() {
-      SupportPreconditions.checkState(
-          isBitmapUpdated || isBufferUpdated,
-          "Both buffer and bitmap data are obsolete. Forgot to call TensorImage#load?");
-      if (isBitmapUpdated) {
-        return bitmapImage.getHeight();
-      }
-      return getBufferDimensionSize(-3);
-    }
-
-    // Internal helper method to get the size of one dimension in the shape of the `bufferImage`.
-    // Requires `isBufferUpdated` is true.
-    // Throws `IllegalArgumentException` if data is corrupted.
-    private int getBufferDimensionSize(int dim) {
-      int[] shape = bufferImage.getShape();
-      // The defensive check is needed because bufferImage might be invalidly changed by user
-      // (a.k.a internal data is corrupted)
-      TensorImage.checkImageTensorShape(shape);
-      dim = dim % shape.length;
-      if (dim < 0) {
-        dim += shape.length;
-      }
-      return shape[dim];
-    }
-
-    public DataType getDataType() {
-      return dataType;
-    }
-
-    // Internal method to update the internal Bitmap data by TensorBuffer data.
-    @NonNull
-    Bitmap getBitmap() {
-      if (isBitmapUpdated) {
-        return bitmapImage;
-      }
-      if (!isBufferUpdated) {
-        throw new IllegalStateException(
-            "Both buffer and bitmap data are obsolete. Forgot to call TensorImage#load?");
-      }
-      if (bufferImage.getDataType() != DataType.UINT8) {
-        throw new IllegalStateException(
-            "TensorImage is holding a float-value image which is not able to convert a Bitmap.");
-      }
-      int requiredAllocation = bufferImage.getFlatSize() * ARGB_8888_ELEMENT_BYTES;
-      // Create a new bitmap and reallocate memory for it.
-      if (bitmapImage == null || bitmapImage.getAllocationByteCount() < requiredAllocation) {
-        int[] shape = bufferImage.getShape();
-        int h = shape[shape.length - 3];
-        int w = shape[shape.length - 2];
-        bitmapImage = Bitmap.createBitmap(w, h, Config.ARGB_8888);
-      }
-      ImageConversions.convertTensorBufferToBitmap(bufferImage, bitmapImage);
-      isBitmapUpdated = true;
-      return bitmapImage;
-    }
-
-    // Internal method to update the internal TensorBuffer data by Bitmap data.
-    @NonNull
-    TensorBuffer getTensorBuffer() {
-      if (isBufferUpdated) {
-        return bufferImage;
-      }
-      SupportPreconditions.checkArgument(
-          isBitmapUpdated,
-          "Both buffer and bitmap data are obsolete. Forgot to call TensorImage#load?");
-      int requiredFlatSize = bitmapImage.getWidth() * bitmapImage.getHeight() * 3;
-      if (bufferImage == null
-          || (!bufferImage.isDynamic() && bufferImage.getFlatSize() != requiredFlatSize)) {
-        bufferImage = TensorBuffer.createDynamic(dataType);
-      }
-      ImageConversions.convertBitmapToTensorBuffer(bitmapImage, bufferImage);
-      isBufferUpdated = true;
-      return bufferImage;
-    }
   }
 }
