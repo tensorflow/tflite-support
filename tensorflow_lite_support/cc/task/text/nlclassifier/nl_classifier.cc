@@ -29,12 +29,16 @@ limitations under the License.
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
+#include "tensorflow/lite/type_to_tflitetype.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
+#include "tensorflow_lite_support/cc/text/tokenizers/regex_tokenizer.h"
+#include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
+#include "tensorflow_lite_support/cc/text/tokenizers/tokenizer_utils.h"
 #include "tensorflow_lite_support/cc/utils/common_utils.h"
 
 namespace tflite {
@@ -52,7 +56,16 @@ using ::tflite::support::StatusOr;
 using ::tflite::support::task::core::Dequantize;
 using ::tflite::support::task::core::GetStringAtIndex;
 using ::tflite::support::task::core::PopulateTensor;
+using ::tflite::support::text::tokenizer::CreateTokenizerFromProcessUnit;
+using ::tflite::support::text::tokenizer::RegexTokenizer;
+using ::tflite::support::text::tokenizer::Tokenizer;
+using ::tflite::support::text::tokenizer::TokenizerResult;
 using ::tflite::support::utils::LoadVocabFromBuffer;
+
+namespace {
+constexpr int kRegexTokenizerInputTensorIndex = 0;
+constexpr int kRegexTokenizerProcessUnitIndex = 0;
+}  // namespace
 
 const NLClassifierOptions& NLClassifier::GetOptions() const { return options_; }
 
@@ -102,11 +115,57 @@ std::vector<core::Category> NLClassifier::Classify(const std::string& text) {
 
 absl::Status NLClassifier::Preprocess(
     const std::vector<TfLiteTensor*>& input_tensors, const std::string& input) {
-  PopulateTensor(
-      input,
-      FindTensorWithNameOrIndex(
-          input_tensors, GetMetadataExtractor()->GetInputTensorMetadata(),
-          options_.input_tensor_name, options_.input_tensor_index));
+  TfLiteTensor* input_tensor = FindTensorWithNameOrIndex(
+      input_tensors, GetMetadataExtractor()->GetInputTensorMetadata(),
+      options_.input_tensor_name, options_.input_tensor_index);
+  if (input_tensor == nullptr) {
+    return CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        "No input tensor found from NLClassifierOptions.",
+        TfLiteSupportStatus::kInputTensorNotFoundError);
+  }
+
+  if (HasRegexTokenizerMetadata()) {
+    //                              |<-------sentence_length-------->|
+    // input_tensor                 <START>, t1, t2... <PAD>, <PAD>...
+    // <START> is optional, t1, t2... will be replaced by <UNKNOWN> if it's not
+    // found in tokenizer vocab.
+    TokenizerResult result = tokenizer_->Tokenize(input);
+
+    size_t max_sentence_length = input_tensor->dims->size == 2
+                                     ? input_tensor->dims->data[1]
+                                     : input_tensor->dims->data[0];
+
+    int unknown_token_id = 0;
+    tokenizer_->GetUnknownToken(&unknown_token_id);
+
+    int pad_token_id = 0;
+    tokenizer_->GetPadToken(&pad_token_id);
+
+    std::vector<int> input_tokens(max_sentence_length, pad_token_id);
+    int start_token_id = 0;
+    size_t input_token_index = 0;
+    if (tokenizer_->GetStartToken(&start_token_id)) {
+      input_tokens[0] = start_token_id;
+      input_token_index = 1;
+    }
+
+    for (size_t i = 0; (i < result.subwords.size()) &&
+                       (input_token_index < max_sentence_length);
+         ++i, ++input_token_index) {
+      const std::string& token = result.subwords[i];
+      int token_id = 0;
+      if (tokenizer_->LookupId(token, &token_id)) {
+        input_tokens[input_token_index] = token_id;
+      } else {
+        input_tokens[input_token_index] = unknown_token_id;
+      }
+    }
+
+    PopulateTensor(input_tokens, input_tensor);
+  } else {
+    PopulateTensor(input, input_tensor);
+  }
   return absl::OkStatus();
 }
 
@@ -172,13 +231,25 @@ absl::Status NLClassifier::Initialize(const NLClassifierOptions& options) {
                      options.input_tensor_index),
         TfLiteSupportStatus::kInputTensorNotFoundError);
   }
-  if (input_tensor->type != kTfLiteString) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrCat("Type mismatch for input tensor ", input_tensor->name,
-                     ". Requested STRING, got ",
-                     TfLiteTypeGetName(input_tensor->type), "."),
-        TfLiteSupportStatus::kInvalidInputTensorTypeError);
+  if (HasRegexTokenizerMetadata()) {
+    if (input_tensor->type != kTfLiteInt32) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrCat("Type mismatch for input tensor ", input_tensor->name,
+                       ". Requested INT32, got ",
+                       TfLiteTypeGetName(input_tensor->type), "."),
+          TfLiteSupportStatus::kInvalidInputTensorTypeError);
+    }
+    RETURN_IF_ERROR(SetupRegexTokenizer());
+  } else {
+    if (input_tensor->type != kTfLiteString) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrCat("Type mismatch for input tensor ", input_tensor->name,
+                       ". Requested STRING, got ",
+                       TfLiteTypeGetName(input_tensor->type), "."),
+          TfLiteSupportStatus::kInvalidInputTensorTypeError);
+    }
   }
 
   // output score tensor should be type
@@ -276,6 +347,35 @@ StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateNLClassifier(
                        fd, std::move(resolver)));
   RETURN_IF_ERROR(nl_classifier->Initialize(options));
   return std::move(nl_classifier);
+}
+
+bool NLClassifier::HasRegexTokenizerMetadata() {
+  const TensorMetadata* input_tensor_metadata =
+      GetMetadataExtractor()->GetInputTensorMetadata(
+          kRegexTokenizerInputTensorIndex);
+  if (input_tensor_metadata == nullptr) {
+    return false;
+  }
+  StatusOr<const tflite::ProcessUnit*> status =
+      GetMetadataExtractor()->FindFirstProcessUnit(
+          *input_tensor_metadata, ProcessUnitOptions_RegexTokenizerOptions);
+  return status.ok() ? status.value() != nullptr : false;
+}
+
+absl::Status NLClassifier::SetupRegexTokenizer() {
+  ASSIGN_OR_RETURN(
+      std::unique_ptr<Tokenizer> base_tokenizer,
+      CreateTokenizerFromProcessUnit(
+          GetMetadataExtractor()
+              ->GetInputTensorMetadata(kRegexTokenizerInputTensorIndex)
+              ->process_units()
+              ->Get(kRegexTokenizerProcessUnitIndex),
+          GetMetadataExtractor()));
+
+  tokenizer_ = std::unique_ptr<RegexTokenizer>(
+      dynamic_cast<RegexTokenizer*>(base_tokenizer.release()));
+
+  return absl::OkStatus();
 }
 
 }  // namespace nlclassifier
