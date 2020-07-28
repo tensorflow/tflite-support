@@ -22,14 +22,16 @@ In the console, run:
 ```bash
 # Download the model:
 curl \
-  -L 'https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/2?lite-format=tflite' \
-  -o /tmp/aiy_vision_classifier_birds_V1_2.tflite
+ -L 'https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/2?lite-format=tflite' \
+ -o /tmp/aiy_vision_classifier_birds_V1_2.tflite
 
 # Run the classification tool:
-bazel run -c opt examples/task/vision/desktop:image_classifier_demo -- \
-  --model_path=/tmp/aiy_vision_classifier_birds_V1_2.tflite \
-  --image_path=$(pwd)/examples/task/vision/desktop/g3doc/sparrow.jpg \
-  --max_results=3
+bazel run -c opt \
+ tensorflow_lite_support/examples/task/vision/desktop:image_classifier_demo -- \
+ --model_path=/tmp/aiy_vision_classifier_birds_V1_2.tflite \
+ --image_path=\
+$(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/sparrow.jpg \
+ --max_results=3
 ```
 
 #### Results
@@ -78,15 +80,17 @@ In the console, run:
 ```bash
 # Download the model:
 curl \
-  -L 'https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/1?lite-format=tflite' \
-  -o /tmp/ssd_mobilenet_v1_1_metadata_1.tflite
+ -L 'https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/1?lite-format=tflite' \
+ -o /tmp/ssd_mobilenet_v1_1_metadata_1.tflite
 
 # Run the detection tool:
-bazel run -c opt examples/task/vision/desktop:object_detector_demo -- \
-  --model_path=/tmp/ssd_mobilenet_v1_1_metadata_1.tflite \
-  --image_path=$(pwd)/examples/task/vision/desktop/g3doc/dogs.jpg \
-  --output_png=/tmp/detection-output.png \
-  --max_results=2
+bazel run -c opt \
+ tensorflow_lite_support/examples/task/vision/desktop:object_detector_demo -- \
+ --model_path=/tmp/ssd_mobilenet_v1_1_metadata_1.tflite \
+ --image_path=\
+$(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/dogs.jpg \
+ --output_png=/tmp/detection-output.png \
+ --max_results=2
 ```
 
 #### Results
@@ -137,14 +141,16 @@ In the console, run:
 ```bash
 # Download the model:
 curl \
-  -L 'https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1?lite-format=tflite' \
-  -o /tmp/deeplabv3_1_metadata_1.tflite
+ -L 'https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1?lite-format=tflite' \
+ -o /tmp/deeplabv3_1_metadata_1.tflite
 
 # Run the segmentation tool:
-bazel run -c opt examples/task/vision/desktop:image_segmenter_demo -- \
-  --model_path=/tmp/deeplabv3_1_metadata_1.tflite \
-  --image_path=$(pwd)/examples/task/vision/desktop/g3doc/plane.jpg \
-  --output_mask_png=/tmp/segmentation-output.png
+bazel run -c opt \
+ tensorflow_lite_support/examples/task/vision/desktop:image_segmenter_demo -- \
+ --model_path=/tmp/deeplabv3_1_metadata_1.tflite \
+ --image_path=\
+$(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/plane.jpg \
+ --output_mask_png=/tmp/segmentation-output.png
 ```
 
 #### Results
