@@ -47,7 +47,7 @@ namespace nlclassifier {
 
 using ::tflite::support::task::core::FindTensorByName;
 using ::tflite::support::task::core::PopulateTensor;
-using ::tflite::support::text::tokenizer::CreateTokenizerFromProcessUnit;
+using ::tflite::support::text::tokenizer::CreateTokenizerFromMetadata;
 using ::tflite::support::text::tokenizer::TokenizerResult;
 
 namespace {
@@ -57,7 +57,6 @@ constexpr char kSegmentIdsTensorName[] = "segment_ids";
 constexpr char kScoreTensorName[] = "probability";
 constexpr char kClassificationToken[] = "[CLS]";
 constexpr char kSeparator[] = "[SEP]";
-constexpr int kTokenizerProcessUnitIndex = 0;
 }  // namespace
 
 absl::Status BertNLClassifier::Preprocess(
@@ -161,17 +160,8 @@ BertNLClassifier::CreateBertNLClassifierWithMetadataFromBinary(
 
 absl::Status BertNLClassifier::InitializeFromMetadata() {
   // Set up mandatory tokenizer.
-  const ProcessUnit* tokenizer_process_unit =
-      GetMetadataExtractor()->GetInputProcessUnit(kTokenizerProcessUnitIndex);
-  if (tokenizer_process_unit == nullptr) {
-    return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        "No input process unit found from metadata.",
-        TfLiteSupportStatus::kMetadataInvalidTokenizerError);
-  }
   ASSIGN_OR_RETURN(tokenizer_,
-                   CreateTokenizerFromProcessUnit(tokenizer_process_unit,
-                                                  GetMetadataExtractor()));
+                   CreateTokenizerFromMetadata(*GetMetadataExtractor()));
 
   // Set up optional label vector.
   TrySetLabelFromMetadata(

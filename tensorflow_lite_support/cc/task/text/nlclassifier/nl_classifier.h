@@ -34,7 +34,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/base_task_api.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
-#include "tensorflow_lite_support/cc/text/tokenizers/regex_tokenizer.h"
 
 namespace tflite {
 namespace support {
@@ -60,10 +59,6 @@ struct NLClassifierOptions {
 // The API expects a TFLite model with the following input/output tensor:
 // Input tensor:
 //   (kTfLiteString) - input of the model, accepts a string.
-//      or
-//   (kTfLiteInt32) - input of the model, accepts a tokenized
-//   indices of a string input. A RegexTokenizer needs to be set up in the input
-//   tensor's metadata.
 // Output score tensor:
 //   (kTfLiteUInt8/kTfLiteInt8/kTfLiteInt16/kTfLiteFloat32/kTfLiteFloat64)
 //    - output scores for each class, if type is one of the Int types,
@@ -160,14 +155,10 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
   }
 
  private:
-  bool HasRegexTokenizerMetadata();
-  absl::Status SetupRegexTokenizer();
-
   NLClassifierOptions options_;
   // labels vector initialized from output tensor's associated file, if one
   // exists.
   std::unique_ptr<std::vector<std::string>> labels_vector_;
-  std::unique_ptr<tflite::support::text::tokenizer::RegexTokenizer> tokenizer_;
 };
 
 }  // namespace nlclassifier
