@@ -17,37 +17,78 @@ limitations under the License.
 
 #include <fstream>
 
+#include "absl/strings/str_split.h"
+
 namespace tflite {
 namespace support {
 namespace utils {
-
+namespace {
 struct membuf : std::streambuf {
   membuf(char* begin, char* end) { this->setg(begin, begin, end); }
 };
 
+void ReadIStreamLineByLine(
+    std::istream* istream,
+    const std::function<void(std::string)>& line_processor) {
+  std::string str;
+  while (std::getline(*istream, str)) {
+    if (!str.empty()) {
+      line_processor(str);
+    }
+  }
+}
+
+absl::node_hash_map<std::string, int> ReadIStreamLineSplits(
+    std::istream* istream) {
+  absl::node_hash_map<std::string, int> vocab_index_map;
+  std::string str;
+  ReadIStreamLineByLine(istream, [&vocab_index_map](const std::string& str) {
+    std::vector<std::string> v = absl::StrSplit(str, ' ');
+    vocab_index_map[v[0]] = std::stoi(v[1]);
+  });
+  return vocab_index_map;
+}
+
+std::vector<std::string> ReadIStreamByLine(std::istream* istream) {
+  std::vector<std::string> vocab_from_file;
+  std::string str;
+
+  ReadIStreamLineByLine(istream, [&vocab_from_file](const std::string& str) {
+    vocab_from_file.push_back(str);
+  });
+  return vocab_from_file;
+}
+
+}  // namespace
+
 std::vector<std::string> LoadVocabFromFile(const std::string& path_to_vocab) {
   std::vector<std::string> vocab_from_file;
   std::ifstream in(path_to_vocab.c_str());
-  std::string str;
-  while (std::getline(in, str)) {
-    if (!str.empty()) vocab_from_file.push_back(str);
-  }
-  in.close();
-
-  return vocab_from_file;
+  return ReadIStreamByLine(&in);
 }
 
 std::vector<std::string> LoadVocabFromBuffer(const char* vocab_buffer_data,
                                              const size_t vocab_buffer_size) {
   membuf sbuf(const_cast<char*>(vocab_buffer_data),
               const_cast<char*>(vocab_buffer_data + vocab_buffer_size));
-  std::vector<std::string> vocab_from_file;
   std::istream in(&sbuf);
-  std::string str;
-  while (std::getline(in, str)) {
-    if (!str.empty()) vocab_from_file.push_back(str);
-  }
-  return vocab_from_file;
+  return ReadIStreamByLine(&in);
+}
+
+absl::node_hash_map<std::string, int> LoadVocabAndIndexFromFile(
+    const std::string& path_to_vocab) {
+  absl::node_hash_map<std::string, int> vocab_index_map;
+  std::ifstream in(path_to_vocab.c_str());
+  return ReadIStreamLineSplits(&in);
+}
+
+absl::node_hash_map<std::string, int> LoadVocabAndIndexFromBuffer(
+    const char* vocab_buffer_data, const size_t vocab_buffer_size) {
+  membuf sbuf(const_cast<char*>(vocab_buffer_data),
+              const_cast<char*>(vocab_buffer_data + vocab_buffer_size));
+  absl::node_hash_map<std::string, int> vocab_index_map;
+  std::istream in(&sbuf);
+  return ReadIStreamLineSplits(&in);
 }
 
 }  // namespace utils

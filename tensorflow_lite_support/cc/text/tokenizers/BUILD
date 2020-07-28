@@ -158,6 +158,7 @@ cc_library(
     ],
     deps = [
         ":bert_tokenizer",
+        ":regex_tokenizer",
         ":sentencepiece_tokenizer",
         ":tokenizer",
         "//tensorflow_lite_support/cc:common",
@@ -166,5 +167,22 @@ cc_library(
         "//tensorflow_lite_support/metadata:metadata_schema_cc",
         "//tensorflow_lite_support/metadata/cc:metadata_extractor",
         "@com_google_absl//absl/status",
+    ],
+)
+
+cc_library(
+    name = "regex_tokenizer",
+    srcs = [
+        "regex_tokenizer.cc",
+    ],
+    hdrs = [
+        "regex_tokenizer.h",
+    ],
+    deps = [
+        ":tokenizer",
+        "//tensorflow_lite_support/cc/utils:common_utils",
+        "@com_google_absl//absl/container:node_hash_map",
+        "@com_google_absl//absl/strings",
+        "@com_googlesource_code_re2//:re2",
     ],
 )

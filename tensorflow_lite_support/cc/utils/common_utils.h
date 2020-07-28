@@ -19,15 +19,29 @@ limitations under the License.
 #include <string>
 #include <vector>
 
+#include "absl/container/node_hash_map.h"
+
 namespace tflite {
 namespace support {
 namespace utils {
 
-// read a vocab file, create a vector of strings
+// Read a vocab file with one vocabulary on each line, create a vector of
+// strings.
 std::vector<std::string> LoadVocabFromFile(const std::string& path_to_vocab);
 
+// read a vocab buffer with one vocab one each line, create a vector of strings
 std::vector<std::string> LoadVocabFromBuffer(const char* vocab_buffer_data,
                                              const size_t vocab_buffer_size);
+
+// Read a vocab file with one vocabulary and its corresponding index on each
+// line separated by space, create a map of <vocab, index>.
+absl::node_hash_map<std::string, int> LoadVocabAndIndexFromFile(
+    const std::string& path_to_vocab);
+
+// Read a vocab buffer with one vocabulary and its corresponding index on each
+// line separated by space, create a map of <vocab, index>.
+absl::node_hash_map<std::string, int> LoadVocabAndIndexFromBuffer(
+    const char* vocab_buffer_data, const size_t vocab_buffer_size);
 }  // namespace utils
 }  // namespace support
 }  // namespace tflite

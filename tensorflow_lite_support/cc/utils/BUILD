@@ -25,4 +25,8 @@ cc_library(
     hdrs = [
         "common_utils.h",
     ],
+    deps = [
+        "@com_google_absl//absl/container:node_hash_map",
+        "@com_google_absl//absl/strings",
+    ],
 )

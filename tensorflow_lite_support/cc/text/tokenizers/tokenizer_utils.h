@@ -29,6 +29,10 @@ inline constexpr int kTokenizerProcessUnitIndex = 0;
 StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromMetadata(
     const tflite::metadata::ModelMetadataExtractor& metadata_extractor);
 
-}  // namespace tflite::support::text::tokenizer
+// Create a Tokenizer from model metadata by extracting
+StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromProcessUnit(
+    const tflite::ProcessUnit* tokenizer_process_unit,
+    const tflite::metadata::ModelMetadataExtractor* metadata_extractor);
 
+}  // namespace tflite::support::text::tokenizer
 #endif  // THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TEXT_TOKENIZERS_TOKENIZER_UTILS_H_
