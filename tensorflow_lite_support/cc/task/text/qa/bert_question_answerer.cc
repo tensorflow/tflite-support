@@ -34,9 +34,13 @@ using ::tflite::support::task::core::PopulateTensor;
 using ::tflite::support::task::core::PopulateVector;
 using ::tflite::support::task::core::ReverseSortIndices;
 using ::tflite::support::text::tokenizer::BertTokenizer;
-using ::tflite::support::text::tokenizer::CreateTokenizerFromMetadata;
+using ::tflite::support::text::tokenizer::CreateTokenizerFromProcessUnit;
 using ::tflite::support::text::tokenizer::SentencePieceTokenizer;
 using ::tflite::support::text::tokenizer::TokenizerResult;
+
+namespace {
+constexpr int kTokenizerProcessUnitIndex = 0;
+}
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
 BertQuestionAnswerer::CreateQuestionAnswererWithMetadata(
@@ -327,8 +331,17 @@ std::string BertQuestionAnswerer::ConvertIndexToString(int start, int end) {
 }
 
 absl::Status BertQuestionAnswerer::InitializeFromMetadata() {
+  const ProcessUnit* tokenizer_process_unit =
+      GetMetadataExtractor()->GetInputProcessUnit(kTokenizerProcessUnitIndex);
+  if (tokenizer_process_unit == nullptr) {
+    return CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        "No input process unit found from metadata.",
+        TfLiteSupportStatus::kMetadataInvalidTokenizerError);
+  }
   ASSIGN_OR_RETURN(tokenizer_,
-                   CreateTokenizerFromMetadata(*GetMetadataExtractor()));
+                   CreateTokenizerFromProcessUnit(tokenizer_process_unit,
+                                                  GetMetadataExtractor()));
   return absl::OkStatus();
 }
 

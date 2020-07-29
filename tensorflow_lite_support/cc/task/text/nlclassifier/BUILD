@@ -19,6 +19,8 @@ cc_library(
         "//tensorflow_lite_support/cc/task/core:category",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:task_utils",
+        "//tensorflow_lite_support/cc/text/tokenizers:regex_tokenizer",
+        "//tensorflow_lite_support/cc/text/tokenizers:tokenizer",
         "//tensorflow_lite_support/cc/utils:common_utils",
         "//tensorflow_lite_support/metadata/cc:metadata_extractor",
         "@com_google_absl//absl/algorithm:container",
