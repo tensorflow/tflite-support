@@ -171,7 +171,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
 }
 
 absl::string_view ExternalFileHandler::GetFileContent() {
-  if (external_file_.has_file_content()) {
+  if (!external_file_.file_content().empty()) {
     return external_file_.file_content();
   } else {
     return absl::string_view(static_cast<const char*>(buffer_) +
