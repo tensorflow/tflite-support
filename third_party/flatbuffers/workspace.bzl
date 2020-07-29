@@ -4,8 +4,6 @@ load("//third_party:repo.bzl", "third_party_http_archive")
 
 def repo():
     third_party_http_archive(
-        # We use a special name here because the build_def.bzl is overridden by us. Otherwise, TF's flatbuffer
-        # dependency will conflict with ours.
         name = "flatbuffers",
         strip_prefix = "flatbuffers-1.12.0",
         sha256 = "62f2223fb9181d1d6338451375628975775f7522185266cd5296571ac152bc45",

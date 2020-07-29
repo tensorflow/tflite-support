@@ -81,12 +81,6 @@ namespace qa {
 
 class BertQuestionAnswerer : public QuestionAnswerer {
  public:
-  static constexpr char kIdsTensorName[] = "ids";
-  static constexpr char kMaskTensorName[] = "mask";
-  static constexpr char kSegmentIdsTensorName[] = "segment_ids";
-  static constexpr char kEndLogitsTensorName[] = "end_logits";
-  static constexpr char kStartLogitsTensorName[] = "start_logits";
-
   // TODO(b/150904655): add support to parameterize.
   static constexpr int kMaxQueryLen = 64;
   static constexpr int kMaxSeqLen = 384;

@@ -29,6 +29,12 @@ namespace task {
 namespace text {
 namespace qa {
 
+constexpr char kIdsTensorName[] = "ids";
+constexpr char kMaskTensorName[] = "mask";
+constexpr char kSegmentIdsTensorName[] = "segment_ids";
+constexpr char kEndLogitsTensorName[] = "end_logits";
+constexpr char kStartLogitsTensorName[] = "start_logits";
+
 using ::tflite::support::task::core::FindTensorByName;
 using ::tflite::support::task::core::PopulateTensor;
 using ::tflite::support::task::core::PopulateVector;

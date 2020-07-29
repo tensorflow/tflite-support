@@ -48,6 +48,10 @@ http_archive(
 # could take effects.
 load("//third_party:repo.bzl", "third_party_http_archive")
 
+# Use our patched gflags which fixes a linking issue.
+load("//third_party/gflags:workspace.bzl", gflags = "repo")
+gflags()
+
 third_party_http_archive(
     name = "pybind11",
     urls = [
