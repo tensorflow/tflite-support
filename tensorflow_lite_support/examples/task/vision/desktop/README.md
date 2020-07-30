@@ -22,13 +22,13 @@ In the console, run:
 ```bash
 # Download the model:
 curl \
- -L 'https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/2?lite-format=tflite' \
- -o /tmp/aiy_vision_classifier_birds_V1_2.tflite
+ -L 'https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3?lite-format=tflite' \
+ -o /tmp/aiy_vision_classifier_birds_V1_3.tflite
 
 # Run the classification tool:
 bazel run -c opt \
  tensorflow_lite_support/examples/task/vision/desktop:image_classifier_demo -- \
- --model_path=/tmp/aiy_vision_classifier_birds_V1_2.tflite \
+ --model_path=/tmp/aiy_vision_classifier_birds_V1_3.tflite \
  --image_path=\
 $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/sparrow.jpg \
  --max_results=3
@@ -42,19 +42,19 @@ In the console, you should get:
 Results:
   Rank #0:
    index       : 671
-   score       : 0.91797
-   class name  : /m/01bwbt
-   display name: Passer montanus
+   score       : 0.91406
+   class name  : /m/01bwb9
+   display name: Passer domesticus
   Rank #1:
    index       : 670
    score       : 0.00391
-   class name  : /m/0193xp
-   display name: Troglodytes hiemalis
+   class name  : /m/01bwbt
+   display name: Passer montanus
   Rank #2:
    index       : 495
    score       : 0.00391
-   class name  : /m/05sjn7
-   display name: Mimus gilvus
+   class name  : /m/0bwm6m
+   display name: Passer italiae
 ```
 
 ## Object Detector
@@ -183,6 +183,6 @@ And `/tmp/segmentation-output.jpg` should contain the segmentation mask:
 
 ![segmentation-output](g3doc/segmentation-output.png)
 
-[1]: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/2
+[1]: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3
 [2]: https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/1
 [3]: https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1
