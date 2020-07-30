@@ -271,7 +271,11 @@ std::vector<core::Category> NLClassifier::BuildResults(
     if (use_index_as_labels) {
       label = std::to_string(index);
     } else if (labels_vector_ == nullptr) {
-      label = GetStringAtIndex(labels, index);
+      if (labels->type == kTfLiteString) {
+        label = GetStringAtIndex(labels, index);
+      } else if (labels->type == kTfLiteInt32) {
+        label = std::to_string(GetTensorData<int>(labels)[index]);
+      }
     } else {
       label = (*labels_vector_)[index];
     }
@@ -368,15 +372,16 @@ absl::Status NLClassifier::Initialize(const NLClassifierOptions& options) {
   // If labels_vector_ is not set up from metadata, try register output label
   // tensor from options.
   if (labels_vector_ == nullptr) {
-    // output label tensor should be type STRING if the one exists
+    // output label tensor should be type STRING or INT32 if the one exists
     auto labels = FindTensorWithNameOrIndex(
         output_tensors, output_tensor_metadatas,
         options.output_label_tensor_name, options.output_label_tensor_index);
-    if (labels != nullptr && labels->type != kTfLiteString) {
+    if (labels != nullptr && labels->type != kTfLiteString &&
+        labels->type != kTfLiteInt32) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
           absl::StrCat("Type mismatch for label tensor ", scores->name,
-                       ". Requested STRING, got ",
+                       ". Requested STRING or int32, got ",
                        TfLiteTypeGetName(scores->type), "."),
           TfLiteSupportStatus::kInvalidOutputTensorTypeError);
     }

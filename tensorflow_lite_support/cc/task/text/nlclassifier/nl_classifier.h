@@ -72,7 +72,7 @@ struct NLClassifierOptions {
 //      should be a plain text file with one label per line, the number of
 //      labels should match the number of categories the model outputs.
 // Output label tensor: optional
-//   (kTfLiteString)
+//   (kTfLiteString/kTfLiteInt32)
 //    - output classname for each class, should be of the same length with
 //      scores. If this tensor is not present, the API uses score indices as
 //      classnames.
