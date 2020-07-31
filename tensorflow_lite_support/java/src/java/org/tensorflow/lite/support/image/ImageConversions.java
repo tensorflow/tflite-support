@@ -17,54 +17,32 @@ package org.tensorflow.lite.support.image;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import java.util.Arrays;
-import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 /**
  * Implements some stateless image conversion methods.
  *
- * This class is an internal helper for {@link org.tensorflow.lite.support.image}.
+ * <p>This class is an internal helper for {@link org.tensorflow.lite.support.image}.
  */
 class ImageConversions {
 
   /**
-   * Converts an Image in a TensorBuffer to a Bitmap, whose memory is already allocated.
+   * Converts a {@link TensorBuffer} that represents a RGB image to an ARGB_8888 Bitmap.
    *
-   * <p>Notice: We only support ARGB_8888 at this point.
+   * <p>Data in buffer will be converted into integer to match the Bitmap API.
    *
-   * @param buffer The TensorBuffer object representing the image. It should be an UInt8 buffer with
-   *     3 dimensions: width, height, channel. Size of each dimension should be positive and the
-   *     size of channels should be 3 (representing R, G, B). An optional 4th dimension "batch" is
-   *     acceptable, and dimensions look like: batch, width, height, channel. In this case, size of
-   *     batches should be 1.
-   * @param bitmap The destination of the conversion. Needs to be created in advance, needs to be
-   *     mutable, and needs to have the same width and height with the buffer.
-   * @throws IllegalArgumentException 1) if the {@code buffer} is not uint8 (e.g. a float buffer),
-   *     or has an invalid shape. 2) if the {@code bitmap} is not mutable. 3) if the {@code bitmap}
-   *     has different height or width with the buffer.
+   * @param buffer a RGB image. Its shape should be either (h, w, 3) or (1, h, w, 3)
+   * @throws IllegalArgumentException if the shape of buffer is neither (h, w, 3) nor (1, h, w, 3)
    */
-  static void convertTensorBufferToBitmap(TensorBuffer buffer, Bitmap bitmap) {
-    if (buffer.getDataType() != DataType.UINT8) {
-      // We will add support to FLOAT format conversion in the future, as it may need other configs.
-      throw new UnsupportedOperationException(
-          String.format(
-              "Converting TensorBuffer of type %s to ARGB_8888 Bitmap is not supported yet.",
-              buffer.getDataType()));
-    }
+  static Bitmap convertRgbTensorBufferToBitmap(TensorBuffer buffer) {
     int[] shape = buffer.getShape();
-    TensorBufferContainer.assertRGBImageShape(shape);
-    int h = shape[shape.length - 3];
-    int w = shape[shape.length - 2];
-    if (bitmap.getWidth() != w || bitmap.getHeight() != h) {
-      throw new IllegalArgumentException(String.format(
-          "Given bitmap has different width or height %s with the expected ones %s.",
-          Arrays.toString(new int[]{bitmap.getWidth(), bitmap.getHeight()}),
-          Arrays.toString(new int[]{w, h})));
-    }
-    if (!bitmap.isMutable()) {
-      throw new IllegalArgumentException("Given bitmap is not mutable");
-    }
+    ColorSpaceType rgb = ColorSpaceType.RGB;
+    rgb.assertShape(shape);
+
+    int h = rgb.getHeight(shape);
+    int w = rgb.getWidth(shape);
+    Bitmap bitmap = Bitmap.createBitmap(w, h, rgb.toBitmapConfig());
+
     // TODO(b/138904567): Find a way to avoid creating multiple intermediate buffers every time.
     int[] intValues = new int[w * h];
     int[] rgbValues = buffer.getIntArray();
@@ -75,6 +53,27 @@ class ImageConversions {
       intValues[i] = Color.rgb(r, g, b);
     }
     bitmap.setPixels(intValues, 0, w, 0, 0, w, h);
+
+    return bitmap;
+  }
+
+  /**
+   * Converts a {@link TensorBuffer} that represents a grayscale image to an ALPHA_8 Bitmap.
+   *
+   * <p>Data in buffer will be converted into integer to match the Bitmap API.
+   *
+   * @param buffer a grayscale image. Its shape should be either (h, w) or (1, h, w)
+   * @throws IllegalArgumentException if the shape of buffer is neither (h, w) nor (1, h, w, 1)
+   */
+  static Bitmap convertGrayscaleTensorBufferToBitmap(TensorBuffer buffer) {
+    int[] shape = buffer.getShape();
+    ColorSpaceType grayscale = ColorSpaceType.GRAYSCALE;
+    grayscale.assertShape(shape);
+
+    int h = grayscale.getHeight(shape);
+    int w = grayscale.getWidth(shape);
+    int[] grayValues = buffer.getIntArray();
+    return Bitmap.createBitmap(grayValues, w, h, grayscale.toBitmapConfig());
   }
 
   /**
@@ -82,9 +81,9 @@ class ImageConversions {
    * is already allocated, or could be dynamically allocated.
    *
    * @param bitmap The Bitmap object representing the image. Currently we only support ARGB_8888
-   * config.
+   *     config.
    * @param buffer The destination of the conversion. Needs to be created in advance. If it's
-   * fixed-size, its flat size should be w*h*3.
+   *     fixed-size, its flat size should be w*h*3.
    * @throws IllegalArgumentException if the buffer is fixed-size, but the size doesn't match.
    */
   static void convertBitmapToTensorBuffer(Bitmap bitmap, TensorBuffer buffer) {

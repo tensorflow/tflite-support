@@ -15,11 +15,9 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
 import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
 
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
@@ -27,35 +25,38 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 final class TensorBufferContainer implements ImageContainer {
 
   private final TensorBuffer buffer;
-  private static final int HEIGHT_DIM = -3; // The third to last element of the shape.
-  private static final int WIDTH_DIM = -2; // The second to last element of the shape.
-  private static final int CHANNEL_DIM = -1; // The last element of the shape.
-  private static final int BATCH_DIM =
-      0; // The batch axis may not exist. But if it does, it is the first element of the shape.
+  private final ColorSpaceType colorSpaceType;
 
+  /**
+   * Creates a {@link TensorBufferContainer} object with {@link ColorSpaceType#RGB} as default.
+   *
+   * @throws IllegalArgumentException if the shape of the {@link TensorBuffer} does not match the
+   *     specified color space type
+   */
   static TensorBufferContainer create(TensorBuffer buffer) {
-    return new TensorBufferContainer(buffer);
+    return new TensorBufferContainer(buffer, ColorSpaceType.RGB);
   }
 
-  private TensorBufferContainer(TensorBuffer buffer) {
-    assertRGBImageShape(buffer.getShape());
+  /**
+   * Creates a {@link TensorBufferContainer} object with the specified {@link
+   * TensorImage#ColorSpaceType}.
+   *
+   * @throws IllegalArgumentException if the shape of the {@link TensorBuffer} does not match the
+   *     specified color space type
+   */
+  static TensorBufferContainer create(TensorBuffer buffer, ColorSpaceType colorSpaceType) {
+    return new TensorBufferContainer(buffer, colorSpaceType);
+  }
+
+  private TensorBufferContainer(TensorBuffer buffer, ColorSpaceType colorSpaceType) {
+    colorSpaceType.assertShape(buffer.getShape());
     this.buffer = buffer;
-  }
-
-  // Verifies if the tensor shape is [h, w, 3] or [1, h, w, 3].
-  static void assertRGBImageShape(int[] shape) {
-    checkArgument(
-        (shape.length == 3 || (shape.length == 4 && shape[BATCH_DIM] == 1))
-            && getArrayElement(shape, HEIGHT_DIM) > 0
-            && getArrayElement(shape, WIDTH_DIM) > 0
-            && getArrayElement(shape, CHANNEL_DIM) == 3,
-        "Only supports image shape in (h, w, c) or (1, h, w, c), and channels representing R, G, B"
-            + " in order.");
+    this.colorSpaceType = colorSpaceType;
   }
 
   @Override
   public TensorBufferContainer clone() {
-    return create(TensorBuffer.createFrom(buffer, buffer.getDataType()));
+    return create(TensorBuffer.createFrom(buffer, buffer.getDataType()), colorSpaceType);
   }
 
   @Override
@@ -65,9 +66,7 @@ final class TensorBufferContainer implements ImageContainer {
         "TensorBufferContainer is holding a float-value image which is not able to convert to a"
             + " Bitmap.");
 
-    Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
-    ImageConversions.convertTensorBufferToBitmap(buffer, bitmap);
-    return bitmap;
+    return colorSpaceType.convertTensorBufferToBitmap(buffer);
   }
 
   @Override
@@ -81,33 +80,11 @@ final class TensorBufferContainer implements ImageContainer {
 
   @Override
   public int getWidth() {
-    int[] shape = buffer.getShape();
-    // The defensive check is needed, because buffer might be invalidly changed by users
-    // (a.k.a internal data is corrupted)
-    assertRGBImageShape(shape);
-    return getArrayElement(shape, WIDTH_DIM);
+    return colorSpaceType.getWidth(buffer.getShape());
   }
 
   @Override
   public int getHeight() {
-    int[] shape = buffer.getShape();
-    // The defensive check is needed, because buffer might be invalidly changed by users
-    // (a.k.a internal data is corrupted)
-    assertRGBImageShape(shape);
-    return getArrayElement(shape, HEIGHT_DIM);
-  }
-
-  /**
-   * Gets the element value through absolute indexing.
-   *
-   * @param index the index of the desired element. If negative, it will index relative to the end
-   *     of the array. If index is out-of-bound, modulo will be applied.
-   */
-  private static int getArrayElement(int[] array, int index) {
-    index = index % array.length;
-    if (index < 0) {
-      index += array.length;
-    }
-    return array[index];
+    return colorSpaceType.getHeight(buffer.getShape());
   }
 }
