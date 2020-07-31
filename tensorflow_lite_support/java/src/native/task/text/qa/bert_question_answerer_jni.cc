@@ -42,7 +42,7 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithModelWithM
   absl::string_view model_with_metadata =
       GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 0));
 
-  absl::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
+  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
       BertQuestionAnswerer::CreateQuestionAnswererWithMetadataFromBinary(
           model_with_metadata.data(), model_with_metadata.size());
   if (status.ok()) {
@@ -60,7 +60,7 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithBertByteBu
   absl::string_view vocab =
       GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 1));
 
-  absl::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
+  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
       BertQuestionAnswerer::CreateBertQuestionAnswererFromBinary(
           model.data(), model.size(), vocab.data(), vocab.size());
   if (status.ok()) {
@@ -78,7 +78,7 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithAlbertByte
   absl::string_view sp_model =
       GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 1));
 
-  absl::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
+  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
       BertQuestionAnswerer::CreateAlbertQuestionAnswererFromBinary(
           model.data(), model.size(), sp_model.data(), sp_model.size());
   if (status.ok()) {

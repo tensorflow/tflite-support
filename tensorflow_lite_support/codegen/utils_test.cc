@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/codegen/utils.h"
 
-#include "testing/base/public/gunit.h"
+#include <gtest/gtest.h>
 
 namespace tflite {
 namespace support {

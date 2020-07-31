@@ -16,24 +16,21 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_PORT_INTEGRAL_TYPES_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_PORT_INTEGRAL_TYPES_H_
 
-// TODO: <sys/types.h> is not portable C. Take a close look at this when we add
-// mobile support.
-#include <sys/types.h>
-#include <cstdint>
+// Add namespace here to avoid conflict with other libraries.
+namespace tflite {
 
-typedef signed char        schar;
-typedef int8_t             int8;
-typedef int16_t            int16;
-typedef int32_t            int32;
-typedef int64_t            int64;
+typedef signed char schar;
+typedef signed char int8;
+typedef short int16;
+typedef int int32;
+typedef long long int64;
 
-typedef uint8_t            uint8;
-typedef uint16_t           uint16;
-typedef uint32_t           uint32;
-typedef uint32_t           char32;
-typedef uint64_t           uint64;
-
-typedef unsigned long      uword_t;
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef unsigned int uint32;
+typedef unsigned int char32;
+typedef unsigned long long uint64;
+typedef unsigned long uword_t;
 
 #define GG_LONGLONG(x) x##LL
 #define GG_ULONGLONG(x) x##ULL
@@ -43,5 +40,7 @@ typedef unsigned long      uword_t;
 typedef uint64 Fprint;
 static const Fprint kIllegalFprint = 0;
 static const Fprint kMaxFprint = GG_ULONGLONG(0xFFFFFFFFFFFFFFFF);
+
+}  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_PORT_INTEGRAL_TYPES_H_

@@ -20,6 +20,7 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
+#include "absl/memory/memory.h"
 #include "absl/strings/str_split.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/sentencepiece_tokenizer.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/tokenizer_jni_lib.h"
@@ -36,7 +37,7 @@ Java_org_tensorflow_lite_support_text_tokenizers_SentencePieceTokenizer_nativeLo
     JNIEnv* env, jobject obj, jobject model_buffer) {
   auto model = GetMappedFileBuffer(env, model_buffer);
   auto handle =
-      absl::MakeUnique<SentencePieceTokenizer>(model.data(), model.size());
+      absl::make_unique<SentencePieceTokenizer>(model.data(), model.size());
   return reinterpret_cast<jlong>(handle.release());
 }
 

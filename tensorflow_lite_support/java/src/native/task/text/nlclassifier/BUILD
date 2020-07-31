@@ -18,6 +18,7 @@ cc_library(
 # nl_classifier_native
 tflite_jni_binary(
     name = "libnl_classifier_jni.so",
+    linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [
         ":native_without_resolver",
         "//tensorflow_lite_support/java/src/native/task/core:builtin_op_resolver",
@@ -47,6 +48,7 @@ tflite_jni_binary(
     srcs = [
         "bert_nl_classifier_jni.cc",
     ],
+    linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [
         ":nl_classifier_jni_utils",
         "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier",

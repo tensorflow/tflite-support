@@ -10,6 +10,7 @@ tflite_jni_binary(
     srcs = [
         "bert_question_answerer_jni.cc",
     ],
+    linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [
         "//tensorflow_lite_support/cc/task/text/qa:bert_question_answerer",
         "//tensorflow_lite_support/cc/utils:jni_utils",

@@ -17,6 +17,7 @@ limitations under the License.
 
 #include <string>
 
+#include "absl/memory/memory.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/bert_tokenizer.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/tokenizer_jni_lib.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
@@ -46,7 +47,7 @@ Java_org_tensorflow_lite_support_text_tokenizers_BertTokenizer_nativeLoadResourc
       env->GetStringUTFChars(junknown_token, JNI_FALSE);
   std::string unknown_token(raw_unknown_token);
 
-  auto handle = absl::MakeUnique<BertTokenizer>(
+  auto handle = absl::make_unique<BertTokenizer>(
       vocab, BertTokenizerOptions{
                  .max_bytes_per_token = max_bytes_per_token,
                  .max_chars_per_subtoken = max_chars_per_sub_token,

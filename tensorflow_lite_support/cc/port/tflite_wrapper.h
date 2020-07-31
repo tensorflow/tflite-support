@@ -17,4 +17,5 @@ limitations under the License.
 #define TENSORFLOW_LITE_SUPPORT_CC_PORT_TFLITE_WRAPPER_H_
 
 #include "tensorflow_lite_support/cc/port/default/tflite_wrapper.h"
+
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_PORT_TFLITE_WRAPPER_H_

@@ -9,7 +9,11 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-exports_files(["AndroidManifest.xml"])
+exports_files([
+    "AndroidManifest.xml",
+    "default_version_script.lds",
+    "debug_version_script.lds",
+])
 
 android_library(
     name = "tensorflowlite_support",
@@ -21,6 +25,19 @@ android_library(
     deps = [
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+    ],
+)
+
+android_library(
+    name = "tensorflowlite_support_java",
+    srcs = glob(
+        ["src/java/org/tensorflow/lite/support/**/*.java"],
+    ),
+    javacopts = JAVACOPTS,
+    manifest = "AndroidManifest.xml",
+    deps = [
+        "@org_checkerframework_qual",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
 )
 

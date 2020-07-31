@@ -1,5 +1,6 @@
 workspace(name = "org_tensorflow_lite_support")
 
+load("@bazel_tools//tools/build_defs/repo:java.bzl", "java_import_external")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
@@ -37,10 +38,10 @@ http_archive(
 
 http_archive(
     name = "org_tensorflow",
-    sha256 = "972ec45352161e4308a1b203956eedfb56e22cc6ce4f4ec95f7b087aeb00559e",
-    strip_prefix = "tensorflow-2.3.0-rc0",
+    sha256 = "2595a5c401521f20a2734c4e5d54120996f8391f00bb62a57267d930bce95350",
+    strip_prefix = "tensorflow-2.3.0",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.3.0-rc0.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/v2.3.0.tar.gz",
     ],
 )
 
@@ -171,16 +172,79 @@ http_archive(
 http_archive(
     name = "libyuv",
     urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/refs/heads/master.tar.gz"],
+    sha256 = "0b3254e62ed03346a294c2df005039093d0dffe57118535afd6ddf0977aa7edc",
     build_file = "//third_party:libyuv.BUILD",
 )
 
 http_archive(
     name = "stblib",
     strip_prefix = "stb-master",
+    sha256 = "c92ea7c860212bf30d998f42395503b4216c84a033535e7ed0fd2d9bda643ca7",
     urls = ["https://github.com/nothings/stb/archive/master.zip"],
     build_file = "//third_party:stblib.BUILD",
 )
 
+# AutoValue 1.6+ shades Guava, Auto Common, and JavaPoet. That's OK
+# because none of these jars become runtime dependencies.
+java_import_external(
+    name = "com_google_auto_value",
+    jar_sha256 = "fd811b92bb59ae8a4cf7eb9dedd208300f4ea2b6275d726e4df52d8334aaae9d",
+    jar_urls = [
+        "https://mirror.bazel.build/repo1.maven.org/maven2/com/google/auto/value/auto-value/1.6/auto-value-1.6.jar",
+        "https://repo1.maven.org/maven2/com/google/auto/value/auto-value/1.6/auto-value-1.6.jar",
+    ],
+    licenses = ["notice"],  # Apache 2.0
+    generated_rule_name = "processor",
+    exports = ["@com_google_auto_value_annotations"],
+    extra_build_file_content = "\n".join([
+        "java_plugin(",
+        "    name = \"AutoAnnotationProcessor\",",
+        "    output_licenses = [\"unencumbered\"],",
+        "    processor_class = \"com.google.auto.value.processor.AutoAnnotationProcessor\",",
+        "    tags = [\"annotation=com.google.auto.value.AutoAnnotation;genclass=${package}.AutoAnnotation_${outerclasses}${classname}_${methodname}\"],",
+        "    deps = [\":processor\"],",
+        ")",
+        "",
+        "java_plugin(",
+        "    name = \"AutoOneOfProcessor\",",
+        "    output_licenses = [\"unencumbered\"],",
+        "    processor_class = \"com.google.auto.value.processor.AutoOneOfProcessor\",",
+        "    tags = [\"annotation=com.google.auto.value.AutoValue;genclass=${package}.AutoOneOf_${outerclasses}${classname}\"],",
+        "    deps = [\":processor\"],",
+        ")",
+        "",
+        "java_plugin(",
+        "    name = \"AutoValueProcessor\",",
+        "    output_licenses = [\"unencumbered\"],",
+        "    processor_class = \"com.google.auto.value.processor.AutoValueProcessor\",",
+        "    tags = [\"annotation=com.google.auto.value.AutoValue;genclass=${package}.AutoValue_${outerclasses}${classname}\"],",
+        "    deps = [\":processor\"],",
+        ")",
+        "",
+        "java_library(",
+        "    name = \"com_google_auto_value\",",
+        "    exported_plugins = [",
+        "        \":AutoAnnotationProcessor\",",
+        "        \":AutoOneOfProcessor\",",
+        "        \":AutoValueProcessor\",",
+        "    ],",
+        "    exports = [\"@com_google_auto_value_annotations\"],",
+        ")",
+    ]),
+)
+
+# Auto value annotations
+java_import_external(
+    name = "com_google_auto_value_annotations",
+    jar_sha256 = "d095936c432f2afc671beaab67433e7cef50bba4a861b77b9c46561b801fae69",
+    jar_urls = [
+        "https://mirror.bazel.build/repo1.maven.org/maven2/com/google/auto/value/auto-value-annotations/1.6/auto-value-annotations-1.6.jar",
+        "https://repo1.maven.org/maven2/com/google/auto/value/auto-value-annotations/1.6/auto-value-annotations-1.6.jar",
+    ],
+    licenses = ["notice"],  # Apache 2.0
+    neverlink = True,
+    default_visibility = ["@com_google_auto_value//:__pkg__"],
+)
 
 load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 

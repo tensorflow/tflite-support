@@ -17,6 +17,7 @@ tflite_jni_binary(
     srcs = [
         "image_classifier_jni.cc",
     ],
+    linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
@@ -25,6 +26,6 @@ tflite_jni_binary(
         "//tensorflow_lite_support/cc/task/vision/proto:image_classifier_options_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
         "//tensorflow_lite_support/cc/utils:jni_utils",
-        "//third_party/java/jdk:jni",
+        "//tensorflow_lite_support/java/jni",
     ],
 )

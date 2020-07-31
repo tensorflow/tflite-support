@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "tensorflow_lite_support/codegen/code_generator.h"
 
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 namespace tflite {
 namespace support {

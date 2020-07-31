@@ -38,7 +38,7 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_initJniWithByteBuffer(
     JNIEnv* env, jclass thiz, jobject model_buffer) {
   auto model = GetMappedFileBuffer(env, model_buffer);
-  absl::StatusOr<std::unique_ptr<BertNLClassifier>> status =
+  tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>> status =
       BertNLClassifier::CreateBertNLClassifierWithMetadataFromBinary(
           model.data(), model.size());
   if (status.ok()) {

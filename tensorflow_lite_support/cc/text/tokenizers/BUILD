@@ -46,6 +46,7 @@ cc_library(
     ],
     deps = [
         ":tokenizer",
+        "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/utils:common_utils",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_googlesource_code_re2//:re2",
@@ -68,6 +69,7 @@ cc_library(
         ":bert_tokenizer",
         ":tokenizer_jni_lib",
         "//tensorflow_lite_support/cc/utils:jni_utils",
+        "@com_google_absl//absl/memory",
         "@org_tensorflow//tensorflow/lite/java/jni",
     ],
     alwayslink = 1,
@@ -121,6 +123,7 @@ cc_library(
         ":sentencepiece_tokenizer",
         ":tokenizer_jni_lib",
         "//tensorflow_lite_support/cc/utils:jni_utils",
+        "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite/java/jni",
     ],
