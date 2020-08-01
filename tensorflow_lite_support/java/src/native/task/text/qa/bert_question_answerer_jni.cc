@@ -43,7 +43,7 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithModelWithM
       GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 0));
 
   tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
-      BertQuestionAnswerer::CreateQuestionAnswererWithMetadataFromBinary(
+      BertQuestionAnswerer::CreateFromBuffer(
           model_with_metadata.data(), model_with_metadata.size());
   if (status.ok()) {
     return reinterpret_cast<jlong>(status->release());
@@ -61,7 +61,7 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithBertByteBu
       GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 1));
 
   tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
-      BertQuestionAnswerer::CreateBertQuestionAnswererFromBinary(
+      BertQuestionAnswerer::CreateBertQuestionAnswererFromBuffer(
           model.data(), model.size(), vocab.data(), vocab.size());
   if (status.ok()) {
     return reinterpret_cast<jlong>(status->release());
@@ -79,7 +79,7 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithAlbertByte
       GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 1));
 
   tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
-      BertQuestionAnswerer::CreateAlbertQuestionAnswererFromBinary(
+      BertQuestionAnswerer::CreateAlbertQuestionAnswererFromBuffer(
           model.data(), model.size(), sp_model.data(), sp_model.size());
   if (status.ok()) {
     return reinterpret_cast<jlong>(status->release());

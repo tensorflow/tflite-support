@@ -39,7 +39,7 @@ Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_initJniWithByte
     JNIEnv* env, jclass thiz, jobject model_buffer) {
   auto model = GetMappedFileBuffer(env, model_buffer);
   tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>> status =
-      BertNLClassifier::CreateBertNLClassifierWithMetadataFromBinary(
+      BertNLClassifier::CreateFromBuffer(
           model.data(), model.size());
   if (status.ok()) {
     return reinterpret_cast<jlong>(status->release());

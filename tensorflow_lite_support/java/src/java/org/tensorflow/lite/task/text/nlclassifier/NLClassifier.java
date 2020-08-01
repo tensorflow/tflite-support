@@ -17,6 +17,7 @@ package org.tensorflow.lite.task.text.nlclassifier;
 
 import android.content.Context;
 import com.google.auto.value.AutoValue;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.List;
@@ -138,10 +139,11 @@ public class NLClassifier extends BaseTaskApi {
    * @param context Android context.
    * @param pathToModel Path to the classification model.
    * @return {@link NLClassifier} instance.
+   * @throws IOException If model file fails to load.
    */
-  public static NLClassifier createNLClassifierFromModelFile(Context context, String pathToModel) {
-    return createNLClassifierFromModelFile(
-        context, pathToModel, NLClassifierOptions.builder().build());
+  public static NLClassifier createFromFile(Context context, String pathToModel)
+      throws IOException {
+    return createFromFileAndOptions(context, pathToModel, NLClassifierOptions.builder().build());
   }
 
   /**
@@ -151,20 +153,21 @@ public class NLClassifier extends BaseTaskApi {
    * @param pathToModel Path to the classification model.
    * @param options Configurations for the model.
    * @return {@link NLClassifier} instance.
+   * @throws IOException If model file fails to load.
    */
-  public static NLClassifier createNLClassifierFromModelFile(
-      Context context, String pathToModel, NLClassifierOptions options) {
-    return createFromBuffer(TaskJniUtils.loadMappedFile(context, pathToModel), options);
+  public static NLClassifier createFromFileAndOptions(
+      Context context, String pathToModel, NLClassifierOptions options) throws IOException {
+    return createFromBufferAndOptions(TaskJniUtils.loadMappedFile(context, pathToModel), options);
   }
 
   /**
    * Create {@link NLClassifier} with {@link MappedByteBuffer} from {@link NLClassifierOptions}.
    *
-   * @param modelBuffer Path to the classification model.
+   * @param modelBuffer In memory buffer of the classification model.
    * @param options Configurations for the model.
    * @return {@link NLClassifier} instance.
    */
-  public static NLClassifier createFromBuffer(
+  public static NLClassifier createFromBufferAndOptions(
       final MappedByteBuffer modelBuffer, final NLClassifierOptions options) {
     return new NLClassifier(
         TaskJniUtils.createHandleFromLibrary(

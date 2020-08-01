@@ -87,20 +87,20 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
   using BaseTaskApi::BaseTaskApi;
 
   // Creates a NLClassifier from TFLite model buffer.
-  static StatusOr<std::unique_ptr<NLClassifier>> CreateNLClassifier(
+  static StatusOr<std::unique_ptr<NLClassifier>> CreateFromBufferAndOptions(
       const char* model_buffer_data, size_t model_buffer_size,
       const NLClassifierOptions& options = {},
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Creates a NLClassifier from TFLite model file.
-  static StatusOr<std::unique_ptr<NLClassifier>> CreateNLClassifier(
+  static StatusOr<std::unique_ptr<NLClassifier>> CreateFromFileAndOptions(
       const std::string& path_to_model, const NLClassifierOptions& options = {},
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Creates a NLClassifier from TFLite model file descriptor.
-  static StatusOr<std::unique_ptr<NLClassifier>> CreateNLClassifier(
+  static StatusOr<std::unique_ptr<NLClassifier>> CreateFromFdAndOptions(
       int fd, const NLClassifierOptions& options = {},
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());

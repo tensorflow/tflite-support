@@ -53,6 +53,7 @@ public class TaskJniUtils {
    * @param filePath path of the file to be loaded
    * @param options options to set up the task API, used by the provider
    * @return C++ handle as long
+   * @throws IOException If model file fails to load.
    */
   public static <T> long createHandleFromFdAndOptions(
       Context context,
@@ -104,30 +105,26 @@ public class TaskJniUtils {
    * @param libName name of C++ lib to load
    * @param filePaths file paths to load
    * @return C++ pointer as long
+   * @throws IOException If model file fails to load.
    */
   public static long createHandleWithMultipleAssetFilesFromLibrary(
       Context context,
       final MultipleBuffersHandleProvider provider,
       String libName,
-      String... filePaths) {
+      String... filePaths)
+      throws IOException {
     final MappedByteBuffer[] buffers = new MappedByteBuffer[filePaths.length];
     for (int i = 0; i < filePaths.length; i++) {
       buffers[i] = loadMappedFile(context, filePaths[i]);
     }
-    try {
-      return createHandleFromLibrary(
-          new EmptyHandleProvider() {
-            @Override
-            public long createHandle() {
-              return provider.createHandle(buffers);
-            }
-          }, libName);
-    } catch (Exception e) {
-      String errorMessage =
-          "Error getting native address of native library: " + libName + " from modelPaths";
-      Log.e(TAG, errorMessage, e);
-      throw new IllegalStateException(errorMessage, e);
-    }
+    return createHandleFromLibrary(
+        new EmptyHandleProvider() {
+          @Override
+          public long createHandle() {
+            return provider.createHandle(buffers);
+          }
+        },
+        libName);
   }
 
   /**
@@ -136,18 +133,16 @@ public class TaskJniUtils {
    * @param context Application context to access assets.
    * @param filePath Asset path of the file.
    * @return the loaded memory mapped file.
+   * @throws IOException If model file fails to load.
    */
-  public static MappedByteBuffer loadMappedFile(Context context, String filePath) {
+  public static MappedByteBuffer loadMappedFile(Context context, String filePath)
+      throws IOException {
     try (AssetFileDescriptor fileDescriptor = context.getAssets().openFd(filePath);
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor())) {
       FileChannel fileChannel = inputStream.getChannel();
       long startOffset = fileDescriptor.getStartOffset();
       long declaredLength = fileDescriptor.getDeclaredLength();
       return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-    } catch (IOException e) {
-      String errorMessage = "Failed to load file: " + filePath;
-      Log.e(TAG, errorMessage, e);
-      throw new IllegalStateException(errorMessage, e);
     }
   }
 

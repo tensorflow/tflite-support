@@ -18,9 +18,9 @@ Use the C++ API to answer questions as follows:
 using tflite::support::task::text::qa::BertQuestionAnswerer;
 using tflite::support::task::text::qa::QaAnswer;
 // Create API handler with Mobile Bert model.
-auto qa_client = BertQuestionAnswerer::CreateBertQuestionAnswerer("/path/to/mobileBertModel", "/path/to/vocab");
+auto qa_client = BertQuestionAnswerer::CreateBertQuestionAnswererFromFile("/path/to/mobileBertModel", "/path/to/vocab");
 // Or create API handler with Albert model.
-// auto qa_client = BertQuestionAnswerer::CreateAlbertQuestionAnswerer("/path/to/alBertModel", "/path/to/sentencePieceModel");
+// auto qa_client = BertQuestionAnswerer::CreateAlbertQuestionAnswererFromFile("/path/to/alBertModel", "/path/to/sentencePieceModel");
 
 
 std::string context =
@@ -77,14 +77,14 @@ Use the C++ API to perform language ID classification as follows:
 ```cc
 using tflite::support::task::text::nlclassifier::NLClassifier;
 using tflite::support::task::core::Category;
-auto classifier = NLClassifier::CreateNLClassifier("/path/to/model");
+auto classifier = NLClassifier::CreateFromFileAndOptions("/path/to/model");
 // Or create a customized NLClassifierOptions
 // NLClassifierOptions options =
 //   {
 //     .output_score_tensor_name = myOutputScoreTensorName,
 //     .output_label_tensor_name = myOutputLabelTensorName,
 //   }
-// auto classifier = NLClassifier::CreateNLClassifier("/path/to/model", options);
+// auto classifier = NLClassifier::CreateFromFileAndOptions("/path/to/model", options);
 std::string context = "What language is this?";
 std::vector<Category> categories = classifier->Classify(context);
 // Access category results.

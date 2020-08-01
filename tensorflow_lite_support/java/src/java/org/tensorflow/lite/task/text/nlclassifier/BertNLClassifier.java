@@ -16,7 +16,9 @@ limitations under the License.
 package org.tensorflow.lite.task.text.nlclassifier;
 
 import android.content.Context;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.util.List;
 import org.tensorflow.lite.support.label.Category;
 import org.tensorflow.lite.task.core.BaseTaskApi;
@@ -56,14 +58,24 @@ public class BertNLClassifier extends BaseTaskApi {
    * @param pathToModel Path to the classification model.
    * @return {@link BertNLClassifier} instance.
    */
-  public static BertNLClassifier createBertNLClassifierWithMetadata(
-      final Context context, final String pathToModel) {
+  public static BertNLClassifier createFromFile(final Context context, final String pathToModel)
+      throws IOException {
+    return createFromBuffer(TaskJniUtils.loadMappedFile(context, pathToModel));
+  }
+
+  /**
+   * Create {@link BertNLClassifier} with {@link MappedByteBuffer}.
+   *
+   * @param modelBuffer In memory buffer of the model.
+   * @return {@link BertNLClassifier} instance.
+   */
+  public static BertNLClassifier createFromBuffer(final MappedByteBuffer modelBuffer) {
     return new BertNLClassifier(
         TaskJniUtils.createHandleFromLibrary(
             new EmptyHandleProvider() {
               @Override
               public long createHandle() {
-                return initJniWithByteBuffer(TaskJniUtils.loadMappedFile(context, pathToModel));
+                return initJniWithByteBuffer(modelBuffer);
               }
             },
             BERT_NL_CLASSIFIER_NATIVE_LIBNAME));

@@ -49,7 +49,7 @@ constexpr int kTokenizerProcessUnitIndex = 0;
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
-BertQuestionAnswerer::CreateQuestionAnswererWithMetadata(
+BertQuestionAnswerer::CreateFromFile(
     const std::string& path_to_model_with_metadata) {
   std::unique_ptr<BertQuestionAnswerer> api_to_init;
   ASSIGN_OR_RETURN(
@@ -63,7 +63,7 @@ BertQuestionAnswerer::CreateQuestionAnswererWithMetadata(
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
-BertQuestionAnswerer::CreateQuestionAnswererWithMetadataFromBinary(
+BertQuestionAnswerer::CreateFromBuffer(
     const char* model_with_metadata_buffer_data,
     size_t model_with_metadata_buffer_size) {
   std::unique_ptr<BertQuestionAnswerer> api_to_init;
@@ -78,7 +78,7 @@ BertQuestionAnswerer::CreateQuestionAnswererWithMetadataFromBinary(
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
-BertQuestionAnswerer::CreateBertQuestionAnswerer(
+BertQuestionAnswerer::CreateBertQuestionAnswererFromFile(
     const std::string& path_to_model, const std::string& path_to_vocab) {
   std::unique_ptr<BertQuestionAnswerer> api_to_init;
   ASSIGN_OR_RETURN(
@@ -92,7 +92,7 @@ BertQuestionAnswerer::CreateBertQuestionAnswerer(
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
-BertQuestionAnswerer::CreateBertQuestionAnswererFromBinary(
+BertQuestionAnswerer::CreateBertQuestionAnswererFromBuffer(
     const char* model_buffer_data, size_t model_buffer_size,
     const char* vocab_buffer_data, size_t vocab_buffer_size) {
   std::unique_ptr<BertQuestionAnswerer> api_to_init;
@@ -108,7 +108,7 @@ BertQuestionAnswerer::CreateBertQuestionAnswererFromBinary(
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
-BertQuestionAnswerer::CreateAlbertQuestionAnswerer(
+BertQuestionAnswerer::CreateAlbertQuestionAnswererFromFile(
     const std::string& path_to_model, const std::string& path_to_spmodel) {
   std::unique_ptr<BertQuestionAnswerer> api_to_init;
   ASSIGN_OR_RETURN(
@@ -122,7 +122,7 @@ BertQuestionAnswerer::CreateAlbertQuestionAnswerer(
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
-BertQuestionAnswerer::CreateAlbertQuestionAnswererFromBinary(
+BertQuestionAnswerer::CreateAlbertQuestionAnswererFromBuffer(
     const char* model_buffer_data, size_t model_buffer_size,
     const char* spmodel_buffer_data, size_t spmodel_buffer_size) {
   std::unique_ptr<BertQuestionAnswerer> api_to_init;

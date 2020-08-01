@@ -94,7 +94,7 @@ Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_initJniWithByteBuff
     jobject model_buffer) {
   auto model = GetMappedFileBuffer(env, model_buffer);
   tflite::support::StatusOr<std::unique_ptr<NLClassifier>> status =
-      NLClassifier::CreateNLClassifier(
+      NLClassifier::CreateFromBufferAndOptions(
           model.data(), model.size(),
           ConvertJavaNLClassifierOptions(env, nl_classifier_options),
           tflite::task::CreateOpResolver());

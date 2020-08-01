@@ -16,6 +16,7 @@ limitations under the License.
 package org.tensorflow.lite.task.text.qa;
 
 import android.content.Context;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import org.tensorflow.lite.task.core.BaseTaskApi;
@@ -46,12 +47,13 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
    * </ul>
    *
    * @param context android context
-   * @param pathToModelWithMetadata file path to the model with metadata. Note: The model should not
-   *     be compressed
+   * @param pathToModel file path to the model with metadata. Note: The model should not be
+   *     compressed
    * @return {@link BertQuestionAnswerer} instance
+   * @throws IOException If model file fails to load.
    */
-  public static BertQuestionAnswerer createQuestionAnswererWithMetadata(
-      Context context, String pathToModelWithMetadata) {
+  public static BertQuestionAnswerer createFromFile(Context context, String pathToModel)
+      throws IOException {
     return new BertQuestionAnswerer(
         TaskJniUtils.createHandleWithMultipleAssetFilesFromLibrary(
             context,
@@ -62,7 +64,7 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
               }
             },
             BERT_QUESTION_ANSWERER_NATIVE_LIBNAME,
-            pathToModelWithMetadata));
+            pathToModel));
   }
 
   /**
@@ -70,17 +72,14 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
    *
    * <p>One suitable model is: https://tfhub.dev/tensorflow/lite-model/mobilebert/1/default/1
    *
-   * <p>TODO(b/149510792): Actually, create{Bert|Albert}QuestionAnswerer support multiple models
-   * beyond BERT or Albert literally. May refactor names to indicate their preprocessing methods and
-   * usage.
-   *
    * @param context android context
    * @param pathToModel file path to the bert model. Note: The model should not be compressed
    * @param pathToVocab file path to the vocabulary file. Note: The file should not be compressed
    * @return {@link BertQuestionAnswerer} instance
+   * @throws IOException If model file fails to load.
    */
-  public static BertQuestionAnswerer createBertQuestionAnswerer(
-      Context context, String pathToModel, String pathToVocab) {
+  public static BertQuestionAnswerer createBertQuestionAnswererFromFile(
+      Context context, String pathToModel, String pathToVocab) throws IOException {
     return new BertQuestionAnswerer(
         TaskJniUtils.createHandleWithMultipleAssetFilesFromLibrary(
             context,
@@ -105,9 +104,10 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
    * @param pathToSentencePieceModel file path to the sentence piece model file. Note: The model
    *     should not be compressed
    * @return {@link BertQuestionAnswerer} instance
+   * @throws IOException If model file fails to load.
    */
-  public static BertQuestionAnswerer createAlbertQuestionAnswerer(
-      Context context, String pathToModel, String pathToSentencePieceModel) {
+  public static BertQuestionAnswerer createAlbertQuestionAnswererFromFile(
+      Context context, String pathToModel, String pathToSentencePieceModel) throws IOException {
     return new BertQuestionAnswerer(
         TaskJniUtils.createHandleWithMultipleAssetFilesFromLibrary(
             context,

@@ -39,10 +39,9 @@ namespace qa {
 // branch of Albert models use SentencePiece tokenizer, respectively.
 //
 // Factory methods:
-//   CreateQuestionAnswererWithMetadata(path_to_model_with_metadata)
-//   CreateQuestionAnswererWithMetadataFromBinary(
-//                                          model_with_metadata_buffer_data,
-//                                          model_with_metadata_buffer_size)
+//   CreateFromFile(path_to_model_with_metadata)
+//   CreateFromBuffer(model_with_metadata_buffer_data,
+//                                model_with_metadata_buffer_size)
 //     Generic API to create the QuestionAnswerer for bert models with metadata
 //     populated. The API expects a Bert based TFLite model with metadata
 //     containing the following information:
@@ -54,24 +53,24 @@ namespace qa {
 //      [0]: https://tfhub.dev/tensorflow/lite-model/mobilebert/1/default/1
 //      [1]: https://tfhub.dev/tensorflow/lite-model/albert_lite_base/squadv1/1
 //
-//   CreateBertQuestionAnswerer(path_to_model, path_to_vocab)
+//   CreateBertQuestionAnswererFromFile(path_to_model, path_to_vocab)
 //     Creates a BertQuestionAnswerer from TFLite model file and vocab file for
 //     WordPiece tokenizer. Used in C++ environment.
 //     One suitable model is:
 //       https://tfhub.dev/tensorflow/lite-model/mobilebert/1/default/1
 //
-//   CreateBertQuestionAnswererFromBinary(model_buffer_data, model_buffer_size,
+//   CreateBertQuestionAnswererFromBuffer(model_buffer_data, model_buffer_size,
 //                                        vocab_buffer_data, vocab_buffer_size)
 //     Creates a BertQuestionAnswerer from TFLite model buffer and vocab file
 //     buffer for WordPiece tokenizer. Used in Jave (JNI) environment.
 //
-//   CreateAlbertQuestionAnswerer(path_to_model, path_to_spmodel)
+//   CreateAlbertQuestionAnswererFromFile(path_to_model, path_to_spmodel)
 //     Creates an AlbertQuestionAnswerer from TFLite model file and
 //     SentencePiece model file. Used in C++ environment.
 //     One suitable model is:
 //       https://tfhub.dev/tensorflow/lite-model/albert_lite_base/squadv1/1
 //
-//   CreateAlbertQuestionAnswererFromBinary(model_buffer_data,
+//   CreateAlbertQuestionAnswererFromBuffer(model_buffer_data,
 //                                          model_buffer_size,
 //                                          spmodel_buffer_data,
 //                                          spmodel_buffer_size)
@@ -91,30 +90,29 @@ class BertQuestionAnswerer : public QuestionAnswerer {
   static constexpr int kNumLiteThreads = 4;
   static constexpr bool kUseLowerCase = true;
 
-  static StatusOr<std::unique_ptr<QuestionAnswerer>>
-  CreateQuestionAnswererWithMetadata(
+  static StatusOr<std::unique_ptr<QuestionAnswerer>> CreateFromFile(
       const std::string& path_to_model_with_metadata);
 
-  static StatusOr<std::unique_ptr<QuestionAnswerer>>
-  CreateQuestionAnswererWithMetadataFromBinary(
+  static StatusOr<std::unique_ptr<QuestionAnswerer>> CreateFromBuffer(
       const char* model_with_metadata_buffer_data,
       size_t model_with_metadata_buffer_size);
 
-  static StatusOr<std::unique_ptr<QuestionAnswerer>> CreateBertQuestionAnswerer(
-      const std::string& path_to_model, const std::string& path_to_vocab);
+  static StatusOr<std::unique_ptr<QuestionAnswerer>>
+  CreateBertQuestionAnswererFromFile(const std::string& path_to_model,
+                                     const std::string& path_to_vocab);
 
   static StatusOr<std::unique_ptr<QuestionAnswerer>>
-  CreateBertQuestionAnswererFromBinary(const char* model_buffer_data,
+  CreateBertQuestionAnswererFromBuffer(const char* model_buffer_data,
                                        size_t model_buffer_size,
                                        const char* vocab_buffer_data,
                                        size_t vocab_buffer_size);
 
   static StatusOr<std::unique_ptr<QuestionAnswerer>>
-  CreateAlbertQuestionAnswerer(const std::string& path_to_model,
-                               const std::string& path_to_spmodel);
+  CreateAlbertQuestionAnswererFromFile(const std::string& path_to_model,
+                                       const std::string& path_to_spmodel);
 
   static StatusOr<std::unique_ptr<QuestionAnswerer>>
-  CreateAlbertQuestionAnswererFromBinary(const char* model_buffer_data,
+  CreateAlbertQuestionAnswererFromBuffer(const char* model_buffer_data,
                                          size_t model_buffer_size,
                                          const char* spmodel_buffer_data,
                                          size_t spmodel_buffer_size);

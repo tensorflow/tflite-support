@@ -57,16 +57,14 @@ class BertNLClassifier : public NLClassifier {
 
   // Factory function to create a BertNLClassifier from TFLite model with
   // metadata.
-  static StatusOr<std::unique_ptr<BertNLClassifier>>
-  CreateBertNLClassifierWithMetadata(
+  static StatusOr<std::unique_ptr<BertNLClassifier>> CreateFromFile(
       const std::string& path_to_model_with_metadata,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Factory function to create a BertNLClassifier from in memory buffer of a
   // TFLite model with metadata.
-  static StatusOr<std::unique_ptr<BertNLClassifier>>
-  CreateBertNLClassifierWithMetadataFromBinary(
+  static StatusOr<std::unique_ptr<BertNLClassifier>> CreateFromBuffer(
       const char* model_with_metadata_buffer_data,
       size_t model_with_metadata_buffer_size,
       std::unique_ptr<tflite::OpResolver> resolver =

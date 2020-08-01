@@ -389,7 +389,8 @@ absl::Status NLClassifier::Initialize(const NLClassifierOptions& options) {
   return absl::OkStatus();
 }
 
-StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateNLClassifier(
+StatusOr<std::unique_ptr<NLClassifier>>
+NLClassifier::CreateFromBufferAndOptions(
     const char* model_buffer_data, size_t model_buffer_size,
     const NLClassifierOptions& options,
     std::unique_ptr<tflite::OpResolver> resolver) {
@@ -402,7 +403,7 @@ StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateNLClassifier(
   return std::move(nl_classifier);
 }
 
-StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateNLClassifier(
+StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateFromFileAndOptions(
     const std::string& path_to_model, const NLClassifierOptions& options,
     std::unique_ptr<tflite::OpResolver> resolver) {
   std::unique_ptr<NLClassifier> nl_classifier;
@@ -413,7 +414,7 @@ StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateNLClassifier(
   return std::move(nl_classifier);
 }
 
-StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateNLClassifier(
+StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateFromFdAndOptions(
     int fd, const NLClassifierOptions& options,
     std::unique_ptr<tflite::OpResolver> resolver) {
   std::unique_ptr<NLClassifier> nl_classifier;
