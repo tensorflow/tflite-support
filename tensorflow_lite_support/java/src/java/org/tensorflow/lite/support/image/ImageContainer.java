@@ -49,4 +49,7 @@ interface ImageContainer {
    * underlying image format.
    */
   TensorBuffer getTensorBuffer(DataType dataType);
+
+  /** Returns the color space type of the image. */
+  ColorSpaceType getColorSpaceType();
 }

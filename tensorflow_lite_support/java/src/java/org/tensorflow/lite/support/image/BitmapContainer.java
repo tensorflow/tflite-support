@@ -72,4 +72,9 @@ final class BitmapContainer implements ImageContainer {
   public int getHeight() {
     return bitmap.getHeight();
   }
+
+  @Override
+  public ColorSpaceType getColorSpaceType() {
+    return ColorSpaceType.fromBitmapConfig(bitmap.getConfig());
+  }
 }

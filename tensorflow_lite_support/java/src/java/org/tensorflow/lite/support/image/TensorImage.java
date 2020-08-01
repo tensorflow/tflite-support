@@ -44,7 +44,6 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
  *
  * @see ImageProcessor which is often used for transforming a {@link TensorImage}.
  */
-// TODO(b/138906681): Support basic Image properties (ColorType, DataType)
 // TODO(b/138907116): Support loading images from TensorBuffer with properties.
 // TODO(b/138905544): Support directly loading RGBBytes, YUVBytes and other types if necessary.
 public class TensorImage {
@@ -179,18 +178,33 @@ public class TensorImage {
    * @throws IllegalArgumentException if the shape is neither (h, w, 3) nor (1, h, w, 3)
    */
   public void load(TensorBuffer buffer) {
-    container = TensorBufferContainer.create(buffer);
+    load(buffer, ColorSpaceType.RGB);
+  }
+
+  /**
+   * Loads a {@link TensorBuffer} containing pixel values with the specific {@link ColorSapceType}.
+   *
+   * <p>Note: if the data type of {@code buffer} does not match that of this {@link TensorImage},
+   * numeric casting and clamping will be applied when calling {@link #getTensorBuffer} and {@link
+   * #getBuffer}.
+   *
+   * @throws IllegalArgumentException if the shape of buffer does not match the color space type
+   * @see ColorSpaceType#assertShape
+   */
+  public void load(TensorBuffer buffer, ColorSpaceType colorSpaceType) {
+    container = TensorBufferContainer.create(buffer, colorSpaceType);
   }
 
   /**
    * Returns a {@link Bitmap} representation of this {@link TensorImage}.
    *
+   * <p>Numeric casting and clamping will be applied if the stored data is not uint8.
+   *
    * <p>Important: it's only a reference. DO NOT MODIFY. We don't create a copy here for performance
    * concern, but if modification is necessary, please make a copy.
    *
    * @return a reference to a {@link Bitmap} in ARGB_8888 config. "A" channel is always opaque
-   * @throws IllegalStateException if the {@link TensorImage} never loads data, or if the {@link
-   *     TensorImage} is holding a float-value image in {@code TensorBuffer}
+   * @throws IllegalStateException if the {@link TensorImage} never loads data
    */
   public Bitmap getBitmap() {
     if (container == null) {
@@ -251,6 +265,19 @@ public class TensorImage {
   }
 
   /**
+   * Gets the color space type of this {@link TensorImage}.
+   *
+   * @throws IllegalStateException if the {@link TensorImage} never loads data
+   */
+  public ColorSpaceType getColorSpaceType() {
+    if (container == null) {
+      throw new IllegalStateException("No image has been loaded yet.");
+    }
+
+    return container.getColorSpaceType();
+  }
+
+  /**
    * Gets the image width.
    *
    * @throws IllegalStateException if the {@link TensorImage} never loads data
@@ -274,6 +301,7 @@ public class TensorImage {
     if (container == null) {
       throw new IllegalStateException("No image has been loaded yet.");
     }
+
     return container.getHeight();
   }
 }

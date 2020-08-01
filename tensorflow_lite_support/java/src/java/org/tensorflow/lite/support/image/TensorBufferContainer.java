@@ -15,9 +15,8 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
-
 import android.graphics.Bitmap;
+import android.util.Log;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
@@ -26,16 +25,7 @@ final class TensorBufferContainer implements ImageContainer {
 
   private final TensorBuffer buffer;
   private final ColorSpaceType colorSpaceType;
-
-  /**
-   * Creates a {@link TensorBufferContainer} object with {@link ColorSpaceType#RGB} as default.
-   *
-   * @throws IllegalArgumentException if the shape of the {@link TensorBuffer} does not match the
-   *     specified color space type
-   */
-  static TensorBufferContainer create(TensorBuffer buffer) {
-    return new TensorBufferContainer(buffer, ColorSpaceType.RGB);
-  }
+  private static final String TAG = TensorBufferContainer.class.getSimpleName();
 
   /**
    * Creates a {@link TensorBufferContainer} object with the specified {@link
@@ -61,10 +51,15 @@ final class TensorBufferContainer implements ImageContainer {
 
   @Override
   public Bitmap getBitmap() {
-    checkState(
-        buffer.getDataType() == DataType.UINT8,
-        "TensorBufferContainer is holding a float-value image which is not able to convert to a"
-            + " Bitmap.");
+    if (buffer.getDataType() != DataType.UINT8) {
+      // Print warning instead of throwing an exception. When using float models, users may want to
+      // convert the resulting float image into Bitmap. That's fine to do so, as long as they are
+      // aware of the potential accuracy lost when casting to uint8.
+      Log.w(
+          TAG,
+          "<Warning> TensorBufferContainer is holding a non-uint8 image. The conversion to Bitmap"
+              + " will cause numeric casting and clamping on the data value.");
+    }
 
     return colorSpaceType.convertTensorBufferToBitmap(buffer);
   }
@@ -86,5 +81,10 @@ final class TensorBufferContainer implements ImageContainer {
   @Override
   public int getHeight() {
     return colorSpaceType.getHeight(buffer.getShape());
+  }
+
+  @Override
+  public ColorSpaceType getColorSpaceType() {
+    return colorSpaceType;
   }
 }
