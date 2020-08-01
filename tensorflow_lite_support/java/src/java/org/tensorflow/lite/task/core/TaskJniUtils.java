@@ -68,9 +68,9 @@ public class TaskJniUtils {
             @Override
             public long createHandle() {
               return provider.createHandle(
-                  /*fileDescriptor=*/ assetFileDescriptor.getParcelFileDescriptor().getFd(),
-                  /*fileDescriptorLength=*/ assetFileDescriptor.getLength(),
-                  /*fileDescriptorOffset=*/ assetFileDescriptor.getStartOffset(),
+                  assetFileDescriptor.getParcelFileDescriptor().getFd(),
+                  assetFileDescriptor.getLength(),
+                  assetFileDescriptor.getStartOffset(),
                   options);
             }
           },

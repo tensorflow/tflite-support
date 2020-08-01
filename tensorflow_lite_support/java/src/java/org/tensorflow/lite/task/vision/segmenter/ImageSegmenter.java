@@ -28,6 +28,7 @@ import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
+import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 
 /**
  * Performs segmentation on images.
@@ -55,7 +56,7 @@ import org.tensorflow.lite.task.core.TaskJniUtils;
  *             is the number of classes supported by the model.
  *         <li>optional (but recommended) label map(s) can be attached as AssociatedFile-s with type
  *             TENSOR_AXIS_LABELS, containing one label per line. The first such AssociatedFile (if
- *             any) is used to fill the class name, i.e. {@link ColoredLabel#getClassName} of the
+ *             any) is used to fill the class name, i.e. {@link ColoredLabel#getlabel()} of the
  *             results. The display name, i.e. {@link ColoredLabel#getDisplayName}, is filled from
  *             the AssociatedFile (if any) whose locale matches the `display_names_locale` field of
  *             the `ImageSegmenterOptions` used at creation time ("en" by default, i.e. English). If
@@ -98,13 +99,17 @@ public final class ImageSegmenter extends BaseTaskApi {
     try (AssetFileDescriptor assetFileDescriptor = context.getAssets().openFd(modelPath)) {
       long nativeHandle =
           TaskJniUtils.createHandleFromLibrary(
-              () ->
-                  initJniWithModelFdAndOptions(
-                      /*fileDescriptor=*/ assetFileDescriptor.getParcelFileDescriptor().getFd(),
-                      /*fileDescriptorLength=*/ assetFileDescriptor.getLength(),
-                      /*fileDescriptorOffset=*/ assetFileDescriptor.getStartOffset(),
+              new EmptyHandleProvider() {
+                @Override
+                public long createHandle() {
+                  return initJniWithModelFdAndOptions(
+                      assetFileDescriptor.getParcelFileDescriptor().getFd(),
+                      assetFileDescriptor.getLength(),
+                      assetFileDescriptor.getStartOffset(),
                       options.getDisplayNamesLocale(),
-                      options.getOutputType().getValue()),
+                      options.getOutputType().getValue());
+                }
+              },
               IMAGE_SEGMENTER_NATIVE_LIB);
       return new ImageSegmenter(nativeHandle, options.getOutputType());
     }

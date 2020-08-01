@@ -28,8 +28,7 @@ final class TensorBufferContainer implements ImageContainer {
   private static final String TAG = TensorBufferContainer.class.getSimpleName();
 
   /**
-   * Creates a {@link TensorBufferContainer} object with the specified {@link
-   * TensorImage#ColorSpaceType}.
+   * Creates a {@link TensorBufferContainer} object with the specified {@link ColorSpaceType}.
    *
    * @throws IllegalArgumentException if the shape of the {@link TensorBuffer} does not match the
    *     specified color space type

@@ -1,6 +1,6 @@
 load("@build_bazel_rules_android//android:rules.bzl", "android_library")
-load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
 load("@org_tensorflow//tensorflow/lite/java:aar_with_jni.bzl", "aar_with_jni")
+load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
