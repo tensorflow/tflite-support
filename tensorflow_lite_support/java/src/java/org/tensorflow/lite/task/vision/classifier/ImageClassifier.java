@@ -16,6 +16,7 @@ limitations under the License.
 package org.tensorflow.lite.task.vision.classifier;
 
 import android.content.Context;
+import android.graphics.Rect;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
+import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 
 /**
  * Performs classification on images.
@@ -259,10 +261,29 @@ public final class ImageClassifier extends BaseTaskApi {
   /**
    * Performs actual classification on the provided image.
    *
-   * @param image a {@link TensorImage} object that represents a RGB image
+   * @param image a {@link TensorImage} object that represents an RGB image
    * @throws AssertionError if error occurs when classifying the image from the native code
    */
   public List<Classifications> classify(TensorImage image) {
+    return classify(image, ImageProcessingOptions.builder().build());
+  }
+
+  /**
+   * Performs actual classification on the provided image with {@link ImageProcessingOptions}.
+   *
+   * <p>{@link ImageClassifier} supports the following options:
+   *
+   * <ul>
+   *   <li>Region of interest (ROI) (through {@link ImageProcessingOptions#Builder#setRoi}). It
+   *       defaults to the entire image.
+   *   <li>image rotation (through {@link ImageProcessingOptions#Builder#setOrientation}). It
+   *       defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.
+   * </ul>
+   *
+   * @param image a {@link TensorImage} object that represents an RGB image
+   * @throws AssertionError if error occurs when classifying the image from the native code
+   */
+  public List<Classifications> classify(TensorImage image, ImageProcessingOptions options) {
     checkNotClosed();
 
     // image_classifier_jni.cc expects an uint8 image. Convert image of other types into uint8.
@@ -270,8 +291,19 @@ public final class ImageClassifier extends BaseTaskApi {
         image.getDataType() == DataType.UINT8
             ? image
             : TensorImage.createFrom(image, DataType.UINT8);
+
+    Rect roi =
+        options.getRoi().isEmpty()
+            ? new Rect(0, 0, imageUint8.getWidth(), imageUint8.getHeight())
+            : options.getRoi();
+
     return classifyNative(
-        getNativeHandle(), imageUint8.getBuffer(), imageUint8.getWidth(), imageUint8.getHeight());
+        getNativeHandle(),
+        imageUint8.getBuffer(),
+        imageUint8.getWidth(),
+        imageUint8.getHeight(),
+        new int[] {roi.left, roi.top, roi.width(), roi.height()},
+        options.getOrientation().getValue());
   }
 
   private static native long initJniWithModelFdAndOptions(
@@ -280,6 +312,14 @@ public final class ImageClassifier extends BaseTaskApi {
       long fileDescriptorOffset,
       ImageClassifierOptions options);
 
+  /**
+   * The native method to classify an image with the ROI and orientation.
+   *
+   * @param roi the ROI of the input image, an array representing the bounding box as {left, top,
+   *     width, height}
+   * @param orientation the integer value corresponding to {@link
+   *     ImageProcessingOptions#Orientation}
+   */
   private static native List<Classifications> classifyNative(
-      long nativeHandle, ByteBuffer image, int width, int height);
+      long nativeHandle, ByteBuffer image, int width, int height, int[] roi, int orientation);
 }

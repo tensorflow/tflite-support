@@ -8,6 +8,9 @@ package(
 
 android_library(
     name = "base_task_api",
-    srcs = glob(["*.java"]),
+    srcs = glob(["**/*.java"]),
     javacopts = JAVACOPTS,
+    deps = [
+        "@com_google_auto_value",
+    ],
 )

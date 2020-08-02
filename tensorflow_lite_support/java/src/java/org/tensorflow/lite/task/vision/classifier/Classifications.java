@@ -30,11 +30,15 @@ import org.tensorflow.lite.support.label.Category;
 public abstract class Classifications {
 
   @UsedByReflection("image_classifier_jni.cc")
-  public static Classifications create(List<Category> categories, int headIndex) {
+  static Classifications create(List<Category> categories, int headIndex) {
     return new AutoValue_Classifications(
         Collections.unmodifiableList(new ArrayList<Category>(categories)), headIndex);
   }
 
+  // As an open source project, we've been trying avoiding depending on common java libraries,
+  // such as Guava, because it may introduce conflicts with clients who also happen to use those
+  // libraries. Therefore, instead of using ImmutableList here, we convert the List into
+  // unmodifiableList in create() to make it less vulnerable.
   public abstract List<Category> getCategories();
 
   public abstract int getHeadIndex();

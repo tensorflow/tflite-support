@@ -21,6 +21,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
@@ -29,6 +30,7 @@ limitations under the License.
 namespace {
 
 using ::tflite::support::StatusOr;
+using ::tflite::support::task::vision::BoundingBox;
 using ::tflite::support::task::vision::ClassificationResult;
 using ::tflite::support::task::vision::Classifications;
 using ::tflite::support::task::vision::FrameBuffer;
@@ -144,6 +146,33 @@ jobject ConvertToClassificationResults(JNIEnv* env,
   return classifications_list;
 }
 
+FrameBuffer::Orientation convertToFrameBufferOrientation(JNIEnv* env,
+                                                         jint jorientation) {
+  switch (jorientation) {
+    case 0:
+      return FrameBuffer::Orientation::kTopLeft;
+    case 1:
+      return FrameBuffer::Orientation::kTopRight;
+    case 2:
+      return FrameBuffer::Orientation::kBottomRight;
+    case 3:
+      return FrameBuffer::Orientation::kBottomLeft;
+    case 4:
+      return FrameBuffer::Orientation::kLeftTop;
+    case 5:
+      return FrameBuffer::Orientation::kRightTop;
+    case 6:
+      return FrameBuffer::Orientation::kRightBottom;
+    case 7:
+      return FrameBuffer::Orientation::kLeftBottom;
+  }
+  // Should never happen.
+  ThrowException(env, kAssertionError,
+                 "The FrameBuffer Orientation type is unsupported: %d",
+                 jorientation);
+  return FrameBuffer::Orientation::kTopLeft;
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_core_BaseTaskApi_deinitJni(JNIEnv* env,
                                                          jobject thiz,
@@ -180,13 +209,23 @@ Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_initJniWithModel
 extern "C" JNIEXPORT jobject JNICALL
 Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_classifyNative(
     JNIEnv* env, jclass thiz, jlong native_handle, jobject image_byte_buffer,
-    jint width, jint height) {
+    jint width, jint height, jintArray jroi, jint jorientation) {
   auto* classifier = reinterpret_cast<ImageClassifier*>(native_handle);
   auto image = GetMappedFileBuffer(env, image_byte_buffer);
-  std::unique_ptr<FrameBuffer> frame_buffer =
-      CreateFromRgbRawBuffer(reinterpret_cast<const uint8*>(image.data()),
-                             FrameBuffer::Dimension{width, height});
-  auto results_or = classifier->Classify(*frame_buffer);
+  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
+      reinterpret_cast<const uint8*>(image.data()),
+      FrameBuffer::Dimension{width, height},
+      convertToFrameBufferOrientation(env, jorientation));
+
+  int* roi_array = env->GetIntArrayElements(jroi, 0);
+  BoundingBox roi;
+  roi.set_origin_x(roi_array[0]);
+  roi.set_origin_y(roi_array[1]);
+  roi.set_width(roi_array[2]);
+  roi.set_height(roi_array[3]);
+  env->ReleaseIntArrayElements(jroi, roi_array, 0);
+
+  auto results_or = classifier->Classify(*frame_buffer, roi);
   if (results_or.ok()) {
     return ConvertToClassificationResults(env, results_or.value());
   } else {

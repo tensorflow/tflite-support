@@ -22,6 +22,7 @@ tflite_jni_binary(
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
+        "//tensorflow_lite_support/cc/task/vision/proto:bounding_box_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/proto:classifications_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/proto:image_classifier_options_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
