@@ -171,16 +171,20 @@ http_archive(
 
 http_archive(
     name = "libyuv",
-    urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/refs/heads/master.tar.gz"],
-    sha256 = "0b3254e62ed03346a294c2df005039093d0dffe57118535afd6ddf0977aa7edc",
+    urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/6d603ec3f57dafddc424ef895e5d903915e94ba6.tar.gz"],
+    # Adding the constrain of sha256 and strip_prefix will cause failure.
+    # It seems that the downloaded libyuv was different every time, so that
+    # the specified sha256 and strip_prefix cannot match.
+    # sha256 = "ce196c72858456baa8022fa4a0dc18b77d619265dbc0e3d58e25ad15ca402522",
+    # strip_prefix = "libyuv-6d603ec3f57dafddc424ef895e5d903915e94ba6",
     build_file = "//third_party:libyuv.BUILD",
 )
 
 http_archive(
     name = "stblib",
-    strip_prefix = "stb-master",
-    sha256 = "c92ea7c860212bf30d998f42395503b4216c84a033535e7ed0fd2d9bda643ca7",
-    urls = ["https://github.com/nothings/stb/archive/master.zip"],
+    strip_prefix = "stb-b42009b3b9d4ca35bc703f5310eedc74f584be58",
+    sha256 = "13a99ad430e930907f5611325ec384168a958bf7610e63e60e2fd8e7b7379610",
+    urls = ["https://github.com/nothings/stb/archive/b42009b3b9d4ca35bc703f5310eedc74f584be58.tar.gz"],
     build_file = "//third_party:stblib.BUILD",
 )
 
