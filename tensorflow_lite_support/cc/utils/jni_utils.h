@@ -77,6 +77,9 @@ std::vector<std::string> StringListToVector(JNIEnv* env, jobject list_object);
 // Gets a mapped file buffer from a java object representing a file.
 absl::string_view GetMappedFileBuffer(JNIEnv* env, const jobject& file_buffer);
 
+// Creates a Java byte array object based on the input data.
+jbyteArray CreateByteArray(JNIEnv* env, const jbyte* data, int num_bytes);
+
 void ThrowException(JNIEnv* env, const char* clazz, const char* fmt, ...);
 
 }  // namespace utils

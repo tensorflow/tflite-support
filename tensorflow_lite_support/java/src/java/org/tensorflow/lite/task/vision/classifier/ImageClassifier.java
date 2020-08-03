@@ -55,7 +55,7 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
  *       </ul>
  * </ul>
  *
- * <p>An example of such model can be found at<a
+ * <p>An example of such model can be found on <a
  * href="https://tfhub.dev/bohemian-visual-recognition-alliance/lite-model/models/mushroom-identification_v1/1">TensorFlow
  * Hub.</a>.
  */
@@ -67,7 +67,7 @@ public final class ImageClassifier extends BaseTaskApi {
    * Creates an {@link ImageClassifier} instance from the default {@link ImageClassifierOptions}.
    *
    * @param modelPath path of the classification model with metadata in the assets
-   * @throws IOException if an I/O error occurs when loading the tflite model.
+   * @throws IOException if an I/O error occurs when loading the tflite model
    * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
    *     code
    */

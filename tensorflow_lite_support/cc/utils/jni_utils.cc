@@ -54,6 +54,13 @@ absl::string_view GetMappedFileBuffer(JNIEnv* env, const jobject& file_buffer) {
       static_cast<size_t>(env->GetDirectBufferCapacity(file_buffer)));
 }
 
+jbyteArray CreateByteArray(JNIEnv* env, const jbyte* data, int num_bytes) {
+  jbyteArray ret = env->NewByteArray(num_bytes);
+  env->SetByteArrayRegion(ret, 0, num_bytes, data);
+
+  return ret;
+}
+
 void ThrowException(JNIEnv* env, const char* clazz, const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);

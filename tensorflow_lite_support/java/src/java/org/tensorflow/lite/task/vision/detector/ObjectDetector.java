@@ -74,7 +74,7 @@ import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
  *       </ul>
  * </ul>
  *
- * <p>An example of such model can be found at<a
+ * <p>An example of such model can be found on <a
  * href="https://tfhub.dev/google/lite-model/object_detection/mobile_object_localizer_v1/1/metadata/1">TensorFlow
  * Hub.</a>.
  */
