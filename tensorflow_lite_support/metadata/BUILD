@@ -57,3 +57,22 @@ stamp_metadata_parser_version(
     srcs = ["metadata_parser.py.template"],
     outs = ["metadata_parser.py"],
 )
+
+py_library(
+    name = "metadata",
+    srcs = [
+        "metadata.py",
+        ":metadata_parser_py",
+    ],
+    data = ["//tensorflow_lite_support/metadata:metadata_schema.fbs"],
+    srcs_version = "PY2AND3",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":metadata_schema_py",
+        ":schema_py",
+        "//tensorflow_lite_support/metadata/cc/python:_pywrap_metadata_version",
+        "//tensorflow_lite_support/metadata/flatbuffers_lib:_pywrap_flatbuffers",
+        "@flatbuffers//:runtime_py",
+        "@org_tensorflow//tensorflow/python:platform",
+    ],
+)
