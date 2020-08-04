@@ -23,7 +23,6 @@ import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.label.Category;
 
 // TODO(b/161175702): introduce the multihead model and explain what is a `head`.
-// TODO(b/161379260): update Category to show both class name and display name.
 /** The classification results of one head in a multihead {@link ImageClassifier}. */
 @AutoValue
 @UsedByReflection("image_classifier_jni.cc")
@@ -35,10 +34,8 @@ public abstract class Classifications {
         Collections.unmodifiableList(new ArrayList<Category>(categories)), headIndex);
   }
 
-  // As an open source project, we've been trying avoiding depending on common java libraries,
-  // such as Guava, because it may introduce conflicts with clients who also happen to use those
-  // libraries. Therefore, instead of using ImmutableList here, we convert the List into
-  // unmodifiableList in create() to make it less vulnerable.
+  // Same reason for not using ImmutableList as stated in
+  // {@link ImageClassifier#ImageClassifierOptions#labelAllowList}.
   public abstract List<Category> getCategories();
 
   public abstract int getHeadIndex();

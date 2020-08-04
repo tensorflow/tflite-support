@@ -37,6 +37,6 @@ public abstract class Detection {
   public abstract RectF getBoundingBox();
 
   // Same reason for not using ImmutableList as stated in
-  // ObjectDetector.ObjectDetectorOptions.classNameAllowList.
+  // {@link ObjectDetector#ObjectDetectorOptions#labelAllowList}.
   public abstract List<Category> getCategories();
 }

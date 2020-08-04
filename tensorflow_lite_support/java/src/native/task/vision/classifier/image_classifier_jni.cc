@@ -26,6 +26,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
+#include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
 namespace {
 
@@ -33,6 +34,7 @@ using ::tflite::support::StatusOr;
 using ::tflite::support::task::vision::BoundingBox;
 using ::tflite::support::task::vision::ClassificationResult;
 using ::tflite::support::task::vision::Classifications;
+using ::tflite::support::task::vision::ConvertToCategory;
 using ::tflite::support::task::vision::FrameBuffer;
 using ::tflite::support::task::vision::ImageClassifier;
 using ::tflite::support::task::vision::ImageClassifierOptions;
@@ -76,7 +78,7 @@ ImageClassifierOptions ConvertToProtoOptions(JNIEnv* env,
   }
 
   jmethodID allow_list_id = env->GetMethodID(
-      java_options_class, "getClassNameAllowList", "()Ljava/util/List;");
+      java_options_class, "getLabelAllowList", "()Ljava/util/List;");
   jobject allow_list = env->CallObjectMethod(java_options, allow_list_id);
   auto allow_list_vector = StringListToVector(env, allow_list);
   for (const auto& class_name : allow_list_vector) {
@@ -84,7 +86,7 @@ ImageClassifierOptions ConvertToProtoOptions(JNIEnv* env,
   }
 
   jmethodID deny_list_id = env->GetMethodID(
-      java_options_class, "getClassNameDenyList", "()Ljava/util/List;");
+      java_options_class, "getLabelDenyList", "()Ljava/util/List;");
   jobject deny_list = env->CallObjectMethod(java_options, deny_list_id);
   auto deny_list_vector = StringListToVector(env, deny_list);
   for (const auto& class_name : deny_list_vector) {
@@ -104,12 +106,6 @@ jobject ConvertToClassificationResults(JNIEnv* env,
                              "(Ljava/util/List;I)Lorg/tensorflow/lite/"
                              "task/vision/classifier/Classifications;");
 
-  // jclass and init of Category.
-  jclass category_class =
-      env->FindClass("org/tensorflow/lite/support/label/Category");
-  jmethodID category_init =
-      env->GetMethodID(category_class, "<init>", "(Ljava/lang/String;F)V");
-
   // jclass, init, and add of ArrayList.
   jclass array_list_class = env->FindClass("java/util/ArrayList");
   jmethodID array_list_init =
@@ -122,26 +118,22 @@ jobject ConvertToClassificationResults(JNIEnv* env,
                      static_cast<jint>(results.classifications_size()));
   for (int i = 0; i < results.classifications_size(); i++) {
     auto classifications = results.classifications(i);
-    jobject category_list = env->NewObject(array_list_class, array_list_init,
-                                           classifications.classes_size());
-    for (int j = 0; j < classifications.classes_size(); j++) {
-      auto category = classifications.classes(j);
-      // TODO(b/161379260): update Category to show both class name and display
-      // name.
-      std::string label = category.display_name().empty()
-                              ? category.class_name()
-                              : category.display_name();
-      jstring class_name = env->NewStringUTF(label.c_str());
-      jobject jcategory = env->NewObject(category_class, category_init,
-                                         class_name, category.score());
-      env->DeleteLocalRef(class_name);
-      env->CallBooleanMethod(category_list, array_list_add_method, jcategory);
+    jobject jcategory_list = env->NewObject(array_list_class, array_list_init,
+                                            classifications.classes_size());
+    for (const auto& classification : classifications.classes()) {
+      jobject jcategory = ConvertToCategory(env, classification);
+      env->CallBooleanMethod(jcategory_list, array_list_add_method, jcategory);
+
+      env->DeleteLocalRef(jcategory);
     }
     jobject jclassifications = env->CallStaticObjectMethod(
-        classifications_class, classifications_create, category_list,
+        classifications_class, classifications_create, jcategory_list,
         classifications.head_index());
     env->CallBooleanMethod(classifications_list, array_list_add_method,
                            jclassifications);
+
+    env->DeleteLocalRef(jcategory_list);
+    env->DeleteLocalRef(jclassifications);
   }
   return classifications_list;
 }

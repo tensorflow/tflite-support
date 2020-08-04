@@ -27,11 +27,13 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/object_detector_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
+#include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
 namespace {
 
 using ::tflite::support::StatusOr;
 using ::tflite::support::task::vision::BoundingBox;
+using ::tflite::support::task::vision::ConvertToCategory;
 using ::tflite::support::task::vision::DetectionResult;
 using ::tflite::support::task::vision::FrameBuffer;
 using ::tflite::support::task::vision::ObjectDetector;
@@ -75,7 +77,7 @@ ObjectDetectorOptions ConvertToProtoOptions(JNIEnv* env, jobject java_options) {
   }
 
   jmethodID allow_list_id = env->GetMethodID(
-      java_options_class, "getClassNameAllowList", "()Ljava/util/List;");
+      java_options_class, "getLabelAllowList", "()Ljava/util/List;");
   jobject allow_list = env->CallObjectMethod(java_options, allow_list_id);
   std::vector<std::string> allow_list_vector =
       StringListToVector(env, allow_list);
@@ -84,7 +86,7 @@ ObjectDetectorOptions ConvertToProtoOptions(JNIEnv* env, jobject java_options) {
   }
 
   jmethodID deny_list_id = env->GetMethodID(
-      java_options_class, "getClassNameDenyList", "()Ljava/util/List;");
+      java_options_class, "getLabelDenyList", "()Ljava/util/List;");
   jobject deny_list = env->CallObjectMethod(java_options, deny_list_id);
   auto deny_list_vector = StringListToVector(env, deny_list);
   for (const auto& class_name : deny_list_vector) {
@@ -102,12 +104,6 @@ jobject ConvertToDetectionResults(JNIEnv* env, const DetectionResult& results) {
       detection_class, "create",
       "(Landroid/graphics/RectF;Ljava/util/List;)Lorg/tensorflow/lite/"
       "task/vision/detector/Detection;");
-
-  // jclass and init of Category.
-  jclass category_class =
-      env->FindClass("org/tensorflow/lite/support/label/Category");
-  jmethodID category_init =
-      env->GetMethodID(category_class, "<init>", "(Ljava/lang/String;F)V");
 
   // jclass, init, and add of ArrayList.
   jclass array_list_class = env->FindClass("java/util/ArrayList");
@@ -128,16 +124,8 @@ jobject ConvertToDetectionResults(JNIEnv* env, const DetectionResult& results) {
     // Create the category list.
     jobject category_list = env->NewObject(array_list_class, array_list_init,
                                            detection.classes_size());
-    for (const auto& category : detection.classes()) {
-      // TODO(b/161379260): update Category to show both class name and display
-      // name.
-      std::string label = category.display_name().empty()
-                              ? category.class_name()
-                              : category.display_name();
-      jstring class_name = env->NewStringUTF(label.c_str());
-      jobject jcategory = env->NewObject(category_class, category_init,
-                                         class_name, category.score());
-      env->DeleteLocalRef(class_name);
+    for (const auto& classification : detection.classes()) {
+      jobject jcategory = ConvertToCategory(env, classification);
       env->CallBooleanMethod(category_list, array_list_add_method, jcategory);
     }
 

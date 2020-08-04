@@ -122,7 +122,7 @@ public final class ImageClassifier extends BaseTaskApi {
     // not an option here, because
     // 1. java.util.Optional require Java 8 while we need to support Java 7.
     // 2. The Guava library (com.google.common.base.Optional) is avoided in this project. See the
-    // comments for classNameAllowList.
+    // comments for labelAllowList.
     private final String displayNamesLocale;
     private final int maxResults;
     private final float scoreThreshold;
@@ -130,10 +130,10 @@ public final class ImageClassifier extends BaseTaskApi {
     // As an open source project, we've been trying avoiding depending on common java libraries,
     // such as Guava, because it may introduce conflicts with clients who also happen to use those
     // libraries. Therefore, instead of using ImmutableList here, we convert the List into
-    // unmodifiableList in setClassNameAllowList() and setClassNameDenyList() to make it less
+    // unmodifiableList in setLabelAllowList() and setLabelDenyList() to make it less
     // vulnerable.
-    private final List<String> classNameAllowList;
-    private final List<String> classNameDenyList;
+    private final List<String> labelAllowList;
+    private final List<String> labelDenyList;
 
     public static Builder builder() {
       return new Builder();
@@ -145,8 +145,8 @@ public final class ImageClassifier extends BaseTaskApi {
       private int maxResults = -1;
       private float scoreThreshold;
       private boolean isScoreThresholdSet = false;
-      private List<String> classNameAllowList = new ArrayList<>();
-      private List<String> classNameDenyList = new ArrayList<>();
+      private List<String> labelAllowList = new ArrayList<>();
+      private List<String> labelDenyList = new ArrayList<>();
 
       private Builder() {}
 
@@ -192,24 +192,24 @@ public final class ImageClassifier extends BaseTaskApi {
       }
 
       /**
-       * Sets the optional allow list of class names.
+       * Sets the optional allowlist of labels.
        *
-       * <p>If non-empty, classifications whose class name is not in this set will be filtered out.
-       * Duplicate or unknown class names are ignored. Mutually exclusive with classNameDenyList.
+       * <p>If non-empty, classifications whose label is not in this set will be filtered out.
+       * Duplicate or unknown labels are ignored. Mutually exclusive with labelDenyList.
        */
-      public Builder setClassNameAllowList(List<String> classNameAllowList) {
-        this.classNameAllowList = Collections.unmodifiableList(new ArrayList<>(classNameAllowList));
+      public Builder setLabelAllowList(List<String> labelAllowList) {
+        this.labelAllowList = Collections.unmodifiableList(new ArrayList<>(labelAllowList));
         return this;
       }
 
       /**
-       * Sets the optional deny list of class names.
+       * Sets the optional denylist of labels.
        *
-       * <p>If non-empty, classifications whose class name is in this set will be filtered out.
-       * Duplicate or unknown class names are ignored. Mutually exclusive with classNameAllowList.
+       * <p>If non-empty, classifications whose label is in this set will be filtered out. Duplicate
+       * or unknown labels are ignored. Mutually exclusive with labelAllowList.
        */
-      public Builder setClassNameDenyList(List<String> classNameDenyList) {
-        this.classNameDenyList = Collections.unmodifiableList(new ArrayList<>(classNameDenyList));
+      public Builder setLabelDenyList(List<String> labelDenyList) {
+        this.labelDenyList = Collections.unmodifiableList(new ArrayList<>(labelDenyList));
         return this;
       }
 
@@ -239,13 +239,13 @@ public final class ImageClassifier extends BaseTaskApi {
     }
 
     @UsedByReflection("image_classifier_jni.cc")
-    public List<String> getClassNameAllowList() {
-      return new ArrayList<>(classNameAllowList);
+    public List<String> getLabelAllowList() {
+      return new ArrayList<>(labelAllowList);
     }
 
     @UsedByReflection("image_classifier_jni.cc")
-    public List<String> getClassNameDenyList() {
-      return new ArrayList<>(classNameDenyList);
+    public List<String> getLabelDenyList() {
+      return new ArrayList<>(labelDenyList);
     }
 
     private ImageClassifierOptions(Builder builder) {
@@ -253,8 +253,8 @@ public final class ImageClassifier extends BaseTaskApi {
       maxResults = builder.maxResults;
       scoreThreshold = builder.scoreThreshold;
       isScoreThresholdSet = builder.isScoreThresholdSet;
-      classNameAllowList = builder.classNameAllowList;
-      classNameDenyList = builder.classNameDenyList;
+      labelAllowList = builder.labelAllowList;
+      labelDenyList = builder.labelDenyList;
     }
   }
 
