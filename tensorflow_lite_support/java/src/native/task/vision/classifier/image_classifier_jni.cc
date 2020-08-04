@@ -35,6 +35,7 @@ using ::tflite::support::task::vision::BoundingBox;
 using ::tflite::support::task::vision::ClassificationResult;
 using ::tflite::support::task::vision::Classifications;
 using ::tflite::support::task::vision::ConvertToCategory;
+using ::tflite::support::task::vision::ConvertToFrameBufferOrientation;
 using ::tflite::support::task::vision::FrameBuffer;
 using ::tflite::support::task::vision::ImageClassifier;
 using ::tflite::support::task::vision::ImageClassifierOptions;
@@ -138,33 +139,6 @@ jobject ConvertToClassificationResults(JNIEnv* env,
   return classifications_list;
 }
 
-FrameBuffer::Orientation convertToFrameBufferOrientation(JNIEnv* env,
-                                                         jint jorientation) {
-  switch (jorientation) {
-    case 0:
-      return FrameBuffer::Orientation::kTopLeft;
-    case 1:
-      return FrameBuffer::Orientation::kTopRight;
-    case 2:
-      return FrameBuffer::Orientation::kBottomRight;
-    case 3:
-      return FrameBuffer::Orientation::kBottomLeft;
-    case 4:
-      return FrameBuffer::Orientation::kLeftTop;
-    case 5:
-      return FrameBuffer::Orientation::kRightTop;
-    case 6:
-      return FrameBuffer::Orientation::kRightBottom;
-    case 7:
-      return FrameBuffer::Orientation::kLeftBottom;
-  }
-  // Should never happen.
-  ThrowException(env, kAssertionError,
-                 "The FrameBuffer Orientation type is unsupported: %d",
-                 jorientation);
-  return FrameBuffer::Orientation::kTopLeft;
-}
-
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_core_BaseTaskApi_deinitJni(JNIEnv* env,
                                                          jobject thiz,
@@ -207,7 +181,7 @@ Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_classifyNative(
   std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
       reinterpret_cast<const uint8*>(image.data()),
       FrameBuffer::Dimension{width, height},
-      convertToFrameBufferOrientation(env, jorientation));
+      ConvertToFrameBufferOrientation(env, jorientation));
 
   int* roi_array = env->GetIntArrayElements(jroi, 0);
   BoundingBox roi;

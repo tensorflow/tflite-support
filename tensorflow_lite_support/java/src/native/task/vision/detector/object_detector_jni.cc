@@ -34,6 +34,7 @@ namespace {
 using ::tflite::support::StatusOr;
 using ::tflite::support::task::vision::BoundingBox;
 using ::tflite::support::task::vision::ConvertToCategory;
+using ::tflite::support::task::vision::ConvertToFrameBufferOrientation;
 using ::tflite::support::task::vision::DetectionResult;
 using ::tflite::support::task::vision::FrameBuffer;
 using ::tflite::support::task::vision::ObjectDetector;
@@ -181,12 +182,13 @@ Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_initJniWithModelFdA
 extern "C" JNIEXPORT jobject JNICALL
 Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_detectNative(
     JNIEnv* env, jclass thiz, jlong native_handle, jobject image_byte_buffer,
-    jint width, jint height) {
+    jint width, jint height, jint jorientation) {
   auto* detector = reinterpret_cast<ObjectDetector*>(native_handle);
   absl::string_view image = GetMappedFileBuffer(env, image_byte_buffer);
-  std::unique_ptr<FrameBuffer> frame_buffer =
-      CreateFromRgbRawBuffer(reinterpret_cast<const uint8*>(image.data()),
-                             FrameBuffer::Dimension{width, height});
+  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
+      reinterpret_cast<const uint8*>(image.data()),
+      FrameBuffer::Dimension{width, height},
+      ConvertToFrameBufferOrientation(env, jorientation));
   auto results_or = detector->Detect(*frame_buffer);
   if (results_or.ok()) {
     return ConvertToDetectionResults(env, results_or.value());

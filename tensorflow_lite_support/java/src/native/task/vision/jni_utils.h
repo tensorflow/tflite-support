@@ -18,6 +18,7 @@ limitations under the License.
 
 #include <jni.h>
 
+#include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/class_proto_inc.h"
 
 namespace tflite {
@@ -27,6 +28,9 @@ namespace vision {
 
 // Creates a Java Category object based on Class.
 jobject ConvertToCategory(JNIEnv* env, const Class& classification);
+
+FrameBuffer::Orientation ConvertToFrameBufferOrientation(JNIEnv* env,
+                                                         jint jorientation);
 
 }  // namespace vision
 }  // namespace task

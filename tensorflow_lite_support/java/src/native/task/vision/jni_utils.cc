@@ -16,11 +16,15 @@ limitations under the License.
 #include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
 #include "absl/strings/str_cat.h"
+#include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
 namespace tflite {
 namespace support {
 namespace task {
 namespace vision {
+
+using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::ThrowException;
 
 constexpr char kCategoryClassName[] =
     "Lorg/tensorflow/lite/support/label/Category;";
@@ -48,6 +52,33 @@ jobject ConvertToCategory(JNIEnv* env, const Class& classification) {
       env->CallStaticObjectMethod(category_class, category_create, label,
                                   display_name, classification.score());
   return jcategory;
+}
+
+FrameBuffer::Orientation ConvertToFrameBufferOrientation(JNIEnv* env,
+                                                         jint jorientation) {
+  switch (jorientation) {
+    case 0:
+      return FrameBuffer::Orientation::kTopLeft;
+    case 1:
+      return FrameBuffer::Orientation::kTopRight;
+    case 2:
+      return FrameBuffer::Orientation::kBottomRight;
+    case 3:
+      return FrameBuffer::Orientation::kBottomLeft;
+    case 4:
+      return FrameBuffer::Orientation::kLeftTop;
+    case 5:
+      return FrameBuffer::Orientation::kRightTop;
+    case 6:
+      return FrameBuffer::Orientation::kRightBottom;
+    case 7:
+      return FrameBuffer::Orientation::kLeftBottom;
+  }
+  // Should never happen.
+  ThrowException(env, kAssertionError,
+                 "The FrameBuffer Orientation type is unsupported: %d",
+                 jorientation);
+  return FrameBuffer::Orientation::kTopLeft;
 }
 
 }  // namespace vision

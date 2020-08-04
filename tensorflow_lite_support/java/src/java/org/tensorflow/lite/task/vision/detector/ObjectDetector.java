@@ -27,6 +27,7 @@ import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
+import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 
 /**
  * Performs object detection on images.
@@ -288,6 +289,19 @@ public final class ObjectDetector extends BaseTaskApi {
    * @throws AssertionError if error occurs when processing the image from the native code
    */
   public List<Detection> detect(TensorImage image) {
+    return detect(image, ImageProcessingOptions.builder().build());
+  }
+
+  /**
+   * Performs actual detection on the provided image.
+   *
+   * @param image a {@link TensorImage} object that represents a RGB image
+   * @param options {@link ObjectDetector} only supports image rotation (through {@link
+   *     ImageProcessingOptions#Builder#setOrientation}) currently. The orientation of an image
+   *     defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.
+   * @throws AssertionError if error occurs when processing the image from the native code
+   */
+  public List<Detection> detect(TensorImage image, ImageProcessingOptions options) {
     checkNotClosed();
 
     // object_detector_jni.cc expects an uint8 image. Convert image of other types into uint8.
@@ -296,7 +310,11 @@ public final class ObjectDetector extends BaseTaskApi {
             ? image
             : TensorImage.createFrom(image, DataType.UINT8);
     return detectNative(
-        getNativeHandle(), imageUint8.getBuffer(), imageUint8.getWidth(), imageUint8.getHeight());
+        getNativeHandle(),
+        imageUint8.getBuffer(),
+        imageUint8.getWidth(),
+        imageUint8.getHeight(),
+        options.getOrientation().getValue());
   }
 
   private static native long initJniWithModelFdAndOptions(
@@ -306,5 +324,5 @@ public final class ObjectDetector extends BaseTaskApi {
       ObjectDetectorOptions options);
 
   private static native List<Detection> detectNative(
-      long nativeHandle, ByteBuffer image, int width, int height);
+      long nativeHandle, ByteBuffer image, int width, int height, int orientation);
 }
