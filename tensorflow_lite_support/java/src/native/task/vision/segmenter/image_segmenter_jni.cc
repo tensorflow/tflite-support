@@ -26,10 +26,12 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/segmentations_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
+#include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
 namespace {
 
 using ::tflite::support::StatusOr;
+using ::tflite::support::task::vision::ConvertToFrameBufferOrientation;
 using ::tflite::support::task::vision::FrameBuffer;
 using ::tflite::support::task::vision::ImageSegmenter;
 using ::tflite::support::task::vision::ImageSegmenterOptions;
@@ -193,12 +195,13 @@ extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_segmentNative(
     JNIEnv* env, jclass thiz, jlong native_handle, jobject jimage_byte_buffer,
     jint width, jint height, jobject jmask_buffers, jintArray jmask_shape,
-    jobject jcolored_labels) {
+    jobject jcolored_labels, jint jorientation) {
   auto* segmenter = reinterpret_cast<ImageSegmenter*>(native_handle);
   absl::string_view image = GetMappedFileBuffer(env, jimage_byte_buffer);
-  std::unique_ptr<FrameBuffer> frame_buffer =
-      CreateFromRgbRawBuffer(reinterpret_cast<const uint8*>(image.data()),
-                             FrameBuffer::Dimension{width, height});
+  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
+      reinterpret_cast<const uint8*>(image.data()),
+      FrameBuffer::Dimension{width, height},
+      ConvertToFrameBufferOrientation(env, jorientation));
   auto results_or = segmenter->Segment(*frame_buffer);
   if (results_or.ok()) {
     ConvertToSegmentationResults(env, results_or.value(), jmask_buffers,

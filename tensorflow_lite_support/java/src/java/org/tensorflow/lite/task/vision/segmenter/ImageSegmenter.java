@@ -28,6 +28,7 @@ import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
+import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 
 /**
  * Performs segmentation on images.
@@ -159,7 +160,7 @@ public final class ImageSegmenter extends BaseTaskApi {
   /**
    * Performs actual segmentation on the provided image.
    *
-   * @param image a {@link TensorImage} object that represents a RGB image
+   * @param image a {@link TensorImage} object that represents an RGB image
    * @return results of performing image segmentation. Note that at the time, a single {@link
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
@@ -167,6 +168,23 @@ public final class ImageSegmenter extends BaseTaskApi {
    * @throws AssertionError if error occurs when segmenting the image from the native code
    */
   public List<Segmentation> segment(TensorImage image) {
+    return segment(image, ImageProcessingOptions.builder().build());
+  }
+
+  /**
+   * Performs actual segmentation on the provided image with {@link ImageProcessingOptions}.
+   *
+   * @param image a {@link TensorImage} object that represents an RGB image
+   * @param options {@link ImageSegmenter} only supports image rotation (through {@link
+   *     ImageProcessingOptions#Builder#setOrientation}) currently. The orientation of an image
+   *     defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.
+   * @return results of performing image segmentation. Note that at the time, a single {@link
+   *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
+   *     for later extension to e.g. instance segmentation models, which may return one segmentation
+   *     per object.
+   * @throws AssertionError if error occurs when segmenting the image from the native code
+   */
+  public List<Segmentation> segment(TensorImage image, ImageProcessingOptions options) {
     checkNotClosed();
 
     // image_segmenter_jni.cc expects an uint8 image. Convert image of other types into uint8.
@@ -184,7 +202,8 @@ public final class ImageSegmenter extends BaseTaskApi {
         imageUint8.getHeight(),
         maskByteArrays,
         maskShape,
-        coloredLabels);
+        coloredLabels,
+        options.getOrientation().getValue());
 
     List<ByteBuffer> maskByteBuffers = new ArrayList<>();
     for (byte[] bytes : maskByteArrays) {
@@ -221,5 +240,6 @@ public final class ImageSegmenter extends BaseTaskApi {
       int height,
       List<byte[]> maskByteArrays,
       int[] maskShape,
-      List<ColoredLabel> coloredLabels);
+      List<ColoredLabel> coloredLabels,
+      int orientation);
 }
