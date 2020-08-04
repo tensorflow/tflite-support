@@ -1,5 +1,5 @@
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_cc_test")
-load("@org_tensorflow//tensorflow/lite/delegates/flex:build_def.bzl", "tflite_flex_cc_library")
+load("@org_tensorflow//tensorflow/lite/delegates/flex:build_def.bzl", "tflite_flex_android_library", "tflite_flex_cc_library")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -11,6 +11,16 @@ package(
 tflite_flex_cc_library(
     name = "tf_text_flex_delegate",
     additional_deps = ["//third_party/tensorflow_text:ops_lib"],
+    models = [
+        # TODO(b/160817619) Replace with a more complex model.
+        "testdata/sentencepiece_tokenizer_flex_op.tflite",
+    ],
+)
+
+# This will generate the android library that supports listed models only.
+tflite_flex_android_library(
+    name = "tf_text_flex_android_library",
+    additional_deps = ["//third_party/tensorflow_text:sentencepiece_tokenizer_cc"],
     models = [
         # TODO(b/160817619) Replace with a more complex model.
         "testdata/sentencepiece_tokenizer_flex_op.tflite",
