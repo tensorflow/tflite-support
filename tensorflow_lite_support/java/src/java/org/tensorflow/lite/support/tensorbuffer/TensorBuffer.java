@@ -310,15 +310,7 @@ public abstract class TensorBuffer {
         (buffer.limit() == getTypeSize() * flatSize),
         "The size of byte buffer and the shape do not match.");
 
-    if (!isDynamic) {
-      checkArgument(
-          flatSize == this.flatSize,
-          "The size of byte buffer and the size of the tensor buffer do not match.");
-    } else {
-      this.flatSize = flatSize;
-    }
-
-    this.shape = shape.clone();
+    resize(shape);
     buffer.rewind();
     this.buffer = buffer;
   }

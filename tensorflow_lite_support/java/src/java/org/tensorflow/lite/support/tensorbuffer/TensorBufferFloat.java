@@ -63,12 +63,14 @@ public final class TensorBufferFloat extends TensorBuffer {
   @NonNull
   public int[] getIntArray() {
     buffer.rewind();
-    int[] arr = new int[flatSize];
+    float[] floatArr = new float[flatSize];
+    buffer.asFloatBuffer().get(floatArr);
 
+    int[] intArr = new int[flatSize];
     for (int i = 0; i < flatSize; i++) {
-      arr[i] = (int) buffer.getFloat();
+      intArr[i] = (int) floatArr[i];
     }
-    return arr;
+    return intArr;
   }
 
   @Override
@@ -103,8 +105,11 @@ public final class TensorBufferFloat extends TensorBuffer {
     resize(shape);
     buffer.rewind();
 
+    float[] floatArray = new float[src.length];
+    int cnt = 0;
     for (int a : src) {
-      buffer.putFloat((float) a);
+      floatArray[cnt++] = (float) a;
     }
+    buffer.asFloatBuffer().put(floatArray);
   }
 }

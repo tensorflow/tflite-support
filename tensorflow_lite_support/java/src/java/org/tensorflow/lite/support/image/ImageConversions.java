@@ -17,6 +17,8 @@ package org.tensorflow.lite.support.image;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 /**
@@ -92,14 +94,35 @@ class ImageConversions {
     int[] intValues = new int[w * h];
     bitmap.getPixels(intValues, 0, w, 0, 0, w, h);
     // TODO(b/138904567): Find a way to avoid creating multiple intermediate buffers every time.
-    int[] rgbValues = new int[w * h * 3];
-    for (int i = 0, j = 0; i < intValues.length; i++) {
-      rgbValues[j++] = ((intValues[i] >> 16) & 0xFF);
-      rgbValues[j++] = ((intValues[i] >> 8) & 0xFF);
-      rgbValues[j++] = (intValues[i] & 0xFF);
-    }
+    int flatSize = w * h * 3;
     int[] shape = new int[] {h, w, 3};
-    buffer.loadArray(rgbValues, shape);
+    switch (buffer.getDataType()) {
+      case UINT8:
+        byte[] byteArr = new byte[w * h * 3];
+        for (int i = 0, j = 0; i < intValues.length; i++) {
+          byteArr[j++] = (byte) ((intValues[i] >> 16) & 0xff);
+          byteArr[j++] = (byte) ((intValues[i] >> 8) & 0xff);
+          byteArr[j++] = (byte) (intValues[i] & 0xff);
+        }
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(flatSize);
+        byteBuffer.order(ByteOrder.nativeOrder());
+        byteBuffer.put(byteArr);
+        buffer.loadBuffer(byteBuffer, shape);
+        break;
+      case FLOAT32:
+        float[] floatArr = new float[w * h * 3];
+        for (int i = 0, j = 0; i < intValues.length; i++) {
+          floatArr[j++] = (float) ((intValues[i] >> 16) & 0xff);
+          floatArr[j++] = (float) ((intValues[i] >> 8) & 0xff);
+          floatArr[j++] = (float) (intValues[i] & 0xff);
+        }
+        buffer.loadArray(floatArr, shape);
+        break;
+      default:
+        // Should never happen.
+        throw new IllegalStateException(
+            "The type of TensorBuffer, " + buffer.getBuffer() + ", is unsupported.");
+    }
   }
 
   // Hide the constructor as the class is static.

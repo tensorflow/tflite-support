@@ -46,12 +46,14 @@ public final class TensorBufferUint8 extends TensorBuffer {
   @NonNull
   public float[] getFloatArray() {
     buffer.rewind();
-    float[] arr = new float[flatSize];
+    byte[] byteArr = new byte[flatSize];
+    buffer.get(byteArr);
 
+    float[] floatArr = new float[flatSize];
     for (int i = 0; i < flatSize; i++) {
-      arr[i] = (float) (buffer.get() & 0xff);
+      floatArr[i] = (float) (byteArr[i] & 0xff);
     }
-    return arr;
+    return floatArr;
   }
 
   @Override
@@ -63,12 +65,14 @@ public final class TensorBufferUint8 extends TensorBuffer {
   @NonNull
   public int[] getIntArray() {
     buffer.rewind();
-    int[] arr = new int[flatSize];
+    byte[] byteArr = new byte[flatSize];
+    buffer.get(byteArr);
 
+    int[] intArr = new int[flatSize];
     for (int i = 0; i < flatSize; i++) {
-      arr[i] = buffer.get() & 0xff;
+      intArr[i] = byteArr[i] & 0xff;
     }
-    return arr;
+    return intArr;
   }
 
   @Override
@@ -90,9 +94,12 @@ public final class TensorBufferUint8 extends TensorBuffer {
     resize(shape);
     buffer.rewind();
 
+    byte[] byteArr = new byte[src.length];
+    int cnt = 0;
     for (float a : src) {
-      buffer.put((byte) Math.max(Math.min(a, 255.0), 0.0));
+      byteArr[cnt++] = (byte) Math.max(Math.min(a, 255.0), 0.0);
     }
+    buffer.put(byteArr);
   }
 
   @Override
@@ -104,8 +111,11 @@ public final class TensorBufferUint8 extends TensorBuffer {
     resize(shape);
     buffer.rewind();
 
-    for (int a : src) {
-      buffer.put((byte) Math.max(Math.min(a, 255), 0));
+    byte[] byteArr = new byte[src.length];
+    int cnt = 0;
+    for (float a : src) {
+      byteArr[cnt++] = (byte) Math.max(Math.min(a, 255), 0);
     }
+    buffer.put(byteArr);
   }
 }
