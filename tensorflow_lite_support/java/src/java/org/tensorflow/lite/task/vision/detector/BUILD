@@ -26,7 +26,7 @@ android_library(
 # AAR target for OSS release.
 #
 # bazel build -c opt --config=monolithic --config=android_arm64 --fat_apk_cpu=x86,x86_64,arm64-v8a,armeabi-v7a \
-#   tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/classifier:object-detector
+#   tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/detector:object-detector
 aar_with_jni(
     name = "object-detector",
     android_library = ":object_detector",

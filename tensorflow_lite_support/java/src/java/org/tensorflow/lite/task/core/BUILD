@@ -7,10 +7,15 @@ package(
 )
 
 android_library(
-    name = "base_task_api",
+    name = "base-task-api",
     srcs = glob(["**/*.java"]),
     javacopts = JAVACOPTS,
     deps = [
         "@com_google_auto_value",
     ],
+)
+
+alias(
+    name = "base_task_api",
+    actual = ":base-task-api",
 )
