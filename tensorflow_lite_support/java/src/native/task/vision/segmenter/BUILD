@@ -25,8 +25,8 @@ tflite_jni_binary(
         "//tensorflow_lite_support/cc/task/vision/proto:segmentations_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
         "//tensorflow_lite_support/cc/utils:jni_utils",
+        "//tensorflow_lite_support/java/jni",
         "//tensorflow_lite_support/java/src/native/task/vision:jni_utils",
-        "//third_party/java/jdk:jni",
         "@com_google_absl//absl/strings",
     ],
 )

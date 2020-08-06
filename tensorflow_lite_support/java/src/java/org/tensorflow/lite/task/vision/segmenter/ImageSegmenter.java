@@ -28,6 +28,7 @@ import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
+import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 
 /**
@@ -95,17 +96,21 @@ public final class ImageSegmenter extends BaseTaskApi {
    *     code
    */
   public static ImageSegmenter createFromFileAndOptions(
-      Context context, String modelPath, ImageSegmenterOptions options) throws IOException {
+      Context context, String modelPath, final ImageSegmenterOptions options) throws IOException {
     try (AssetFileDescriptor assetFileDescriptor = context.getAssets().openFd(modelPath)) {
       long nativeHandle =
           TaskJniUtils.createHandleFromLibrary(
-              () ->
-                  initJniWithModelFdAndOptions(
+              new EmptyHandleProvider() {
+                @Override
+                public long createHandle() {
+                  return initJniWithModelFdAndOptions(
                       /*fileDescriptor=*/ assetFileDescriptor.getParcelFileDescriptor().getFd(),
                       /*fileDescriptorLength=*/ assetFileDescriptor.getLength(),
                       /*fileDescriptorOffset=*/ assetFileDescriptor.getStartOffset(),
                       options.getDisplayNamesLocale(),
-                      options.getOutputType().getValue()),
+                      options.getOutputType().getValue());
+                }
+              },
               IMAGE_SEGMENTER_NATIVE_LIB);
       return new ImageSegmenter(nativeHandle, options.getOutputType());
     }
