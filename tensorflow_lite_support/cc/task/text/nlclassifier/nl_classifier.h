@@ -36,7 +36,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/text/tokenizers/regex_tokenizer.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace text {
 namespace nlclassifier {
@@ -87,20 +86,23 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
   using BaseTaskApi::BaseTaskApi;
 
   // Creates a NLClassifier from TFLite model buffer.
-  static StatusOr<std::unique_ptr<NLClassifier>> CreateFromBufferAndOptions(
+  static tflite::support::StatusOr<std::unique_ptr<NLClassifier>>
+  CreateFromBufferAndOptions(
       const char* model_buffer_data, size_t model_buffer_size,
       const NLClassifierOptions& options = {},
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Creates a NLClassifier from TFLite model file.
-  static StatusOr<std::unique_ptr<NLClassifier>> CreateFromFileAndOptions(
+  static tflite::support::StatusOr<std::unique_ptr<NLClassifier>>
+  CreateFromFileAndOptions(
       const std::string& path_to_model, const NLClassifierOptions& options = {},
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Creates a NLClassifier from TFLite model file descriptor.
-  static StatusOr<std::unique_ptr<NLClassifier>> CreateFromFdAndOptions(
+  static tflite::support::StatusOr<std::unique_ptr<NLClassifier>>
+  CreateFromFdAndOptions(
       int fd, const NLClassifierOptions& options = {},
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
@@ -127,7 +129,7 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
   // Extract model output and create results with output label tensor or label
   // file attached in metadata. If no output label tensor or label file is
   // found, use output score index as labels.
-  StatusOr<std::vector<core::Category>> Postprocess(
+  tflite::support::StatusOr<std::vector<core::Category>> Postprocess(
       const std::vector<const TfLiteTensor*>& output_tensors,
       const std::string& input) override;
 
@@ -172,7 +174,6 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
 }  // namespace nlclassifier
 }  // namespace text
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_NL_CLASSIFIER_H_

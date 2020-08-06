@@ -23,10 +23,12 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 namespace {
+
+using ::tflite::support::StatusOr;
+
 constexpr int kRgbaChannels = 4;
 constexpr int kRgbChannels = 3;
 constexpr int kGrayChannel = 1;
@@ -423,5 +425,4 @@ StatusOr<std::unique_ptr<FrameBuffer>> CreateFromRawBuffer(
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

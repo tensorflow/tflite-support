@@ -37,7 +37,6 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -53,9 +52,10 @@ using ::tflite::ProcessUnitOptions_ScoreThresholdingOptions;
 using ::tflite::TensorMetadata;
 using ::tflite::metadata::ModelMetadataExtractor;
 using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
-using ::tflite::support::task::core::AssertAndReturnTypedTensor;
-using ::tflite::support::task::core::TaskAPIFactory;
+using ::tflite::task::core::AssertAndReturnTypedTensor;
+using ::tflite::task::core::TaskAPIFactory;
 
 // The expected number of dimensions of the 4 output tensors, representing in
 // that order: locations, classes, scores, num_results.
@@ -540,5 +540,4 @@ absl::Status ObjectDetector::FillResultsFromLabelMap(DetectionResult* result) {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

@@ -16,9 +16,10 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
+
+using ::tflite::support::StatusOr;
 
 namespace {
 
@@ -175,5 +176,4 @@ StatusOr<FrameBuffer::YuvData> FrameBuffer::GetYuvDataFromFrameBuffer(
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

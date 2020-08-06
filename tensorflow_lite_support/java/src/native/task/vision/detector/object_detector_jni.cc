@@ -32,18 +32,18 @@ limitations under the License.
 namespace {
 
 using ::tflite::support::StatusOr;
-using ::tflite::support::task::vision::BoundingBox;
-using ::tflite::support::task::vision::ConvertToCategory;
-using ::tflite::support::task::vision::ConvertToFrameBufferOrientation;
-using ::tflite::support::task::vision::DetectionResult;
-using ::tflite::support::task::vision::FrameBuffer;
-using ::tflite::support::task::vision::ObjectDetector;
-using ::tflite::support::task::vision::ObjectDetectorOptions;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::StringListToVector;
 using ::tflite::support::utils::ThrowException;
+using ::tflite::task::vision::BoundingBox;
+using ::tflite::task::vision::ConvertToCategory;
+using ::tflite::task::vision::ConvertToFrameBufferOrientation;
+using ::tflite::task::vision::DetectionResult;
+using ::tflite::task::vision::FrameBuffer;
+using ::tflite::task::vision::ObjectDetector;
+using ::tflite::task::vision::ObjectDetectorOptions;
 
 // Creates an ObjectDetectorOptions proto based on the Java class.
 ObjectDetectorOptions ConvertToProtoOptions(JNIEnv* env, jobject java_options) {

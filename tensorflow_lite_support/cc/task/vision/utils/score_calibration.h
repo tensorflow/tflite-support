@@ -31,7 +31,6 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -134,14 +133,14 @@ class ScoreCalibration {
 // correspondence with `label_map_items`, so as to associate each sigmoid to its
 // corresponding label name. Returns an error if no valid parameters could be
 // built (e.g. malformed parameters).
-StatusOr<SigmoidCalibrationParameters> BuildSigmoidCalibrationParams(
+tflite::support::StatusOr<SigmoidCalibrationParameters>
+BuildSigmoidCalibrationParams(
     const tflite::ScoreCalibrationOptions& score_calibration_options,
     absl::string_view score_calibration_file,
     const std::vector<LabelMapItem>& label_map_items);
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_UTILS_SCORE_CALIBRATION_H_

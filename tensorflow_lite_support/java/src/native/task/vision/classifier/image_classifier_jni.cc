@@ -31,19 +31,19 @@ limitations under the License.
 namespace {
 
 using ::tflite::support::StatusOr;
-using ::tflite::support::task::vision::BoundingBox;
-using ::tflite::support::task::vision::ClassificationResult;
-using ::tflite::support::task::vision::Classifications;
-using ::tflite::support::task::vision::ConvertToCategory;
-using ::tflite::support::task::vision::ConvertToFrameBufferOrientation;
-using ::tflite::support::task::vision::FrameBuffer;
-using ::tflite::support::task::vision::ImageClassifier;
-using ::tflite::support::task::vision::ImageClassifierOptions;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::StringListToVector;
 using ::tflite::support::utils::ThrowException;
+using ::tflite::task::vision::BoundingBox;
+using ::tflite::task::vision::ClassificationResult;
+using ::tflite::task::vision::Classifications;
+using ::tflite::task::vision::ConvertToCategory;
+using ::tflite::task::vision::ConvertToFrameBufferOrientation;
+using ::tflite::task::vision::FrameBuffer;
+using ::tflite::task::vision::ImageClassifier;
+using ::tflite::task::vision::ImageClassifierOptions;
 
 // Creates an ImageClassifierOptions proto based on the Java class.
 ImageClassifierOptions ConvertToProtoOptions(JNIEnv* env,

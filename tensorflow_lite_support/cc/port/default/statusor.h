@@ -409,28 +409,32 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
 // Implementation details for StatusOr<T>
 
 template <typename T>
-StatusOr<T>::StatusOr() : Base(absl::Status(absl::StatusCode::kUnknown, "")) {}
+tflite::support::StatusOr<T>::StatusOr()
+    : Base(absl::Status(absl::StatusCode::kUnknown, "")) {}
 
 template <typename T>
-StatusOr<T>::StatusOr(const T& value) : Base(value) {}
+tflite::support::StatusOr<T>::StatusOr(const T& value) : Base(value) {}
 
 template <typename T>
-StatusOr<T>::StatusOr(const absl::Status& status) : Base(status) {}
+tflite::support::StatusOr<T>::StatusOr(const absl::Status& status)
+    : Base(status) {}
 
 template <typename T>
-StatusOr<T>& StatusOr<T>::operator=(const absl::Status& status) {
+tflite::support::StatusOr<T>& StatusOr<T>::operator=(
+    const absl::Status& status) {
   this->Assign(status);
   return *this;
 }
 
 template <typename T>
-StatusOr<T>::StatusOr(T&& value) : Base(std::move(value)) {}
+tflite::support::StatusOr<T>::StatusOr(T&& value) : Base(std::move(value)) {}
 
 template <typename T>
-StatusOr<T>::StatusOr(absl::Status&& status) : Base(std::move(status)) {}
+tflite::support::StatusOr<T>::StatusOr(absl::Status&& status)
+    : Base(std::move(status)) {}
 
 template <typename T>
-StatusOr<T>& StatusOr<T>::operator=(absl::Status&& status) {
+tflite::support::StatusOr<T>& StatusOr<T>::operator=(absl::Status&& status) {
   this->Assign(std::move(status));
   return *this;
 }
@@ -456,13 +460,14 @@ inline void StatusOr<T>::Assign(StatusOr<U>&& other) {
 }
 template <typename T>
 template <typename... Args>
-StatusOr<T>::StatusOr(absl::in_place_t, Args&&... args)
+tflite::support::StatusOr<T>::StatusOr(absl::in_place_t, Args&&... args)
     : Base(absl::in_place, std::forward<Args>(args)...) {}
 
 template <typename T>
 template <typename U, typename... Args>
-StatusOr<T>::StatusOr(absl::in_place_t, std::initializer_list<U> ilist,
-                      Args&&... args)
+tflite::support::StatusOr<T>::StatusOr(absl::in_place_t,
+                                       std::initializer_list<U> ilist,
+                                       Args&&... args)
     : Base(absl::in_place, ilist, std::forward<Args>(args)...) {}
 
 template <typename T>

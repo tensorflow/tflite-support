@@ -27,7 +27,6 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -37,8 +36,7 @@ struct ClassificationHead {
   ClassificationHead() : score_threshold(0) {}
 
   explicit ClassificationHead(
-      const std::vector<tflite::support::task::vision::LabelMapItem>&&
-          label_map_items)
+      const std::vector<tflite::task::vision::LabelMapItem>&& label_map_items)
       : label_map_items(label_map_items), score_threshold(0) {}
 
   // An optional name that usually indicates what this set of classes represent,
@@ -56,7 +54,7 @@ struct ClassificationHead {
   //
   // This requires to put in place dedicated sanity checks before running
   // inference.
-  std::vector<tflite::support::task::vision::LabelMapItem> label_map_items;
+  std::vector<tflite::task::vision::LabelMapItem> label_map_items;
   // Recommended score threshold typically in [0,1[. Classification results with
   // a score below this value are considered low-confidence and should be
   // rejected from returned results.
@@ -70,7 +68,7 @@ struct ClassificationHead {
   // precision.
   //
   // Example: 60% precision for threshold = 0.5.
-  absl::optional<tflite::support::task::vision::SigmoidCalibrationParameters>
+  absl::optional<tflite::task::vision::SigmoidCalibrationParameters>
       calibration_params;
 };
 
@@ -100,14 +98,13 @@ struct ClassificationHead {
 // ...
 //
 // See metadata schema TENSOR_AXIS_LABELS for more details.
-StatusOr<ClassificationHead> BuildClassificationHead(
+tflite::support::StatusOr<ClassificationHead> BuildClassificationHead(
     const tflite::metadata::ModelMetadataExtractor& metadata_extractor,
     const tflite::TensorMetadata& output_tensor_metadata,
     absl::string_view display_names_locale = nullptr);
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_CORE_CLASSIFICATION_HEAD_ITEM_H_

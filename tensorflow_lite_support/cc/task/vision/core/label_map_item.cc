@@ -19,12 +19,12 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/common.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
 using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 
 StatusOr<std::vector<LabelMapItem>> BuildLabelMapFromFiles(
@@ -124,5 +124,4 @@ void LabelHierarchy::GetAncestors(
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

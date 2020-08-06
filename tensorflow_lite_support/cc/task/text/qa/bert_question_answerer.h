@@ -27,7 +27,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/text/tokenizers/sentencepiece_tokenizer.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace text {
 namespace qa {
@@ -90,28 +89,28 @@ class BertQuestionAnswerer : public QuestionAnswerer {
   static constexpr int kNumLiteThreads = 4;
   static constexpr bool kUseLowerCase = true;
 
-  static StatusOr<std::unique_ptr<QuestionAnswerer>> CreateFromFile(
-      const std::string& path_to_model_with_metadata);
+  static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>
+  CreateFromFile(const std::string& path_to_model_with_metadata);
 
-  static StatusOr<std::unique_ptr<QuestionAnswerer>> CreateFromBuffer(
-      const char* model_with_metadata_buffer_data,
-      size_t model_with_metadata_buffer_size);
+  static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>
+  CreateFromBuffer(const char* model_with_metadata_buffer_data,
+                   size_t model_with_metadata_buffer_size);
 
-  static StatusOr<std::unique_ptr<QuestionAnswerer>>
+  static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>
   CreateBertQuestionAnswererFromFile(const std::string& path_to_model,
                                      const std::string& path_to_vocab);
 
-  static StatusOr<std::unique_ptr<QuestionAnswerer>>
+  static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>
   CreateBertQuestionAnswererFromBuffer(const char* model_buffer_data,
                                        size_t model_buffer_size,
                                        const char* vocab_buffer_data,
                                        size_t vocab_buffer_size);
 
-  static StatusOr<std::unique_ptr<QuestionAnswerer>>
+  static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>
   CreateAlbertQuestionAnswererFromFile(const std::string& path_to_model,
                                        const std::string& path_to_spmodel);
 
-  static StatusOr<std::unique_ptr<QuestionAnswerer>>
+  static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>
   CreateAlbertQuestionAnswererFromBuffer(const char* model_buffer_data,
                                          size_t model_buffer_size,
                                          const char* spmodel_buffer_data,
@@ -129,7 +128,7 @@ class BertQuestionAnswerer : public QuestionAnswerer {
                           const std::string& lowercased_context,
                           const std::string& lowercased_query) override;
 
-  StatusOr<std::vector<QaAnswer>> Postprocess(
+  tflite::support::StatusOr<std::vector<QaAnswer>> Postprocess(
       const std::vector<const TfLiteTensor*>& output_tensors,
       const std::string& lowercased_context,
       const std::string& lowercased_query) override;
@@ -161,7 +160,6 @@ class BertQuestionAnswerer : public QuestionAnswerer {
 }  // namespace qa
 }  // namespace text
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_QA_BERT_QUESTION_ANSWERER_H_

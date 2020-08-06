@@ -31,7 +31,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -1497,5 +1496,4 @@ absl::Status LibyuvFrameBufferUtils::Convert(const FrameBuffer& buffer,
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

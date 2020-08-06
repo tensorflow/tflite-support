@@ -35,7 +35,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/utils/score_calibration.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -77,7 +76,8 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
   // Creates an ImageClassifier from the provided options. A non-default
   // OpResolver can be specified in order to support custom Ops or specify a
   // subset of built-in Ops.
-  static StatusOr<std::unique_ptr<ImageClassifier>> CreateFromOptions(
+  static tflite::support::StatusOr<std::unique_ptr<ImageClassifier>>
+  CreateFromOptions(
       const ImageClassifierOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
@@ -93,7 +93,8 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
   //   only supported colorspace for now),
   // - rotate it according to its `Orientation` so that inference is performed
   //   on an "upright" image.
-  StatusOr<ClassificationResult> Classify(const FrameBuffer& frame_buffer);
+  tflite::support::StatusOr<ClassificationResult> Classify(
+      const FrameBuffer& frame_buffer);
 
   // Same as above, except that the classification is performed based on the
   // input region of interest. Cropping according to this region of interest is
@@ -106,8 +107,8 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
   // `frame_buffer` data before any `Orientation` flag gets applied. Also, the
   // region of interest is not clamped, so this method will return a non-ok
   // status if the region is out of these bounds.
-  StatusOr<ClassificationResult> Classify(const FrameBuffer& frame_buffer,
-                                          const BoundingBox& roi);
+  tflite::support::StatusOr<ClassificationResult> Classify(
+      const FrameBuffer& frame_buffer, const BoundingBox& roi);
 
  protected:
   // The options used to build this ImageClassifier.
@@ -119,7 +120,7 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
 
   // Post-processing to transform the raw model outputs into classification
   // results.
-  StatusOr<ClassificationResult> Postprocess(
+  tflite::support::StatusOr<ClassificationResult> Postprocess(
       const std::vector<const TfLiteTensor*>& output_tensors,
       const FrameBuffer& frame_buffer, const BoundingBox& roi) override;
 
@@ -176,7 +177,6 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_IMAGE_CLASSIFIER_H_

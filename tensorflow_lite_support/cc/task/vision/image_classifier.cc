@@ -33,7 +33,6 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -42,9 +41,10 @@ namespace {
 using ::absl::StatusCode;
 using ::tflite::metadata::ModelMetadataExtractor;
 using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
-using ::tflite::support::task::core::AssertAndReturnTypedTensor;
-using ::tflite::support::task::core::TaskAPIFactory;
+using ::tflite::task::core::AssertAndReturnTypedTensor;
+using ::tflite::task::core::TaskAPIFactory;
 
 // Default score value used as a fallback for classes that (1) have no score
 // calibration data or (2) have a very low confident uncalibrated score, i.e.
@@ -563,5 +563,4 @@ absl::Status ImageClassifier::FillResultsFromLabelMaps(
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

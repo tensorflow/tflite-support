@@ -29,11 +29,13 @@ limitations under the License.
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
+#include "tensorflow_lite_support/cc/port/statusor.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
+
+using ::tflite::support::StatusOr;
 
 StatusOr<ImageData> DecodeImageFromFile(const std::string& file_name) {
   ImageData image_data;
@@ -89,5 +91,4 @@ void ImageDataFree(ImageData* image) { stbi_image_free(image->pixel_data); }
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

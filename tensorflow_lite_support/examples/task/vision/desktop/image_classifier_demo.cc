@@ -60,7 +60,6 @@ ABSL_FLAG(
     "are filtered out. Mutually exclusive with 'class_name_whitelist'.");
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -143,7 +142,6 @@ absl::Status Classify() {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 int main(int argc, char** argv) {
@@ -165,7 +163,7 @@ int main(int argc, char** argv) {
   }
 
   // Run classification.
-  absl::Status status = tflite::support::task::vision::Classify();
+  absl::Status status = tflite::task::vision::Classify();
   if (status.ok()) {
     return 0;
   } else {

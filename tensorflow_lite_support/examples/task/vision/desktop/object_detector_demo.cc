@@ -67,7 +67,6 @@ ABSL_FLAG(std::vector<std::string>, class_name_blacklist, {},
           "are filtered out. Mutually exclusive with 'class_name_whitelist'.");
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -213,7 +212,6 @@ absl::Status Detect() {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 int main(int argc, char** argv) {
@@ -243,7 +241,7 @@ int main(int argc, char** argv) {
   }
 
   // Run detection.
-  absl::Status status = tflite::support::task::vision::Detect();
+  absl::Status status = tflite::task::vision::Detect();
   if (status.ok()) {
     return 0;
   } else {

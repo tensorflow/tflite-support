@@ -18,9 +18,9 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
+#include "tensorflow_lite_support/cc/port/statusor.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 namespace {
@@ -34,6 +34,7 @@ using ::tflite::ImageProperties;
 using ::tflite::TensorMetadata;
 using ::tflite::metadata::ModelMetadataExtractor;
 using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 
 StatusOr<const TensorMetadata*> GetInputTensorMetadataIfAny(
@@ -249,5 +250,4 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

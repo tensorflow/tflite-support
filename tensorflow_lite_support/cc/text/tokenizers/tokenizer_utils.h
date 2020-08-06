@@ -24,7 +24,8 @@ limitations under the License.
 namespace tflite::support::text::tokenizer {
 
 // Create a Tokenizer from model metadata by extracting
-StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromProcessUnit(
+tflite::support::StatusOr<std::unique_ptr<Tokenizer>>
+CreateTokenizerFromProcessUnit(
     const tflite::ProcessUnit* tokenizer_process_unit,
     const tflite::metadata::ModelMetadataExtractor* metadata_extractor);
 

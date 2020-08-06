@@ -31,12 +31,11 @@ extern std::unique_ptr<OpResolver> CreateOpResolver();
 
 namespace {
 
-using ::tflite::support::task::core::Category;
-using ::tflite::support::task::text::nlclassifier::NLClassifier;
-using ::tflite::support::task::text::nlclassifier::NLClassifierOptions;
-using ::tflite::support::task::text::nlclassifier::RunClassifier;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::JStringToString;
+using ::tflite::task::text::nlclassifier::NLClassifier;
+using ::tflite::task::text::nlclassifier::NLClassifierOptions;
+using ::tflite::task::text::nlclassifier::RunClassifier;
 
 constexpr int kInvalidPointer = 0;
 

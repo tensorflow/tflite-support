@@ -20,12 +20,14 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
 using ::absl::StatusCode;
 using ::tflite::metadata::ModelMetadataExtractor;
+using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
+using ::tflite::support::TfLiteSupportStatus;
 
 StatusOr<ClassificationHead> BuildClassificationHead(
     const tflite::metadata::ModelMetadataExtractor& metadata_extractor,
@@ -109,5 +111,4 @@ StatusOr<ClassificationHead> BuildClassificationHead(
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

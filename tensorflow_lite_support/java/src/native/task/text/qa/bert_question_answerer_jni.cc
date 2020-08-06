@@ -20,12 +20,12 @@ limitations under the License.
 
 namespace {
 
-using ::tflite::support::task::text::qa::BertQuestionAnswerer;
-using ::tflite::support::task::text::qa::QaAnswer;
-using ::tflite::support::task::text::qa::QuestionAnswerer;
 using ::tflite::support::utils::ConvertVectorToArrayList;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::JStringToString;
+using ::tflite::task::text::qa::BertQuestionAnswerer;
+using ::tflite::task::text::qa::QaAnswer;
+using ::tflite::task::text::qa::QuestionAnswerer;
 
 constexpr int kInvalidPointer = 0;
 

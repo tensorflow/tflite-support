@@ -21,7 +21,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -41,7 +40,8 @@ struct ImageData {
 // occurred. If decoding succeeded, the caller must manage deletion of the
 // underlying pixel data using `ImageDataFree`.
 // Supports a wide range of image formats, listed in `stb_image/stb_image.h`.
-StatusOr<ImageData> DecodeImageFromFile(const std::string& file_name);
+tflite::support::StatusOr<ImageData> DecodeImageFromFile(
+    const std::string& file_name);
 
 // Encodes the image provided as an ImageData as lossless PNG to the provided
 // path.
@@ -53,7 +53,6 @@ void ImageDataFree(ImageData* image);
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_EXAMPLES_TASK_VISION_DESKTOP_UTILS_IMAGE_UTILS_H_

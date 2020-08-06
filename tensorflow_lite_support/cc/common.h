@@ -159,7 +159,8 @@ enum class TfLiteSupportStatus {
 // for more details.
 absl::Status CreateStatusWithPayload(
     absl::StatusCode canonical_code, absl::string_view message,
-    TfLiteSupportStatus tfls_code = TfLiteSupportStatus::kError);
+    tflite::support::TfLiteSupportStatus tfls_code =
+        tflite::support::TfLiteSupportStatus::kError);
 
 }  // namespace support
 }  // namespace tflite

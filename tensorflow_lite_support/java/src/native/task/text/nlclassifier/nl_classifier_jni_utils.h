@@ -19,7 +19,6 @@ limitations under the License.
 #include <jni.h>
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace text {
 namespace nlclassifier {
@@ -29,7 +28,6 @@ jobject RunClassifier(JNIEnv* env, jlong native_handle, jstring text);
 }  // namespace nlclassifier
 }  // namespace text
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_JAVA_SRC_NATIVE_TAKS_TEXT_NLCLASSIFIER_NL_CLASSIFIER_JNI_UTILS_H_

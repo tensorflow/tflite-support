@@ -28,7 +28,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace core {
 template <typename T>
@@ -41,7 +40,7 @@ class TaskAPIFactory {
   TaskAPIFactory() = delete;
 
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
-  static StatusOr<std::unique_ptr<T>> CreateFromBuffer(
+  static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromBuffer(
       const char* buffer_data, size_t buffer_size,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
@@ -52,7 +51,7 @@ class TaskAPIFactory {
   }
 
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
-  static StatusOr<std::unique_ptr<T>> CreateFromFile(
+  static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromFile(
       const string& file_name,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
@@ -63,7 +62,7 @@ class TaskAPIFactory {
   }
 
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
-  static StatusOr<std::unique_ptr<T>> CreateFromFileDescriptor(
+  static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromFileDescriptor(
       int file_descriptor,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
@@ -74,7 +73,8 @@ class TaskAPIFactory {
   }
 
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
-  static StatusOr<std::unique_ptr<T>> CreateFromExternalFileProto(
+  static tflite::support::StatusOr<std::unique_ptr<T>>
+  CreateFromExternalFileProto(
       const ExternalFile* external_file,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
@@ -86,7 +86,7 @@ class TaskAPIFactory {
 
  private:
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
-  static StatusOr<std::unique_ptr<T>> CreateFromTfLiteEngine(
+  static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromTfLiteEngine(
       std::unique_ptr<TfLiteEngine> engine, int num_threads) {
     RETURN_IF_ERROR(engine->InitInterpreter(num_threads));
     return absl::make_unique<T>(std::move(engine));
@@ -95,7 +95,6 @@ class TaskAPIFactory {
 
 }  // namespace core
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_TASK_API_FACTORY_H_

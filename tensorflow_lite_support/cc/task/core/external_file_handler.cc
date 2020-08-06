@@ -31,13 +31,13 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace core {
 namespace {
 
 using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 
 // Gets the offset aligned to page size for mapping given files into memory by
@@ -191,5 +191,4 @@ ExternalFileHandler::~ExternalFileHandler() {
 
 }  // namespace core
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

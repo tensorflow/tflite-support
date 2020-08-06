@@ -38,20 +38,19 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
 // Base class providing common logic for vision models.
 template <class OutputType>
 class BaseVisionTaskApi
-    : public tflite::support::task::core::BaseTaskApi<
-          OutputType, const FrameBuffer&, const BoundingBox&> {
+    : public tflite::task::core::BaseTaskApi<OutputType, const FrameBuffer&,
+                                             const BoundingBox&> {
  public:
   explicit BaseVisionTaskApi(std::unique_ptr<core::TfLiteEngine> engine)
-      : tflite::support::task::core::BaseTaskApi<OutputType, const FrameBuffer&,
-                                                 const BoundingBox&>(
-            std::move(engine)) {}
+      : tflite::task::core::BaseTaskApi<OutputType, const FrameBuffer&,
+                                        const BoundingBox&>(std::move(engine)) {
+  }
   // BaseVisionTaskApi is neither copyable nor movable.
   BaseVisionTaskApi(const BaseVisionTaskApi&) = delete;
   BaseVisionTaskApi& operator=(const BaseVisionTaskApi&) = delete;
@@ -67,8 +66,8 @@ class BaseVisionTaskApi
   }
 
  protected:
-  using tflite::support::task::core::BaseTaskApi<OutputType, const FrameBuffer&,
-                                                 const BoundingBox&>::engine_;
+  using tflite::task::core::BaseTaskApi<OutputType, const FrameBuffer&,
+                                        const BoundingBox&>::engine_;
 
   // Checks input tensor and metadata (if any) are valid, or return an error
   // otherwise. This must be called once at initialization time, before running
@@ -82,7 +81,7 @@ class BaseVisionTaskApi
                                    *engine_->metadata_extractor()));
 
     if (input_specs.color_space != tflite::ColorSpaceType_RGB) {
-      return CreateStatusWithPayload(
+      return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kUnimplemented,
           "BaseVisionTaskApi only supports RGB color space for now.");
     }
@@ -116,22 +115,22 @@ class BaseVisionTaskApi
                           const FrameBuffer& frame_buffer,
                           const BoundingBox& roi) override {
     if (input_specs_ == nullptr) {
-      return CreateStatusWithPayload(
+      return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kInternal,
           "Uninitialized input tensor specs: CheckAndSetInputs must be called "
           "at initialization time.");
     }
 
     if (frame_buffer_utils_ == nullptr) {
-      return CreateStatusWithPayload(
+      return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kInternal,
           "Uninitialized frame buffer utils: SetProcessEngine must be called "
           "at initialization time.");
     }
 
     if (input_tensors.size() != 1) {
-      return CreateStatusWithPayload(absl::StatusCode::kInternal,
-                                     "A single input tensor is expected.");
+      return tflite::support::CreateStatusWithPayload(
+          absl::StatusCode::kInternal, "A single input tensor is expected.");
     }
 
     // Input data to be normalized (if needed) and used for inference. In most
@@ -178,28 +177,28 @@ class BaseVisionTaskApi
     switch (input_specs_->tensor_type) {
       case kTfLiteUInt8:
         if (input_tensors[0]->bytes != input_data_byte_size) {
-          return CreateStatusWithPayload(
+          return tflite::support::CreateStatusWithPayload(
               absl::StatusCode::kInternal,
               "Size mismatch or unsupported padding bytes between pixel data "
               "and input tensor.");
         }
         // No normalization required: directly populate data.
-        tflite::support::task::core::PopulateTensor(
+        tflite::task::core::PopulateTensor(
             input_data, input_data_byte_size / sizeof(uint8), input_tensors[0]);
         break;
       case kTfLiteFloat32: {
         if (input_tensors[0]->bytes / sizeof(float) !=
             input_data_byte_size / sizeof(uint8)) {
-          return CreateStatusWithPayload(
+          return tflite::support::CreateStatusWithPayload(
               absl::StatusCode::kInternal,
               "Size mismatch or unsupported padding bytes between pixel data "
               "and input tensor.");
         }
         // Normalize and populate.
         float* normalized_input_data =
-            tflite::support::task::core::AssertAndReturnTypedTensor<float>(
+            tflite::task::core::AssertAndReturnTypedTensor<float>(
                 input_tensors[0]);
-        const tflite::support::task::vision::NormalizationOptions&
+        const tflite::task::vision::NormalizationOptions&
             normalization_options = input_specs_->normalization_options.value();
         if (normalization_options.num_values == 1) {
           float mean_value = normalization_options.mean_values[0];
@@ -224,12 +223,12 @@ class BaseVisionTaskApi
         break;
       }
       case kTfLiteInt8:
-        return CreateStatusWithPayload(
+        return tflite::support::CreateStatusWithPayload(
             absl::StatusCode::kUnimplemented,
             "kTfLiteInt8 input type is not implemented yet.");
       default:
-        return CreateStatusWithPayload(absl::StatusCode::kInternal,
-                                       "Unexpected input tensor type.");
+        return tflite::support::CreateStatusWithPayload(
+            absl::StatusCode::kInternal, "Unexpected input tensor type.");
     }
 
     return absl::OkStatus();
@@ -266,7 +265,6 @@ class BaseVisionTaskApi
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_CORE_BASE_VISION_TASK_API_H_

@@ -21,9 +21,9 @@ limitations under the License.
 
 namespace {
 
-using ::tflite::support::task::text::nlclassifier::BertNLClassifier;
-using ::tflite::support::task::text::nlclassifier::RunClassifier;
 using ::tflite::support::utils::GetMappedFileBuffer;
+using ::tflite::task::text::nlclassifier::BertNLClassifier;
+using ::tflite::task::text::nlclassifier::RunClassifier;
 
 constexpr int kInvalidPointer = 0;
 

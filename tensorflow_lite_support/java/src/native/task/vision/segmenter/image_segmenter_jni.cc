@@ -31,18 +31,18 @@ limitations under the License.
 namespace {
 
 using ::tflite::support::StatusOr;
-using ::tflite::support::task::vision::ConvertToFrameBufferOrientation;
-using ::tflite::support::task::vision::FrameBuffer;
-using ::tflite::support::task::vision::ImageSegmenter;
-using ::tflite::support::task::vision::ImageSegmenterOptions;
-using ::tflite::support::task::vision::Segmentation;
-using ::tflite::support::task::vision::SegmentationResult;
 using ::tflite::support::utils::CreateByteArray;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kIllegalArgumentException;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
+using ::tflite::task::vision::ConvertToFrameBufferOrientation;
+using ::tflite::task::vision::FrameBuffer;
+using ::tflite::task::vision::ImageSegmenter;
+using ::tflite::task::vision::ImageSegmenterOptions;
+using ::tflite::task::vision::Segmentation;
+using ::tflite::task::vision::SegmentationResult;
 
 constexpr char kArrayListClassName[] = "Ljava/util/ArrayList;";
 constexpr char kObjectClassName[] = "Ljava/lang/Object;";

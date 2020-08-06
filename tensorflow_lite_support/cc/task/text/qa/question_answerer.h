@@ -24,7 +24,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace text {
 namespace qa {
@@ -61,7 +60,6 @@ class QuestionAnswerer
 }  // namespace qa
 }  // namespace text
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_QA_QUESTION_ANSWERER_H_

@@ -19,15 +19,14 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace text {
 namespace nlclassifier {
 
-using ::tflite::support::task::core::Category;
-using ::tflite::support::task::text::nlclassifier::NLClassifier;
 using ::tflite::support::utils::ConvertVectorToArrayList;
 using ::tflite::support::utils::JStringToString;
+using ::tflite::task::core::Category;
+using ::tflite::task::text::nlclassifier::NLClassifier;
 
 jobject RunClassifier(JNIEnv* env, jlong native_handle, jstring text) {
   auto* question_answerer = reinterpret_cast<NLClassifier*>(native_handle);
@@ -54,5 +53,4 @@ jobject RunClassifier(JNIEnv* env, jlong native_handle, jstring text) {
 }  // namespace nlclassifier
 }  // namespace text
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

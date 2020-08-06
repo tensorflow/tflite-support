@@ -31,7 +31,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/segmentations_proto_inc.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -75,7 +74,8 @@ class ImageSegmenter : public BaseVisionTaskApi<SegmentationResult> {
   // Creates an ImageSegmenter from the provided options. A non-default
   // OpResolver can be specified in order to support custom Ops or specify a
   // subset of built-in Ops.
-  static StatusOr<std::unique_ptr<ImageSegmenter>> CreateFromOptions(
+  static tflite::support::StatusOr<std::unique_ptr<ImageSegmenter>>
+  CreateFromOptions(
       const ImageSegmenterOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
@@ -110,12 +110,13 @@ class ImageSegmenter : public BaseVisionTaskApi<SegmentationResult> {
   // masks need to be:
   // * re-scaled to 640 x 480,
   // * then rotated 90° clockwise.
-  StatusOr<SegmentationResult> Segment(const FrameBuffer& frame_buffer);
+  tflite::support::StatusOr<SegmentationResult> Segment(
+      const FrameBuffer& frame_buffer);
 
  protected:
   // Post-processing to transform the raw model outputs into segmentation
   // results.
-  StatusOr<SegmentationResult> Postprocess(
+  tflite::support::StatusOr<SegmentationResult> Postprocess(
       const std::vector<const TfLiteTensor*>& output_tensors,
       const FrameBuffer& frame_buffer, const BoundingBox& roi) override;
 
@@ -166,7 +167,6 @@ class ImageSegmenter : public BaseVisionTaskApi<SegmentationResult> {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_IMAGE_SEGMENTER_H_

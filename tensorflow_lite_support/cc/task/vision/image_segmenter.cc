@@ -33,7 +33,6 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -43,9 +42,10 @@ using ::absl::StatusCode;
 using ::tflite::TensorMetadata;
 using ::tflite::metadata::ModelMetadataExtractor;
 using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
-using ::tflite::support::task::core::AssertAndReturnTypedTensor;
-using ::tflite::support::task::core::TaskAPIFactory;
+using ::tflite::task::core::AssertAndReturnTypedTensor;
+using ::tflite::task::core::TaskAPIFactory;
 
 // The maximum number of labels allowed in the labelmap. This is because so far
 // segmentation masks are stored with 8 bit per pixel (flattened byte array).
@@ -418,5 +418,4 @@ float ImageSegmenter::GetOutputConfidence(const TfLiteTensor& output_tensor,
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

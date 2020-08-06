@@ -18,7 +18,6 @@ limitations under the License.
 #include <string>
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace core {
 
@@ -40,7 +39,6 @@ struct Category {
 
 }  // namespace core
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_CATEGORY_H_

@@ -28,12 +28,13 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 namespace {
 
 using ::absl::StatusCode;
+using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 
 // Used to prevent log(<=0.0) in ClampedLog() calls.
@@ -106,7 +107,7 @@ StatusOr<Sigmoid> SigmoidFromLabelAndLine(absl::string_view label,
 }
 
 // Converts a tflite::ScoreTransformationType to its
-// tflite::support::task::vision::ScoreTransformation equivalent.
+// tflite::task::vision::ScoreTransformation equivalent.
 ScoreTransformation ConvertScoreTransformationType(
     tflite::ScoreTransformationType type) {
   switch (type) {
@@ -220,5 +221,4 @@ StatusOr<SigmoidCalibrationParameters> BuildSigmoidCalibrationParams(
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

@@ -30,7 +30,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/object_detector_options_proto_inc.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -81,7 +80,8 @@ class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
   // Creates an ObjectDetector from the provided options. A non-default
   // OpResolver can be specified in order to support custom Ops or specify a
   // subset of built-in Ops.
-  static StatusOr<std::unique_ptr<ObjectDetector>> CreateFromOptions(
+  static tflite::support::StatusOr<std::unique_ptr<ObjectDetector>>
+  CreateFromOptions(
       const ObjectDetectorOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
@@ -114,11 +114,12 @@ class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
   // `kLeftBottom` (i.e. the image will be rotated 90° clockwise during
   // preprocessing to make it "upright"), then the same 90° clockwise rotation
   // needs to be applied to the bounding box for display.
-  StatusOr<DetectionResult> Detect(const FrameBuffer& frame_buffer);
+  tflite::support::StatusOr<DetectionResult> Detect(
+      const FrameBuffer& frame_buffer);
 
  protected:
   // Post-processing to transform the raw model outputs into detection results.
-  StatusOr<DetectionResult> Postprocess(
+  tflite::support::StatusOr<DetectionResult> Postprocess(
       const std::vector<const TfLiteTensor*>& output_tensors,
       const FrameBuffer& frame_buffer, const BoundingBox& roi) override;
 
@@ -180,7 +181,6 @@ class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_OBJECT_DETECTOR_H_

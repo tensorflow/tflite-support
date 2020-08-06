@@ -22,7 +22,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/class_proto_inc.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -34,7 +33,6 @@ FrameBuffer::Orientation ConvertToFrameBufferOrientation(JNIEnv* env,
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_JAVA_SRC_NATIVE_TASK_VISION_JNI_UTILS_H_

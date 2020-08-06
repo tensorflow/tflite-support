@@ -28,7 +28,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils_interface.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -288,7 +287,6 @@ class FrameBufferUtils {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_UTILS_FRAME_BUFFER_UTILS_H_

@@ -28,6 +28,8 @@ namespace tflite::support::text::tokenizer {
 using ::tflite::ProcessUnit;
 using ::tflite::SentencePieceTokenizerOptions;
 using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
+using ::tflite::support::TfLiteSupportStatus;
 
 namespace {
 

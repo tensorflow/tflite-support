@@ -25,7 +25,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace core {
 
@@ -181,5 +180,4 @@ absl::Status TfLiteEngine::InitInterpreter(
 
 }  // namespace core
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

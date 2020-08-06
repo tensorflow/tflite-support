@@ -33,7 +33,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -196,7 +195,8 @@ class FrameBuffer {
   // Returns YuvData which contains the Y, U, and V buffer and their
   // stride info from the input `source` FrameBuffer which is in the YUV family
   // formats (e.g NV12, NV21, YV12, and YV21).
-  static StatusOr<YuvData> GetYuvDataFromFrameBuffer(const FrameBuffer& source);
+  static tflite::support::StatusOr<YuvData> GetYuvDataFromFrameBuffer(
+      const FrameBuffer& source);
 
   // Builds a FrameBuffer object from a row-major backing buffer.
   //
@@ -283,7 +283,6 @@ class FrameBuffer {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_CORE_FRAME_BUFFER_H_

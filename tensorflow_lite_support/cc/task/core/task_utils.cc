@@ -20,7 +20,6 @@ limitations under the License.
 #include "absl/strings/str_cat.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace core {
 
@@ -64,5 +63,4 @@ std::string LoadBinaryContent(const char* filename) {
 
 }  // namespace core
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

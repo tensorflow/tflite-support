@@ -25,7 +25,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -42,17 +41,18 @@ int GetFrameBufferByteSize(FrameBuffer::Dimension dimension,
                            FrameBuffer::Format format);
 
 // Returns pixel stride info for kGRAY, kRGB, kRGBA formats.
-StatusOr<int> GetPixelStrides(FrameBuffer::Format format);
+tflite::support::StatusOr<int> GetPixelStrides(FrameBuffer::Format format);
 
 // Returns the biplanar UV raw buffer for NV12/NV21 frame buffer.
-StatusOr<const uint8*> GetUvRawBuffer(const FrameBuffer& buffer);
+tflite::support::StatusOr<const uint8*> GetUvRawBuffer(
+    const FrameBuffer& buffer);
 
 // Returns U or V plane dimension with the given buffer `dimension` and
 // `format`. Only supports NV12/NV21/YV12/YV21 formats. Returns
 // InvalidArgumentError if 'dimension' is invalid or 'format' is other than the
 // supported formats. This method assums the UV plane share the same dimension,
 // especially for the YV12 / YV21 formats.
-StatusOr<FrameBuffer::Dimension> GetUvPlaneDimension(
+tflite::support::StatusOr<FrameBuffer::Dimension> GetUvPlaneDimension(
     FrameBuffer::Dimension dimension, FrameBuffer::Format format);
 
 // Returns crop dimension based on crop start and end points.
@@ -122,7 +122,7 @@ std::unique_ptr<FrameBuffer> CreateFromGrayRawBuffer(
     absl::Time timestamp = absl::Now());
 
 // Creates a FrameBuffer from raw YUV buffer and passing arguments.
-StatusOr<std::unique_ptr<FrameBuffer>> CreateFromYuvRawBuffer(
+tflite::support::StatusOr<std::unique_ptr<FrameBuffer>> CreateFromYuvRawBuffer(
     const uint8* y_plane, const uint8* u_plane, const uint8* v_plane,
     FrameBuffer::Format format, FrameBuffer::Dimension dimension,
     int row_stride_y, int row_stride_uv, int pixel_stride_uv,
@@ -130,7 +130,7 @@ StatusOr<std::unique_ptr<FrameBuffer>> CreateFromYuvRawBuffer(
     absl::Time timestamp = absl::Now());
 
 // Creates an instance of FrameBuffer from raw buffer and passing arguments.
-StatusOr<std::unique_ptr<FrameBuffer>> CreateFromRawBuffer(
+tflite::support::StatusOr<std::unique_ptr<FrameBuffer>> CreateFromRawBuffer(
     const uint8* buffer, FrameBuffer::Dimension dimension,
     FrameBuffer::Format target_format,
     FrameBuffer::Orientation orientation = FrameBuffer::Orientation::kTopLeft,
@@ -138,7 +138,6 @@ StatusOr<std::unique_ptr<FrameBuffer>> CreateFromRawBuffer(
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_UTILS_FRAME_BUFFER_COMMON_UTILS_H_

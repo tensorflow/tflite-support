@@ -25,7 +25,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace core {
 
@@ -44,8 +43,8 @@ class ExternalFileHandler {
   //
   // Warning: Does not take ownership of `external_file`, which must refer to a
   // valid proto that outlives this object.
-  static StatusOr<std::unique_ptr<ExternalFileHandler>> CreateFromExternalFile(
-      const ExternalFile* external_file);
+  static tflite::support::StatusOr<std::unique_ptr<ExternalFileHandler>>
+  CreateFromExternalFile(const ExternalFile* external_file);
 
   ~ExternalFileHandler();
 
@@ -90,7 +89,6 @@ class ExternalFileHandler {
 
 }  // namespace core
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_EXTERNAL_FILE_HANDLER_H_

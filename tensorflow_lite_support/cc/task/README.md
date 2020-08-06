@@ -15,8 +15,8 @@ answer question based on context.
 Use the C++ API to answer questions as follows:
 
 ```cc
-using tflite::support::task::text::qa::BertQuestionAnswerer;
-using tflite::support::task::text::qa::QaAnswer;
+using tflite::task::text::qa::BertQuestionAnswerer;
+using tflite::task::text::qa::QaAnswer;
 // Create API handler with Mobile Bert model.
 auto qa_client = BertQuestionAnswerer::CreateBertQuestionAnswererFromFile("/path/to/mobileBertModel", "/path/to/vocab");
 // Or create API handler with Albert model.
@@ -75,8 +75,8 @@ tensor index. The option is configurable for different TFLite models.
 Use the C++ API to perform language ID classification as follows:
 
 ```cc
-using tflite::support::task::text::nlclassifier::NLClassifier;
-using tflite::support::task::core::Category;
+using tflite::task::text::nlclassifier::NLClassifier;
+using tflite::task::core::Category;
 auto classifier = NLClassifier::CreateFromFileAndOptions("/path/to/model");
 // Or create a customized NLClassifierOptions
 // NLClassifierOptions options =

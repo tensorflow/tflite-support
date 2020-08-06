@@ -48,7 +48,6 @@ ABSL_FLAG(std::string, output_mask_png, "",
           "are not supported by this tool). Must have a '.png' extension.");
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -169,7 +168,6 @@ absl::Status Segment() {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 int main(int argc, char** argv) {
@@ -193,7 +191,7 @@ int main(int argc, char** argv) {
   }
 
   // Run segmentation.
-  absl::Status status = tflite::support::task::vision::Segment();
+  absl::Status status = tflite::task::vision::Segment();
   if (status.ok()) {
     return 0;
   } else {

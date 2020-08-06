@@ -39,15 +39,17 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace text {
 namespace nlclassifier {
 
-using ::tflite::support::task::core::FindTensorByName;
-using ::tflite::support::task::core::PopulateTensor;
+using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
+using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::support::text::tokenizer::CreateTokenizerFromProcessUnit;
 using ::tflite::support::text::tokenizer::TokenizerResult;
+using ::tflite::task::core::FindTensorByName;
+using ::tflite::task::core::PopulateTensor;
 
 namespace {
 constexpr char kIdsTensorName[] = "ids";
@@ -182,5 +184,4 @@ absl::Status BertNLClassifier::InitializeFromMetadata() {
 }  // namespace nlclassifier
 }  // namespace text
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

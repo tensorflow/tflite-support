@@ -31,7 +31,6 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace core {
 
@@ -178,7 +177,6 @@ static TensorType* FindTensorByName(
 
 }  // namespace core
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_TASK_UTILS_H_

@@ -28,7 +28,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace core {
 
@@ -78,7 +77,7 @@ class BaseTaskApi : public BaseUntypedTaskApi {
 
   // Subclasses need to construct OutputType object from output_tensors.
   // Original inputs are also provided as they may be needed.
-  virtual StatusOr<OutputType> Postprocess(
+  virtual tflite::support::StatusOr<OutputType> Postprocess(
       const std::vector<const TfLiteTensor*>& output_tensors,
       InputTypes... api_inputs) = 0;
 
@@ -104,7 +103,7 @@ class BaseTaskApi : public BaseUntypedTaskApi {
 
   // Performs inference using tflite::support::TfLiteInterpreterWrapper
   // InvokeWithoutFallback().
-  StatusOr<OutputType> Infer(InputTypes... args) {
+  tflite::support::StatusOr<OutputType> Infer(InputTypes... args) {
     tflite::support::TfLiteInterpreterWrapper* interpreter_wrapper =
         engine_->interpreter_wrapper();
     // Note: AllocateTensors() is already performed by the interpreter wrapper
@@ -115,7 +114,8 @@ class BaseTaskApi : public BaseUntypedTaskApi {
       return status.GetPayload(tflite::support::kTfLiteSupportPayload)
                      .has_value()
                  ? status
-                 : CreateStatusWithPayload(status.code(), status.message());
+                 : tflite::support::CreateStatusWithPayload(status.code(),
+                                                            status.message());
     }
     return Postprocess(GetOutputTensors(), args...);
   }
@@ -123,7 +123,7 @@ class BaseTaskApi : public BaseUntypedTaskApi {
   // Performs inference using tflite::support::TfLiteInterpreterWrapper
   // InvokeWithFallback() to benefit from automatic fallback from delegation to
   // CPU where applicable.
-  StatusOr<OutputType> InferWithFallback(InputTypes... args) {
+  tflite::support::StatusOr<OutputType> InferWithFallback(InputTypes... args) {
     tflite::support::TfLiteInterpreterWrapper* interpreter_wrapper =
         engine_->interpreter_wrapper();
     // Note: AllocateTensors() is already performed by the interpreter wrapper
@@ -139,7 +139,8 @@ class BaseTaskApi : public BaseUntypedTaskApi {
       return status.GetPayload(tflite::support::kTfLiteSupportPayload)
                      .has_value()
                  ? status
-                 : CreateStatusWithPayload(status.code(), status.message());
+                 : tflite::support::CreateStatusWithPayload(status.code(),
+                                                            status.message());
     }
     return Postprocess(GetOutputTensors(), args...);
   }
@@ -147,6 +148,5 @@ class BaseTaskApi : public BaseUntypedTaskApi {
 
 }  // namespace core
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_BASE_TASK_API_H_

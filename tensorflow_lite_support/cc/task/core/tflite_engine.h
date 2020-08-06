@@ -34,7 +34,6 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace core {
 
@@ -142,7 +141,6 @@ class TfLiteEngine {
 
 }  // namespace core
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_TFLITE_ENGINE_H_

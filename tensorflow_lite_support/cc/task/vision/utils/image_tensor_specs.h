@@ -25,7 +25,6 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -83,13 +82,12 @@ struct ImageTensorSpecs {
 // initialized before calling this function by means of (respectively):
 // - `tflite::InterpreterBuilder`,
 // - `tflite::metadata::ModelMetadataExtractor::CreateFromModelBuffer`.
-StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
+tflite::support::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
     const tflite::Interpreter& interpreter,
     const tflite::metadata::ModelMetadataExtractor& metadata_extractor);
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_UTILS_IMAGE_TENSOR_SPECS_H_

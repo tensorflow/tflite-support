@@ -19,7 +19,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -83,5 +82,4 @@ FrameBuffer::Orientation ConvertToFrameBufferOrientation(JNIEnv* env,
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

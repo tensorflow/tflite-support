@@ -40,7 +40,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/utils/common_utils.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace text {
 namespace nlclassifier {
@@ -51,13 +50,14 @@ using ::flatbuffers::Vector;
 using ::tflite::TensorMetadata;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::StatusOr;
-using ::tflite::support::task::core::Dequantize;
-using ::tflite::support::task::core::GetStringAtIndex;
-using ::tflite::support::task::core::PopulateTensor;
+using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::support::text::tokenizer::RegexTokenizer;
 using ::tflite::support::text::tokenizer::Tokenizer;
 using ::tflite::support::text::tokenizer::TokenizerResult;
 using ::tflite::support::utils::LoadVocabFromBuffer;
+using ::tflite::task::core::Dequantize;
+using ::tflite::task::core::GetStringAtIndex;
+using ::tflite::task::core::PopulateTensor;
 
 namespace {
 constexpr int kRegexTokenizerInputTensorIndex = 0;
@@ -161,7 +161,7 @@ absl::Status NLClassifier::TrySetLabelFromMetadata(
         "Incorrect label type found for tensor metadata.",
         TfLiteSupportStatus::kMetadataMissingLabelsError);
   }
-  StatusOr<absl::string_view> label_buffer =
+  tflite::support::StatusOr<absl::string_view> label_buffer =
       GetMetadataExtractor()->GetAssociatedFile(
           associated_files->Get(kOutputTensorIndex)->name()->str());
   if (label_buffer.ok()) {
@@ -432,7 +432,7 @@ bool NLClassifier::HasRegexTokenizerMetadata() {
   if (input_tensor_metadata == nullptr) {
     return false;
   }
-  StatusOr<const tflite::ProcessUnit*> status =
+  tflite::support::StatusOr<const tflite::ProcessUnit*> status =
       GetMetadataExtractor()->FindFirstProcessUnit(
           *input_tensor_metadata, ProcessUnitOptions_RegexTokenizerOptions);
   return status.ok() ? status.value() != nullptr : false;
@@ -457,5 +457,4 @@ absl::Status NLClassifier::SetupRegexTokenizer() {
 }  // namespace nlclassifier
 }  // namespace text
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

@@ -25,7 +25,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace vision {
 
@@ -49,7 +48,7 @@ struct LabelMapItem {
 // associated files.
 // Returns an error e.g. if there's a mismatch between the number of labels and
 // display names.
-StatusOr<std::vector<LabelMapItem>> BuildLabelMapFromFiles(
+tflite::support::StatusOr<std::vector<LabelMapItem>> BuildLabelMapFromFiles(
     absl::string_view labels_file, absl::string_view display_names_file);
 
 // A class that represents a hierarchy of labels as specified in a label map.
@@ -91,7 +90,6 @@ class LabelHierarchy {
 
 }  // namespace vision
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_CORE_LABEL_MAP_ITEM_H_

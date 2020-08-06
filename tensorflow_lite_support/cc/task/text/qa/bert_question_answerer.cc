@@ -24,7 +24,6 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace text {
 namespace qa {
@@ -35,14 +34,17 @@ constexpr char kSegmentIdsTensorName[] = "segment_ids";
 constexpr char kEndLogitsTensorName[] = "end_logits";
 constexpr char kStartLogitsTensorName[] = "start_logits";
 
-using ::tflite::support::task::core::FindTensorByName;
-using ::tflite::support::task::core::PopulateTensor;
-using ::tflite::support::task::core::PopulateVector;
-using ::tflite::support::task::core::ReverseSortIndices;
+using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
+using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::support::text::tokenizer::BertTokenizer;
 using ::tflite::support::text::tokenizer::CreateTokenizerFromProcessUnit;
 using ::tflite::support::text::tokenizer::SentencePieceTokenizer;
 using ::tflite::support::text::tokenizer::TokenizerResult;
+using ::tflite::task::core::FindTensorByName;
+using ::tflite::task::core::PopulateTensor;
+using ::tflite::task::core::PopulateVector;
+using ::tflite::task::core::ReverseSortIndices;
 
 namespace {
 constexpr int kTokenizerProcessUnitIndex = 0;
@@ -376,5 +378,4 @@ void BertQuestionAnswerer::InitializeSentencepieceTokenizerFromBinary(
 }  // namespace qa
 }  // namespace text
 }  // namespace task
-}  // namespace support
 }  // namespace tflite

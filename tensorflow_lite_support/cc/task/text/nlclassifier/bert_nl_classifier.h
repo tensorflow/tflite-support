@@ -32,7 +32,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
 
 namespace tflite {
-namespace support {
 namespace task {
 namespace text {
 namespace nlclassifier {
@@ -57,14 +56,16 @@ class BertNLClassifier : public NLClassifier {
 
   // Factory function to create a BertNLClassifier from TFLite model with
   // metadata.
-  static StatusOr<std::unique_ptr<BertNLClassifier>> CreateFromFile(
+  static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
+  CreateFromFile(
       const std::string& path_to_model_with_metadata,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Factory function to create a BertNLClassifier from in memory buffer of a
   // TFLite model with metadata.
-  static StatusOr<std::unique_ptr<BertNLClassifier>> CreateFromBuffer(
+  static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
+  CreateFromBuffer(
       const char* model_with_metadata_buffer_data,
       size_t model_with_metadata_buffer_size,
       std::unique_ptr<tflite::OpResolver> resolver =
@@ -78,7 +79,7 @@ class BertNLClassifier : public NLClassifier {
 
   // Extract model output and create results with label file attached in
   // metadata. If no label file is attached, use output score index as labels.
-  StatusOr<std::vector<core::Category>> Postprocess(
+  tflite::support::StatusOr<std::vector<core::Category>> Postprocess(
       const std::vector<const TfLiteTensor*>& output_tensors,
       const std::string& input) override;
 
@@ -92,7 +93,6 @@ class BertNLClassifier : public NLClassifier {
 }  // namespace nlclassifier
 }  // namespace text
 }  // namespace task
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_BERT_NL_CLASSIFIER_H_
