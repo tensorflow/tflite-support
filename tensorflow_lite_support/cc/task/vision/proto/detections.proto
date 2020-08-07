@@ -15,7 +15,7 @@ limitations under the License.
 
 syntax = "proto2";
 
-package tflite.support.task.vision;
+package tflite.task.vision;
 
 import "tensorflow_lite_support/cc/task/vision/proto/bounding_box.proto";
 import "tensorflow_lite_support/cc/task/vision/proto/class.proto";

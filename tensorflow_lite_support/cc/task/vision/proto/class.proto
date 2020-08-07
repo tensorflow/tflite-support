@@ -15,7 +15,7 @@ limitations under the License.
 
 syntax = "proto2";
 
-package tflite.support.task.vision;
+package tflite.task.vision;
 
 // A single classification result.
 message Class {

@@ -15,7 +15,7 @@ limitations under the License.
 
 syntax = "proto2";
 
-package tflite.support.task.vision;
+package tflite.task.vision;
 
 // Results of performing image segmentation.
 // Note that at the time, a single `Segmentation` element is expected to be

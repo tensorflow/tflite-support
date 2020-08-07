@@ -15,7 +15,7 @@ limitations under the License.
 
 syntax = "proto2";
 
-package tflite.support.task.core;
+package tflite.task.core;
 
 
 // Represents external files used by the Task APIs (e.g. TF Lite FlatBuffer or
