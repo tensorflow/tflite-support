@@ -14,6 +14,7 @@ package_group(
         "//research/kernel/softskills/...",
         "//tensorflow_lite_support/...",
         "//third_party/py/tensorflow_examples/...",
+        "//third_party/tensorflow_models/...",
     ],
 )
 
