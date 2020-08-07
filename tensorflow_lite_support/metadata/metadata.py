@@ -19,22 +19,43 @@ from __future__ import division
 from __future__ import print_function
 
 import copy
+import inspect
 import io
 import os
 import shutil
+import sys
 import tempfile
 import warnings
 import zipfile
 
 from flatbuffers.python import flatbuffers
-from third_party.tensorflow.python.platform import resource_loader
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 from tensorflow_lite_support.metadata.cc.python import _pywrap_metadata_version
 from tensorflow_lite_support.metadata.flatbuffers_lib import _pywrap_flatbuffers
 
-_FLATC_TFLITE_METADATA_SCHEMA_FILE = resource_loader.get_path_to_datafile(
-    "metadata_schema.fbs")
+
+def get_path_to_datafile(path):
+  """Gets the path to the specified file in the data dependencies.
+
+  The path is relative to the file calling the function.
+
+  It's a simple replacement of
+  "tensorflow.python.platform.resource_loader.get_path_to_datafile".
+
+  Args:
+    path: a string resource path relative to the calling file.
+
+  Returns:
+    The path to the specified file present in the data attribute of py_test
+    or py_binary.
+  """
+  data_files_path = os.path.dirname(
+      inspect.getfile(sys._getframe(1)))  # pylint: disable=protected-access
+  return os.path.join(data_files_path, path)
+
+
+_FLATC_TFLITE_METADATA_SCHEMA_FILE = get_path_to_datafile("metadata_schema.fbs")
 
 
 # TODO(b/141467403): add delete method for associated files.
