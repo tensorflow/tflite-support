@@ -26,7 +26,7 @@ using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::ThrowException;
 
 constexpr char kCategoryClassName[] =
-    "Lorg/tensorflow/lite/support/label/Category;";
+    "org/tensorflow/lite/support/label/Category";
 constexpr char kStringClassName[] = "Ljava/lang/String;";
 constexpr char kEmptyString[] = "";
 
@@ -35,8 +35,8 @@ jobject ConvertToCategory(JNIEnv* env, const Class& classification) {
   jclass category_class = env->FindClass(kCategoryClassName);
   jmethodID category_create = env->GetStaticMethodID(
       category_class, "create",
-      absl::StrCat("(", kStringClassName, kStringClassName, "F)",
-                   kCategoryClassName)
+      absl::StrCat("(", kStringClassName, kStringClassName, "F)L",
+                   kCategoryClassName, ";")
           .c_str());
 
   std::string label_string = classification.has_class_name()

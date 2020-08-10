@@ -44,11 +44,14 @@ using ::tflite::task::vision::ImageSegmenterOptions;
 using ::tflite::task::vision::Segmentation;
 using ::tflite::task::vision::SegmentationResult;
 
-constexpr char kArrayListClassName[] = "Ljava/util/ArrayList;";
+constexpr char kArrayListClassNameNoSig[] = "java/util/ArrayList";
 constexpr char kObjectClassName[] = "Ljava/lang/Object;";
 constexpr char kColorClassName[] = "Landroid/graphics/Color;";
+constexpr char kColorClassNameNoSig[] = "android/graphics/Color";
 constexpr char kColoredLabelClassName[] =
     "Lorg/tensorflow/lite/task/vision/segmenter/ColoredLabel;";
+constexpr char kColoredLabelClassNameNoSig[] =
+    "org/tensorflow/lite/task/vision/segmenter/ColoredLabel";
 constexpr char kStringClassName[] = "Ljava/lang/String;";
 constexpr int kOutputTypeCategoryMask = 0;
 constexpr int kOutputTypeConfidenceMask = 1;
@@ -98,7 +101,7 @@ void ConvertToSegmentationResults(JNIEnv* env,
   env->SetIntArrayRegion(jmask_shape, 0, 2, shape_array);
 
   // jclass, init, and add of ArrayList.
-  jclass array_list_class = env->FindClass(kArrayListClassName);
+  jclass array_list_class = env->FindClass(kArrayListClassNameNoSig);
   jmethodID array_list_add_method =
       env->GetMethodID(array_list_class, "add",
                        absl::StrCat("(", kObjectClassName, ")Z").c_str());
@@ -124,12 +127,12 @@ void ConvertToSegmentationResults(JNIEnv* env,
   }
 
   // Convert colored labels from the C++ object to the Java object.
-  jclass color_class = env->FindClass(kColorClassName);
+  jclass color_class = env->FindClass(kColorClassNameNoSig);
   jmethodID color_value_of_method = env->GetStaticMethodID(
       color_class, "valueOf", absl::StrCat("(I)", kColorClassName).c_str());
   jmethodID color_rgb_method =
       env->GetStaticMethodID(color_class, "rgb", "(III)I");
-  jclass colored_label_class = env->FindClass(kColoredLabelClassName);
+  jclass colored_label_class = env->FindClass(kColoredLabelClassNameNoSig);
   jmethodID colored_label_create_method = env->GetStaticMethodID(
       colored_label_class, "create",
       absl::StrCat("(", kStringClassName, kStringClassName, kColorClassName,
@@ -140,9 +143,9 @@ void ConvertToSegmentationResults(JNIEnv* env,
     jstring label = env->NewStringUTF(colored_label.class_name().c_str());
     jstring display_name =
         env->NewStringUTF(colored_label.display_name().c_str());
-    jint rgb =
-        env->CallIntMethod(color_class, color_rgb_method, colored_label.r(),
-                           colored_label.g(), colored_label.b());
+    jint rgb = env->CallStaticIntMethod(color_class, color_rgb_method,
+                                        colored_label.r(), colored_label.g(),
+                                        colored_label.b());
     jobject color =
         env->CallStaticObjectMethod(color_class, color_value_of_method, rgb);
 
