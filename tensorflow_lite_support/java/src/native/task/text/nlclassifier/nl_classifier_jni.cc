@@ -31,13 +31,15 @@ extern std::unique_ptr<OpResolver> CreateOpResolver();
 
 namespace {
 
+using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::JStringToString;
+using ::tflite::support::utils::ThrowException;
 using ::tflite::task::text::nlclassifier::NLClassifier;
 using ::tflite::task::text::nlclassifier::NLClassifierOptions;
 using ::tflite::task::text::nlclassifier::RunClassifier;
 
-constexpr int kInvalidPointer = 0;
 
 NLClassifierOptions ConvertJavaNLClassifierOptions(
     JNIEnv* env, jobject java_nl_classifier_options) {
@@ -101,6 +103,9 @@ Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_initJniWithByteBuff
   if (status.ok()) {
     return reinterpret_cast<jlong>(status->release());
   } else {
+    ThrowException(env, kAssertionError,
+                   "Error occurred when initializing NLClassifier: %s",
+                   status.status().message().data());
     return kInvalidPointer;
   }
 }

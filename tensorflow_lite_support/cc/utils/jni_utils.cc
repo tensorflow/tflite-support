@@ -15,6 +15,8 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
+#include <string.h>
+
 namespace tflite {
 namespace support {
 namespace utils {
@@ -67,14 +69,30 @@ void ThrowException(JNIEnv* env, const char* clazz, const char* fmt, ...) {
   const size_t max_msg_len = 512;
   auto* message = static_cast<char*>(malloc(max_msg_len));
   if (message && (vsnprintf(message, max_msg_len, fmt, args) >= 0)) {
-    env->ThrowNew(env->FindClass(clazz), message);
+    ThrowExceptionWithMessage(env, clazz, message);
   } else {
-    env->ThrowNew(env->FindClass(clazz), "");
+    ThrowExceptionWithMessage(env, clazz, "");
   }
   if (message) {
     free(message);
   }
   va_end(args);
+}
+
+void ThrowExceptionWithMessage(JNIEnv* env, const char* clazz,
+                               const char* message) {
+  jclass e_class = env->FindClass(clazz);
+  if (strcmp(clazz, kAssertionError) == 0) {
+    // AssertionError cannot use ThrowNew in Java 7
+    jmethodID constructor =
+        env->GetMethodID(e_class, "<init>", "(Ljava/lang/Object;)V");
+    jstring jstr_message = env->NewStringUTF(message);
+    jobject e_object = env->NewObject(e_class, constructor,
+                                      static_cast<jobject>(jstr_message));
+    env->Throw(static_cast<jthrowable>(e_object));
+    return;
+  }
+  env->ThrowNew(e_class, message);
 }
 
 }  // namespace utils

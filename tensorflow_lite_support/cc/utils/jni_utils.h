@@ -82,6 +82,9 @@ jbyteArray CreateByteArray(JNIEnv* env, const jbyte* data, int num_bytes);
 
 void ThrowException(JNIEnv* env, const char* clazz, const char* fmt, ...);
 
+void ThrowExceptionWithMessage(JNIEnv* env, const char* clazz,
+                               const char* message);
+
 }  // namespace utils
 }  // namespace support
 }  // namespace tflite

@@ -21,11 +21,12 @@ limitations under the License.
 
 namespace {
 
+using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::GetMappedFileBuffer;
+using ::tflite::support::utils::ThrowException;
 using ::tflite::task::text::nlclassifier::BertNLClassifier;
 using ::tflite::task::text::nlclassifier::RunClassifier;
-
-constexpr int kInvalidPointer = 0;
 
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_core_BaseTaskApi_deinitJni(JNIEnv* env,
@@ -44,6 +45,9 @@ Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_initJniWithByte
   if (status.ok()) {
     return reinterpret_cast<jlong>(status->release());
   } else {
+    ThrowException(env, kAssertionError,
+                   "Error occurred when initializing Bert NLClassifier: %s",
+                   status.status().message().data());
     return kInvalidPointer;
   }
 }
