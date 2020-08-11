@@ -26,7 +26,7 @@ public abstract class BaseTaskApi implements Closeable {
 
   /**
    * Represents a pointer to the corresponding C++ task_api object. The nativeHandle pointer is
-   * initialized from subclasses and must be released by calling {@link #deinitJni} after it is no
+   * initialized from subclasses and must be released by calling {@link #deinit} after it is no
    * longer needed.
    */
   private final long nativeHandle;
@@ -56,7 +56,7 @@ public abstract class BaseTaskApi implements Closeable {
     if (closed) {
       return;
     }
-    deinitJni(nativeHandle);
+    deinit(nativeHandle);
     closed = true;
   }
 
@@ -83,9 +83,9 @@ public abstract class BaseTaskApi implements Closeable {
   }
 
   /**
-   * Native implementation to release memory pointed by the pointer.
+   * Releases memory pointed by the pointer in the native layer.
    *
    * @param nativeHandle pointer to memory allocated
    */
-  native void deinitJni(long nativeHandle);
+  protected abstract void deinit(long nativeHandle);
 }

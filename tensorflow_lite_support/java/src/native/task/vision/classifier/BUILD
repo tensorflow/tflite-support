@@ -5,15 +5,17 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files(["image_classifier_jni.cc"])
+
 cc_library(
     name = "image_classifier_native",
     srcs = [
-        ":libimage_classifier_jni.so",
+        ":libtask_vision_jni.so",
     ],
 )
 
 tflite_jni_binary(
-    name = "libimage_classifier_jni.so",
+    name = "libtask_vision_jni.so",
     srcs = [
         "image_classifier_jni.cc",
     ],

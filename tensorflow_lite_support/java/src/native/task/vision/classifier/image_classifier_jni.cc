@@ -140,9 +140,8 @@ jobject ConvertToClassificationResults(JNIEnv* env,
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_org_tensorflow_lite_task_core_BaseTaskApi_deinitJni(JNIEnv* env,
-                                                         jobject thiz,
-                                                         jlong native_handle) {
+Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_deinitJni(
+    JNIEnv* env, jobject thiz, jlong native_handle) {
   delete reinterpret_cast<ImageClassifier*>(native_handle);
 }
 

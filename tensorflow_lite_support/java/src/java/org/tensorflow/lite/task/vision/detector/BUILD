@@ -7,7 +7,14 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-exports_files(["AndroidManifest.xml"])
+exports_files([
+    "AndroidManifest.xml",
+])
+
+filegroup(
+    name = "object_detector_src",
+    srcs = glob(["**/*.java"]),
+)
 
 android_library(
     name = "object_detector",

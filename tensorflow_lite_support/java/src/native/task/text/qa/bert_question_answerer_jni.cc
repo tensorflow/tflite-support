@@ -30,9 +30,8 @@ using ::tflite::task::text::qa::QuestionAnswerer;
 constexpr int kInvalidPointer = 0;
 
 extern "C" JNIEXPORT void JNICALL
-Java_org_tensorflow_lite_task_core_BaseTaskApi_deinitJni(JNIEnv* env,
-                                                         jobject thiz,
-                                                         jlong native_handle) {
+Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_deinitJni(
+    JNIEnv* env, jobject thiz, jlong native_handle) {
   delete reinterpret_cast<QuestionAnswerer*>(native_handle);
 }
 

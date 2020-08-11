@@ -122,7 +122,7 @@ public class NLClassifier extends BaseTaskApi {
     }
   }
 
-  private static final String NL_CLASSIFIER_NATIVE_LIBNAME = "nl_classifier_jni";
+  private static final String NL_CLASSIFIER_NATIVE_LIBNAME = "task_text_jni";
 
   /**
    * Constructor to initialize the JNI with a pointer from C++.
@@ -194,4 +194,16 @@ public class NLClassifier extends BaseTaskApi {
       NLClassifierOptions options, ByteBuffer modelBuffer);
 
   private static native List<Category> classifyNative(long nativeHandle, String text);
+
+  @Override
+  protected void deinit(long nativeHandle) {
+    deinitJni(nativeHandle);
+  }
+
+  /**
+   * Native implementation to release memory pointed by the pointer.
+   *
+   * @param nativeHandle pointer to memory allocated
+   */
+  private native void deinitJni(long nativeHandle);
 }

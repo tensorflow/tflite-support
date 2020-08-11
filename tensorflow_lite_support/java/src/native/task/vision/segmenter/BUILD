@@ -5,15 +5,17 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files(["image_segmenter_jni.cc"])
+
 cc_library(
     name = "image_segmenter_native",
     srcs = [
-        ":libimage_segmenter_jni.so",
+        ":libtask_vision_jni.so",
     ],
 )
 
 tflite_jni_binary(
-    name = "libimage_segmenter_jni.so",
+    name = "libtask_vision_jni.so",
     srcs = [
         "image_segmenter_jni.cc",
     ],

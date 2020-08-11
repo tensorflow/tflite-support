@@ -7,6 +7,11 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+filegroup(
+    name = "bert_question_answerer_src",
+    srcs = glob(["**/*.java"]),
+)
+
 android_library(
     name = "bert_question_answerer",
     srcs = glob(["*.java"]),

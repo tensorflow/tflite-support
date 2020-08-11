@@ -70,7 +70,7 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
  */
 public final class ImageSegmenter extends BaseTaskApi {
 
-  private static final String IMAGE_SEGMENTER_NATIVE_LIB = "image_segmenter_jni";
+  private static final String IMAGE_SEGMENTER_NATIVE_LIB = "task_vision_jni";
 
   private final OutputType outputType;
 
@@ -247,4 +247,16 @@ public final class ImageSegmenter extends BaseTaskApi {
       int[] maskShape,
       List<ColoredLabel> coloredLabels,
       int orientation);
+
+  @Override
+  protected void deinit(long nativeHandle) {
+    deinitJni(nativeHandle);
+  }
+
+  /**
+   * Native implementation to release memory pointed by the pointer.
+   *
+   * @param nativeHandle pointer to memory allocated
+   */
+  private native void deinitJni(long nativeHandle);
 }

@@ -25,7 +25,7 @@ import org.tensorflow.lite.task.core.TaskJniUtils.MultipleBuffersHandleProvider;
 
 /** Task API for BertQA models. */
 public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswerer {
-  private static final String BERT_QUESTION_ANSWERER_NATIVE_LIBNAME = "bert_question_answerer_jni";
+  private static final String BERT_QUESTION_ANSWERER_NATIVE_LIBNAME = "task_text_jni";
 
   private BertQuestionAnswerer(long nativeHandle) {
     super(nativeHandle);
@@ -140,4 +140,16 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
 
   private static native List<QaAnswer> answerNative(
       long nativeHandle, String context, String question);
+
+  @Override
+  protected void deinit(long nativeHandle) {
+    deinitJni(nativeHandle);
+  }
+
+  /**
+   * Native implementation to release memory pointed by the pointer.
+   *
+   * @param nativeHandle pointer to memory allocated
+   */
+  private native void deinitJni(long nativeHandle);
 }

@@ -153,7 +153,7 @@ public class TaskJniUtils {
    *
    * @param libName name of the lib
    */
-  private static void tryLoadLibrary(String libName) {
+  static void tryLoadLibrary(String libName) {
     try {
       System.loadLibrary(libName);
     } catch (UnsatisfiedLinkError e) {

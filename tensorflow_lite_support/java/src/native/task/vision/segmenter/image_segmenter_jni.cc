@@ -163,9 +163,8 @@ void ConvertToSegmentationResults(JNIEnv* env,
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_org_tensorflow_lite_task_core_BaseTaskApi_deinitJni(JNIEnv* env,
-                                                         jobject thiz,
-                                                         jlong native_handle) {
+Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_deinitJni(
+    JNIEnv* env, jobject thiz, jlong native_handle) {
   delete reinterpret_cast<ImageSegmenter*>(native_handle);
 }
 

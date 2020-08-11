@@ -5,19 +5,23 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files([
+    "nl_classifier_jni.cc",
+])
+
 # Default native target for nl_classifier to provide BuiltInOpResolver.
 cc_library(
     name = "nl_classifier_native",
     srcs = [
-        ":libnl_classifier_jni.so",
+        ":libtask_text_jni.so",
     ],
 )
 
-# Note: "nl_classifier_jni" is hardcoded in Java to look up the .so, therefore
+# Note: "libtask_text_jni" is hardcoded in Java to look up the .so, therefore
 # the name should remain the same when creating customized version of
 # nl_classifier_native
 tflite_jni_binary(
-    name = "libnl_classifier_jni.so",
+    name = "libtask_text_jni.so",
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [
         ":native_without_resolver",
@@ -41,27 +45,6 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
     ],
     alwayslink = 1,
-)
-
-tflite_jni_binary(
-    name = "libbert_nl_classifier_jni.so",
-    srcs = [
-        "bert_nl_classifier_jni.cc",
-    ],
-    linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
-    deps = [
-        ":nl_classifier_jni_utils",
-        "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier",
-        "//tensorflow_lite_support/cc/utils:jni_utils",
-        "//tensorflow_lite_support/java/jni",
-    ],
-)
-
-cc_library(
-    name = "bert_nl_classifier_native",
-    srcs = [
-        ":libbert_nl_classifier_jni.so",
-    ],
 )
 
 cc_library(

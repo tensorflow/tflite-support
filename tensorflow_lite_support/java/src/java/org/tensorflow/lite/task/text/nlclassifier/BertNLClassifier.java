@@ -40,7 +40,7 @@ import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
  * </ul>
  */
 public class BertNLClassifier extends BaseTaskApi {
-  private static final String BERT_NL_CLASSIFIER_NATIVE_LIBNAME = "bert_nl_classifier_jni";
+  private static final String BERT_NL_CLASSIFIER_NATIVE_LIBNAME = "task_text_jni";
 
   /**
    * Constructor to initialize the JNI with a pointer from C++.
@@ -94,4 +94,16 @@ public class BertNLClassifier extends BaseTaskApi {
   private static native long initJniWithByteBuffer(ByteBuffer modelBuffer);
 
   private static native List<Category> classifyNative(long nativeHandle, String text);
+
+  @Override
+  protected void deinit(long nativeHandle) {
+    deinitJni(nativeHandle);
+  }
+
+  /**
+   * Native implementation to release memory pointed by the pointer.
+   *
+   * @param nativeHandle pointer to memory allocated
+   */
+  private native void deinitJni(long nativeHandle);
 }

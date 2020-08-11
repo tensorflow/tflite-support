@@ -6,25 +6,26 @@ package(
 )
 
 exports_files([
-    "bert_question_answerer_jni.cc",
+    "bert_nl_classifier_jni.cc",
 ])
+
+cc_library(
+    name = "bert_nl_classifier_native",
+    srcs = [
+        ":libtask_text_jni.so",
+    ],
+)
 
 tflite_jni_binary(
     name = "libtask_text_jni.so",
     srcs = [
-        "bert_question_answerer_jni.cc",
+        "bert_nl_classifier_jni.cc",
     ],
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [
-        "//tensorflow_lite_support/cc/task/text/qa:bert_question_answerer",
+        "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier",
         "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
-    ],
-)
-
-cc_library(
-    name = "bert_question_answerer_native",
-    srcs = [
-        ":libtask_text_jni.so",
+        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_jni_utils",
     ],
 )

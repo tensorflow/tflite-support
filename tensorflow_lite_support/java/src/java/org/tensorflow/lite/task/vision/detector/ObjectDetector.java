@@ -81,7 +81,7 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
  */
 public final class ObjectDetector extends BaseTaskApi {
 
-  private static final String OBJECT_DETECTOR_NATIVE_LIB = "object_detector_jni";
+  private static final String OBJECT_DETECTOR_NATIVE_LIB = "task_vision_jni";
 
   /**
    * Creates an {@link ObjectDetector} instance from the default {@link ObjectDetectorOptions}.
@@ -325,4 +325,16 @@ public final class ObjectDetector extends BaseTaskApi {
 
   private static native List<Detection> detectNative(
       long nativeHandle, ByteBuffer image, int width, int height, int orientation);
+
+  @Override
+  protected void deinit(long nativeHandle) {
+    deinitJni(nativeHandle);
+  }
+
+  /**
+   * Native implementation to release memory pointed by the pointer.
+   *
+   * @param nativeHandle pointer to memory allocated
+   */
+  private native void deinitJni(long nativeHandle);
 }

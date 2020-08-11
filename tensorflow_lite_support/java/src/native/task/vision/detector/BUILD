@@ -5,15 +5,17 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files(["object_detector_jni.cc"])
+
 cc_library(
     name = "object_detector_native",
     srcs = [
-        ":libobject_detector_jni.so",
+        ":libtask_vision_jni.so",
     ],
 )
 
 tflite_jni_binary(
-    name = "libobject_detector_jni.so",
+    name = "libtask_vision_jni.so",
     srcs = [
         "object_detector_jni.cc",
     ],

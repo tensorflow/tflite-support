@@ -7,6 +7,11 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+filegroup(
+    name = "nl_classifier_src",
+    srcs = glob(["**/*.java"]),
+)
+
 # Java-only target, need to be used together with a native target similar to
 # third_party/tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_native.
 # Use this target when you want to provide a MutableOpResolver with customized
@@ -60,7 +65,7 @@ android_library(
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier:bert_nl_classifier_native",
+        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert_nlclassifier:bert_nl_classifier_native",
     ],
 )
 

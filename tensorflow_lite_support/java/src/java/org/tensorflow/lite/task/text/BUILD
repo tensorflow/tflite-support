@@ -7,24 +7,20 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-exports_files([
-    "AndroidManifest.xml",
-])
-
-filegroup(
-    name = "image_classifier_src",
-    srcs = glob(["**/*.java"]),
-)
+exports_files(["AndroidManifest.xml"])
 
 android_library(
-    name = "image_classifier",
-    srcs = glob(["*.java"]),
+    name = "task_library_text",
+    srcs = [
+        "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text/nlclassifier:nl_classifier_src",
+        "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text/qa:bert_question_answerer_src",
+    ],
     javacopts = JAVACOPTS,
     manifest = "AndroidManifest.xml",
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "//tensorflow_lite_support/java/src/native/task/vision/classifier:image_classifier_native",
+        "//tensorflow_lite_support/java/src/native/task/text:task_text_native",
         "@com_google_auto_value",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
@@ -33,8 +29,8 @@ android_library(
 # AAR target for OSS release.
 #
 # bazel build -c opt --config=monolithic --config=android_arm64 --fat_apk_cpu=x86,x86_64,arm64-v8a,armeabi-v7a \
-#   tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/classifier:image-classifier
+#   tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text:task-library-text
 aar_with_jni(
-    name = "image-classifier",
-    android_library = ":image_classifier",
+    name = "task-library-text",
+    android_library = ":task_library_text",
 )

@@ -61,7 +61,7 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
  */
 public final class ImageClassifier extends BaseTaskApi {
 
-  private static final String IMAGE_CLASSIFIER_NATIVE_LIB = "image_classifier_jni";
+  private static final String IMAGE_CLASSIFIER_NATIVE_LIB = "task_vision_jni";
 
   /**
    * Creates an {@link ImageClassifier} instance from the default {@link ImageClassifierOptions}.
@@ -322,4 +322,16 @@ public final class ImageClassifier extends BaseTaskApi {
    */
   private static native List<Classifications> classifyNative(
       long nativeHandle, ByteBuffer image, int width, int height, int[] roi, int orientation);
+
+  @Override
+  protected void deinit(long nativeHandle) {
+    deinitJni(nativeHandle);
+  }
+
+  /**
+   * Native implementation to release memory pointed by the pointer.
+   *
+   * @param nativeHandle pointer to memory allocated
+   */
+  private native void deinitJni(long nativeHandle);
 }

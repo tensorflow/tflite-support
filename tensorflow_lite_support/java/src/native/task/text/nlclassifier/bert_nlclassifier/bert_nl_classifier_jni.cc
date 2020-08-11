@@ -29,9 +29,8 @@ using ::tflite::task::text::nlclassifier::BertNLClassifier;
 using ::tflite::task::text::nlclassifier::RunClassifier;
 
 extern "C" JNIEXPORT void JNICALL
-Java_org_tensorflow_lite_task_core_BaseTaskApi_deinitJni(JNIEnv* env,
-                                                         jobject thiz,
-                                                         jlong native_handle) {
+Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_deinitJni(
+    JNIEnv* env, jobject thiz, jlong native_handle) {
   delete reinterpret_cast<BertNLClassifier*>(native_handle);
 }
 

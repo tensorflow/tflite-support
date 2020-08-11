@@ -148,9 +148,8 @@ jobject ConvertToDetectionResults(JNIEnv* env, const DetectionResult& results) {
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_org_tensorflow_lite_task_core_BaseTaskApi_deinitJni(JNIEnv* env,
-                                                         jobject thiz,
-                                                         jlong native_handle) {
+Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_deinitJni(
+    JNIEnv* env, jobject thiz, jlong native_handle) {
   delete reinterpret_cast<ObjectDetector*>(native_handle);
 }
 
