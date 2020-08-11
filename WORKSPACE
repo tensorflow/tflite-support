@@ -36,12 +36,13 @@ http_archive(
     ],
 )
 
+# tf-nightly-20200810
 http_archive(
     name = "org_tensorflow",
-    sha256 = "2595a5c401521f20a2734c4e5d54120996f8391f00bb62a57267d930bce95350",
-    strip_prefix = "tensorflow-2.3.0",
+    sha256 = "fc6d7c57cd9427e695a38ad00fb6ecc3f623bac792dd44ad73a3f85b338b68be",
+    strip_prefix = "tensorflow-8a4ffe2e1ae722cff5306778df0cfca8b7f503fe",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.3.0.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/8a4ffe2e1ae722cff5306778df0cfca8b7f503fe.tar.gz",
     ],
 )
 
