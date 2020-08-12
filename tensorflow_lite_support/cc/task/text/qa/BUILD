@@ -40,3 +40,18 @@ cc_library(
         "@com_google_absl//absl/strings",
     ],
 )
+
+cc_library(
+    name = "bert_qa_c_api",
+    srcs = [
+        "bert_qa_c_api.cc",
+    ],
+    hdrs = [
+        "bert_qa_c_api.h",
+    ],
+    visibility = ["//tensorflow_lite_support:__subpackages__"],
+    deps = [
+        ":bert_question_answerer",
+        ":question_answerer",
+    ],
+)
