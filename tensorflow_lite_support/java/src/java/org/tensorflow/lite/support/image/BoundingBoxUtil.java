@@ -188,49 +188,51 @@ public final class BoundingBoxUtil {
   }
 
   private static RectF convertFromBoundaries(
-      float[] values, CoordinateType coordinateType, int height, int width) {
-    if (coordinateType == CoordinateType.RATIO) {
-      return new RectF(
-          values[0] * width, values[1] * height, values[2] * width, values[3] * height);
-    } else {
-      return new RectF(values[0], values[1], values[2], values[3]);
-    }
+      float[] values, CoordinateType coordinateType, int imageHeight, int imageWidth) {
+    float left = values[0];
+    float top = values[1];
+    float right = values[2];
+    float bottom = values[3];
+    return getRectF(left, top, right, bottom, imageHeight, imageWidth, coordinateType);
   }
 
   private static RectF convertFromUpperLeft(
-      float[] values, CoordinateType coordinateType, int height, int width) {
-    if (coordinateType == CoordinateType.PIXEL) {
-      float left = values[0];
-      float top = values[1];
-      float w = values[2];
-      float h = values[3];
-
-      return new RectF(
-        left, top, left + w, top + h);
-    } else {
-      return new RectF(
-        values[0] * width, values[1] * height, width * values[2], height * values[3]);
-    }
+      float[] values, CoordinateType coordinateType, int imageHeight, int imageWidth) {
+    float left = values[0];
+    float top = values[1];
+    float right = values[0] + values[2];
+    float bottom = values[1] + values[3];
+    return getRectF(left, top, right, bottom, imageHeight, imageWidth, coordinateType);
   }
 
   private static RectF convertFromCenter(
-      float[] values, CoordinateType coordinateType, int height, int width) {
+      float[] values, CoordinateType coordinateType, int imageHeight, int imageWidth) {
+    float centerX = values[0];
+    float centerY = values[1];
+    float w = values[2];
+    float h = values[3];
+
+    float left = centerX - w / 2;
+    float top = centerY - h / 2;
+    float right = centerX + w / 2;
+    float bottom = centerX + h / 2;
+    return getRectF(left, top, right, bottom, imageHeight, imageWidth, coordinateType);
+  }
+
+  private static RectF getRectF(
+      float left,
+      float top,
+      float right,
+      float bottom,
+      int imageHeight,
+      int imageWidth,
+      CoordinateType coordinateType) {
     if (coordinateType == CoordinateType.PIXEL) {
-      float centerX = values[0];
-      float centerY = values[1];
-      float w = values[2];
-      float h = values[3];
-
-      float left = centerX - w/2;
-      float top = centerY - h/2;
-      float right = centerX + w/2;
-      float bottom = centerX + h/2;
-
       return new RectF(
-        left, top, right, bottom);
+          left, top, right, bottom);
     } else {
-      // TODO: add conversion for CoordinateType.RATIO
-      throw new IllegalArgumentException("BoundingBox.Type Center is not supported with CoordinateType CoordinateType.RATIO");
+      return new RectF(
+          left * imageWidth, top * imageHeight, right * imageWidth, bottom * imageHeight);
     }
   }
 
