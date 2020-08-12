@@ -11,6 +11,7 @@ exports_files(["LICENSE"])
 package_group(
     name = "users",
     packages = [
+        "//nlp/descartes/...",
         "//research/kernel/softskills/...",
         "//tensorflow_lite_support/...",
         "//third_party/py/tensorflow_examples/...",

@@ -1,5 +1,7 @@
 package(
-    default_visibility = ["//tensorflow_lite_support:users"],
+    default_visibility = [
+        "//tensorflow_lite_support:users",
+    ],
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -9,5 +11,33 @@ py_library(
     deps = [
         "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
         "//tensorflow_lite_support/custom_ops:expect_tftext_installed",
+    ],
+)
+
+py_library(
+    name = "sentencepiece_tokenizer",
+    srcs = ["sentencepiece_tokenizer.py"],
+    srcs_version = "PY3",
+    deps = [
+        "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:gen_sentencepiece_tokenizer_op",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_tokenizer_op",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece/py:model_converter",
+    ],
+)
+
+py_test(
+    name = "sentencepiece_tokenizer_test",
+    srcs = ["sentencepiece_tokenizer_test.py"],
+    data = [
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:testdata",
+    ],
+    python_version = "PY3",
+    deps = [
+        ":sentencepiece_tokenizer",
+        "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
+        "//tensorflow_lite_support/custom_ops:expect_tftext_installed",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:pywrap_tflite_registerer",
+        "@absl_py//absl/flags",
     ],
 )
