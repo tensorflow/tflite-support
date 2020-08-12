@@ -22,7 +22,7 @@ limitations under the License.
 #include "tensorflow/lite/context.h"
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/string_util.h"
-#include "third_party/utf/utf.h"
+#include "libutf/utf.h"
 
 constexpr int kInput = 0;
 constexpr int kOutputValues = 0;
@@ -46,6 +46,15 @@ namespace whitespace_tokenizer {
 
 inline bool OutputIsPaddedTensor(TfLiteNode* node) {
   return NumOutputs(node) == 1;
+}
+
+inline int charntorune(Rune* r, const char* s, int n) {
+  const int bytes_read = chartorune(r, const_cast<char *>(s));
+  if (bytes_read > n) {
+    *r = Runeerror;
+    return 0;
+  }
+  return bytes_read;
 }
 
 std::vector<std::pair<const char*, int>> Tokenize(StringRef str) {

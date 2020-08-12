@@ -21,4 +21,6 @@ bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/java:tensorflowlite_support \
     //tensorflow_lite_support/codegen/python:codegen \
     //tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata_lib \
-    //tensorflow_lite_support/metadata/cc:metadata_extractor
+    //tensorflow_lite_support/metadata/cc:metadata_extractor \
+    //tensorflow_lite_support/custom_ops/kernel:all \
+    //tensorflow_lite_support/custom_ops/python:all

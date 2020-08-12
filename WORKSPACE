@@ -189,6 +189,27 @@ http_archive(
     build_file = "//third_party:stblib.BUILD",
 )
 
+http_archive(
+    name = "utf_archive",
+    build_file = "@//third_party:utf.BUILD",
+    sha256 = "262a902f622dcd28e05b8a4be10da0aa3899050d0be8f4a71780eed6b2ea65ca",
+    urls = [
+        "https://mirror.bazel.build/9fans.github.io/plan9port/unix/libutf.tgz",
+        "https://9fans.github.io/plan9port/unix/libutf.tgz",
+    ],
+)
+
+http_archive(
+    name = "icu",
+    strip_prefix = "icu-release-64-2",
+    sha256 = "dfc62618aa4bd3ca14a3df548cd65fe393155edd213e49c39f3a30ccd618fc27",
+    urls = [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/unicode-org/icu/archive/release-64-2.zip",
+        "https://github.com/unicode-org/icu/archive/release-64-2.zip",
+    ],
+    build_file = "@//third_party:icu.BUILD",
+)
+
 # AutoValue 1.6+ shades Guava, Auto Common, and JavaPoet. That's OK
 # because none of these jars become runtime dependencies.
 java_import_external(

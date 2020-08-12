@@ -10,10 +10,10 @@ cc_library(
     srcs = ["whitespace_tokenizer.cc"],
     hdrs = ["whitespace_tokenizer.h"],
     deps = [
-        "//third_party/utf",
         "@org_tensorflow//tensorflow/lite:context",
         "@org_tensorflow//tensorflow/lite:string_util",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
+        "@utf_archive//:utf",
     ],
 )
 
@@ -34,7 +34,7 @@ cc_test(
     srcs = ["whitespace_tokenizer_test.cc"],
     deps = [
         ":whitespace_tokenizer",
-        "//testing/base/public:gunit_main",
+        "@com_google_googletest//:gtest_main",
         "@org_tensorflow//tensorflow/lite:string_util",
         "@org_tensorflow//tensorflow/lite/kernels:test_util",
         "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
@@ -54,13 +54,11 @@ py_test(
     python_version = "PY3",
     srcs_version = "PY3",
     deps = [
-        ":whitespace_tokenizer_op_resolver",
-        "//third_party/py/numpy",
-        "//third_party/py/tensorflow",
-        "//third_party/py/tensorflow_text",
+        "//tensorflow_lite_support/custom_ops:expect_numpy_installed",
+        "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
+        "//tensorflow_lite_support/custom_ops:expect_tftext_installed",
         "@absl_py//absl/logging",
         "@absl_py//absl/testing:parameterized",
-        "@org_tensorflow//tensorflow/lite/delegates/flex:delegate",
         "@org_tensorflow//tensorflow/lite/python:interpreter",
         "@org_tensorflow//tensorflow/python:platform",
     ],
@@ -95,7 +93,7 @@ cc_test(
     srcs = ["ngrams_test.cc"],
     deps = [
         ":ngrams",
-        "//testing/base/public:gunit_main",
+        "@com_google_googletest//:gtest_main",
         "@flatbuffers",
         "@org_tensorflow//tensorflow/lite:string_util",
         "@org_tensorflow//tensorflow/lite/kernels:test_util",
@@ -110,10 +108,9 @@ py_test(
     python_version = "PY3",
     srcs_version = "PY3",
     deps = [
-        ":ngrams_op_resolver",
+        "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
+        "//tensorflow_lite_support/custom_ops:expect_tftext_installed",
         "//tensorflow_lite_support/custom_ops/python:tflite_text_api",
-        "//third_party/py/tensorflow",
-        "//third_party/py/tensorflow_text",
         "@absl_py//absl/logging",
         "@absl_py//absl/testing:parameterized",
         "@org_tensorflow//tensorflow/lite/python:interpreter",

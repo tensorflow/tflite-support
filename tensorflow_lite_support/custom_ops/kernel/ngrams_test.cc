@@ -151,28 +151,28 @@ class NgramsModel : public SingleOpModel {
 };
 
 TEST(NgramsTest, TensorSingleSequenceWidthTwo) {
-  NgramsModel m(2, " ", {"this", "is", "a", "test"}, {4});
+  NgramsModel m(2, " ", {"this", "is", "a", "test"}, std::vector<int>{4});
   EXPECT_THAT(m.GetValuesTensorShape(), ElementsAre(3));
   EXPECT_THAT(m.ExtractValuesTensorVector(),
               ElementsAre("this is", "is a", "a test"));
 }
 
 TEST(NgramsTest, TensorSingleSequenceWidthThree) {
-  NgramsModel m(3, " ", {"this", "is", "a", "test"}, {4});
+  NgramsModel m(3, " ", {"this", "is", "a", "test"}, std::vector<int>{4});
   EXPECT_THAT(m.GetValuesTensorShape(), ElementsAre(2));
   EXPECT_THAT(m.ExtractValuesTensorVector(),
               ElementsAre("this is a", "is a test"));
 }
 
 TEST(NgramsTest, TensorSingleSequenceLongerSeparator) {
-  NgramsModel m(2, "...", {"this", "is", "a", "test"}, {4});
+  NgramsModel m(2, "...", {"this", "is", "a", "test"}, std::vector<int>{4});
   EXPECT_THAT(m.GetValuesTensorShape(), ElementsAre(3));
   EXPECT_THAT(m.ExtractValuesTensorVector(),
               ElementsAre("this...is", "is...a", "a...test"));
 }
 
 TEST(NgramsTest, TensorSingleSequenceWidthTooLong) {
-  NgramsModel m(5, " ", {"this", "is", "a", "test"}, {4});
+  NgramsModel m(5, " ", {"this", "is", "a", "test"}, std::vector<int>{4});
   EXPECT_THAT(m.GetValuesTensorShape(), ElementsAre(0));
   EXPECT_THAT(m.ExtractValuesTensorVector(), ElementsAre());
 }
@@ -187,7 +187,7 @@ TEST(NgramsTest, TensorMultidimensionalInputWidthTwo) {
                     "1,1,0", "1,1,1", "1,1,2", "1,1,3",  //
                     "1,2,0", "1,2,1", "1,2,2", "1,2,3",  //
                 },
-                {2, 3, 4});
+                std::vector<int>{2, 3, 4});
   EXPECT_THAT(m.GetValuesTensorShape(), ElementsAre(2, 3, 3));
   EXPECT_THAT(m.ExtractValuesTensorVector(),
               ElementsAreArray({
@@ -203,7 +203,8 @@ TEST(NgramsTest, TensorMultidimensionalInputWidthTwo) {
 TEST(NgramsTest, RaggedTensorSingleSequenceWidthTwo) {
   std::vector<std::vector<int64_t>> nested_row_lengths;
   nested_row_lengths.push_back({4});
-  NgramsModel m(2, " ", {"this", "is", "a", "test"}, nested_row_lengths);
+  NgramsModel m(2, " ", {"this", "is", "a", "test"},
+                nested_row_lengths);
   EXPECT_THAT(m.GetValuesTensorShape(), ElementsAre(3));
   EXPECT_THAT(m.ExtractValuesTensorVector(),
               ElementsAre("this is", "is a", "a test"));

@@ -7,7 +7,7 @@ py_library(
     name = "tflite_text_api",
     srcs = ["tflite_text_api.py"],
     deps = [
-        "//third_party/py/tensorflow",
-        "//third_party/py/tensorflow_text",
+        "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
+        "//tensorflow_lite_support/custom_ops:expect_tftext_installed",
     ],
 )
