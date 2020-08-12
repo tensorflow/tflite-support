@@ -63,3 +63,21 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ],
 )
+
+cc_library(
+    name = "bert_nl_classifier_c_api",
+    srcs = [
+        "bert_nl_classifier_c_api.cc",
+        "nl_classifier_c_api_common.cc",
+    ],
+    hdrs = [
+        "bert_nl_classifier_c_api.h",
+        "nl_classifier_c_api_common.h",
+    ],
+    visibility = ["//tensorflow_lite_support:__subpackages__"],
+    deps = [
+        ":bert_nl_classifier",
+        "//tensorflow_lite_support/cc/task/core:category",
+        "@com_google_absl//absl/strings",
+    ],
+)
