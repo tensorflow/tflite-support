@@ -61,15 +61,11 @@ bool TfLiteEngine::Verifier::Verify(const char* data, int length,
   return tflite::Verify(data, length, *op_resolver_, reporter);
 }
 
-absl::Status TfLiteEngine::BuildModelFromFlatBuffer(const char* buffer_data,
-                                                    size_t buffer_size) {
-  if (model_) {
-    return CreateStatusWithPayload(StatusCode::kInternal,
-                                   "Model already built");
-  }
-  const char* final_buffer_data = buffer_data;
+absl::Status TfLiteEngine::InitializeFromModelFileHandler() {
+  const char* buffer_data = model_file_handler_->GetFileContent().data();
+  size_t buffer_size = model_file_handler_->GetFileContent().size();
   model_ = tflite::FlatBufferModel::VerifyAndBuildFromBuffer(
-      final_buffer_data, buffer_size, &verifier_, &error_reporter_);
+      buffer_data, buffer_size, &verifier_, &error_reporter_);
 
   if (model_ == nullptr) {
     // To be replaced with a proper switch-case when TF Lite model builder
@@ -99,6 +95,19 @@ absl::Status TfLiteEngine::BuildModelFromFlatBuffer(const char* buffer_data,
   return absl::OkStatus();
 }
 
+absl::Status TfLiteEngine::BuildModelFromFlatBuffer(const char* buffer_data,
+                                                    size_t buffer_size) {
+  if (model_) {
+    return CreateStatusWithPayload(StatusCode::kInternal,
+                                   "Model already built");
+  }
+  external_file_.set_file_content(std::string(buffer_data, buffer_size));
+  ASSIGN_OR_RETURN(
+      model_file_handler_,
+      ExternalFileHandler::CreateFromExternalFile(&external_file_));
+  return InitializeFromModelFileHandler();
+}
+
 absl::Status TfLiteEngine::BuildModelFromFile(const std::string& file_name) {
   if (model_) {
     return CreateStatusWithPayload(StatusCode::kInternal,
@@ -108,8 +117,7 @@ absl::Status TfLiteEngine::BuildModelFromFile(const std::string& file_name) {
   ASSIGN_OR_RETURN(
       model_file_handler_,
       ExternalFileHandler::CreateFromExternalFile(&external_file_));
-  return BuildModelFromFlatBuffer(model_file_handler_->GetFileContent().data(),
-                                  model_file_handler_->GetFileContent().size());
+  return InitializeFromModelFileHandler();
 }
 
 absl::Status TfLiteEngine::BuildModelFromFileDescriptor(int file_descriptor) {
@@ -121,8 +129,7 @@ absl::Status TfLiteEngine::BuildModelFromFileDescriptor(int file_descriptor) {
   ASSIGN_OR_RETURN(
       model_file_handler_,
       ExternalFileHandler::CreateFromExternalFile(&external_file_));
-  return BuildModelFromFlatBuffer(model_file_handler_->GetFileContent().data(),
-                                  model_file_handler_->GetFileContent().size());
+  return InitializeFromModelFileHandler();
 }
 
 absl::Status TfLiteEngine::BuildModelFromExternalFileProto(
@@ -133,8 +140,7 @@ absl::Status TfLiteEngine::BuildModelFromExternalFileProto(
   }
   ASSIGN_OR_RETURN(model_file_handler_,
                    ExternalFileHandler::CreateFromExternalFile(external_file));
-  return BuildModelFromFlatBuffer(model_file_handler_->GetFileContent().data(),
-                                  model_file_handler_->GetFileContent().size());
+  return InitializeFromModelFileHandler();
 }
 
 absl::Status TfLiteEngine::InitInterpreter(int num_threads) {

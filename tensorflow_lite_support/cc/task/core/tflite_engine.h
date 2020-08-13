@@ -116,6 +116,8 @@ class TfLiteEngine {
     const tflite::OpResolver* op_resolver_;
   };
 
+  absl::Status InitializeFromModelFileHandler();
+
   // TF Lite model and interpreter for actual inference.
   std::unique_ptr<tflite::FlatBufferModel> model_;
 
