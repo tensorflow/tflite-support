@@ -651,14 +651,14 @@ public static {{MODEL_CLASS_NAME}} newInstance(Context context, String modelPath
   for (const auto& tensor : model.inputs) {
     SetCodeWriterWithTensorInfo(code_writer, tensor);
     code_writer->Append(
-        "instance.reset{{NAME_U}}Preprocessor(instance.buildDefault{{NAME_U}}"
-        "Preprocessor());");
+        R"(  instance.reset{{NAME_U}}Preprocessor(
+      instance.buildDefault{{NAME_U}}Preprocessor());)");
   }
   for (const auto& tensor : model.outputs) {
     SetCodeWriterWithTensorInfo(code_writer, tensor);
     code_writer->Append(
-        "instance.reset{{NAME_U}}Postprocessor(instance.buildDefault{{NAME_U}}"
-        "Postprocessor());");
+        R"(  instance.reset{{NAME_U}}Postprocessor(
+      instance.buildDefault{{NAME_U}}Postprocessor());)");
   }
   code_writer->Append(R"(  return instance;
 }
@@ -868,7 +868,7 @@ if (model != null) {
       code_writer->Append(R"(
     // Prepare tensor "{{NAME}}" from a Bitmap with ARGB_8888 format.
     Bitmap bitmap = ...;
-    TensorImage {{MAME}} = TensorImage.fromBitmap(bitmap);
+    TensorImage {{NAME}} = TensorImage.fromBitmap(bitmap);
     // Alternatively, load the input tensor "{{NAME}}" from pixel values.
     // Check out TensorImage documentation to load other image data structures.
     // int[] pixelValues = ...;

@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import os
 import shutil
+import sys
 from absl import app
 from absl import flags
 from absl import logging
@@ -59,7 +60,9 @@ def prepare_directory_for_file(file_path):
     logging.error('Cannot write to %s', target_dir)
 
 
-def main(argv):
+def run_main(argv):
+  """Main function of the codegen."""
+
   if len(argv) > 1:
     logging.error('None flag arguments found: [%s]', ', '.join(argv[1:]))
 
@@ -90,7 +93,12 @@ def main(argv):
   logging.info('Model copied into assets!')
 
 
-if __name__ == '__main__':
+# Simple wrapper to make the code pip-friendly
+def main():
   flags.mark_flag_as_required('model')
   flags.mark_flag_as_required('destination')
+  app.run(main=run_main, argv=sys.argv)
+
+
+if __name__ == '__main__':
   app.run(main)
