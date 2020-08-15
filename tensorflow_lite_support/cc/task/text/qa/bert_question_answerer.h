@@ -119,7 +119,8 @@ class BertQuestionAnswerer : public QuestionAnswerer {
   explicit BertQuestionAnswerer(std::unique_ptr<core::TfLiteEngine> engine)
       : QuestionAnswerer(std::move(engine)) {}
 
-  // Answers question based on the context.
+  // Answers question based on the context. Could be empty if no answer was
+  // found from the given context.
   std::vector<QaAnswer> Answer(const std::string& context,
                                const std::string& question) override;
 

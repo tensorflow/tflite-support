@@ -21,7 +21,8 @@ import java.util.List;
 public interface QuestionAnswerer {
 
   /**
-   * Answers question based on context, and returns a list of possible {@link QaAnswer}s.
+   * Answers question based on context, and returns a list of possible {@link QaAnswer}s. Could be
+   * empty if no answer was found from the given context.
    *
    * @param context context the question bases on
    * @param question question to ask
