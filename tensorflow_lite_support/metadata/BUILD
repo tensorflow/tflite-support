@@ -72,6 +72,6 @@ py_library(
         ":schema_py",
         "//tensorflow_lite_support/metadata/cc/python:_pywrap_metadata_version",
         "//tensorflow_lite_support/metadata/flatbuffers_lib:_pywrap_flatbuffers",
-        "@flatbuffers//:runtime_py",
+        "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
     ],
 )

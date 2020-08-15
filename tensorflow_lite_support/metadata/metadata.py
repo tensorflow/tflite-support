@@ -28,7 +28,7 @@ import tempfile
 import warnings
 import zipfile
 
-from flatbuffers.python import flatbuffers
+import flatbuffers
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 from tensorflow_lite_support.metadata.cc.python import _pywrap_metadata_version
