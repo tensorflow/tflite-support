@@ -13,6 +13,7 @@ package_group(
     packages = [
         "//nlp/descartes/...",
         "//research/kernel/softskills/...",
+        "//research/vision/raid/mobile/query_modulated_localizer/...",
         "//tensorflow_lite_support/...",
         "//third_party/py/tensorflow_examples/...",
         "//third_party/tensorflow_models/...",
