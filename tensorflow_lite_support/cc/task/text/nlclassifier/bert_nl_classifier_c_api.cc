@@ -45,7 +45,8 @@ BertNLClassifier* BertNLClassifierFromFile(const char* model_path) {
   }
 }
 
-Categories* Classify(const BertNLClassifier* classifier, const char* text) {
+Categories* BertNLClassifierClassify(const BertNLClassifier* classifier,
+                                     const char* text) {
   std::vector<CategoryCPP> results =
       classifier->impl->Classify(absl::string_view(text).data());
   size_t size = results.size();

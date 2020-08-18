@@ -62,8 +62,9 @@ extern BertQuestionAnswerer* BertQuestionAnswererFromFile(
 
 // Invokes the encapsulated TFLite model and answers a question based on
 // context.
-extern struct QaAnswers* Answer(const BertQuestionAnswerer* question_answerer,
-                                const char* context, const char* question);
+extern struct QaAnswers* BertQuestionAnswererAnswer(
+    const BertQuestionAnswerer* question_answerer, const char* context,
+    const char* question);
 
 extern void BertQuestionAnswererDelete(
     BertQuestionAnswerer* bert_question_answerer);

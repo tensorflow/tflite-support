@@ -64,7 +64,8 @@ NLClassifier* NLClassifierFromFileAndOptions(
   }
 }
 
-Categories* Classify(const NLClassifier* classifier, const char* text) {
+Categories* NLClassifierClassify(const NLClassifier* classifier,
+                                 const char* text) {
   std::vector<CategoryCPP> results =
       classifier->impl->Classify(absl::string_view(text).data());
   size_t size = results.size();

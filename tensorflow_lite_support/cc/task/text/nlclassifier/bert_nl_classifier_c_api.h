@@ -48,8 +48,8 @@ typedef struct BertNLClassifier BertNLClassifier;
 extern BertNLClassifier* BertNLClassifierFromFile(const char* model_path);
 
 // Invokes the encapsulated TFLite model and classifies the input text.
-extern struct Categories* Classify(const BertNLClassifier* classifier,
-                                   const char* text);
+extern struct Categories* BertNLClassifierClassify(
+    const BertNLClassifier* classifier, const char* text);
 
 extern void BertNLClassifierDelete(BertNLClassifier* classifier);
 

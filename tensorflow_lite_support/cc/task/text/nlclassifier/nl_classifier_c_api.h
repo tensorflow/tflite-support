@@ -60,8 +60,8 @@ extern NLClassifier* NLClassifierFromFileAndOptions(
     const struct NLClassifierOptions* options);
 
 // Invokes the encapsulated TFLite model and classifies the input text.
-extern struct Categories* Classify(const NLClassifier* classifier,
-                                   const char* text);
+extern struct Categories* NLClassifierClassify(const NLClassifier* classifier,
+                                               const char* text);
 
 extern void NLClassifierDelete(NLClassifier* classifier);
 

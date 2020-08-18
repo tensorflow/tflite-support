@@ -39,7 +39,6 @@ cc_library(
     name = "nl_classifier_c_api",
     srcs = [
         "nl_classifier_c_api.cc",
-        "nl_classifier_c_api_common.cc",
     ],
     hdrs = [
         "nl_classifier_c_api.h",
@@ -48,6 +47,7 @@ cc_library(
     visibility = ["//tensorflow_lite_support:__subpackages__"],
     deps = [
         ":nl_classifier",
+        ":nl_classifier_c_api_common",
         "//tensorflow_lite_support/cc/task/core:category",
         "@com_google_absl//absl/strings",
     ],
@@ -86,7 +86,6 @@ cc_library(
     name = "bert_nl_classifier_c_api",
     srcs = [
         "bert_nl_classifier_c_api.cc",
-        "nl_classifier_c_api_common.cc",
     ],
     hdrs = [
         "bert_nl_classifier_c_api.h",
@@ -95,7 +94,19 @@ cc_library(
     visibility = ["//tensorflow_lite_support:__subpackages__"],
     deps = [
         ":bert_nl_classifier",
+        ":nl_classifier_c_api_common",
         "//tensorflow_lite_support/cc/task/core:category",
         "@com_google_absl//absl/strings",
     ],
+)
+
+cc_library(
+    name = "nl_classifier_c_api_common",
+    srcs = [
+        "nl_classifier_c_api_common.cc",
+    ],
+    hdrs = [
+        "nl_classifier_c_api_common.h",
+    ],
+    visibility = ["//tensorflow_lite_support:__subpackages__"],
 )

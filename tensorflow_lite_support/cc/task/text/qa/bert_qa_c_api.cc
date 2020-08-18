@@ -44,8 +44,9 @@ BertQuestionAnswerer* BertQuestionAnswererFromFile(const char* model_path) {
   }
 }
 
-QaAnswers* Answer(const BertQuestionAnswerer* question_answerer,
-                  const char* context, const char* question) {
+QaAnswers* BertQuestionAnswererAnswer(
+    const BertQuestionAnswerer* question_answerer, const char* context,
+    const char* question) {
   std::vector<QaAnswerCPP> answers = question_answerer->impl->Answer(
       absl::string_view(context).data(), absl::string_view(question).data());
   size_t size = answers.size();
