@@ -44,6 +44,8 @@ http_archive(
     urls = [
         "https://github.com/tensorflow/tensorflow/archive/8a4ffe2e1ae722cff5306778df0cfca8b7f503fe.tar.gz",
     ],
+    patches = ["@//third_party:tensorflow_lite_ios_build.patch"],
+    patch_args = ["-p1"],
 )
 
 # Set up dependencies. Need to do this before set up TF so that our modification
@@ -187,6 +189,14 @@ http_archive(
     sha256 = "13a99ad430e930907f5611325ec384168a958bf7610e63e60e2fd8e7b7379610",
     urls = ["https://github.com/nothings/stb/archive/b42009b3b9d4ca35bc703f5310eedc74f584be58.tar.gz"],
     build_file = "//third_party:stblib.BUILD",
+)
+
+http_archive(
+    name = "google_toolbox_for_mac",
+    url = "https://github.com/google/google-toolbox-for-mac/archive/v2.2.1.zip",
+    sha256 = "e3ac053813c989a88703556df4dc4466e424e30d32108433ed6beaec76ba4fdc",
+    strip_prefix = "google-toolbox-for-mac-2.2.1",
+    build_file = "@//third_party:google_toolbox_for_mac.BUILD",
 )
 
 http_archive(
