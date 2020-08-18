@@ -3,6 +3,12 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files([
+    "bert_nl_classifier_c_api.h",
+    "nl_classifier_c_api.h",
+    "nl_classifier_c_api_common.h",
+])
+
 cc_library(
     name = "nl_classifier",
     srcs = [

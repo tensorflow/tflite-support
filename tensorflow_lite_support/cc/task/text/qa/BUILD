@@ -3,6 +3,10 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files([
+    "bert_qa_c_api.h",
+])
+
 cc_library(
     name = "question_answerer",
     hdrs = [
