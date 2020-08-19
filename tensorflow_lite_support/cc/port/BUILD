@@ -28,7 +28,10 @@ cc_library(
     hdrs = [
         "tflite_wrapper.h",
     ],
-    deps = ["//tensorflow_lite_support/cc/port/default:tflite_wrapper"],
+    deps = [
+        "//intelligence/mobile_acceleration/proto:allowlist_portable_proto",
+        "//tensorflow_lite_support/cc/port/default:tflite_wrapper",
+    ],
 )
 
 cc_library(
