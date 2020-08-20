@@ -20,6 +20,7 @@ android_library(
     # TODO(b/163039980): Use JAVACOPTS in TF. "-Xep:RemoveUnusedImports:ERROR" wierdly break the build.
     javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
+    visibility = ["//visibility:public"],
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",

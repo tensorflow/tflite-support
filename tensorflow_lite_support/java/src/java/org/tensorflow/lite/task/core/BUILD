@@ -10,6 +10,7 @@ android_library(
     name = "base-task-api",
     srcs = glob(["**/*.java"]),
     javacopts = JAVACOPTS,
+    visibility = ["//visibility:public"],
     deps = [
         "@com_google_auto_value",
     ],

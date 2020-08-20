@@ -17,6 +17,7 @@ android_library(
     ],
     javacopts = JAVACOPTS,
     manifest = "AndroidManifest.xml",
+    visibility = ["//visibility:public"],
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
