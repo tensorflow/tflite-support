@@ -15,6 +15,8 @@
 # Lint as: python3
 """Tests for tensorflow_lite_support.custom_ops.kernel.whitespace_tokenizer."""
 
+import os
+import sys
 import timeit
 
 from absl import logging
@@ -25,6 +27,14 @@ import tensorflow_text as tf_text
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.lite.python import interpreter as interpreter_wrapper
 from tensorflow.python.platform import resource_loader
+
+# Force loaded shared object symbols to be globally visible. This is needed so
+# that the interpreter_wrapper, in one .so file, can see the op resolver
+# in a different .so file. Note that this may already be set by default.
+# pylint: disable=g-import-not-at-top,g-bad-import-order,unused-import
+if hasattr(sys, 'setdlopenflags') and hasattr(sys, 'getdlopenflags'):
+  sys.setdlopenflags(sys.getdlopenflags() | os.RTLD_GLOBAL)
+from tensorflow_lite_support.custom_ops.kernel import _pywrap_whitespace_tokenizer_op_resolver
 
 TEST_CASES = [
     ['this is a test'],
@@ -50,7 +60,7 @@ def _call_whitespace_tokenizer_to_ragged(test_case):
   return tokenizer.tokenize(test_case)
 
 
-class WhitespaceTokenizerTest(tf.test.TestCase, parameterized.TestCase):
+class WhitespaceTokenizerTest(parameterized.TestCase):
 
   @parameterized.parameters([t] for t in TEST_CASES)
   def testToTensorEquivalence(self, test_case):

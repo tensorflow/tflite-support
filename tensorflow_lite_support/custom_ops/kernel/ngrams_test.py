@@ -15,6 +15,8 @@
 # Lint as: python3
 """Tests for tensorflow_lite_support.custom_ops.ngrams."""
 
+import os
+import sys
 import timeit
 
 from absl import logging
@@ -23,6 +25,14 @@ import tensorflow as tf
 import tensorflow_text as tf_text
 from tensorflow.lite.python import interpreter as interpreter_wrapper  # pylint: disable=g-direct-tensorflow-import
 from tensorflow_lite_support.custom_ops.python import tflite_text_api
+
+# Force loaded shared object symbols to be globally visible. This is needed so
+# that the interpreter_wrapper, in one .so file, can see the op resolver
+# in a different .so file. Note that this may already be set by default.
+# pylint: disable=g-import-not-at-top,g-bad-import-order,unused-import
+if hasattr(sys, 'setdlopenflags') and hasattr(sys, 'getdlopenflags'):
+  sys.setdlopenflags(sys.getdlopenflags() | os.RTLD_GLOBAL)
+from tensorflow_lite_support.custom_ops.kernel import _pywrap_ngrams_op_resolver
 
 TEST_CASES = [
     [['this', 'is', 'a', 'test']],
@@ -34,16 +44,17 @@ TEST_CASES = [
      [['0', '1', '2', '3', '4', '5']]],
 ]
 
-
 INVOKES_FOR_SINGLE_OP_BENCHMARK = 1000
 INVOKES_FOR_FLEX_DELEGATE_BENCHMARK = 100
 
 
-class NgramsTest(tf.test.TestCase, parameterized.TestCase):
+class NgramsTest(parameterized.TestCase):
 
   _models = {}
 
   def _make_model(self, rank, width, ragged_tensor=False, flex=False):
+    temp_dir = self.create_tempdir().full_path
+
     key = (rank, width, ragged_tensor, flex)
     if key in self._models:
       return self._models[key]
@@ -70,7 +81,7 @@ class NgramsTest(tf.test.TestCase, parameterized.TestCase):
           output.reverse()
           return tuple(output)
 
-      tf.saved_model.save(Model(), self.get_temp_dir())
+      tf.saved_model.save(Model(), temp_dir)
     else:
       shape = [None] * rank
 
@@ -82,9 +93,9 @@ class NgramsTest(tf.test.TestCase, parameterized.TestCase):
           return ngrams(
               input_tensor, width, reduction_type=tf_text.Reduction.STRING_JOIN)
 
-      tf.saved_model.save(Model(), self.get_temp_dir())
+      tf.saved_model.save(Model(), temp_dir)
 
-    converter = tf.lite.TFLiteConverter.from_saved_model(self.get_temp_dir())
+    converter = tf.lite.TFLiteConverter.from_saved_model(temp_dir)
     converter.inference_type = tf.float32
     converter.inference_input_type = tf.float32
     converter.allow_custom_ops = not flex

@@ -1,4 +1,5 @@
 # Placeholder for internal Python strict compatibility macro.
+load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -26,7 +27,21 @@ cc_library(
         ":whitespace_tokenizer",
         "@org_tensorflow//tensorflow/lite:framework",
     ],
-    alwayslink = 1,
+)
+
+pybind_extension(
+    name = "_pywrap_whitespace_tokenizer_op_resolver",
+    srcs = ["whitespace_tokenizer_op_resolver_wrapper.cc"],
+    hdrs = ["whitespace_tokenizer_op_resolver.h"],
+    additional_exported_symbols = ["AddWhitespaceTokenizerCustomOp"],
+    module_name = "_pywrap_whitespace_tokenizer_op_resolver",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":whitespace_tokenizer_op_resolver",
+        "@local_config_python//:python_headers",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@pybind11",
+    ],
 )
 
 cc_test(
@@ -54,13 +69,12 @@ py_test(
     python_version = "PY3",
     srcs_version = "PY3",
     deps = [
+        ":_pywrap_whitespace_tokenizer_op_resolver",
         "//tensorflow_lite_support/custom_ops:expect_numpy_installed",
         "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
         "//tensorflow_lite_support/custom_ops:expect_tftext_installed",
         "@absl_py//absl/logging",
         "@absl_py//absl/testing:parameterized",
-        "@org_tensorflow//tensorflow/lite/python:interpreter",
-        "@org_tensorflow//tensorflow/python:platform",
     ],
 )
 
@@ -85,7 +99,21 @@ cc_library(
         ":ngrams",
         "@org_tensorflow//tensorflow/lite:framework",
     ],
-    alwayslink = 1,
+)
+
+pybind_extension(
+    name = "_pywrap_ngrams_op_resolver",
+    srcs = ["ngrams_op_resolver_wrapper.cc"],
+    hdrs = ["ngrams_op_resolver.h"],
+    additional_exported_symbols = ["AddNgramsCustomOp"],
+    module_name = "_pywrap_ngrams_op_resolver",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":ngrams_op_resolver",
+        "@local_config_python//:python_headers",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@pybind11",
+    ],
 )
 
 cc_test(
@@ -108,12 +136,11 @@ py_test(
     python_version = "PY3",
     srcs_version = "PY3",
     deps = [
+        ":_pywrap_ngrams_op_resolver",
         "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
         "//tensorflow_lite_support/custom_ops:expect_tftext_installed",
         "//tensorflow_lite_support/custom_ops/python:tflite_text_api",
         "@absl_py//absl/logging",
         "@absl_py//absl/testing:parameterized",
-        "@org_tensorflow//tensorflow/lite/python:interpreter",
-        "@org_tensorflow//tensorflow/python:platform",
     ],
 )

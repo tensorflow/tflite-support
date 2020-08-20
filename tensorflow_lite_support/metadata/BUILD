@@ -70,6 +70,7 @@ py_library(
     deps = [
         ":metadata_schema_py",
         ":schema_py",
+        "//tensorflow_lite_support/custom_ops:expect_numpy_installed",
         "//tensorflow_lite_support/metadata/cc/python:_pywrap_metadata_version",
         "//tensorflow_lite_support/metadata/flatbuffers_lib:_pywrap_flatbuffers",
         "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
