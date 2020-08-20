@@ -3,11 +3,7 @@
 
 load("@flatbuffers//:build_defs.bzl", "flatbuffer_cc_library")
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_gen_op_wrapper_py")
-load(
-    "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:native.bzl",
-    "micore_tf_copts",
-    "micore_tf_deps",
-)
+load(":native.bzl", "micore_tf_copts", "micore_tf_deps")
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
 
 package(
@@ -63,7 +59,9 @@ cc_library(
     ],
     deps = [
         ":encoder_config",
-        "//third_party/darts_clone",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/strings",
+        "@darts_clone",
     ],
 )
 
@@ -90,9 +88,9 @@ cc_library(
     deps = [
         ":double_array_trie_builder",
         ":encoder_config",
-        "//third_party/sentencepiece/src:sentencepiece_model_cc_proto",
+        "//tensorflow_lite_support/cc/port:statusor",
         "@com_google_absl//absl/status",
-        "@com_google_absl//absl/status:statusor",
+        "@com_google_sentencepiece//src:sentencepiece_model_cc_proto",
     ],
 )
 
@@ -131,6 +129,19 @@ cc_library(
     alwayslink = 1,
 )
 
+cc_binary(
+    name = "sentencepiece_tokenizer_op.so",
+    srcs = [
+        "sentencepiece_tokenizer_op.cc",
+    ],
+    copts = micore_tf_copts(),
+    linkshared = 1,
+    deps = [
+        ":sentencepiece_tokenizer_h",
+        ":optimized_encoder",
+    ] + micore_tf_deps(),
+)
+
 cc_library(
     name = "sentencepiece_tokenizer_tflite",
     srcs = ["sentencepiece_tokenizer_tflite.cc"],
@@ -150,13 +161,6 @@ cc_library(
         ],
 )
 
-tf_gen_op_wrapper_py(
-    name = "gen_sentencepiece_tokenizer_op",
-    out = "gen_sentencepiece_tokenizer_op.py",
-    op_whitelist = ["TFSentencepieceTokenizeOp"],
-    deps = [":sentencepiece_tokenizer_op"],
-)
-
 cc_test(
     name = "optimized_encoder_test",
     srcs = [
@@ -170,9 +174,11 @@ cc_test(
         ":encoder_config",
         ":model_converter",
         ":optimized_encoder",
-        "//third_party/sentencepiece/src:sentencepiece_cc_proto",
-        "//third_party/sentencepiece/src:sentencepiece_processor",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
         "@com_google_googletest//:gtest_main",
+        "@com_google_sentencepiece//src:sentencepiece_cc_proto",
+        "@com_google_sentencepiece//src:sentencepiece_processor",
         "@org_tensorflow//tensorflow/core:lib",
     ],
 )
@@ -199,9 +205,99 @@ pybind_extension(
     module_name = "pywrap_tflite_registerer",
     deps = [
         ":py_tflite_registerer",
-        "//third_party/pybind11",
-        "//third_party/python_runtime:headers",
+        "@local_config_python//:python_headers",
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@pybind11",
     ],
+)
+
+pybind_extension(
+    name = "pywrap_model_converter",
+    srcs = ["pywrap_model_converter.cc"],
+    hdrs = ["model_converter.h"],
+    additional_exported_symbols = [
+        "ConvertSentencepieceModel",
+        "GetVocabularySize",
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules"],
+    module_name = "pywrap_model_converter",
+    deps = [
+        ":model_converter",
+        "@com_google_absl//absl/status",
+        "@local_config_python//:python_headers",
+        "@pybind11",
+    ],
+)
+
+config_setting(
+    name = "armeabi_v7a_and_fastbuild",
+    values = {
+        "cpu": "armeabi-v7a",
+        "compilation_mode": "fastbuild",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "armeabi_v7a_and_dbg",
+    values = {
+        "cpu": "armeabi-v7a",
+        "compilation_mode": "dbg",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "android",
+    values = {"crosstool_top": "//external:android/crosstool"},
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "macos_i386",
+    values = {
+        "apple_platform_type": "macos",
+        "cpu": "darwin",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "macos_x86_64",
+    values = {
+        "apple_platform_type": "macos",
+        "cpu": "darwin_x86_64",
+    },
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "macos",
+    actual = select({
+        ":macos_i386": ":macos_i386",
+        ":macos_x86_64": ":macos_x86_64",
+        "//conditions:default": ":macos_i386",  # Arbitrarily chosen from above.
+    }),
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "ios",
+    values = {
+        "crosstool_top": "@bazel_tools//tools/cpp:toolchain",
+        "apple_platform_type": "ios",
+    },
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "apple",
+    actual = select({
+        ":macos": ":macos",
+        ":ios": ":ios",
+        "//conditions:default": ":ios",  # Arbitrarily chosen from above.
+    }),
+    visibility = ["//visibility:public"],
 )

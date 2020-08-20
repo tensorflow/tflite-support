@@ -20,9 +20,13 @@ It follows TF.text designers design.
 
 """
 import tensorflow.compat.v2 as tf  # pylint: disable=g-direct-tensorflow-import
-from third_party.tensorflow.python.ops.ragged import ragged_tensor  # pylint: disable=g-direct-tensorflow-import
-from tensorflow_lite_support.custom_ops.kernel.sentencepiece import gen_sentencepiece_tokenizer_op
-from tensorflow_lite_support.custom_ops.kernel.sentencepiece.py import model_converter
+from tensorflow.python.ops.ragged import ragged_tensor  # pylint: disable=g-direct-tensorflow-import
+from tensorflow.python.framework import load_library
+from tensorflow.python.platform import resource_loader
+sentencepiece_tokenizer_op = load_library.load_op_library(
+    resource_loader.get_path_to_datafile('../kernel/sentencepiece/sentencepiece_tokenizer_op.so'))
+gen_sentencepiece_tokenizer_op = sentencepiece_tokenizer_op.TFSentencepieceTokenizeOp
+from tensorflow_lite_support.custom_ops.kernel.sentencepiece import pywrap_model_converter as model_converter
 
 
 class SentencepieceTokenizer:

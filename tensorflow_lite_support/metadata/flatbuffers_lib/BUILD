@@ -15,8 +15,8 @@ pybind_extension(
     features = ["-use_header_modules"],
     module_name = "_pywrap_flatbuffers",
     deps = [
-        "//third_party/python_runtime:headers",
         "@flatbuffers",
+        "@local_config_python//:python_headers",
         "@pybind11",
     ],
 )

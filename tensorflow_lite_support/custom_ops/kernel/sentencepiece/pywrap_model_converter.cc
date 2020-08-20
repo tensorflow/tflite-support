@@ -13,23 +13,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/py_tflite_registerer.h"
 #include "pybind11/pybind11.h"
-#include "pybind11/pytypes.h"
+#include "pybind11/stl.h"
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"
 
-PYBIND11_MODULE(pywrap_lingua_registerer, m) {
-  m.doc() = R"pbdoc(
-    pywrap_tflite_registerer
-    A module with a wrapper that adds to a Python wrapper for TFLite
-    sentencepiece tokenizer.
-  )pbdoc";
-  m.def(
-      "TFLite_SentencepieceTokenizerRegisterer",
-      [](uintptr_t resolver) {
-        TFLite_SentencepieceTokenizerRegisterer(
-            reinterpret_cast<tflite::MutableOpResolver*>(resolver));
-      },
-      R"pbdoc(
-      The function that adds Sentencepiece Tokenizer to the TFLite interpreter.
-      )pbdoc");
+namespace tflite {
+namespace support {
+namespace ops {
+
+namespace py = pybind11;
+
+PYBIND11_MODULE(pywrap_model_converter, m) {
+  m.def("convert_sentencepiece_model", [](py::bytes model_string) {
+    return py::bytes(ConvertSentencepieceModel(std::string(model_string)));
+  });
+
+  m.def("get_vocabulary_size", [](py::bytes model_string) {
+    return GetVocabularySize(std::string(model_string));
+  });
 }
+
+}  // namespace ops
+}  // namespace support
+}  // namespace tflite

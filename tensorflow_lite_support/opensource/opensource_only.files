@@ -1,3 +1,4 @@
+tensorflow_lite_support/custom_ops/kernel/sentencepiece/native.bzl
 tensorflow_lite_support/opensource/BUILD
 tensorflow_lite_support/opensource/WORKSPACE
 tensorflow_lite_support/third_party/android/BUILD
@@ -5,6 +6,12 @@ tensorflow_lite_support/third_party/android/android.bzl.tpl
 tensorflow_lite_support/third_party/android/android_configure.BUILD.tpl
 tensorflow_lite_support/third_party/android/android_configure.bzl
 tensorflow_lite_support/third_party/com_google_absl.BUILD
+tensorflow_lite_support/third_party/darts_clone.BUILD
+tensorflow_lite_support/third_party/fft2d/BUILD
+tensorflow_lite_support/third_party/fft2d/LICENSE
+tensorflow_lite_support/third_party/fft2d/fft.h
+tensorflow_lite_support/third_party/fft2d/fft2d.BUILD
+tensorflow_lite_support/third_party/fft2d/fft2d.h
 tensorflow_lite_support/third_party/google_toolbox_for_mac.BUILD
 tensorflow_lite_support/third_party/icu.BUILD
 tensorflow_lite_support/third_party/libyuv.BUILD

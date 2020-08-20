@@ -17,7 +17,7 @@ pybind_extension(
     deps = [
         "//tensorflow_lite_support/codegen:android_java_generator",
         "//tensorflow_lite_support/codegen:code_generator",
-        "//third_party/python_runtime:headers",
+        "@local_config_python//:python_headers",
         "@pybind11",
     ],
 )

@@ -17,14 +17,14 @@ limitations under the License.
 #define THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_MODEL_CONVERTER_H_
 #include <string>
 
-#include "absl/status/statusor.h"
+#include "tensorflow_lite_support/cc/port/statusor.h"
 
 namespace tflite {
 namespace support {
 namespace ops {
 // Converts Sentencepiece configuration to flatbuffer format.
 // encoding_offset is used by some encoders that combine different encodings.
-absl::StatusOr<std::string> ConvertSentencepieceModelToFlatBuffer(
+tflite::support::StatusOr<std::string> ConvertSentencepieceModelToFlatBuffer(
     const std::string& model_config_str, int encoding_offset = 0);
 
 // The functions that are provided for the Python wrapper.

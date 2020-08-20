@@ -17,12 +17,11 @@ py_library(
 py_library(
     name = "sentencepiece_tokenizer",
     srcs = ["sentencepiece_tokenizer.py"],
+    data = ["//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_tokenizer_op.so"],
     srcs_version = "PY3",
     deps = [
         "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
-        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:gen_sentencepiece_tokenizer_op",
-        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_tokenizer_op",
-        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece/py:model_converter",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:pywrap_model_converter",
     ],
 )
 
@@ -38,6 +37,9 @@ py_test(
         "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
         "//tensorflow_lite_support/custom_ops:expect_tftext_installed",
         "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:pywrap_tflite_registerer",
+        "@absl_py//absl:app",
         "@absl_py//absl/flags",
+        "@absl_py//absl/logging",
+        "@absl_py//absl/testing:parameterized",
     ],
 )

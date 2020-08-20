@@ -24,7 +24,7 @@ import tensorflow as tf
 import tensorflow_text as tf_text
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.lite.python import interpreter as interpreter_wrapper
-from third_party.tensorflow.python.platform import resource_loader
+from tensorflow.python.platform import resource_loader
 
 TEST_CASES = [
     ['this is a test'],

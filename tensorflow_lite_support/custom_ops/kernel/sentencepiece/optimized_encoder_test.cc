@@ -15,22 +15,52 @@ limitations under the License.
 
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/optimized_encoder.h"
 
+#include <fstream>
+
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "src/sentencepiece.proto.h"
+#include "absl/status/status.h"
+#include "absl/strings/str_format.h"
+#include "src/sentencepiece.pb.h"
 #include "src/sentencepiece_processor.h"
 #include "tensorflow/core/platform/env.h"
+
 
 namespace tflite {
 namespace support {
 namespace ops {
+
+
+namespace internal {
+
+tensorflow::Status TFReadFileToString(
+    const std::string& filepath, std::string* data) {
+  return tensorflow::ReadFileToString(
+      tensorflow::Env::Default(), /*test_path*/ filepath, data);
+}
+
+absl::Status StdReadFileToString(
+    const std::string& filepath, std::string* data) {
+  std::ifstream infile(filepath);
+  if (!infile.is_open()) {
+    return absl::NotFoundError(
+        absl::StrFormat("Error when opening %s", filepath));
+  }
+  std::string contents((std::istreambuf_iterator<char>(infile)),
+                       (std::istreambuf_iterator<char>()));
+  data->append(contents);
+  infile.close();
+  return absl::OkStatus();
+}
+}  // namespace internal
+
 namespace {
 
 static char kConfigFilePath[] =
-    "/tensorflow_lite_support/custom_ops/kernel/"
+    "tensorflow_lite_support/custom_ops/kernel/"
     "sentencepiece/testdata/sentencepiece.model";
 
 TEST(OptimizedEncoder, NormalizeStringWhitestpaces) {
@@ -110,13 +140,11 @@ TEST(OptimizedEncoder, NormalizeStringWhitespacesRemove) {
 
 TEST(OptimizedEncoder, ConfigConverter) {
   std::string config;
-  auto status = tensorflow::ReadFileToString(tensorflow::Env::Default(),
-                              FLAGS_test_srcdir + kConfigFilePath, &config);
-
+  auto status = internal::StdReadFileToString(kConfigFilePath, &config);
   ASSERT_TRUE(status.ok());
 
   ::sentencepiece::SentencePieceProcessor processor;
-  ASSERT_OK(processor.LoadFromSerializedProto(config));
+  ASSERT_TRUE(processor.LoadFromSerializedProto(config).ok());
   const auto converted_model = ConvertSentencepieceModel(config);
   const std::string test_string("Hello world!\\xF0\\x9F\\x8D\\x95");
   const auto encoded =
@@ -124,7 +152,7 @@ TEST(OptimizedEncoder, ConfigConverter) {
   ASSERT_EQ(encoded.codes.size(), encoded.offsets.size());
 
   ::sentencepiece::SentencePieceText reference_encoded;
-  CHECK_OK(processor.Encode(test_string, &reference_encoded));
+  ASSERT_TRUE(processor.Encode(test_string, &reference_encoded).ok());
   EXPECT_EQ(encoded.codes.size(), reference_encoded.pieces_size());
   for (int i = 0; i < encoded.codes.size(); ++i) {
     EXPECT_EQ(encoded.codes[i], reference_encoded.pieces(i).id());

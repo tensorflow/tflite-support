@@ -2,6 +2,7 @@ workspace(name = "org_tensorflow_lite_support")
 
 load("@bazel_tools//tools/build_defs/repo:java.bzl", "java_import_external")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@//third_party/py:python_configure.bzl", "python_configure")
 
 http_archive(
     name = "io_bazel_rules_closure",
@@ -220,6 +221,37 @@ http_archive(
     build_file = "@//third_party:icu.BUILD",
 )
 
+http_archive(
+    name = "gemmlowp",
+    sha256 = "6678b484d929f2d0d3229d8ac4e3b815a950c86bb9f17851471d143f6d4f7834",
+    strip_prefix = "gemmlowp-12fed0cd7cfcd9e169bf1925bc3a7a58725fdcc3",
+    urls = [
+        "http://mirror.tensorflow.org/github.com/google/gemmlowp/archive/12fed0cd7cfcd9e169bf1925bc3a7a58725fdcc3.zip",
+        "https://github.com/google/gemmlowp/archive/12fed0cd7cfcd9e169bf1925bc3a7a58725fdcc3.zip",
+    ],
+)
+
+http_archive(
+    name = "fft2d",
+    build_file = "@//third_party/fft2d:fft2d.BUILD",
+    sha256 = "5f4dabc2ae21e1f537425d58a49cdca1c49ea11db0d6271e2a4b27e9697548eb",
+    strip_prefix = "OouraFFT-1.0",
+    urls = [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/petewarden/OouraFFT/archive/v1.0.tar.gz",
+        "https://github.com/petewarden/OouraFFT/archive/v1.0.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "darts_clone",
+    build_file = "@//third_party:darts_clone.BUILD",
+    sha256 = "c97f55d05c98da6fcaf7f9ecc6a6dc6bc5b18b8564465f77abff8879d446491c",
+    strip_prefix = "darts-clone-e40ce4627526985a7767444b6ed6893ab6ff8983",
+    urls = [
+        "https://github.com/s-yata/darts-clone/archive/e40ce4627526985a7767444b6ed6893ab6ff8983.zip",
+    ],
+)
+
 # AutoValue 1.6+ shades Guava, Auto Common, and JavaPoet. That's OK
 # because none of these jars become runtime dependencies.
 java_import_external(
@@ -317,4 +349,6 @@ load("//third_party/android:android_configure.bzl", "android_configure")
 android_configure(name="local_config_android")
 load("@local_config_android//:android.bzl", "android_workspace")
 android_workspace()
+
+python_configure(name = "local_config_python")
 

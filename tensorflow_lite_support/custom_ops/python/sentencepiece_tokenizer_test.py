@@ -24,7 +24,7 @@ import tensorflow.compat.v2 as tf  # pylint: disable=g-direct-tensorflow-import
 import tensorflow_text
 
 from tensorflow.lite.python import interpreter as interpreter_wrapper  # pylint: disable=g-direct-tensorflow-import
-from third_party.tensorflow.python.platform import resource_loader
+from tensorflow.python.platform import resource_loader
 from tensorflow_lite_support.custom_ops.python import sentencepiece_tokenizer
 
 FLAGS = flags.FLAGS

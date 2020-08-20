@@ -17,8 +17,8 @@ limitations under the License.
 
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
-#include "src/sentencepiece_model.proto.h"
-#include "absl/status/status.h"
+#include "src/sentencepiece_model.pb.h"
+
 namespace tflite {
 namespace support {
 namespace ops {
@@ -50,7 +50,7 @@ DecodePrecompiledCharsmap(
       std::vector<int8_t>(normalized_ptr, normalized_ptr + normalized_size));
 }
 
-absl::StatusOr<std::string> ConvertSentencepieceModelToFlatBuffer(
+tflite::support::StatusOr<std::string> ConvertSentencepieceModelToFlatBuffer(
     const std::string& model_config_str, int encoding_offset) {
   ::sentencepiece::ModelProto model_config;
   if (!model_config.ParseFromString(model_config_str)) {
