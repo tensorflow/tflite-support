@@ -225,6 +225,7 @@ pybind_extension(
     module_name = "pywrap_model_converter",
     deps = [
         ":model_converter",
+        "//tensorflow_lite_support/cc/port:statusor",
         "@com_google_absl//absl/status",
         "@local_config_python//:python_headers",
         "@pybind11",
