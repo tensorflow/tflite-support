@@ -22,8 +22,12 @@ import java.util.List;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.label.Category;
 
-// TODO(b/161175702): introduce the multihead model and explain what is a `head`.
-/** The classification results of one head in a multihead {@link ImageClassifier}. */
+/**
+ * The classification results of one head in a multihead (a.k.a. multi-output) {@link
+ * ImageClassifier}. A multihead {@link ImageClassifier} can perform classification for multiple
+ * purposes, such as a fine grained classifier to describe apparel items (e.g. color, material,
+ * type, etc.).
+ */
 @AutoValue
 @UsedByReflection("image_classifier_jni.cc")
 public abstract class Classifications {

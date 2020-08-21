@@ -61,10 +61,6 @@ Results:
 
 #### Prerequisites
 
-TODO(b/161960089): the model used in this example has an off-by-one error in its
-label map, which will cause the model to return "cat" instead of "dog" in the
-following example. It will soon be updated on tfhub.dev with a fix.
-
 You will need:
 
 * a TFLite object detection model (e.g. [ssd_mobilenet_v1][2], a generic object
@@ -121,10 +117,6 @@ And `/tmp/detection-output.jpg` should contain:
 ## Image Segmenter
 
 #### Prerequisites
-
-TODO(b/161957922): the model used in this example doesn't include a label map,
-which will cause the console output to be less complete than in the example
-below. It will soon be updated on tfhub.dev with a fix.
 
 You will need:
 
@@ -184,5 +176,5 @@ And `/tmp/segmentation-output.jpg` should contain the segmentation mask:
 ![segmentation-output](g3doc/segmentation-output.png)
 
 [1]: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3
-[2]: https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/1
-[3]: https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1
+[2]: https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/2
+[3]: https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/2
