@@ -68,7 +68,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   typedef internal_statusor::StatusOrData<T> Base;
 
  public:
-  typedef T element_type;
+  typedef T value_type;
 
   // Constructs a new StatusOr with Status::UNKNOWN status.  This is marked
   // 'explicit' to try to catch cases like 'return {};', where people think
@@ -287,7 +287,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   // returns util::OkStatus().
 #ifdef SWIG
   const ::util::Status& status() const;
-#else   // SWIG
+#else  // SWIG
   const absl::Status& status() const&;
   absl::Status status() &&;
 #endif  // SWIG
@@ -316,7 +316,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   // warnings about possible uses of the statusor object after the move.
 #ifdef SWIG
   const T& value() const;
-#else   // SWIG
+#else  // SWIG
   const T& value() const&;
   T& value() &;
   const T&& value() const&&;
@@ -567,7 +567,6 @@ void StatusOr<T>::IgnoreError() const {
 }
 
 #endif  // SWIG
-
 
 }  // namespace support
 }  // namespace tflite
