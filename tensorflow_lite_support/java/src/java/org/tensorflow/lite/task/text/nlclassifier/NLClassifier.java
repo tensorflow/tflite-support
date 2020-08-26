@@ -38,9 +38,11 @@ import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
  *       <ul>
  *         <li>input of the model, accepts a string.
  *       </ul>
- *   <li>Output score tensor (kTfLiteUInt8/kTfLiteInt8/kTfLiteInt16/kTfLiteFloat32/kTfLiteFloat64)
+ *   <li>Output score tensor
+ *         (kTfLiteUInt8/kTfLiteInt8/kTfLiteInt16/kTfLiteFloat32/kTfLiteFloat64/kTfLiteBool)
  *       <ul>
- *         <li>output scores for each class, if type is one of the Int types, dequantize it.
+ *         <li>output scores for each class, if type is one of the Int types, dequantize it, if it
+ *             is Bool type, convert the values to 0.0 and 1.0 respectively.
  *         <li>can have an optional associated file in metadata for labels, the file should be a
  *             plain text file with one label per line, the number of labels should match the number
  *             of categories the model outputs. Output label tensor: optional (kTfLiteString) -

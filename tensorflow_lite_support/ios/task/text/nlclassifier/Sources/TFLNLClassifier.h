@@ -37,8 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
  *   Input tensor (kTfLiteString)
  *     input of the model, accepts a string.
  *
- *   Output score tensor (kTfLiteUInt8/kTfLiteInt8/kTfLiteInt16/kTfLiteFloat32/kTfLiteFloat64)
- *     output scores for each class, if type is one of the Int types, dequantize it.
+ *   Output score tensor
+ *     (kTfLiteUInt8/kTfLiteInt8/kTfLiteInt16/kTfLiteFloat32/kTfLiteFloat64/kTfLiteBool)
+ *     output scores for each class, if type is one of the Int types, dequantize it, if it
+ *       is Bool type, convert the values to 0.0 and 1.0 respectively.
  *
  *     can have an optional associated file in metadata for labels, the file should be a
  *       plain text file with one label per line, the number of labels should match the number

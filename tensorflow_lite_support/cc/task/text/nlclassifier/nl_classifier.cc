@@ -55,6 +55,7 @@ using ::tflite::support::text::tokenizer::RegexTokenizer;
 using ::tflite::support::text::tokenizer::Tokenizer;
 using ::tflite::support::text::tokenizer::TokenizerResult;
 using ::tflite::support::utils::LoadVocabFromBuffer;
+using ::tflite::task::core::Category;
 using ::tflite::task::core::Dequantize;
 using ::tflite::task::core::GetStringAtIndex;
 using ::tflite::task::core::PopulateTensor;
@@ -177,7 +178,7 @@ absl::Status NLClassifier::TrySetLabelFromMetadata(
   }
 }
 
-std::vector<core::Category> NLClassifier::Classify(const std::string& text) {
+std::vector<Category> NLClassifier::Classify(const std::string& text) {
   // The NLClassifier implementation for Preprocess() and Postprocess() never
   // returns errors: just call value().
   return Infer(text).value();
@@ -239,7 +240,7 @@ absl::Status NLClassifier::Preprocess(
   return absl::OkStatus();
 }
 
-StatusOr<std::vector<core::Category>> NLClassifier::Postprocess(
+StatusOr<std::vector<Category>> NLClassifier::Postprocess(
     const std::vector<const TfLiteTensor*>& output_tensors,
     const std::string& /*input*/) {
   return BuildResults(
@@ -253,14 +254,14 @@ StatusOr<std::vector<core::Category>> NLClassifier::Postprocess(
           options_.output_label_tensor_index));
 }
 
-std::vector<core::Category> NLClassifier::BuildResults(
-    const TfLiteTensor* scores, const TfLiteTensor* labels) {
+std::vector<Category> NLClassifier::BuildResults(const TfLiteTensor* scores,
+                                                 const TfLiteTensor* labels) {
   bool use_index_as_labels = (labels_vector_ == nullptr) && (labels == nullptr);
   // Some models output scores with transposed shape [1, categories]
   int categories =
       scores->dims->size == 2 ? scores->dims->data[1] : scores->dims->data[0];
 
-  std::vector<core::Category> predictions;
+  std::vector<Category> predictions;
   predictions.reserve(categories);
 
   bool should_dequantize = scores->type == kTfLiteUInt8 ||
@@ -280,12 +281,15 @@ std::vector<core::Category> NLClassifier::BuildResults(
       label = (*labels_vector_)[index];
     }
     if (should_dequantize) {
-      predictions.emplace_back(label, Dequantize(*scores, index));
+      predictions.push_back(Category(label, Dequantize(*scores, index)));
+    } else if (scores->type == kTfLiteBool) {
+      predictions.push_back(
+          Category(label, GetTensorData<bool>(scores)[index] ? 1.0 : 0.0));
     } else {
-      predictions.emplace_back(label,
-                               scores->type == kTfLiteFloat32
-                                   ? GetTensorData<float>(scores)[index]
-                                   : GetTensorData<double>(scores)[index]);
+      predictions.push_back(
+          Category(label, scores->type == kTfLiteFloat32
+                              ? GetTensorData<float>(scores)[index]
+                              : GetTensorData<double>(scores)[index]));
     }
   }
 
@@ -327,7 +331,7 @@ absl::Status NLClassifier::Initialize(const NLClassifierOptions& options) {
   }
 
   // output score tensor should be type
-  // UINT8/INT8/INT16(quantized) or FLOAT32/FLOAT64(dequantized)
+  // UINT8/INT8/INT16(quantized) or FLOAT32/FLOAT64(dequantized) or BOOL
   std::vector<const TfLiteTensor*> output_tensors = GetOutputTensors();
   const Vector<Offset<TensorMetadata>>* output_tensor_metadatas =
       GetMetadataExtractor()->GetOutputTensorMetadata();
@@ -343,14 +347,15 @@ absl::Status NLClassifier::Initialize(const NLClassifierOptions& options) {
                      options.output_score_tensor_index),
         TfLiteSupportStatus::kOutputTensorNotFoundError);
   }
-  static constexpr TfLiteType valid_types[] = {
-      kTfLiteUInt8, kTfLiteInt8, kTfLiteInt16, kTfLiteFloat32, kTfLiteFloat64};
+  static constexpr TfLiteType valid_types[] = {kTfLiteUInt8,   kTfLiteInt8,
+                                               kTfLiteInt16,   kTfLiteFloat32,
+                                               kTfLiteFloat64, kTfLiteBool};
   if (!absl::c_linear_search(valid_types, scores->type)) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         absl::StrCat("Type mismatch for score tensor ", scores->name,
                      ". Requested one of these types: "
-                     "INT8/UINT8/INT16/FLOAT32/FLOAT64, got ",
+                     "INT8/UINT8/INT16/FLOAT32/FLOAT64/BOOL, got ",
                      TfLiteTypeGetName(scores->type), "."),
         TfLiteSupportStatus::kInvalidOutputTensorTypeError);
   }
@@ -381,7 +386,7 @@ absl::Status NLClassifier::Initialize(const NLClassifierOptions& options) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
           absl::StrCat("Type mismatch for label tensor ", scores->name,
-                       ". Requested STRING or int32, got ",
+                       ". Requested STRING or INT32, got ",
                        TfLiteTypeGetName(scores->type), "."),
           TfLiteSupportStatus::kInvalidOutputTensorTypeError);
     }
