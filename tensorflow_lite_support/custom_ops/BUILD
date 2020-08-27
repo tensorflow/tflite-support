@@ -10,7 +10,7 @@ package(
 # flex delegate that only contains ops in listed models.
 tflite_flex_cc_library(
     name = "tf_text_flex_delegate",
-    additional_deps = ["//third_party/tensorflow_text:ops_lib"],
+    additional_deps = ["@org_tensorflow_text//tensorflow_text:ops_lib"],
     models = [
         # TODO(b/160817619) Replace with a more complex model.
         "testdata/sentencepiece_tokenizer_flex_op.tflite",
@@ -20,7 +20,7 @@ tflite_flex_cc_library(
 tf_cc_test(
     name = "tflite_inference_test",
     srcs = ["tflite_inference_main.cc"],
-    args = ["--model=third_party/tensorflow_lite_support/custom_ops/testdata/sentencepiece_tokenizer_flex_op.tflite"],
+    args = ["--model=tensorflow_lite_support/custom_ops/testdata/sentencepiece_tokenizer_flex_op.tflite"],
     data = ["//tensorflow_lite_support/custom_ops:testdata/sentencepiece_tokenizer_flex_op.tflite"],
     deps = [
         ":tf_text_flex_delegate",
