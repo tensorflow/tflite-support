@@ -29,9 +29,9 @@ using ::tflite::task::core::Category;
 using ::tflite::task::text::nlclassifier::NLClassifier;
 
 jobject RunClassifier(JNIEnv* env, jlong native_handle, jstring text) {
-  auto* question_answerer = reinterpret_cast<NLClassifier*>(native_handle);
+  auto* nl_classifier = reinterpret_cast<NLClassifier*>(native_handle);
 
-  auto results = question_answerer->Classify(JStringToString(env, text));
+  auto results = nl_classifier->Classify(JStringToString(env, text));
   jclass category_class =
       env->FindClass("org/tensorflow/lite/support/label/Category");
   jmethodID category_init =
