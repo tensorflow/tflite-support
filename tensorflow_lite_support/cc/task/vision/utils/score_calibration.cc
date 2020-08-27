@@ -185,9 +185,10 @@ StatusOr<SigmoidCalibrationParameters> BuildSigmoidCalibrationParams(
     absl::string_view score_calibration_file,
     const std::vector<LabelMapItem>& label_map_items) {
   // Split file lines and perform sanity checks.
-  if (score_calibration_file == nullptr) {
-    return CreateStatusWithPayload(StatusCode::kInvalidArgument,
-                                   "Expected non-null score calibration file.");
+  if (score_calibration_file.empty()) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "Expected non-empty score calibration file.");
   }
   std::vector<absl::string_view> lines =
       absl::StrSplit(score_calibration_file, '\n');

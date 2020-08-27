@@ -63,7 +63,8 @@ class ModelMetadataExtractor {
   // Note: see `GetAssociatedFile` to read the actual file contents.
   static std::string FindFirstAssociatedFileName(
       const tflite::TensorMetadata& tensor_metadata,
-      tflite::AssociatedFileType type, absl::string_view locale = nullptr);
+      tflite::AssociatedFileType type,
+      absl::string_view locale = absl::string_view());
 
   // Returns a pointer to the extracted TFLite Model Metadata, or nullptr if no
   // metadata was present in the Model FlatBuffer provided at creation time.

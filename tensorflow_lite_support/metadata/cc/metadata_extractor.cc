@@ -121,8 +121,8 @@ std::string ModelMetadataExtractor::FindFirstAssociatedFileName(
     if (associated_file->type() != type || associated_file->name() == nullptr) {
       continue;
     }
-    if (locale == nullptr || (associated_file->locale() != nullptr &&
-                              locale == associated_file->locale()->str())) {
+    if (locale.empty() || (associated_file->locale() != nullptr &&
+                           locale == associated_file->locale()->str())) {
       return associated_file->name()->str();
     }
   }

@@ -1,3 +1,4 @@
+
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,9 +30,9 @@ using ::tflite::support::TfLiteSupportStatus;
 
 StatusOr<std::vector<LabelMapItem>> BuildLabelMapFromFiles(
     absl::string_view labels_file, absl::string_view display_names_file) {
-  if (labels_file == nullptr) {
+  if (labels_file.empty()) {
     return CreateStatusWithPayload(StatusCode::kInvalidArgument,
-                                   "Expected non-null labels file.",
+                                   "Expected non-empty labels file.",
                                    TfLiteSupportStatus::kInvalidArgumentError);
   }
   std::vector<absl::string_view> labels = absl::StrSplit(labels_file, '\n');
@@ -50,7 +51,7 @@ StatusOr<std::vector<LabelMapItem>> BuildLabelMapFromFiles(
     label_map_items.emplace_back(LabelMapItem{.name = std::string(labels[i])});
   }
 
-  if (display_names_file != nullptr) {
+  if (!display_names_file.empty()) {
     std::vector<std::string> display_names =
         absl::StrSplit(display_names_file, '\n');
     // In most cases, there is an empty line (i.e. newline character) at the end

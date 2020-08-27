@@ -101,7 +101,7 @@ struct ClassificationHead {
 tflite::support::StatusOr<ClassificationHead> BuildClassificationHead(
     const tflite::metadata::ModelMetadataExtractor& metadata_extractor,
     const tflite::TensorMetadata& output_tensor_metadata,
-    absl::string_view display_names_locale = nullptr);
+    absl::string_view display_names_locale = absl::string_view());
 
 }  // namespace vision
 }  // namespace task
