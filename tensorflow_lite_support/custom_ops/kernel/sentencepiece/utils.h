@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_UTILS_H_
-#define THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_UTILS_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_UTILS_H_
+#define TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_UTILS_H_
 
 #include <ostream>
 #include <string>
@@ -59,4 +59,4 @@ inline bool operator==(const string_view& view1, const string_view& view2) {
 }  // namespace support
 }  // namespace tflite
 
-#endif  // THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_UTILS_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_UTILS_H_
