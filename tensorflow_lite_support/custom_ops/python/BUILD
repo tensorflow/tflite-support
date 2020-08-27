@@ -1,6 +1,6 @@
 package(
     default_visibility = [
-        "//tensorflow_lite_support:users",
+        "//visibility:public",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
