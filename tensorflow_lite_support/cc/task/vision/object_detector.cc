@@ -246,7 +246,7 @@ absl::Status ObjectDetector::SanityCheckOptions(
 /* static */
 StatusOr<std::unique_ptr<ObjectDetector>> ObjectDetector::CreateFromOptions(
     const ObjectDetectorOptions& options,
-    std::unique_ptr<tflite::OpResolver> resolver) {
+    std::unique_ptr<tflite::IterableOpResolver> resolver) {
   RETURN_IF_ERROR(SanityCheckOptions(options));
 
   // Copy options to ensure the ExternalFile outlives the constructed object.

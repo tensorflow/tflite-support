@@ -398,7 +398,7 @@ StatusOr<std::unique_ptr<NLClassifier>>
 NLClassifier::CreateFromBufferAndOptions(
     const char* model_buffer_data, size_t model_buffer_size,
     const NLClassifierOptions& options,
-    std::unique_ptr<tflite::OpResolver> resolver) {
+    std::unique_ptr<tflite::IterableOpResolver> resolver) {
   std::unique_ptr<NLClassifier> nl_classifier;
   ASSIGN_OR_RETURN(
       nl_classifier,
@@ -410,7 +410,7 @@ NLClassifier::CreateFromBufferAndOptions(
 
 StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateFromFileAndOptions(
     const std::string& path_to_model, const NLClassifierOptions& options,
-    std::unique_ptr<tflite::OpResolver> resolver) {
+    std::unique_ptr<tflite::IterableOpResolver> resolver) {
   std::unique_ptr<NLClassifier> nl_classifier;
   ASSIGN_OR_RETURN(nl_classifier,
                    core::TaskAPIFactory::CreateFromFile<NLClassifier>(
@@ -421,7 +421,7 @@ StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateFromFileAndOptions(
 
 StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateFromFdAndOptions(
     int fd, const NLClassifierOptions& options,
-    std::unique_ptr<tflite::OpResolver> resolver) {
+    std::unique_ptr<tflite::IterableOpResolver> resolver) {
   std::unique_ptr<NLClassifier> nl_classifier;
   ASSIGN_OR_RETURN(nl_classifier,
                    core::TaskAPIFactory::CreateFromFileDescriptor<NLClassifier>(

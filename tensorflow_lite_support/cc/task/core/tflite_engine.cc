@@ -49,7 +49,7 @@ using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::TfLiteSupportStatus;
 }  // namespace
 
-TfLiteEngine::TfLiteEngine(std::unique_ptr<tflite::OpResolver> resolver)
+TfLiteEngine::TfLiteEngine(std::unique_ptr<tflite::IterableOpResolver> resolver)
     : resolver_(std::move(resolver)), verifier_(resolver_.get()) {}
 
 int TfLiteEngine::ErrorReporter::Report(const char* format, va_list args) {

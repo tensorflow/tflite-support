@@ -42,7 +42,7 @@ namespace core {
 class TfLiteEngine {
  public:
   explicit TfLiteEngine(
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
   // Model is neither copyable nor movable.
   TfLiteEngine(const TfLiteEngine&) = delete;

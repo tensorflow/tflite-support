@@ -92,21 +92,21 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
   CreateFromBufferAndOptions(
       const char* model_buffer_data, size_t model_buffer_size,
       const NLClassifierOptions& options = {},
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Creates a NLClassifier from TFLite model file.
   static tflite::support::StatusOr<std::unique_ptr<NLClassifier>>
   CreateFromFileAndOptions(
       const std::string& path_to_model, const NLClassifierOptions& options = {},
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Creates a NLClassifier from TFLite model file descriptor.
   static tflite::support::StatusOr<std::unique_ptr<NLClassifier>>
   CreateFromFdAndOptions(
       int fd, const NLClassifierOptions& options = {},
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Performs classification on a string input, returns classified results.

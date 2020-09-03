@@ -153,7 +153,7 @@ absl::Status ImageSegmenter::SanityCheckOptions(
 
 StatusOr<std::unique_ptr<ImageSegmenter>> ImageSegmenter::CreateFromOptions(
     const ImageSegmenterOptions& options,
-    std::unique_ptr<tflite::OpResolver> resolver) {
+    std::unique_ptr<tflite::IterableOpResolver> resolver) {
   RETURN_IF_ERROR(SanityCheckOptions(options));
 
   // Copy options to ensure the ExternalFile outlives the constructed object.

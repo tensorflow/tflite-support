@@ -83,7 +83,7 @@ class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
   static tflite::support::StatusOr<std::unique_ptr<ObjectDetector>>
   CreateFromOptions(
       const ObjectDetectorOptions& options,
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Performs actual detection on the provided FrameBuffer.

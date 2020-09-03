@@ -71,7 +71,7 @@ constexpr float kMaxCalibratedScore = 1.0f;
 /* static */
 StatusOr<std::unique_ptr<ImageClassifier>> ImageClassifier::CreateFromOptions(
     const ImageClassifierOptions& options,
-    std::unique_ptr<tflite::OpResolver> resolver) {
+    std::unique_ptr<tflite::IterableOpResolver> resolver) {
   RETURN_IF_ERROR(SanityCheckOptions(options));
 
   // Copy options to ensure the ExternalFile outlives the constructed object.

@@ -42,7 +42,7 @@ class TaskAPIFactory {
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromBuffer(
       const char* buffer_data, size_t buffer_size,
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
       int num_threads = 1) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
@@ -53,7 +53,7 @@ class TaskAPIFactory {
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromFile(
       const string& file_name,
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
       int num_threads = 1) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
@@ -64,7 +64,7 @@ class TaskAPIFactory {
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromFileDescriptor(
       int file_descriptor,
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
       int num_threads = 1) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
@@ -76,7 +76,7 @@ class TaskAPIFactory {
   static tflite::support::StatusOr<std::unique_ptr<T>>
   CreateFromExternalFileProto(
       const ExternalFile* external_file,
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
       int num_threads = 1) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));

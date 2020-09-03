@@ -79,7 +79,7 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
   static tflite::support::StatusOr<std::unique_ptr<ImageClassifier>>
   CreateFromOptions(
       const ImageClassifierOptions& options,
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Performs actual classification on the provided FrameBuffer.

@@ -59,7 +59,7 @@ class BertNLClassifier : public NLClassifier {
   static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
   CreateFromFile(
       const std::string& path_to_model_with_metadata,
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Factory function to create a BertNLClassifier from in memory buffer of a
@@ -68,7 +68,7 @@ class BertNLClassifier : public NLClassifier {
   CreateFromBuffer(
       const char* model_with_metadata_buffer_data,
       size_t model_with_metadata_buffer_size,
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
  protected:

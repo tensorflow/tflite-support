@@ -77,7 +77,7 @@ class ImageSegmenter : public BaseVisionTaskApi<SegmentationResult> {
   static tflite::support::StatusOr<std::unique_ptr<ImageSegmenter>>
   CreateFromOptions(
       const ImageSegmenterOptions& options,
-      std::unique_ptr<tflite::OpResolver> resolver =
+      std::unique_ptr<tflite::IterableOpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Performs actual segmentation on the provided FrameBuffer.
