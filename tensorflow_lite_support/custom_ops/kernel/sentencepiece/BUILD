@@ -203,6 +203,7 @@ pybind_extension(
     hdrs = ["py_tflite_registerer.h"],
     additional_exported_symbols = ["TFLite_SentencepieceTokenizerRegisterer"],
     module_name = "pywrap_tflite_registerer",
+    srcs_version = "PY3ONLY",
     deps = [
         ":py_tflite_registerer",
         "@local_config_python//:python_headers",
