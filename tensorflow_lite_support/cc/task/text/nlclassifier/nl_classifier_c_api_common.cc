@@ -20,7 +20,7 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-void CategoriesDelete(Categories* categories) {
+void NLClassifierCategoriesDelete(Categories* categories) {
   delete[] categories->categories;
   delete categories;
 }

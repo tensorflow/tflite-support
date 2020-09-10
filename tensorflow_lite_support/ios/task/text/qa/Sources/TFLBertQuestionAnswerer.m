@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
     [answer setText:[NSString stringWithUTF8String:cAnswer.text]];
     [ret addObject:answer];
   }
-  QaAnswersDelete(cAnswers);
+  BertQuestionAnswererQaAnswersDelete(cAnswers);
   return ret;
 }
 @end

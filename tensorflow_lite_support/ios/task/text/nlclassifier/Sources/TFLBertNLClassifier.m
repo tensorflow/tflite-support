@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
     [ret setValue:[NSNumber numberWithDouble:cCategory.score]
            forKey:[NSString stringWithUTF8String:cCategory.text]];
   }
-  CategoriesDelete(cCategories);
+  NLClassifierCategoriesDelete(cCategories);
   return ret;
 }
 @end

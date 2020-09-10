@@ -35,7 +35,7 @@ limitations under the License.
 ///
 /// // Dispose of the API and QaAnswers objects.
 /// BertQuestionAnswererDelete(qa_answerer);
-/// QaAnswersDelete(answers);
+/// BertQuestionAnswererQaAnswersDelete(answers);
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,7 +69,7 @@ extern struct QaAnswers* BertQuestionAnswererAnswer(
 extern void BertQuestionAnswererDelete(
     BertQuestionAnswerer* bert_question_answerer);
 
-extern void QaAnswersDelete(struct QaAnswers* qa_answers);
+extern void BertQuestionAnswererQaAnswersDelete(struct QaAnswers* qa_answers);
 
 #ifdef __cplusplus
 }  // extern "C"

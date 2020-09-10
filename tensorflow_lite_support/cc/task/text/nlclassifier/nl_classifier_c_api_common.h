@@ -18,7 +18,7 @@ limitations under the License.
 // Common structs shared between NLClassifier APIs
 //
 /// // Dispose of the Categories object.
-/// CategoriesDelete(categories);
+/// NLClassifierCategoriesDelete(categories);
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +34,7 @@ struct Categories {
   struct Category* categories;
 };
 
-extern void CategoriesDelete(struct Categories* categories);
+extern void NLClassifierCategoriesDelete(struct Categories* categories);
 
 #ifdef __cplusplus
 }  // extern "C"

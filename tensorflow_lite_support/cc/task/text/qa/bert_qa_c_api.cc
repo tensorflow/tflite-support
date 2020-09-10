@@ -69,7 +69,7 @@ void BertQuestionAnswererDelete(BertQuestionAnswerer* bert_question_answerer) {
   delete bert_question_answerer;
 }
 
-void QaAnswersDelete(QaAnswers* qa_answers) {
+void BertQuestionAnswererQaAnswersDelete(QaAnswers* qa_answers) {
   delete[] qa_answers->answers;
   delete qa_answers;
 }
