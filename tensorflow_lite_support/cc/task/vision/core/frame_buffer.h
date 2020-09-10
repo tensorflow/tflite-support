@@ -138,6 +138,14 @@ class FrameBuffer {
       return width != other.width || height != other.height;
     }
 
+    bool operator>=(const Dimension& other) const {
+      return width >= other.width && height >= other.height;
+    }
+
+    bool operator<=(const Dimension& other) const {
+      return width <= other.width && height <= other.height;
+    }
+
     // Swaps width and height.
     void Swap() {
       using std::swap;
