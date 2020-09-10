@@ -1,4 +1,3 @@
-load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_cc_test")
 load("@org_tensorflow//tensorflow/lite/delegates/flex:build_def.bzl", "tflite_flex_cc_library")
 
 package(
@@ -17,14 +16,14 @@ tflite_flex_cc_library(
     ],
 )
 
-tf_cc_test(
+# bazel test --config=monolithic tensorflow_lite_support/custom_ops:tflite_inference_test
+cc_test(
     name = "tflite_inference_test",
     srcs = ["tflite_inference_main.cc"],
     args = ["--model=tensorflow_lite_support/custom_ops/testdata/sentencepiece_tokenizer_flex_op.tflite"],
     data = ["//tensorflow_lite_support/custom_ops:testdata/sentencepiece_tokenizer_flex_op.tflite"],
     deps = [
         ":tf_text_flex_delegate",
-        "//base",
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite:string_util",
         "@org_tensorflow//tensorflow/lite/c:common",
