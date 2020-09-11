@@ -20,11 +20,32 @@ filegroup(
     ]),
 )
 
+filegroup(
+    name = "config_fbs",
+    srcs = ["config.fbs"],
+)
+
+flatbuffer_cc_library(
+    name = "config",
+    srcs = [
+        "config.fbs",
+    ],
+)
+
 flatbuffer_cc_library(
     name = "encoder_config",
     srcs = [
         "encoder_config.fbs",
     ],
+    includes = [":config_fbs"],
+)
+
+flatbuffer_cc_library(
+    name = "decoder_config",
+    srcs = [
+        "decoder_config.fbs",
+    ],
+    includes = [":config_fbs"],
 )
 
 cc_library(
@@ -44,7 +65,7 @@ cc_library(
         "double_array_trie.h",
     ],
     deps = [
-        ":encoder_config",
+        ":config",
         ":utils",
     ],
 )
@@ -58,9 +79,8 @@ cc_library(
         "double_array_trie_builder.h",
     ],
     deps = [
-        ":encoder_config",
-        "@com_google_absl//absl/memory",
-        "@com_google_absl//absl/strings",
+        ":config",
+        ":utils",
         "@darts_clone",
     ],
 )
@@ -73,8 +93,15 @@ cc_test(
     deps = [
         ":double_array_trie",
         ":double_array_trie_builder",
+        ":encoder_config",
         "@com_google_googletest//:gtest_main",
     ],
+)
+
+cc_library(
+    name = "sentencepiece_constants",
+    srcs = [],
+    hdrs = ["sentencepiece_constants.h"],
 )
 
 cc_library(
@@ -86,10 +113,14 @@ cc_library(
         "model_converter.h",
     ],
     deps = [
+        ":config",
+        ":decoder_config",
         ":double_array_trie_builder",
         ":encoder_config",
+        ":sentencepiece_constants",
         "//tensorflow_lite_support/cc/port:statusor",
         "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
         "@com_google_sentencepiece//src:sentencepiece_model_cc_proto",
     ],
 )
@@ -103,8 +134,24 @@ cc_library(
         "optimized_encoder.h",
     ],
     deps = [
+        ":config",
         ":double_array_trie",
         ":encoder_config",
+    ],
+)
+
+cc_library(
+    name = "optimized_decoder",
+    srcs = [
+        "optimized_decoder.cc",
+    ],
+    hdrs = [
+        "optimized_decoder.h",
+    ],
+    deps = [
+        "config",
+        ":decoder_config",
+        ":double_array_trie",
     ],
 )
 
@@ -112,6 +159,13 @@ cc_library(
     name = "sentencepiece_tokenizer_h",
     hdrs = [
         "sentencepiece_tokenizer.h",
+    ],
+)
+
+cc_library(
+    name = "sentencepiece_detokenizer_h",
+    hdrs = [
+        "sentencepiece_detokenizer.h",
     ],
 )
 
@@ -143,6 +197,33 @@ cc_binary(
 )
 
 cc_library(
+    name = "sentencepiece_detokenizer_op",
+    srcs = ["sentencepiece_detokenizer_op.cc"],
+    copts = micore_tf_copts(),
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":sentencepiece_detokenizer_h",
+        ":optimized_decoder",
+    ] + micore_tf_deps(),
+    alwayslink = 1,
+)
+
+cc_binary(
+    name = "sentencepiece_detokenizer_op.so",
+    srcs = [
+        "sentencepiece_detokenizer_op.cc",
+    ],
+    copts = micore_tf_copts(),
+    linkshared = 1,
+    deps = [
+        ":sentencepiece_detokenizer_h",
+        ":optimized_decoder",
+    ] + micore_tf_deps(),
+)
+
+cc_library(
     name = "sentencepiece_tokenizer_tflite",
     srcs = ["sentencepiece_tokenizer_tflite.cc"],
     visibility = [
@@ -152,6 +233,25 @@ cc_library(
         [
             ":optimized_encoder",
             ":sentencepiece_tokenizer_h",
+            "@flatbuffers",
+            "@org_tensorflow//tensorflow/lite:framework",
+            "@org_tensorflow//tensorflow/lite:string_util",
+            "@org_tensorflow//tensorflow/lite/c:common",
+            "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
+            "@org_tensorflow//tensorflow/lite/kernels/internal:tensor",
+        ],
+)
+
+cc_library(
+    name = "sentencepiece_detokenizer_tflite",
+    srcs = ["sentencepiece_detokenizer_tflite.cc"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps =
+        [
+            ":optimized_decoder",
+            ":sentencepiece_detokenizer_h",
             "@flatbuffers",
             "@org_tensorflow//tensorflow/lite:framework",
             "@org_tensorflow//tensorflow/lite:string_util",
@@ -183,11 +283,34 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "optimized_decoder_test",
+    srcs = [
+        "optimized_decoder_test.cc",
+    ],
+    data = [
+        ":testdata",
+    ],
+    deps = [
+        ":decoder_config",
+        ":double_array_trie_builder",
+        ":model_converter",
+        ":optimized_decoder",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_sentencepiece//src:sentencepiece_cc_proto",
+        "@com_google_sentencepiece//src:sentencepiece_processor",
+        "@org_tensorflow//tensorflow/core:lib",
+    ],
+)
+
 cc_library(
     name = "py_tflite_registerer",
     srcs = ["py_tflite_registerer.cc"],
     hdrs = ["py_tflite_registerer.h"],
     deps = [
+        ":sentencepiece_detokenizer_tflite",
         ":sentencepiece_tokenizer_tflite",
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
@@ -219,6 +342,7 @@ pybind_extension(
     hdrs = ["model_converter.h"],
     additional_exported_symbols = [
         "ConvertSentencepieceModel",
+        "ConvertSentencepieceModelForDecoder",
         "GetVocabularySize",
     ],
     copts = ["-fexceptions"],
@@ -229,6 +353,7 @@ pybind_extension(
         "//tensorflow_lite_support/cc/port:statusor",
         "@com_google_absl//absl/status",
         "@local_config_python//:python_headers",
+        "@org_tensorflow//tensorflow/lite:framework",
         "@pybind11",
     ],
 )

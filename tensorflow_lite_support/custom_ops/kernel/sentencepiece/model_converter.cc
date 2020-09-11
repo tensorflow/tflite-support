@@ -15,36 +15,31 @@ limitations under the License.
 
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"
 
+#include "absl/status/status.h"
+#include "absl/strings/str_replace.h"
+#include "src/sentencepiece_model.pb.h"
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/decoder_config_generated.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
-#include "src/sentencepiece_model.pb.h"
-
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/sentencepiece_constants.h"
 namespace tflite {
 namespace support {
 namespace ops {
 
-namespace {
-// The constant is copied from
-// third_party/sentencepiece/src/unigram_model.cc
-constexpr float kUnkPenalty = 10.0;
-}  // namespace
-
 std::tuple<std::vector<uint32_t>, std::vector<int8_t>>
 DecodePrecompiledCharsmap(
-    const ::sentencepiece::ModelProto& sentencepiece_model) {
+    const ::sentencepiece::NormalizerSpec& normalizer_spec) {
   // This function "undoes" encoding done by
   // sentencepiece::normalizer::Normalizer::EncodePrecompiledCharsMap.
-  const char* precompiled_map =
-      sentencepiece_model.normalizer_spec().precompiled_charsmap().data();
+  const char* precompiled_map = normalizer_spec.precompiled_charsmap().data();
   const uint32_t trie_size =
       *reinterpret_cast<const uint32_t*>(precompiled_map);
   const uint32_t* trie_ptr =
       reinterpret_cast<const uint32_t*>(precompiled_map + sizeof(uint32_t));
   const int8_t* normalized_ptr = reinterpret_cast<const int8_t*>(
       precompiled_map + sizeof(uint32_t) + trie_size);
-  const int normalized_size =
-      sentencepiece_model.normalizer_spec().precompiled_charsmap().length() -
-      sizeof(uint32_t) - trie_size;
+  const int normalized_size = normalizer_spec.precompiled_charsmap().length() -
+                              sizeof(uint32_t) - trie_size;
   return std::make_tuple(
       std::vector<uint32_t>(trie_ptr, trie_ptr + trie_size / sizeof(uint32_t)),
       std::vector<int8_t>(normalized_ptr, normalized_ptr + normalized_size));
@@ -97,7 +92,7 @@ tflite::support::StatusOr<std::string> ConvertSentencepieceModelToFlatBuffer(
 
   // Converting normalization.
   const auto [normalization_trie, normalization_strings] =
-      DecodePrecompiledCharsmap(model_config);
+      DecodePrecompiledCharsmap(model_config.normalizer_spec());
   const auto normalization_trie_vector =
       builder.CreateVector(normalization_trie);
   TrieBuilder normalization_trie_builder(builder);
@@ -127,6 +122,50 @@ tflite::support::StatusOr<std::string> ConvertSentencepieceModelToFlatBuffer(
                      builder.GetSize());
 }
 
+tflite::support::StatusOr<std::string>
+ConvertSentencepieceModelToFlatBufferForDecoder(
+    const std::string& model_config_str, int encoding_offset) {
+  ::sentencepiece::ModelProto model_config;
+  if (!model_config.ParseFromString(model_config_str)) {
+    return absl::InvalidArgumentError(
+        "Invalid configuration, can't parse SentencePiece model config " +
+        model_config.InitializationErrorString());
+  }
+  flatbuffers::FlatBufferBuilder builder(1024);
+  // Collect sentencepieces.
+  std::vector<std::string> pieces;
+  for (const auto& piece : model_config.pieces()) {
+    // In the original library all pieces processing is done during decoding.
+    // Because it is independent from context or parameters we can do it in
+    // advance here.
+    switch (piece.type()) {
+      case ::sentencepiece::ModelProto::SentencePiece::NORMAL:
+      case ::sentencepiece::ModelProto::SentencePiece::USER_DEFINED:
+        pieces.push_back(
+            absl::StrReplaceAll(piece.piece(), {{kSpaceSymbol, " "}}));
+        break;
+      case ::sentencepiece::ModelProto::SentencePiece::UNKNOWN:
+        pieces.push_back(
+            kDefaultUnknownSymbol);  // Always decode with the default unknown.
+        break;
+      default:
+        pieces.push_back("");
+    }
+  }
+  const auto pieces_fbs = builder.CreateVectorOfStrings(pieces);
+  DecoderConfigBuilder decb(builder);
+
+  decb.add_version(EncoderVersion::EncoderVersion_SENTENCE_PIECE);
+  decb.add_encoding_offset(encoding_offset);
+  decb.add_decode_pieces(pieces_fbs);
+  decb.add_remove_dummy_prefix(
+      model_config.normalizer_spec().add_dummy_prefix());
+
+  FinishDecoderConfigBuffer(builder, decb.Finish());
+  return std::string(reinterpret_cast<const char*>(builder.GetBufferPointer()),
+                     builder.GetSize());
+}
+
 int GetVocabularySize(const std::string& model_string) {
   const EncoderConfig* config = GetEncoderConfig(model_string.data());
   return config->pieces_scores()->size() + config->encoding_offset();
@@ -134,6 +173,18 @@ int GetVocabularySize(const std::string& model_string) {
 
 std::string ConvertSentencepieceModel(const std::string& model_string) {
   const auto result = ConvertSentencepieceModelToFlatBuffer(model_string);
+  // TODO(mgubin): Propogate error to the Python code and throw correct
+  // exception.
+  assert(result.status().ok());
+  return result.value();
+}
+
+std::string ConvertSentencepieceModelForDecoder(
+    const std::string& model_string) {
+  const auto result =
+      ConvertSentencepieceModelToFlatBufferForDecoder(model_string);
+  // TODO(mgubin): Propogate error to the Python code and throw correct
+  // exception.
   assert(result.status().ok());
   return result.value();
 }

@@ -17,7 +17,7 @@ limitations under the License.
 #include "pybind11/pybind11.h"
 #include "pybind11/pytypes.h"
 
-PYBIND11_MODULE(pywrap_lingua_registerer, m) {
+PYBIND11_MODULE(pywrap_tflite_registerer, m) {
   m.doc() = R"pbdoc(
     pywrap_tflite_registerer
     A module with a wrapper that adds to a Python wrapper for TFLite

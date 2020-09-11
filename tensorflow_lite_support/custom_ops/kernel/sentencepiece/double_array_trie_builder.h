@@ -19,7 +19,8 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/config_generated.h"
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/utils.h"
 
 namespace tflite {
 namespace support {

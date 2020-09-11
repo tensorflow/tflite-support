@@ -28,6 +28,11 @@ PYBIND11_MODULE(pywrap_model_converter, m) {
     return py::bytes(ConvertSentencepieceModel(std::string(model_string)));
   });
 
+  m.def("convert_sentencepiece_model_for_decoder", [](py::bytes model_string) {
+    return py::bytes(
+        ConvertSentencepieceModelForDecoder(std::string(model_string)));
+  });
+
   m.def("get_vocabulary_size", [](py::bytes model_string) {
     return GetVocabularySize(std::string(model_string));
   });

@@ -27,8 +27,16 @@ namespace ops {
 tflite::support::StatusOr<std::string> ConvertSentencepieceModelToFlatBuffer(
     const std::string& model_config_str, int encoding_offset = 0);
 
+// Converts Sentencepiece configuration to flatbuffer format for encoder.
+// encoding_offset is used by some encoders that combine different encodings.
+tflite::support::StatusOr<std::string>
+ConvertSentencepieceModelToFlatBufferForDecoder(
+    const std::string& model_config_str, int encoding_offset = 0);
+
 // The functions that are provided for the Python wrapper.
 std::string ConvertSentencepieceModel(const std::string& model_string);
+std::string ConvertSentencepieceModelForDecoder(
+    const std::string& model_string);
 
 // Returns size of a vocabulary from Sentencepiece configuration in flatbuffer
 // format.

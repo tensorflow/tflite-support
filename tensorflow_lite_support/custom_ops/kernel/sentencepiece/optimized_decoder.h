@@ -13,24 +13,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/py_tflite_registerer.h"
+#ifndef TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_OPTIMIZED_DECODER_H_
+#define TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_OPTIMIZED_DECODER_H_
+
+// Sentencepiece decoder optimized with memmapped model.
+
+#include <string>
+#include <vector>
 
 namespace tflite {
 namespace support {
 namespace ops {
-namespace custom {
-TfLiteRegistration* Register_SENTENCEPIECE_TOKENIZER();
-TfLiteRegistration* Register_SENTENCEPIECE_DETOKENIZER();
-}  // namespace custom
+enum class DecoderResultType {
+  SUCCESS = 0,
+  WRONG_CONFIG = 1,
+  INVALID_INPUT = 2
+};
+
+struct DecoderResult {
+  DecoderResultType type = DecoderResultType::SUCCESS;
+  std::string decoded;
+};
+
+// Decodes one string from a vector of id. Takes the configuration as a
+// type-erased  buffer.
+DecoderResult DecodeString(const std::vector<int>& encoded,
+                           const void* config_buffer);
 }  // namespace ops
 }  // namespace support
 }  // namespace tflite
-extern "C" void TFLite_SentencepieceTokenizerRegisterer(
-    tflite::MutableOpResolver* resolver) {
-  resolver->AddCustom("TFSentencepieceTokenizeOp",
-                      tflite::support::ops::custom::
-                      Register_SENTENCEPIECE_TOKENIZER());
-  resolver->AddCustom(
-      "TFSentencepieceDetokenizeOp",
-      tflite::support::ops::custom::Register_SENTENCEPIECE_DETOKENIZER());
-}
+
+#endif  // TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_OPTIMIZED_DECODER_H_

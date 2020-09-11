@@ -17,7 +17,10 @@ py_library(
 py_library(
     name = "sentencepiece_tokenizer",
     srcs = ["sentencepiece_tokenizer.py"],
-    data = ["//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_tokenizer_op.so"],
+    data = [
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_detokenizer_op.so",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_tokenizer_op.so",
+    ],
     srcs_version = "PY3",
     deps = [
         "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",

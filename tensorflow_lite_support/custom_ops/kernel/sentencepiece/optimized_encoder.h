@@ -15,9 +15,8 @@ limitations under the License.
 
 #ifndef TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_OPTIMIZED_ENCODER_H_
 #define TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_OPTIMIZED_ENCODER_H_
-/* Sentencepiece encoder optimized with memmapped model.
- * Compilable by WASM.
- */
+
+// Sentencepiece encoder optimized with memmapped model.
 
 #include <string>
 #include <tuple>
@@ -39,8 +38,8 @@ struct EncoderResult {
 std::tuple<std::string, std::vector<int>> NormalizeString(
     const std::string& in_string, const EncoderConfig& config);
 
-// Encodes one string and returns ids and offsets. Takes configuration as a
-// buffer and uses it with minimal changes.
+// Encodes one string and returns ids and offsets. Takes the configuration as a
+// type-erased buffer.
 EncoderResult EncodeString(const std::string& string, const void* config_buffer,
                            bool add_bos, bool add_eos, bool reverse);
 

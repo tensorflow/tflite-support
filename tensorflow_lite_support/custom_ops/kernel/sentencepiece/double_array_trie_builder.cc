@@ -16,8 +16,8 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
 
 #include <algorithm>
+#include <memory>
 
-#include "absl/memory/memory.h"
 #include "include/darts.h"
 
 namespace tflite {
@@ -62,7 +62,7 @@ std::vector<uint32_t> BuildTrie(const std::vector<std::string>& data,
     strings.push_back(el.key->c_str());
     indexes.push_back(el.index);
   }
-  auto trie = absl::make_unique<Darts::DoubleArray>();
+  auto trie = std::make_unique<Darts::DoubleArray>();
   trie->build(data.size(), const_cast<char**>(&strings[0]), nullptr,
               &indexes[0]);
   // We make strong assumptions about internal Darts trie structure:

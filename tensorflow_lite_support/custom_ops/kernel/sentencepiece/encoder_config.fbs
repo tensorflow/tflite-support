@@ -11,17 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+include "config.fbs";
 
 namespace tflite.support.ops;
-
-table Trie {
-  nodes: [uint32];
-}
-
-
-enum EncoderVersion: byte {
-  SENTENCE_PIECE = 0,
-}
 
 table EncoderConfig {
   // Version of the encoder.
@@ -34,15 +26,25 @@ table EncoderConfig {
   // big negative weight,less than any other sentencepiece.
   unknown_penalty: float = 0;
 
+  // The offset for encoding, usually used when codes with low codes are reserved
+  // for some special needs.
   encoding_offset: int32;
+
+  // String pieces for encoding.
   pieces: Trie;
   pieces_scores: [float];
 
   // Normalization related parameters.
   remove_extra_whitespaces: bool;
+
+  // Add a whitespace prefix before encoding.
   add_dummy_prefix: bool;
+
+  // Escape whitespaces during encoding so the decoder can restore them exactly as
+  // in the input.
   escape_whitespaces: bool;
 
+  // Normalization parameters.
   normalized_prefixes: Trie;
   normalized_replacements: [byte];
 }

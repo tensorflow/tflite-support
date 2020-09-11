@@ -36,7 +36,7 @@ class string_view {
   int length() const { return len_; }
   const char* data() const { return str_; }
   bool empty() const { return len_ == 0; }
-  char at(int i) const { return str_[i]; }
+  unsigned char at(int i) const { return str_[i]; }
 
  private:
   const char* str_ = nullptr;
@@ -54,7 +54,7 @@ inline bool operator==(const string_view& view1, const string_view& view2) {
   return memcmp(view1.data(), view2.data(), view1.length()) == 0;
 }
 
-}  // namespace  sentencepiece_utils
+}  // namespace sentencepiece_utils
 }  // namespace ops
 }  // namespace support
 }  // namespace tflite

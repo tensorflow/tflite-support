@@ -15,9 +15,10 @@ limitations under the License.
 
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie.h"
 
-#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
 
 namespace tflite {
 namespace support {
@@ -35,10 +36,8 @@ TEST(DoubleArrayTrieTest, Match) {
   FinishEncoderConfigBuffer(builder, ecb.Finish());
   const EncoderConfig* config = GetEncoderConfig(builder.GetBufferPointer());
   DoubleArrayTrie dat(config->pieces()->nodes());
-  EXPECT_EQ(
-      dat.LongestPrefixMatch(
-          sentencepiece_utils::string_view("AAL")),
-      DoubleArrayTrie::Match(2, 2));
+  EXPECT_EQ(dat.LongestPrefixMatch(sentencepiece_utils::string_view("AAL")),
+            DoubleArrayTrie::Match(2, 2));
 
   std::vector<DoubleArrayTrie::Match> matches;
   dat.IteratePrefixMatches(
