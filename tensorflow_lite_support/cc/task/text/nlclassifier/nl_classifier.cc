@@ -364,9 +364,11 @@ absl::Status NLClassifier::Initialize(const NLClassifierOptions& options) {
   // well-formatted metadata should have same number of tensors with the model.
   if (output_tensor_metadatas &&
       output_tensor_metadatas->size() == output_tensors.size()) {
-    for (const auto& metadata : *output_tensor_metadatas) {
-      if (metadata->name() &&
-          metadata->name()->string_view() == options.output_score_tensor_name) {
+    for (int i = 0; i < output_tensor_metadatas->size(); ++i) {
+      const tflite::TensorMetadata* metadata = output_tensor_metadatas->Get(i);
+      if ((metadata->name() && metadata->name()->string_view() ==
+                                   options.output_score_tensor_name) ||
+          i == options.output_score_tensor_index) {
         if (TrySetLabelFromMetadata(metadata).ok()) {
           return absl::OkStatus();
         }
