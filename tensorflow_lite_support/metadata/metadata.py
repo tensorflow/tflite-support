@@ -28,11 +28,11 @@ import tempfile
 import warnings
 import zipfile
 
-import flatbuffers
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 from tensorflow_lite_support.metadata.cc.python import _pywrap_metadata_version
 from tensorflow_lite_support.metadata.flatbuffers_lib import _pywrap_flatbuffers
+from tensorflow_lite_support.metadata.schema_py_generated import flatbuffers as _flatbuffers
 
 
 def get_path_to_datafile(path):
@@ -277,7 +277,7 @@ class MetadataPopulator(object):
         _metadata_fb.ModelMetadata.GetRootAsModelMetadata(metadata_buf, 0))
     metadata.minParserVersion = min_version
 
-    b = flatbuffers.Builder(0)
+    b = _flatbuffers.Builder(0)
     b.Finish(metadata.Pack(b), self.METADATA_FILE_IDENTIFIER)
     metadata_buf_with_version = b.Output()
 
@@ -486,7 +486,7 @@ class MetadataPopulator(object):
       model.metadata.append(metadata_field)
 
     # Packs model back to a flatbuffer binaray file.
-    b = flatbuffers.Builder(0)
+    b = _flatbuffers.Builder(0)
     b.Finish(model.Pack(b), self.TFLITE_FILE_IDENTIFIER)
     model_buf = b.Output()
 
