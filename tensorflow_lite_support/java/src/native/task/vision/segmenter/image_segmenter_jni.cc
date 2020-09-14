@@ -128,15 +128,13 @@ void ConvertToSegmentationResults(JNIEnv* env,
 
   // Convert colored labels from the C++ object to the Java object.
   jclass color_class = env->FindClass(kColorClassNameNoSig);
-  jmethodID color_value_of_method = env->GetStaticMethodID(
-      color_class, "valueOf", absl::StrCat("(I)", kColorClassName).c_str());
   jmethodID color_rgb_method =
       env->GetStaticMethodID(color_class, "rgb", "(III)I");
   jclass colored_label_class = env->FindClass(kColoredLabelClassNameNoSig);
   jmethodID colored_label_create_method = env->GetStaticMethodID(
       colored_label_class, "create",
-      absl::StrCat("(", kStringClassName, kStringClassName, kColorClassName,
-                   ")", kColoredLabelClassName)
+      absl::StrCat("(", kStringClassName, kStringClassName, "I)",
+                   kColoredLabelClassName)
           .c_str());
 
   for (const auto& colored_label : segmentation.colored_labels()) {
@@ -146,18 +144,14 @@ void ConvertToSegmentationResults(JNIEnv* env,
     jint rgb = env->CallStaticIntMethod(color_class, color_rgb_method,
                                         colored_label.r(), colored_label.g(),
                                         colored_label.b());
-    jobject color =
-        env->CallStaticObjectMethod(color_class, color_value_of_method, rgb);
-
     jobject jcolored_label = env->CallStaticObjectMethod(
         colored_label_class, colored_label_create_method, label, display_name,
-        color);
+        rgb);
     env->CallBooleanMethod(jcolored_labels, array_list_add_method,
                            jcolored_label);
 
     env->DeleteLocalRef(label);
     env->DeleteLocalRef(display_name);
-    env->DeleteLocalRef(color);
     env->DeleteLocalRef(jcolored_label);
   }
 }
