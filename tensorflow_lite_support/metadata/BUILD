@@ -58,6 +58,7 @@ stamp_metadata_parser_version(
     outs = ["metadata_parser.py"],
 )
 
+# This target will soon be deprecated. Please use //third_party/tensorflow_lite_support/metadata/python:metadata.
 py_library(
     name = "metadata",
     srcs = [
