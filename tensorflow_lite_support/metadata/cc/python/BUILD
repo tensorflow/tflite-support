@@ -2,7 +2,7 @@ load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
 
 package(
     default_visibility = [
-        "//tensorflow_lite_support/metadata:__pkg__",
+        "//tensorflow_lite_support/metadata:__subpackages__",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
