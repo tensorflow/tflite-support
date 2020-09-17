@@ -25,13 +25,23 @@ limitations under the License.
 #include "absl/strings/string_view.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
-#include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
-#include "tensorflow/lite/model.h"
 #include "tensorflow_lite_support/cc/port/tflite_wrapper.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
+
+// TODO(b/168025296): eliminate the '#if TFLITE_USE_C_API' directives here and
+// elsewhere and instead use the C API unconditionally, once we have a suitable
+// replacement for the features of tflite::support::TfLiteInterpreterWrapper.
+#if TFLITE_USE_C_API
+#include "tensorflow/lite/c/c_api.h"
+#include "tensorflow/lite/core/api/verifier.h"
+#include "tensorflow/lite/tools/verifier.h"
+#else
+#include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/model.h"
+#endif
 
 namespace tflite {
 namespace task {
@@ -41,6 +51,42 @@ namespace core {
 // and error reporting.
 class TfLiteEngine {
  public:
+  // Types.
+#if TFLITE_USE_C_API
+  using Model = struct TfLiteModel;
+  using Interpreter = struct TfLiteInterpreter;
+  using ModelDeleter = void (*)(Model*);
+  using InterpreterDeleter = void (*)(Interpreter*);
+  // TODO(fergus): support all the features of
+  // tflite::support::tfLiteInterpreterWrapper.
+  class InterpreterWrapper {
+   public:
+    InterpreterWrapper() : impl_(nullptr, TfLiteInterpreterDelete) {}
+    absl::Status InitializeWithFallback(
+        std::function<
+            absl::Status(std::unique_ptr<Interpreter, InterpreterDeleter>*)>
+            interpreter_initializer,
+        const tflite::proto::ComputeSettings& compute_settings);
+    absl::Status InvokeWithoutFallback();
+    absl::Status InvokeWithFallback(
+        const std::function<absl::Status(Interpreter* interpreter)>&
+            set_inputs);
+    Interpreter* get() { return impl_.get(); }
+    const Interpreter* get() const { return impl_.get(); }
+    void reset(Interpreter* interpreter) { impl_.reset(interpreter); }
+
+   private:
+    std::unique_ptr<Interpreter, InterpreterDeleter> impl_;
+  };
+#else
+  using Model = tflite::FlatBufferModel;
+  using Interpreter = tflite::Interpreter;
+  using ModelDeleter = std::default_delete<Model>;
+  using InterpreterDeleter = std::default_delete<Interpreter>;
+  using InterpreterWrapper = tflite::support::TfLiteInterpreterWrapper;
+#endif
+
+  // Constructors.
   explicit TfLiteEngine(
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
@@ -49,11 +95,64 @@ class TfLiteEngine {
   TfLiteEngine& operator=(const TfLiteEngine&) = delete;
 
   // Accessors.
-  tflite::FlatBufferModel* model() const { return model_.get(); }
-  tflite::Interpreter* interpreter() const { return interpreter_.get(); }
-  tflite::support::TfLiteInterpreterWrapper* interpreter_wrapper() {
-    return &interpreter_;
+  static int32_t InputCount(const Interpreter* interpreter) {
+#if TFLITE_USE_C_API
+    return TfLiteInterpreterGetInputTensorCount(interpreter);
+#else
+    return interpreter->inputs().size();
+#endif
   }
+  static int32_t OutputCount(const Interpreter* interpreter) {
+#if TFLITE_USE_C_API
+    return TfLiteInterpreterGetOutputTensorCount(interpreter);
+#else
+    return interpreter->outputs().size();
+#endif
+  }
+  static TfLiteTensor* GetInput(Interpreter* interpreter, int index) {
+#if TFLITE_USE_C_API
+    return TfLiteInterpreterGetInputTensor(interpreter, index);
+#else
+    return interpreter->tensor(interpreter->inputs()[index]);
+#endif
+  }
+  // Same as above, but const.
+  static const TfLiteTensor* GetInput(const Interpreter* interpreter,
+                                      int index) {
+#if TFLITE_USE_C_API
+    return TfLiteInterpreterGetInputTensor(interpreter, index);
+#else
+    return interpreter->tensor(interpreter->inputs()[index]);
+#endif
+  }
+  static TfLiteTensor* GetOutput(Interpreter* interpreter, int index) {
+#if TFLITE_USE_C_API
+    // We need a const_cast here, because the TF Lite C API only has a non-const
+    // version of GetOutputTensor (in part because C doesn't support overloading
+    // on const).
+    return const_cast<TfLiteTensor*>(
+        TfLiteInterpreterGetOutputTensor(interpreter, index));
+#else
+    return interpreter->tensor(interpreter->outputs()[index]);
+#endif
+  }
+  // Same as above, but const.
+  static const TfLiteTensor* GetOutput(const Interpreter* interpreter,
+                                       int index) {
+#if TFLITE_USE_C_API
+    return TfLiteInterpreterGetOutputTensor(interpreter, index);
+#else
+    return interpreter->tensor(interpreter->outputs()[index]);
+#endif
+  }
+
+  std::vector<TfLiteTensor*> GetInputs();
+  std::vector<const TfLiteTensor*> GetOutputs();
+
+  const Model* model() const { return model_.get(); }
+  Interpreter* interpreter() { return interpreter_.get(); }
+  const Interpreter* interpreter() const { return interpreter_.get(); }
+  InterpreterWrapper* interpreter_wrapper() { return &interpreter_; }
   const tflite::metadata::ModelMetadataExtractor* metadata_extractor() const {
     return model_metadata_extractor_.get();
   }
@@ -89,7 +188,13 @@ class TfLiteEngine {
   // Cancels the on-going `Invoke()` call if any and if possible. This method
   // can be called from a different thread than the one where `Invoke()` is
   // running.
-  void Cancel() { interpreter_.Cancel(); }
+  void Cancel() {
+#if TFLITE_USE_C_API
+    // NOP.
+#else
+    interpreter_.Cancel();
+#endif
+  }
 
  protected:
   // TF Lite's DefaultErrorReporter() outputs to stderr. This one captures the
@@ -116,13 +221,24 @@ class TfLiteEngine {
     const tflite::OpResolver* op_resolver_;
   };
 
+  // Verifies that the supplied buffer refers to a valid flatbuffer model,
+  // and that it uses only operators that are supported by the OpResolver
+  // that was passed to the TfLiteEngine constructor, and then builds
+  // the model from the buffer and stores it in 'model_'.
+  void VerifyAndBuildModelFromBuffer(const char* buffer_data,
+                                     size_t buffer_size);
+
+  // Gets the buffer from the file handler; verifies and builds the model
+  // from the buffer; if successful, sets 'model_metadata_extractor_' to be
+  // a TF Lite Metadata extractor for the model; and calculates an appropriate
+  // return Status,
   absl::Status InitializeFromModelFileHandler();
 
   // TF Lite model and interpreter for actual inference.
-  std::unique_ptr<tflite::FlatBufferModel> model_;
+  std::unique_ptr<Model, ModelDeleter> model_;
 
   // Interpreter wrapper built from the model.
-  tflite::support::TfLiteInterpreterWrapper interpreter_;
+  InterpreterWrapper interpreter_;
 
   // TFLite Metadata extractor built from the model.
   std::unique_ptr<tflite::metadata::ModelMetadataExtractor>

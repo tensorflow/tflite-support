@@ -15,3 +15,11 @@ cc_library(
         "@com_google_absl//absl/strings:cord",
     ],
 )
+
+config_setting(
+    name = "tflite_use_c_api",
+    values = {
+        "copt": "-DTFLITE_USE_C_API",
+    },
+    visibility = ["//tensorflow_lite_support:__subpackages__"],
+)

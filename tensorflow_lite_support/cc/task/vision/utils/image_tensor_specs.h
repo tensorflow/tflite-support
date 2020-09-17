@@ -19,8 +19,8 @@ limitations under the License.
 
 #include "absl/types/optional.h"
 #include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/interpreter.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
@@ -83,7 +83,7 @@ struct ImageTensorSpecs {
 // - `tflite::InterpreterBuilder`,
 // - `tflite::metadata::ModelMetadataExtractor::CreateFromModelBuffer`.
 tflite::support::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
-    const tflite::Interpreter& interpreter,
+    const tflite::task::core::TfLiteEngine::Interpreter& interpreter,
     const tflite::metadata::ModelMetadataExtractor& metadata_extractor);
 
 }  // namespace vision
