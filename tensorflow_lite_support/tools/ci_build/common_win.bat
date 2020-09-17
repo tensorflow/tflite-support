@@ -23,7 +23,7 @@ echo on
 @REM
 SET PY_EXE=C:\%PYTHON_DIRECTORY%\python.exe
 SET PIP_EXE=C:\%PYTHON_DIRECTORY%\Scripts\pip.exe
-SET PATH=%PATH%;C:\%PYTHON_DIRECTORY%
+SET PATH=C:\%PYTHON_DIRECTORY%;C:\%PYTHON_DIRECTORY%\Scripts;%PATH%
 
 %PIP_EXE% install flatbuffers==1.12 --upgrade --no-deps
 %PIP_EXE% install setuptools --upgrade
