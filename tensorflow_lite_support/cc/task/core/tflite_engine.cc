@@ -167,7 +167,7 @@ absl::Status TfLiteEngine::InitInterpreter(
           absl::StrCat("Could not build the TF Lite interpreter: ",
                        error_reporter_.error_message));
     }
-    if (interpreter_out == nullptr) {
+    if (*interpreter_out == nullptr) {
       return CreateStatusWithPayload(StatusCode::kInternal,
                                      "TF Lite interpreter is null.");
     }
