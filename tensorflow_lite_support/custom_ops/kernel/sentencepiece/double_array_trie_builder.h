@@ -23,15 +23,19 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/utils.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
+
 std::vector<uint32_t> BuildTrie(const std::vector<std::string>& data,
                                 const std::vector<int>& ids);
 
 // A variant where ids are indexes in data.
 std::vector<uint32_t> BuildTrie(const std::vector<std::string>& data);
+
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_DOUBLE_ARRAY_TRIE_BUILDER_H_

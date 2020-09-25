@@ -21,8 +21,9 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
 
 TEST(DoubleArrayTrieTest, Match) {
   flatbuffers::FlatBufferBuilder builder(1024);
@@ -36,12 +37,12 @@ TEST(DoubleArrayTrieTest, Match) {
   FinishEncoderConfigBuffer(builder, ecb.Finish());
   const EncoderConfig* config = GetEncoderConfig(builder.GetBufferPointer());
   DoubleArrayTrie dat(config->pieces()->nodes());
-  EXPECT_EQ(dat.LongestPrefixMatch(sentencepiece_utils::string_view("AAL")),
+  EXPECT_EQ(dat.LongestPrefixMatch(utils::string_view("AAL")),
             DoubleArrayTrie::Match(2, 2));
 
   std::vector<DoubleArrayTrie::Match> matches;
   dat.IteratePrefixMatches(
-      sentencepiece_utils::string_view("AAXL"),
+      utils::string_view("AAXL"),
       [&matches](const DoubleArrayTrie::Match& m) { matches.push_back(m); });
   EXPECT_THAT(matches, testing::ElementsAre(DoubleArrayTrie::Match(0, 1),
                                             DoubleArrayTrie::Match(2, 2),
@@ -66,10 +67,12 @@ TEST(DoubleArrayTrieTest, ComplexMatch) {
 
   std::vector<DoubleArrayTrie::Match> matches;
   dat.IteratePrefixMatches(
-      sentencepiece_utils::string_view("\xe2\x96\x81Hello"),
+      utils::string_view("\xe2\x96\x81Hello"),
       [&matches](const DoubleArrayTrie::Match& m) { matches.push_back(m); });
   EXPECT_THAT(matches, testing::ElementsAre(DoubleArrayTrie::Match(15, 8)));
 }
+
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

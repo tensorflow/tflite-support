@@ -23,8 +23,9 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/utils.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
 
 // A trie node specifies a node in the tree, either an intermediate node or
 // a leaf node.
@@ -54,14 +55,11 @@ class DoubleArrayTrie {
 
   // Finds matches that are prefixes of a string.
   template <typename callback>
-  void IteratePrefixMatches(
-      const sentencepiece_utils::string_view& input,
-      callback update_fn) const;
+  void IteratePrefixMatches(const utils::string_view& input,
+                            callback update_fn) const;
 
   // Finds the longest prefix match of a string.
-  Match LongestPrefixMatch(
-      const sentencepiece_utils::string_view& input)
-      const {
+  Match LongestPrefixMatch(const utils::string_view& input) const {
     Match match;
     IteratePrefixMatches(input, [&match](const Match& m) { match = m; });
     return match;
@@ -90,9 +88,8 @@ class DoubleArrayTrie {
 };
 
 template <typename callback>
-void DoubleArrayTrie::IteratePrefixMatches(
-    const sentencepiece_utils::string_view& input,
-    callback update_fn) const {
+void DoubleArrayTrie::IteratePrefixMatches(const utils::string_view& input,
+                                           callback update_fn) const {
   if (nodes_->size() == 0) {
     return;
   }
@@ -115,8 +112,9 @@ void DoubleArrayTrie::IteratePrefixMatches(
   }
 }
 
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_DOUBLE_ARRAY_TRIE_H_

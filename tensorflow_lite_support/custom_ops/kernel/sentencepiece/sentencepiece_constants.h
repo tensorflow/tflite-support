@@ -16,8 +16,9 @@ limitations under the License.
 #define TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_SENTENCEPIECE_CONSTANTS_H_
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
 
 // The constant is copied from
 // https://github.com/google/sentencepiece/blob/master/src/unigram_model.cc
@@ -33,8 +34,10 @@ constexpr char kSpaceSymbol[] = "\xe2\x96\x81";
 // since this character can be useful both for user and
 // developer. We can easily figure out that <unk> is emitted.
 constexpr char kDefaultUnknownSymbol[] = " \xE2\x81\x87 ";
+
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_SENTENCEPIECE_CONSTANTS_H_

@@ -28,13 +28,12 @@ limitations under the License.
 #include "tensorflow/lite/schema/schema_generated.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
 namespace custom {
 TfLiteRegistration* Register_RAGGED_TENSOR_TO_TENSOR();
 }  // namespace custom
 }  // namespace ops
-}  // namespace support
+
 namespace {
 
 class RaggedTensorToTensorOpModel : public SingleOpModel {
@@ -73,7 +72,7 @@ class RaggedTensorToTensorOpModel : public SingleOpModel {
     fbb.EndMap(start);
     fbb.Finish();
     SetCustomOp("RaggedTensorToTensor", fbb.GetBuffer(),
-                support::ops::custom::Register_RAGGED_TENSOR_TO_TENSOR);
+                ops::custom::Register_RAGGED_TENSOR_TO_TENSOR);
     BuildInterpreter(shapes);
   }
 

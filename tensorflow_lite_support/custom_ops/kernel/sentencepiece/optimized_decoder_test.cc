@@ -25,8 +25,10 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
+
 namespace internal {
 
 tensorflow::Status TFReadFileToString(const std::string& filepath,
@@ -52,7 +54,6 @@ absl::Status StdReadFileToString(const std::string& filepath,
 }  // namespace internal
 
 namespace {
-
 static char kConfigFilePath[] =
     "tensorflow_lite_support/custom_ops/kernel/"
     "sentencepiece/testdata/sentencepiece.model";
@@ -81,8 +82,9 @@ TEST(OptimizedEncoder, ConfigConverter) {
   ASSERT_EQ(decoded.type, DecoderResultType::SUCCESS);
   ASSERT_EQ(ref_decoded, decoded.decoded);
 }
-
 }  // namespace
+
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

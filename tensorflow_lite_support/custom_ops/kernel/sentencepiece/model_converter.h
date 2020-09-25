@@ -20,8 +20,10 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
+
 // Converts Sentencepiece configuration to flatbuffer format.
 // encoding_offset is used by some encoders that combine different encodings.
 tflite::support::StatusOr<std::string> ConvertSentencepieceModelToFlatBuffer(
@@ -41,8 +43,10 @@ std::string ConvertSentencepieceModelForDecoder(
 // Returns size of a vocabulary from Sentencepiece configuration in flatbuffer
 // format.
 int GetVocabularySize(const std::string& model_string);
+
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_MODEL_CONVERTER_H_

@@ -22,8 +22,10 @@ limitations under the License.
 #include <vector>
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
+
 enum class DecoderResultType {
   SUCCESS = 0,
   WRONG_CONFIG = 1,
@@ -39,8 +41,10 @@ struct DecoderResult {
 // type-erased  buffer.
 DecoderResult DecodeString(const std::vector<int>& encoded,
                            const void* config_buffer);
+
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_OPTIMIZED_DECODER_H_

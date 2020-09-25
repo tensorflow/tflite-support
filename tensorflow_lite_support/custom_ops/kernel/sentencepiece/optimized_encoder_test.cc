@@ -30,9 +30,9 @@ limitations under the License.
 
 
 namespace tflite {
-namespace support {
 namespace ops {
-
+namespace custom {
+namespace sentencepiece {
 
 namespace internal {
 
@@ -161,6 +161,7 @@ TEST(OptimizedEncoder, ConfigConverter) {
 }
 
 }  // namespace
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

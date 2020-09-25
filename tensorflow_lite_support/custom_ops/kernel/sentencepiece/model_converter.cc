@@ -22,9 +22,11 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/sentencepiece_constants.h"
+
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
 
 std::tuple<std::vector<uint32_t>, std::vector<int8_t>>
 DecodePrecompiledCharsmap(
@@ -188,6 +190,8 @@ std::string ConvertSentencepieceModelForDecoder(
   assert(result.status().ok());
   return result.value();
 }
+
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

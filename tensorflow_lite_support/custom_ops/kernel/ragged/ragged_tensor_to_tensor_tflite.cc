@@ -26,13 +26,13 @@ limitations under the License.
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/model.h"
 
-// TODO(b/168755851): To unify namespace inside custom_ops.
 namespace tflite {
-namespace support {
 namespace ops {
 namespace custom {
+namespace ragged {
 namespace ragged_tensor_to_tensor {
 namespace {
+
 constexpr int kShapeInput = 0;
 constexpr int kValuesInput = 1;
 constexpr int kDefaultValueInput = 2;
@@ -666,14 +666,16 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
 }
 
 }  // namespace ragged_tensor_to_tensor
+}  // namespace ragged
 
 TfLiteRegistration* Register_RAGGED_TENSOR_TO_TENSOR() {
-  static TfLiteRegistration r = {
-      ragged_tensor_to_tensor::Initialize, ragged_tensor_to_tensor::Free,
-      ragged_tensor_to_tensor::Prepare, ragged_tensor_to_tensor::Eval};
+  static TfLiteRegistration r = {ragged::ragged_tensor_to_tensor::Initialize,
+                                 ragged::ragged_tensor_to_tensor::Free,
+                                 ragged::ragged_tensor_to_tensor::Prepare,
+                                 ragged::ragged_tensor_to_tensor::Eval};
   return &r;
 }
+
 }  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

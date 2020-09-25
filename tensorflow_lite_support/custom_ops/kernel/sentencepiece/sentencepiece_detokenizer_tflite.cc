@@ -28,10 +28,10 @@
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/sentencepiece_detokenizer.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
 namespace custom {
-namespace sentencepiece_detokenizer {
+namespace sentencepiece {
+namespace detokenizer {
 
 constexpr int kOutputValuesInd = 0;
 // Initializes text encoder object from serialized parameters.
@@ -74,8 +74,7 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
     std::copy(input_encoded_data + input_offset,
               input_encoded_data + input_offset + split_size,
               std::back_inserter(codes_for_split));
-    const auto res =
-        tflite::support::ops::DecodeString(codes_for_split, model_buffer_data);
+    const auto res = DecodeString(codes_for_split, model_buffer_data);
     TF_LITE_ENSURE_MSG(context, res.type == DecoderResultType::SUCCESS,
                        "Sentencepiece decoding failed");
     buf.AddString(res.decoded.data(), res.decoded.length());
@@ -86,15 +85,16 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
   buf.WriteToTensor(&output_values, nullptr);
   return kTfLiteOk;
 }
-}  // namespace sentencepiece_detokenizer
+}  // namespace detokenizer
+}  // namespace sentencepiece
 
 TfLiteRegistration* Register_SENTENCEPIECE_DETOKENIZER() {
   static TfLiteRegistration r = {
-      sentencepiece_detokenizer::Initialize, sentencepiece_detokenizer::Free,
-      sentencepiece_detokenizer::Prepare, sentencepiece_detokenizer::Eval};
+      sentencepiece::detokenizer::Initialize, sentencepiece::detokenizer::Free,
+      sentencepiece::detokenizer::Prepare, sentencepiece::detokenizer::Eval};
   return &r;
 }
+
 }  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

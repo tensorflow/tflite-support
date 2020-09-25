@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-namespace tflite.support.ops;
+namespace tflite.ops.custom.sentencepiece;
 
 table Trie {
   nodes: [uint32];

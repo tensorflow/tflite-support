@@ -16,21 +16,19 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/py_tflite_registerer.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
 namespace custom {
 TfLiteRegistration* Register_SENTENCEPIECE_TOKENIZER();
 TfLiteRegistration* Register_SENTENCEPIECE_DETOKENIZER();
 }  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite
+
 extern "C" void TFLite_SentencepieceTokenizerRegisterer(
     tflite::MutableOpResolver* resolver) {
   resolver->AddCustom("TFSentencepieceTokenizeOp",
-                      tflite::support::ops::custom::
-                      Register_SENTENCEPIECE_TOKENIZER());
+                      tflite::ops::custom::Register_SENTENCEPIECE_TOKENIZER());
   resolver->AddCustom(
       "TFSentencepieceDetokenizeOp",
-      tflite::support::ops::custom::Register_SENTENCEPIECE_DETOKENIZER());
+      tflite::ops::custom::Register_SENTENCEPIECE_DETOKENIZER());
 }

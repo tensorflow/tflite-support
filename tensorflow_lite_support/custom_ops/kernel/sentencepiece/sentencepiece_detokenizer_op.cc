@@ -67,18 +67,21 @@ class TFSentencepieceDetokenizerOp : public tensorflow::OpKernel {
       for (int j = 0; j < split_size; ++j) {
         codes_for_split.push_back(input_values_flat(input_offset++));
       }
-      const auto res = tflite::support::ops::DecodeString(codes_for_split,
-                                                          model_tensor.data());
-      OP_REQUIRES(ctx,
-                  res.type == tflite::support::ops::DecoderResultType::SUCCESS,
-                  tensorflow::Status(tensorflow::error::INTERNAL,
-                                     "Sentencepiece conversion failed"));
+      const auto res = tflite::ops::custom::sentencepiece::DecodeString(
+          codes_for_split, model_tensor.data());
+      OP_REQUIRES(
+          ctx,
+          res.type ==
+              tflite::ops::custom::sentencepiece::DecoderResultType::SUCCESS,
+          tensorflow::Status(tensorflow::error::INTERNAL,
+                             "Sentencepiece conversion failed"));
       output_flat(i) = res.decoded;
     }
   }
 };
 }  // namespace ops
 }  // namespace tensorflow
+
 REGISTER_KERNEL_BUILDER(
     Name("TFSentencepieceDetokenizeOp")
         .Device(tensorflow::DEVICE_CPU)

@@ -13,7 +13,7 @@
 // limitations under the License.
 include "config.fbs";
 
-namespace tflite.support.ops;
+namespace tflite.ops.custom.sentencepiece;
 
 table EncoderConfig {
   // Version of the encoder.

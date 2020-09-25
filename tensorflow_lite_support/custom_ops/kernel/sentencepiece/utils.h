@@ -20,11 +20,14 @@ limitations under the License.
 #include <string>
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
+
 // AOSP and WASM doesn't support string_view,
 // we put here a minimal re-implementation.
-namespace sentencepiece_utils {
+namespace utils {
+
 class string_view {
  public:
   explicit string_view(const std::string& s)
@@ -54,9 +57,10 @@ inline bool operator==(const string_view& view1, const string_view& view2) {
   return memcmp(view1.data(), view2.data(), view1.length()) == 0;
 }
 
-}  // namespace sentencepiece_utils
+}  // namespace utils
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_UTILS_H_

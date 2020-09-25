@@ -27,11 +27,10 @@ limitations under the License.
 #include "tensorflow/lite/string_util.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
 namespace custom {
-namespace sentencepiece_tokenizer {
-
+namespace sentencepiece {
+namespace tokenizer {
 
 constexpr int kOutputValuesInd = 0;
 constexpr int kOutputSplitsInd = 1;
@@ -115,15 +114,16 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
   std::copy(splits.begin(), splits.end(), output_splits_flat + 1);
   return kTfLiteOk;
 }
-}  // namespace sentencepiece_tokenizer
+}  // namespace tokenizer
+}  // namespace sentencepiece
 
 TfLiteRegistration* Register_SENTENCEPIECE_TOKENIZER() {
   static TfLiteRegistration r = {
-      sentencepiece_tokenizer::Initialize, sentencepiece_tokenizer::Free,
-      sentencepiece_tokenizer::Prepare, sentencepiece_tokenizer::Eval};
+      sentencepiece::tokenizer::Initialize, sentencepiece::tokenizer::Free,
+      sentencepiece::tokenizer::Prepare, sentencepiece::tokenizer::Eval};
   return &r;
 }
+
 }  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

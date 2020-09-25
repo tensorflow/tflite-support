@@ -18,8 +18,9 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
 
 namespace py = pybind11;
 
@@ -38,6 +39,7 @@ PYBIND11_MODULE(pywrap_model_converter, m) {
   });
 }
 
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

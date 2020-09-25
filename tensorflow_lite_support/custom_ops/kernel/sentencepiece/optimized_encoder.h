@@ -25,8 +25,9 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
 
 enum class EncoderResultType { SUCCESS = 0, WRONG_CONFIG = 1 };
 
@@ -43,8 +44,9 @@ std::tuple<std::string, std::vector<int>> NormalizeString(
 EncoderResult EncodeString(const std::string& string, const void* config_buffer,
                            bool add_bos, bool add_eos, bool reverse);
 
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_OPTIMIZED_ENCODER_H_

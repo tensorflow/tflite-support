@@ -21,8 +21,10 @@ limitations under the License.
 #include "include/darts.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
+
 std::vector<uint32_t> BuildTrie(const std::vector<std::string>& data) {
   std::vector<int> ids;
   ids.reserve(data.size());
@@ -72,6 +74,8 @@ std::vector<uint32_t> BuildTrie(const std::vector<std::string>& data,
   const uint32_t* trie_data = static_cast<const uint32_t*>(trie->array());
   return std::vector<uint32_t>(trie_data, trie_data + trie->size());
 }
+
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

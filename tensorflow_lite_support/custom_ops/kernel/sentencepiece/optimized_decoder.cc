@@ -22,8 +22,9 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
 
 DecoderResult DecodeString(const std::vector<int>& encoded,
                            const void* config_buffer) {
@@ -56,6 +57,7 @@ DecoderResult DecodeString(const std::vector<int>& encoded,
   return result;
 }
 
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

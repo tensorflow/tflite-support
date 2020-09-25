@@ -22,8 +22,9 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
 
 namespace tflite {
-namespace support {
 namespace ops {
+namespace custom {
+namespace sentencepiece {
 namespace {
 
 const char kSpaceSymbol[] = "\xe2\x96\x81";
@@ -60,36 +61,33 @@ inline char is_whitespace(char c) {
   return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 }
 
-std::tuple<int, sentencepiece_utils::string_view> remove_extra_whitespaces(
-    const char* data, int len) {
+std::tuple<int, utils::string_view> remove_extra_whitespaces(const char* data,
+                                                             int len) {
   if (len == 0 || !is_whitespace(*data)) {
-    return std::make_tuple(0, sentencepiece_utils::string_view(nullptr, 0));
+    return std::make_tuple(0, utils::string_view(nullptr, 0));
   }
   int num_consumed = 1;
   for (; num_consumed < len && is_whitespace(data[num_consumed]);
        ++num_consumed) {
   }
   return num_consumed > 1
-             ? std::make_tuple(num_consumed,
-                               sentencepiece_utils::string_view(" ", 1))
-             : std::make_tuple(0, sentencepiece_utils::string_view(nullptr, 0));
+             ? std::make_tuple(num_consumed, utils::string_view(" ", 1))
+             : std::make_tuple(0, utils::string_view(nullptr, 0));
 }
 
-std::tuple<int, sentencepiece_utils::string_view> find_replacement(
+std::tuple<int, utils::string_view> find_replacement(
     const char* data, int len, const DoubleArrayTrie& dat,
     const flatbuffers::Vector<int8_t>& replacements) {
-  const auto max_match =
-      dat.LongestPrefixMatch(sentencepiece_utils::string_view(data, len));
+  const auto max_match = dat.LongestPrefixMatch(utils::string_view(data, len));
   if (!max_match.empty()) {
     // Because flatbuffer byte is signed char which is not the same as char,
     // there is the reinterpret_cast here.
     const char* replaced_string_ptr =
         reinterpret_cast<const char*>(replacements.data() + max_match.id);
-    return std::make_tuple(
-        max_match.match_length,
-        sentencepiece_utils::string_view(replaced_string_ptr));
+    return std::make_tuple(max_match.match_length,
+                           utils::string_view(replaced_string_ptr));
   }
-  return std::make_tuple(0, sentencepiece_utils::string_view(nullptr, 0));
+  return std::make_tuple(0, utils::string_view(nullptr, 0));
 }
 }  // namespace
 
@@ -132,10 +130,9 @@ std::tuple<std::string, std::vector<int>> NormalizeString(
   if (config.escape_whitespaces()) {
     const auto replace_whitespaces = [](const char* data, int len) {
       if (len > 0 && is_whitespace(*data)) {
-        return std::make_tuple(1,
-                               sentencepiece_utils::string_view(kSpaceSymbol));
+        return std::make_tuple(1, utils::string_view(kSpaceSymbol));
       }
-      return std::make_tuple(0, sentencepiece_utils::string_view(nullptr, 0));
+      return std::make_tuple(0, utils::string_view(nullptr, 0));
     };
     std::tie(result, output_offsets) =
         process_string(result, output_offsets, replace_whitespaces);
@@ -190,8 +187,7 @@ EncoderResult EncodeNormalizedString(const std::string& str,
       }
     };
     piece_matcher.IteratePrefixMatches(
-        sentencepiece_utils::string_view(str.data() + i, length - i),
-        lattice_update);
+        utils::string_view(str.data() + i, length - i), lattice_update);
   }
 
   EncoderResult result;
@@ -237,6 +233,7 @@ EncoderResult EncodeString(const std::string& string, const void* config_buffer,
                                 add_eos, reverse);
 }
 
+}  // namespace sentencepiece
+}  // namespace custom
 }  // namespace ops
-}  // namespace support
 }  // namespace tflite

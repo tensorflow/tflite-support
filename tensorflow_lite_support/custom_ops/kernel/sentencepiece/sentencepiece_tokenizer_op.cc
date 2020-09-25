@@ -80,12 +80,14 @@ class TFSentencepieceOp : public tensorflow::OpKernel {
     std::vector<int32> encoded;
     std::vector<int32> splits;
     for (int i = 0; i < num_of_input_values; ++i) {
-      const auto res = tflite::support::ops::EncodeString(
+      const auto res = ::tflite::ops::custom::sentencepiece::EncodeString(
           input_values_flat(i), model_tensor.data(), add_bos, add_eos, reverse);
-      OP_REQUIRES(ctx,
-                  res.type == tflite::support::ops::EncoderResultType::SUCCESS,
-                  tensorflow::Status(tensorflow::error::INTERNAL,
-                                     "Sentencepiece conversion failed"));
+      OP_REQUIRES(
+          ctx,
+          res.type ==
+              ::tflite::ops::custom::sentencepiece::EncoderResultType::SUCCESS,
+          tensorflow::Status(tensorflow::error::INTERNAL,
+                             "Sentencepiece conversion failed"));
       std::copy(res.codes.begin(), res.codes.end(),
                 std::back_inserter(encoded));
       splits.emplace_back(encoded.size());
