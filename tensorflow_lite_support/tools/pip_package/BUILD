@@ -11,7 +11,7 @@ COMMON_PIP_DEPS = [
     "README",
     "setup.py",
     "//tensorflow_lite_support/codegen/python:codegen",
-    "//tensorflow_lite_support/metadata",
+    "//tensorflow_lite_support/metadata/python:metadata",
 ]
 
 filegroup(
