@@ -70,7 +70,7 @@ In the console, run:
 ```bash
 # Download the model:
 curl \
- -L 'https://storage.googleapis.com/download.tensorflow.org/models/tflite/text_classification/text_classification.tflite' \
+ -L 'https://storage.googleapis.com/download.tensorflow.org/models/tflite/text_classification/text_classification_v2.tflite' \
  -o /tmp/movie_review.tflite
 
 # Run the detection tool:
