@@ -16,7 +16,9 @@ limitations under the License.
 package org.tensorflow.lite.task.text.nlclassifier;
 
 import android.content.Context;
+import android.os.ParcelFileDescriptor;
 import com.google.auto.value.AutoValue;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -39,7 +41,7 @@ import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
  *         <li>input of the model, accepts a string.
  *       </ul>
  *   <li>Output score tensor
- *         (kTfLiteUInt8/kTfLiteInt8/kTfLiteInt16/kTfLiteFloat32/kTfLiteFloat64/kTfLiteBool)
+ *       (kTfLiteUInt8/kTfLiteInt8/kTfLiteInt16/kTfLiteFloat32/kTfLiteFloat64/kTfLiteBool)
  *       <ul>
  *         <li>output scores for each class, if type is one of the Int types, dequantize it, if it
  *             is Bool type, convert the values to 0.0 and 1.0 respectively.
@@ -139,7 +141,7 @@ public class NLClassifier extends BaseTaskApi {
    * Create {@link NLClassifier} from default {@link NLClassifierOptions}.
    *
    * @param context Android context.
-   * @param pathToModel Path to the classification model.
+   * @param pathToModel Path to the classification model relative to asset dir.
    * @return {@link NLClassifier} instance.
    * @throws IOException If model file fails to load.
    */
@@ -149,10 +151,21 @@ public class NLClassifier extends BaseTaskApi {
   }
 
   /**
+   * Create {@link NLClassifier} from default {@link NLClassifierOptions}.
+   *
+   * @param modelFile The classification model {@link File} instance.
+   * @return {@link NLClassifier} instance.
+   * @throws IOException If model file fails to load.
+   */
+  public static NLClassifier createFromFile(File modelFile) throws IOException {
+    return createFromFileAndOptions(modelFile, NLClassifierOptions.builder().build());
+  }
+
+  /**
    * Create {@link NLClassifier} from {@link NLClassifierOptions}.
    *
    * @param context Android context
-   * @param pathToModel Path to the classification model.
+   * @param pathToModel Path to the classification model relative to asset dir.
    * @param options Configurations for the model.
    * @return {@link NLClassifier} instance.
    * @throws IOException If model file fails to load.
@@ -160,6 +173,30 @@ public class NLClassifier extends BaseTaskApi {
   public static NLClassifier createFromFileAndOptions(
       Context context, String pathToModel, NLClassifierOptions options) throws IOException {
     return createFromBufferAndOptions(TaskJniUtils.loadMappedFile(context, pathToModel), options);
+  }
+
+  /**
+   * Create {@link NLClassifier} from {@link NLClassifierOptions}.
+   *
+   * @param modelFile The classification model {@link File} instance.
+   * @param options Configurations for the model.
+   * @return {@link NLClassifier} instance.
+   * @throws IOException If model file fails to load.
+   */
+  public static NLClassifier createFromFileAndOptions(
+      File modelFile, final NLClassifierOptions options) throws IOException {
+    try (ParcelFileDescriptor descriptor =
+        ParcelFileDescriptor.open(modelFile, ParcelFileDescriptor.MODE_READ_ONLY)) {
+      return new NLClassifier(
+          TaskJniUtils.createHandleFromLibrary(
+              new EmptyHandleProvider() {
+                @Override
+                public long createHandle() {
+                  return initJniWithFileDescriptor(options, descriptor.getFd());
+                }
+              },
+              NL_CLASSIFIER_NATIVE_LIBNAME));
+    }
   }
 
   /**
@@ -194,6 +231,8 @@ public class NLClassifier extends BaseTaskApi {
 
   private static native long initJniWithByteBuffer(
       NLClassifierOptions options, ByteBuffer modelBuffer);
+
+  private static native long initJniWithFileDescriptor(NLClassifierOptions options, int fd);
 
   private static native List<Category> classifyNative(long nativeHandle, String text);
 

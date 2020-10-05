@@ -109,6 +109,23 @@ Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_initJniWithByteBuff
   }
 }
 
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_initJniWithFileDescriptor(
+    JNIEnv* env, jclass thiz, jobject nl_classifier_options, jint fd) {
+  tflite::support::StatusOr<std::unique_ptr<NLClassifier>> status =
+      NLClassifier::CreateFromFdAndOptions(
+          fd, ConvertJavaNLClassifierOptions(env, nl_classifier_options),
+          tflite::task::CreateOpResolver());
+  if (status.ok()) {
+    return reinterpret_cast<jlong>(status->release());
+  } else {
+    ThrowException(env, kAssertionError,
+                   "Error occurred when initializing NLClassifier: %s",
+                   status.status().message().data());
+    return kInvalidPointer;
+  }
+}
+
 extern "C" JNIEXPORT jobject JNICALL
 Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_classifyNative(
     JNIEnv* env, jclass thiz, jlong native_handle, jstring text) {
