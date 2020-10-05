@@ -252,10 +252,10 @@ StatusOr<std::unique_ptr<ObjectDetector>> ObjectDetector::CreateFromOptions(
   // Copy options to ensure the ExternalFile outlives the constructed object.
   auto options_copy = absl::make_unique<ObjectDetectorOptions>(options);
 
-  ASSIGN_OR_RETURN(
-      auto object_detector,
-      TaskAPIFactory::CreateFromExternalFileProto<ObjectDetector>(
-          &options_copy->model_file_with_metadata(), std::move(resolver)));
+  ASSIGN_OR_RETURN(auto object_detector,
+                   TaskAPIFactory::CreateFromExternalFileProto<ObjectDetector>(
+                       &options_copy->model_file_with_metadata(),
+                       std::move(resolver), /*num_threads =*/4));
 
   RETURN_IF_ERROR(object_detector->Init(std::move(options_copy)));
 
