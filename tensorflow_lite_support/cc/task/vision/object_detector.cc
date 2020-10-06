@@ -56,6 +56,7 @@ using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::core::AssertAndReturnTypedTensor;
 using ::tflite::task::core::TaskAPIFactory;
+using ::tflite::task::core::TfLiteEngine;
 
 // The expected number of dimensions of the 4 output tensors, representing in
 // that order: locations, classes, scores, num_results.
@@ -288,20 +289,19 @@ absl::Status ObjectDetector::PreInit() {
 
 absl::Status ObjectDetector::CheckAndSetOutputs() {
   // First, sanity checks on the model itself.
-  const tflite::Interpreter* interpreter = engine_->interpreter();
+  const TfLiteEngine::Interpreter* interpreter = engine_->interpreter();
   // Check the number of output tensors.
-  if (interpreter->outputs().size() != 4) {
+  if (TfLiteEngine::OutputCount(interpreter) != 4) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         absl::StrFormat("Mobile SSD models are expected to have exactly 4 "
                         "outputs, found %d",
-                        interpreter->outputs().size()),
+                        TfLiteEngine::OutputCount(interpreter)),
         TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
   // Check tensor dimensions and batch size.
   for (int i = 0; i < 4; ++i) {
-    const int tensor_index = interpreter->outputs()[i];
-    const TfLiteTensor* tensor = interpreter->tensor(tensor_index);
+    const TfLiteTensor* tensor = TfLiteEngine::GetOutput(interpreter, i);
     if (tensor->dims->size != kOutputTensorsExpectedDims[i]) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
