@@ -86,7 +86,7 @@ auto classifier = NLClassifier::CreateFromFileAndOptions("/path/to/model");
 //   }
 // auto classifier = NLClassifier::CreateFromFileAndOptions("/path/to/model", options);
 std::string context = "What language is this?";
-std::vector<Category> categories = classifier->Classify(context);
+std::vector<LangIdResult> categories = classifier->Classify(context);
 // Access category results.
 for (const Categoryr& category : categories) {
   std::cout << absl::StrFormat("Language: %s Probability: %f", category.class_name, category_.score)
