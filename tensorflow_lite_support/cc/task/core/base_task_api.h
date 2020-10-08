@@ -38,9 +38,7 @@ class BaseUntypedTaskApi {
 
   virtual ~BaseUntypedTaskApi() = default;
 
-  TfLiteEngine* GetTfLiteEngine() { return engine_.get(); }
   const TfLiteEngine* GetTfLiteEngine() const { return engine_.get(); }
-
   const metadata::ModelMetadataExtractor* GetMetadataExtractor() const {
     return engine_->metadata_extractor();
   }
@@ -83,18 +81,30 @@ class BaseTaskApi : public BaseUntypedTaskApi {
       const std::vector<const TfLiteTensor*>& output_tensors,
       InputTypes... api_inputs) = 0;
 
-  // Returns (the addresses of) the model's inputs.
-  std::vector<TfLiteTensor*> GetInputTensors() { return engine_->GetInputs(); }
+  // Returns the tensors associated with the given input/output indexes.
+  template <typename TensorType>
+  std::vector<TensorType*> GetTensors(const std::vector<int>& tensor_indices) {
+    tflite::Interpreter* interpreter = engine_->interpreter();
+    std::vector<TensorType*> tensors;
+    tensors.reserve(tensor_indices.size());
+    for (int index : tensor_indices) {
+      tensors.push_back(interpreter->tensor(index));
+    }
+    return tensors;
+  }
 
-  // Returns (the addresses of) the model's outputs.
+  std::vector<TfLiteTensor*> GetInputTensors() {
+    return GetTensors<TfLiteTensor>(engine_->interpreter()->inputs());
+  }
+
   std::vector<const TfLiteTensor*> GetOutputTensors() {
-    return engine_->GetOutputs();
+    return GetTensors<const TfLiteTensor>(engine_->interpreter()->outputs());
   }
 
   // Performs inference using tflite::support::TfLiteInterpreterWrapper
   // InvokeWithoutFallback().
   tflite::support::StatusOr<OutputType> Infer(InputTypes... args) {
-    tflite::task::core::TfLiteEngine::InterpreterWrapper* interpreter_wrapper =
+    tflite::support::TfLiteInterpreterWrapper* interpreter_wrapper =
         engine_->interpreter_wrapper();
     // Note: AllocateTensors() is already performed by the interpreter wrapper
     // at InitInterpreter time (see TfLiteEngine).
@@ -114,14 +124,12 @@ class BaseTaskApi : public BaseUntypedTaskApi {
   // InvokeWithFallback() to benefit from automatic fallback from delegation to
   // CPU where applicable.
   tflite::support::StatusOr<OutputType> InferWithFallback(InputTypes... args) {
-    tflite::task::core::TfLiteEngine::InterpreterWrapper* interpreter_wrapper =
+    tflite::support::TfLiteInterpreterWrapper* interpreter_wrapper =
         engine_->interpreter_wrapper();
     // Note: AllocateTensors() is already performed by the interpreter wrapper
     // at InitInterpreter time (see TfLiteEngine).
     RETURN_IF_ERROR(Preprocess(GetInputTensors(), args...));
-    auto set_inputs_nop =
-        [](tflite::task::core::TfLiteEngine::Interpreter* interpreter)
-        -> absl::Status {
+    auto set_inputs_nop = [](tflite::Interpreter* interpreter) -> absl::Status {
       // NOP since inputs are populated at Preprocess() time.
       return absl::OkStatus();
     };

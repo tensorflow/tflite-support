@@ -19,7 +19,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
-#include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 
 namespace tflite {
 namespace task {
@@ -37,7 +36,6 @@ using ::tflite::metadata::ModelMetadataExtractor;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
-using ::tflite::task::core::TfLiteEngine;
 
 StatusOr<const TensorMetadata*> GetInputTensorMetadataIfAny(
     const ModelMetadataExtractor& metadata_extractor) {
@@ -135,7 +133,7 @@ StatusOr<absl::optional<NormalizationOptions>> GetNormalizationOptionsIfAny(
 }  // namespace
 
 StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
-    const TfLiteEngine::Interpreter& interpreter,
+    const tflite::Interpreter& interpreter,
     const tflite::metadata::ModelMetadataExtractor& metadata_extractor) {
   ASSIGN_OR_RETURN(const TensorMetadata* metadata,
                    GetInputTensorMetadataIfAny(metadata_extractor));
@@ -148,7 +146,7 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
                      GetNormalizationOptionsIfAny(*metadata));
   }
 
-  if (TfLiteEngine::InputCount(&interpreter) != 1) {
+  if (interpreter.inputs().size() != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         "Models are assumed to have a single input.",
@@ -156,7 +154,8 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
   }
 
   // Input-related specifications.
-  const TfLiteTensor* input_tensor = TfLiteEngine::GetInput(&interpreter, 0);
+  const int input_tensor_index = interpreter.inputs()[0];
+  const TfLiteTensor* input_tensor = interpreter.tensor(input_tensor_index);
   if (input_tensor->dims->size != 4) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
