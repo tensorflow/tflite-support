@@ -46,6 +46,7 @@ using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::core::AssertAndReturnTypedTensor;
 using ::tflite::task::core::TaskAPIFactory;
+using ::tflite::task::core::TfLiteEngine;
 
 // The maximum number of labels allowed in the labelmap. This is because so far
 // segmentation masks are stored with 8 bit per pixel (flattened byte array).
@@ -195,19 +196,18 @@ absl::Status ImageSegmenter::PreInit() {
 
 absl::Status ImageSegmenter::CheckAndSetOutputs() {
   // First, sanity checks on the model itself.
-  const tflite::Interpreter* interpreter = engine_->interpreter();
+  const TfLiteEngine::Interpreter* interpreter = engine_->interpreter();
 
   // Check the number of output tensors.
-  if (interpreter->outputs().size() != 1) {
+  if (TfLiteEngine::OutputCount(interpreter) != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         absl::StrFormat("Image segmentation models are expected to have only 1 "
                         "output, found %d",
-                        interpreter->outputs().size()),
+                        TfLiteEngine::OutputCount(interpreter)),
         TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
-  const TfLiteTensor* output_tensor =
-      interpreter->tensor(interpreter->outputs()[0]);
+  const TfLiteTensor* output_tensor = TfLiteEngine::GetOutput(interpreter, 0);
 
   // Check tensor dimensions.
   if (output_tensor->dims->size != 4) {

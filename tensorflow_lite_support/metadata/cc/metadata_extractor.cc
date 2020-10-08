@@ -22,12 +22,16 @@ limitations under the License.
 #include "absl/strings/str_format.h"
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "lib/zip.h"  // from @org_libzip
-#include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/schema/schema_generated.h"
-#include "tensorflow/lite/tools/verifier.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
+
+#if TFLITE_USE_C_API
+#include "tensorflow/lite/c/c_api.h"
+#else
+#include "tensorflow/lite/model_builder.h"
+#endif
 
 namespace tflite {
 namespace metadata {
