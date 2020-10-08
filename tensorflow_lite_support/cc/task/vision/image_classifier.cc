@@ -45,6 +45,7 @@ using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::core::AssertAndReturnTypedTensor;
 using ::tflite::task::core::TaskAPIFactory;
+using ::tflite::task::core::TfLiteEngine;
 
 // Default score value used as a fallback for classes that (1) have no score
 // calibration data or (2) have a very low confident uncalibrated score, i.e.
@@ -152,7 +153,7 @@ absl::Status ImageClassifier::PreInit() {
 absl::Status ImageClassifier::PostInit() { return InitScoreCalibrations(); }
 
 absl::Status ImageClassifier::CheckAndSetOutputs() {
-  num_outputs_ = engine_->interpreter()->outputs().size();
+  num_outputs_ = TfLiteEngine::OutputCount(engine_->interpreter());
 
   // Perform sanity checks and extract metadata.
   const ModelMetadataExtractor* metadata_extractor =
@@ -210,9 +211,8 @@ absl::Status ImageClassifier::CheckAndSetOutputs() {
 
   int num_quantized_outputs = 0;
   for (int i = 0; i < num_outputs_; ++i) {
-    const int output_tensor_index = engine_->interpreter()->outputs()[i];
     const TfLiteTensor* output_tensor =
-        engine_->interpreter()->tensor(output_tensor_index);
+        TfLiteEngine::GetOutput(engine_->interpreter(), i);
     const int num_dimensions = output_tensor->dims->size;
     if (num_dimensions == 4) {
       if (output_tensor->dims->data[1] != 1 ||
