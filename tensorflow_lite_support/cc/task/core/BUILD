@@ -13,7 +13,7 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite/core/api",
+        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
         # The dependency on builtin_ops here is only for the default
         # value of the OpResolver parameter:
         #     std::unique_ptr<tflite::IterableOpResolver> resolver =
@@ -69,6 +69,7 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "@org_tensorflow//tensorflow/lite/tools:verifier",
     ] + [
+        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
         "@org_tensorflow//tensorflow/lite/core/api:verifier",
         "@org_tensorflow//tensorflow/lite/c:c_api",
         "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
@@ -109,7 +110,7 @@ cc_library(
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
         "@com_google_absl//absl/status",
         "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite/core/api",
+        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
         "@org_tensorflow//tensorflow/lite/kernels:op_macros",
     ],
 )
