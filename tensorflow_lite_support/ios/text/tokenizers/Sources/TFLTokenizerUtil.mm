@@ -31,7 +31,8 @@ NSArray<NSString *> *Tokenize(Tokenizer *tokenizer, NSString *input) {
 NSArray<NSNumber *> *ConvertTokensToIds(Tokenizer *tokenizer, NSArray<NSString *> *tokens) {
   NSMutableArray<NSNumber *> *ret = [NSMutableArray arrayWithCapacity:[tokens count]];
   for (NSString *token in tokens) {
-    const char *cToken = MakeString(token).c_str();
+    std::string cc_token = MakeString(token);
+    const char *cToken = cc_token.c_str();
     int id;
     tokenizer->LookupId(cToken, &id);
     [ret addObject:[NSNumber numberWithInt:id]];
