@@ -80,7 +80,8 @@ public final class BoundingBoxUtil {
    *     corresponding underlying elements.
    * @param boundingBoxAxis specifies the index of the dimension that represents bounding box. The
    *     size of that dimension is required to be 4. Index here starts from 0. For example, if the
-   *     tensor has shape 4x10, the axis for bounding boxes is likely to be 0. For shape 10x4, the
+   *     tensor has shape 4x10, the axis for bounding boxes is likely to be 0. Negative axis is also
+   *     supported: -1 gives the last axis and -2 gives the second, .etc. theFor shape 10x4, the
    *     axis is likely to be 1 (or -1, equivalently).
    * @param type defines how values should be converted into boxes. See {@link Type}
    * @param coordinateType defines how values are interpreted to coordinates. See {@link
@@ -180,20 +181,61 @@ public final class BoundingBoxUtil {
       case BOUNDARIES:
         return convertFromBoundaries(values, coordinateType, height, width);
       case UPPER_LEFT:
+        return convertFromUpperLeft(values, coordinateType, height, width);
       case CENTER:
-        // TODO(b/150824448): convertFrom{UpperLeft, Center}
-        throw new IllegalArgumentException("BoundingBox.Type " + type + " is not yet supported.");
+        return convertFromCenter(values, coordinateType, height, width);
     }
     throw new IllegalArgumentException("Cannot recognize BoundingBox.Type " + type);
   }
 
   private static RectF convertFromBoundaries(
-      float[] values, CoordinateType coordinateType, int height, int width) {
-    if (coordinateType == CoordinateType.RATIO) {
+      float[] values, CoordinateType coordinateType, int imageHeight, int imageWidth) {
+    float left = values[0];
+    float top = values[1];
+    float right = values[2];
+    float bottom = values[3];
+    return getRectF(left, top, right, bottom, imageHeight, imageWidth, coordinateType);
+  }
+
+  private static RectF convertFromUpperLeft(
+      float[] values, CoordinateType coordinateType, int imageHeight, int imageWidth) {
+    float left = values[0];
+    float top = values[1];
+    float right = values[0] + values[2];
+    float bottom = values[1] + values[3];
+    return getRectF(left, top, right, bottom, imageHeight, imageWidth, coordinateType);
+  }
+
+  private static RectF convertFromCenter(
+      float[] values, CoordinateType coordinateType, int imageHeight, int imageWidth) {
+    float centerX = values[0];
+    float centerY = values[1];
+    float w = values[2];
+    float h = values[3];
+
+    float left = centerX - w / 2;
+    float top = centerY - h / 2;
+    float right = centerX + w / 2;
+    float bottom = centerY + h / 2;
+    return getRectF(left, top, right, bottom, imageHeight, imageWidth, coordinateType);
+  }
+
+  private static RectF getRectF(
+      float left,
+      float top,
+      float right,
+      float bottom,
+      int imageHeight,
+      int imageWidth,
+      CoordinateType coordinateType) {
+    if (coordinateType == CoordinateType.PIXEL) {
       return new RectF(
-          values[0] * width, values[1] * height, values[2] * width, values[3] * height);
+          left, top, right, bottom);
+    } else if (coordinateType == CoordinateType.RATIO) {
+      return new RectF(
+          left * imageWidth, top * imageHeight, right * imageWidth, bottom * imageHeight);
     } else {
-      return new RectF(values[0], values[1], values[2], values[3]);
+      throw new IllegalArgumentException("Cannot convert coordinate type " + coordinateType);
     }
   }
 
