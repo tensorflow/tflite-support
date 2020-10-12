@@ -1,5 +1,4 @@
 load("@flatbuffers//:build_defs.bzl", "flatbuffer_android_library", "flatbuffer_cc_library", "flatbuffer_java_library", "flatbuffer_py_library")
-load("//tensorflow_lite_support/metadata:build_defs.bzl", "stamp_metadata_parser_version")
 
 package(
     default_visibility = [
@@ -49,31 +48,4 @@ flatbuffer_android_library(
     name = "metadata_schema_fbs_android",
     srcs = ["metadata_schema.fbs"],
     custom_package = "org.tensorflow.lite.support.metadata.schema",
-)
-
-# TODO(b/157813075): move the metadata python library to metadata/python/ when migrating to the new repo.
-stamp_metadata_parser_version(
-    name = "metadata_parser_py",
-    srcs = ["metadata_parser.py.template"],
-    outs = ["metadata_parser.py"],
-)
-
-# This target will soon be deprecated. Please use //third_party/tensorflow_lite_support/metadata/python:metadata.
-py_library(
-    name = "metadata",
-    srcs = [
-        "metadata.py",
-        ":metadata_parser_py",
-    ],
-    data = ["//tensorflow_lite_support/metadata:metadata_schema.fbs"],
-    srcs_version = "PY2AND3",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":metadata_schema_py",
-        ":schema_py",
-        "//tensorflow_lite_support/custom_ops:expect_numpy_installed",
-        "//tensorflow_lite_support/metadata/cc/python:_pywrap_metadata_version",
-        "//tensorflow_lite_support/metadata/flatbuffers_lib:_pywrap_flatbuffers",
-        "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
-    ],
 )
