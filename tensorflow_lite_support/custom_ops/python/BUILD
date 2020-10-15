@@ -46,3 +46,16 @@ py_test(
         "@absl_py//absl/testing:parameterized",
     ],
 )
+
+py_test(
+    name = "ragged_tensor_to_tensor_test",
+    srcs = ["ragged_tensor_to_tensor_test.py"],
+    python_version = "PY3",
+    deps = [
+        "//tensorflow_lite_support/custom_ops:expect_tfpy_installed",
+        "//tensorflow_lite_support/custom_ops/kernel/ragged:pywrap_tflite_registerer",
+        "@absl_py//absl:app",
+        "@absl_py//absl/flags",
+        "@absl_py//absl/logging",
+    ],
+)

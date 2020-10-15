@@ -116,6 +116,10 @@ RuntimeShape TensorShapeFromTensor(const TfLiteTensor& tensor) {
   // TODO(mgubin): No checks, see
   // third_party/tensorflow/core/kernels/list_kernels.cc
   const RuntimeShape tensor_shape(tensor.dims->size, tensor.dims->data);
+  if (0 == tensor.dims->size) {
+    // If the input tensor is scalar then the shape is empty (also scalar).
+    return RuntimeShape{};
+  }
   RuntimeShape result(tensor_shape.FlatSize());
   switch (tensor.type) {
     case kTfLiteInt32: {
@@ -210,7 +214,7 @@ int GetMaxWidth(const ConversionAttributes& conversion_attributes,
                 TfLiteContext* context, TfLiteNode* node, int dimension) {
   const TfLiteTensor* tensor = GetRowPartitionTensor(
       conversion_attributes, context, node, dimension - 1);
-  switch (conversion_attributes.GetRowPartitionTypeByDimension(dimension)) {
+  switch (conversion_attributes.GetRowPartitionTypeByDimension(dimension - 1)) {
     case tensorflow::RowPartitionType::VALUE_ROWIDS:
       return GetMaxWidthValueRowID(tensor);
     case tensorflow::RowPartitionType::ROW_SPLITS:
@@ -227,6 +231,13 @@ RuntimeShape CombineRaggedTensorToTensorShapes(
   // TODO(mgubin): No checks, see
   // third_party/tensorflow/core/ops/ragged_to_dense_util.cc
   RuntimeShape result(output_shape);
+  if (output_shape.DimensionsCount() == 0) {
+    const int output_shape_rank = ragged_rank + value_shape.DimensionsCount();
+    result.Resize(output_shape_rank);
+    for (int i = 0; i < output_shape_rank; ++i) {
+      result.SetDim(i, -1);
+    }
+  }
   const int need_to_set =
       output_shape.DimensionsCount() - value_shape.DimensionsCount();
   for (int i = 1; i < value_shape.DimensionsCount(); ++i) {
@@ -441,8 +452,6 @@ void SetOutputT(TfLiteContext* context, int ragged_rank,
                 const TfLiteTensor& values_tensor,
                 const TfLiteTensor& default_value_tensor,
                 TfLiteTensor* output_tensor) {
-  // if (output_tensor->NumElements() == 0) return;
-
   const VALUE_TYPE* values_base = GetTensorData<VALUE_TYPE>(&values_tensor);
   VALUE_TYPE* output_base = GetTensorData<VALUE_TYPE>(output_tensor);
   const VALUE_TYPE* default_value =

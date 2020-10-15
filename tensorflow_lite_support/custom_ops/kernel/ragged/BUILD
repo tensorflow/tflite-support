@@ -1,5 +1,7 @@
 # RaggedTensors suppport in TFLite
 
+load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
+
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
     licenses = ["notice"],  # Apache 2.0
@@ -34,5 +36,35 @@ cc_test(
         "@org_tensorflow//tensorflow/lite/kernels:test_util",
         "@org_tensorflow//tensorflow/lite/kernels/internal:tensor",
         "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
+    ],
+)
+
+cc_library(
+    name = "py_tflite_registerer",
+    srcs = ["py_tflite_registerer.cc"],
+    hdrs = ["py_tflite_registerer.h"],
+    deps = [
+        ":ragged_tensor_to_tensor_tflite",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+    ],
+    alwayslink = 1,
+)
+
+pybind_extension(
+    name = "pywrap_tflite_registerer",
+    srcs = [
+        "pywrap_tflite_registerer.cc",
+    ],
+    hdrs = ["py_tflite_registerer.h"],
+    additional_exported_symbols = ["TFLite_RaggedTensorToTensorRegisterer"],
+    module_name = "pywrap_tflite_registerer",
+    srcs_version = "PY3ONLY",
+    deps = [
+        ":py_tflite_registerer",
+        "@local_config_python//:python_headers",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@pybind11",
     ],
 )
