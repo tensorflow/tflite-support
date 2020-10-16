@@ -241,6 +241,12 @@ absl::Status ObjectDetector::SanityCheckOptions(
         "exclusive options.",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
+  if (options.num_threads() == 0 || options.num_threads() < -1) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "`num_threads` must be greater than 0 or equal to -1.",
+        TfLiteSupportStatus::kInvalidArgumentError);
+  }
   return absl::OkStatus();
 }
 
@@ -253,10 +259,10 @@ StatusOr<std::unique_ptr<ObjectDetector>> ObjectDetector::CreateFromOptions(
   // Copy options to ensure the ExternalFile outlives the constructed object.
   auto options_copy = absl::make_unique<ObjectDetectorOptions>(options);
 
-  ASSIGN_OR_RETURN(
-      auto object_detector,
-      TaskAPIFactory::CreateFromExternalFileProto<ObjectDetector>(
-          &options_copy->model_file_with_metadata(), std::move(resolver)));
+  ASSIGN_OR_RETURN(auto object_detector,
+                   TaskAPIFactory::CreateFromExternalFileProto<ObjectDetector>(
+                       &options_copy->model_file_with_metadata(),
+                       std::move(resolver), options_copy->num_threads()));
 
   RETURN_IF_ERROR(object_detector->Init(std::move(options_copy)));
 

@@ -146,7 +146,13 @@ absl::Status ImageSegmenter::SanityCheckOptions(
   if (options.output_type() == ImageSegmenterOptions::UNSPECIFIED) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        "ImageSegmenterOptions: output_type must not be UNSPECIFIED",
+        "ImageSegmenterOptions: `output_type` must not be UNSPECIFIED",
+        TfLiteSupportStatus::kInvalidArgumentError);
+  }
+  if (options.num_threads() == 0 || options.num_threads() < -1) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "`num_threads` must be greater than 0 or equal to -1.",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
   return absl::OkStatus();
@@ -160,10 +166,10 @@ StatusOr<std::unique_ptr<ImageSegmenter>> ImageSegmenter::CreateFromOptions(
   // Copy options to ensure the ExternalFile outlives the constructed object.
   auto options_copy = absl::make_unique<ImageSegmenterOptions>(options);
 
-  ASSIGN_OR_RETURN(
-      auto image_segmenter,
-      TaskAPIFactory::CreateFromExternalFileProto<ImageSegmenter>(
-          &options_copy->model_file_with_metadata(), std::move(resolver)));
+  ASSIGN_OR_RETURN(auto image_segmenter,
+                   TaskAPIFactory::CreateFromExternalFileProto<ImageSegmenter>(
+                       &options_copy->model_file_with_metadata(),
+                       std::move(resolver), options_copy->num_threads()));
 
   RETURN_IF_ERROR(image_segmenter->Init(std::move(options_copy)));
 
