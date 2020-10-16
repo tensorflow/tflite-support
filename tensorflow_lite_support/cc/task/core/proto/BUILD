@@ -1,5 +1,4 @@
-load("@org_tensorflow//tensorflow/core/platform:build_config.bzl", "tf_proto_library")
-load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_portable_proto_library")
+load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_cc_proto_library")
 
 package(
     default_visibility = [
@@ -8,17 +7,15 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-tf_proto_library(
+proto_library(
     name = "external_file_proto",
     srcs = ["external_file.proto"],
-    cc_api_version = 2,
 )
 
-tf_portable_proto_library(
-    name = "external_file_portable_proto",
-    config = "proto_config.pbtxt",
-    header_outs = ["//tensorflow_lite_support/cc/task/core/proto/external_file.proto.h"],
-    proto_deps = [
+support_cc_proto_library(
+    name = "external_file_cc_proto",
+    srcs = ["external_file.proto"],
+    deps = [
         ":external_file_proto",
     ],
 )
@@ -26,5 +23,5 @@ tf_portable_proto_library(
 cc_library(
     name = "external_file_proto_inc",
     hdrs = ["external_file_proto_inc.h"],
-    deps = [":external_file_portable_proto"],
+    deps = [":external_file_cc_proto"],
 )

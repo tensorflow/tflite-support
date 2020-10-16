@@ -1,8 +1,4 @@
-load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_portable_proto_library")
-load(
-    "@org_tensorflow//tensorflow/core/platform:build_config.bzl",
-    "tf_proto_library",
-)
+load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_cc_proto_library")
 
 package(
     default_visibility = [
@@ -13,17 +9,15 @@ package(
 
 # Common vision protos.
 
-tf_proto_library(
+proto_library(
     name = "bounding_box_proto",
     srcs = ["bounding_box.proto"],
-    cc_api_version = 2,
 )
 
-tf_portable_proto_library(
-    name = "bounding_box_portable_proto",
-    config_string = "allow_all:true",
-    header_outs = ["//tensorflow_lite_support/cc/task/vision/proto/bounding_box.proto.h"],
-    proto_deps = [
+support_cc_proto_library(
+    name = "bounding_box_cc_proto",
+    srcs = ["bounding_box.proto"],
+    deps = [
         ":bounding_box_proto",
     ],
 )
@@ -31,20 +25,18 @@ tf_portable_proto_library(
 cc_library(
     name = "bounding_box_proto_inc",
     hdrs = ["bounding_box_proto_inc.h"],
-    deps = [":bounding_box_portable_proto"],
+    deps = [":bounding_box_cc_proto"],
 )
 
-tf_proto_library(
+proto_library(
     name = "class_proto",
     srcs = ["class.proto"],
-    cc_api_version = 2,
 )
 
-tf_portable_proto_library(
-    name = "class_portable_proto",
-    config_string = "allow_all:true",
-    header_outs = ["//tensorflow_lite_support/cc/task/vision/proto/class.proto.h"],
-    proto_deps = [
+support_cc_proto_library(
+    name = "class_cc_proto",
+    srcs = ["class.proto"],
+    deps = [
         ":class_proto",
     ],
 )
@@ -52,28 +44,24 @@ tf_portable_proto_library(
 cc_library(
     name = "class_proto_inc",
     hdrs = ["class_proto_inc.h"],
-    deps = [":class_portable_proto"],
+    deps = [":class_cc_proto"],
 )
 
 # ObjectDetector protos.
 
-tf_proto_library(
+proto_library(
     name = "object_detector_options_proto",
     srcs = ["object_detector_options.proto"],
-    cc_api_version = 2,
-    protodeps = [
+    deps = [
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
     ],
 )
 
-tf_portable_proto_library(
-    name = "object_detector_options_portable_proto",
-    config_string = "allow_all:true",
-    header_outs = ["//tensorflow_lite_support/cc/task/vision/proto/object_detector_options.proto.h"],
-    portable_deps = [
-        "//tensorflow_lite_support/cc/task/core/proto:external_file_portable_proto",
-    ],
-    proto_deps = [
+support_cc_proto_library(
+    name = "object_detector_options_cc_proto",
+    srcs = ["object_detector_options.proto"],
+    cc_deps = ["//tensorflow_lite_support/cc/task/core/proto:external_file_cc_proto"],
+    deps = [
         ":object_detector_options_proto",
     ],
 )
@@ -82,30 +70,28 @@ cc_library(
     name = "object_detector_options_proto_inc",
     hdrs = ["object_detector_options_proto_inc.h"],
     deps = [
-        ":object_detector_options_portable_proto",
+        ":object_detector_options_cc_proto",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
     ],
 )
 
-tf_proto_library(
+proto_library(
     name = "detections_proto",
     srcs = ["detections.proto"],
-    cc_api_version = 2,
-    protodeps = [
+    deps = [
         ":bounding_box_proto",
         ":class_proto",
     ],
 )
 
-tf_portable_proto_library(
-    name = "detections_portable_proto",
-    config_string = "allow_all:true",
-    header_outs = ["//tensorflow_lite_support/cc/task/vision/proto/detections.proto.h"],
-    portable_deps = [
-        ":class_portable_proto",
-        ":bounding_box_portable_proto",
+support_cc_proto_library(
+    name = "detections_cc_proto",
+    srcs = ["detections.proto"],
+    cc_deps = [
+        ":bounding_box_cc_proto",
+        ":class_cc_proto",
     ],
-    proto_deps = [
+    deps = [
         ":detections_proto",
     ],
 )
@@ -116,29 +102,25 @@ cc_library(
     deps = [
         ":bounding_box_proto_inc",
         ":class_proto_inc",
-        ":detections_portable_proto",
+        ":detections_cc_proto",
     ],
 )
 
 # ImageClassifier protos.
 
-tf_proto_library(
+proto_library(
     name = "image_classifier_options_proto",
     srcs = ["image_classifier_options.proto"],
-    cc_api_version = 2,
-    protodeps = [
+    deps = [
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
     ],
 )
 
-tf_portable_proto_library(
-    name = "image_classifier_options_portable_proto",
-    config_string = "allow_all:true",
-    header_outs = ["//tensorflow_lite_support/cc/task/vision/proto/image_classifier_options.proto.h"],
-    portable_deps = [
-        "//tensorflow_lite_support/cc/task/core/proto:external_file_portable_proto",
-    ],
-    proto_deps = [
+support_cc_proto_library(
+    name = "image_classifier_options_cc_proto",
+    srcs = ["image_classifier_options.proto"],
+    cc_deps = ["//tensorflow_lite_support/cc/task/core/proto:external_file_cc_proto"],
+    deps = [
         ":image_classifier_options_proto",
     ],
 )
@@ -147,28 +129,24 @@ cc_library(
     name = "image_classifier_options_proto_inc",
     hdrs = ["image_classifier_options_proto_inc.h"],
     deps = [
-        ":image_classifier_options_portable_proto",
+        ":image_classifier_options_cc_proto",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
     ],
 )
 
-tf_proto_library(
+proto_library(
     name = "classifications_proto",
     srcs = ["classifications.proto"],
-    cc_api_version = 2,
-    protodeps = [
+    deps = [
         ":class_proto",
     ],
 )
 
-tf_portable_proto_library(
-    name = "classifications_portable_proto",
-    config_string = "allow_all:true",
-    header_outs = ["//tensorflow_lite_support/cc/task/vision/proto/classifications.proto.h"],
-    portable_deps = [
-        ":class_portable_proto",
-    ],
-    proto_deps = [
+support_cc_proto_library(
+    name = "classifications_cc_proto",
+    srcs = ["classifications.proto"],
+    cc_deps = [":class_cc_proto"],
+    deps = [
         ":classifications_proto",
     ],
 )
@@ -178,29 +156,25 @@ cc_library(
     hdrs = ["classifications_proto_inc.h"],
     deps = [
         ":class_proto_inc",
-        ":classifications_portable_proto",
+        ":classifications_cc_proto",
     ],
 )
 
 # ImageSegmenter protos.
 
-tf_proto_library(
+proto_library(
     name = "image_segmenter_options_proto",
     srcs = ["image_segmenter_options.proto"],
-    cc_api_version = 2,
-    protodeps = [
+    deps = [
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
     ],
 )
 
-tf_portable_proto_library(
-    name = "image_segmenter_options_portable_proto",
-    config_string = "allow_all:true",
-    header_outs = ["//tensorflow_lite_support/cc/task/vision/proto/image_segmenter_options.proto.h"],
-    portable_deps = [
-        "//tensorflow_lite_support/cc/task/core/proto:external_file_portable_proto",
-    ],
-    proto_deps = [
+support_cc_proto_library(
+    name = "image_segmenter_options_cc_proto",
+    srcs = ["image_segmenter_options.proto"],
+    cc_deps = ["//tensorflow_lite_support/cc/task/core/proto:external_file_cc_proto"],
+    deps = [
         ":image_segmenter_options_proto",
     ],
 )
@@ -209,22 +183,20 @@ cc_library(
     name = "image_segmenter_options_proto_inc",
     hdrs = ["image_segmenter_options_proto_inc.h"],
     deps = [
-        ":image_segmenter_options_portable_proto",
+        ":image_segmenter_options_cc_proto",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
     ],
 )
 
-tf_proto_library(
+proto_library(
     name = "segmentations_proto",
     srcs = ["segmentations.proto"],
-    cc_api_version = 2,
 )
 
-tf_portable_proto_library(
-    name = "segmentations_portable_proto",
-    config_string = "allow_all:true",
-    header_outs = ["//tensorflow_lite_support/cc/task/vision/proto/segmentations.proto.h"],
-    proto_deps = [
+support_cc_proto_library(
+    name = "segmentations_cc_proto",
+    srcs = ["segmentations.proto"],
+    deps = [
         ":segmentations_proto",
     ],
 )
@@ -232,5 +204,5 @@ tf_portable_proto_library(
 cc_library(
     name = "segmentations_proto_inc",
     hdrs = ["segmentations_proto_inc.h"],
-    deps = [":segmentations_portable_proto"],
+    deps = [":segmentations_cc_proto"],
 )
