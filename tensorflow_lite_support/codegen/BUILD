@@ -15,8 +15,6 @@ cc_library(
     hdrs = [
         "utils.h",
     ],
-    deps = [
-    ],
 )
 
 cc_library(

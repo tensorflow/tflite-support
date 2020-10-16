@@ -13,7 +13,7 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
+        "@org_tensorflow//tensorflow/lite/core/api",
         # The dependency on builtin_ops here is only for the default
         # value of the OpResolver parameter:
         #     std::unique_ptr<tflite::IterableOpResolver> resolver =
@@ -23,18 +23,14 @@ cc_library(
         # to get included in the executable.
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "@org_tensorflow//tensorflow/lite/tools:verifier",
+        "@org_tensorflow//tensorflow/lite:kernel_api",
     ] + select({
         "//tensorflow_lite_support/cc:tflite_use_c_api": [
-            "@org_tensorflow//tensorflow/lite/core/api:verifier",
             "@org_tensorflow//tensorflow/lite/c:c_api",
             "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
-            "@org_tensorflow//tensorflow/lite:kernel_api",
             "@org_tensorflow//tensorflow/lite:stderr_reporter",
         ],
-        "//conditions:default": [
-            "@org_tensorflow//tensorflow/lite:framework",
-            "@org_tensorflow//tensorflow/lite:kernel_api",
-        ],
+        "//conditions:default": ["@org_tensorflow//tensorflow/lite:framework"],
     }) + [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:status_macros",
@@ -61,26 +57,22 @@ cc_library(
     defines = ["TFLITE_USE_C_API"],
     deps = [
         ":external_file_handler",
-        "@com_google_absl//absl/memory",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/strings",
-        "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
-        "@org_tensorflow//tensorflow/lite/tools:verifier",
-    ] + [
-        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
-        "@org_tensorflow//tensorflow/lite/core/api:verifier",
-        "@org_tensorflow//tensorflow/lite/c:c_api",
-        "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
-        "@org_tensorflow//tensorflow/lite:kernel_api",
-        "@org_tensorflow//tensorflow/lite:stderr_reporter",
-    ] + [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:tflite_wrapper",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
         "//tensorflow_lite_support/metadata/cc:metadata_extractor",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@org_tensorflow//tensorflow/lite:kernel_api",
+        "@org_tensorflow//tensorflow/lite:stderr_reporter",
+        "@org_tensorflow//tensorflow/lite/c:c_api",
+        "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
+        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/core/api",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/tools:verifier",
     ],
 )
 
@@ -110,7 +102,7 @@ cc_library(
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
         "@com_google_absl//absl/status",
         "@org_tensorflow//tensorflow/lite/c:common",
-        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
+        "@org_tensorflow//tensorflow/lite/core/api",
         "@org_tensorflow//tensorflow/lite/kernels:op_macros",
     ],
 )
