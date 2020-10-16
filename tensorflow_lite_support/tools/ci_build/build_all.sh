@@ -24,3 +24,10 @@ bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/metadata/cc:metadata_extractor \
     //tensorflow_lite_support/custom_ops/kernel:all \
     //tensorflow_lite_support/custom_ops/python:tflite_text_api
+
+# Build Task libraries.
+bazel build -c opt --config=monolithic \
+    --config=android_arm64 --fat_apk_cpu=x86,x86_64,arm64-v8a,armeabi-v7a \
+    //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base-task-api.aar \
+    //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text:task-library-text \
+    //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision:task-library-vision
