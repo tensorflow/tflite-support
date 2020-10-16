@@ -41,6 +41,7 @@ namespace qa {
 //   CreateFromFile(path_to_model_with_metadata)
 //   CreateFromBuffer(model_with_metadata_buffer_data,
 //                                model_with_metadata_buffer_size)
+//   CreateFromFd(file_descriptor_to_model_with_metadata)
 //     Generic API to create the QuestionAnswerer for bert models with metadata
 //     populated. The API expects a Bert based TFLite model with metadata
 //     containing the following information:
@@ -95,6 +96,9 @@ class BertQuestionAnswerer : public QuestionAnswerer {
   static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>
   CreateFromBuffer(const char* model_with_metadata_buffer_data,
                    size_t model_with_metadata_buffer_size);
+
+  static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>
+  CreateFromFd(int fd);
 
   static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>
   CreateBertQuestionAnswererFromFile(const std::string& path_to_model,

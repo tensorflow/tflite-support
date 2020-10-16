@@ -79,6 +79,18 @@ BertQuestionAnswerer::CreateFromBuffer(
   return api_to_init;
 }
 
+StatusOr<std::unique_ptr<QuestionAnswerer>> BertQuestionAnswerer::CreateFromFd(
+    int fd) {
+  std::unique_ptr<BertQuestionAnswerer> api_to_init;
+  ASSIGN_OR_RETURN(
+      api_to_init,
+      core::TaskAPIFactory::CreateFromFileDescriptor<BertQuestionAnswerer>(
+          fd, absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          kNumLiteThreads));
+  RETURN_IF_ERROR(api_to_init->InitializeFromMetadata());
+  return api_to_init;
+}
+
 StatusOr<std::unique_ptr<QuestionAnswerer>>
 BertQuestionAnswerer::CreateBertQuestionAnswererFromFile(
     const std::string& path_to_model, const std::string& path_to_vocab) {
