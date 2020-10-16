@@ -160,6 +160,17 @@ BertNLClassifier::CreateFromBuffer(
   return std::move(bert_nl_classifier);
 }
 
+StatusOr<std::unique_ptr<BertNLClassifier>> BertNLClassifier::CreateFromFd(
+    int fd, std::unique_ptr<tflite::OpResolver> resolver) {
+  std::unique_ptr<BertNLClassifier> bert_nl_classifier;
+  ASSIGN_OR_RETURN(
+      bert_nl_classifier,
+      core::TaskAPIFactory::CreateFromFileDescriptor<BertNLClassifier>(
+          fd, std::move(resolver)));
+  RETURN_IF_ERROR(bert_nl_classifier->InitializeFromMetadata());
+  return std::move(bert_nl_classifier);
+}
+
 absl::Status BertNLClassifier::InitializeFromMetadata() {
   // Set up mandatory tokenizer.
   const ProcessUnit* tokenizer_process_unit =

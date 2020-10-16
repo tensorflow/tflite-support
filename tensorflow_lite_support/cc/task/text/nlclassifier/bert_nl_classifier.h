@@ -71,6 +71,13 @@ class BertNLClassifier : public NLClassifier {
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
+  // Factory function to create a BertNLClassifier from the file descriptor of a
+  // TFLite model with metadata.
+  static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
+  CreateFromFd(
+      int fd, std::unique_ptr<tflite::OpResolver> resolver =
+                  absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
+
  protected:
   // Run tokenization on input text and construct three input tensors ids, mask
   // and segment_ids for the model input.
