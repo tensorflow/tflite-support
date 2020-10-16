@@ -16,11 +16,14 @@ limitations under the License.
 package org.tensorflow.lite.task.text.qa;
 
 import android.content.Context;
+import android.os.ParcelFileDescriptor;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
+import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.MultipleBuffersHandleProvider;
 
 /** Task API for BertQA models. */
@@ -65,6 +68,41 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
             },
             BERT_QUESTION_ANSWERER_NATIVE_LIBNAME,
             pathToModel));
+  }
+
+  /**
+   * Generic API to create the QuestionAnswerer for bert models with metadata populated. The API
+   * expects a Bert based TFLite model with metadata containing the following information:
+   *
+   * <ul>
+   *   <li>input_process_units for Wordpiece/Sentencepiece Tokenizer - Wordpiece Tokenizer can be
+   *       used for a <a
+   *       href="https://tfhub.dev/tensorflow/lite-model/mobilebert/1/default/1">MobileBert</a>
+   *       model, Sentencepiece Tokenizer Tokenizer can be used for an <a
+   *       href="https://tfhub.dev/tensorflow/lite-model/albert_lite_base/squadv1/1">Albert</a>
+   *       model.
+   *   <li>3 input tensors with names "ids", "mask" and "segment_ids".
+   *   <li>2 output tensors with names "end_logits" and "start_logits".
+   * </ul>
+   *
+   * @param modelFile {@link File} object of the model
+   * @return {@link BertQuestionAnswerer} instance
+   * @throws IOException If model file fails to load.
+   */
+  public static BertQuestionAnswerer createFromFile(File modelFile)
+      throws IOException {
+    try (ParcelFileDescriptor descriptor =
+        ParcelFileDescriptor.open(modelFile, ParcelFileDescriptor.MODE_READ_ONLY)) {
+      return new BertQuestionAnswerer(
+          TaskJniUtils.createHandleFromLibrary(
+              new EmptyHandleProvider() {
+                @Override
+                public long createHandle() {
+                  return initJniWithFileDescriptor(descriptor.getFd());
+                }
+              },
+              BERT_QUESTION_ANSWERER_NATIVE_LIBNAME));
+    }
   }
 
   /**
@@ -137,6 +175,8 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
 
   // modelBuffers[0] is tflite model file buffer with metadata to specify which tokenizer to use.
   private static native long initJniWithModelWithMetadataByteBuffers(ByteBuffer... modelBuffers);
+
+  private static native long initJniWithFileDescriptor(int fd);
 
   private static native List<QaAnswer> answerNative(
       long nativeHandle, String context, String question);

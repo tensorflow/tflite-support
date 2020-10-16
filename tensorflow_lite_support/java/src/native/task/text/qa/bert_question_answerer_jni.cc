@@ -52,6 +52,18 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithModelWithM
 }
 
 extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithFileDescriptor(
+    JNIEnv* env, jclass thiz, jint fd) {
+  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
+      BertQuestionAnswerer::CreateFromFd(fd);
+  if (status.ok()) {
+    return reinterpret_cast<jlong>(status->release());
+  } else {
+    return kInvalidPointer;
+  }
+}
+
+extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithBertByteBuffers(
     JNIEnv* env, jclass thiz, jobjectArray model_buffers) {
   absl::string_view model =
