@@ -21,9 +21,9 @@ limitations under the License.
 
 namespace {
 
+using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
-using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::text::nlclassifier::BertNLClassifier;
 using ::tflite::task::text::nlclassifier::RunClassifier;
@@ -39,8 +39,22 @@ Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_initJniWithByte
     JNIEnv* env, jclass thiz, jobject model_buffer) {
   auto model = GetMappedFileBuffer(env, model_buffer);
   tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>> status =
-      BertNLClassifier::CreateFromBuffer(
-          model.data(), model.size());
+      BertNLClassifier::CreateFromBuffer(model.data(), model.size());
+  if (status.ok()) {
+    return reinterpret_cast<jlong>(status->release());
+  } else {
+    ThrowException(env, kAssertionError,
+                   "Error occurred when initializing Bert NLClassifier: %s",
+                   status.status().message().data());
+    return kInvalidPointer;
+  }
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_initJniWithFileDescriptor(
+    JNIEnv* env, jclass thiz, jint fd) {
+  tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>> status =
+      BertNLClassifier::CreateFromFd(fd);
   if (status.ok()) {
     return reinterpret_cast<jlong>(status->release());
   } else {

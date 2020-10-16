@@ -16,6 +16,8 @@ limitations under the License.
 package org.tensorflow.lite.task.text.nlclassifier;
 
 import android.content.Context;
+import android.os.ParcelFileDescriptor;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -57,10 +59,33 @@ public class BertNLClassifier extends BaseTaskApi {
    * @param context Android context
    * @param pathToModel Path to the classification model.
    * @return {@link BertNLClassifier} instance.
+   * @throws IOException If model file fails to load.
    */
   public static BertNLClassifier createFromFile(final Context context, final String pathToModel)
       throws IOException {
     return createFromBuffer(TaskJniUtils.loadMappedFile(context, pathToModel));
+  }
+
+  /**
+   * Create {@link BertNLClassifier} from a {@link File} object with metadata.
+   *
+   * @param modelFile The classification model {@link File} instance.
+   * @return {@link BertNLClassifier} instance.
+   * @throws IOException If model file fails to load.
+   */
+  public static BertNLClassifier createFromFile(File modelFile) throws IOException {
+    try (ParcelFileDescriptor descriptor =
+        ParcelFileDescriptor.open(modelFile, ParcelFileDescriptor.MODE_READ_ONLY)) {
+      return new BertNLClassifier(
+          TaskJniUtils.createHandleFromLibrary(
+              new EmptyHandleProvider() {
+                @Override
+                public long createHandle() {
+                  return initJniWithFileDescriptor(descriptor.getFd());
+                }
+              },
+              BERT_NL_CLASSIFIER_NATIVE_LIBNAME));
+    }
   }
 
   /**
@@ -92,6 +117,8 @@ public class BertNLClassifier extends BaseTaskApi {
   }
 
   private static native long initJniWithByteBuffer(ByteBuffer modelBuffer);
+
+  private static native long initJniWithFileDescriptor(int fd);
 
   private static native List<Category> classifyNative(long nativeHandle, String text);
 
