@@ -68,3 +68,34 @@ pybind_extension(
         "@pybind11",
     ],
 )
+
+cc_library(
+    name = "ragged_range_tflite",
+    srcs = ["ragged_range_tflite.cc"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@flatbuffers",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
+        "@org_tensorflow//tensorflow/lite/kernels/internal:tensor",
+        "@org_tensorflow//tensorflow/lite/kernels/internal:types",
+    ],
+)
+
+cc_test(
+    name = "ragged_range_tflite_test",
+    srcs = ["ragged_range_tflite_test.cc"],
+    deps = [
+        ":ragged_range_tflite",
+        "@com_google_googletest//:gtest_main",
+        "@flatbuffers",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/kernels:test_util",
+        "@org_tensorflow//tensorflow/lite/kernels/internal:tensor",
+        "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
+    ],
+)
