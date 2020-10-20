@@ -200,10 +200,15 @@ public class TensorImage {
    *
    * <p>Numeric casting and clamping will be applied if the stored data is not uint8.
    *
+   * <p>Note that, the reliable way to get pixels from an {@code ALPHA_8} Bitmap is to use {@code
+   * copyPixelsToBuffer}. Bitmap methods such as, `setPixels()` and `getPixels` do not work.
+   *
    * <p>Important: it's only a reference. DO NOT MODIFY. We don't create a copy here for performance
    * concern, but if modification is necessary, please make a copy.
    *
-   * @return a reference to a {@link Bitmap} in ARGB_8888 config. "A" channel is always opaque
+   * @return a reference to a {@link Bitmap} in {@code ARGB_8888} config ("A" channel is always
+   *     opaque) or in {@code ALPHA_8}, depending on the {@link ColorSpaceType} of this {@link
+   *     TensorBuffer}.
    * @throws IllegalStateException if the {@link TensorImage} never loads data
    */
   public Bitmap getBitmap() {

@@ -19,6 +19,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 /**
@@ -68,14 +69,29 @@ class ImageConversions {
    * @throws IllegalArgumentException if the shape of buffer is neither (h, w) nor (1, h, w, 1)
    */
   static Bitmap convertGrayscaleTensorBufferToBitmap(TensorBuffer buffer) {
-    int[] shape = buffer.getShape();
+    // Convert buffer into Uint8 as needed.
+    TensorBuffer uint8Buffer =
+        buffer.getDataType() == DataType.UINT8
+            ? buffer
+            : TensorBuffer.createFrom(buffer, DataType.UINT8);
+
+    int[] shape = uint8Buffer.getShape();
     ColorSpaceType grayscale = ColorSpaceType.GRAYSCALE;
     grayscale.assertShape(shape);
 
-    int h = grayscale.getHeight(shape);
-    int w = grayscale.getWidth(shape);
-    int[] grayValues = buffer.getIntArray();
-    return Bitmap.createBitmap(grayValues, w, h, grayscale.toBitmapConfig());
+    // Even though `Bitmap.createBitmap(int[] colors, int width, int height, Bitmap.Config config)`
+    // seems to work for internal Android testing framework, but it actually doesn't work for the
+    // real Android environment.
+    //
+    // The only reliable way to create an ALPHA_8 Bitmap is to use `copyPixelsFromBuffer()` to load
+    // the pixels from a ByteBuffer, and then use `copyPixelsToBuffer` to read out.
+    // Note: for ALPHA_8 Bitmap, methods such as, `setPixels()` and `getPixels()` do not work.
+    Bitmap bitmap =
+        Bitmap.createBitmap(
+            grayscale.getWidth(shape), grayscale.getHeight(shape), grayscale.toBitmapConfig());
+    uint8Buffer.getBuffer().rewind();
+    bitmap.copyPixelsFromBuffer(uint8Buffer.getBuffer());
+    return bitmap;
   }
 
   /**
