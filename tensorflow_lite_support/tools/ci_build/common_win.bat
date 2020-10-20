@@ -19,17 +19,6 @@
 echo on
 
 @REM
-@REM Set Environment Variables
-@REM
-SET PY_EXE=C:\%PYTHON_DIRECTORY%\python.exe
-SET PIP_EXE=C:\%PYTHON_DIRECTORY%\Scripts\pip.exe
-SET PATH=C:\%PYTHON_DIRECTORY%;C:\%PYTHON_DIRECTORY%\Scripts;%PATH%
-
-%PIP_EXE% install flatbuffers==1.12 --upgrade --no-deps
-%PIP_EXE% install setuptools --upgrade
-%PIP_EXE% install numpy==1.16.0 --upgrade --no-deps
-
-@REM
 @REM Setup Bazel
 @REM
 :: Download Bazel from github and make sure its found in PATH.
