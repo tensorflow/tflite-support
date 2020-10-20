@@ -55,48 +55,6 @@ using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::TfLiteSupportStatus;
 
-#if TFLITE_USE_C_API
-absl::Status TfLiteEngine::InterpreterWrapper::InitializeWithFallback(
-    std::function<
-        absl::Status(std::unique_ptr<Interpreter, InterpreterDeleter>*)>
-        interpreter_initializer,
-    const tflite::proto::ComputeSettings& compute_settings) {
-  if (compute_settings.has_preference() ||
-      compute_settings.has_tflite_settings()) {
-    // TODO(fergus): support acceleration.
-    return absl::UnimplementedError(
-        "Acceleration via ComputeSettings is not supported yet.");
-  }
-  absl::Status result = interpreter_initializer(&impl_);
-  if (!result.ok()) {
-    return result;
-  }
-  return (TfLiteInterpreterAllocateTensors(impl_.get()) != kTfLiteOk)
-             ? absl::InternalError(
-                   "TFLite interpreter: AllocateTensors() failed.")
-             : absl::OkStatus();
-}
-
-absl::Status TfLiteEngine::InterpreterWrapper::InvokeWithoutFallback() {
-  TfLiteStatus result = TfLiteInterpreterInvoke(impl_.get());
-  if (result != kTfLiteOk) {
-    return absl::Status(absl::StatusCode::kAborted,
-                        "TfLiteInterpreterInvoke failed");
-  }
-  return absl::OkStatus();
-}
-
-absl::Status TfLiteEngine::InterpreterWrapper::InvokeWithFallback(
-    const std::function<absl::Status(Interpreter* interpreter)>& set_inputs) {
-  // TODO(fergus): implement fallback.
-  absl::Status result = set_inputs(impl_.get());
-  if (!result.ok()) {
-    return result;
-  }
-  return InvokeWithoutFallback();
-}
-#endif  // TFLITE_USE_C_API
-
 int TfLiteEngine::ErrorReporter::Report(const char* format, va_list args) {
   return std::vsnprintf(error_message, sizeof(error_message), format, args);
 }
@@ -276,11 +234,13 @@ absl::Status TfLiteEngine::InitInterpreter(
         "TF Lite FlatBufferModel is null. Please make sure to call one of the "
         "BuildModelFrom methods before calling InitInterpreter.");
   }
-  auto initializer =
-      [this, num_threads](
+#if TFLITE_USE_C_API
+  std::function<absl::Status(TfLiteDelegate*,
+                             std::unique_ptr<Interpreter, InterpreterDeleter>*)>
+      initializer = [this, num_threads](
+          TfLiteDelegate* optional_delegate,
           std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
       -> absl::Status {
-#if TFLITE_USE_C_API
     std::unique_ptr<TfLiteInterpreterOptions,
                     void (*)(TfLiteInterpreterOptions*)>
         options{TfLiteInterpreterOptionsCreate(),
@@ -288,6 +248,9 @@ absl::Status TfLiteEngine::InitInterpreter(
     TfLiteInterpreterOptionsSetOpResolver(options.get(), FindBuiltinOp,
                                           FindCustomOp, resolver_.get());
     TfLiteInterpreterOptionsSetNumThreads(options.get(), num_threads);
+    if (optional_delegate != nullptr) {
+      TfLiteInterpreterOptionsAddDelegate(options.get(), optional_delegate);
+    }
     interpreter_out->reset(
         TfLiteInterpreterCreateWithSelectedOps(model_.get(), options.get()));
     if (*interpreter_out == nullptr) {
@@ -297,7 +260,13 @@ absl::Status TfLiteEngine::InitInterpreter(
                        "TfLiteInterpreterCreateWithSelectedOps failed: ",
                        error_reporter_.error_message));
     }
+    return absl::OkStatus();
+  };
 #else
+  auto initializer =
+      [this, num_threads](
+          std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
+      -> absl::Status {
     if (tflite::InterpreterBuilder(*model_, *resolver_)(
             interpreter_out, num_threads) != kTfLiteOk) {
       return CreateStatusWithPayload(
@@ -309,9 +278,9 @@ absl::Status TfLiteEngine::InitInterpreter(
       return CreateStatusWithPayload(StatusCode::kInternal,
                                      "TF Lite interpreter is null.");
     }
-#endif
     return absl::OkStatus();
   };
+#endif
 
   absl::Status status =
       interpreter_.InitializeWithFallback(initializer, compute_settings);

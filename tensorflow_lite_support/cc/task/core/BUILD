@@ -59,7 +59,7 @@ cc_library(
         ":external_file_handler",
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:status_macros",
-        "//tensorflow_lite_support/cc/port:tflite_wrapper",
+        "//tensorflow_lite_support/cc/port:tflite_wrapper_with_c_api_for_test",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
         "//tensorflow_lite_support/metadata/cc:metadata_extractor",
         "@com_google_absl//absl/memory",

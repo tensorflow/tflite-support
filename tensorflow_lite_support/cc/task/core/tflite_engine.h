@@ -31,6 +31,8 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
 
+// If compiled with -DTFLITE_USE_C_API, this file will use the TF Lite C API
+// rather than the TF Lite C++ API.
 // TODO(b/168025296): eliminate the '#if TFLITE_USE_C_API' directives here and
 // elsewhere and instead use the C API unconditionally, once we have a suitable
 // replacement for the features of tflite::support::TfLiteInterpreterWrapper.
@@ -52,38 +54,17 @@ namespace core {
 class TfLiteEngine {
  public:
   // Types.
+  using InterpreterWrapper = tflite::support::TfLiteInterpreterWrapper;
 #if TFLITE_USE_C_API
   using Model = struct TfLiteModel;
   using Interpreter = struct TfLiteInterpreter;
   using ModelDeleter = void (*)(Model*);
-  using InterpreterDeleter = void (*)(Interpreter*);
-  // TODO(fergus): support all the features of
-  // tflite::support::tfLiteInterpreterWrapper.
-  class InterpreterWrapper {
-   public:
-    InterpreterWrapper() : impl_(nullptr, TfLiteInterpreterDelete) {}
-    absl::Status InitializeWithFallback(
-        std::function<
-            absl::Status(std::unique_ptr<Interpreter, InterpreterDeleter>*)>
-            interpreter_initializer,
-        const tflite::proto::ComputeSettings& compute_settings);
-    absl::Status InvokeWithoutFallback();
-    absl::Status InvokeWithFallback(
-        const std::function<absl::Status(Interpreter* interpreter)>&
-            set_inputs);
-    Interpreter* get() { return impl_.get(); }
-    const Interpreter* get() const { return impl_.get(); }
-    void reset(Interpreter* interpreter) { impl_.reset(interpreter); }
-
-   private:
-    std::unique_ptr<Interpreter, InterpreterDeleter> impl_;
-  };
+  using InterpreterDeleter = InterpreterWrapper::InterpreterDeleter;
 #else
   using Model = tflite::FlatBufferModel;
   using Interpreter = tflite::Interpreter;
   using ModelDeleter = std::default_delete<Model>;
   using InterpreterDeleter = std::default_delete<Interpreter>;
-  using InterpreterWrapper = tflite::support::TfLiteInterpreterWrapper;
 #endif
 
   // Constructors.
