@@ -348,6 +348,7 @@ pybind_extension(
     copts = ["-fexceptions"],
     features = ["-use_header_modules"],
     module_name = "pywrap_model_converter",
+    srcs_version = "PY3ONLY",
     deps = [
         ":model_converter",
         "//tensorflow_lite_support/cc/port:statusor",
