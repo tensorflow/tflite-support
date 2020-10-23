@@ -54,3 +54,9 @@ Utils, you need to set up following env variables correctly:
 *   `ANDROID_NDK_API_LEVEL`
 *   `ANDROID_SDK_API_LEVEL`
 *   `ANDROID_BUILD_TOOLS_VERSION`
+
+## Contact us
+
+Let us know what you think about TFLite Support by creating a
+[new Github issue](https://github.com/tensorflow/tflite-support/issues/new), or
+email us at tflite-support-team@google.com.
