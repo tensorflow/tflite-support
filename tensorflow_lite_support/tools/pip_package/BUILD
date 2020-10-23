@@ -34,7 +34,14 @@ filegroup(
 sh_binary(
     name = "build_pip_package",
     srcs = ["build_pip_package.sh"],
-    data = COMMON_PIP_DEPS,
+    data = COMMON_PIP_DEPS +
+           select({
+               "@org_tensorflow//tensorflow:windows": [
+                   ":simple_console_for_windows",
+               ],
+               "//conditions:default": [
+               ],
+           }),
 )
 
 # On Windows, python binary is a zip file of runfiles tree.
