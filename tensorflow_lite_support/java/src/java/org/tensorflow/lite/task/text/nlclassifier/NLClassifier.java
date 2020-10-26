@@ -207,7 +207,7 @@ public class NLClassifier extends BaseTaskApi {
    * @return {@link NLClassifier} instance.
    */
   public static NLClassifier createFromBufferAndOptions(
-      final MappedByteBuffer modelBuffer, final NLClassifierOptions options) {
+      final ByteBuffer modelBuffer, final NLClassifierOptions options) {
     return new NLClassifier(
         TaskJniUtils.createHandleFromLibrary(
             new EmptyHandleProvider() {
