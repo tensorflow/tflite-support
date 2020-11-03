@@ -23,8 +23,8 @@ especially around:
 *   Use-cases we should support including data types and operations
 *   Ease of use - does the APIs make sense to the community
 
-See the [documentation](https://www.tensorflow.org/lite/guide/lite_support) for
-more instruction and examples.
+See the [documentation](https://www.tensorflow.org/lite/inference_with_metadata/lite_support)
+for more instruction and examples.
 
 
 ## TensorFlow Lite Android Task Library
