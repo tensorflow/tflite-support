@@ -21,7 +21,11 @@ limitations under the License.
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
-namespace tflite::support::text::tokenizer {
+namespace tflite {
+namespace support {
+namespace text {
+namespace tokenizer {
+
 
 // Create a Tokenizer from model metadata by extracting
 tflite::support::StatusOr<std::unique_ptr<Tokenizer>>
@@ -29,5 +33,9 @@ CreateTokenizerFromProcessUnit(
     const tflite::ProcessUnit* tokenizer_process_unit,
     const tflite::metadata::ModelMetadataExtractor* metadata_extractor);
 
-}  // namespace tflite::support::text::tokenizer
+}  // namespace tokenizer
+}  // namespace text
+}  // namespace support
+}  // namespace tflite
+
 #endif  // THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TEXT_TOKENIZERS_TOKENIZER_UTILS_H_

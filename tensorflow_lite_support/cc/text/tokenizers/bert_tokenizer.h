@@ -27,7 +27,10 @@ limitations under the License.
 #include "tensorflow_text/core/kernels/regex_split.h"
 #include "tensorflow_text/core/kernels/wordpiece_tokenizer.h"
 
-namespace tflite::support::text::tokenizer {
+namespace tflite {
+namespace support {
+namespace text {
+namespace tokenizer {
 
 constexpr char kDefaultDelimRe[] =
     R"((\s+|[!-/]|[:-@]|[\[-`]|[{-~]|[\p{P}]|[\x{4E00}-\x{9FFF}]|[\x{3400}-\x{4DBF}]|[\x{20000}-\x{2A6DF}]|[\x{2A700}-\x{2B73F}]|[\x{2B740}-\x{2B81F}]|[\x{2B820}-\x{2CEAF}]|[\x{F900}-\x{FAFF}]|[\x{2F800}-\x{2FA1F}]))";
@@ -138,6 +141,9 @@ class BertTokenizer : public tflite::support::text::tokenizer::Tokenizer {
   RE2 include_delim_re_;
 };
 
-}  // namespace tflite::support::text::tokenizer
+}  // namespace tokenizer
+}  // namespace text
+}  // namespace support
+}  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TEXT_TOKENIZERS_BERT_TOKENIZER_H_

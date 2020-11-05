@@ -22,7 +22,10 @@ limitations under the License.
 
 #include "absl/strings/string_view.h"
 
-namespace tflite::support::text::tokenizer {
+namespace tflite {
+namespace support {
+namespace text {
+namespace tokenizer {
 
 struct TokenizerResult {
   std::vector<std::string> subwords;
@@ -44,6 +47,9 @@ class Tokenizer {
   virtual ~Tokenizer() = default;
 };
 
-}  // namespace tflite::support::text::tokenizer
+}  // namespace tokenizer
+}  // namespace text
+}  // namespace support
+}  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TEXT_TOKENIZERS_TOKENIZER_H_

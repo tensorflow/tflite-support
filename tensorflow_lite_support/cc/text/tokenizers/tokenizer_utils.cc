@@ -23,7 +23,11 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/text/tokenizers/sentencepiece_tokenizer.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
-namespace tflite::support::text::tokenizer {
+namespace tflite {
+namespace support {
+namespace text {
+namespace tokenizer {
+
 
 using ::tflite::ProcessUnit;
 using ::tflite::SentencePieceTokenizerOptions;
@@ -125,4 +129,8 @@ StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromProcessUnit(
   }
 }
 
-}  // namespace tflite::support::text::tokenizer
+}  // namespace tokenizer
+}  // namespace text
+}  // namespace support
+}  // namespace tflite
+

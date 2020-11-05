@@ -20,7 +20,10 @@ limitations under the License.
 #include "re2/re2.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
 
-namespace tflite::support::text::tokenizer {
+namespace tflite {
+namespace support {
+namespace text {
+namespace tokenizer {
 
 // Tokenizer to load a vocabulary and split text by regular expressions.
 class RegexTokenizer : public Tokenizer {
@@ -48,6 +51,9 @@ class RegexTokenizer : public Tokenizer {
   absl::node_hash_map<int, absl::string_view> index_token_map_;
 };
 
-}  // namespace tflite::support::text::tokenizer
+}  // namespace tokenizer
+}  // namespace text
+}  // namespace support
+}  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TEXT_TOKENIZERS_REGEX_TOKENIZER_H_
