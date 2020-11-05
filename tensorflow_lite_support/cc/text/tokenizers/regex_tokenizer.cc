@@ -30,8 +30,8 @@ constexpr char kUnknown[] = "<UNKNOWN>";
 void buildIndexTokenMap(
     const absl::node_hash_map<std::string, int>& token_index_map,
     absl::node_hash_map<int, absl::string_view>* index_token_map) {
-  for (const auto& [token, index] : token_index_map) {
-    (*index_token_map)[index] = token.data();
+  for (const auto& token : token_index_map) {
+    (*index_token_map)[token.second] = token.first;
   }
 }
 
