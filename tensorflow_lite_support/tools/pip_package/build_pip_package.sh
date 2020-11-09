@@ -212,12 +212,12 @@ function main() {
   if [[ ${NIGHTLY_BUILD} == "1" ]]; then
     # we use a script to update versions to avoid any tool differences on different platforms.
     if [[ ! -z ${VERSION} ]]; then
-      python tensorflow_lite_support/tools/ci_build/update_version.py --src $(pwd) --version ${VERSION} --nightly
+      python tensorflow_lite_support/tools/ci_build/update_version.py --src "." --version ${VERSION} --nightly
     else
-      python tensorflow_lite_support/tools/ci_build/update_version.py --src $(pwd) --nightly
+      python tensorflow_lite_support/tools/ci_build/update_version.py --src "." --nightly
     fi
   elif [[ ! -z ${VERSION} ]]; then
-    python tensorflow_lite_support/tools/ci_build/update_version.py --src $(pwd) --version ${VERSION}
+    python tensorflow_lite_support/tools/ci_build/update_version.py --src "." --version ${VERSION}
   fi
 
   prepare_src "$SRCDIR"
