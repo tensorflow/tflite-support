@@ -29,20 +29,6 @@ tflite_jni_binary(
     ],
 )
 
-# Custom ops resolver for Wear OS Smart Reply.
-cc_library(
-    name = "custom_ops_resolver_for_smart_reply",
-    srcs = ["custom_ops_resolver_for_smart_reply.cc"],
-    deps = [
-        "//knowledge/hobbes/chat/tensorflow/tflite:tflite-all-lingua-ops-resolver",
-        "@com_google_absl//absl/memory",
-        "@org_tensorflow//tensorflow/lite:framework",
-        "@org_tensorflow//tensorflow/lite:string_util",
-        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
-        "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
-    ],
-)
-
 # Shared native logic for NLClassifier. Combine this target and customized
 # version of op_resolver to build customized nl_classifier_native target.
 cc_library(
