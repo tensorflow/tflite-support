@@ -15,17 +15,28 @@
 # ==============================================================================
 # Pip install TensorFlow Lite Support and run basic test on the pip package.
 
+# Important: Use msys shell to run this script on Windows.
+
 set -e
 set -x
 
 function run_smoke_test() {
-  VENV_TMP_DIR=$(mktemp -d)
+  VENV_TMP_DIR="$(mktemp -d)"
+
+  if [[ "$OSTYPE" == "msys" ]]; then
+    VENV_TMP_DIR="$(cygpath -m $VENV_TMP_DIR)"
+  fi
 
   ${PYTHON_BIN_PATH} -m virtualenv -p ${PYTHON_BIN_PATH} "${VENV_TMP_DIR}" || \
       die "FAILED: Unable to create virtualenv"
 
-  source "${VENV_TMP_DIR}/bin/activate" || \
-      die "FAILED: Unable to activate virtualenv "
+  if [[ "$OSTYPE" == "msys" ]]; then
+    source "${VENV_TMP_DIR}/Scripts/activate" || \
+        die "FAILED: Unable to activate virtualenv "
+  else
+    source "${VENV_TMP_DIR}/bin/activate" || \
+        die "FAILED: Unable to activate virtualenv "
+  fi
 
   # install tflite-support
   python -m pip install ${WHL_NAME} || \
@@ -35,6 +46,9 @@ function run_smoke_test() {
   # Download a test model
   export TEST_MODEL="$(pwd)/test.tflite"
   wget https://tfhub.dev/tensorflow/lite-model/mobilenet_v1_0.75_192_quantized/1/metadata/1\?lite-format\=tflite -O "$TEST_MODEL"
+  if [[ "$OSTYPE" == "msys" ]]; then
+    TEST_MODEL=$(cygpath -m $TEST_MODEL)
+  fi
 
   test_tfls_imports
 
