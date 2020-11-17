@@ -59,8 +59,19 @@ def update_version(path, current_version, new_version):
   replace_string_in_line(
       "_VERSION = '%s'" % current_version,
       # pep440 requires such a replacement
-      "_VERSION = '%s'" % new_version.replace("-", ""),
+      "_VERSION = '%s'" % new_version.replace("-", "."),
       os.path.join(path, SETUP_PY_PATH))
+
+
+def remove_build_suffix(version):
+  """Remove build suffix (if exists) from a version."""
+  if version.find("-dev") >= 0:
+    return version[:version.find("-dev")]
+  if version.find(".dev") >= 0:
+    return version[:version.find(".dev")]
+  if version.find("dev") >= 0:
+    return version[:version.find("dev")]
+  return version
 
 
 def main():
@@ -73,7 +84,9 @@ def main():
   parser.add_argument("--version", help="the new SemVer code", default="")
   parser.add_argument(
       "--nightly",
-      help="if true, a build suffix will append to the version code",
+      help="if true, a build suffix will append to the version code. If "
+           "current version code or the <version> argument provided contains a "
+           "build suffix, the suffix will be replaced with the timestamp",
       action="store_true")
   args = parser.parse_args()
 
@@ -83,6 +96,7 @@ def main():
     return
   new_version = args.version if args.version else current_version
   if args.nightly:
+    new_version = remove_build_suffix(new_version)
     new_version += "-dev" + time.strftime("%Y%m%d")
   print("Updating version from %s to %s" % (current_version, new_version))
   update_version(path, current_version, new_version)
