@@ -17,7 +17,9 @@ package org.tensorflow.lite.task.vision.segmenter;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.os.ParcelFileDescriptor;
 import com.google.auto.value.AutoValue;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -71,6 +73,8 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 public final class ImageSegmenter extends BaseTaskApi {
 
   private static final String IMAGE_SEGMENTER_NATIVE_LIB = "task_vision_jni";
+  private static final int OPTIONAL_FD_LENGTH = -1;
+  private static final int OPTIONAL_FD_OFFSET = -1;
 
   private final OutputType outputType;
 
@@ -88,6 +92,18 @@ public final class ImageSegmenter extends BaseTaskApi {
   }
 
   /**
+   * Creates an {@link ImageSegmenter} instance from the default {@link ImageSegmenterOptions}.
+   *
+   * @param modelFile the segmentation model {@link File} instance
+   * @throws IOException if an I/O error occurs when loading the tflite model
+   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
+   *     code
+   */
+  public static ImageSegmenter createFromFile(File modelFile) throws IOException {
+    return createFromFileAndOptions(modelFile, ImageSegmenterOptions.builder().build());
+  }
+
+  /**
    * Creates an {@link ImageSegmenter} instance from {@link ImageSegmenterOptions}.
    *
    * @param modelPath path of the segmentation model with metadata in the assets
@@ -98,21 +114,31 @@ public final class ImageSegmenter extends BaseTaskApi {
   public static ImageSegmenter createFromFileAndOptions(
       Context context, String modelPath, final ImageSegmenterOptions options) throws IOException {
     try (AssetFileDescriptor assetFileDescriptor = context.getAssets().openFd(modelPath)) {
-      long nativeHandle =
-          TaskJniUtils.createHandleFromLibrary(
-              new EmptyHandleProvider() {
-                @Override
-                public long createHandle() {
-                  return initJniWithModelFdAndOptions(
-                      /*fileDescriptor=*/ assetFileDescriptor.getParcelFileDescriptor().getFd(),
-                      /*fileDescriptorLength=*/ assetFileDescriptor.getLength(),
-                      /*fileDescriptorOffset=*/ assetFileDescriptor.getStartOffset(),
-                      options.getDisplayNamesLocale(),
-                      options.getOutputType().getValue());
-                }
-              },
-              IMAGE_SEGMENTER_NATIVE_LIB);
-      return new ImageSegmenter(nativeHandle, options.getOutputType());
+      return createFromModelFdAndOptions(
+          /*fileDescriptor=*/ assetFileDescriptor.getParcelFileDescriptor().getFd(),
+          /*fileDescriptorLength=*/ assetFileDescriptor.getLength(),
+          /*fileDescriptorOffset=*/ assetFileDescriptor.getStartOffset(),
+          options);
+    }
+  }
+
+  /**
+   * Creates an {@link ImageSegmenter} instance from {@link ImageSegmenterOptions}.
+   *
+   * @param modelFile the segmentation model {@link File} instance
+   * @throws IOException if an I/O error occurs when loading the tflite model
+   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
+   *     code
+   */
+  public static ImageSegmenter createFromFileAndOptions(
+      File modelFile, final ImageSegmenterOptions options) throws IOException {
+    try (ParcelFileDescriptor descriptor =
+        ParcelFileDescriptor.open(modelFile, ParcelFileDescriptor.MODE_READ_ONLY)) {
+      return createFromModelFdAndOptions(
+          /*fileDescriptor=*/ descriptor.getFd(),
+          /*fileDescriptorLength=*/ OPTIONAL_FD_LENGTH,
+          /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET,
+          options);
     }
   }
 
@@ -223,6 +249,28 @@ public final class ImageSegmenter extends BaseTaskApi {
             outputType,
             outputType.createMasksFromBuffer(maskByteBuffers, maskShape),
             coloredLabels));
+  }
+
+  private static ImageSegmenter createFromModelFdAndOptions(
+      final int fileDescriptor,
+      final long fileDescriptorLength,
+      final long fileDescriptorOffset,
+      final ImageSegmenterOptions options) {
+    long nativeHandle =
+        TaskJniUtils.createHandleFromLibrary(
+            new EmptyHandleProvider() {
+              @Override
+              public long createHandle() {
+                return initJniWithModelFdAndOptions(
+                    fileDescriptor,
+                    fileDescriptorLength,
+                    fileDescriptorOffset,
+                    options.getDisplayNamesLocale(),
+                    options.getOutputType().getValue());
+              }
+            },
+            IMAGE_SEGMENTER_NATIVE_LIB);
+    return new ImageSegmenter(nativeHandle, options.getOutputType());
   }
 
   private static native long initJniWithModelFdAndOptions(
