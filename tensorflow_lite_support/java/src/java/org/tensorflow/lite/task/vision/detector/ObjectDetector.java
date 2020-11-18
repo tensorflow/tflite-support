@@ -16,6 +16,8 @@ limitations under the License.
 package org.tensorflow.lite.task.vision.detector;
 
 import android.content.Context;
+import android.os.ParcelFileDescriptor;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -82,6 +84,8 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 public final class ObjectDetector extends BaseTaskApi {
 
   private static final String OBJECT_DETECTOR_NATIVE_LIB = "task_vision_jni";
+  private static final int OPTIONAL_FD_LENGTH = -1;
+  private static final int OPTIONAL_FD_OFFSET = -1;
 
   /**
    * Creates an {@link ObjectDetector} instance from the default {@link ObjectDetectorOptions}.
@@ -94,6 +98,18 @@ public final class ObjectDetector extends BaseTaskApi {
   public static ObjectDetector createFromFile(Context context, String modelPath)
       throws IOException {
     return createFromFileAndOptions(context, modelPath, ObjectDetectorOptions.builder().build());
+  }
+
+  /**
+   * Creates an {@link ObjectDetector} instance from the default {@link ObjectDetectorOptions}.
+   *
+   * @param modelFile the detection model {@link File} instance
+   * @throws IOException if an I/O error occurs when loading the tflite model
+   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
+   *     code
+   */
+  public static ObjectDetector createFromFile(File modelFile) throws IOException {
+    return createFromFileAndOptions(modelFile, ObjectDetectorOptions.builder().build());
   }
 
   /**
@@ -123,6 +139,34 @@ public final class ObjectDetector extends BaseTaskApi {
             OBJECT_DETECTOR_NATIVE_LIB,
             modelPath,
             options));
+  }
+
+  /**
+   * Creates an {@link ObjectDetector} instance from {@link ObjectDetectorOptions}.
+   *
+   * @param modelFile the detection model {@link File} instance
+   * @throws IOException if an I/O error occurs when loading the tflite model
+   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
+   *     code
+   */
+  public static ObjectDetector createFromFileAndOptions(
+      File modelFile, final ObjectDetectorOptions options) throws IOException {
+    try (ParcelFileDescriptor descriptor =
+        ParcelFileDescriptor.open(modelFile, ParcelFileDescriptor.MODE_READ_ONLY)) {
+      return new ObjectDetector(
+          TaskJniUtils.createHandleFromLibrary(
+              new TaskJniUtils.EmptyHandleProvider() {
+                @Override
+                public long createHandle() {
+                  return initJniWithModelFdAndOptions(
+                      descriptor.getFd(),
+                      /*fileDescriptorLength=*/ OPTIONAL_FD_LENGTH,
+                      /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET,
+                      options);
+                }
+              },
+              OBJECT_DETECTOR_NATIVE_LIB));
+    }
   }
 
   /**

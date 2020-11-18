@@ -153,6 +153,9 @@ Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_deinitJni(
   delete reinterpret_cast<ObjectDetector*>(native_handle);
 }
 
+// Creates an ObjectDetector instance from the model file descriptor.
+// file_descriptor_length and file_descriptor_offset are optional. Non-possitive
+// values will be ignored.
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_initJniWithModelFdAndOptions(
     JNIEnv* env, jclass thiz, jint file_descriptor,
@@ -163,8 +166,12 @@ Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_initJniWithModelFdA
   auto file_descriptor_meta = proto_options.mutable_model_file_with_metadata()
                                   ->mutable_file_descriptor_meta();
   file_descriptor_meta->set_fd(file_descriptor);
-  file_descriptor_meta->set_length(file_descriptor_length);
-  file_descriptor_meta->set_offset(file_descriptor_offset);
+  if (file_descriptor_length > 0) {
+    file_descriptor_meta->set_length(file_descriptor_length);
+  }
+  if (file_descriptor_offset > 0) {
+    file_descriptor_meta->set_offset(file_descriptor_offset);
+  }
 
   StatusOr<std::unique_ptr<ObjectDetector>> object_detector_or =
       ObjectDetector::CreateFromOptions(proto_options);
