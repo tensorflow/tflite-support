@@ -17,6 +17,8 @@ package org.tensorflow.lite.task.vision.classifier;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.ParcelFileDescriptor;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -66,6 +68,8 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 public final class ImageClassifier extends BaseTaskApi {
 
   private static final String IMAGE_CLASSIFIER_NATIVE_LIB = "task_vision_jni";
+  private static final int OPTIONAL_FD_LENGTH = -1;
+  private static final int OPTIONAL_FD_OFFSET = -1;
 
   /**
    * Creates an {@link ImageClassifier} instance from the default {@link ImageClassifierOptions}.
@@ -78,6 +82,18 @@ public final class ImageClassifier extends BaseTaskApi {
   public static ImageClassifier createFromFile(Context context, String modelPath)
       throws IOException {
     return createFromFileAndOptions(context, modelPath, ImageClassifierOptions.builder().build());
+  }
+
+  /**
+   * Creates an {@link ImageClassifier} instance from the default {@link ImageClassifierOptions}.
+   *
+   * @param modelFile the classification model {@link File} instance
+   * @throws IOException if an I/O error occurs when loading the tflite model
+   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
+   *     code
+   */
+  public static ImageClassifier createFromFile(File modelFile) throws IOException {
+    return createFromFileAndOptions(modelFile, ImageClassifierOptions.builder().build());
   }
 
   /**
@@ -107,6 +123,34 @@ public final class ImageClassifier extends BaseTaskApi {
             IMAGE_CLASSIFIER_NATIVE_LIB,
             modelPath,
             options));
+  }
+
+  /**
+   * Creates an {@link ImageClassifier} instance.
+   *
+   * @param modelFile the classification model {@link File} instance
+   * @throws IOException if an I/O error occurs when loading the tflite model
+   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
+   *     code
+   */
+  public static ImageClassifier createFromFileAndOptions(
+      File modelFile, final ImageClassifierOptions options) throws IOException {
+    try (ParcelFileDescriptor descriptor =
+        ParcelFileDescriptor.open(modelFile, ParcelFileDescriptor.MODE_READ_ONLY)) {
+      return new ImageClassifier(
+          TaskJniUtils.createHandleFromLibrary(
+              new TaskJniUtils.EmptyHandleProvider() {
+                @Override
+                public long createHandle() {
+                  return initJniWithModelFdAndOptions(
+                      descriptor.getFd(),
+                      /*fileDescriptorLength=*/ OPTIONAL_FD_LENGTH,
+                      /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET,
+                      options);
+                }
+              },
+              IMAGE_CLASSIFIER_NATIVE_LIB));
+    }
   }
 
   /**

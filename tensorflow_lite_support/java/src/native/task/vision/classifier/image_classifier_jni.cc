@@ -145,6 +145,9 @@ Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_deinitJni(
   delete reinterpret_cast<ImageClassifier*>(native_handle);
 }
 
+// Creates an ImageClassifier instance from the model file descriptor.
+// file_descriptor_length and file_descriptor_offset are optional. Non-possitive
+// values will be ignored.
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_initJniWithModelFdAndOptions(
     JNIEnv* env, jclass thiz, jint file_descriptor,
@@ -155,8 +158,12 @@ Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_initJniWithModel
   auto file_descriptor_meta = proto_options.mutable_model_file_with_metadata()
                                   ->mutable_file_descriptor_meta();
   file_descriptor_meta->set_fd(file_descriptor);
-  file_descriptor_meta->set_length(file_descriptor_length);
-  file_descriptor_meta->set_offset(file_descriptor_offset);
+  if (file_descriptor_length > 0) {
+    file_descriptor_meta->set_length(file_descriptor_length);
+  }
+  if (file_descriptor_offset > 0) {
+    file_descriptor_meta->set_offset(file_descriptor_offset);
+  }
 
   StatusOr<std::unique_ptr<ImageClassifier>> image_classifier_or =
       ImageClassifier::CreateFromOptions(proto_options);
