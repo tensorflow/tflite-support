@@ -41,7 +41,7 @@ jobject ConvertToCategory(JNIEnv* env, const Class& classification) {
 
   std::string label_string = classification.has_class_name()
                                  ? classification.class_name()
-                                 : kEmptyString;
+                                 : std::to_string(classification.index());
   jstring label = env->NewStringUTF(label_string.c_str());
   std::string display_name_string = classification.has_display_name()
                                         ? classification.display_name()

@@ -52,6 +52,10 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
  *       <ul>
  *         <li>with {@code N} classes of either 2 or 4 dimensions, such as {@code [1 x N]} or {@code
  *             [1 x 1 x 1 x N]}
+ *         <li>the label file is required to be packed to the metadata. See the <a
+ *             href="https://www.tensorflow.org/lite/convert/metadata#label_output">example of
+ *             creating metadata for an image classifier</a>. If no label files are packed, it will
+ *             use index as label in the result.
  *       </ul>
  * </ul>
  *
