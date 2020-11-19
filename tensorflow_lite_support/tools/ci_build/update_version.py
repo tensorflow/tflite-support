@@ -28,9 +28,9 @@ It should not run by bazel. Use it as a simple python script.
 """
 
 import argparse
+import datetime
 import os
 import re
-import time
 
 SETUP_PY_PATH = "tensorflow_lite_support/tools/pip_package/setup.py"
 
@@ -85,8 +85,8 @@ def main():
   parser.add_argument(
       "--nightly",
       help="if true, a build suffix will append to the version code. If "
-           "current version code or the <version> argument provided contains a "
-           "build suffix, the suffix will be replaced with the timestamp",
+      "current version code or the <version> argument provided contains a "
+      "build suffix, the suffix will be replaced with the timestamp",
       action="store_true")
   args = parser.parse_args()
 
@@ -97,7 +97,10 @@ def main():
   new_version = args.version if args.version else current_version
   if args.nightly:
     new_version = remove_build_suffix(new_version)
-    new_version += "-dev" + time.strftime("%Y%m%d")
+    # Use UTC-8 rather than uncertain local time.
+    d = datetime.datetime.now(
+        tz=datetime.timezone(-datetime.timedelta(hours=8)))
+    new_version += "-dev" + d.strftime("%Y%m%d")
   print("Updating version from %s to %s" % (current_version, new_version))
   update_version(path, current_version, new_version)
 
