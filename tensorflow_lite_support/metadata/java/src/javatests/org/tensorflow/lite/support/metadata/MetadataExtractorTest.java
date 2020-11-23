@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import org.apache.commons.io.IOUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -112,7 +111,8 @@ public class MetadataExtractorTest {
       // Reads the golden file from context.
       Context context = ApplicationProvider.getApplicationContext();
       InputStream goldenAssociateFileStream = context.getAssets().open(VALID_LABEL_FILE_NAME);
-      assertThat(IOUtils.contentEquals(goldenAssociateFileStream, associateFileStream)).isTrue();
+      assertThat(getContentFromInputStream(goldenAssociateFileStream))
+          .isEqualTo(getContentFromInputStream(associateFileStream));
     }
 
     @Test
@@ -976,5 +976,10 @@ public class MetadataExtractorTest {
     byte[] buffer = new byte[20];
     new Random().nextBytes(buffer);
     return ByteBuffer.wrap(buffer);
+  }
+
+  private static String getContentFromInputStream(InputStream stream) {
+    Scanner s = new Scanner(stream).useDelimiter("\\A");
+    return s.hasNext() ? s.next() : "";
   }
 }

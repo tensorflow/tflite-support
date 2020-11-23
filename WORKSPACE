@@ -317,6 +317,89 @@ java_import_external(
     default_visibility = ["@com_google_auto_value//:__pkg__"],
 )
 
+java_import_external(
+    name = "com_google_truth_truth",
+    jar_sha256 = "032eddc69652b0a1f8d458f999b4a9534965c646b8b5de0eba48ee69407051df",
+    jar_urls = [
+        "https://storage.googleapis.com/mirror.tensorflow.org/repo1.maven.org/maven2/com/google/truth/truth/0.32/truth-0.32.jar",
+        "https://repo1.maven.org/maven2/com/google/truth/truth/0.32/truth-0.32.jar",
+    ],
+    licenses = ["notice"],  # Apache 2.0
+    testonly_ = True,
+    deps = ["@com_google_guava_guava"],
+)
+
+# We only use guava in tests, as it's required by com_google_truth.
+java_import_external(
+    name = "com_google_guava_guava",
+    licenses = ["notice"],  # Apache 2.0
+    jar_urls = [
+        "http://bazel-mirror.storage.googleapis.com/repo1.maven.org/maven2/com/google/guava/guava/20.0/guava-20.0.jar",
+        "http://repo1.maven.org/maven2/com/google/guava/guava/20.0/guava-20.0.jar",
+        "http://maven.ibiblio.org/maven2/com/google/guava/guava/20.0/guava-20.0.jar",
+    ],
+    jar_sha256 = "36a666e3b71ae7f0f0dca23654b67e086e6c93d192f60ba5dfd5519db6c288c8",
+    testonly_ = True,
+    deps = [
+        "@com_google_code_findbugs_jsr305",
+        "@com_google_errorprone_error_prone_annotations",
+    ],
+)
+
+# guava dependency.
+java_import_external(
+    name = "com_google_code_findbugs_jsr305",
+    licenses = ["notice"],  # BSD 3-clause
+    jar_urls = [
+        "http://bazel-mirror.storage.googleapis.com/repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar",
+        "http://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar",
+        "http://maven.ibiblio.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar",
+    ],
+    jar_sha256 = "905721a0eea90a81534abb7ee6ef4ea2e5e645fa1def0a5cd88402df1b46c9ed",
+)
+
+# guava dependency.
+java_import_external(
+    name = "com_google_errorprone_error_prone_annotations",
+    licenses = ["notice"],  # Apache 2.0
+    jar_sha256 = "e7749ffdf03fb8ebe08a727ea205acb301c8791da837fee211b99b04f9d79c46",
+    jar_urls = [
+        "http://bazel-mirror.storage.googleapis.com/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.0.15/error_prone_annotations-2.0.15.jar",
+        "http://maven.ibiblio.org/maven2/com/google/errorprone/error_prone_annotations/2.0.15/error_prone_annotations-2.0.15.jar",
+        "http://repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.0.15/error_prone_annotations-2.0.15.jar",
+    ],
+)
+
+http_archive(
+    name = "robolectric",
+    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.4.tar.gz"],
+    strip_prefix = "robolectric-bazel-4.4",
+    sha256 = "d4f2eb078a51f4e534ebf5e18b6cd4646d05eae9b362ac40b93831bdf46112c7",
+)
+
+load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
+
+robolectric_repositories()
+
+http_archive(
+    name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-3.1",
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/3.1.zip",
+    sha256 = "e246373de2353f3d34d35814947aa8b7d0dd1a58c2f7a6c41cfeaff3007c2d14",
+)
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    artifacts = [
+        "org.robolectric:robolectric:4.4",
+    ],
+    repositories = [
+        "https://maven.google.com",
+        "https://repo1.maven.org/maven2",
+    ],
+)
+
 load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 
 flatbuffers()

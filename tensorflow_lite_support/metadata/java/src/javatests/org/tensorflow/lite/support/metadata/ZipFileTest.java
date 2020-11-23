@@ -26,9 +26,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.zip.ZipException;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -91,7 +91,8 @@ public final class ZipFileTest {
 
     // Reads the golden file from context.
     InputStream goldenFileStream = context.getAssets().open(VALID_LABEL_FILE_NAME);
-    assertThat(IOUtils.contentEquals(goldenFileStream, fileStream)).isTrue();
+    assertThat(getContentFromInputStream(goldenFileStream))
+        .isEqualTo(getContentFromInputStream(fileStream));
   }
 
   @Test
@@ -130,5 +131,10 @@ public final class ZipFileTest {
     ByteBuffer modelBuffer =
         fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     return new ByteBufferChannel(modelBuffer);
+  }
+
+  private static String getContentFromInputStream(InputStream stream) {
+    Scanner s = new Scanner(stream).useDelimiter("\\A");
+    return s.hasNext() ? s.next() : "";
   }
 }

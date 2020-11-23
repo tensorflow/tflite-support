@@ -31,10 +31,10 @@ android_local_test(
         "//tensorflow_lite_support/metadata:metadata_schema_fbs_android",
         "//tensorflow_lite_support/metadata:schema_fbs_android",
         "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
-        "//third_party/java/jakarta_commons_io",
-        "//third_party/java/truth:truth-android",
+        "@com_google_truth_truth",  # android
         "@flatbuffers//:runtime_android",
         "@org_checkerframework_qual",
+        "@robolectric//bazel:android-all",
     ],
 )
 
@@ -48,7 +48,8 @@ android_local_test(
     test_class = "org.tensorflow.lite.support.metadata.ByteBufferChannelTest",
     deps = [
         "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
-        "//third_party/java/truth:truth-android",
+        "@com_google_truth_truth",  # android
+        "@robolectric//bazel:android-all",
     ],
 )
 
@@ -65,8 +66,8 @@ android_local_test(
     deps = [
         ":test_lib",
         "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
-        "//third_party/java/jakarta_commons_io",
-        "//third_party/java/truth:truth-android",
+        "@com_google_truth_truth",  # android
+        "@robolectric//bazel:android-all",
     ],
 )
 
@@ -80,7 +81,8 @@ android_local_test(
     test_class = "org.tensorflow.lite.support.metadata.BoundedInputStreamTest",
     deps = [
         "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
-        "//third_party/java/truth:truth-android",
+        "@com_google_truth_truth",  # android
+        "@robolectric//bazel:android-all",
     ],
 )
 
@@ -93,7 +95,7 @@ java_test(
     test_class = "org.tensorflow.lite.support.metadata.MetadataParserTest",
     deps = [
         "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata_lib",
-        "//third_party/java/truth",
+        "@com_google_truth_truth",
         "@junit",
     ],
 )
