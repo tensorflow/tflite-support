@@ -63,6 +63,18 @@ def update_version(path, current_version, new_version):
       os.path.join(path, SETUP_PY_PATH))
 
 
+class CustomTimeZone(datetime.tzinfo):
+
+  def utcoffset(self, dt):
+    return -datetime.timedelta(hours=8)
+
+  def tzname(self, dt):
+    return "UTC-8"
+
+  def dst(self, dt):
+    return datetime.timedelta(0)
+
+
 def remove_build_suffix(version):
   """Remove build suffix (if exists) from a version."""
   if version.find("-dev") >= 0:
@@ -98,8 +110,7 @@ def main():
   if args.nightly:
     new_version = remove_build_suffix(new_version)
     # Use UTC-8 rather than uncertain local time.
-    d = datetime.datetime.now(
-        tz=datetime.timezone(-datetime.timedelta(hours=8)))
+    d = datetime.datetime.now(tz=CustomTimeZone())
     new_version += "-dev" + d.strftime("%Y%m%d")
   print("Updating version from %s to %s" % (current_version, new_version))
   update_version(path, current_version, new_version)
