@@ -12,8 +12,8 @@ exports_files(["LICENSE"])
 package_group(
     name = "users",
     packages = [
+        # tensorflow_examples/... dep,
         "//tensorflow_lite_support/...",
-        "//third_party/py/tensorflow_examples/...",
         "//third_party/tensorflow_models/...",
     ],
 )
