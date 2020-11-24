@@ -46,3 +46,28 @@ cc_library(
     name = "integral_types",
     hdrs = ["integral_types.h"],
 )
+
+cc_library(
+    name = "gtest",
+    testonly = 1,
+    hdrs = [
+        "gmock.h",
+        "gtest.h",
+    ],
+    deps = [
+        "//testing/base/public:gunit_for_library_testonly",
+    ],
+)
+
+cc_library(
+    name = "gtest_main",
+    testonly = 1,
+    hdrs = [
+        "benchmark.h",
+        "gmock.h",
+        "gtest.h",
+    ],
+    deps = [
+        "@com_google_googletest//:gtest_main",
+    ],
+)
