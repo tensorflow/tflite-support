@@ -31,3 +31,10 @@ bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base-task-api.aar \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text:task-library-text \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision:task-library-vision
+
+
+# Run Metadata tests.
+bazel clean --expunge
+
+bazel test tensorflow_lite_support/metadata/python/tests:metadata_test --test_output=all
+

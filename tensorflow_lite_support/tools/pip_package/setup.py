@@ -46,7 +46,7 @@ from setuptools.dist import Distribution
 _VERSION = '0.1.0'
 
 SETUP_PACKAGES = [
-    'pybind11 >= 2.4',
+    'pybind11 >= 2.6.0',
 ]
 
 REQUIRED_PACKAGES = [

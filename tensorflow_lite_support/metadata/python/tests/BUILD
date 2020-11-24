@@ -5,8 +5,6 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-# TODO(b/160127851): verify if the fix to enable the test works for the
-# external code base after metadata.py can be open sourced.
 py_test(
     name = "metadata_test",
     srcs = ["metadata_test.py"],

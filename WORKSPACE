@@ -60,11 +60,11 @@ gflags()
 third_party_http_archive(
     name = "pybind11",
     urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pybind/pybind11/archive/v2.4.3.tar.gz",
-        "https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz",
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pybind/pybind11/archive/v2.6.0.tar.gz",
+        "https://github.com/pybind/pybind11/archive/v2.6.0.tar.gz",
     ],
-    sha256 = "1eed57bc6863190e35637290f97a20c81cfe4d9090ac0a24f3bbf08f265eb71d",
-    strip_prefix = "pybind11-2.4.3",
+    sha256 = "90b705137b69ee3b5fc655eaca66d0dc9862ea1759226f7ccd3098425ae69571",
+    strip_prefix = "pybind11-2.6.0",
     build_file = "//third_party:pybind11.BUILD",
 )
 
