@@ -2,7 +2,7 @@ load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_cc_proto_libra
 
 package(
     default_visibility = [
-        "//tensorflow_lite_support:users",
+        "//visibility:public",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
