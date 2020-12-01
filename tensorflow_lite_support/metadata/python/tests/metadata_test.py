@@ -714,5 +714,20 @@ class MetadataDisplayerTest(MetadataTest):
     self.assertEqual(set(packed_files), set(expected_packed_files))
 
 
+class MetadataUtilTest(MetadataTest):
+
+  def test_convert_to_json_should_succeed(self):
+    with open(self._metadata_file_with_version, "rb") as f:
+      metadata_buf = f.read()
+    metadata_json = _metadata.convert_to_json(metadata_buf)
+
+    # Verifies the generated json file.
+    golden_json_file_path = resource_loader.get_path_to_datafile(
+        "testdata/golden_json.json")
+    with open(golden_json_file_path, "r") as f:
+      expected = f.read()
+    self.assertEqual(metadata_json, expected)
+
+
 if __name__ == "__main__":
   tf.test.main()

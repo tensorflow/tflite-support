@@ -635,14 +635,7 @@ class MetadataDisplayer(object):
 
   def get_metadata_json(self):
     """Converts the metadata into a json string."""
-    opt = _pywrap_flatbuffers.IDLOptions()
-    opt.strict_json = True
-    parser = _pywrap_flatbuffers.Parser(opt)
-    with open(_FLATC_TFLITE_METADATA_SCHEMA_FILE) as f:
-      metadata_schema_content = f.read()
-    if not parser.parse(metadata_schema_content):
-      raise ValueError("Cannot parse metadata schema. Reason: " + parser.error)
-    return _pywrap_flatbuffers.generate_text(parser, self._metadata_buffer)
+    return convert_to_json(self._metadata_buffer)
 
   def get_packed_associated_file_list(self):
     """Returns a list of associated files that are packed in the model.
@@ -694,6 +687,31 @@ class MetadataDisplayer(object):
         return zf.namelist()
     except zipfile.BadZipFile:
       return []
+
+
+# Create an individual method for getting the metadata json file, so that it can
+# be used as a standalone util.
+def convert_to_json(metadata_buffer):
+  """Converts the metadata into a json string.
+
+  Args:
+    metadata_buffer: valid metadata buffer in bytes.
+
+  Returns:
+    Metadata in JSON format.
+
+  Raises:
+    ValueError: error occured when parsing the metadata schema file.
+  """
+
+  opt = _pywrap_flatbuffers.IDLOptions()
+  opt.strict_json = True
+  parser = _pywrap_flatbuffers.Parser(opt)
+  with open(_FLATC_TFLITE_METADATA_SCHEMA_FILE) as f:
+    metadata_schema_content = f.read()
+  if not parser.parse(metadata_schema_content):
+    raise ValueError("Cannot parse metadata schema. Reason: " + parser.error)
+  return _pywrap_flatbuffers.generate_text(parser, metadata_buffer)
 
 
 def _assert_file_exist(filename):

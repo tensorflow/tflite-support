@@ -8,7 +8,7 @@ package(
 py_test(
     name = "metadata_test",
     srcs = ["metadata_test.py"],
-    data = ["testdata/golden_json.json"],
+    data = ["//tensorflow_lite_support/metadata/python/tests/testdata:test_files"],
     python_version = "PY3",
     srcs_version = "PY2AND3",
     tags = [
