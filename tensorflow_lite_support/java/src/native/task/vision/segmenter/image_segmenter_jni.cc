@@ -59,7 +59,8 @@ constexpr int kOutputTypeConfidenceMask = 1;
 // Creates an ImageSegmenterOptions proto based on the Java class.
 ImageSegmenterOptions ConvertToProtoOptions(JNIEnv* env,
                                             jstring display_names_locale,
-                                            jint output_type) {
+                                            jint output_type,
+                                            jint num_threads) {
   ImageSegmenterOptions proto_options;
 
   const char* pchars = env->GetStringUTFChars(display_names_locale, nullptr);
@@ -78,6 +79,8 @@ ImageSegmenterOptions ConvertToProtoOptions(JNIEnv* env,
       ThrowException(env, kIllegalArgumentException,
                      "Unsupported output type: %d", output_type);
   }
+
+  proto_options.set_num_threads(num_threads);
 
   return proto_options;
 }
@@ -169,9 +172,9 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_initJniWithModelFdAndOptions(
     JNIEnv* env, jclass thiz, jint file_descriptor,
     jlong file_descriptor_length, jlong file_descriptor_offset,
-    jstring display_names_locale, jint output_type) {
-  ImageSegmenterOptions proto_options =
-      ConvertToProtoOptions(env, display_names_locale, output_type);
+    jstring display_names_locale, jint output_type, jint num_threads) {
+  ImageSegmenterOptions proto_options = ConvertToProtoOptions(
+      env, display_names_locale, output_type, num_threads);
   auto file_descriptor_meta = proto_options.mutable_model_file_with_metadata()
                                   ->mutable_file_descriptor_meta();
   file_descriptor_meta->set_fd(file_descriptor);

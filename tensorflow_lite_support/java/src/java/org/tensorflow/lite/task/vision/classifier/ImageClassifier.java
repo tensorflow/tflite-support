@@ -227,6 +227,7 @@ public final class ImageClassifier extends BaseTaskApi {
     // vulnerable.
     private final List<String> labelAllowList;
     private final List<String> labelDenyList;
+    private final int numThreads;
 
     public static Builder builder() {
       return new Builder();
@@ -240,6 +241,7 @@ public final class ImageClassifier extends BaseTaskApi {
       private boolean isScoreThresholdSet = false;
       private List<String> labelAllowList = new ArrayList<>();
       private List<String> labelDenyList = new ArrayList<>();
+      private int numThreads = -1;
 
       private Builder() {}
 
@@ -306,6 +308,18 @@ public final class ImageClassifier extends BaseTaskApi {
         return this;
       }
 
+      /**
+       * Sets the number of threads to be used for TFLite ops that support multi-threading when
+       * running inference with CPU. Defaults to -1.
+       *
+       * <p>numThreads should be greater than 0 or equal to -1. Setting numThreads to -1 has the
+       * effect to let TFLite runtime set the value.
+       */
+      public Builder setNumThreads(int numThreads) {
+        this.numThreads = numThreads;
+        return this;
+      }
+
       public ImageClassifierOptions build() {
         return new ImageClassifierOptions(this);
       }
@@ -341,6 +355,11 @@ public final class ImageClassifier extends BaseTaskApi {
       return new ArrayList<>(labelDenyList);
     }
 
+    @UsedByReflection("image_classifier_jni.cc")
+    public int getNumThreads() {
+      return numThreads;
+    }
+
     private ImageClassifierOptions(Builder builder) {
       displayNamesLocale = builder.displayNamesLocale;
       maxResults = builder.maxResults;
@@ -348,6 +367,7 @@ public final class ImageClassifier extends BaseTaskApi {
       isScoreThresholdSet = builder.isScoreThresholdSet;
       labelAllowList = builder.labelAllowList;
       labelDenyList = builder.labelDenyList;
+      numThreads = builder.numThreads;
     }
   }
 

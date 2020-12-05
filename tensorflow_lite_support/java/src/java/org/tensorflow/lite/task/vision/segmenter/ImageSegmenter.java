@@ -157,15 +157,19 @@ public final class ImageSegmenter extends BaseTaskApi {
   public abstract static class ImageSegmenterOptions {
     private static final String DEFAULT_DISPLAY_NAME_LOCALE = "en";
     private static final OutputType DEFAULT_OUTPUT_TYPE = OutputType.CATEGORY_MASK;
+    private static final int NUM_THREADS = -1;
 
     public abstract String getDisplayNamesLocale();
 
     public abstract OutputType getOutputType();
 
+    public abstract int getNumThreads();
+
     public static Builder builder() {
       return new AutoValue_ImageSegmenter_ImageSegmenterOptions.Builder()
           .setDisplayNamesLocale(DEFAULT_DISPLAY_NAME_LOCALE)
-          .setOutputType(DEFAULT_OUTPUT_TYPE);
+          .setOutputType(DEFAULT_OUTPUT_TYPE)
+          .setNumThreads(NUM_THREADS);
     }
 
     /** Builder for {@link ImageSegmenterOptions}. */
@@ -183,6 +187,15 @@ public final class ImageSegmenter extends BaseTaskApi {
       public abstract Builder setDisplayNamesLocale(String displayNamesLocale);
 
       public abstract Builder setOutputType(OutputType outputType);
+
+      /**
+       * Sets the number of threads to be used for TFLite ops that support multi-threading when
+       * running inference with CPU. Defaults to -1.
+       *
+       * <p>numThreads should be greater than 0 or equal to -1. Setting numThreads to -1 has the
+       * effect to let TFLite runtime set the value.
+       */
+      public abstract Builder setNumThreads(int numThreads);
 
       public abstract ImageSegmenterOptions build();
     }
@@ -266,7 +279,8 @@ public final class ImageSegmenter extends BaseTaskApi {
                     fileDescriptorLength,
                     fileDescriptorOffset,
                     options.getDisplayNamesLocale(),
-                    options.getOutputType().getValue());
+                    options.getOutputType().getValue(),
+                    options.getNumThreads());
               }
             },
             IMAGE_SEGMENTER_NATIVE_LIB);
@@ -278,7 +292,8 @@ public final class ImageSegmenter extends BaseTaskApi {
       long fileDescriptorLength,
       long fileDescriptorOffset,
       String displayNamesLocale,
-      int outputType);
+      int outputType,
+      int numThreads);
 
   /**
    * The native method to segment the image.

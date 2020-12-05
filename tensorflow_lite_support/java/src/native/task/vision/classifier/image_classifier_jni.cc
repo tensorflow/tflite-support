@@ -94,6 +94,11 @@ ImageClassifierOptions ConvertToProtoOptions(JNIEnv* env,
     proto_options.add_class_name_blacklist(class_name);
   }
 
+  jmethodID num_threads_id =
+      env->GetMethodID(java_options_class, "getNumThreads", "()I");
+  jint num_threads = env->CallIntMethod(java_options, num_threads_id);
+  proto_options.set_num_threads(num_threads);
+
   return proto_options;
 }
 
