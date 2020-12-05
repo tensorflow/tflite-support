@@ -89,12 +89,18 @@ public class BertNLClassifier extends BaseTaskApi {
   }
 
   /**
-   * Create {@link BertNLClassifier} with {@link MappedByteBuffer}.
+   * Create {@link BertNLClassifier} with a model buffer.
    *
-   * @param modelBuffer In memory buffer of the model.
-   * @return {@link BertNLClassifier} instance.
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the model
+   * @return {@link BertNLClassifier} instance
+   * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
+   *     {@link MappedByteBuffer}
    */
-  public static BertNLClassifier createFromBuffer(final MappedByteBuffer modelBuffer) {
+  public static BertNLClassifier createFromBuffer(final ByteBuffer modelBuffer) {
+    if (!(modelBuffer.isDirect() || modelBuffer instanceof MappedByteBuffer)) {
+      throw new IllegalArgumentException(
+          "The model buffer should be either a direct ByteBuffer or a MappedByteBuffer.");
+    }
     return new BertNLClassifier(
         TaskJniUtils.createHandleFromLibrary(
             new EmptyHandleProvider() {

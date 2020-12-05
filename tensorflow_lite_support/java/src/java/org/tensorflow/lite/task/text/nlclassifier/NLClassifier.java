@@ -200,14 +200,21 @@ public class NLClassifier extends BaseTaskApi {
   }
 
   /**
-   * Create {@link NLClassifier} with {@link MappedByteBuffer} from {@link NLClassifierOptions}.
+   * Create {@link NLClassifier} with a model {@link ByteBuffer} and {@link NLClassifierOptions}.
    *
-   * @param modelBuffer In memory buffer of the classification model.
-   * @param options Configurations for the model.
-   * @return {@link NLClassifier} instance.
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
+   *     classification model
+   * @param options Configurations for the model
+   * @return {@link NLClassifier} instance
+   * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
+   *     {@link MappedByteBuffer}
    */
   public static NLClassifier createFromBufferAndOptions(
       final ByteBuffer modelBuffer, final NLClassifierOptions options) {
+    if (!(modelBuffer.isDirect() || modelBuffer instanceof MappedByteBuffer)) {
+      throw new IllegalArgumentException(
+          "The model buffer should be either a direct ByteBuffer or a MappedByteBuffer.");
+    }
     return new NLClassifier(
         TaskJniUtils.createHandleFromLibrary(
             new EmptyHandleProvider() {

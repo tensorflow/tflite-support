@@ -139,6 +139,21 @@ jobject ConvertToClassificationResults(JNIEnv* env,
   return classifications_list;
 }
 
+jlong CreateImageClassifierFromOptions(JNIEnv* env,
+                                       const ImageClassifierOptions& options) {
+  StatusOr<std::unique_ptr<ImageClassifier>> image_classifier_or =
+      ImageClassifier::CreateFromOptions(options);
+  if (image_classifier_or.ok()) {
+    // Deletion is handled at deinitJni time.
+    return reinterpret_cast<jlong>(image_classifier_or->release());
+  } else {
+    ThrowException(env, kAssertionError,
+                   "Error occurred when initializing ImageClassifier: %s",
+                   image_classifier_or.status().message().data());
+    return kInvalidPointer;
+  }
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_deinitJni(
     JNIEnv* env, jobject thiz, jlong native_handle) {
@@ -164,18 +179,22 @@ Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_initJniWithModel
   if (file_descriptor_offset > 0) {
     file_descriptor_meta->set_offset(file_descriptor_offset);
   }
+  return CreateImageClassifierFromOptions(env, proto_options);
+}
 
-  StatusOr<std::unique_ptr<ImageClassifier>> image_classifier_or =
-      ImageClassifier::CreateFromOptions(proto_options);
-  if (image_classifier_or.ok()) {
-    // Deletion is handled at deinitJni time.
-    return reinterpret_cast<jlong>(image_classifier_or->release());
-  } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing ImageClassifier: %s",
-                   image_classifier_or.status().message().data());
-    return kInvalidPointer;
-  }
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_initJniWithByteBuffer(
+    JNIEnv* env, jclass thiz, jobject model_buffer, jobject java_options) {
+  ImageClassifierOptions proto_options =
+      ConvertToProtoOptions(env, java_options);
+  // External proto generated header does not overload `set_file_content` with
+  // string_view, therefore GetMappedFileBuffer does not apply here.
+  // Creating a std::string will cause one extra copying of data. Thus, the
+  // most efficient way here is to set file_content using char* and its size.
+  proto_options.mutable_model_file_with_metadata()->set_file_content(
+      static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
+      static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
+  return CreateImageClassifierFromOptions(env, proto_options);
 }
 
 extern "C" JNIEXPORT jobject JNICALL

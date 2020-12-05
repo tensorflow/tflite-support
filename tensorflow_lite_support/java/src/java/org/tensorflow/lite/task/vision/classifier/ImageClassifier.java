@@ -21,6 +21,7 @@ import android.os.ParcelFileDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
+import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 
@@ -97,6 +99,21 @@ public final class ImageClassifier extends BaseTaskApi {
   }
 
   /**
+   * Creates an {@link ImageClassifier} instance with a model buffer and the default {@link
+   * ImageClassifierOptions}.
+   *
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
+   *     classification model
+   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
+   *     code
+   * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
+   *     {@link MappedByteBuffer}
+   */
+  public static ImageClassifier createFromBuffer(final ByteBuffer modelBuffer) {
+    return createFromBufferAndOptions(modelBuffer, ImageClassifierOptions.builder().build());
+  }
+
+  /**
    * Creates an {@link ImageClassifier} instance from {@link ImageClassifierOptions}.
    *
    * @param modelPath path of the classification model with metadata in the assets
@@ -151,6 +168,34 @@ public final class ImageClassifier extends BaseTaskApi {
               },
               IMAGE_CLASSIFIER_NATIVE_LIB));
     }
+  }
+
+  /**
+   * Creates an {@link ImageClassifier} instance with a model buffer and {@link
+   * ImageClassifierOptions}.
+   *
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
+   *     classification model
+   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
+   *     code
+   * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
+   *     {@link MappedByteBuffer}
+   */
+  public static ImageClassifier createFromBufferAndOptions(
+      final ByteBuffer modelBuffer, final ImageClassifierOptions options) {
+    if (!(modelBuffer.isDirect() || modelBuffer instanceof MappedByteBuffer)) {
+      throw new IllegalArgumentException(
+          "The model buffer should be either a direct ByteBuffer or a MappedByteBuffer.");
+    }
+    return new ImageClassifier(
+        TaskJniUtils.createHandleFromLibrary(
+            new EmptyHandleProvider() {
+              @Override
+              public long createHandle() {
+                return initJniWithByteBuffer(modelBuffer, options);
+              }
+            },
+            IMAGE_CLASSIFIER_NATIVE_LIB));
   }
 
   /**
@@ -359,6 +404,9 @@ public final class ImageClassifier extends BaseTaskApi {
       long fileDescriptorLength,
       long fileDescriptorOffset,
       ImageClassifierOptions options);
+
+  private static native long initJniWithByteBuffer(
+      ByteBuffer modelBuffer, ImageClassifierOptions options);
 
   /**
    * The native method to classify an image with the ROI and orientation.
