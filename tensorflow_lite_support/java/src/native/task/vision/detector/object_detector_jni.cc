@@ -152,6 +152,20 @@ jobject ConvertToDetectionResults(JNIEnv* env, const DetectionResult& results) {
   return detections_list;
 }
 
+jlong CreateObjectDetectorFromOptions(JNIEnv* env,
+                                      const ObjectDetectorOptions& options) {
+  StatusOr<std::unique_ptr<ObjectDetector>> object_detector_or =
+      ObjectDetector::CreateFromOptions(options);
+  if (object_detector_or.ok()) {
+    return reinterpret_cast<jlong>(object_detector_or->release());
+  } else {
+    ThrowException(env, kAssertionError,
+                   "Error occurred when initializing ObjectDetector: %s",
+                   object_detector_or.status().message().data());
+    return kInvalidPointer;
+  }
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_deinitJni(
     JNIEnv* env, jobject thiz, jlong native_handle) {
@@ -177,17 +191,18 @@ Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_initJniWithModelFdA
   if (file_descriptor_offset > 0) {
     file_descriptor_meta->set_offset(file_descriptor_offset);
   }
+  return CreateObjectDetectorFromOptions(env, proto_options);
+}
 
-  StatusOr<std::unique_ptr<ObjectDetector>> object_detector_or =
-      ObjectDetector::CreateFromOptions(proto_options);
-  if (object_detector_or.ok()) {
-    return reinterpret_cast<jlong>(object_detector_or->release());
-  } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing ObjectDetector: %s",
-                   object_detector_or.status().message().data());
-    return kInvalidPointer;
-  }
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_initJniWithByteBuffer(
+    JNIEnv* env, jclass thiz, jobject model_buffer, jobject java_options) {
+  ObjectDetectorOptions proto_options =
+      ConvertToProtoOptions(env, java_options);
+  proto_options.mutable_model_file_with_metadata()->set_file_content(
+      static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
+      static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
+  return CreateObjectDetectorFromOptions(env, proto_options);
 }
 
 extern "C" JNIEXPORT jobject JNICALL

@@ -159,6 +159,20 @@ void ConvertToSegmentationResults(JNIEnv* env,
   }
 }
 
+jlong CreateImageClassifierFromOptions(JNIEnv* env,
+                                       const ImageSegmenterOptions& options) {
+  StatusOr<std::unique_ptr<ImageSegmenter>> image_segmenter_or =
+      ImageSegmenter::CreateFromOptions(options);
+  if (image_segmenter_or.ok()) {
+    return reinterpret_cast<jlong>(image_segmenter_or->release());
+  } else {
+    ThrowException(env, kAssertionError,
+                   "Error occurred when initializing ImageSegmenter: %s",
+                   image_segmenter_or.status().message().data());
+    return kInvalidPointer;
+  }
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_deinitJni(
     JNIEnv* env, jobject thiz, jlong native_handle) {
@@ -184,17 +198,19 @@ Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_initJniWithModelFd
   if (file_descriptor_offset > 0) {
     file_descriptor_meta->set_offset(file_descriptor_offset);
   }
+  return CreateImageClassifierFromOptions(env, proto_options);
+}
 
-  StatusOr<std::unique_ptr<ImageSegmenter>> image_segmenter_or =
-      ImageSegmenter::CreateFromOptions(proto_options);
-  if (image_segmenter_or.ok()) {
-    return reinterpret_cast<jlong>(image_segmenter_or->release());
-  } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing ImageSegmenter: %s",
-                   image_segmenter_or.status().message().data());
-    return kInvalidPointer;
-  }
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_initJniWithByteBuffer(
+    JNIEnv* env, jclass thiz, jobject model_buffer,
+    jstring display_names_locale, jint output_type, jint num_threads) {
+  ImageSegmenterOptions proto_options = ConvertToProtoOptions(
+      env, display_names_locale, output_type, num_threads);
+  proto_options.mutable_model_file_with_metadata()->set_file_content(
+      static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
+      static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
+  return CreateImageClassifierFromOptions(env, proto_options);
 }
 
 extern "C" JNIEXPORT void JNICALL

@@ -20,6 +20,7 @@ import android.os.ParcelFileDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
+import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 
@@ -113,6 +115,21 @@ public final class ObjectDetector extends BaseTaskApi {
   }
 
   /**
+   * Creates an {@link ObjectDetector} instance with a model buffer and the default {@link
+   * ObjectDetectorOptions}.
+   *
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
+   *     classification model
+   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
+   *     code
+   * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
+   *     {@link MappedByteBuffer}
+   */
+  public static ObjectDetector createFromBuffer(final ByteBuffer modelBuffer) {
+    return createFromBufferAndOptions(modelBuffer, ObjectDetectorOptions.builder().build());
+  }
+
+  /**
    * Creates an {@link ObjectDetector} instance from {@link ObjectDetectorOptions}.
    *
    * @param modelPath path to the detection model with metadata in the assets
@@ -167,6 +184,34 @@ public final class ObjectDetector extends BaseTaskApi {
               },
               OBJECT_DETECTOR_NATIVE_LIB));
     }
+  }
+
+  /**
+   * Creates an {@link ObjectDetector} instance with a model buffer and {@link
+   * ObjectDetectorOptions}.
+   *
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
+   *     classification model
+   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
+   *     code
+   * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
+   *     {@link MappedByteBuffer}
+   */
+  public static ObjectDetector createFromBufferAndOptions(
+      final ByteBuffer modelBuffer, final ObjectDetectorOptions options) {
+    if (!(modelBuffer.isDirect() || modelBuffer instanceof MappedByteBuffer)) {
+      throw new IllegalArgumentException(
+          "The model buffer should be either a direct ByteBuffer or a MappedByteBuffer.");
+    }
+    return new ObjectDetector(
+        TaskJniUtils.createHandleFromLibrary(
+            new EmptyHandleProvider() {
+              @Override
+              public long createHandle() {
+                return initJniWithByteBuffer(modelBuffer, options);
+              }
+            },
+            OBJECT_DETECTOR_NATIVE_LIB));
   }
 
   /**
@@ -386,6 +431,9 @@ public final class ObjectDetector extends BaseTaskApi {
       long fileDescriptorLength,
       long fileDescriptorOffset,
       ObjectDetectorOptions options);
+
+  private static native long initJniWithByteBuffer(
+      ByteBuffer modelBuffer, ObjectDetectorOptions options);
 
   private static native List<Detection> detectNative(
       long nativeHandle, ByteBuffer image, int width, int height, int orientation);

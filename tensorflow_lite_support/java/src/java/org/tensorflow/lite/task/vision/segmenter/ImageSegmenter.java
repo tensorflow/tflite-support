@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -104,6 +105,21 @@ public final class ImageSegmenter extends BaseTaskApi {
   }
 
   /**
+   * Creates an {@link ImageSegmenter} instance with a model buffer and the default {@link
+   * ImageSegmenterOptions}.
+   *
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
+   *     classification model
+   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
+   *     code
+   * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
+   *     {@link MappedByteBuffer}
+   */
+  public static ImageSegmenter createFromBuffer(final ByteBuffer modelBuffer) {
+    return createFromBufferAndOptions(modelBuffer, ImageSegmenterOptions.builder().build());
+  }
+
+  /**
    * Creates an {@link ImageSegmenter} instance from {@link ImageSegmenterOptions}.
    *
    * @param modelPath path of the segmentation model with metadata in the assets
@@ -140,6 +156,39 @@ public final class ImageSegmenter extends BaseTaskApi {
           /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET,
           options);
     }
+  }
+
+  /**
+   * Creates an {@link ImageSegmenter} instance with a model buffer and {@link
+   * ImageSegmenterOptions}.
+   *
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
+   *     classification model
+   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
+   *     code
+   * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
+   *     {@link MappedByteBuffer}
+   */
+  public static ImageSegmenter createFromBufferAndOptions(
+      final ByteBuffer modelBuffer, final ImageSegmenterOptions options) {
+    if (!(modelBuffer.isDirect() || modelBuffer instanceof MappedByteBuffer)) {
+      throw new IllegalArgumentException(
+          "The model buffer should be either a direct ByteBuffer or a MappedByteBuffer.");
+    }
+    return new ImageSegmenter(
+        TaskJniUtils.createHandleFromLibrary(
+            new EmptyHandleProvider() {
+              @Override
+              public long createHandle() {
+                return initJniWithByteBuffer(
+                    modelBuffer,
+                    options.getDisplayNamesLocale(),
+                    options.getOutputType().getValue(),
+                    options.getNumThreads());
+              }
+            },
+            IMAGE_SEGMENTER_NATIVE_LIB),
+        options.getOutputType());
   }
 
   /**
@@ -294,6 +343,9 @@ public final class ImageSegmenter extends BaseTaskApi {
       String displayNamesLocale,
       int outputType,
       int numThreads);
+
+  private static native long initJniWithByteBuffer(
+      ByteBuffer modelBuffer, String displayNamesLocale, int outputType, int numThreads);
 
   /**
    * The native method to segment the image.
