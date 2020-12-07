@@ -109,6 +109,18 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
+#ifdef __EMSCRIPTEN__
+  // When using Emscripten to bind C++ functions, we cannot use raw primitive
+  // pointers in our function type signature. Instead, we use uintptr_t and
+  // cast it to be pointer to make the compiler happy.
+  //
+  // TODO(jingjin): support custom resolver.
+  static tflite::support::StatusOr<std::unique_ptr<NLClassifier>>
+  CreateFromBufferAndOptionsEmscripten(
+      const uintptr_t /* char* */ model_buffer_data,
+      const size_t model_buffer_size, const NLClassifierOptions& options = {});
+#endif  // __EMSCRIPTEN__
+
   // Performs classification on a string input, returns classified results.
   std::vector<core::Category> Classify(const std::string& text);
 

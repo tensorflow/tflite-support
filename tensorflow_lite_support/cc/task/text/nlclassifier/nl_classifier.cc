@@ -432,6 +432,16 @@ StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateFromFdAndOptions(
   return std::move(nl_classifier);
 }
 
+#ifdef __EMSCRIPTEN__
+StatusOr<std::unique_ptr<NLClassifier>>
+NLClassifier::CreateFromBufferAndOptionsEmscripten(
+    const uintptr_t /* char* */ model_buffer_data,
+    const size_t model_buffer_size, const NLClassifierOptions& options) {
+  return NLClassifier::CreateFromBufferAndOptions(
+      (const char*)model_buffer_data, model_buffer_size, options);
+}
+#endif
+
 bool NLClassifier::HasRegexTokenizerMetadata() {
   const TensorMetadata* input_tensor_metadata =
       GetMetadataExtractor()->GetInputTensorMetadata(
