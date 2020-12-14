@@ -24,7 +24,7 @@ py_library(
     srcs_version = "PY3",
     deps = [
         # tensorflow dep,
-        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:pywrap_model_converter",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece/py:pywrap_model_converter",
     ],
 )
 
