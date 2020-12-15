@@ -39,7 +39,7 @@ py_test(
         ":sentencepiece_tokenizer",
         # tensorflow dep,
         # tensorflow_text dep,
-        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:pywrap_tflite_registerer",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece/py:pywrap_tflite_registerer",
         "@absl_py//absl:app",
         "@absl_py//absl/flags",
         "@absl_py//absl/logging",
@@ -53,7 +53,7 @@ py_test(
     python_version = "PY3",
     deps = [
         # tensorflow dep,
-        "//tensorflow_lite_support/custom_ops/kernel/ragged:pywrap_tflite_registerer",
+        "//tensorflow_lite_support/custom_ops/kernel/ragged/py:pywrap_tflite_registerer",
         "@absl_py//absl:app",
         "@absl_py//absl/flags",
         "@absl_py//absl/logging",
