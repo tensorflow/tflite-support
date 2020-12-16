@@ -17,7 +17,17 @@
             "min": [
               0.0
             ]
-          }
+          },
+          "associated_files": [
+            {
+              "name": "labels.txt",
+              "locale": "en"
+            },
+            {
+              "name": "labels_cn.txt",
+              "locale": "cn"
+            }
+          ]
         }
       ]
     }
