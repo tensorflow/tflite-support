@@ -36,5 +36,7 @@ bazel build -c opt --config=monolithic \
 # Run Metadata tests.
 bazel clean --expunge
 
-bazel test tensorflow_lite_support/metadata/python/tests:metadata_test --test_output=all
+bazel test --test_output=all \
+    //tensorflow_lite_support/metadata/python/tests:metadata_test \
+    //tensorflow_lite_support/metadata/python/tests/metadata_writers:all
 

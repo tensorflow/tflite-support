@@ -1,4 +1,4 @@
-# Placeholder for internal Python strict compatibility macro.
+# Placeholder for internal Python strict test compatibility macro.
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
 
 package(

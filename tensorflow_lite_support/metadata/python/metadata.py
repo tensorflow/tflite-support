@@ -572,7 +572,7 @@ class _MetadataPopulatorWithBuffer(MetadataPopulator):
     with open(model_file, "wb") as f:
       f.write(model_buf)
 
-    MetadataPopulator.__init__(self, model_file)
+    super().__init__(model_file)
 
   def __del__(self):
     """Destructor of _MetadataPopulatorWithBuffer.
