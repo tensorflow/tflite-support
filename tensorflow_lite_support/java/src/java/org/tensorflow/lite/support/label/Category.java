@@ -16,11 +16,13 @@ limitations under the License.
 package org.tensorflow.lite.support.label;
 
 import java.util.Objects;
+import org.tensorflow.lite.annotations.UsedByReflection;
 
 /**
  * Category is a util class, contains a label, its display name and a float value as score.
  * Typically it's used as result of classification tasks.
  */
+@UsedByReflection("TFLiteSupport/Task")
 public final class Category {
   private final String label;
   private final String displayName;
@@ -33,10 +35,12 @@ public final class Category {
    *     locales. For exmaple, a label, "apple", may be translated into Spanish for display purpose,
    *     so that the displayName is "manzana".
    */
+  @UsedByReflection("TFLiteSupport/Task")
   public static Category create(String label, String displayName, float score) {
     return new Category(label, displayName, score);
   }
 
+  @UsedByReflection("TFLiteSupport/Task")
   /** Constructs a {@link Category} object with an empty displayName. */
   public Category(String label, float score) {
     this(label, /*displayName=*/ "", score);
