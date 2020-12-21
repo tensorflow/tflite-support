@@ -1,7 +1,20 @@
 diff --git a/tensorflow/lite/experimental/ios/BUILD.apple b/tensorflow/lite/experimental/ios/BUILD
-similarity index 100%
+similarity index 97%
 rename from tensorflow/lite/experimental/ios/BUILD.apple
 rename to tensorflow/lite/experimental/ios/BUILD
+index cce0c4df..49eba35f 100644
+--- a/tensorflow/lite/experimental/ios/BUILD.apple
++++ b/tensorflow/lite/experimental/ios/BUILD
+@@ -22,8 +22,7 @@ sh_binary(
+         "hide_symbols_with_allowlist.sh",
+     ],
+     visibility = [
+-        "//tensorflow/lite:__subpackages__",
+-        "//tensorflow_lite_support:__subpackages__",
++        "//visibility:public",
+     ],
+ )
+ 
 diff --git a/tensorflow/lite/experimental/ios/ios.bzl b/tensorflow/lite/experimental/ios/ios.bzl
 index 63747eb8..07bcb49d 100644
 --- a/tensorflow/lite/experimental/ios/ios.bzl
