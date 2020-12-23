@@ -12,6 +12,8 @@ COMMON_PIP_DEPS = [
     "setup.py",
     "//tensorflow_lite_support/codegen/python:codegen",
     "//tensorflow_lite_support/metadata/python:metadata",
+    "//tensorflow_lite_support/metadata/python/metadata_writers:image_classifier",
+    "//tensorflow_lite_support/metadata/python/metadata_writers:object_detector",
 ]
 
 filegroup(
