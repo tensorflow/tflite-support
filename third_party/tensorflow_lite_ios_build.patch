@@ -1,10 +1,10 @@
-diff --git a/tensorflow/lite/experimental/ios/BUILD.apple b/tensorflow/lite/experimental/ios/BUILD
+diff --git a/tensorflow/lite/ios/BUILD.apple b/tensorflow/lite/ios/BUILD
 similarity index 97%
-rename from tensorflow/lite/experimental/ios/BUILD.apple
-rename to tensorflow/lite/experimental/ios/BUILD
+rename from tensorflow/lite/ios/BUILD.apple
+rename to tensorflow/lite/ios/BUILD
 index cce0c4df..49eba35f 100644
---- a/tensorflow/lite/experimental/ios/BUILD.apple
-+++ b/tensorflow/lite/experimental/ios/BUILD
+--- a/tensorflow/lite/ios/BUILD.apple
++++ b/tensorflow/lite/ios/BUILD
 @@ -22,8 +22,7 @@ sh_binary(
          "hide_symbols_with_allowlist.sh",
      ],
@@ -15,16 +15,16 @@ index cce0c4df..49eba35f 100644
      ],
  )
  
-diff --git a/tensorflow/lite/experimental/ios/ios.bzl b/tensorflow/lite/experimental/ios/ios.bzl
+diff --git a/tensorflow/lite/ios/ios.bzl b/tensorflow/lite/ios/ios.bzl
 index 63747eb8..07bcb49d 100644
---- a/tensorflow/lite/experimental/ios/ios.bzl
-+++ b/tensorflow/lite/experimental/ios/ios.bzl
+--- a/tensorflow/lite/ios/ios.bzl
++++ b/tensorflow/lite/ios/ios.bzl
 @@ -60,7 +60,7 @@ def tflite_ios_static_framework(
             "BUNDLE_NAME=\"" + bundle_name + "\" " +
             "ALLOWLIST_FILE_PATH=\"$(location " + allowlist_symbols_file + ")\" " +
             "OUTPUT=\"$(OUTS)\" " +
--           "\"$(location //tensorflow/lite/experimental/ios:hide_symbols_with_allowlist)\"")
-+           "\"$(location @org_tensorflow//tensorflow/lite/experimental/ios:hide_symbols_with_allowlist)\"")
+-           "\"$(location //tensorflow/lite/ios:hide_symbols_with_allowlist)\"")
++           "\"$(location @org_tensorflow//tensorflow/lite/ios:hide_symbols_with_allowlist)\"")
  
      native.genrule(
          name = name,
@@ -32,8 +32,8 @@ index 63747eb8..07bcb49d 100644
          outs = [name + ".zip"],
          cmd = cmd,
          tools = [
--            "//tensorflow/lite/experimental/ios:hide_symbols_with_allowlist",
-+            "@org_tensorflow//tensorflow/lite/experimental/ios:hide_symbols_with_allowlist",
+-            "//tensorflow/lite/ios:hide_symbols_with_allowlist",
++            "@org_tensorflow//tensorflow/lite/ios:hide_symbols_with_allowlist",
          ],
      )
  

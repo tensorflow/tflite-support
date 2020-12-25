@@ -37,13 +37,13 @@ http_archive(
     ],
 )
 
-# tf-nightly-20200810
+# TF on 2020-12-16.
 http_archive(
     name = "org_tensorflow",
-    sha256 = "26c833b7e1873936379e810a39d14700281125257ddda8cd822c89111db6f6ae",
-    strip_prefix = "tensorflow-2.4.0",
+    sha256 = "bec76817fa2ddf15aa7ae103e490001ed2f885e481719ef6ac1d03f668eca90f",
+    strip_prefix = "tensorflow-a87bf6e6fe0097beefd1292e5c245345f8574b1b",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/v2.4.0.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/a87bf6e6fe0097beefd1292e5c245345f8574b1b.tar.gz",
     ],
     patches = ["@//third_party:tensorflow_lite_ios_build.patch"],
     patch_args = ["-p1"],

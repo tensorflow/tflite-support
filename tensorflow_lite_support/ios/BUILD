@@ -1,7 +1,7 @@
 # TensorFlow Lite Task Library - Text
 
 load(
-    "@org_tensorflow//tensorflow/lite/experimental/ios:ios.bzl",
+    "@org_tensorflow//tensorflow/lite/ios:ios.bzl",
     "TFL_MINIMUM_OS_VERSION",
     "tflite_ios_static_framework",
 )
