@@ -12,18 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""An import entry for the TFLite Support project.
+"""An import entry for the metadata writers library."""
 
-In the original project structure, all python targets are accessed by paths like
-tensorflow_lite_support.metadata.metadata.MetadataDisplayer, which is verbose
-and deep. This file provides some shortcuts. It's also compatible with our first
-version Pip package.
-
-In pip build, this file will be renamed as tflite_support/__init__.py.
-"""
-
-import flatbuffers
-from tensorflow_lite_support.metadata import metadata_schema_py_generated
-from tensorflow_lite_support.metadata import schema_py_generated
-from tensorflow_lite_support.metadata.python import metadata
-from tflite_support import metadata_writers
+from tensorflow_lite_support.metadata.python.metadata_writers import image_classifier
+from tensorflow_lite_support.metadata.python.metadata_writers import object_detector

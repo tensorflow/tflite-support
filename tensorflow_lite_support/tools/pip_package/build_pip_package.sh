@@ -92,6 +92,8 @@ function prepare_src() {
   # A helper entry.
   mkdir ${TMPDIR}/tflite_support
   cp tensorflow_lite_support/tools/pip_package/tflite_support.__init__.py ${TMPDIR}/tflite_support/__init__.py
+  mkdir ${TMPDIR}/tflite_support/metadata_writers
+  cp tensorflow_lite_support/tools/pip_package/metadata_writers.__init__.py ${TMPDIR}/tflite_support/metadata_writers/__init__.py
 }
 
 function build_wheel() {

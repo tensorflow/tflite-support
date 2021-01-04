@@ -31,6 +31,7 @@ tensorflow_lite_support/tools/pip_package/BUILD
 tensorflow_lite_support/tools/pip_package/MANIFEST.in
 tensorflow_lite_support/tools/pip_package/README
 tensorflow_lite_support/tools/pip_package/build_pip_package.sh
+tensorflow_lite_support/tools/pip_package/metadata_writers.__init__.py
 tensorflow_lite_support/tools/pip_package/setup.py
 tensorflow_lite_support/tools/pip_package/simple_console_for_windows.py
 tensorflow_lite_support/tools/pip_package/tflite_support.__init__.py
