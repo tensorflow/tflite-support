@@ -14,7 +14,7 @@
 # ==============================================================================
 """Helper methods for writing metadata into TFLite models."""
 
-from typing import List
+from typing import List, Union
 
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 
@@ -39,6 +39,39 @@ def get_output_tensor_types(
     index = subgraph.Outputs(i)
     tensor_types.append(subgraph.Tensors(index).Type())
   return tensor_types
+
+
+def load_file(file_path: str, mode: str = "rb") -> Union[str, bytes]:
+  """Loads file from the file path.
+
+  Args:
+    file_path: valid file path string.
+    mode: a string specifies the model in which the file is opened. Use "rt" for
+      reading in text mode; use "rb" for reading in binary mode.
+
+  Returns:
+    The loaded file in str or bytes.
+  """
+  with open(file_path, mode) as file:
+    return file.read()
+
+
+def save_file(file_bytes: Union[bytes, bytearray],
+              save_to_path: str,
+              mode: str = "wb"):
+  """Loads file from the file path.
+
+  Args:
+    file_bytes: the bytes to be saved to file.
+    save_to_path: valid file path string.
+    mode: a string specifies the model in which the file is opened. Use "wt" for
+      writing in text mode; use "wb" for writing in binary mode.
+
+  Returns:
+    The loaded file in str or bytes.
+  """
+  with open(save_to_path, mode) as file:
+    file.write(file_bytes)
 
 
 def _get_subgraph(model_buffer: bytearray) -> _schema_fb.SubGraph:

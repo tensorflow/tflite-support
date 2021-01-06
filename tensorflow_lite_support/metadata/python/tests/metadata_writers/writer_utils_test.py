@@ -40,6 +40,14 @@ class WriterUtilsTest(tf.test.TestCase):
         model_buffer=test_utils.load_file(_MODEL_NAME))
     self.assertEqual(tensor_types, list(_EXPECTED_OUTPUT_TYPES))
 
+  def test_save_and_load_file(self):
+    expected_file_bytes = b"This is a test file."
+    file_path = self.create_tempfile().full_path
+
+    writer_utils.save_file(expected_file_bytes, file_path)
+    file_bytes = writer_utils.load_file(file_path)
+    self.assertEqual(file_bytes, expected_file_bytes)
+
 
 if __name__ == "__main__":
   tf.test.main()
