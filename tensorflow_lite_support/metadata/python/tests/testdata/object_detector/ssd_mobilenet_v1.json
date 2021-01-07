@@ -107,6 +107,16 @@
           "stats": {
           }
         }
+      ],
+      "output_tensor_groups": [
+        {
+          "name": "detection_result",
+          "tensor_names": [
+            "location",
+            "category",
+            "score"
+          ]
+        }
       ]
     }
   ]

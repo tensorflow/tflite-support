@@ -16,7 +16,9 @@
 
 from typing import List, Optional
 
+import flatbuffers
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
+from tensorflow_lite_support.metadata.python import metadata as _metadata
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_writer
 from tensorflow_lite_support.metadata.python.metadata_writers import writer_utils
@@ -38,6 +40,7 @@ _OUTPUT_NUMBER_NAME = "number of detections"
 _OUTPUT_NUMBER_DESCRIPTION = "The number of the detected boxes."
 _CONTENT_VALUE_DIM = 2
 _BOUNDING_BOX_INDEX = (1, 0, 3, 2)
+_GROUP_NAME = "detection_result"
 
 
 def _create_1d_value_range(dim: int) -> _metadata_fb.ValueRangeT:
@@ -139,16 +142,36 @@ class MetadataWriter(metadata_writer.MetadataWriter):
     if output_category_md.associated_files is None:
       output_category_md.associated_files = []
 
-    return super().create_from_metadata(
+    # Create output tensor group info.
+    group = _metadata_fb.TensorGroupT()
+    group.name = _GROUP_NAME
+    group.tensorNames = [
+        output_location_md.name, output_category_md.name, output_score_md.name
+    ]
+
+    # Create subgraph info.
+    subgraph_metadata = _metadata_fb.SubGraphMetadataT()
+    subgraph_metadata.inputTensorMetadata = [input_md.create_metadata()]
+    subgraph_metadata.outputTensorMetadata = [
+        _create_location_metadata(output_location_md),
+        _create_metadata_with_value_range(output_category_md),
+        _create_metadata_with_value_range(output_score_md),
+        output_number_md.create_metadata()
+    ]
+    subgraph_metadata.outputTensorGroups = [group]
+
+    # Create model metadata
+    model_metadata = general_md.create_metadata()
+    model_metadata.subgraphMetadata = [subgraph_metadata]
+
+    b = flatbuffers.Builder(0)
+    b.Finish(
+        model_metadata.Pack(b),
+        _metadata.MetadataPopulator.METADATA_FILE_IDENTIFIER)
+
+    return cls(
         model_buffer,
-        model_metadata=general_md.create_metadata(),
-        input_metadata=[input_md.create_metadata()],
-        output_metadata=[
-            _create_location_metadata(output_location_md),
-            _create_metadata_with_value_range(output_category_md),
-            _create_metadata_with_value_range(output_score_md),
-            output_number_md.create_metadata()
-        ],
+        b.Output(),
         associated_files=[
             file.file_path for file in output_category_md.associated_files
         ])
