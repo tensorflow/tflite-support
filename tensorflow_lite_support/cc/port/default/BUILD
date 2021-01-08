@@ -44,7 +44,14 @@ cc_library(
     deps = [
         "//tensorflow_lite_support/cc/port:status_macros",
         "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
+        "@com_google_absl//absl/synchronization",
+        "@flatbuffers",
         "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/delegates:interpreter_utils",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_cc_proto",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:delegate_registry",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:proto_to_flatbuffer",
     ],
 )

@@ -19,37 +19,74 @@ limitations under the License.
 #include <utility>
 
 #include "absl/status/status.h"
+#include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/experimental/acceleration/configuration/configuration.pb.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
 #include "tensorflow/lite/interpreter.h"
 
 namespace tflite {
 namespace support {
 
-// Wrapper for a TfLiteInterpreter that may be accelerated[1]. This is NOT yet
-// implemented: this class only provides a first, minimal interface in the
-// meanwhile.
+// Wrapper for a TfLiteInterpreter that may be accelerated [1]. Meant to be
+// substituted for `unique_ptr<tflite::Interpreter>` class members.
 //
-// [1] See tensorflow/lite/experimental/acceleration for more details.
+// This class is in charge of:
+// * Picking, instantiating and configuring the right delegate for the provided
+//   ComputeSettings [2],
+// * Providing methods to initialize and invoke the Interpreter with optional
+//   (controlled through the ComputeSettings) automatic fallback to CPU if any
+//   acceleration-related error occurs at compilation or runtime.
+// * TODO(b/169474250) Cache interpreters for multiple input sizes to enable
+//   performant acceleration for the case where input size changes frequently.
+//
+// IMPORTANT: The only supported delegates are (as defined in [1]) NONE, GPU,
+// HEXAGON and NNAPI. Trying to use this class with EDGETPU or XNNPACK delegates
+// will cause an UnimplementedError to be thrown at initialization time.
+//
+// Like TfLiteInterpreter, this class is thread-compatible. Use from multiple
+// threads must be guarded by synchronization outside this class.
+//
+// [1]:
+// https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/configuration.proto
 class TfLiteInterpreterWrapper {
  public:
-  TfLiteInterpreterWrapper() = default;
+  TfLiteInterpreterWrapper();
 
   virtual ~TfLiteInterpreterWrapper() = default;
 
-  // Calls `interpreter_initializer` and then `AllocateTensors`. Future
-  // implementation of this method will attempt to apply the provided
-  // `compute_settings` with a graceful fallback in case a failure occurs.
-  // Note: before this gets implemented, do NOT call this method with non-empty
-  // `compute_settings` otherwise an unimplemented error occurs.
+  // Calls `interpreter_initializer` to construct the Interpreter, then
+  // initializes it with the appropriate delegate (if any) specified through
+  // `compute_settings` and finally calls AllocateTensors() on it.
+  //
+  // Whether or not this function automatically falls back to using CPU in case
+  // initialization with a delegate fails depends on the FallbackSettings
+  // specified in the TFLiteSettings of the provided ComputeSettings: if the
+  // `allow_automatic_fallback_on_compilation_error` field is set to true,
+  // fallback will automatically happen; otherwise an InternalError will be
+  // thrown.
+  // This flag allows callers to rely on this function whether or not they
+  // actually want fallback to happen; if they don't, it will ensure that the
+  // configuration doesn't accidentally trigger fallback.
+  //
+  // IMPORTANT: The only supported delegates are NONE, GPU, HEXAGON and NNAPI.
+  // Trying to use this method with EDGETPU or XNNPACK delegates will cause an
+  // UnimplementedError to be thrown.
   absl::Status InitializeWithFallback(
       std::function<absl::Status(std::unique_ptr<tflite::Interpreter>*)>
           interpreter_initializer,
       const tflite::proto::ComputeSettings& compute_settings);
 
-  // Calls `set_inputs` and then Invoke() on the interpreter. Future
-  // implementation of this method will perform a graceful fallback in case a
-  // failure occur due to the `compute_settings` provided at initialization
-  // time.
+  // Calls `set_inputs` and then Invoke() on the interpreter.
+  //
+  // Whether or not this function automatically falls back to using CPU in case
+  // invocation with a delegate fails depends on the FallbackSettings
+  // specified in the TFLiteSettings of the ComputeSettings provided at
+  // initialization: if the `allow_automatic_fallback_on_execution_error`
+  // field is set to true, fallback will automatically happen; otherwise an
+  // InternalError will be thrown.
+  // This flag allows callers to rely on this function whether or not they
+  // actually want fallback to happen; if they don't, it will ensure that the
+  // configuration doesn't accidentally trigger fallback.
   absl::Status InvokeWithFallback(
       const std::function<absl::Status(tflite::Interpreter* interpreter)>&
           set_inputs);
@@ -58,8 +95,23 @@ class TfLiteInterpreterWrapper {
   // before-hand.
   absl::Status InvokeWithoutFallback();
 
-  // Cancels the current running TFLite invocation on CPU. This method is not
-  // yet implemented though it is safe to use it as it acts as a NOP.
+  // Cancels the current TFLite **CPU** inference.
+  //
+  // IMPORTANT: If inference is entirely running on a delegate, this has no
+  // effect; if inference is partially delegated, only the CPU part is
+  // cancelled.
+  //
+  // Usually called on a different thread than the one Invoke() is running
+  // on. Calling Cancel() while InvokeWithFallback() or InvokeWithoutFallback()
+  // is running may cause these methods to return a `CancelledError` with empty
+  // results. Calling Cancel() at any other time doesn't have any effect.
+  //
+  // InvokeWithFallback() and InvokeWithoutFallback() reset the cancel flag
+  // right before the underlying Invoke() is called, so these two methods can be
+  // called again on the same instance after a call to Cancel().
+  //
+  // Note that this is the only method that can be called from another thread
+  // without locking.
   void Cancel();
 
   // Accesses the underlying interpreter for other methods.
@@ -72,8 +124,83 @@ class TfLiteInterpreterWrapper {
   TfLiteInterpreterWrapper(const TfLiteInterpreterWrapper&) = delete;
   TfLiteInterpreterWrapper& operator=(const TfLiteInterpreterWrapper&) = delete;
 
+  // Whether an error has occurred with the delegate.
+  bool HasDelegateError() { return got_error_do_not_delegate_anymore_; }
+
+ protected:
+  // The delegate used to accelerate inference.
+  Interpreter::TfLiteDelegatePtr delegate_;
+  // The corresponding delegate plugin.
+  std::unique_ptr<tflite::delegates::DelegatePluginInterface> delegate_plugin_;
+
  private:
+  // Performs sanity checks on the provided ComputeSettings.
+  static absl::Status SanityCheckComputeSettings(
+      const tflite::proto::ComputeSettings& compute_settings);
+
+  // Inner function for initializing an interpreter with fallback, optionally
+  // resizing input tensors by calling `resize` on the newly initialized
+  // interpreter.
+  absl::Status InitializeWithFallbackAndResize(
+      std::function<absl::Status(Interpreter* interpreter)> resize =
+          [](Interpreter* interpreter) { return absl::OkStatus(); });
+
+  // Initializes the delegate plugin and creates the delegate.
+  absl::Status InitializeDelegate();
+
+  // Wrapper around the interpreter's `AllocateTensors()` method converting the
+  // returned `TfLiteStatus` to an `absl::Status`.
+  absl::Status AllocateTensors();
+
+  // The interpreter instance being used.
   std::unique_ptr<tflite::Interpreter> interpreter_;
+  // The function used to initialize the interpreter and store it into the
+  // provided `std::unique_ptr`.
+  // This is typically a wrapper function around `tflite::InterpreterBuilder`,
+  // giving the caller the opportunity to hook-up a custom `tflite::OpResolver`
+  // and / or `tflite::ErrorReporter`.
+  std::function<absl::Status(std::unique_ptr<Interpreter>*)>
+      interpreter_initializer_;
+
+  // The ComputeSettings provided at initialization time.
+  tflite::proto::ComputeSettings compute_settings_;
+
+  // Set to true if an occurs with the specified delegate (if any), causing
+  // future calls to fallback on CPU.
+  bool got_error_do_not_delegate_anymore_;
+
+  // Fallback behavior as specified through the ComputeSettings.
+  bool fallback_on_compilation_error_;
+  bool fallback_on_execution_error_;
+
+  // Used to convert the ComputeSettings proto to FlatBuffer format.
+  flatbuffers::FlatBufferBuilder flatbuffers_builder_;
+
+  // Cancellation flag definition.
+  struct CancelFlag {
+    // Mutex to guard the `cancel_flag`.
+    mutable absl::Mutex cancel_mutex;
+
+    // A flag indicates if the caller cancels the TFLite interpreter invocation.
+    bool cancel_flag ABSL_GUARDED_BY(cancel_mutex) = false;
+
+    // Returns `cancel_flag`.
+    bool Get() const ABSL_LOCKS_EXCLUDED(cancel_mutex) {
+      absl::MutexLock cancel_lock(&cancel_mutex);
+      return cancel_flag;
+    }
+
+    // Sets `cancel_flag` to `value`.
+    void Set(bool value) ABSL_LOCKS_EXCLUDED(cancel_mutex) {
+      absl::MutexLock cancel_lock(&cancel_mutex);
+      cancel_flag = value;
+    }
+  };
+  CancelFlag cancel_flag_;
+
+  // Sets up the TFLite invocation cancellation by
+  // tflite::Interpreter::SetCancellationFunction().
+  void SetTfLiteCancellation();
 };
 
 }  // namespace support
