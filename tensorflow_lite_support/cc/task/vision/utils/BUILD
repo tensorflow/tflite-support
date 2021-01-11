@@ -32,6 +32,7 @@ cc_library(
         "frame_buffer_common_utils.h",
         "frame_buffer_utils_interface.h",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
