@@ -110,3 +110,17 @@ py_test(
         "@absl_py//absl/testing:parameterized",
     ],
 )
+
+py_test(
+    name = "image_segmenter_test",
+    srcs = ["image_segmenter_test.py"],
+    data = ["//tensorflow_lite_support/metadata/python/tests/testdata/image_segmenter:test_files"],
+    python_version = "PY3",
+    srcs_version = "PY3",
+    deps = [
+        ":test_utils",
+        # tensorflow dep,
+        "//tensorflow_lite_support/metadata/python/metadata_writers:image_segmenter",
+        "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
+    ],
+)

@@ -79,3 +79,18 @@ py_library(
         "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
     ],
 )
+
+py_library(
+    name = "image_segmenter",
+    srcs = [
+        "image_segmenter.py",
+    ],
+    srcs_version = "PY3",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":metadata_info",
+        ":metadata_writer",
+        ":writer_utils",
+        "//tensorflow_lite_support/metadata:metadata_schema_py",
+    ],
+)
