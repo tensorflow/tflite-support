@@ -146,6 +146,13 @@ http_archive(
         "https://mirror.bazel.build/github.com/google/glog/archive/028d37889a1e80e8a07da1b8945ac706259e5fd8.tar.gz",
         "https://github.com/google/glog/archive/028d37889a1e80e8a07da1b8945ac706259e5fd8.tar.gz",
     ],
+    # The fix is actually from https://github.com/google/glog/commit/1227cf4dab20ea7b1770822c9db8c99498ba0f37#.
+    patches = [
+        "@//third_party:glog_android_posix_fadvise_fixes.diff"
+    ],
+    patch_args = [
+        "-p1",
+    ],
 )
 
 
