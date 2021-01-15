@@ -50,6 +50,9 @@ jobject ConvertToCategory(JNIEnv* env, const Class& classification) {
   jobject jcategory =
       env->CallStaticObjectMethod(category_class, category_create, label,
                                   display_name, classification.score());
+  env->DeleteLocalRef(category_class);
+  env->DeleteLocalRef(label);
+  env->DeleteLocalRef(display_name);
   return jcategory;
 }
 
