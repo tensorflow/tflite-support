@@ -35,7 +35,7 @@ jobject ConvertToCategory(JNIEnv* env, const Class& classification) {
   jclass category_class = env->FindClass(kCategoryClassName);
   jmethodID category_create = env->GetStaticMethodID(
       category_class, "create",
-      absl::StrCat("(", kStringClassName, kStringClassName, "F)L",
+      absl::StrCat("(", kStringClassName, kStringClassName, "FI)L",
                    kCategoryClassName, ";")
           .c_str());
 
@@ -47,9 +47,9 @@ jobject ConvertToCategory(JNIEnv* env, const Class& classification) {
                                         ? classification.display_name()
                                         : kEmptyString;
   jstring display_name = env->NewStringUTF(display_name_string.c_str());
-  jobject jcategory =
-      env->CallStaticObjectMethod(category_class, category_create, label,
-                                  display_name, classification.score());
+  jobject jcategory = env->CallStaticObjectMethod(
+      category_class, category_create, label, display_name,
+      classification.score(), classification.index());
   env->DeleteLocalRef(category_class);
   env->DeleteLocalRef(label);
   env->DeleteLocalRef(display_name);

@@ -19,11 +19,14 @@ import java.util.Objects;
 import org.tensorflow.lite.annotations.UsedByReflection;
 
 /**
- * Category is a util class, contains a label, its display name and a float value as score.
- * Typically it's used as result of classification tasks.
+ * Category is a util class, contains a label, its display name, a float value as score, and the
+ * index of the label in the corresponding label file. Typically it's used as result of
+ * classification tasks.
  */
 @UsedByReflection("TFLiteSupport/Task")
 public final class Category {
+  private static final int DEFAULT_INDEX = -1;
+  private final int index;
   private final String label;
   private final String displayName;
   private final float score;
@@ -31,25 +34,35 @@ public final class Category {
   /**
    * Constructs a {@link Category} object.
    *
+   * @param label the label of this category object
    * @param displayName the display name of the label, which may be translated for different
    *     locales. For exmaple, a label, "apple", may be translated into Spanish for display purpose,
    *     so that the displayName is "manzana".
+   * @param score the probability score of this label category
+   * @param index the index of the label in the corresponding label file
    */
   @UsedByReflection("TFLiteSupport/Task")
-  public static Category create(String label, String displayName, float score) {
-    return new Category(label, displayName, score);
+  public static Category create(String label, String displayName, float score, int index) {
+    return new Category(label, displayName, score, index);
   }
 
+  /** Constructs a {@link Category} object with the default index (-1). */
   @UsedByReflection("TFLiteSupport/Task")
-  /** Constructs a {@link Category} object with an empty displayName. */
-  public Category(String label, float score) {
-    this(label, /*displayName=*/ "", score);
+  public static Category create(String label, String displayName, float score) {
+    return new Category(label, displayName, score, DEFAULT_INDEX);
   }
 
-  private Category(String label, String displayName, float score) {
+  /** Constructs a {@link Category} object with an empty displayName and the default index (-1). */
+  @UsedByReflection("TFLiteSupport/Task")
+  public Category(String label, float score) {
+    this(label, /*displayName=*/ "", score, DEFAULT_INDEX);
+  }
+
+  private Category(String label, String displayName, float score, int index) {
     this.label = label;
     this.displayName = displayName;
     this.score = score;
+    this.index = index;
   }
 
   /** Gets the reference of category's label. */
@@ -72,24 +85,41 @@ public final class Category {
     return score;
   }
 
+  /**
+   * Gets the index of the category. The index value might be -1, which means it has not been set up
+   * properly and is invalid.
+   */
+  public int getIndex() {
+    return index;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (o instanceof Category) {
       Category other = (Category) o;
       return (other.getLabel().equals(this.label)
           && other.getDisplayName().equals(this.displayName)
-          && other.getScore() == this.score);
+          && other.getScore() == this.score
+          && other.getIndex() == this.index);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(label, displayName, score);
+    return Objects.hash(label, displayName, score, index);
   }
 
   @Override
   public String toString() {
-    return "<Category \"" + label + "\" (displayName=" + displayName + "\" (score=" + score + ")>";
+    return "<Category \""
+        + label
+        + "\" (displayName="
+        + displayName
+        + " score="
+        + score
+        + " index="
+        + index
+        + ")>";
   }
 }
