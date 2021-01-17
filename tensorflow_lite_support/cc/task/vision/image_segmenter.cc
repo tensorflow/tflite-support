@@ -166,10 +166,11 @@ StatusOr<std::unique_ptr<ImageSegmenter>> ImageSegmenter::CreateFromOptions(
   // Copy options to ensure the ExternalFile outlives the constructed object.
   auto options_copy = absl::make_unique<ImageSegmenterOptions>(options);
 
-  ASSIGN_OR_RETURN(auto image_segmenter,
-                   TaskAPIFactory::CreateFromExternalFileProto<ImageSegmenter>(
-                       &options_copy->model_file_with_metadata(),
-                       std::move(resolver), options_copy->num_threads()));
+  ASSIGN_OR_RETURN(
+      auto image_segmenter,
+      TaskAPIFactory::CreateFromExternalFileProto<ImageSegmenter>(
+          &options_copy->model_file_with_metadata(), std::move(resolver),
+          options_copy->num_threads(), options_copy->compute_settings()));
 
   RETURN_IF_ERROR(image_segmenter->Init(std::move(options_copy)));
 

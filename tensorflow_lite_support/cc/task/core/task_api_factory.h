@@ -78,17 +78,22 @@ class TaskAPIFactory {
       const ExternalFile* external_file,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
-      int num_threads = 1) {
+      int num_threads = 1,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings()) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
     RETURN_IF_ERROR(engine->BuildModelFromExternalFileProto(external_file));
-    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads);
+    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
+                                     compute_settings);
   }
 
  private:
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromTfLiteEngine(
-      std::unique_ptr<TfLiteEngine> engine, int num_threads) {
-    RETURN_IF_ERROR(engine->InitInterpreter(num_threads));
+      std::unique_ptr<TfLiteEngine> engine, int num_threads,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings()) {
+    RETURN_IF_ERROR(engine->InitInterpreter(compute_settings, num_threads));
     return absl::make_unique<T>(std::move(engine));
   }
 };
