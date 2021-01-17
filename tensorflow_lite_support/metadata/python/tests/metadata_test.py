@@ -608,6 +608,31 @@ class MetadataPopulatorTest(MetadataTest):
     recorded_files = populator.get_recorded_associated_file_list()
     self.assertEqual(set(recorded_files), set(expected_files))
 
+  def testPopulatedFullPathAssociatedFileShouldSucceed(self):
+    # Create AssociatedFileT using the full path file name.
+    associated_file = _metadata_fb.AssociatedFileT()
+    associated_file.name = self._file1
+
+    # Create model metadata with the associated file.
+    subgraph = _metadata_fb.SubGraphMetadataT()
+    subgraph.associatedFiles = [associated_file]
+    # Creates the input and output tensor metadata to match self._model_file.
+    dummy_tensor = _metadata_fb.TensorMetadataT()
+    subgraph.inputTensorMetadata = [dummy_tensor, dummy_tensor]
+    subgraph.outputTensorMetadata = [dummy_tensor]
+    md_buffer = self._create_model_meta_with_subgraph_meta(subgraph)
+
+    # Populate the metadata to a model.
+    populator = _metadata.MetadataPopulator.with_model_file(self._model_file)
+    populator.load_metadata_buffer(md_buffer)
+    populator.load_associated_files([self._file1])
+    populator.populate()
+
+    # The recorded file name in metadata should only contain file basename; file
+    # directory should not be included.
+    recorded_files = populator.get_recorded_associated_file_list()
+    self.assertEqual(set(recorded_files), set([os.path.basename(self._file1)]))
+
 
 class MetadataDisplayerTest(MetadataTest):
 

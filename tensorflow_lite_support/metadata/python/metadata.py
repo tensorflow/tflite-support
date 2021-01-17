@@ -193,47 +193,17 @@ class MetadataPopulator(object):
     Returns:
       List of recorded associated files.
     """
-    recorded_files = []
-
     if not self._metadata_buf:
-      return recorded_files
+      return []
 
-    metadata = _metadata_fb.ModelMetadata.GetRootAsModelMetadata(
-        self._metadata_buf, 0)
+    metadata = _metadata_fb.ModelMetadataT.InitFromObj(
+        _metadata_fb.ModelMetadata.GetRootAsModelMetadata(
+            self._metadata_buf, 0))
 
-    # Add associated files attached to ModelMetadata.
-    recorded_files += self._get_associated_files_from_table(
-        metadata, "AssociatedFiles")
-
-    # Add associated files attached to each SubgraphMetadata.
-    for j in range(metadata.SubgraphMetadataLength()):
-      subgraph = metadata.SubgraphMetadata(j)
-      recorded_files += self._get_associated_files_from_table(
-          subgraph, "AssociatedFiles")
-
-      # Add associated files attached to each input tensor.
-      for k in range(subgraph.InputTensorMetadataLength()):
-        recorded_files += self._get_associated_files_from_table(
-            subgraph.InputTensorMetadata(k), "AssociatedFiles")
-        recorded_files += self._get_associated_files_from_process_units(
-            subgraph.InputTensorMetadata(k), "ProcessUnits")
-
-      # Add associated files attached to each output tensor.
-      for k in range(subgraph.OutputTensorMetadataLength()):
-        recorded_files += self._get_associated_files_from_table(
-            subgraph.OutputTensorMetadata(k), "AssociatedFiles")
-        recorded_files += self._get_associated_files_from_process_units(
-            subgraph.OutputTensorMetadata(k), "ProcessUnits")
-
-      # Add associated files attached to the input_process_units.
-      recorded_files += self._get_associated_files_from_process_units(
-          subgraph, "InputProcessUnits")
-
-      # Add associated files attached to the output_process_units.
-      recorded_files += self._get_associated_files_from_process_units(
-          subgraph, "OutputProcessUnits")
-
-    return recorded_files
+    return [
+        file.name.decode("utf-8")
+        for file in self._get_recorded_associated_file_object_list(metadata)
+    ]
 
   def load_associated_files(self, associated_files):
     """Loads associated files that to be concatenated after the model file.
@@ -276,6 +246,10 @@ class MetadataPopulator(object):
     metadata = _metadata_fb.ModelMetadataT.InitFromObj(
         _metadata_fb.ModelMetadata.GetRootAsModelMetadata(metadata_buf, 0))
     metadata.minParserVersion = min_version
+
+    # Remove local file directory in the `name` field of `AssociatedFileT`, and
+    # make it consistent with the name of the actual file packed in the model.
+    self._use_basename_for_associated_files_in_metadata(metadata)
 
     b = flatbuffers.Builder(0)
     b.Finish(metadata.Pack(b), self.METADATA_FILE_IDENTIFIER)
@@ -373,36 +347,25 @@ class MetadataPopulator(object):
         either "InputProcessUnits" or "OutputProcessUnits".
 
     Returns:
-      the associated files list.
+      A list of AssociatedFileT objects.
     """
 
     if table is None:
-      return
+      return []
 
     file_list = []
-    length_method = getattr(table, field_name + "Length", None)
-    member_method = getattr(table, field_name, None)
-    if length_method is None or member_method is None:
-      raise ValueError("{0} does not have the field {1}".format(
-          type(table).__name__, field_name))
-
-    for k in range(length_method()):
-      process_unit = member_method(k)
-      tokenizer = process_unit.Options()
-      if (process_unit.OptionsType() is
-          _metadata_fb.ProcessUnitOptions.BertTokenizerOptions):
-        bert_tokenizer = _metadata_fb.BertTokenizerOptions()
-        bert_tokenizer.Init(tokenizer.Bytes, tokenizer.Pos)
+    process_units = getattr(table, field_name)
+    # If the process_units field is not populated, it will be None. Use an
+    # empty list to skip the check.
+    for process_unit in process_units or []:
+      options = process_unit.options
+      if isinstance(options, (_metadata_fb.BertTokenizerOptionsT,
+                              _metadata_fb.RegexTokenizerOptionsT)):
+        file_list += self._get_associated_files_from_table(options, "vocabFile")
+      elif isinstance(options, _metadata_fb.SentencePieceTokenizerOptionsT):
         file_list += self._get_associated_files_from_table(
-            bert_tokenizer, "VocabFile")
-      elif (process_unit.OptionsType() is
-            _metadata_fb.ProcessUnitOptions.SentencePieceTokenizerOptions):
-        sentence_piece = _metadata_fb.SentencePieceTokenizerOptions()
-        sentence_piece.Init(tokenizer.Bytes, tokenizer.Pos)
-        file_list += self._get_associated_files_from_table(
-            sentence_piece, "SentencePieceModel")
-        file_list += self._get_associated_files_from_table(
-            sentence_piece, "VocabFile")
+            options, "sentencePieceModel")
+        file_list += self._get_associated_files_from_table(options, "vocabFile")
     return file_list
 
   def _get_associated_files_from_table(self, table, field_name):
@@ -417,17 +380,62 @@ class MetadataPopulator(object):
         be "VocabFile".
 
     Returns:
-      the associated files list.
+      A list of AssociatedFileT objects.
     """
 
     if table is None:
-      return
-    file_list = []
-    length_method = getattr(table, field_name + "Length")
-    member_method = getattr(table, field_name)
-    for j in range(length_method()):
-      file_list.append(member_method(j).Name().decode("utf-8"))
-    return file_list
+      return []
+
+    # If the associated file field is not populated,
+    # `getattr(table, field_name)` will be None. Return an empty list.
+    return getattr(table, field_name) or []
+
+  def _get_recorded_associated_file_object_list(self, metadata):
+    """Gets a list of AssociatedFileT objects recorded in the metadata.
+
+    Associated files may be attached to a model, a subgraph, or an input/output
+    tensor.
+
+    Args:
+      metadata: the ModelMetadataT object.
+
+    Returns:
+      List of recorded AssociatedFileT objects.
+    """
+    recorded_files = []
+
+    # Add associated files attached to ModelMetadata.
+    recorded_files += self._get_associated_files_from_table(
+        metadata, "associatedFiles")
+
+    # Add associated files attached to each SubgraphMetadata.
+    for subgraph in metadata.subgraphMetadata or []:
+      recorded_files += self._get_associated_files_from_table(
+          subgraph, "associatedFiles")
+
+      # Add associated files attached to each input tensor.
+      for tensor_metadata in subgraph.inputTensorMetadata or []:
+        recorded_files += self._get_associated_files_from_table(
+            tensor_metadata, "associatedFiles")
+        recorded_files += self._get_associated_files_from_process_units(
+            tensor_metadata, "processUnits")
+
+      # Add associated files attached to each output tensor.
+      for tensor_metadata in subgraph.outputTensorMetadata or []:
+        recorded_files += self._get_associated_files_from_table(
+            tensor_metadata, "associatedFiles")
+        recorded_files += self._get_associated_files_from_process_units(
+            tensor_metadata, "processUnits")
+
+      # Add associated files attached to the input_process_units.
+      recorded_files += self._get_associated_files_from_process_units(
+          subgraph, "inputProcessUnits")
+
+      # Add associated files attached to the output_process_units.
+      recorded_files += self._get_associated_files_from_process_units(
+          subgraph, "outputProcessUnits")
+
+    return recorded_files
 
   def _populate_associated_files(self):
     """Concatenates associated files after TensorFlow Lite model file.
@@ -506,6 +514,11 @@ class MetadataPopulator(object):
     else:
       with open(self._model_file, "wb") as f:
         f.write(model_buf)
+
+  def _use_basename_for_associated_files_in_metadata(self, metadata):
+    """Removes any associated file local directory (if exists)."""
+    for file in self._get_recorded_associated_file_object_list(metadata):
+      file.name = os.path.basename(file.name)
 
   def _validate_metadata(self, metadata_buf):
     """Validates the metadata to be populated."""
