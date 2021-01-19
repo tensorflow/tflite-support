@@ -32,5 +32,6 @@ tflite_jni_binary(
         "//tensorflow_lite_support/java/jni",
         "//tensorflow_lite_support/java/src/native/task/vision:jni_utils",
         "@com_google_absl//absl/strings",
+        "@org_tensorflow//tensorflow/lite/kernels:deprecated_backends",
     ],
 )
