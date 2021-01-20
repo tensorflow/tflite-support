@@ -235,10 +235,10 @@ absl::Status TfLiteEngine::InitInterpreter(
         "BuildModelFrom methods before calling InitInterpreter.");
   }
 #if TFLITE_USE_C_API
-  std::function<absl::Status(TfLiteDelegate*,
+  std::function<absl::Status(const acceleration::InterpreterCreationResources &,
                              std::unique_ptr<Interpreter, InterpreterDeleter>*)>
       initializer = [this, num_threads](
-          TfLiteDelegate* optional_delegate,
+          const acceleration::InterpreterCreationResources& resources,
           std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
       -> absl::Status {
     std::unique_ptr<TfLiteInterpreterOptions,
@@ -248,8 +248,13 @@ absl::Status TfLiteEngine::InitInterpreter(
     TfLiteInterpreterOptionsSetOpResolver(options.get(), FindBuiltinOp,
                                           FindCustomOp, resolver_.get());
     TfLiteInterpreterOptionsSetNumThreads(options.get(), num_threads);
-    if (optional_delegate != nullptr) {
-      TfLiteInterpreterOptionsAddDelegate(options.get(), optional_delegate);
+    if (resources.optional_delegate != nullptr) {
+      TfLiteInterpreterOptionsAddDelegate(options.get(),
+                                          resources.optional_delegate);
+    }
+    if (resources.fallback_on_execution_error) {
+      TfLiteInterpreterOptionsSetEnableDelegateFallback(
+          options.get(), resources.fallback_on_execution_error);
     }
     interpreter_out->reset(
         TfLiteInterpreterCreateWithSelectedOps(model_.get(), options.get()));
