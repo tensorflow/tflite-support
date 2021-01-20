@@ -56,6 +56,19 @@ absl::Status TfLiteInterpreterWrapper::InitializeWithFallback(
     std::function<absl::Status(std::unique_ptr<tflite::Interpreter>*)>
         interpreter_initializer,
     const ComputeSettings& compute_settings) {
+  return InitializeWithFallback(
+      [interpreter_initializer](
+          const InterpreterCreationResources& /*resources*/,
+          std::unique_ptr<tflite::Interpreter>* interpreter_out)
+          -> absl::Status { return interpreter_initializer(interpreter_out); },
+      compute_settings);
+}
+
+absl::Status TfLiteInterpreterWrapper::InitializeWithFallback(
+    std::function<absl::Status(const InterpreterCreationResources&,
+                               std::unique_ptr<tflite::Interpreter>*)>
+        interpreter_initializer,
+    const ComputeSettings& compute_settings) {
   // Store interpreter initializer if not already here.
   if (interpreter_initializer_) {
     return absl::FailedPreconditionError(
@@ -101,7 +114,8 @@ absl::Status TfLiteInterpreterWrapper::AllocateTensors() {
 // ResizeAndAllocateTensors functions, coming soon.
 absl::Status TfLiteInterpreterWrapper::InitializeWithFallbackAndResize(
     std::function<absl::Status(Interpreter* interpreter)> resize) {
-  RETURN_IF_ERROR(interpreter_initializer_(&interpreter_));
+  RETURN_IF_ERROR(
+      interpreter_initializer_(InterpreterCreationResources(), &interpreter_));
   RETURN_IF_ERROR(resize(interpreter_.get()));
   SetTfLiteCancellation();
 

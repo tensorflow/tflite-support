@@ -20,12 +20,31 @@ limitations under the License.
 
 #include "absl/status/status.h"
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
+#include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/experimental/acceleration/configuration/configuration.pb.h"
 #include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
 #include "tensorflow/lite/interpreter.h"
 
 namespace tflite {
 namespace support {
+
+// Options that are created by `TFLiteInterpreterWrapper` and will help to
+// initialize Interpreter in the callback function. `TFLiteInterpreterWrapper`
+// retains ownership of the included options, and will ensure that they remain
+// valid for the duration of the created interpreter's lifetime.
+struct InterpreterCreationResources {
+#if TFLITE_USE_C_API
+  // The delegate created according to `Acceleration`.
+  // `TfLiteInterpreterWrapper` exclusively owns the `TfLiteDelegate` object,
+  // and maintains it through out the lifetime of `TfLiteInterpreterWrapper`.
+  TfLiteDelegate* optional_delegate;
+
+  // Whether to enable automatic fallback to execution without a delegate
+  // if execution with the delegate fails when the interpreter is *invoked*
+  // (as opposed to failure when the interpreter is *constructed*).
+  bool fallback_on_execution_error;
+#endif
+};
 
 // Wrapper for a TfLiteInterpreter that may be accelerated [1]. Meant to be
 // substituted for `unique_ptr<tflite::Interpreter>` class members.
@@ -71,6 +90,13 @@ class TfLiteInterpreterWrapper {
   // IMPORTANT: The only supported delegates are NONE, GPU, HEXAGON and NNAPI.
   // Trying to use this method with EDGETPU or XNNPACK delegates will cause an
   // UnimplementedError to be thrown.
+  absl::Status InitializeWithFallback(
+      std::function<absl::Status(const InterpreterCreationResources&,
+                                 std::unique_ptr<tflite::Interpreter>*)>
+          interpreter_initializer,
+      const tflite::proto::ComputeSettings& compute_settings);
+
+  // Deprecated: Use the one above with `InterpreterCreationResources` instead.
   absl::Status InitializeWithFallback(
       std::function<absl::Status(std::unique_ptr<tflite::Interpreter>*)>
           interpreter_initializer,
@@ -159,7 +185,8 @@ class TfLiteInterpreterWrapper {
   // This is typically a wrapper function around `tflite::InterpreterBuilder`,
   // giving the caller the opportunity to hook-up a custom `tflite::OpResolver`
   // and / or `tflite::ErrorReporter`.
-  std::function<absl::Status(std::unique_ptr<Interpreter>*)>
+  std::function<absl::Status(const InterpreterCreationResources&,
+                             std::unique_ptr<Interpreter>*)>
       interpreter_initializer_;
 
   // The ComputeSettings provided at initialization time.
