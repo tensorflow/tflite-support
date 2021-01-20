@@ -85,10 +85,11 @@ ImageSegmenterOptions ConvertToProtoOptions(JNIEnv* env,
   return proto_options;
 }
 
-void ConvertToSegmentationResults(JNIEnv* env,
-                                  const SegmentationResult& results,
-                                  jobject jmask_buffers, jintArray jmask_shape,
-                                  jobject jcolored_labels) {
+void ConvertFromSegmentationResults(JNIEnv* env,
+                                    const SegmentationResult& results,
+                                    jobject jmask_buffers,
+                                    jintArray jmask_shape,
+                                    jobject jcolored_labels) {
   if (results.segmentation_size() != 1) {
     // Should never happen.
     ThrowException(
@@ -159,7 +160,7 @@ void ConvertToSegmentationResults(JNIEnv* env,
   }
 }
 
-jlong CreateImageClassifierFromOptions(JNIEnv* env,
+jlong CreateImageSegmenterFromOptions(JNIEnv* env,
                                        const ImageSegmenterOptions& options) {
   StatusOr<std::unique_ptr<ImageSegmenter>> image_segmenter_or =
       ImageSegmenter::CreateFromOptions(options);
@@ -198,7 +199,7 @@ Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_initJniWithModelFd
   if (file_descriptor_offset > 0) {
     file_descriptor_meta->set_offset(file_descriptor_offset);
   }
-  return CreateImageClassifierFromOptions(env, proto_options);
+  return CreateImageSegmenterFromOptions(env, proto_options);
 }
 
 extern "C" JNIEXPORT jlong JNICALL
@@ -210,7 +211,7 @@ Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_initJniWithByteBuf
   proto_options.mutable_model_file_with_metadata()->set_file_content(
       static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
       static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
-  return CreateImageClassifierFromOptions(env, proto_options);
+  return CreateImageSegmenterFromOptions(env, proto_options);
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -226,8 +227,8 @@ Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_segmentNative(
       ConvertToFrameBufferOrientation(env, jorientation));
   auto results_or = segmenter->Segment(*frame_buffer);
   if (results_or.ok()) {
-    ConvertToSegmentationResults(env, results_or.value(), jmask_buffers,
-                                 jmask_shape, jcolored_labels);
+    ConvertFromSegmentationResults(env, results_or.value(), jmask_buffers,
+                                   jmask_shape, jcolored_labels);
   } else {
     ThrowException(env, kAssertionError,
                    "Error occurred when segmenting the image: %s",
