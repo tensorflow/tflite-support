@@ -365,7 +365,8 @@ def _concat_flatbuffer_py_srcs_impl(ctx):
     # Merge all generated python files. The files are concatenated and the
     # import statements are removed. Finally we import the flatbuffer runtime
     # library.
-    command = "echo 'import flatbuffers\n' > %s; "
+    command = ""
+    command += "echo 'import flatbuffers\n' > %s; "
     command += "for f in $(find %s -name '*.py'); do cat $f | sed '/import flatbuffers/d' >> %s; done "
     ctx.actions.run_shell(
         inputs = ctx.attr.deps[0].files,
