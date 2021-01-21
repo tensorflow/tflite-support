@@ -89,9 +89,30 @@ StatusOr<std::unique_ptr<ImageClassifier>> ImageClassifier::CreateFromOptions(
 }
 
 /* static */
+StatusOr<std::unique_ptr<ImageClassifier>>
+ImageClassifier::CreateFromBufferAndOptions(
+    const char* model_buffer_data, size_t model_buffer_size,
+    const ImageClassifierOptions& options,
+    std::unique_ptr<tflite::OpResolver> resolver) {
+  RETURN_IF_ERROR(SanityCheckOptions(options, false));
+
+  // Copy options to ensure the ExternalFile outlives the constructed object.
+  auto options_copy = absl::make_unique<ImageClassifierOptions>(options);
+
+  ASSIGN_OR_RETURN(auto image_classifier,
+                   TaskAPIFactory::CreateFromBuffer<ImageClassifier>(
+                       model_buffer_data, model_buffer_size,
+                       std::move(resolver), options_copy->num_threads()));
+
+  RETURN_IF_ERROR(image_classifier->Init(std::move(options_copy)));
+
+  return image_classifier;
+}
+
+/* static */
 absl::Status ImageClassifier::SanityCheckOptions(
-    const ImageClassifierOptions& options) {
-  if (!options.has_model_file_with_metadata()) {
+    const ImageClassifierOptions& options, const bool check_model_file) {
+  if (!options.has_model_file_with_metadata() && check_model_file) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         "Missing mandatory `model_file_with_metadata` field",

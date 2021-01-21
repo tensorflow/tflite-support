@@ -82,6 +82,19 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
+  // Creates an ImageClassifier from the provided TFLite model buffer and
+  // options. A non-default OpResolver can be specified in order to support
+  // custom Ops or specify a subset of built-in Ops.
+  //
+  // The model will be created using the provided model buffer instead of the
+  // `model_file_with_metadata` field in `ImageClassifierOptions`.
+  static tflite::support::StatusOr<std::unique_ptr<ImageClassifier>>
+  CreateFromBufferAndOptions(
+      const char* model_buffer_data, size_t model_buffer_size,
+      const ImageClassifierOptions& options,
+      std::unique_ptr<tflite::OpResolver> resolver =
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
+
   // Performs actual classification on the provided FrameBuffer.
   //
   // The FrameBuffer can be of any size and any of the supported formats, i.e.
@@ -125,7 +138,8 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
       const FrameBuffer& frame_buffer, const BoundingBox& roi) override;
 
   // Performs sanity checks on the provided ImageClassifierOptions.
-  static absl::Status SanityCheckOptions(const ImageClassifierOptions& options);
+  static absl::Status SanityCheckOptions(const ImageClassifierOptions& options,
+                                         const bool check_model_file = true);
 
   // Initializes the ImageClassifier from the provided ImageClassifierOptions,
   // whose ownership is transferred to this object.
