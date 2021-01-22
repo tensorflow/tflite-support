@@ -244,15 +244,12 @@ http_archive(
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "a79d19dcdf9139fa4b81206e318e33d245c4c9da1ffed21c87288ed4380426f9",
-    strip_prefix = "protobuf-3.11.4",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.11.4.tar.gz"],
-    patches = [
-        "@//third_party:com_google_protobuf_fixes.diff"
+    urls = [
+        "https://github.com/protocolbuffers/protobuf/archive/v3.11.2.zip",
     ],
-    patch_args = [
-        "-p1",
-    ],
+    sha256 = "e4f8bedb19a93d0dccc359a126f51158282e0b24d92e0cad9c76a9699698268d",
+    strip_prefix = "protobuf-3.11.2",
+    type = "zip",
 )
 
 # AutoValue 1.6+ shades Guava, Auto Common, and JavaPoet. That's OK
