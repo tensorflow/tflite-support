@@ -15,6 +15,10 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
+
 import android.graphics.PointF;
 import android.graphics.RectF;
 import java.util.ArrayList;
@@ -106,8 +110,22 @@ public class ImageProcessor extends SequentialProcessor<TensorImage> {
         inverseTransform(new PointF(rect.left, rect.top), inputImageHeight, inputImageWidth);
     PointF p2 =
         inverseTransform(new PointF(rect.right, rect.bottom), inputImageHeight, inputImageWidth);
-    return new RectF(
-        Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.max(p1.x, p2.x), Math.max(p1.y, p2.y));
+    return new RectF(min(p1.x, p2.x), min(p1.y, p2.y), max(p1.x, p2.x), max(p1.y, p2.y));
+  }
+
+  /**
+   * Processes a {@link TensorImage} object with prepared {@link TensorOperator}.
+   *
+   * @throws IllegalArgumentException if image is not RGB
+   */
+  @Override
+  public TensorImage process(TensorImage image) {
+    checkArgument(
+        image.getColorSpaceType() == ColorSpaceType.RGB,
+        "Only RGB images are supported in ImageProcessor, but not "
+            + image.getColorSpaceType().name());
+
+    return super.process(image);
   }
 
   /**
