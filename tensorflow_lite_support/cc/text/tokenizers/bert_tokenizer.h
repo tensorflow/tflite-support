@@ -114,7 +114,7 @@ class BertTokenizer : public tflite::support::text::tokenizer::Tokenizer {
 
   // Perform tokenization, return wordpiece-specific tokenized result including
   // subwords and offsets
-  WordpieceTokenizerResult TokenizeWordpiece(const std::string& input);
+  WordpieceTokenizerResult TokenizeWordpiece(const std::string& input) const;
 
   // Check if a certain key is included in the vocab.
   tensorflow::text::LookupStatus Contains(const absl::string_view key,
