@@ -107,6 +107,7 @@ cc_library(
         ":tflite_engine",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/port:tflite_wrapper",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
         "@com_google_absl//absl/status",
         "@org_tensorflow//tensorflow/lite/c:common",

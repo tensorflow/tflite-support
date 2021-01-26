@@ -23,6 +23,7 @@ limitations under the License.
 #include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/port/tflite_wrapper.h"
 #include "tensorflow_lite_support/cc/task/core/base_task_api.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
@@ -30,6 +31,7 @@ limitations under the License.
 namespace tflite {
 namespace task {
 namespace core {
+
 template <typename T>
 using EnableIfBaseUntypedTaskApiSubclass = typename std::enable_if<
     std::is_base_of<BaseUntypedTaskApi, T>::value>::type*;
@@ -44,10 +46,13 @@ class TaskAPIFactory {
       const char* buffer_data, size_t buffer_size,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
-      int num_threads = 1) {
+      int num_threads = 1,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings()) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
     RETURN_IF_ERROR(engine->BuildModelFromFlatBuffer(buffer_data, buffer_size));
-    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads);
+    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
+                                     compute_settings);
   }
 
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
@@ -55,10 +60,13 @@ class TaskAPIFactory {
       const string& file_name,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
-      int num_threads = 1) {
+      int num_threads = 1,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings()) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
     RETURN_IF_ERROR(engine->BuildModelFromFile(file_name));
-    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads);
+    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
+                                     compute_settings);
   }
 
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
@@ -66,10 +74,13 @@ class TaskAPIFactory {
       int file_descriptor,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
-      int num_threads = 1) {
+      int num_threads = 1,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings()) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
     RETURN_IF_ERROR(engine->BuildModelFromFileDescriptor(file_descriptor));
-    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads);
+    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
+                                     compute_settings);
   }
 
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
@@ -78,17 +89,22 @@ class TaskAPIFactory {
       const ExternalFile* external_file,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
-      int num_threads = 1) {
+      int num_threads = 1,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings()) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
     RETURN_IF_ERROR(engine->BuildModelFromExternalFileProto(external_file));
-    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads);
+    return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
+                                     compute_settings);
   }
 
  private:
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromTfLiteEngine(
-      std::unique_ptr<TfLiteEngine> engine, int num_threads) {
-    RETURN_IF_ERROR(engine->InitInterpreter(num_threads));
+      std::unique_ptr<TfLiteEngine> engine, int num_threads,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings()) {
+    RETURN_IF_ERROR(engine->InitInterpreter(compute_settings, num_threads));
     return absl::make_unique<T>(std::move(engine));
   }
 };
