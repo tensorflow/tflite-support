@@ -15,6 +15,8 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image;
 
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
+
 import android.graphics.Bitmap;
 import android.util.Log;
 import org.tensorflow.lite.DataType;
@@ -25,28 +27,57 @@ final class TensorBufferContainer implements ImageContainer {
 
   private final TensorBuffer buffer;
   private final ColorSpaceType colorSpaceType;
+  private final int height;
+  private final int width;
   private static final String TAG = TensorBufferContainer.class.getSimpleName();
 
   /**
    * Creates a {@link TensorBufferContainer} object with the specified {@link
    * TensorImage#ColorSpaceType}.
    *
+   * <p>Only supports {@link ColorSapceType#RGB} and {@link ColorSpaceType#GRAYSCALE}. Use {@link
+   * #create(TensorBuffer, ImageProperties)} for other color space types.
+   *
    * @throws IllegalArgumentException if the shape of the {@link TensorBuffer} does not match the
-   *     specified color space type
+   *     specified color space type, or if the color space type is not supported
    */
   static TensorBufferContainer create(TensorBuffer buffer, ColorSpaceType colorSpaceType) {
-    return new TensorBufferContainer(buffer, colorSpaceType);
+    checkArgument(
+        colorSpaceType == ColorSpaceType.RGB || colorSpaceType == ColorSpaceType.GRAYSCALE,
+        "Only ColorSpaceType.RGB and ColorSpaceType.GRAYSCALE are supported. Use"
+            + " `create(TensorBuffer, ImageProperties)` for other color space types.");
+
+    return new TensorBufferContainer(
+        buffer,
+        colorSpaceType,
+        colorSpaceType.getHeight(buffer.getShape()),
+        colorSpaceType.getWidth(buffer.getShape()));
   }
 
-  private TensorBufferContainer(TensorBuffer buffer, ColorSpaceType colorSpaceType) {
-    colorSpaceType.assertShape(buffer.getShape());
+  static TensorBufferContainer create(TensorBuffer buffer, ImageProperties imageProperties) {
+    return new TensorBufferContainer(
+        buffer,
+        imageProperties.getColorSpaceType(),
+        imageProperties.getHeight(),
+        imageProperties.getWidth());
+  }
+
+  private TensorBufferContainer(
+      TensorBuffer buffer, ColorSpaceType colorSpaceType, int height, int width) {
+    colorSpaceType.assertNumElements(buffer.getFlatSize(), height, width);
     this.buffer = buffer;
     this.colorSpaceType = colorSpaceType;
+    this.height = height;
+    this.width = width;
   }
 
   @Override
   public TensorBufferContainer clone() {
-    return create(TensorBuffer.createFrom(buffer, buffer.getDataType()), colorSpaceType);
+    return new TensorBufferContainer(
+        TensorBuffer.createFrom(buffer, buffer.getDataType()),
+        colorSpaceType,
+        getHeight(),
+        getWidth());
   }
 
   @Override
@@ -75,12 +106,16 @@ final class TensorBufferContainer implements ImageContainer {
 
   @Override
   public int getWidth() {
-    return colorSpaceType.getWidth(buffer.getShape());
+    // In case the underlying buffer in Tensorbuffer gets updated after TensorImage is created.
+    colorSpaceType.assertNumElements(buffer.getFlatSize(), height, width);
+    return width;
   }
 
   @Override
   public int getHeight() {
-    return colorSpaceType.getHeight(buffer.getShape());
+    // In case the underlying buffer in Tensorbuffer gets updated after TensorImage is created.
+    colorSpaceType.assertNumElements(buffer.getFlatSize(), height, width);
+    return height;
   }
 
   @Override

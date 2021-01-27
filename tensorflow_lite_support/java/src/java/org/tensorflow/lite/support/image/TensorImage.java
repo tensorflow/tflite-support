@@ -184,15 +184,43 @@ public class TensorImage {
   /**
    * Loads a {@link TensorBuffer} containing pixel values with the specific {@link ColorSapceType}.
    *
+   * <p>Only supports {@link ColorSapceType#RGB} and {@link ColorSpaceType#GRAYSCALE}. Use {@link
+   * #load(TensorBuffer, ImageProperties)} for other color space types.
+   *
    * <p>Note: if the data type of {@code buffer} does not match that of this {@link TensorImage},
    * numeric casting and clamping will be applied when calling {@link #getTensorBuffer} and {@link
    * #getBuffer}.
    *
-   * @throws IllegalArgumentException if the shape of buffer does not match the color space type
+   * @param buffer the {@link TensorBuffer} to be loaded. Its shape should be either (h, w, 3) or
+   *     (1, h, w, 3) for RGB images, and either (h, w) or (1, h, w) for GRAYSCALE images
+   * @throws IllegalArgumentException if the shape of buffer does not match the color space type, or
+   *     if the color space type is not supported
    * @see ColorSpaceType#assertShape
    */
   public void load(TensorBuffer buffer, ColorSpaceType colorSpaceType) {
+    checkArgument(
+        colorSpaceType == ColorSpaceType.RGB || colorSpaceType == ColorSpaceType.GRAYSCALE,
+        "Only ColorSpaceType.RGB and ColorSpaceType.GRAYSCALE are supported. Use"
+            + " `load(TensorBuffer, ImageProperties)` for other color space types.");
+
     container = TensorBufferContainer.create(buffer, colorSpaceType);
+  }
+
+  /**
+   * Loads a {@link TensorBuffer} containing pixel values with the specific {@link ImageProperties}.
+   *
+   * <p>The shape of the {@link TensorBuffer} will not be used to determine image height and width.
+   * Set image properties through {@link ImageProperties}.
+   *
+   * <p>Note: if the data type of {@code buffer} does not match that of this {@link TensorImage},
+   * numeric casting and clamping will be applied when calling {@link #getTensorBuffer} and {@link
+   * #getBuffer}.
+   *
+   * @throws IllegalArgumentException if the shape of buffer does not match image height, width, and
+   *     color space type in {@link ImageProperties}
+   */
+  public void load(TensorBuffer buffer, ImageProperties imageProperties) {
+    container = TensorBufferContainer.create(buffer, imageProperties);
   }
 
   /**
