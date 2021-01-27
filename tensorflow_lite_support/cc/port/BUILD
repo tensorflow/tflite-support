@@ -24,9 +24,17 @@ cc_library(
 )
 
 cc_library(
+    name = "configuration_proto_inc",
+    hdrs = ["configuration_proto_inc.h"],
+    deps = ["@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_cc_proto"],
+)
+
+cc_library(
     name = "tflite_wrapper",
     hdrs = ["tflite_wrapper.h"],
-    deps = ["//tensorflow_lite_support/cc/port/default:tflite_wrapper"],
+    deps = [
+        "//tensorflow_lite_support/cc/port/default:tflite_wrapper",
+    ],
 )
 
 # This is identical to the rule above, except that it gets built with
@@ -37,7 +45,6 @@ cc_library(
     testonly = 1,
     hdrs = ["tflite_wrapper.h"],
     deps = [
-        "//intelligence/mobile_acceleration/proto:allowlist_portable_proto",
         "//intelligence/mobile_acceleration/support_library:tflite_wrapper_with_c_api_for_test",
     ],
 )

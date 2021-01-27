@@ -26,6 +26,7 @@ limitations under the License.
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/kernels/register.h"
+#include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/tflite_wrapper.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"

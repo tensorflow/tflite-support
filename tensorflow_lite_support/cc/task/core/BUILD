@@ -37,6 +37,7 @@ cc_library(
         ],
     }) + [
         "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:tflite_wrapper",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
@@ -77,6 +78,7 @@ cc_library(
         "@org_tensorflow//tensorflow/lite:stderr_reporter",
     ] + [
         "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:tflite_wrapper_with_c_api_for_test",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
@@ -105,9 +107,9 @@ cc_library(
     deps = [
         ":base_task_api",
         ":tflite_engine",
+        "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
-        "//tensorflow_lite_support/cc/port:tflite_wrapper",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
         "@com_google_absl//absl/status",
         "@org_tensorflow//tensorflow/lite/c:common",
