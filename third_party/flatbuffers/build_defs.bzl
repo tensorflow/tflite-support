@@ -361,17 +361,33 @@ _gen_flatbuffer_srcs = rule(
     output_to_genfiles = True,
 )
 
+def flatbuffer_py_strip_prefix_srcs(name, srcs = [], strip_prefix = ""):
+    """Strips path prefix.
+
+    Args:
+      name: Rule name. (required)
+      srcs: Source .py files. (required)
+      strip_prefix: Path that needs to be stripped from the srcs filepaths. (required)
+    """
+    for i, src in enumerate(srcs):
+        cmd = "mv $< $@"
+        cmd += "| rm -rf " + strip_prefix if i == len(srcs) - 1 else ""
+        native.genrule(
+            name = name + "_" + src.replace(".", "_").replace("/", "_"),
+            srcs = [src],
+            outs = [src.replace(strip_prefix, "")],
+            cmd = cmd,
+        )
+
 def _concat_flatbuffer_py_srcs_impl(ctx):
-    # Merge all generated python files. The files are concatenated and the
-    # import statements are removed. Finally we import the flatbuffer runtime
-    # library.
-    command = "echo 'import flatbuffers\n' > %s; "
-    command += "for f in $(find %s -name '*.py'); do cat $f | sed '/import flatbuffers/d' >> %s; done "
+    # Merge all generated python files. Concatenate the files and replace all
+    # flatbuffer library import statements with a single import statement.
+    command = "find '%s' -name '*.py' -exec cat {} + | sed '/import flatbuffers/d'"
+    command += " | sed '1s/^/import flatbuffers\\'$'\\n/' > %s"
     ctx.actions.run_shell(
         inputs = ctx.attr.deps[0].files,
         outputs = [ctx.outputs.out],
         command = command % (
-            ctx.outputs.out.path,
             ctx.attr.deps[0].files.to_list()[0].path,
             ctx.outputs.out.path,
         ),

@@ -23,9 +23,6 @@ py_test(
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata:test_files"],
     python_version = "PY3",
     srcs_version = "PY3",
-    tags = [
-        "no_mac",  # TODO(b/148247402): flatbuffers import broken on Mac OS.
-    ],
     deps = [
         ":test_utils",
         # tensorflow dep,
@@ -33,7 +30,7 @@ py_test(
         "//tensorflow_lite_support/metadata/python:metadata",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_writer",
-        "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
+        "@flatbuffers//:runtime_py",
     ],
 )
 
@@ -43,9 +40,6 @@ py_test(
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata:test_files"],
     python_version = "PY3",
     srcs_version = "PY3",
-    tags = [
-        "no_mac",  # TODO(b/148247402): flatbuffers import broken on Mac OS.
-    ],
     deps = [
         ":test_utils",
         # tensorflow dep,
@@ -53,8 +47,8 @@ py_test(
         "//tensorflow_lite_support/metadata:schema_py",
         "//tensorflow_lite_support/metadata/python:metadata",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
-        "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
         "@absl_py//absl/testing:parameterized",
+        "@flatbuffers//:runtime_py",
     ],
 )
 
@@ -64,9 +58,6 @@ py_test(
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/object_detector:test_files"],
     python_version = "PY3",
     srcs_version = "PY3",
-    tags = [
-        "no_mac",  # TODO(b/148247402): flatbuffers import broken on Mac OS.
-    ],
     deps = [
         ":test_utils",
         # tensorflow dep,
@@ -81,15 +72,12 @@ py_test(
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/image_classifier:test_files"],
     python_version = "PY3",
     srcs_version = "PY3",
-    tags = [
-        "no_mac",  # TODO(b/148247402): flatbuffers import broken on Mac OS.
-    ],
     deps = [
         ":test_utils",
         # tensorflow dep,
         "//tensorflow_lite_support/metadata/python/metadata_writers:image_classifier",
-        "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
         "@absl_py//absl/testing:parameterized",
+        "@flatbuffers//:runtime_py",
     ],
 )
 
@@ -99,15 +87,12 @@ py_test(
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/object_detector:test_files"],
     python_version = "PY3",
     srcs_version = "PY3",
-    tags = [
-        "no_mac",  # TODO(b/148247402): flatbuffers import broken on Mac OS.
-    ],
     deps = [
         ":test_utils",
         # tensorflow dep,
         "//tensorflow_lite_support/metadata/python/metadata_writers:object_detector",
-        "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
         "@absl_py//absl/testing:parameterized",
+        "@flatbuffers//:runtime_py",
     ],
 )
 
@@ -121,6 +106,6 @@ py_test(
         ":test_utils",
         # tensorflow dep,
         "//tensorflow_lite_support/metadata/python/metadata_writers:image_segmenter",
-        "//tensorflow_lite_support/tools:expect_flatbuffers_installed",
+        "@flatbuffers//:runtime_py",
     ],
 )
