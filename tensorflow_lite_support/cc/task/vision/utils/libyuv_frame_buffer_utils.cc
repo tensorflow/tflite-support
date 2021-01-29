@@ -154,7 +154,7 @@ absl::Status ConvertFromNv21(const FrameBuffer& buffer,
       // The libyuv ABGR format is interleaved RGBA format in memory.
       int ret = libyuv::NV21ToABGR(
           yuv_data.y_buffer, yuv_data.y_row_stride, yuv_data.v_buffer,
-          yuv_data.uv_pixel_stride,
+          yuv_data.uv_row_stride,
           const_cast<uint8*>(output_buffer->plane(0).buffer),
           output_buffer->plane(0).stride.row_stride_bytes,
           buffer.dimension().width, buffer.dimension().height);
