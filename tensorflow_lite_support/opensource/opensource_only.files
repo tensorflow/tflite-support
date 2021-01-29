@@ -1,4 +1,5 @@
 tensorflow_lite_support/custom_ops/kernel/sentencepiece/native.bzl
+tensorflow_lite_support/opensource/.bazelversion
 tensorflow_lite_support/opensource/BUILD
 tensorflow_lite_support/opensource/WORKSPACE
 tensorflow_lite_support/opensource/cc_build_defs.bzl
