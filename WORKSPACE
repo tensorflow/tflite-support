@@ -175,12 +175,12 @@ http_archive(
 
 http_archive(
     name = "libyuv",
-    urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/6d603ec3f57dafddc424ef895e5d903915e94ba6.tar.gz"],
-    # Adding the constrain of sha256 and strip_prefix will cause failure.
-    # It seems that the downloaded libyuv was different every time, so that
-    # the specified sha256 and strip_prefix cannot match.
-    # sha256 = "ce196c72858456baa8022fa4a0dc18b77d619265dbc0e3d58e25ad15ca402522",
-    # strip_prefix = "libyuv-6d603ec3f57dafddc424ef895e5d903915e94ba6",
+    urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/39240f7149cffde62e3620344d222c8ab2c21178.tar.gz"],
+    # Adding the constrain of sha256 and strip_prefix will cause failure as of
+    # Jan 2021. It seems that the downloaded libyuv was different every time,
+    # so that the specified sha256 and strip_prefix cannot match.
+    # sha256 = "01c2e30eb8e83880f9ba382f6bece9c38cd5b07f9cadae46ef1d5a69e07fafaf",
+    # strip_prefix = "libyuv-39240f7149cffde62e3620344d222c8ab2c21178",
     build_file = "//third_party:libyuv.BUILD",
 )
 

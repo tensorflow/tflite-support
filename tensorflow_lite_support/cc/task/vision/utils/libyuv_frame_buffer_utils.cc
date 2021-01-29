@@ -353,39 +353,30 @@ absl::Status ResizeYv(const FrameBuffer& buffer, FrameBuffer* output_buffer) {
 
 // Resizes NV12/NV21 `buffer` to the target `output_buffer`.
 absl::Status ResizeNv(const FrameBuffer& buffer, FrameBuffer* output_buffer) {
-  const int buffer_size =
-      GetFrameBufferByteSize(buffer.dimension(), FrameBuffer::Format::kYV21);
-  auto yuv_raw_buffer = absl::make_unique<uint8[]>(buffer_size);
-  ASSIGN_OR_RETURN(
-      std::unique_ptr<FrameBuffer> yuv_buffer,
-      CreateFromRawBuffer(yuv_raw_buffer.get(), buffer.dimension(),
-                          FrameBuffer::Format::kYV21, buffer.orientation()));
-  // TODO(b/151375918): Current implementation is a workaround by converting
-  // input NV12/NV21 buffer to the YV12 formats, resizing the YV12 buffer, and
-  // converting the resized YV12 buffer back to the target format. Consider
-  // optimizes this by adding the support of NV12/NV21 resizing in Libyuv.
-  if (buffer.format() == FrameBuffer::Format::kNV12) {
-    RETURN_IF_ERROR(ConvertFromNv12(buffer, yuv_buffer.get()));
-  } else if (buffer.format() == FrameBuffer::Format::kNV21) {
-    RETURN_IF_ERROR(ConvertFromNv21(buffer, yuv_buffer.get()));
-  } else {
-    return CreateStatusWithPayload(
-        StatusCode::kInternal,
-        absl::StrFormat("Format %i is not supported.", buffer.format()),
-        TfLiteSupportStatus::kImageProcessingError);
+  ASSIGN_OR_RETURN(FrameBuffer::YuvData input_data,
+                   FrameBuffer::GetYuvDataFromFrameBuffer(buffer));
+  ASSIGN_OR_RETURN(FrameBuffer::YuvData output_data,
+                   FrameBuffer::GetYuvDataFromFrameBuffer(*output_buffer));
+  const uint8* src_uv = input_data.u_buffer;
+  const uint8* dst_uv = output_data.u_buffer;
+  if (buffer.format() == FrameBuffer::Format::kNV21) {
+    src_uv = input_data.v_buffer;
+    dst_uv = output_data.v_buffer;
   }
 
-  const int resized_buffer_size = GetFrameBufferByteSize(
-      output_buffer->dimension(), FrameBuffer::Format::kYV12);
-  auto resized_yuv_raw_buffer = absl::make_unique<uint8[]>(resized_buffer_size);
-  ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> resized_yuv_buffer,
-                   CreateFromRawBuffer(resized_yuv_raw_buffer.get(),
-                                       output_buffer->dimension(),
-                                       FrameBuffer::Format::kYV12,
-                                       output_buffer->orientation()));
-  RETURN_IF_ERROR(ResizeYv(*yuv_buffer, resized_yuv_buffer.get()));
+  int ret = libyuv::NV12Scale(
+      input_data.y_buffer, input_data.y_row_stride, src_uv,
+      input_data.uv_row_stride, buffer.dimension().width,
+      buffer.dimension().height, const_cast<uint8_t*>(output_data.y_buffer),
+      output_data.y_row_stride, const_cast<uint8_t*>(dst_uv),
+      output_data.uv_row_stride, output_buffer->dimension().width,
+      output_buffer->dimension().height, libyuv::FilterMode::kFilterBilinear);
 
-  RETURN_IF_ERROR(ConvertFromYv(*resized_yuv_buffer, output_buffer));
+  if (ret != 0) {
+    return CreateStatusWithPayload(
+        StatusCode::kUnknown, "Libyuv NV12Scale operation failed.",
+        TfLiteSupportStatus::kImageProcessingBackendError);
+  }
   return absl::OkStatus();
 }
 
