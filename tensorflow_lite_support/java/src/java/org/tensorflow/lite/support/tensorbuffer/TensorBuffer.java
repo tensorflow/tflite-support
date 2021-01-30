@@ -298,6 +298,9 @@ public abstract class TensorBuffer {
    * <p>Important: The loaded buffer is a reference. DO NOT MODIFY. We don't create a copy here for
    * performance concern, but if modification is necessary, please make a copy.
    *
+   * <p>For the best performance, always load a direct {@link ByteBuffer} or a {@link ByteBuffer}
+   * backed by an array.
+   *
    * @param buffer The byte buffer to load.
    * @throws NullPointerException if {@code buffer} is null.
    * @throws IllegalArgumentException if the size of {@code buffer} and {@code typeSize} do not
@@ -321,6 +324,9 @@ public abstract class TensorBuffer {
    *
    * <p>Important: The loaded buffer is a reference. DO NOT MODIFY. We don't create a copy here for
    * performance concern, but if modification is necessary, please make a copy.
+   *
+   * <p>For the best performance, always load a direct {@link ByteBuffer} or a {@link ByteBuffer}
+   * backed by an array.
    *
    * @param buffer The byte buffer to load.
    */
