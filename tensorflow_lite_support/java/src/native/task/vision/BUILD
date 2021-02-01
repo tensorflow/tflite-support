@@ -14,8 +14,10 @@ cc_library(
         "jni_utils.h",
     ],
     deps = [
+        "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/proto:class_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
         "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
         "@com_google_absl//absl/strings",
@@ -33,6 +35,7 @@ tflite_jni_binary(
     name = "libtask_vision_jni.so",
     srcs = [
         "//tensorflow_lite_support/java/src/native/task/vision/classifier:image_classifier_jni.cc",
+        "//tensorflow_lite_support/java/src/native/task/vision/core:base_vision_task_api_jni.cc",
         "//tensorflow_lite_support/java/src/native/task/vision/detector:object_detector_jni.cc",
         "//tensorflow_lite_support/java/src/native/task/vision/segmenter:image_segmenter_jni.cc",
     ],

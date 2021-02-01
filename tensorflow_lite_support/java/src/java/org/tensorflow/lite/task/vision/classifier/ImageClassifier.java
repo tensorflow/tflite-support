@@ -25,14 +25,14 @@ import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
+import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi;
+import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi.InferenceProvider;
 
 /**
  * Performs classification on images.
@@ -67,7 +67,7 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
  * href="https://tfhub.dev/bohemian-visual-recognition-alliance/lite-model/models/mushroom-identification_v1/1">TensorFlow
  * Hub.</a>.
  */
-public final class ImageClassifier extends BaseTaskApi {
+public final class ImageClassifier extends BaseVisionTaskApi {
 
   private static final String IMAGE_CLASSIFIER_NATIVE_LIB = "task_vision_jni";
   private static final int OPTIONAL_FD_LENGTH = -1;
@@ -395,28 +395,31 @@ public final class ImageClassifier extends BaseTaskApi {
    *
    * @param image a {@link TensorImage} object that represents an RGB image
    * @throws AssertionError if error occurs when classifying the image from the native code
+   * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Classifications> classify(TensorImage image, ImageProcessingOptions options) {
+    return run(
+        new InferenceProvider<List<Classifications>>() {
+          @Override
+          public List<Classifications> run(
+              long frameBufferHandle, int width, int height, ImageProcessingOptions options) {
+            return classify(frameBufferHandle, width, height, options);
+          }
+        },
+        image,
+        options);
+  }
+
+  private List<Classifications> classify(
+      long frameBufferHandle, int width, int height, ImageProcessingOptions options) {
     checkNotClosed();
 
-    // image_classifier_jni.cc expects an uint8 image. Convert image of other types into uint8.
-    TensorImage imageUint8 =
-        image.getDataType() == DataType.UINT8
-            ? image
-            : TensorImage.createFrom(image, DataType.UINT8);
-
-    Rect roi =
-        options.getRoi().isEmpty()
-            ? new Rect(0, 0, imageUint8.getWidth(), imageUint8.getHeight())
-            : options.getRoi();
+    Rect roi = options.getRoi().isEmpty() ? new Rect(0, 0, width, height) : options.getRoi();
 
     return classifyNative(
         getNativeHandle(),
-        imageUint8.getBuffer(),
-        imageUint8.getWidth(),
-        imageUint8.getHeight(),
-        new int[] {roi.left, roi.top, roi.width(), roi.height()},
-        options.getOrientation().getValue());
+        frameBufferHandle,
+        new int[] {roi.left, roi.top, roi.width(), roi.height()});
   }
 
   private static native long initJniWithModelFdAndOptions(
@@ -433,11 +436,9 @@ public final class ImageClassifier extends BaseTaskApi {
    *
    * @param roi the ROI of the input image, an array representing the bounding box as {left, top,
    *     width, height}
-   * @param orientation the integer value corresponding to {@link
-   *     ImageProcessingOptions#Orientation}
    */
   private static native List<Classifications> classifyNative(
-      long nativeHandle, ByteBuffer image, int width, int height, int[] roi, int orientation);
+      long nativeHandle, long frameBufferHandle, int[] roi);
 
   @Override
   protected void deinit(long nativeHandle) {

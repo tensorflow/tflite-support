@@ -18,7 +18,9 @@ filegroup(
 
 android_library(
     name = "object_detector",
-    srcs = glob(["*.java"]),
+    srcs = glob(["*.java"]) + [
+        "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/core:base_vision_api_src",
+    ],
     javacopts = JAVACOPTS,
     manifest = "AndroidManifest.xml",
     deps = [
@@ -26,6 +28,7 @@ android_library(
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "//tensorflow_lite_support/java/src/native/task/vision/detector:object_detector_native",
         "@com_google_auto_value",
+        "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
 )

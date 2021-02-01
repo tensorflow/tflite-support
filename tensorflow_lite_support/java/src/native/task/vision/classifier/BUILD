@@ -18,6 +18,7 @@ tflite_jni_binary(
     name = "libtask_vision_jni.so",
     srcs = [
         "image_classifier_jni.cc",
+        "//tensorflow_lite_support/java/src/native/task/vision/core:base_vision_task_api_jni.cc",
     ],
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [

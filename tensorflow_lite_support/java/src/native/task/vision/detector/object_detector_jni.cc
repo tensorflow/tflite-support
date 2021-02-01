@@ -32,14 +32,12 @@ limitations under the License.
 namespace {
 
 using ::tflite::support::StatusOr;
-using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::StringListToVector;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::vision::BoundingBox;
 using ::tflite::task::vision::ConvertToCategory;
-using ::tflite::task::vision::ConvertToFrameBufferOrientation;
 using ::tflite::task::vision::DetectionResult;
 using ::tflite::task::vision::FrameBuffer;
 using ::tflite::task::vision::ObjectDetector;
@@ -207,14 +205,11 @@ Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_initJniWithByteBuff
 
 extern "C" JNIEXPORT jobject JNICALL
 Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_detectNative(
-    JNIEnv* env, jclass thiz, jlong native_handle, jobject image_byte_buffer,
-    jint width, jint height, jint jorientation) {
+    JNIEnv* env, jclass thiz, jlong native_handle, jlong frame_buffer_handle) {
   auto* detector = reinterpret_cast<ObjectDetector*>(native_handle);
-  absl::string_view image = GetMappedFileBuffer(env, image_byte_buffer);
-  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
-      reinterpret_cast<const uint8*>(image.data()),
-      FrameBuffer::Dimension{width, height},
-      ConvertToFrameBufferOrientation(env, jorientation));
+  // frame_buffer will be deleted after inference is done in
+  // base_vision_api_jni.cc.
+  auto* frame_buffer = reinterpret_cast<FrameBuffer*>(frame_buffer_handle);
   auto results_or = detector->Detect(*frame_buffer);
   if (results_or.ok()) {
     return ConvertToDetectionResults(env, results_or.value());

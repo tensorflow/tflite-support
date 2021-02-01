@@ -16,14 +16,19 @@ limitations under the License.
 #include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
 #include "absl/strings/str_cat.h"
+#include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
+#include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
 namespace tflite {
 namespace task {
 namespace vision {
 
+using ::tflite::support::StatusOr;
+using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::ThrowException;
+using ::tflite::task::vision::CreateFromRawBuffer;
 
 constexpr char kCategoryClassName[] =
     "org/tensorflow/lite/support/label/Category";
@@ -56,6 +61,30 @@ jobject ConvertToCategory(JNIEnv* env, const Class& classification) {
   return jcategory;
 }
 
+FrameBuffer::Format ConvertToFrameBufferFormat(JNIEnv* env,
+                                               jint jcolor_space_type) {
+  switch (jcolor_space_type) {
+    case 0:
+      return FrameBuffer::Format::kRGB;
+    case 1:
+      return FrameBuffer::Format::kGRAY;
+    case 2:
+      return FrameBuffer::Format::kNV12;
+    case 3:
+      return FrameBuffer::Format::kNV21;
+    case 4:
+      return FrameBuffer::Format::kYV12;
+    case 5:
+      return FrameBuffer::Format::kYV21;
+    default:
+      break;
+  }
+  // Should never happen.
+  ThrowException(env, kAssertionError,
+                 "The color space type is unsupported: %d", jcolor_space_type);
+  return FrameBuffer::Format::kRGB;
+}
+
 FrameBuffer::Orientation ConvertToFrameBufferOrientation(JNIEnv* env,
                                                          jint jorientation) {
   switch (jorientation) {
@@ -81,6 +110,39 @@ FrameBuffer::Orientation ConvertToFrameBufferOrientation(JNIEnv* env,
                  "The FrameBuffer Orientation type is unsupported: %d",
                  jorientation);
   return FrameBuffer::Orientation::kTopLeft;
+}
+
+StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBuffer(
+    JNIEnv* env, jobject jimage_byte_buffer, jint width, jint height,
+    jint jorientation, jint jcolor_space_type) {
+  absl::string_view image = GetMappedFileBuffer(env, jimage_byte_buffer);
+  return CreateFromRawBuffer(
+      reinterpret_cast<const uint8*>(image.data()),
+      FrameBuffer::Dimension{width, height},
+      ConvertToFrameBufferFormat(env, jcolor_space_type),
+      ConvertToFrameBufferOrientation(env, jorientation));
+}
+
+StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBuffer(
+    JNIEnv* env, jbyteArray jimage_bytes, jint width, jint height,
+    jint jorientation, jint jcolor_space_type, jlongArray jbyte_array_handle) {
+  jbyte* jimage_ptr = env->GetByteArrayElements(jimage_bytes, NULL);
+  // Free jimage_ptr together with frame_buffer after inference is finished.
+  jlong jimage_ptr_handle = reinterpret_cast<jlong>(jimage_ptr);
+  // jbyte_array_handle has only one element, which is a holder for jimage_ptr.
+  env->SetLongArrayRegion(jbyte_array_handle, 0, 1, &jimage_ptr_handle);
+
+  if (jimage_ptr == NULL) {
+    ThrowException(env, kAssertionError,
+                   "Error occurred when reading image data from byte array.");
+    return nullptr;
+  }
+
+  return CreateFromRawBuffer(
+      reinterpret_cast<const uint8*>(jimage_ptr),
+      FrameBuffer::Dimension{width, height},
+      ConvertToFrameBufferFormat(env, jcolor_space_type),
+      ConvertToFrameBufferOrientation(env, jorientation));
 }
 
 }  // namespace vision

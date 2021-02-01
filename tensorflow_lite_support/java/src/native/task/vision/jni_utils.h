@@ -18,6 +18,7 @@ limitations under the License.
 
 #include <jni.h>
 
+#include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/class_proto_inc.h"
 
@@ -30,6 +31,16 @@ jobject ConvertToCategory(JNIEnv* env, const Class& classification);
 
 FrameBuffer::Orientation ConvertToFrameBufferOrientation(JNIEnv* env,
                                                          jint jorientation);
+
+// Creates FrameBuffer from a direct ByteBuffer.
+::tflite::support::StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBuffer(
+    JNIEnv* env, jobject jimage_byte_buffer, jint width, jint height,
+    jint jorientation, jint jcolor_space_type);
+
+// Creates FrameBuffer from a byte array.
+::tflite::support::StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBuffer(
+    JNIEnv* env, jbyteArray jimage_bytes, jint width, jint height,
+    jint jorientation, jint jcolor_space_type, jlongArray jbyte_array_handle);
 
 }  // namespace vision
 }  // namespace task

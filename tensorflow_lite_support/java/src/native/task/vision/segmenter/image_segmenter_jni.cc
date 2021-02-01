@@ -32,12 +32,10 @@ namespace {
 
 using ::tflite::support::StatusOr;
 using ::tflite::support::utils::CreateByteArray;
-using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kIllegalArgumentException;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
-using ::tflite::task::vision::ConvertToFrameBufferOrientation;
 using ::tflite::task::vision::FrameBuffer;
 using ::tflite::task::vision::ImageSegmenter;
 using ::tflite::task::vision::ImageSegmenterOptions;
@@ -161,7 +159,7 @@ void ConvertFromSegmentationResults(JNIEnv* env,
 }
 
 jlong CreateImageSegmenterFromOptions(JNIEnv* env,
-                                       const ImageSegmenterOptions& options) {
+                                      const ImageSegmenterOptions& options) {
   StatusOr<std::unique_ptr<ImageSegmenter>> image_segmenter_or =
       ImageSegmenter::CreateFromOptions(options);
   if (image_segmenter_or.ok()) {
@@ -216,15 +214,13 @@ Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_initJniWithByteBuf
 
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_segmentNative(
-    JNIEnv* env, jclass thiz, jlong native_handle, jobject jimage_byte_buffer,
-    jint width, jint height, jobject jmask_buffers, jintArray jmask_shape,
-    jobject jcolored_labels, jint jorientation) {
+    JNIEnv* env, jclass thiz, jlong native_handle, jlong frame_buffer_handle,
+    jobject jmask_buffers, jintArray jmask_shape, jobject jcolored_labels) {
   auto* segmenter = reinterpret_cast<ImageSegmenter*>(native_handle);
-  absl::string_view image = GetMappedFileBuffer(env, jimage_byte_buffer);
-  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
-      reinterpret_cast<const uint8*>(image.data()),
-      FrameBuffer::Dimension{width, height},
-      ConvertToFrameBufferOrientation(env, jorientation));
+  // frame_buffer will be deleted after inference is done in
+  // base_vision_api_jni.cc.
+  auto* frame_buffer = reinterpret_cast<FrameBuffer*>(frame_buffer_handle);
+
   auto results_or = segmenter->Segment(*frame_buffer);
   if (results_or.ok()) {
     ConvertFromSegmentationResults(env, results_or.value(), jmask_buffers,

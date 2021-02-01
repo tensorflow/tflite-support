@@ -17,7 +17,9 @@ filegroup(
 
 android_library(
     name = "image_segmenter",
-    srcs = glob(["*.java"]),
+    srcs = glob(["*.java"]) + [
+        "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/core:base_vision_api_src",
+    ],
     # TODO(b/163039980): Use JAVACOPTS in TF. "-Xep:RemoveUnusedImports:ERROR" wierdly break the build.
     javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
@@ -27,6 +29,7 @@ android_library(
         "//tensorflow_lite_support/java/src/native/task/vision/segmenter:image_segmenter_native",
         "@com_google_auto_value",
         "@maven//:androidx_annotation_annotation",
+        "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
 )

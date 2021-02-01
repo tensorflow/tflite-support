@@ -89,7 +89,7 @@ public class TaskJniUtils {
     tryLoadLibrary(libName);
     try {
       return provider.createHandle();
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       String errorMessage = "Error getting native address of native library: " + libName;
       Log.e(TAG, errorMessage, e);
       throw new IllegalStateException(errorMessage, e);
@@ -146,14 +146,12 @@ public class TaskJniUtils {
     }
   }
 
-  private TaskJniUtils() {}
-
   /**
    * Try load a native library, if it's already loaded return directly.
    *
    * @param libName name of the lib
    */
-  static void tryLoadLibrary(String libName) {
+  public static void tryLoadLibrary(String libName) {
     try {
       System.loadLibrary(libName);
     } catch (UnsatisfiedLinkError e) {
@@ -162,4 +160,6 @@ public class TaskJniUtils {
       throw new UnsatisfiedLinkError(errorMessage);
     }
   }
+
+  private TaskJniUtils() {}
 }

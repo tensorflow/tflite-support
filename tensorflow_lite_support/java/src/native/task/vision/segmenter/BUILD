@@ -18,7 +18,9 @@ tflite_jni_binary(
     name = "libtask_vision_jni.so",
     srcs = [
         "image_segmenter_jni.cc",
+        "//tensorflow_lite_support/java/src/native/task/vision/core:base_vision_task_api_jni.cc",
     ],
+    linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/vision:image_segmenter",

@@ -24,14 +24,14 @@ import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
+import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi;
+import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi.InferenceProvider;
 
 /**
  * Performs object detection on images.
@@ -83,7 +83,7 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
  * href="https://tfhub.dev/google/lite-model/object_detection/mobile_object_localizer_v1/1/metadata/1">TensorFlow
  * Hub.</a>.
  */
-public final class ObjectDetector extends BaseTaskApi {
+public final class ObjectDetector extends BaseVisionTaskApi {
 
   private static final String OBJECT_DETECTOR_NATIVE_LIB = "task_vision_jni";
   private static final int OPTIONAL_FD_LENGTH = -1;
@@ -409,21 +409,25 @@ public final class ObjectDetector extends BaseTaskApi {
    *     ImageProcessingOptions#Builder#setOrientation}) currently. The orientation of an image
    *     defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.
    * @throws AssertionError if error occurs when processing the image from the native code
+   * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Detection> detect(TensorImage image, ImageProcessingOptions options) {
+    return run(
+        new InferenceProvider<List<Detection>>() {
+          @Override
+          public List<Detection> run(
+              long frameBufferHandle, int width, int height, ImageProcessingOptions options) {
+            return detect(frameBufferHandle, options);
+          }
+        },
+        image,
+        options);
+  }
+
+  private List<Detection> detect(long frameBufferHandle, ImageProcessingOptions options) {
     checkNotClosed();
 
-    // object_detector_jni.cc expects an uint8 image. Convert image of other types into uint8.
-    TensorImage imageUint8 =
-        image.getDataType() == DataType.UINT8
-            ? image
-            : TensorImage.createFrom(image, DataType.UINT8);
-    return detectNative(
-        getNativeHandle(),
-        imageUint8.getBuffer(),
-        imageUint8.getWidth(),
-        imageUint8.getHeight(),
-        options.getOrientation().getValue());
+    return detectNative(getNativeHandle(), frameBufferHandle);
   }
 
   private static native long initJniWithModelFdAndOptions(
@@ -435,8 +439,7 @@ public final class ObjectDetector extends BaseTaskApi {
   private static native long initJniWithByteBuffer(
       ByteBuffer modelBuffer, ObjectDetectorOptions options);
 
-  private static native List<Detection> detectNative(
-      long nativeHandle, ByteBuffer image, int width, int height, int orientation);
+  private static native List<Detection> detectNative(long nativeHandle, long frameBufferHandle);
 
   @Override
   protected void deinit(long nativeHandle) {

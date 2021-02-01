@@ -27,12 +27,12 @@ import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
+import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi;
+import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi.InferenceProvider;
 
 /**
  * Performs segmentation on images.
@@ -71,7 +71,7 @@ import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
  * <p>An example of such model can be found on <a
  * href="https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1">TensorFlow Hub.</a>.
  */
-public final class ImageSegmenter extends BaseTaskApi {
+public final class ImageSegmenter extends BaseVisionTaskApi {
 
   private static final String IMAGE_SEGMENTER_NATIVE_LIB = "task_vision_jni";
   private static final int OPTIONAL_FD_LENGTH = -1;
@@ -276,27 +276,28 @@ public final class ImageSegmenter extends BaseTaskApi {
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
    * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Segmentation> segment(TensorImage image, ImageProcessingOptions options) {
+    return run(
+        new InferenceProvider<List<Segmentation>>() {
+          @Override
+          public List<Segmentation> run(
+              long frameBufferHandle, int width, int height, ImageProcessingOptions options) {
+            return segment(frameBufferHandle, options);
+          }
+        },
+        image,
+        options);
+  }
+
+  public List<Segmentation> segment(long frameBufferHandle, ImageProcessingOptions options) {
     checkNotClosed();
 
-    // image_segmenter_jni.cc expects an uint8 image. Convert image of other types into uint8.
-    TensorImage imageUint8 =
-        image.getDataType() == DataType.UINT8
-            ? image
-            : TensorImage.createFrom(image, DataType.UINT8);
     List<byte[]> maskByteArrays = new ArrayList<>();
     List<ColoredLabel> coloredLabels = new ArrayList<>();
     int[] maskShape = new int[2];
-    segmentNative(
-        getNativeHandle(),
-        imageUint8.getBuffer(),
-        imageUint8.getWidth(),
-        imageUint8.getHeight(),
-        maskByteArrays,
-        maskShape,
-        coloredLabels,
-        options.getOrientation().getValue());
+    segmentNative(getNativeHandle(), frameBufferHandle, maskByteArrays, maskShape, coloredLabels);
 
     List<ByteBuffer> maskByteBuffers = new ArrayList<>();
     for (byte[] bytes : maskByteArrays) {
@@ -355,13 +356,10 @@ public final class ImageSegmenter extends BaseTaskApi {
    */
   private static native void segmentNative(
       long nativeHandle,
-      ByteBuffer image,
-      int width,
-      int height,
+      long frameBufferHandle,
       List<byte[]> maskByteArrays,
       int[] maskShape,
-      List<ColoredLabel> coloredLabels,
-      int orientation);
+      List<ColoredLabel> coloredLabels);
 
   @Override
   protected void deinit(long nativeHandle) {
