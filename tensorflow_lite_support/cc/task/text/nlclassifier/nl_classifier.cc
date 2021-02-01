@@ -249,7 +249,7 @@ StatusOr<std::vector<Category>> NLClassifier::Postprocess(
           options_.output_score_tensor_name,
           options_.output_score_tensor_index),
       FindTensorWithNameOrIndex(
-          output_tensors, GetMetadataExtractor()->GetInputTensorMetadata(),
+          output_tensors, GetMetadataExtractor()->GetOutputTensorMetadata(),
           options_.output_label_tensor_name,
           options_.output_label_tensor_index));
 }
