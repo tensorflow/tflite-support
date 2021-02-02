@@ -55,10 +55,6 @@ using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::TfLiteSupportStatus;
 
-int TfLiteEngine::ErrorReporter::Report(const char* format, va_list args) {
-  return std::vsnprintf(error_message, sizeof(error_message), format, args);
-}
-
 bool TfLiteEngine::Verifier::Verify(const char* data, int length,
                                     tflite::ErrorReporter* reporter) {
   return tflite::Verify(data, length, *op_resolver_, reporter);
@@ -132,10 +128,10 @@ absl::Status TfLiteEngine::InitializeFromModelFileHandler() {
   if (model_ == nullptr) {
     // To be replaced with a proper switch-case when TF Lite model builder
     // returns a `TfLiteStatus` code capturing this type of error.
-    if (absl::StrContains(error_reporter_.error_message,
+    if (absl::StrContains(error_reporter_.message(),
                           "The model is not a valid Flatbuffer")) {
       return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument, error_reporter_.error_message,
+          StatusCode::kInvalidArgument, error_reporter_.message(),
           TfLiteSupportStatus::kInvalidFlatBufferError);
     } else {
       // TODO(b/154917059): augment status with another `TfLiteStatus` code when
@@ -145,7 +141,7 @@ absl::Status TfLiteEngine::InitializeFromModelFileHandler() {
           StatusCode::kUnknown,
           absl::StrCat(
               "Could not build model from the provided pre-loaded flatbuffer: ",
-              error_reporter_.error_message));
+              error_reporter_.message()));
     }
   }
 
@@ -263,7 +259,7 @@ absl::Status TfLiteEngine::InitInterpreter(
           StatusCode::kAborted,
           absl::StrCat("Could not build the TF Lite interpreter: "
                        "TfLiteInterpreterCreateWithSelectedOps failed: ",
-                       error_reporter_.error_message));
+                       error_reporter_.message()));
     }
     return absl::OkStatus();
   };
@@ -277,7 +273,7 @@ absl::Status TfLiteEngine::InitInterpreter(
       return CreateStatusWithPayload(
           StatusCode::kUnknown,
           absl::StrCat("Could not build the TF Lite interpreter: ",
-                       error_reporter_.error_message));
+                       error_reporter_.message()));
     }
     if (*interpreter_out == nullptr) {
       return CreateStatusWithPayload(StatusCode::kInternal,

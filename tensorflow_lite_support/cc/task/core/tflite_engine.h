@@ -28,6 +28,7 @@ limitations under the License.
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/tflite_wrapper.h"
+#include "tensorflow_lite_support/cc/task/core/error_reporter.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
@@ -179,15 +180,8 @@ class TfLiteEngine {
   }
 
  protected:
-  // TF Lite's DefaultErrorReporter() outputs to stderr. This one captures the
-  // error into a string so that it can be used to complement tensorflow::Status
+  // Custom error reporter capturing and printing to stderr low-level TF Lite
   // error messages.
-  struct ErrorReporter : public tflite::ErrorReporter {
-    // Last error message captured by this error reporter.
-    char error_message[256];
-    int Report(const char* format, va_list args) override;
-  };
-  // Custom error reporter capturing low-level TF Lite error messages.
   ErrorReporter error_reporter_;
 
  private:

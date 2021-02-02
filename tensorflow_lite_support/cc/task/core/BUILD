@@ -8,6 +8,7 @@ cc_library(
     srcs = ["tflite_engine.cc"],
     hdrs = ["tflite_engine.h"],
     deps = [
+        ":error_reporter",
         ":external_file_handler",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
@@ -61,6 +62,7 @@ cc_library(
     hdrs = ["tflite_engine.h"],
     defines = ["TFLITE_USE_C_API"],
     deps = [
+        ":error_reporter",
         ":external_file_handler",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
@@ -155,5 +157,15 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
+    ],
+)
+
+cc_library(
+    name = "error_reporter",
+    srcs = ["error_reporter.cc"],
+    hdrs = ["error_reporter.h"],
+    deps = [
+        "@org_tensorflow//tensorflow/lite:minimal_logging",
+        "@org_tensorflow//tensorflow/lite:stateful_error_reporter",
     ],
 )
