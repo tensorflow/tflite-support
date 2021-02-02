@@ -37,13 +37,13 @@ http_archive(
     ],
 )
 
-# TF on 2021-01-28.
+# TF on 2021-02-02.
 http_archive(
     name = "org_tensorflow",
-    sha256 = "1936a2a119ac8558aaf877bc1cfcc5415171e9dbfb80a403f1185c2d9701445f",
-    strip_prefix = "tensorflow-791dc47439f01bc89431e8d3a5b0b63b1f8226d0",
+    sha256 = "47a7ef720fdfbde14b0afd35fe45e9f4881938afb7799efbe8a924abd7529759",
+    strip_prefix = "tensorflow-23b10298680cc028098aed16d56567e2aac3e6d9",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/791dc47439f01bc89431e8d3a5b0b63b1f8226d0.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/23b10298680cc028098aed16d56567e2aac3e6d9.tar.gz",
     ],
     patches = ["@//third_party:tensorflow_lite_ios_build.patch"],
     patch_args = ["-p1"],
