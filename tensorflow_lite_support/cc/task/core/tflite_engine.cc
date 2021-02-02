@@ -27,9 +27,9 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 
 #if TFLITE_USE_C_API
-#include "tensorflow/lite/c/c_api_experimental.h"
+#include "tensorflow/lite/core/shims/c/c_api_experimental.h"
 #else
-#include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/core/shims/cc/kernels/register.h"
 #endif
 
 namespace tflite {
@@ -116,7 +116,7 @@ void TfLiteEngine::VerifyAndBuildModelFromBuffer(const char* buffer_data,
   // Build the model.
   model_.reset(TfLiteModelCreate(buffer_data, buffer_size));
 #else
-  model_ = tflite::FlatBufferModel::VerifyAndBuildFromBuffer(
+  model_ = tflite_shims::FlatBufferModel::VerifyAndBuildFromBuffer(
       buffer_data, buffer_size, &verifier_, &error_reporter_);
 #endif
 }
@@ -268,7 +268,7 @@ absl::Status TfLiteEngine::InitInterpreter(
       [this, num_threads](
           std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
       -> absl::Status {
-    if (tflite::InterpreterBuilder(*model_, *resolver_)(
+    if (tflite_shims::InterpreterBuilder(*model_, *resolver_)(
             interpreter_out, num_threads) != kTfLiteOk) {
       return CreateStatusWithPayload(
           StatusCode::kUnknown,

@@ -13,7 +13,8 @@ cc_library(
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
-        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite:kernel_api",
+        "@org_tensorflow//tensorflow/lite/core/shims:common",
         "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
         # The dependency on builtin_ops here is only for the default
         # value of the OpResolver parameter:
@@ -22,19 +23,17 @@ cc_library(
         # When linking statically, if the client of this library doesn't use
         # the default argument, this dependency does not cause all the builtin ops
         # to get included in the executable.
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "@org_tensorflow//tensorflow/lite/tools:verifier",
     ] + select({
         "//tensorflow_lite_support/cc:tflite_use_c_api": [
             "@org_tensorflow//tensorflow/lite/core/api:verifier",
-            "@org_tensorflow//tensorflow/lite/c:c_api",
-            "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
-            "@org_tensorflow//tensorflow/lite:kernel_api",
+            "@org_tensorflow//tensorflow/lite/core/shims:c_api",
+            "@org_tensorflow//tensorflow/lite/core/shims:c_api_experimental",
             "@org_tensorflow//tensorflow/lite:stderr_reporter",
         ],
         "//conditions:default": [
-            "@org_tensorflow//tensorflow/lite:framework",
-            "@org_tensorflow//tensorflow/lite:kernel_api",
+            "@org_tensorflow//tensorflow/lite/core/shims:framework",
         ],
     }) + [
         "//tensorflow_lite_support/cc:common",
@@ -67,16 +66,16 @@ cc_library(
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
-        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite:kernel_api",
         "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/core/shims:common",
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "@org_tensorflow//tensorflow/lite/tools:verifier",
     ] + [
         "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
         "@org_tensorflow//tensorflow/lite/core/api:verifier",
-        "@org_tensorflow//tensorflow/lite/c:c_api",
-        "@org_tensorflow//tensorflow/lite/c:c_api_experimental",
-        "@org_tensorflow//tensorflow/lite:kernel_api",
+        "@org_tensorflow//tensorflow/lite/core/shims:c_api",
+        "@org_tensorflow//tensorflow/lite/core/shims:c_api_experimental",
         "@org_tensorflow//tensorflow/lite:stderr_reporter",
     ] + [
         "//tensorflow_lite_support/cc:common",
