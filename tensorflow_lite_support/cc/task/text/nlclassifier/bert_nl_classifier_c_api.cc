@@ -20,10 +20,13 @@ limitations under the License.
 #include "absl/strings/string_view.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/bert_nl_classifier.h"
+#include "tensorflow_lite_support/cc/task/text/proto/bert_nl_classifier_options_proto_inc.h"
 
 using CategoryCPP = ::tflite::task::core::Category;
 using BertNLClassifierCPP =
     ::tflite::task::text::nlclassifier::BertNLClassifier;
+using BertNLClassifierOptionsCPP =
+    ::tflite::task::text::BertNLClassifierOptions;
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,9 +36,15 @@ struct BertNLClassifier {
   std::unique_ptr<BertNLClassifierCPP> impl;
 };
 
-BertNLClassifier* BertNLClassifierFromFile(const char* model_path) {
-  auto classifier_status =
-      BertNLClassifierCPP::CreateFromFile(std::string(model_path));
+const struct BertNLClassifierOptions BertNLClassifierOptions_default = {128};
+
+BertNLClassifier* BertNLClassifierFromFileAndOptions(
+    const char* model_path, const struct BertNLClassifierOptions* options) {
+  BertNLClassifierOptionsCPP cc_options;
+  cc_options.set_max_seq_len(options->max_seq_len);
+  cc_options.mutable_base_options()->mutable_model_file()->set_file_name(
+      model_path);
+  auto classifier_status = BertNLClassifierCPP::CreateFromOptions(cc_options);
   if (classifier_status.ok()) {
     return new BertNLClassifier{.impl = std::unique_ptr<BertNLClassifierCPP>(
                                     dynamic_cast<BertNLClassifierCPP*>(
@@ -43,6 +52,11 @@ BertNLClassifier* BertNLClassifierFromFile(const char* model_path) {
   } else {
     return nullptr;
   }
+}
+
+BertNLClassifier* BertNLClassifierFromFile(const char* model_path) {
+  return BertNLClassifierFromFileAndOptions(model_path,
+                                            &BertNLClassifierOptions_default);
 }
 
 Categories* BertNLClassifierClassify(const BertNLClassifier* classifier,

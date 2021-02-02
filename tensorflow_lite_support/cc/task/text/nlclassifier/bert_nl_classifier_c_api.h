@@ -43,8 +43,19 @@ extern "C" {
 
 typedef struct BertNLClassifier BertNLClassifier;
 
-// Creates BertNLClassifier from model path, returns nullptr if the file
-// doesn't exist or is not a well formatted TFLite model path.
+struct BertNLClassifierOptions {
+  int max_seq_len;
+};
+
+extern const struct BertNLClassifierOptions BertNLClassifierOptions_default;
+
+// Creates BertNLClassifier from model path and options, returns nullptr if the
+// file doesn't exist or is not a well formatted TFLite model path.
+extern BertNLClassifier* BertNLClassifierFromFileAndOptions(
+    const char* model_path, const struct BertNLClassifierOptions* options);
+
+// Creates BertNLClassifier from model path and default options, returns nullptr
+// if the file doesn't exist or is not a well formatted TFLite model path.
 extern BertNLClassifier* BertNLClassifierFromFile(const char* model_path);
 
 // Invokes the encapsulated TFLite model and classifies the input text.

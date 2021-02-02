@@ -79,11 +79,11 @@ absl::Status BertNLClassifier::Preprocess(
   input_tokenize_results = tokenizer_->Tokenize(processed_input);
 
   // 2 accounts for [CLS], [SEP]
-  absl::Span<const std::string> query_tokens =
-      absl::MakeSpan(input_tokenize_results.subwords.data(),
-                     input_tokenize_results.subwords.data() +
-                         std::min(static_cast<size_t>(kMaxSeqLen - 2),
-                                  input_tokenize_results.subwords.size()));
+  absl::Span<const std::string> query_tokens = absl::MakeSpan(
+      input_tokenize_results.subwords.data(),
+      input_tokenize_results.subwords.data() +
+          std::min(static_cast<size_t>(options_.max_seq_len() - 2),
+                   input_tokenize_results.subwords.size()));
 
   std::vector<std::string> tokens;
   tokens.reserve(2 + query_tokens.size());
@@ -96,21 +96,22 @@ absl::Status BertNLClassifier::Preprocess(
   // For Separation.
   tokens.push_back(kSeparator);
 
-  std::vector<int> input_ids(kMaxSeqLen, 0);
-  std::vector<int> input_mask(kMaxSeqLen, 0);
+  std::vector<int> input_ids(options_.max_seq_len(), 0);
+  std::vector<int> input_mask(options_.max_seq_len(), 0);
   // Convert tokens back into ids and set mask
   for (int i = 0; i < tokens.size(); ++i) {
     tokenizer_->LookupId(tokens[i], &input_ids[i]);
     input_mask[i] = 1;
   }
-  //                             |<-----------kMaxSeqLen---------->|
+  //                             |<-----------max_seq_len--------->|
   // input_ids                 [CLS] s1  s2...  sn [SEP]  0  0...  0
   // input_masks                 1    1   1...  1    1    0  0...  0
   // segment_ids                 0    0   0...  0    0    0  0...  0
 
   PopulateTensor(input_ids, ids_tensor);
   PopulateTensor(input_mask, mask_tensor);
-  PopulateTensor(std::vector<int>(kMaxSeqLen, 0), segment_ids_tensor);
+  PopulateTensor(std::vector<int>(options_.max_seq_len(), 0),
+                 segment_ids_tensor);
 
   return absl::OkStatus();
 }
@@ -135,44 +136,22 @@ StatusOr<std::vector<core::Category>> BertNLClassifier::Postprocess(
 }
 
 StatusOr<std::unique_ptr<BertNLClassifier>>
-BertNLClassifier::CreateFromFile(
-    const std::string& path_to_model_with_metadata,
+BertNLClassifier::CreateFromOptions(const BertNLClassifierOptions& options,
     std::unique_ptr<tflite::OpResolver> resolver) {
-  std::unique_ptr<BertNLClassifier> bert_nl_classifier;
-  ASSIGN_OR_RETURN(bert_nl_classifier,
-                   core::TaskAPIFactory::CreateFromFile<BertNLClassifier>(
-                       path_to_model_with_metadata, std::move(resolver)));
-  RETURN_IF_ERROR(bert_nl_classifier->InitializeFromMetadata());
-  return std::move(bert_nl_classifier);
-}
+  auto options_copy = absl::make_unique<BertNLClassifierOptions>(options);
 
-StatusOr<std::unique_ptr<BertNLClassifier>>
-BertNLClassifier::CreateFromBuffer(
-    const char* model_with_metadata_buffer_data,
-    size_t model_with_metadata_buffer_size,
-    std::unique_ptr<tflite::OpResolver> resolver) {
-  std::unique_ptr<BertNLClassifier> bert_nl_classifier;
-  ASSIGN_OR_RETURN(bert_nl_classifier,
-                   core::TaskAPIFactory::CreateFromBuffer<BertNLClassifier>(
-                       model_with_metadata_buffer_data,
-                       model_with_metadata_buffer_size, std::move(resolver)));
-  RETURN_IF_ERROR(bert_nl_classifier->InitializeFromMetadata());
-  return std::move(bert_nl_classifier);
-}
-
-StatusOr<std::unique_ptr<BertNLClassifier>> BertNLClassifier::CreateFromFd(
-    int fd, std::unique_ptr<tflite::OpResolver> resolver) {
-  std::unique_ptr<BertNLClassifier> bert_nl_classifier;
   ASSIGN_OR_RETURN(
-      bert_nl_classifier,
-      core::TaskAPIFactory::CreateFromFileDescriptor<BertNLClassifier>(
-          fd, std::move(resolver)));
-  RETURN_IF_ERROR(bert_nl_classifier->InitializeFromMetadata());
+      auto bert_nl_classifier,
+      core::TaskAPIFactory::CreateFromExternalFileProto<BertNLClassifier>(
+          &options_copy->base_options().model_file(), std::move(resolver)));
+  RETURN_IF_ERROR(bert_nl_classifier->Initialize(options));
   return std::move(bert_nl_classifier);
 }
 
-absl::Status BertNLClassifier::InitializeFromMetadata() {
-  // Set up mandatory tokenizer.
+absl::Status BertNLClassifier::Initialize(
+    const BertNLClassifierOptions& options) {
+  options_ = options;
+  // Set up mandatory tokenizer from metadata.
   const ProcessUnit* tokenizer_process_unit =
       GetMetadataExtractor()->GetInputProcessUnit(kTokenizerProcessUnitIndex);
   if (tokenizer_process_unit == nullptr) {
@@ -185,7 +164,7 @@ absl::Status BertNLClassifier::InitializeFromMetadata() {
                    CreateTokenizerFromProcessUnit(tokenizer_process_unit,
                                                   GetMetadataExtractor()));
 
-  // Set up optional label vector.
+  // Set up optional label vector from metadata.
   TrySetLabelFromMetadata(
       GetMetadataExtractor()->GetOutputTensorMetadata(kOutputTensorIndex))
       .IgnoreError();
