@@ -45,7 +45,10 @@ http_archive(
     urls = [
         "https://github.com/tensorflow/tensorflow/archive/791dc47439f01bc89431e8d3a5b0b63b1f8226d0.tar.gz",
     ],
-    patches = ["@//third_party:tensorflow_lite_ios_build.patch"],
+    patches = [
+        "@//third_party:tensorflow_lite_build.patch",
+        "@//third_party:tensorflow_lite_ios_build.patch",
+    ],
     patch_args = ["-p1"],
 )
 
