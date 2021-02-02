@@ -19,69 +19,67 @@ import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgum
 import static org.tensorflow.lite.support.common.SupportPreconditions.checkNotNull;
 
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
+import android.graphics.ImageFormat;
 import android.media.Image;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
-/** Holds a {@link Bitmap} and converts it to other image formats as needed. */
-final class BitmapContainer implements ImageContainer {
+/** Holds an {@link Image} and converts it to other image formats as needed. */
+final class MediaImageContainer implements ImageContainer {
 
-  private final Bitmap bitmap;
+  private final Image image;
 
   /**
-   * Creates a {@link BitmapContainer} object with ARGB_8888 {@link Bitmap}.
+   * Creates a {@link MediaImageContainer} object with a YUV_420_888 {@link Image}.
    *
-   * @throws IllegalArgumentException if the bitmap configuration is not ARGB_8888
+   * @throws IllegalArgumentException if the {@link ImageFormat} of {@code image} is not ARGB_8888
    */
-  static BitmapContainer create(Bitmap bitmap) {
-    return new BitmapContainer(bitmap);
+  static MediaImageContainer create(Image image) {
+    return new MediaImageContainer(image);
   }
 
-  private BitmapContainer(Bitmap bitmap) {
-    checkNotNull(bitmap, "Cannot load null bitmap.");
+  private MediaImageContainer(Image image) {
+    checkNotNull(image, "Cannot load null Image.");
     checkArgument(
-        bitmap.getConfig().equals(Config.ARGB_8888), "Only supports loading ARGB_8888 bitmaps.");
-    this.bitmap = bitmap;
+        image.getFormat() == ImageFormat.YUV_420_888, "Only supports loading YUV_420_888 Image.");
+    this.image = image;
   }
 
   @Override
-  public BitmapContainer clone() {
-    return create(bitmap.copy(bitmap.getConfig(), bitmap.isMutable()));
+  public MediaImageContainer clone() {
+    throw new UnsupportedOperationException(
+        "android.media.Image is an abstract class and cannot be cloned.");
   }
 
   @Override
   public Bitmap getBitmap() {
-    // Not making a defensive copy for performance considerations. During image processing,
-    // users may need to set and get the bitmap many times.
-    return bitmap;
+    throw new UnsupportedOperationException(
+        "Converting an android.media.Image to Bitmap is not supported.");
   }
 
   @Override
   public TensorBuffer getTensorBuffer(DataType dataType) {
-    TensorBuffer buffer = TensorBuffer.createDynamic(dataType);
-    ImageConversions.convertBitmapToTensorBuffer(bitmap, buffer);
-    return buffer;
+    throw new UnsupportedOperationException(
+        "Converting an android.media.Image to TesorBuffer is not supported.");
   }
 
   @Override
   public Image getMediaImage() {
-    throw new UnsupportedOperationException(
-        "Converting from Bitmap to android.media.Image is unsupported.");
+    return image;
   }
 
   @Override
   public int getWidth() {
-    return bitmap.getWidth();
+    return image.getWidth();
   }
 
   @Override
   public int getHeight() {
-    return bitmap.getHeight();
+    return image.getHeight();
   }
 
   @Override
   public ColorSpaceType getColorSpaceType() {
-    return ColorSpaceType.fromBitmapConfig(bitmap.getConfig());
+    return ColorSpaceType.fromImageFormat(image.getFormat());
   }
 }

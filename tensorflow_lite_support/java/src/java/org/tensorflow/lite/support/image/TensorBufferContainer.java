@@ -18,6 +18,7 @@ package org.tensorflow.lite.support.image;
 import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
 
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.util.Log;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -64,6 +65,11 @@ final class TensorBufferContainer implements ImageContainer {
 
   private TensorBufferContainer(
       TensorBuffer buffer, ColorSpaceType colorSpaceType, int height, int width) {
+    checkArgument(
+        colorSpaceType != ColorSpaceType.YUV_420_888,
+        "The actual encoding format of YUV420 is required. Choose a ColorSpaceType from: NV12,"
+            + " NV21, YV12, YV21. Use YUV_420_888 only when loading an android.media.Image.");
+
     colorSpaceType.assertNumElements(buffer.getFlatSize(), height, width);
     this.buffer = buffer;
     this.colorSpaceType = colorSpaceType;
@@ -102,6 +108,12 @@ final class TensorBufferContainer implements ImageContainer {
     // TensorBuffer many times.
     // Otherwise, create another one with the expected data type.
     return buffer.getDataType() == dataType ? buffer : TensorBuffer.createFrom(buffer, dataType);
+  }
+
+  @Override
+  public Image getMediaImage() {
+    throw new UnsupportedOperationException(
+        "Converting from TensorBuffer to android.media.Image is unsupported.");
   }
 
   @Override

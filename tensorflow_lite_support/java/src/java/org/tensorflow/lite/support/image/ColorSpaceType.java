@@ -19,6 +19,7 @@ import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgum
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.ImageFormat;
 import java.util.Arrays;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
@@ -122,7 +123,7 @@ public enum ColorSpaceType {
     }
   },
 
-  // YUV420sp format, encoded as "YYYYYYYY UVUV".
+  /** YUV420sp format, encoded as "YYYYYYYY UVUV". */
   NV12(2) {
     @Override
     int getNumElements(int height, int width) {
@@ -130,8 +131,10 @@ public enum ColorSpaceType {
     }
   },
 
-  // YUV420sp format, encoded as "YYYYYYYY VUVU", the standard picture format on Android Camera1
-  // preview.
+  /**
+   * YUV420sp format, encoded as "YYYYYYYY VUVU", the standard picture format on Android Camera1
+   * preview.
+   */
   NV21(3) {
     @Override
     int getNumElements(int height, int width) {
@@ -139,7 +142,7 @@ public enum ColorSpaceType {
     }
   },
 
-  // YUV420p format, encoded as "YYYYYYYY VV UU".
+  /** YUV420p format, encoded as "YYYYYYYY VV UU". */
   YV12(4) {
     @Override
     int getNumElements(int height, int width) {
@@ -147,8 +150,21 @@ public enum ColorSpaceType {
     }
   },
 
-  // YUV420p format, encoded as "YYYYYYYY UU VV".
+  /** YUV420p format, encoded as "YYYYYYYY UU VV". */
   YV21(5) {
+    @Override
+    int getNumElements(int height, int width) {
+      return getYuv420NumElements(height, width);
+    }
+  },
+
+  /**
+   * YUV420 format corresponding to {@link ImageFormat#YUV_420_888}. The actual encoding format
+   * (i.e. NV12 / Nv21 / YV12 / YV21) depends on the implementation of the image.
+   *
+   * <p>Use this format only when you load an {@link android.media.Image}.
+   */
+  YUV_420_888(6) {
     @Override
     int getNumElements(int height, int width) {
       return getYuv420NumElements(height, width);
@@ -180,6 +196,25 @@ public enum ColorSpaceType {
       default:
         throw new IllegalArgumentException(
             "Bitmap configuration: " + config + ", is not supported yet.");
+    }
+  }
+
+  /**
+   * Converts an {@link ImageFormat} value into the corresponding color space type.
+   *
+   * @throws IllegalArgumentException if the config is unsupported
+   */
+  static ColorSpaceType fromImageFormat(int imageFormat) {
+    switch (imageFormat) {
+      case ImageFormat.NV21:
+        return ColorSpaceType.NV21;
+      case ImageFormat.YV12:
+        return ColorSpaceType.YV12;
+      case ImageFormat.YUV_420_888:
+        return ColorSpaceType.YUV_420_888;
+      default:
+        throw new IllegalArgumentException(
+            "ImageFormat: " + imageFormat + ", is not supported yet.");
     }
   }
 

@@ -18,6 +18,7 @@ package org.tensorflow.lite.support.image;
 import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
 
 import android.graphics.Bitmap;
+import android.media.Image;
 import java.nio.ByteBuffer;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -224,6 +225,21 @@ public class TensorImage {
   }
 
   /**
+   * Loads an {@link Image} object into this {@link TensorImage}.
+   *
+   * <p>The main usage of this method is to load an {@link Image} object as model input to the <a
+   * href="TFLite Task
+   * Library">https://www.tensorflow.org/lite/inference_with_metadata/task_library/overview</a>.
+   * {@link TensorImage} backed by {@link Image} is not supported by {#link ImageProcessor}.
+   *
+   * <p>* @throws IllegalArgumentException if the {@link ImageFormat} of {@code image} is not
+   * ARGB_8888
+   */
+  public void load(Image image) {
+    container = MediaImageContainer.create(image);
+  }
+
+  /**
    * Returns a {@link Bitmap} representation of this {@link TensorImage}.
    *
    * <p>Numeric casting and clamping will be applied if the stored data is not uint8.
@@ -285,6 +301,28 @@ public class TensorImage {
     }
 
     return container.getTensorBuffer(dataType);
+  }
+
+  /**
+   * Returns an {@link Image} representation of this {@link TensorImage}.
+   *
+   * <p>This method only works when the {@link TensorImage} is backed by an {@link Image}, meaning
+   * you need to first load an {@link Image} through {@link TensorImage#load(Image)}.
+   *
+   * <p>Important: it's only a reference. DO NOT MODIFY. We don't create a copy here for performance
+   * concern, but if modification is necessary, please make a copy.
+   *
+   * @return a reference to a {@link Bitmap} in {@code ARGB_8888} config ("A" channel is always
+   *     opaque) or in {@code ALPHA_8}, depending on the {@link ColorSpaceType} of this {@link
+   *     TensorBuffer}.
+   * @throws IllegalStateException if the {@link TensorImage} never loads data
+   */
+  public Image getMediaImage() {
+    if (container == null) {
+      throw new IllegalStateException("No image has been loaded yet.");
+    }
+
+    return container.getMediaImage();
   }
 
   /**
