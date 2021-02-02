@@ -66,6 +66,8 @@ android_library(
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert_nlclassifier:bert_nl_classifier_native",
+        "@com_google_auto_value",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
 )
 
