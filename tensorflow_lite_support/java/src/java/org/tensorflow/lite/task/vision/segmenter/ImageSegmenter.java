@@ -109,7 +109,7 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    * ImageSegmenterOptions}.
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
-   *     classification model
+   *     segmentation model
    * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
    *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
@@ -163,7 +163,7 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    * ImageSegmenterOptions}.
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
-   *     classification model
+   *     segmentation model
    * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
    *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
@@ -253,12 +253,22 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
   /**
    * Performs actual segmentation on the provided image.
    *
-   * @param image a {@link TensorImage} object that represents an RGB image
+   * <p>{@link ImageSegmenter} supports the following {@link TensorImage} color space types:
+   *
+   * <ul>
+   *   <li>{@link ColorSpaceType#RGB}
+   *   <li>{@link ColorSpaceType#NV21}
+   *   <li>{@link ColorSpaceType#YV12}
+   *   <li>{@link ColorSpaceType#YV21}
+   * </ul>
+   *
+   * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @return results of performing image segmentation. Note that at the time, a single {@link
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
    * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Segmentation> segment(TensorImage image) {
     return segment(image, ImageProcessingOptions.builder().build());
@@ -267,7 +277,16 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
   /**
    * Performs actual segmentation on the provided image with {@link ImageProcessingOptions}.
    *
-   * @param image a {@link TensorImage} object that represents an RGB image
+   * <p>{@link ImageSegmenter} supports the following {@link TensorImage} color space types:
+   *
+   * <ul>
+   *   <li>{@link ColorSpaceType#RGB}
+   *   <li>{@link ColorSpaceType#NV21}
+   *   <li>{@link ColorSpaceType#YV12}
+   *   <li>{@link ColorSpaceType#YV21}
+   * </ul>
+   *
+   * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @param options {@link ImageSegmenter} only supports image rotation (through {@link
    *     ImageProcessingOptions#Builder#setOrientation}) currently. The orientation of an image
    *     defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.

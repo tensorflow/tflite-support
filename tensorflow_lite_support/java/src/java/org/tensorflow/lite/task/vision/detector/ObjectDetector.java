@@ -118,8 +118,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    * Creates an {@link ObjectDetector} instance with a model buffer and the default {@link
    * ObjectDetectorOptions}.
    *
-   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
-   *     classification model
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the detection
+   *     model
    * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
    *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
@@ -190,8 +190,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    * Creates an {@link ObjectDetector} instance with a model buffer and {@link
    * ObjectDetectorOptions}.
    *
-   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
-   *     classification model
+   * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the detection
+   *     model
    * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
    *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
@@ -394,8 +394,18 @@ public final class ObjectDetector extends BaseVisionTaskApi {
   /**
    * Performs actual detection on the provided image.
    *
-   * @param image a {@link TensorImage} object that represents a RGB image
+   * <p>{@link ObjectDetector} supports the following {@link TensorImage} color space types:
+   *
+   * <ul>
+   *   <li>{@link ColorSpaceType#RGB}
+   *   <li>{@link ColorSpaceType#NV21}
+   *   <li>{@link ColorSpaceType#YV12}
+   *   <li>{@link ColorSpaceType#YV21}
+   * </ul>
+   *
+   * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @throws AssertionError if error occurs when processing the image from the native code
+   * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Detection> detect(TensorImage image) {
     return detect(image, ImageProcessingOptions.builder().build());
@@ -404,7 +414,16 @@ public final class ObjectDetector extends BaseVisionTaskApi {
   /**
    * Performs actual detection on the provided image.
    *
-   * @param image a {@link TensorImage} object that represents a RGB image
+   * <p>{@link ObjectDetector} supports the following {@link TensorImage} color space types:
+   *
+   * <ul>
+   *   <li>{@link ColorSpaceType#RGB}
+   *   <li>{@link ColorSpaceType#NV21}
+   *   <li>{@link ColorSpaceType#YV12}
+   *   <li>{@link ColorSpaceType#YV21}
+   * </ul>
+   *
+   * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @param options {@link ObjectDetector} only supports image rotation (through {@link
    *     ImageProcessingOptions#Builder#setOrientation}) currently. The orientation of an image
    *     defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.

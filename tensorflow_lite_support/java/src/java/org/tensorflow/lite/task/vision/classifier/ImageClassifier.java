@@ -374,8 +374,18 @@ public final class ImageClassifier extends BaseVisionTaskApi {
   /**
    * Performs actual classification on the provided image.
    *
-   * @param image a {@link TensorImage} object that represents an RGB image
+   * <p>{@link ImageClassifier} supports the following {@link TensorImage} color space types:
+   *
+   * <ul>
+   *   <li>{@link ColorSpaceType#RGB}
+   *   <li>{@link ColorSpaceType#NV21}
+   *   <li>{@link ColorSpaceType#YV12}
+   *   <li>{@link ColorSpaceType#YV21}
+   * </ul>
+   *
+   * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @throws AssertionError if error occurs when classifying the image from the native code
+   * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Classifications> classify(TensorImage image) {
     return classify(image, ImageProcessingOptions.builder().build());
@@ -393,7 +403,16 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *       defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.
    * </ul>
    *
-   * @param image a {@link TensorImage} object that represents an RGB image
+   * <p>{@link ImageClassifier} supports the following {@link TensorImage} color space types:
+   *
+   * <ul>
+   *   <li>{@link ColorSpaceType#RGB}
+   *   <li>{@link ColorSpaceType#NV21}
+   *   <li>{@link ColorSpaceType#YV12}
+   *   <li>{@link ColorSpaceType#YV21}
+   * </ul>
+   *
+   * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @throws AssertionError if error occurs when classifying the image from the native code
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
