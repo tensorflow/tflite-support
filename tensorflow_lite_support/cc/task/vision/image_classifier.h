@@ -23,6 +23,7 @@ limitations under the License.
 #include "absl/status/status.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
+#include "tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
@@ -80,7 +81,7 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
   CreateFromOptions(
       const ImageClassifierOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 
   // Performs actual classification on the provided FrameBuffer.
   //

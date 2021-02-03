@@ -23,7 +23,6 @@ limitations under the License.
 #include "absl/strings/str_format.h"
 #include "absl/strings/string_view.h"
 #include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/interpreter.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"

@@ -32,9 +32,9 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
-        "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )
 
@@ -69,9 +69,9 @@ cc_library(
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
         "@flatbuffers",
-        "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )
 
@@ -104,5 +104,6 @@ cc_library(
         "@flatbuffers",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )

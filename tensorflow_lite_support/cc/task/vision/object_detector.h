@@ -21,6 +21,7 @@ limitations under the License.
 #include "absl/container/flat_hash_set.h"
 #include "absl/status/status.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
+#include "tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/vision/core/base_vision_task_api.h"
@@ -84,7 +85,7 @@ class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
   CreateFromOptions(
       const ObjectDetectorOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 
   // Performs actual detection on the provided FrameBuffer.
   //
