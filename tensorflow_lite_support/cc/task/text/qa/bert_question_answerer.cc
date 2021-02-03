@@ -17,6 +17,7 @@ limitations under the License.
 
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
@@ -58,7 +59,7 @@ BertQuestionAnswerer::CreateFromFile(
       api_to_init,
       core::TaskAPIFactory::CreateFromFile<BertQuestionAnswerer>(
           path_to_model_with_metadata,
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
   RETURN_IF_ERROR(api_to_init->InitializeFromMetadata());
   return api_to_init;
@@ -73,7 +74,7 @@ BertQuestionAnswerer::CreateFromBuffer(
       api_to_init,
       core::TaskAPIFactory::CreateFromBuffer<BertQuestionAnswerer>(
           model_with_metadata_buffer_data, model_with_metadata_buffer_size,
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
   RETURN_IF_ERROR(api_to_init->InitializeFromMetadata());
   return api_to_init;
@@ -85,7 +86,8 @@ StatusOr<std::unique_ptr<QuestionAnswerer>> BertQuestionAnswerer::CreateFromFd(
   ASSIGN_OR_RETURN(
       api_to_init,
       core::TaskAPIFactory::CreateFromFileDescriptor<BertQuestionAnswerer>(
-          fd, absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          fd,
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
   RETURN_IF_ERROR(api_to_init->InitializeFromMetadata());
   return api_to_init;
@@ -99,7 +101,7 @@ BertQuestionAnswerer::CreateBertQuestionAnswererFromFile(
       api_to_init,
       core::TaskAPIFactory::CreateFromFile<BertQuestionAnswerer>(
           path_to_model,
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
   api_to_init->InitializeBertTokenizer(path_to_vocab);
   return api_to_init;
@@ -114,7 +116,7 @@ BertQuestionAnswerer::CreateBertQuestionAnswererFromBuffer(
       api_to_init,
       core::TaskAPIFactory::CreateFromBuffer<BertQuestionAnswerer>(
           model_buffer_data, model_buffer_size,
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
   api_to_init->InitializeBertTokenizerFromBinary(vocab_buffer_data,
                                                  vocab_buffer_size);
@@ -129,7 +131,7 @@ BertQuestionAnswerer::CreateAlbertQuestionAnswererFromFile(
       api_to_init,
       core::TaskAPIFactory::CreateFromFile<BertQuestionAnswerer>(
           path_to_model,
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
   api_to_init->InitializeSentencepieceTokenizer(path_to_spmodel);
   return api_to_init;
@@ -144,7 +146,7 @@ BertQuestionAnswerer::CreateAlbertQuestionAnswererFromBuffer(
       api_to_init,
       core::TaskAPIFactory::CreateFromBuffer<BertQuestionAnswerer>(
           model_buffer_data, model_buffer_size,
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
   api_to_init->InitializeSentencepieceTokenizerFromBinary(spmodel_buffer_data,
                                                           spmodel_buffer_size);
