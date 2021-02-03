@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_ERROR_REPORTER_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_ERROR_REPORTER_H_
 
+#include <cstdarg>
 #include <string>
 
 #include "tensorflow/lite/stateful_error_reporter.h"
@@ -27,12 +28,14 @@ namespace core {
 // An ErrorReporter that logs to stderr and captures the last message.
 class ErrorReporter : public tflite::StatefulErrorReporter {
  public:
+  ErrorReporter() { last_message_[0] = '\0'; }
+
   // We declared two functions with name 'Report', so that the variadic Report
   // function in tflite::ErrorReporter is hidden.
   // See https://isocpp.org/wiki/faq/strange-inheritance#hiding-rule.
   using tflite::ErrorReporter::Report;
 
-  int Report(const char* format, va_list args) override;
+  int Report(const char* format, std::va_list args) override;
 
   std::string message() override;
 
