@@ -83,8 +83,8 @@ class MetadataWriter(metadata_writer.MetadataWriter):
 
   @classmethod
   def create_for_inference(cls, model_buffer: bytearray,
-                           input_norm_mean: List[float],
-                           input_norm_std: List[float],
+                           input_norm_mean: Optional[List[float]],
+                           input_norm_std: Optional[List[float]],
                            label_file_paths: List[str]):
     """Creates mandatory metadata for TFLite Support inference.
 
