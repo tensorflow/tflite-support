@@ -77,10 +77,11 @@ StatusOr<std::unique_ptr<ImageClassifier>> ImageClassifier::CreateFromOptions(
   // Copy options to ensure the ExternalFile outlives the constructed object.
   auto options_copy = absl::make_unique<ImageClassifierOptions>(options);
 
-  ASSIGN_OR_RETURN(auto image_classifier,
-                   TaskAPIFactory::CreateFromExternalFileProto<ImageClassifier>(
-                       &options_copy->model_file_with_metadata(),
-                       std::move(resolver), options_copy->num_threads()));
+  ASSIGN_OR_RETURN(
+      auto image_classifier,
+      TaskAPIFactory::CreateFromExternalFileProto<ImageClassifier>(
+          &options_copy->model_file_with_metadata(), std::move(resolver),
+          options_copy->num_threads(), options_copy->compute_settings()));
 
   RETURN_IF_ERROR(image_classifier->Init(std::move(options_copy)));
 

@@ -245,16 +245,6 @@ http_archive(
     ],
 )
 
-http_archive(
-    name = "com_google_protobuf",
-    urls = [
-        "https://github.com/protocolbuffers/protobuf/archive/v3.11.2.zip",
-    ],
-    sha256 = "e4f8bedb19a93d0dccc359a126f51158282e0b24d92e0cad9c76a9699698268d",
-    strip_prefix = "protobuf-3.11.2",
-    type = "zip",
-)
-
 # AutoValue 1.6+ shades Guava, Auto Common, and JavaPoet. That's OK
 # because none of these jars become runtime dependencies.
 java_import_external(

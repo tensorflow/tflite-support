@@ -17,6 +17,7 @@ syntax = "proto2";
 
 package tflite.task.vision;
 
+import "tensorflow/lite/experimental/acceleration/configuration/configuration.proto";
 import "tensorflow_lite_support/cc/task/core/proto/external_file.proto";
 
 // Options for setting up an ImageSegmenter.
@@ -56,6 +57,21 @@ message ImageSegmenterOptions {
   // -1 has the effect to let TFLite runtime set the value.
   optional int32 num_threads = 7 [default = -1];
 
+  // Advanced settings specifying how to accelerate the model inference using
+  // dedicated delegates.
+  // Only NONE, GPU, NNAPI and HEXAGON delegates are supported for now;
+  // specifying another delegate will cause an UnimplementedError to be thrown
+  // at initialization time.
+  //
+  // IMPORTANT: in order to use a delegate, the appropriate delegate plugin
+  // needs to be linked at build time. See comment above the "image_segmenter"
+  // target at:
+  // https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/cc/task/vision/BUILD
+  //
+  // See settings definition at:
+  // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/configuration.proto
+  optional tflite.proto.ComputeSettings compute_settings = 4;
+
   // Reserved tags.
-  reserved 1, 2, 4;
+  reserved 1, 2;
 }
