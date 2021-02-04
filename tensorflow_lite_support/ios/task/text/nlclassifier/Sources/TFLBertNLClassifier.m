@@ -19,6 +19,10 @@ limitations under the License.
 
 NS_ASSUME_NONNULL_BEGIN
 
+@implementation TFLBertNLClassifierOptions
+@synthesize maxSeqLen;
+@end
+
 @interface TFLBertNLClassifier ()
 /** BertNLClassifier backed by C API */
 @property(nonatomic) BertNLClassifier *bertNLClassifier;
@@ -33,6 +37,16 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)bertNLClassifierWithModelPath:(NSString *)modelPath {
   BertNLClassifier *classifier = BertNLClassifierFromFile(modelPath.UTF8String);
 
+  _GTMDevAssert(classifier, @"Failed to create BertNLClassifier");
+  return [[TFLBertNLClassifier alloc] initWithBertNLClassifier:classifier];
+}
+
++ (instancetype)bertNLClassifierWithModelPath:(NSString *)modelPath
+                                  options:(TFLBertNLClassifierOptions *)options {
+  struct BertNLClassifierOptions cOptions = {
+          .max_seq_len = options.maxSeqLen
+  };
+  BertNLClassifier *classifier = BertNLClassifierFromFileAndOptions(modelPath.UTF8String, &cOptions);
   _GTMDevAssert(classifier, @"Failed to create BertNLClassifier");
   return [[TFLBertNLClassifier alloc] initWithBertNLClassifier:classifier];
 }

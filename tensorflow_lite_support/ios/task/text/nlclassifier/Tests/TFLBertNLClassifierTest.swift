@@ -21,6 +21,7 @@ class TFLBertNLClassifierTest: XCTestCase {
   static let bundle = Bundle(for: TFLBertNLClassifierTest.self)
   static let bertModelPath = bundle.path(forResource: "test_model_nl_classifier_bert", ofType: "tflite")!
 
+
   func testClassifyPositiveResult() {
     let bertNLClassifier = TFLBertNLClassifier.bertNLClassifier(
       modelPath: TFLBertNLClassifierTest.bertModelPath)
@@ -35,6 +36,34 @@ class TFLBertNLClassifierTest: XCTestCase {
   func testClassifyNegativeResult() {
     let bertNLClassifier = TFLBertNLClassifier.bertNLClassifier(
       modelPath: TFLBertNLClassifierTest.bertModelPath)
+
+    XCTAssertNotNil(bertNLClassifier)
+
+    let categories = bertNLClassifier.classify(text: "unflinchingly bleak and desperate")
+
+    XCTAssertGreaterThan(categories["negative"]!.doubleValue, categories["positive"]!.doubleValue)
+  }
+
+  func testCreateFromOptionsClassifyPositiveResult() {
+    let modelOptions = TFLBertNLClassifierOptions()
+    modelOptions.maxSeqLen = 128;
+    let bertNLClassifier = TFLBertNLClassifier.bertNLClassifier(
+      modelPath: TFLBertNLClassifierTest.bertModelPath,
+      options: modelOptions)
+
+    XCTAssertNotNil(bertNLClassifier)
+
+    let categories = bertNLClassifier.classify(text: "it's a charming and often affecting journey")
+
+    XCTAssertGreaterThan(categories["positive"]!.doubleValue, categories["negative"]!.doubleValue)
+  }
+
+  func testCreateFromOptionsClassifyNegativeResult() {
+    let modelOptions = TFLBertNLClassifierOptions()
+    modelOptions.maxSeqLen = 128;
+    let bertNLClassifier = TFLBertNLClassifier.bertNLClassifier(
+      modelPath: TFLBertNLClassifierTest.bertModelPath,
+      options: modelOptions)
 
     XCTAssertNotNil(bertNLClassifier)
 

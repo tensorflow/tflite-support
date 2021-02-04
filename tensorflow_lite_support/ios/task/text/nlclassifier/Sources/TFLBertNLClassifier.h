@@ -17,6 +17,13 @@ limitations under the License.
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ * Options to configure TFLBertNLClassifier.
+ */
+@interface TFLBertNLClassifierOptions : NSObject
+@property(nonatomic) int maxSeqLen;
+@end
+
+/**
  * Classifier API for NLClassification tasks with Bert models, categorizes string into different
  * classes. The API expects a Bert based TFLite model with metadata populated.
  *
@@ -37,6 +44,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)bertNLClassifierWithModelPath:(NSString *)modelPath
     NS_SWIFT_NAME(bertNLClassifier(modelPath:));
+
+/**
+ * Creates TFLBertNLClassifier from a model file.
+ *
+ * @param modelPath Path to the classification model.
+ * @return A TFLBertNLClassifier instance.
+ */
++ (instancetype)bertNLClassifierWithModelPath:(NSString *)modelPath
+                                      options:(TFLBertNLClassifierOptions *)options
+    NS_SWIFT_NAME(bertNLClassifier(modelPath:options:));
 
 /**
  * Performs classification on a NSString input, returns <NSString *, NSNumber *>
