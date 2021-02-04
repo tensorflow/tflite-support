@@ -55,6 +55,10 @@ using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::TfLiteSupportStatus;
 
+#if TFLITE_USE_C_API
+using ::tflite::support::InterpreterCreationResources;
+#endif
+
 bool TfLiteEngine::Verifier::Verify(const char* data, int length,
                                     tflite::ErrorReporter* reporter) {
   return tflite::Verify(data, length, *op_resolver_, reporter);
@@ -231,11 +235,12 @@ absl::Status TfLiteEngine::InitInterpreter(
         "BuildModelFrom methods before calling InitInterpreter.");
   }
 #if TFLITE_USE_C_API
-  std::function<absl::Status(const acceleration::InterpreterCreationResources &,
+  std::function<absl::Status(const InterpreterCreationResources&,
                              std::unique_ptr<Interpreter, InterpreterDeleter>*)>
-      initializer = [this, num_threads](
-          const acceleration::InterpreterCreationResources& resources,
-          std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
+      initializer =
+          [this, num_threads](
+              const InterpreterCreationResources& resources,
+              std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
       -> absl::Status {
     std::unique_ptr<TfLiteInterpreterOptions,
                     void (*)(TfLiteInterpreterOptions*)>
