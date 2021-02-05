@@ -55,9 +55,7 @@ using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::TfLiteSupportStatus;
 
-#if TFLITE_USE_C_API
 using ::tflite::support::InterpreterCreationResources;
-#endif
 
 bool TfLiteEngine::Verifier::Verify(const char* data, int length,
                                     tflite::ErrorReporter* reporter) {
@@ -130,12 +128,19 @@ absl::Status TfLiteEngine::InitializeFromModelFileHandler() {
   size_t buffer_size = model_file_handler_->GetFileContent().size();
   VerifyAndBuildModelFromBuffer(buffer_data, buffer_size);
   if (model_ == nullptr) {
+    static constexpr char kInvalidFlatbufferMessage[] =
+        "The model is not a valid Flatbuffer";
     // To be replaced with a proper switch-case when TF Lite model builder
     // returns a `TfLiteStatus` code capturing this type of error.
     if (absl::StrContains(error_reporter_.message(),
-                          "The model is not a valid Flatbuffer")) {
+                          kInvalidFlatbufferMessage)) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument, error_reporter_.message(),
+          TfLiteSupportStatus::kInvalidFlatBufferError);
+    } else if (absl::StrContains(error_reporter_.message(),
+                                 "Error loading model from buffer")) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument, kInvalidFlatbufferMessage,
           TfLiteSupportStatus::kInvalidFlatBufferError);
     } else {
       // TODO(b/154917059): augment status with another `TfLiteStatus` code when
@@ -271,6 +276,7 @@ absl::Status TfLiteEngine::InitInterpreter(
 #else
   auto initializer =
       [this, num_threads](
+          const InterpreterCreationResources&,
           std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
       -> absl::Status {
     if (tflite_shims::InterpreterBuilder(*model_, *resolver_)(

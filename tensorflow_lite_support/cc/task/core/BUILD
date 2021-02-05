@@ -68,11 +68,11 @@ cc_library(
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite:kernel_api",
         "@org_tensorflow//tensorflow/lite/core/api",
+        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
         "@org_tensorflow//tensorflow/lite/core/shims:common",
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "@org_tensorflow//tensorflow/lite/tools:verifier",
     ] + [
-        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
         "@org_tensorflow//tensorflow/lite/core/api:verifier",
         "@org_tensorflow//tensorflow/lite/core/shims:c_api",
         "@org_tensorflow//tensorflow/lite/core/shims:c_api_experimental",
