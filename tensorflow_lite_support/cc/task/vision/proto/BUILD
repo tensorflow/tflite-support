@@ -1,5 +1,3 @@
-load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_cc_proto_library")
-
 package(
     default_visibility = [
         "//visibility:public",
@@ -14,9 +12,8 @@ proto_library(
     srcs = ["bounding_box.proto"],
 )
 
-support_cc_proto_library(
+cc_proto_library(
     name = "bounding_box_cc_proto",
-    srcs = ["bounding_box.proto"],
     deps = [
         ":bounding_box_proto",
     ],
@@ -33,9 +30,8 @@ proto_library(
     srcs = ["class.proto"],
 )
 
-support_cc_proto_library(
+cc_proto_library(
     name = "class_cc_proto",
-    srcs = ["class.proto"],
     deps = [
         ":class_proto",
     ],
@@ -57,10 +53,8 @@ proto_library(
     ],
 )
 
-support_cc_proto_library(
+cc_proto_library(
     name = "object_detector_options_cc_proto",
-    srcs = ["object_detector_options.proto"],
-    cc_deps = ["//tensorflow_lite_support/cc/task/core/proto:external_file_cc_proto"],
     deps = [
         ":object_detector_options_proto",
     ],
@@ -84,13 +78,8 @@ proto_library(
     ],
 )
 
-support_cc_proto_library(
+cc_proto_library(
     name = "detections_cc_proto",
-    srcs = ["detections.proto"],
-    cc_deps = [
-        ":bounding_box_cc_proto",
-        ":class_cc_proto",
-    ],
     deps = [
         ":detections_proto",
     ],
@@ -116,10 +105,8 @@ proto_library(
     ],
 )
 
-support_cc_proto_library(
+cc_proto_library(
     name = "image_classifier_options_cc_proto",
-    srcs = ["image_classifier_options.proto"],
-    cc_deps = ["//tensorflow_lite_support/cc/task/core/proto:external_file_cc_proto"],
     deps = [
         ":image_classifier_options_proto",
     ],
@@ -142,10 +129,8 @@ proto_library(
     ],
 )
 
-support_cc_proto_library(
+cc_proto_library(
     name = "classifications_cc_proto",
-    srcs = ["classifications.proto"],
-    cc_deps = [":class_cc_proto"],
     deps = [
         ":classifications_proto",
     ],
@@ -170,10 +155,8 @@ proto_library(
     ],
 )
 
-support_cc_proto_library(
+cc_proto_library(
     name = "image_segmenter_options_cc_proto",
-    srcs = ["image_segmenter_options.proto"],
-    cc_deps = ["//tensorflow_lite_support/cc/task/core/proto:external_file_cc_proto"],
     deps = [
         ":image_segmenter_options_proto",
     ],
@@ -193,9 +176,8 @@ proto_library(
     srcs = ["segmentations.proto"],
 )
 
-support_cc_proto_library(
+cc_proto_library(
     name = "segmentations_cc_proto",
-    srcs = ["segmentations.proto"],
     deps = [
         ":segmentations_proto",
     ],
