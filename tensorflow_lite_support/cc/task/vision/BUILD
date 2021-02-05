@@ -5,6 +5,10 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+# IMPORTANT: in order to use hardware acceleration delegates, configurable through the
+# `compute_settings` field of the ObjectDetectorOptions, you must additionally link to
+# the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
+# https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
 cc_library(
     name = "object_detector",
     srcs = ["object_detector.cc"],
@@ -38,6 +42,10 @@ cc_library(
     ],
 )
 
+# IMPORTANT: in order to use hardware acceleration delegates, configurable through the
+# `compute_settings` field of the ImageClassifierOptions, you must additionally link to
+# the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
+# https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
 cc_library(
     name = "image_classifier",
     srcs = ["image_classifier.cc"],
@@ -75,6 +83,10 @@ cc_library(
     ],
 )
 
+# IMPORTANT: in order to use hardware acceleration delegates, configurable through the
+# `compute_settings` field of the ImageSegmenterOptions, you must additionally link to
+# the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
+# https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
 cc_library(
     name = "image_segmenter",
     srcs = ["image_segmenter.cc"],

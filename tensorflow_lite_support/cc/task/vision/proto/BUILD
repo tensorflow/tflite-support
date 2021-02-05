@@ -50,6 +50,7 @@ proto_library(
     srcs = ["object_detector_options.proto"],
     deps = [
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
     ],
 )
 
@@ -102,6 +103,7 @@ proto_library(
     srcs = ["image_classifier_options.proto"],
     deps = [
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
     ],
 )
 
@@ -152,6 +154,7 @@ proto_library(
     srcs = ["image_segmenter_options.proto"],
     deps = [
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
     ],
 )
 
