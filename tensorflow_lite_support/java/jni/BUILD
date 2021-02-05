@@ -46,3 +46,15 @@ genrule(
     outs = ["jni_md.h"],
     cmd = "cp -f $< $@",
 )
+
+# Contains code to initialize TFLite through JNI in the internal version.
+cc_library(
+    name = "tflite_jni_initialization",
+    srcs = [],
+    # Prevent automated tools from removing this target as a dependency due to
+    # it being empty.
+    tags = ["keep_dep"],
+    visibility = [
+        "//tensorflow_lite_support:__subpackages__",
+    ],
+)
