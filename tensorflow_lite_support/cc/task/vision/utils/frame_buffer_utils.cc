@@ -25,8 +25,8 @@ limitations under the License.
 #include "absl/memory/memory.h"
 #include "absl/status/status.h"
 #include "absl/strings/str_format.h"
-#include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow/lite/kernels/internal/compatibility.h"
+#include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/libyuv_frame_buffer_utils.h"
@@ -347,9 +347,10 @@ std::vector<FrameBuffer::Plane> FrameBufferUtils::GetPlanes(
       planes.push_back(
           {buffer, /*stride=*/{/*row_stride_bytes=*/dimension.width,
                                /*pixel_stride_bytes=*/1}});
-      planes.push_back({buffer + (dimension.width * dimension.height),
-                        /*stride=*/{/*row_stride_bytes=*/dimension.width,
-                                    /*pixel_stride_bytes=*/2}});
+      planes.push_back(
+          {buffer + (dimension.width * dimension.height),
+           /*stride=*/{/*row_stride_bytes=*/(dimension.width + 1) / 2 * 2,
+                       /*pixel_stride_bytes=*/2}});
     } break;
     case FrameBuffer::Format::kYV12:
     case FrameBuffer::Format::kYV21: {

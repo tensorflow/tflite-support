@@ -87,12 +87,12 @@ int GetFrameBufferByteSize(FrameBuffer::Dimension dimension,
     case FrameBuffer::Format::kYV12:
     case FrameBuffer::Format::kYV21:
       return /*y plane*/ dimension.Size() +
-             /*uv plane*/ ((static_cast<float>(dimension.width + 1) / 2) *
-                           (static_cast<float>(dimension.height + 1) / 2) * 2);
+             /*uv plane*/ (dimension.width + 1) / 2 * (dimension.height + 1) /
+                 2 * 2;
     case FrameBuffer::Format::kRGB:
-      return dimension.Size() * 3;
+      return dimension.Size() * kRgbPixelBytes;
     case FrameBuffer::Format::kRGBA:
-      return dimension.Size() * 4;
+      return dimension.Size() * kRgbaPixelBytes;
     case FrameBuffer::Format::kGRAY:
       return dimension.Size();
     default:
