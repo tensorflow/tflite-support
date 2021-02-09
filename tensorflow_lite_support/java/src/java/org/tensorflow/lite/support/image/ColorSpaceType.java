@@ -247,10 +247,10 @@ public enum ColorSpaceType {
    */
   void assertNumElements(int numElements, int height, int width) {
     checkArgument(
-        numElements == getNumElements(height, width),
+        numElements >= getNumElements(height, width),
         String.format(
             "The given number of elements (%d) does not match the image (%s) in %d x %d. The"
-                + " expected number of elements is %d.",
+                + " expected number of elements should be at least %d.",
             numElements, this.name(), height, width, getNumElements(height, width)));
   }
 

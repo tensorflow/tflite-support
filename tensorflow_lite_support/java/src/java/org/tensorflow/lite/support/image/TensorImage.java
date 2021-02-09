@@ -217,11 +217,27 @@ public class TensorImage {
    * numeric casting and clamping will be applied when calling {@link #getTensorBuffer} and {@link
    * #getBuffer}.
    *
-   * @throws IllegalArgumentException if the shape of buffer does not match image height, width, and
-   *     color space type in {@link ImageProperties}
+   * @throws IllegalArgumentException if buffer size is less than the image size indicated by image
+   *     height, width, and color space type in {@link ImageProperties}
    */
   public void load(TensorBuffer buffer, ImageProperties imageProperties) {
     container = TensorBufferContainer.create(buffer, imageProperties);
+  }
+
+  /**
+   * Loads a {@link ByteBuffer} containing pixel values with the specific {@link ImageProperties}.
+   *
+   * <p>Note: if the data type of {@code buffer} does not match that of this {@link TensorImage},
+   * numeric casting and clamping will be applied when calling {@link #getTensorBuffer} and {@link
+   * #getBuffer}.
+   *
+   * @throws IllegalArgumentException if buffer size is less than the image size indicated by image
+   *     height, width, and color space type in {@link ImageProperties}
+   */
+  public void load(ByteBuffer buffer, ImageProperties imageProperties) {
+    TensorBuffer tensorBuffer = TensorBuffer.createDynamic(DataType.UINT8);
+    tensorBuffer.loadBuffer(buffer, new int[] {buffer.limit()});
+    container = TensorBufferContainer.create(tensorBuffer, imageProperties);
   }
 
   /**
