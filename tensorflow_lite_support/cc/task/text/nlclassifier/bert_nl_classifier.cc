@@ -82,7 +82,7 @@ absl::Status BertNLClassifier::Preprocess(
   absl::Span<const std::string> query_tokens = absl::MakeSpan(
       input_tokenize_results.subwords.data(),
       input_tokenize_results.subwords.data() +
-          std::min(static_cast<size_t>(options_.max_seq_len() - 2),
+          std::min(static_cast<size_t>(options_->max_seq_len() - 2),
                    input_tokenize_results.subwords.size()));
 
   std::vector<std::string> tokens;
@@ -96,8 +96,8 @@ absl::Status BertNLClassifier::Preprocess(
   // For Separation.
   tokens.push_back(kSeparator);
 
-  std::vector<int> input_ids(options_.max_seq_len(), 0);
-  std::vector<int> input_mask(options_.max_seq_len(), 0);
+  std::vector<int> input_ids(options_->max_seq_len(), 0);
+  std::vector<int> input_mask(options_->max_seq_len(), 0);
   // Convert tokens back into ids and set mask
   for (int i = 0; i < tokens.size(); ++i) {
     tokenizer_->LookupId(tokens[i], &input_ids[i]);
@@ -110,7 +110,7 @@ absl::Status BertNLClassifier::Preprocess(
 
   PopulateTensor(input_ids, ids_tensor);
   PopulateTensor(input_mask, mask_tensor);
-  PopulateTensor(std::vector<int>(options_.max_seq_len(), 0),
+  PopulateTensor(std::vector<int>(options_->max_seq_len(), 0),
                  segment_ids_tensor);
 
   return absl::OkStatus();
@@ -144,13 +144,13 @@ BertNLClassifier::CreateFromOptions(const BertNLClassifierOptions& options,
       auto bert_nl_classifier,
       core::TaskAPIFactory::CreateFromExternalFileProto<BertNLClassifier>(
           &options_copy->base_options().model_file(), std::move(resolver)));
-  RETURN_IF_ERROR(bert_nl_classifier->Initialize(options));
+  RETURN_IF_ERROR(bert_nl_classifier->Initialize(std::move(options_copy)));
   return std::move(bert_nl_classifier);
 }
 
 absl::Status BertNLClassifier::Initialize(
-    const BertNLClassifierOptions& options) {
-  options_ = options;
+    std::unique_ptr<BertNLClassifierOptions> options) {
+  options_ = std::move(options);
   // Set up mandatory tokenizer from metadata.
   const ProcessUnit* tokenizer_process_unit =
       GetMetadataExtractor()->GetInputProcessUnit(kTokenizerProcessUnitIndex);

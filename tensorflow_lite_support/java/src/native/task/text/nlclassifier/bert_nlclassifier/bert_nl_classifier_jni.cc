@@ -22,7 +22,6 @@ limitations under the License.
 
 namespace {
 
-using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
@@ -52,11 +51,11 @@ Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_deinitJni(
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_initJniWithByteBuffer(
     JNIEnv* env, jclass thiz, jobject model_buffer, jobject java_options) {
-  auto model = GetMappedFileBuffer(env, model_buffer);
   BertNLClassifierOptions proto_options =
       ConvertJavaBertNLClassifierOptions(env, java_options);
   proto_options.mutable_base_options()->mutable_model_file()->set_file_content(
-      model.data(), model.size());
+      static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
+      static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
 
   tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>> status =
       BertNLClassifier::CreateFromOptions(proto_options);

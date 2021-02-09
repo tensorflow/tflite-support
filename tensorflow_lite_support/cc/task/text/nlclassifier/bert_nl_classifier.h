@@ -117,11 +117,11 @@ class BertNLClassifier : public NLClassifier {
 
  private:
   // Initialize the API with the tokenizer and label files set in the metadata.
-  absl::Status Initialize(const BertNLClassifierOptions& options);
+  absl::Status Initialize(std::unique_ptr<BertNLClassifierOptions> options);
 
   std::unique_ptr<tflite::support::text::tokenizer::Tokenizer> tokenizer_;
 
-  BertNLClassifierOptions options_;
+  std::unique_ptr<BertNLClassifierOptions> options_;
 };
 
 }  // namespace nlclassifier
