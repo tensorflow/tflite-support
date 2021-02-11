@@ -54,8 +54,7 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
     ColorSpaceType colorSpaceType = image.getColorSpaceType();
     switch (colorSpaceType) {
       case RGB:
-        // TODO(b/178035553): Disable NV12 due to FrameBuffer issue.
-        // case NV12:
+      case NV12:
       case NV21:
       case YV12:
       case YV21:

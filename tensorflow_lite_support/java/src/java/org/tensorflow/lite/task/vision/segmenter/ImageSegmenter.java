@@ -257,6 +257,7 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * <ul>
    *   <li>{@link ColorSpaceType#RGB}
+   *   <li>{@link ColorSpaceType#NV12}
    *   <li>{@link ColorSpaceType#NV21}
    *   <li>{@link ColorSpaceType#YV12}
    *   <li>{@link ColorSpaceType#YV21}
@@ -281,6 +282,7 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * <ul>
    *   <li>{@link ColorSpaceType#RGB}
+   *   <li>{@link ColorSpaceType#NV12}
    *   <li>{@link ColorSpaceType#NV21}
    *   <li>{@link ColorSpaceType#YV12}
    *   <li>{@link ColorSpaceType#YV21}
