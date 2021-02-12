@@ -191,3 +191,48 @@ cc_library(
     hdrs = ["segmentations_proto_inc.h"],
     deps = [":segmentations_cc_proto"],
 )
+
+# ImageEmbedder protos.
+
+proto_library(
+    name = "image_embedder_options_proto",
+    srcs = ["image_embedder_options.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "image_embedder_options_cc_proto",
+    deps = [
+        ":image_embedder_options_proto",
+    ],
+)
+
+cc_library(
+    name = "image_embedder_options_proto_inc",
+    hdrs = ["image_embedder_options_proto_inc.h"],
+    deps = [
+        ":image_embedder_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
+    ],
+)
+
+proto_library(
+    name = "embeddings_proto",
+    srcs = ["embeddings.proto"],
+)
+
+cc_proto_library(
+    name = "embeddings_cc_proto",
+    deps = [
+        ":embeddings_proto",
+    ],
+)
+
+cc_library(
+    name = "embeddings_proto_inc",
+    hdrs = ["embeddings_proto_inc.h"],
+    deps = [":embeddings_cc_proto"],
+)
