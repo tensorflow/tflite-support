@@ -14,6 +14,7 @@ cc_library(
         "jni_utils.h",
     ],
     deps = [
+        "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/proto:class_proto_inc",

@@ -16,6 +16,7 @@ limitations under the License.
 #include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
 #include "absl/strings/str_cat.h"
+#include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
@@ -112,7 +113,28 @@ FrameBuffer::Orientation ConvertToFrameBufferOrientation(JNIEnv* env,
   return FrameBuffer::Orientation::kTopLeft;
 }
 
-StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBuffer(
+// TODO(b/180051417): remove the code, once FrameBuffer can digest YUV buffers
+// without format.
+// Theoretically, when using CreateFromYuvRawBuffer, "format" can always be set
+// to YV12 (or YV21, they are identical). However, prefer to set format to NV12
+// or NV21 whenever it's applicable, because NV12 and NV21 is better optimized
+// in performance than YV12 or YV21.
+StatusOr<FrameBuffer::Format> GetYUVImageFormat(const uint8* u_buffer,
+                                                const uint8* v_buffer,
+                                                int uv_pixel_stride) {
+  intptr_t u = reinterpret_cast<intptr_t>(u_buffer);
+  intptr_t v = reinterpret_cast<intptr_t>(v_buffer);
+  if ((std::abs(u - v) == 1) && (uv_pixel_stride == 2)) {
+    if (u_buffer > v_buffer) {
+      return FrameBuffer::Format::kNV21;
+    } else {
+      return FrameBuffer::Format::kNV12;
+    }
+  }
+  return FrameBuffer::Format::kYV12;
+}
+
+StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBufferFromByteBuffer(
     JNIEnv* env, jobject jimage_byte_buffer, jint width, jint height,
     jint jorientation, jint jcolor_space_type) {
   absl::string_view image = GetMappedFileBuffer(env, jimage_byte_buffer);
@@ -123,7 +145,7 @@ StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBuffer(
       ConvertToFrameBufferOrientation(env, jorientation));
 }
 
-StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBuffer(
+StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBufferFromBytes(
     JNIEnv* env, jbyteArray jimage_bytes, jint width, jint height,
     jint jorientation, jint jcolor_space_type, jlongArray jbyte_array_handle) {
   jbyte* jimage_ptr = env->GetByteArrayElements(jimage_bytes, NULL);
@@ -142,6 +164,27 @@ StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBuffer(
       reinterpret_cast<const uint8*>(jimage_ptr),
       FrameBuffer::Dimension{width, height},
       ConvertToFrameBufferFormat(env, jcolor_space_type),
+      ConvertToFrameBufferOrientation(env, jorientation));
+}
+
+StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBufferFromYuvPlanes(
+    JNIEnv* env, jobject jy_plane, jobject ju_plane, jobject jv_plane,
+    jint width, jint height, jint row_stride_y, jint row_stride_uv,
+    jint pixel_stride_uv, jint jorientation) {
+  const uint8* y_plane =
+      reinterpret_cast<const uint8*>(GetMappedFileBuffer(env, jy_plane).data());
+  const uint8* u_plane =
+      reinterpret_cast<const uint8*>(GetMappedFileBuffer(env, ju_plane).data());
+  const uint8* v_plane =
+      reinterpret_cast<const uint8*>(GetMappedFileBuffer(env, jv_plane).data());
+
+  FrameBuffer::Format format;
+  ASSIGN_OR_RETURN(format,
+                   GetYUVImageFormat(u_plane, v_plane, pixel_stride_uv));
+
+  return CreateFromYuvRawBuffer(
+      y_plane, u_plane, v_plane, format, FrameBuffer::Dimension{width, height},
+      row_stride_y, row_stride_uv, pixel_stride_uv,
       ConvertToFrameBufferOrientation(env, jorientation));
 }
 

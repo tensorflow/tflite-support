@@ -15,6 +15,12 @@ limitations under the License.
 
 package org.tensorflow.lite.task.vision.core;
 
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkNotNull;
+
+import android.graphics.ImageFormat;
+import android.media.Image;
+import android.media.Image.Plane;
 import com.google.auto.value.AutoValue;
 import java.nio.ByteBuffer;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -50,7 +56,7 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
     return results;
   }
 
-  private FrameBufferData createFrameBuffer(TensorImage image, int orientation) {
+  private static FrameBufferData createFrameBuffer(TensorImage image, int orientation) {
     ColorSpaceType colorSpaceType = image.getColorSpaceType();
     switch (colorSpaceType) {
       case RGB:
@@ -58,12 +64,67 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
       case NV21:
       case YV12:
       case YV21:
-        break;
+        // All these types can be converted to ByteBuffer inside TensorImage. Creating FrameBuffer
+        // base on the image ByteBuffer.
+        return createFrameBufferFromByteBuffer(image, orientation);
+      case YUV_420_888:
+        // YUV_420_888 is a specific type for android.media.Image.
+        return createFrameBufferFromMediaImage(image, orientation);
       default:
         throw new IllegalArgumentException(
             "Color space type, " + colorSpaceType.name() + ", is unsupported.");
     }
+  }
 
+  /**
+   * Creates FrameBuffer from the {@link android.media.Image} stored in the given {@link
+   * TensorImage}.
+   */
+  private static FrameBufferData createFrameBufferFromMediaImage(
+      TensorImage image, int orientation) {
+    Image mediaImage = image.getMediaImage();
+
+    checkArgument(
+        mediaImage.getFormat() == ImageFormat.YUV_420_888,
+        "Only supports loading YUV_420_888 Image.");
+
+    Plane[] planes = mediaImage.getPlanes();
+    checkArgument(
+        planes.length == 3,
+        String.format("The input image should have 3 planes, but got %d plane(s).", planes.length));
+
+    // Verify and rewind planes.
+    for (Plane plane : planes) {
+      ByteBuffer buffer = plane.getBuffer();
+      checkNotNull(buffer, "The image buffer is corrupted and the plane is null.");
+      // From the public documentation, plane.getBuffer() should always return a direct ByteBuffer.
+      // See https://developer.android.com/reference/android/media/Image.Plane#getBuffer()
+      checkArgument(
+          buffer.isDirect(),
+          "The image plane buffer is not a direct ByteBuffer, and is not supported.");
+      buffer.rewind();
+    }
+
+    return FrameBufferData.create(
+        createFrameBufferFromPlanes(
+            planes[0].getBuffer(),
+            planes[1].getBuffer(),
+            planes[2].getBuffer(),
+            mediaImage.getWidth(),
+            mediaImage.getHeight(),
+            planes[0].getRowStride(),
+            // row_stride and pixel_stride should be identical for U/V planes.
+            planes[1].getRowStride(),
+            planes[1].getPixelStride(),
+            orientation),
+        // FrameBuffer created with direct ByteBuffer does not require memory freeing.
+        /*byteArrayHandle=*/ 0,
+        /*byteArray=*/ null);
+  }
+
+  /** Creates FrameBuffer from the {@link ByteBuffer} stored in the given {@link TensorImage}. */
+  private static FrameBufferData createFrameBufferFromByteBuffer(
+      TensorImage image, int orientation) {
     // base_vision_api_jni.cc expects an uint8 image. Convert image of other types into uint8.
     TensorImage imageUint8 =
         image.getDataType() == DataType.UINT8
@@ -71,6 +132,8 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
             : TensorImage.createFrom(image, DataType.UINT8);
 
     ByteBuffer byteBuffer = imageUint8.getBuffer();
+    byteBuffer.rewind();
+    ColorSpaceType colorSpaceType = image.getColorSpaceType();
     if (byteBuffer.isDirect()) {
       return FrameBufferData.create(
           createFrameBufferFromByteBuffer(
@@ -79,7 +142,7 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
               imageUint8.getHeight(),
               orientation,
               colorSpaceType.getValue()),
-          // FrameBuffer created with ByteBuffer does not require memory freeing.
+          // FrameBuffer created with direct ByteBuffer does not require memory freeing.
           /*byteArrayHandle=*/ 0,
           /*byteArray=*/ null);
     } else {
@@ -131,10 +194,10 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
     abstract byte[] getByteArray();
   }
 
-  private native long createFrameBufferFromByteBuffer(
+  private static native long createFrameBufferFromByteBuffer(
       ByteBuffer image, int width, int height, int orientation, int colorSpaceType);
 
-  private native long createFrameBufferFromBytes(
+  private static native long createFrameBufferFromBytes(
       byte[] image,
       int width,
       int height,
@@ -142,7 +205,18 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
       int colorSpaceType,
       long[] byteArrayHandle);
 
-  private native void deleteFrameBuffer(
+  private static native long createFrameBufferFromPlanes(
+      ByteBuffer yBuffer,
+      ByteBuffer uBuffer,
+      ByteBuffer vBuffer,
+      int width,
+      int height,
+      int yRowStride,
+      int uvRowStride,
+      int uvPixelStride,
+      int orientation);
+
+  private static native void deleteFrameBuffer(
       long frameBufferHandle, long byteArrayHandle, byte[] byteArray);
 
   private static byte[] getBytesFromByteBuffer(ByteBuffer byteBuffer) {

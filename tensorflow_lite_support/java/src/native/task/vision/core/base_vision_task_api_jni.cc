@@ -24,14 +24,16 @@ namespace {
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
-using ::tflite::task::vision::CreateFrameBuffer;
+using ::tflite::task::vision::CreateFrameBufferFromByteBuffer;
+using ::tflite::task::vision::CreateFrameBufferFromBytes;
+using ::tflite::task::vision::CreateFrameBufferFromYuvPlanes;
 using ::tflite::task::vision::FrameBuffer;
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_vision_core_BaseVisionTaskApi_createFrameBufferFromByteBuffer(
     JNIEnv* env, jclass thiz, jobject jimage_byte_buffer, jint width,
     jint height, jint jorientation, jint jcolor_space_type) {
-  auto frame_buffer_or = CreateFrameBuffer(
+  auto frame_buffer_or = CreateFrameBufferFromByteBuffer(
       env, jimage_byte_buffer, width, height, jorientation, jcolor_space_type);
   if (frame_buffer_or.ok()) {
     return reinterpret_cast<jlong>(frame_buffer_or->release());
@@ -48,8 +50,26 @@ Java_org_tensorflow_lite_task_vision_core_BaseVisionTaskApi_createFrameBufferFro
     JNIEnv* env, jclass thiz, jbyteArray jimage_bytes, jint width, jint height,
     jint jorientation, jint jcolor_space_type, jlongArray jbyte_array_handle) {
   auto frame_buffer_or =
-      CreateFrameBuffer(env, jimage_bytes, width, height, jorientation,
-                        jcolor_space_type, jbyte_array_handle);
+      CreateFrameBufferFromBytes(env, jimage_bytes, width, height, jorientation,
+                                 jcolor_space_type, jbyte_array_handle);
+  if (frame_buffer_or.ok()) {
+    return reinterpret_cast<jlong>(frame_buffer_or->release());
+  } else {
+    ThrowException(env, kAssertionError,
+                   "Error occurred when creating FrameBuffer: %s",
+                   frame_buffer_or.status().message().data());
+    return kInvalidPointer;
+  }
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_vision_core_BaseVisionTaskApi_createFrameBufferFromPlanes(
+    JNIEnv* env, jclass thiz, jobject jy_plane, jobject ju_plane,
+    jobject jv_plane, jint width, jint height, jint row_stride_y,
+    jint row_stride_uv, jint pixel_stride_uv, jint orientation) {
+  auto frame_buffer_or = CreateFrameBufferFromYuvPlanes(
+      env, jy_plane, ju_plane, jv_plane, width, height, row_stride_y,
+      row_stride_uv, pixel_stride_uv, orientation);
   if (frame_buffer_or.ok()) {
     return reinterpret_cast<jlong>(frame_buffer_or->release());
   } else {
