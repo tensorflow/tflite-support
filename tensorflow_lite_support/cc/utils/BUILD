@@ -12,8 +12,8 @@ cc_library(
         "jni_utils.h",
     ],
     deps = [
-        "//tensorflow_lite_support/java/jni:tflite_jni_initialization",
         "@com_google_absl//absl/strings",
+        "@org_tensorflow//tensorflow/lite/core/shims:jni_initialization",
         "@org_tensorflow//tensorflow/lite/java/jni",
     ],
 )
