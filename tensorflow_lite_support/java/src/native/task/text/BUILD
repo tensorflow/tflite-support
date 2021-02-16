@@ -29,7 +29,7 @@ tflite_jni_binary(
         "//tensorflow_lite_support/java/jni",
         "//tensorflow_lite_support/java/src/native/task/core:builtin_op_resolver",
         "//tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_jni_utils",
-        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite:op_resolver",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
     ],
 )

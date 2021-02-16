@@ -41,7 +41,7 @@ cc_library(
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
         "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
-        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite:op_resolver",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
     ],
     alwayslink = 1,
