@@ -25,13 +25,12 @@ limitations under the License.
 #include "absl/status/status.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
-#include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow/lite/string_type.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
-#include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_nl_classifier_options_proto_inc.h"
-
+#include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
 
 namespace tflite {
 namespace task {
@@ -60,7 +59,7 @@ class BertNLClassifier : public NLClassifier {
   CreateFromFile(
       const std::string& path_to_model_with_metadata,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>()) {
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>()) {
     BertNLClassifierOptions options;
     options.mutable_base_options()->mutable_model_file()->set_file_name(
         path_to_model_with_metadata);
@@ -74,7 +73,7 @@ class BertNLClassifier : public NLClassifier {
       const char* model_with_metadata_buffer_data,
       size_t model_with_metadata_buffer_size,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>()) {
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>()) {
     BertNLClassifierOptions options;
     options.mutable_base_options()->mutable_model_file()->set_file_content(
         model_with_metadata_buffer_data, model_with_metadata_buffer_size);
@@ -87,7 +86,7 @@ class BertNLClassifier : public NLClassifier {
   CreateFromFd(
       int fd,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>()) {
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>()) {
     BertNLClassifierOptions options;
     options.mutable_base_options()
         ->mutable_model_file()
@@ -101,7 +100,7 @@ class BertNLClassifier : public NLClassifier {
   CreateFromOptions(
       const BertNLClassifierOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
-                  absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 
  protected:
   // Run tokenization on input text and construct three input tensors ids, mask

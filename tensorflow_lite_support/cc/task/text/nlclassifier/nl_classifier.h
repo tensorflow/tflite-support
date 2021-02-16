@@ -27,7 +27,7 @@ limitations under the License.
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
-#include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow/lite/string_type.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
@@ -93,21 +93,21 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
       const char* model_buffer_data, size_t model_buffer_size,
       const NLClassifierOptions& options = {},
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 
   // Creates a NLClassifier from TFLite model file.
   static tflite::support::StatusOr<std::unique_ptr<NLClassifier>>
   CreateFromFileAndOptions(
       const std::string& path_to_model, const NLClassifierOptions& options = {},
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 
   // Creates a NLClassifier from TFLite model file descriptor.
   static tflite::support::StatusOr<std::unique_ptr<NLClassifier>>
   CreateFromFdAndOptions(
       int fd, const NLClassifierOptions& options = {},
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 
   // Performs classification on a string input, returns classified results.
   std::vector<core::Category> Classify(const std::string& text);

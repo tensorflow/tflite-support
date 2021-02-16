@@ -36,7 +36,7 @@ cc_library(
         "@org_tensorflow//tensorflow/lite:string",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "@org_tensorflow//tensorflow/lite/kernels/internal:tensor",
     ],
 )
@@ -84,7 +84,7 @@ cc_library(
         "@org_tensorflow//tensorflow/lite:string",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )
 
