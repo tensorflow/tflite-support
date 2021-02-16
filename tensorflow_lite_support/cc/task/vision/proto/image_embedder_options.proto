@@ -21,7 +21,7 @@ import "tensorflow/lite/experimental/acceleration/configuration/configuration.pr
 import "tensorflow_lite_support/cc/task/core/proto/external_file.proto";
 
 // Options for setting up an ImageEmbedder.
-// Next Id: 9.
+// Next Id: 10.
 message ImageEmbedderOptions {
   // The external model file, as a single standalone TFLite, optionally packed
   // with TFLite Model Metadata [1]. Those are mandatory only if the model input
@@ -29,7 +29,7 @@ message ImageEmbedderOptions {
   // be set on the input tensor metadata.
   //
   // [1]: https://www.tensorflow.org/lite/convert/metadata
-  optional core.ExternalFile model_file_with_metadata = 4;
+  optional core.ExternalFile model_file_with_metadata = 9;
 
   // Whether to normalize the returned feature vector with L2 norm. Use this
   // option only if the model does not already contain a native L2_NORMALIZATION
@@ -63,5 +63,5 @@ message ImageEmbedderOptions {
   optional tflite.proto.ComputeSettings compute_settings = 8;
 
   // Reserved tags.
-  reserved 1, 3, 5;
+  reserved 1, 3, 4, 5;
 }
