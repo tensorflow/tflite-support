@@ -16,8 +16,21 @@ filegroup(
     srcs = glob(["**/*.java"]),
 )
 
+# Default target that uses BuiltInOpResolver, registers all built-in OPs.
 android_library(
     name = "object_detector",
+    exports = [
+        ":object_detector_java",
+        "//tensorflow_lite_support/java/src/native/task/vision/detector:object_detector_native",
+    ],
+)
+
+# Java-only target, need to be used together with a native target similar to
+# //third_party/tensorflow_lite_support/java/src/native/task/vision/detector:object_detector_native.
+# Use this target when you want to provide a MutableOpResolver with customized
+# OPs and/or a subset of BuiltInOps to reduce binary size.
+android_library(
+    name = "object_detector_java",
     srcs = glob(["*.java"]) + [
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/core:base_vision_api_src",
     ],
@@ -26,7 +39,6 @@ android_library(
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "//tensorflow_lite_support/java/src/native/task/vision/detector:object_detector_native",
         "@com_google_auto_value",
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",

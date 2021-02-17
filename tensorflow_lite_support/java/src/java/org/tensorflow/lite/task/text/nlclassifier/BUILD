@@ -12,6 +12,15 @@ filegroup(
     srcs = glob(["**/*.java"]),
 )
 
+# Default target that uses BuiltInOpResolver, registers all built-in OPs.
+android_library(
+    name = "nl_classifier",
+    exports = [
+        ":nl_classifier_java",
+        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_native",
+    ],
+)
+
 # Java-only target, need to be used together with a native target similar to
 # third_party/tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_native.
 # Use this target when you want to provide a MutableOpResolver with customized
@@ -25,22 +34,6 @@ android_library(
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "@com_google_auto_value",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
-    ],
-)
-
-# Default target that uses BuiltInOpResolver, registers all built-in OPs.
-android_library(
-    name = "nl_classifier",
-    srcs = [
-        "NLClassifier.java",
-    ],
-    javacopts = JAVACOPTS,
-    deps = [
-        "//tensorflow_lite_support/java:tensorflowlite_support_java",
-        "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_native",
         "@com_google_auto_value",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],

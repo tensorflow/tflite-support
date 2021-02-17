@@ -12,13 +12,25 @@ filegroup(
     srcs = glob(["**/*.java"]),
 )
 
+# Default target that uses BuiltInOpResolver, registers all built-in OPs.
 android_library(
     name = "bert_question_answerer",
+    exports = [
+        ":bert_question_answerer_java",
+        "//tensorflow_lite_support/java/src/native/task/text/qa:bert_question_answerer_native",
+    ],
+)
+
+# Java-only target, need to be used together with a native target similar to
+# //third_party/tensorflow_lite_support/java/src/native/task/text/qa:bert_question_answerer_native.
+# Use this target when you want to provide a MutableOpResolver with customized
+# OPs and/or a subset of BuiltInOps to reduce binary size.
+android_library(
+    name = "bert_question_answerer_java",
     srcs = glob(["*.java"]),
     javacopts = JAVACOPTS,
     deps = [
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "//tensorflow_lite_support/java/src/native/task/text/qa:bert_question_answerer_native",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
 )
