@@ -81,7 +81,8 @@ absl::Status ExternalFileHandler::MapExternalFile() {
   }
   // Obtain file descriptor, offset and size.
   int fd = -1;
-  if (!external_file_.file_name().empty()) {
+  if (!external_file_.file_name().empty() &&
+      (external_file_.file_descriptor_meta().fd() <= 0)) {
     owned_fd_ = open(external_file_.file_name().c_str(), O_RDONLY);
     if (owned_fd_ < 0) {
       const std::string error_message = absl::StrFormat(
