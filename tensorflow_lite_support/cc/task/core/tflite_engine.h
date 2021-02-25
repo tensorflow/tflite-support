@@ -33,19 +33,8 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
 
-// If compiled with -DTFLITE_USE_C_API, this file will use the TF Lite C API
-// rather than the TF Lite C++ API.
-// TODO(b/168025296): eliminate the '#if TFLITE_USE_C_API' directives here and
-// elsewhere and instead use the C API unconditionally, once we have a suitable
-// replacement for the features of tflite::support::TfLiteInterpreterWrapper.
-#if TFLITE_USE_C_API
-#include "tensorflow/lite/core/api/verifier.h"
-#include "tensorflow/lite/core/shims/c/c_api.h"
-#include "tensorflow/lite/tools/verifier.h"
-#else
 #include "tensorflow/lite/core/shims/cc/interpreter.h"
 #include "tensorflow/lite/core/shims/cc/model.h"
-#endif
 
 namespace tflite {
 namespace task {
@@ -57,17 +46,10 @@ class TfLiteEngine {
  public:
   // Types.
   using InterpreterWrapper = ::tflite::support::TfLiteInterpreterWrapper;
-#if TFLITE_USE_C_API
-  using Model = struct TfLiteModel;
-  using Interpreter = struct TfLiteInterpreter;
-  using ModelDeleter = void (*)(Model*);
-  using InterpreterDeleter = InterpreterWrapper::InterpreterDeleter;
-#else
   using Model = ::tflite_shims::FlatBufferModel;
   using Interpreter = ::tflite_shims::Interpreter;
   using ModelDeleter = std::default_delete<Model>;
   using InterpreterDeleter = std::default_delete<Interpreter>;
-#endif
 
   // Constructors.
   explicit TfLiteEngine(
@@ -79,54 +61,26 @@ class TfLiteEngine {
 
   // Accessors.
   static int32_t InputCount(const Interpreter* interpreter) {
-#if TFLITE_USE_C_API
-    return TfLiteInterpreterGetInputTensorCount(interpreter);
-#else
     return interpreter->inputs().size();
-#endif
   }
   static int32_t OutputCount(const Interpreter* interpreter) {
-#if TFLITE_USE_C_API
-    return TfLiteInterpreterGetOutputTensorCount(interpreter);
-#else
     return interpreter->outputs().size();
-#endif
   }
   static TfLiteTensor* GetInput(Interpreter* interpreter, int index) {
-#if TFLITE_USE_C_API
-    return TfLiteInterpreterGetInputTensor(interpreter, index);
-#else
     return interpreter->tensor(interpreter->inputs()[index]);
-#endif
   }
   // Same as above, but const.
   static const TfLiteTensor* GetInput(const Interpreter* interpreter,
                                       int index) {
-#if TFLITE_USE_C_API
-    return TfLiteInterpreterGetInputTensor(interpreter, index);
-#else
     return interpreter->tensor(interpreter->inputs()[index]);
-#endif
   }
   static TfLiteTensor* GetOutput(Interpreter* interpreter, int index) {
-#if TFLITE_USE_C_API
-    // We need a const_cast here, because the TF Lite C API only has a non-const
-    // version of GetOutputTensor (in part because C doesn't support overloading
-    // on const).
-    return const_cast<TfLiteTensor*>(
-        TfLiteInterpreterGetOutputTensor(interpreter, index));
-#else
     return interpreter->tensor(interpreter->outputs()[index]);
-#endif
   }
   // Same as above, but const.
   static const TfLiteTensor* GetOutput(const Interpreter* interpreter,
                                        int index) {
-#if TFLITE_USE_C_API
-    return TfLiteInterpreterGetOutputTensor(interpreter, index);
-#else
     return interpreter->tensor(interpreter->outputs()[index]);
-#endif
   }
 
   std::vector<TfLiteTensor*> GetInputs();
@@ -172,11 +126,7 @@ class TfLiteEngine {
   // can be called from a different thread than the one where `Invoke()` is
   // running.
   void Cancel() {
-#if TFLITE_USE_C_API
-    // NOP.
-#else
     interpreter_.Cancel();
-#endif
   }
 
  protected:
