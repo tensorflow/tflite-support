@@ -37,18 +37,6 @@ cc_library(
     ],
 )
 
-# This is identical to the rule above, except that it gets built with
-# '-DTFLITE_USE_C_API'. This rule is used for unit tests that verify things
-# work correctly when built with TFLITE_USE_C_API defined.
-cc_library(
-    name = "tflite_wrapper_with_c_api_for_test",
-    testonly = 1,
-    hdrs = ["tflite_wrapper.h"],
-    deps = [
-        "//intelligence/mobile_acceleration/support_library:tflite_wrapper_with_c_api_for_test",
-    ],
-)
-
 cc_library(
     name = "integral_types",
     hdrs = ["integral_types.h"],

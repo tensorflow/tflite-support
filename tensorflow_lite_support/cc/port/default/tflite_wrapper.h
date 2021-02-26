@@ -33,17 +33,6 @@ namespace support {
 // retains ownership of the included options, and will ensure that they remain
 // valid for the duration of the created interpreter's lifetime.
 struct InterpreterCreationResources {
-#if TFLITE_USE_C_API
-  // The delegate created according to `Acceleration`.
-  // `TfLiteInterpreterWrapper` exclusively owns the `TfLiteDelegate` object,
-  // and maintains it through out the lifetime of `TfLiteInterpreterWrapper`.
-  TfLiteDelegate* optional_delegate;
-
-  // Whether to enable automatic fallback to execution without a delegate
-  // if execution with the delegate fails when the interpreter is *invoked*
-  // (as opposed to failure when the interpreter is *constructed*).
-  bool fallback_on_execution_error;
-#endif
 };
 
 // Wrapper for a TfLiteInterpreter that may be accelerated [1]. Meant to be

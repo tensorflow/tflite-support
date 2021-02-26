@@ -24,64 +24,12 @@ cc_library(
         # the default argument, this dependency does not cause all the builtin ops
         # to get included in the executable.
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/core/shims:framework",
         "@org_tensorflow//tensorflow/lite/tools:verifier",
-    ] + select({
-        "//tensorflow_lite_support/cc:tflite_use_c_api": [
-            "@org_tensorflow//tensorflow/lite/core/api:verifier",
-            "@org_tensorflow//tensorflow/lite/core/shims:c_api",
-            "@org_tensorflow//tensorflow/lite/core/shims:c_api_experimental",
-            "@org_tensorflow//tensorflow/lite:stderr_reporter",
-        ],
-        "//conditions:default": [
-            "@org_tensorflow//tensorflow/lite/core/shims:framework",
-        ],
-    }) + [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:tflite_wrapper",
-        "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
-        "//tensorflow_lite_support/metadata/cc:metadata_extractor",
-    ],
-)
-
-# This is a duplicate of the above 'tflite_engine' target that is used for
-# testing with TFLITE_USE_C_API defined.  It should be the same as the target
-# above, except that it adds
-#    testonly = 1,
-#    defines = ["TFLITE_USE_C_API"],
-# and that it resolves the conditional deps from the 'select' as if
-# "//tensorflow_lite_support/cc:tflite_use_c_api" was enabled.
-# This allows testing the TFLITE_USE_C_API case even when
-# '--copt=-DTFLITE_USE_C_API' wasn't passed on the build command line.
-cc_library(
-    name = "tflite_engine_with_c_api_for_test",
-    testonly = 1,
-    srcs = ["tflite_engine.cc"],
-    hdrs = ["tflite_engine.h"],
-    defines = ["TFLITE_USE_C_API"],
-    deps = [
-        ":error_reporter",
-        ":external_file_handler",
-        "@com_google_absl//absl/memory",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/strings",
-        "@org_tensorflow//tensorflow/lite:kernel_api",
-        "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
-        "@org_tensorflow//tensorflow/lite/core/shims:common",
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
-        "@org_tensorflow//tensorflow/lite/tools:verifier",
-    ] + [
-        "@org_tensorflow//tensorflow/lite/core/api:verifier",
-        "@org_tensorflow//tensorflow/lite/core/shims:c_api",
-        "@org_tensorflow//tensorflow/lite/core/shims:c_api_experimental",
-        "@org_tensorflow//tensorflow/lite:stderr_reporter",
-    ] + [
-        "//tensorflow_lite_support/cc:common",
-        "//tensorflow_lite_support/cc/port:configuration_proto_inc",
-        "//tensorflow_lite_support/cc/port:status_macros",
-        "//tensorflow_lite_support/cc/port:tflite_wrapper_with_c_api_for_test",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
         "//tensorflow_lite_support/metadata/cc:metadata_extractor",
     ],
