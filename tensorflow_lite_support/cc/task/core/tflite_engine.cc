@@ -191,11 +191,12 @@ absl::Status TfLiteEngine::InitInterpreter(
   }
   auto initializer =
       [this, num_threads](
-          const InterpreterCreationResources&,
+          const InterpreterCreationResources& resources,
           std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
       -> absl::Status {
-    if (tflite_shims::InterpreterBuilder(*model_, *resolver_)(
-            interpreter_out, num_threads) != kTfLiteOk) {
+    tflite_shims::InterpreterBuilder interpreter_builder(*model_, *resolver_);
+    resources.ApplyTo(&interpreter_builder);
+    if (interpreter_builder(interpreter_out, num_threads) != kTfLiteOk) {
       return CreateStatusWithPayload(
           StatusCode::kUnknown,
           absl::StrCat("Could not build the TF Lite interpreter: ",

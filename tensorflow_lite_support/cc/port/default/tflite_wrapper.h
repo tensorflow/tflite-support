@@ -24,6 +24,7 @@ limitations under the License.
 #include "tensorflow/lite/experimental/acceleration/configuration/configuration.pb.h"
 #include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
 #include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/interpreter_builder.h"
 
 namespace tflite {
 namespace support {
@@ -33,6 +34,8 @@ namespace support {
 // retains ownership of the included options, and will ensure that they remain
 // valid for the duration of the created interpreter's lifetime.
 struct InterpreterCreationResources {
+  // Apply the InterpreterCreationResources to the InterpreterBuilder.
+  void ApplyTo(tflite::InterpreterBuilder*) const {}
 };
 
 // Wrapper for a TfLiteInterpreter that may be accelerated [1]. Meant to be
