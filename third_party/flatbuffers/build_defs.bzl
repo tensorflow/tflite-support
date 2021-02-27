@@ -369,14 +369,12 @@ def flatbuffer_py_strip_prefix_srcs(name, srcs = [], strip_prefix = ""):
       srcs: Source .py files. (required)
       strip_prefix: Path that needs to be stripped from the srcs filepaths. (required)
     """
-    for i, src in enumerate(srcs):
-        cmd = "mv $< $@"
-        cmd += "| rm -rf " + strip_prefix if i == len(srcs) - 1 else ""
+    for src in srcs:
         native.genrule(
             name = name + "_" + src.replace(".", "_").replace("/", "_"),
             srcs = [src],
             outs = [src.replace(strip_prefix, "")],
-            cmd = cmd,
+            cmd = "mv $< $@",
         )
 
 def _concat_flatbuffer_py_srcs_impl(ctx):
