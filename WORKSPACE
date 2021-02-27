@@ -37,16 +37,16 @@ http_archive(
     ],
 )
 
-# TF on 2021-02-02.
+# TF on 2021-02-24
 http_archive(
     name = "org_tensorflow",
-    sha256 = "47a7ef720fdfbde14b0afd35fe45e9f4881938afb7799efbe8a924abd7529759",
-    strip_prefix = "tensorflow-23b10298680cc028098aed16d56567e2aac3e6d9",
+    sha256 = "2fcbd8a1928cce6b9fb338983391a35e2f4a4dab218ffdfdd5ebcf47b623988f",
+    strip_prefix = "tensorflow-b1de80b78f1a9523e4bcdd6f906c8ebdf227d3fe",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/23b10298680cc028098aed16d56567e2aac3e6d9.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/b1de80b78f1a9523e4bcdd6f906c8ebdf227d3fe.tar.gz",
     ],
     patches = [
-        "@//third_party:tensorflow_lite_build.patch",
+        # We need to rename lite/ios/BUILD.apple to lite/ios/BUILD.
         "@//third_party:tensorflow_lite_ios_build.patch",
     ],
     patch_args = ["-p1"],
@@ -310,9 +310,27 @@ java_import_external(
 load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 
 flatbuffers()
+
+RULES_JVM_EXTERNAL_TAG = "3.2"
+
+http_archive(
+    name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = "82262ff4223c5fda6fb7ff8bd63db8131b51b413d26eb49e3131037e79e324af",
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+)
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
 # Set up TF.
-load("@org_tensorflow//tensorflow:workspace.bzl", "tf_workspace")
-tf_workspace(tf_repo_name="@org_tensorflow")
+load("@org_tensorflow//tensorflow:workspace3.bzl", "workspace")
+workspace()
+load("@org_tensorflow//tensorflow:workspace2.bzl", "workspace")  # buildifier: disable=load
+workspace()
+load("@org_tensorflow//tensorflow:workspace1.bzl", "workspace")  # buildifier: disable=load
+workspace()
+load("@org_tensorflow//tensorflow:workspace0.bzl", "workspace")  # buildifier: disable=load
+workspace()
 
 load("//third_party/tensorflow:tf_configure.bzl", "tf_configure")
 tf_configure(name = "local_config_tf")
@@ -337,27 +355,10 @@ load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
 bazel_version_repository(name = "bazel_version")
 
 
-# Set up Android.
-load("//third_party/android:android_configure.bzl", "android_configure")
-android_configure(name="local_config_android")
-load("@local_config_android//:android.bzl", "android_workspace")
-android_workspace()
-
 python_configure(name = "local_config_python")
 
 
 # Maven dependencies.
-
-RULES_JVM_EXTERNAL_TAG = "3.2"
-
-http_archive(
-    name = "rules_jvm_external",
-    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
-    sha256 = "82262ff4223c5fda6fb7ff8bd63db8131b51b413d26eb49e3131037e79e324af",
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
-)
-
-load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
