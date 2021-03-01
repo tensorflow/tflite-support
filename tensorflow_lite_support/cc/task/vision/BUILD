@@ -119,3 +119,37 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )
+
+# IMPORTANT: in order to use hardware acceleration delegates, configurable through the
+# `compute_settings` field of the ImageEmbedderOptions, you must additionally link to
+# the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
+# https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
+cc_library(
+    name = "image_embedder",
+    srcs = ["image_embedder.cc"],
+    hdrs = ["image_embedder.h"],
+    deps = [
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:integral_types",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core:external_file_handler",
+        "//tensorflow_lite_support/cc/task/core:task_api_factory",
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+        "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
+        "//tensorflow_lite_support/cc/task/vision/proto:bounding_box_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/proto:embeddings_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/proto:image_embedder_options_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_utils",
+        "@com_google_absl//absl/container:node_hash_set",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:str_format",
+        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+    ],
+)
