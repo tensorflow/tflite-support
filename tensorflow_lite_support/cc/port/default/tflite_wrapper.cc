@@ -35,6 +35,7 @@ using tflite::proto::Delegate;
 constexpr char kGpuPluginName[] = "GpuPlugin";
 constexpr char kHexagonPluginName[] = "HexagonPlugin";
 constexpr char kNnApiPluginName[] = "NnapiPlugin";
+constexpr char kXnnPackPluginName[] = "XNNPackPlugin";
 }  // namespace
 
 /* static */
@@ -42,7 +43,8 @@ absl::Status TfLiteInterpreterWrapper::SanityCheckComputeSettings(
     const ComputeSettings& compute_settings) {
   Delegate delegate = compute_settings.tflite_settings().delegate();
   if (delegate != Delegate::NONE && delegate != Delegate::GPU &&
-      delegate != Delegate::HEXAGON && delegate != Delegate::NNAPI) {
+      delegate != Delegate::HEXAGON && delegate != Delegate::NNAPI &&
+      delegate != Delegate::XNNPACK) {
     return absl::UnimplementedError(absl::StrFormat(
         "Using delegate '%s' is not supported.", Delegate_Name(delegate)));
   }
@@ -185,6 +187,16 @@ absl::Status TfLiteInterpreterWrapper::InitializeDelegate() {
         return absl::NotFoundError(
             "Unable to find HEXAGON delegate plugin. Have you linked in the "
             "`hexagon_plugin` target?");
+      }
+      delegate_ = delegate_plugin_->Create();
+      break;
+    case Delegate::XNNPACK:
+      delegate_plugin_ = DelegatePluginRegistry::CreateByName(
+          kXnnPackPluginName, *compute_settings->tflite_settings());
+      if (!delegate_plugin_) {
+        return absl::NotFoundError(
+            "Unable to find XNNPACK delegate plugin. Have you linked in the "
+            "`xnnpack_plugin` target?");
       }
       delegate_ = delegate_plugin_->Create();
       break;
