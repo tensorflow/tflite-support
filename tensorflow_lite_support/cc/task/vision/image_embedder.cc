@@ -97,16 +97,14 @@ absl::Status ImageEmbedder::Init(
 
 absl::Status ImageEmbedder::CheckAndSetOutputs() {
   // First, sanity checks on the model itself.
-  const tflite::Interpreter* interpreter = engine_->interpreter();
-
-  num_output_layers_ = interpreter->outputs().size();
+  num_output_layers_ = engine_->interpreter()->outputs().size();
   embedding_dimensions_.resize(num_output_layers_);
 
   int num_quantized_outputs = 0;
   for (int i = 0; i < num_output_layers_; ++i) {
-    int output_tensor_index = interpreter->outputs()[i];
+    int output_tensor_index = engine_->interpreter()->outputs()[i];
     const TfLiteTensor* output_tensor =
-        interpreter->tensor(output_tensor_index);
+        engine_->interpreter()->tensor(output_tensor_index);
     int num_dimensions = output_tensor->dims->size;
     if (num_dimensions == 4) {
       if (output_tensor->dims->data[1] != 1 ||
