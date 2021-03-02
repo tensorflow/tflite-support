@@ -17,7 +17,6 @@ package org.tensorflow.lite.support.image;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
 
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -116,15 +115,10 @@ public class ImageProcessor extends SequentialProcessor<TensorImage> {
   /**
    * Processes a {@link TensorImage} object with prepared {@link TensorOperator}.
    *
-   * @throws IllegalArgumentException if image is not RGB
+   * @throws IllegalArgumentException if the image is not supported by any op.
    */
   @Override
   public TensorImage process(TensorImage image) {
-    checkArgument(
-        image.getColorSpaceType() == ColorSpaceType.RGB,
-        "Only RGB images are supported in ImageProcessor, but not "
-            + image.getColorSpaceType().name());
-
     return super.process(image);
   }
 

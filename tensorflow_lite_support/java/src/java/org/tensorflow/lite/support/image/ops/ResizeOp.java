@@ -15,9 +15,12 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image.ops;
 
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
+
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.tensorflow.lite.support.image.ColorSpaceType;
 import org.tensorflow.lite.support.image.ImageOperator;
 import org.tensorflow.lite.support.image.TensorImage;
 
@@ -65,6 +68,9 @@ public class ResizeOp implements ImageOperator {
   @Override
   @NonNull
   public TensorImage apply(@NonNull TensorImage image) {
+    checkArgument(
+        image.getColorSpaceType() == ColorSpaceType.RGB,
+        "Only RGB images are supported in ResizeOp, but not " + image.getColorSpaceType().name());
     Bitmap scaled =
         Bitmap.createScaledBitmap(image.getBitmap(), targetWidth, targetHeight, useBilinear);
     image.load(scaled);

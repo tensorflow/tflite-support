@@ -15,12 +15,15 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image.ops;
 
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
+
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.tensorflow.lite.support.image.ColorSpaceType;
 import org.tensorflow.lite.support.image.ImageOperator;
 import org.tensorflow.lite.support.image.TensorImage;
 
@@ -64,6 +67,10 @@ public class ResizeWithCropOrPadOp implements ImageOperator {
   @Override
   @NonNull
   public TensorImage apply(@NonNull TensorImage image) {
+    checkArgument(
+        image.getColorSpaceType() == ColorSpaceType.RGB,
+        "Only RGB images are supported in ResizeWithCropOrPadOp, but not "
+            + image.getColorSpaceType().name());
     Bitmap input = image.getBitmap();
     int srcL;
     int srcR;
