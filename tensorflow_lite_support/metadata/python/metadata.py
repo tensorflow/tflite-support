@@ -34,6 +34,47 @@ from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 from tensorflow_lite_support.metadata.cc.python import _pywrap_metadata_version
 from tensorflow_lite_support.metadata.flatbuffers_lib import _pywrap_flatbuffers
 
+try:
+  # If exists, optionally use TensorFlow to open and check files. Used to
+  # support more than local file systems.
+  # In pip requirements, we doesn't necessarily need tensorflow as a dep.
+  import tensorflow as tf  # pylint: disable=g-import-not-at-top
+  _open_file = tf.io.gfile.GFile
+  _exists_file = tf.io.gfile.exists
+except ImportError as e:
+  # If TensorFlow package doesn't exist, fall back to original open and exists.
+  _open_file = open
+  _exists_file = os.path.exists
+
+
+def _maybe_open_as_binary(filename, mode):
+  """Maybe open the binary file, and returns a file-like."""
+  if hasattr(filename, "read"):  # A file-like has read().
+    return filename
+  openmode = mode if "b" in mode else mode + "b"  # Add binary explicitly.
+  return _open_file(filename, openmode)
+
+
+def _open_as_zipfile(filename, mode="r"):
+  """Open file as a zipfile.
+
+  Args:
+    filename: str or file-like or path-like, to the zipfile.
+    mode: str, common file mode for zip.
+          (See: https://docs.python.org/3/library/zipfile.html)
+
+  Returns:
+    A ZipFile object.
+  """
+  file_like = _maybe_open_as_binary(filename, mode)
+  return zipfile.ZipFile(file_like, mode)
+
+
+def _is_zipfile(filename):
+  """Checks whether it is a zipfile."""
+  with _maybe_open_as_binary(filename, "r") as f:
+    return zipfile.is_zipfile(f)
+
 
 def get_path_to_datafile(path):
   """Gets the path to the specified file in the data dependencies.
@@ -169,7 +210,7 @@ class MetadataPopulator(object):
     Returns:
       Model buffer (in bytearray).
     """
-    with open(self._model_file, "rb") as f:
+    with _open_file(self._model_file, "rb") as f:
       return f.read()
 
   def get_packed_associated_file_list(self):
@@ -178,10 +219,10 @@ class MetadataPopulator(object):
     Returns:
       List of packed associated files.
     """
-    if not zipfile.is_zipfile(self._model_file):
+    if not _is_zipfile(self._model_file):
       return []
 
-    with zipfile.ZipFile(self._model_file, "r") as zf:
+    with _open_as_zipfile(self._model_file, "r") as zf:
       return zf.namelist()
 
   def get_recorded_associated_file_list(self):
@@ -273,7 +314,7 @@ class MetadataPopulator(object):
         of input/output tensor metadata.
     """
     _assert_file_exist(metadata_file)
-    with open(metadata_file, "rb") as f:
+    with _open_file(metadata_file, "rb") as f:
       metadata_buf = f.read()
     self.load_metadata_buffer(bytearray(metadata_buf))
 
@@ -317,15 +358,14 @@ class MetadataPopulator(object):
             "File, '{0}', does not exsit in the metadata. But packing it to "
             "tflite model is still allowed.".format(f))
 
-  def _copy_archived_files(self, src_zip, dst_zip, file_list):
+  def _copy_archived_files(self, src_zip, file_list, dst_zip):
     """Copy archieved files in file_list from src_zip ro dst_zip."""
 
-    if not zipfile.is_zipfile(src_zip):
+    if not _is_zipfile(src_zip):
       raise ValueError("File, '{0}', is not a zipfile.".format(src_zip))
 
-    with zipfile.ZipFile(src_zip,
-                         "r") as src_zf, zipfile.ZipFile(dst_zip,
-                                                         "a") as dst_zf:
+    with _open_as_zipfile(src_zip, "r") as src_zf, \
+         _open_as_zipfile(dst_zip, "a") as dst_zf:
       src_list = src_zf.namelist()
       for f in file_list:
         if f not in src_list:
@@ -449,10 +489,21 @@ class MetadataPopulator(object):
     # self._model_file = old_tflite_file | label1.txt | label2.txt
     # Then after trigger populate() to add label3.txt, self._model_file becomes
     # self._model_file = old_tflite_file | label1.txt | label2.txt | label3.txt
-    with zipfile.ZipFile(self._model_file, "a") as zf:
-      for af in self._associated_files:
-        filename = os.path.basename(af)
-        zf.write(af, filename)
+    with tempfile.SpooledTemporaryFile() as temp:
+      # (1) Copy content from model file of to temp file.
+      with _open_file(self._model_file, "rb") as f:
+        shutil.copyfileobj(f, temp)
+
+      # (2) Append of to a temp file as a zip.
+      with _open_as_zipfile(temp, "a") as zf:
+        for af in self._associated_files:
+          filename = os.path.basename(af)
+          zf.write(af, filename)
+
+      # (3) Copy temp file to model file.
+      temp.seek(0)
+      with _open_file(self._model_file, "wb") as f:
+        shutil.copyfileobj(temp, f)
 
   def _populate_metadata_buffer(self):
     """Populates the metadata buffer (in bytearray) into the model file.
@@ -465,7 +516,7 @@ class MetadataPopulator(object):
     buffer.
     """
 
-    with open(self._model_file, "rb") as f:
+    with _open_file(self._model_file, "rb") as f:
       model_buf = f.read()
 
     model = _schema_fb.ModelT.InitFromObj(
@@ -503,16 +554,15 @@ class MetadataPopulator(object):
     packed_files = self.get_packed_associated_file_list()
     if packed_files:
       # Writes the updated model buffer and associated files into a new model
-      # file. Then overwrites the original model file.
-      with tempfile.NamedTemporaryFile() as temp:
-        new_file = temp.name
-      with open(new_file, "wb") as f:
-        f.write(model_buf)
-      self._copy_archived_files(self._model_file, new_file, packed_files)
-      shutil.copy(new_file, self._model_file)
-      os.remove(new_file)
+      # file (in memory). Then overwrites the original model file.
+      with tempfile.SpooledTemporaryFile() as temp:
+        temp.write(model_buf)
+        self._copy_archived_files(self._model_file, packed_files, temp)
+        temp.seek(0)
+        with _open_file(self._model_file, "wb") as f:
+          shutil.copyfileobj(temp, f)
     else:
-      with open(self._model_file, "wb") as f:
+      with _open_file(self._model_file, "wb") as f:
         f.write(model_buf)
 
   def _use_basename_for_associated_files_in_metadata(self, metadata):
@@ -534,7 +584,7 @@ class MetadataPopulator(object):
                            model_meta.SubgraphMetadataLength()))
 
     # Verify if the number of tensor metadata matches the number of tensors.
-    with open(self._model_file, "rb") as f:
+    with _open_file(self._model_file, "rb") as f:
       model_buf = f.read()
     model = _schema_fb.Model.GetRootAsModel(model_buf, 0)
 
@@ -582,7 +632,7 @@ class _MetadataPopulatorWithBuffer(MetadataPopulator):
     with tempfile.NamedTemporaryFile() as temp:
       model_file = temp.name
 
-    with open(model_file, "wb") as f:
+    with _open_file(model_file, "wb") as f:
       f.write(model_buf)
 
     super().__init__(model_file)
@@ -627,7 +677,7 @@ class MetadataDisplayer(object):
       ValueError: The model does not have metadata.
     """
     _assert_file_exist(model_file)
-    with open(model_file, "rb") as f:
+    with _open_file(model_file, "rb") as f:
       return cls.with_model_buffer(f.read())
 
   @classmethod
@@ -696,7 +746,7 @@ class MetadataDisplayer(object):
     """
 
     try:
-      with zipfile.ZipFile(io.BytesIO(model_buf)) as zf:
+      with _open_as_zipfile(io.BytesIO(model_buf)) as zf:
         return zf.namelist()
     except zipfile.BadZipFile:
       return []
@@ -720,7 +770,7 @@ def convert_to_json(metadata_buffer):
   opt = _pywrap_flatbuffers.IDLOptions()
   opt.strict_json = True
   parser = _pywrap_flatbuffers.Parser(opt)
-  with open(_FLATC_TFLITE_METADATA_SCHEMA_FILE) as f:
+  with _open_file(_FLATC_TFLITE_METADATA_SCHEMA_FILE) as f:
     metadata_schema_content = f.read()
   if not parser.parse(metadata_schema_content):
     raise ValueError("Cannot parse metadata schema. Reason: " + parser.error)
@@ -729,14 +779,14 @@ def convert_to_json(metadata_buffer):
 
 def _assert_file_exist(filename):
   """Checks if a file exists."""
-  if not os.path.exists(filename):
+  if not _exists_file(filename):
     raise IOError("File, '{0}', does not exist.".format(filename))
 
 
 def _assert_model_file_identifier(model_file):
   """Checks if a model file has the expected TFLite schema identifier."""
   _assert_file_exist(model_file)
-  with open(model_file, "rb") as f:
+  with _open_file(model_file, "rb") as f:
     _assert_model_buffer_identifier(f.read())
 
 
