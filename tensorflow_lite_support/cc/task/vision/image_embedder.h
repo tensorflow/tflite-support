@@ -101,6 +101,15 @@ class ImageEmbedder
   // Returns the number of output layers of the model.
   int GetNumberOfOutputLayers() const;
 
+  // Utility function to compute cosine similarity [1] between two feature
+  // vectors. May return an InvalidArgumentError if e.g. the feature vectors are
+  // of different types (quantized vs. float), have different sizes, or have a
+  // an L2-norm of 0.
+  //
+  // [1]: https://en.wikipedia.org/wiki/Cosine_similarity
+  static absl::StatusOr<double> CosineSimilarity(const FeatureVector& u,
+                                                 const FeatureVector& v);
+
  protected:
   // The options used to build this ImageEmbedder.
   std::unique_ptr<ImageEmbedderOptions> options_;

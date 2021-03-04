@@ -39,7 +39,71 @@ using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::core::TaskAPIFactory;
+
+// Performs actual cosine similarity computation.
+template <typename T>
+absl::StatusOr<double> ComputeCosineSimilarity(const T* u, const T* v,
+                                               int num_elements) {
+  if (num_elements <= 0) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "Cannot compute cosine similarity on empty feature vectors",
+        TfLiteSupportStatus::kInvalidArgumentError);
+  }
+  double dot_product = 0.0;
+  double norm_u = 0.0;
+  double norm_v = 0.0;
+  for (int i = 0; i < num_elements; ++i) {
+    dot_product += u[i] * v[i];
+    norm_u += u[i] * u[i];
+    norm_v += v[i] * v[i];
+  }
+  if (norm_u <= 0.0 || norm_v <= 0.0) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "Cannot compute cosine similarity on feature vector with 0 norm",
+        TfLiteSupportStatus::kInvalidArgumentError);
+  }
+  return dot_product / std::sqrt(norm_u * norm_v);
+}
+
 }  // namespace
+
+/* static */
+absl::StatusOr<double> ImageEmbedder::CosineSimilarity(const FeatureVector& u,
+                                                       const FeatureVector& v) {
+  if (u.has_value_string() && v.has_value_string()) {
+    if (u.value_string().size() != v.value_string().size()) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrFormat("Cannot compute cosine similarity on quantized "
+                          "feature vectors of different sizes (%d vs %d)",
+                          u.value_string().size(), v.value_string().size()),
+          TfLiteSupportStatus::kInvalidArgumentError);
+    }
+    return ComputeCosineSimilarity(
+        reinterpret_cast<const int8_t*>(&u.value_string()[0]),
+        reinterpret_cast<const int8_t*>(&v.value_string()[0]),
+        u.value_string().size());
+  }
+  if (!u.has_value_string() && !v.has_value_string()) {
+    if (u.value_float_size() != v.value_float_size()) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrFormat("Cannot compute cosine similarity on float "
+                          "feature vectors of different sizes (%d vs %d)",
+                          u.value_float_size(), v.value_float_size()),
+          TfLiteSupportStatus::kInvalidArgumentError);
+    }
+    return ComputeCosineSimilarity(
+        u.value_float().data(), v.value_float().data(), u.value_float().size());
+  }
+  return CreateStatusWithPayload(
+      StatusCode::kInvalidArgument,
+      "Cannot compute cosine similarity between quantized and float "
+      "feature vectors",
+      TfLiteSupportStatus::kInvalidArgumentError);
+}
 
 /* static */
 absl::Status ImageEmbedder::SanityCheckOptions(
@@ -48,6 +112,7 @@ absl::Status ImageEmbedder::SanityCheckOptions(
   return absl::OkStatus();
 }
 
+/* static */
 absl::StatusOr<std::unique_ptr<ImageEmbedder>> ImageEmbedder::CreateFromOptions(
     const ImageEmbedderOptions& options,
     std::unique_ptr<tflite::OpResolver> resolver) {
