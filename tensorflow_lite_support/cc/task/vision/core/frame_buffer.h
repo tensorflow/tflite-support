@@ -75,7 +75,7 @@ namespace vision {
 class FrameBuffer {
  public:
   // Colorspace formats.
-  enum class Format { kRGBA, kRGB, kNV12, kNV21, kYV12, kYV21, kGRAY };
+  enum class Format { kRGBA, kRGB, kNV12, kNV21, kYV12, kYV21, kGRAY, kUNKNOWN};
 
   // Stride information.
   struct Stride {
