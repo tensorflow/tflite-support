@@ -12,6 +12,7 @@ exports_files(["LICENSE"])
 package_group(
     name = "users",
     packages = [
+        "//nlp/semantic_parsing/learning/neural/portable/...",
         # tensorflow_examples/... dep,
         "//tensorflow_lite_support/...",
         "//third_party/tensorflow_models/...",
