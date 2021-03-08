@@ -66,3 +66,22 @@ cc_binary(
         "@com_google_absl//absl/strings:str_format",
     ],
 )
+
+cc_binary(
+    name = "image_embedder_demo",
+    srcs = ["image_embedder_demo.cc"],
+    deps = [
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core:external_file_handler",
+        "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision:image_embedder",
+        "//tensorflow_lite_support/cc/task/vision/proto:embeddings_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/proto:image_embedder_options_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
+        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
+    ],
+)

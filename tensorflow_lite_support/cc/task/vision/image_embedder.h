@@ -54,7 +54,10 @@ namespace vision {
 //    - Either 2 or 4 dimensions, i.e. `[1 x N]` or `[1 x 1 x 1 x N]`.
 //
 // TODO(b/180502532): add pointer to example model.
-// TODO(b/172211314): add pointer to CLI demo tool.
+//
+// A CLI demo tool is available for easily trying out this API, and provides
+// example usage. See:
+// examples/task/vision/desktop/image_embedder_demo.cc
 class ImageEmbedder
     : public tflite::task::vision::BaseVisionTaskApi<EmbeddingResult> {
  public:
