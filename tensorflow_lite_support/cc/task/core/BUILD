@@ -116,3 +116,54 @@ cc_library(
         "@org_tensorflow//tensorflow/lite:stateful_error_reporter",
     ],
 )
+
+cc_library(
+    name = "label_map_item",
+    srcs = ["label_map_item.cc"],
+    hdrs = ["label_map_item.h"],
+    deps = [
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/container:flat_hash_set",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:str_format",
+    ],
+)
+
+cc_library(
+    name = "classification_head",
+    srcs = ["classification_head.cc"],
+    hdrs = ["classification_head.h"],
+    deps = [
+        ":label_map_item",
+        ":score_calibration",
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
+        "//tensorflow_lite_support/metadata/cc:metadata_extractor",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "score_calibration",
+    srcs = ["score_calibration.cc"],
+    hdrs = ["score_calibration.h"],
+    deps = [
+        ":label_map_item",
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:str_format",
+        "@com_google_absl//absl/types:optional",
+    ],
+)
