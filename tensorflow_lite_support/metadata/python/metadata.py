@@ -355,7 +355,7 @@ class MetadataPopulator(object):
 
       if f not in recorded_files:
         warnings.warn(
-            "File, '{0}', does not exsit in the metadata. But packing it to "
+            "File, '{0}', does not exist in the metadata. But packing it to "
             "tflite model is still allowed.".format(f))
 
   def _copy_archived_files(self, src_zip, file_list, dst_zip):
