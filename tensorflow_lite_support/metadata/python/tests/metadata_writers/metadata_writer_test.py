@@ -31,6 +31,7 @@ _OUTPUT_NAME = "probability"
 _LABEL_FILE = resource_loader.get_path_to_datafile("../testdata/labels.txt")
 _EXPECTED_DUMMY_JSON = "../testdata/mobilenet_v2_1.0_224_quant_dummy.json"
 _EXPECTED_META_INFO_JSON = "../testdata/mobilenet_v2_1.0_224_quant_meta_info_.json"
+_EXPECTED_DEFAULT_JSON = "../testdata/mobilenet_v2_1.0_224_quant_default.json"
 # Before populated into the model, metadata does not have the verson string
 _EXPECTED_DUMMY_NO_VERSION_JSON = "../testdata/mobilenet_v2_1.0_224_quant_dummy_no_version.json"
 
@@ -47,7 +48,16 @@ class MetadataWriterTest(tf.test.TestCase):
         [_LABEL_FILE])
     model_with_metadata = writer.populate()
 
-    self._assert_correct_metadata(model_with_metadata, _EXPECTED_DUMMY_JSON)
+    self._assert_correct_metadata(model_with_metadata, _EXPECTED_DUMMY_JSON,
+                                  _LABEL_FILE)
+
+  def test_create_from_metadata_with_default_value_should_succeed(self):
+    model_buffer = test_utils.load_file(_MODEL)
+
+    writer = metadata_writer.MetadataWriter.create_from_metadata(model_buffer)
+    model_with_metadata = writer.populate()
+
+    self._assert_correct_metadata(model_with_metadata, _EXPECTED_DEFAULT_JSON)
 
   def test_populate_create_from_metadata_info_should_succeed(self):
     model_buffer = test_utils.load_file(_MODEL)
@@ -59,7 +69,17 @@ class MetadataWriterTest(tf.test.TestCase):
         model_buffer, general_md, [input_md], [output_md], [_LABEL_FILE])
     model_with_metadata = writer.populate()
 
-    self._assert_correct_metadata(model_with_metadata, _EXPECTED_META_INFO_JSON)
+    self._assert_correct_metadata(model_with_metadata, _EXPECTED_META_INFO_JSON,
+                                  _LABEL_FILE)
+
+  def test_create_from_metadata_info_with_default_value_should_succeed(self):
+    model_buffer = test_utils.load_file(_MODEL)
+
+    writer = metadata_writer.MetadataWriter.create_from_metadata_info(
+        model_buffer)
+    model_with_metadata = writer.populate()
+
+    self._assert_correct_metadata(model_with_metadata, _EXPECTED_DEFAULT_JSON)
 
   def test_get_metadata_json_should_succeed(self):
     model_buffer = test_utils.load_file(_MODEL)
@@ -74,7 +94,10 @@ class MetadataWriterTest(tf.test.TestCase):
     expected_json = test_utils.load_file(_EXPECTED_DUMMY_NO_VERSION_JSON, "r")
     self.assertEqual(metadata_json, expected_json)
 
-  def _assert_correct_metadata(self, model_with_metadata, expected_json_file):
+  def _assert_correct_metadata(self,
+                               model_with_metadata,
+                               expected_json_file,
+                               expected_label_file=None):
     # Verify if the metadata populated is correct.
     displayer = _metadata.MetadataDisplayer.with_model_buffer(
         model_with_metadata)
@@ -83,9 +106,10 @@ class MetadataWriterTest(tf.test.TestCase):
     self.assertEqual(metadata_json, expected_json)
 
     # Verify if the associated file is packed as expected.
-    packed_files = displayer.get_packed_associated_file_list()
-    expected_packed_files = [os.path.basename(_LABEL_FILE)]
-    self.assertEqual(set(packed_files), set(expected_packed_files))
+    if expected_label_file:
+      packed_files = displayer.get_packed_associated_file_list()
+      expected_packed_files = [os.path.basename(expected_label_file)]
+      self.assertEqual(set(packed_files), set(expected_packed_files))
 
   def _create_dummy_metadata(self):
     # Create dummy input metadata

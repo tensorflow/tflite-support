@@ -18,6 +18,7 @@ from typing import List, Optional, Type
 
 import flatbuffers
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
+from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 from tensorflow_lite_support.metadata.python import metadata as _metadata
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 
@@ -102,6 +103,17 @@ class MetadataWriter:
     Returns:
       A MetadataWriter Object.
     """
+    # Create empty tensor metadata when input_metadata/output_metadata are None
+    # to bypass MetadataPopulator verification.
+    if not input_metadata:
+      model = _schema_fb.Model.GetRootAsModel(model_buffer, 0)
+      num_input_tensors = model.Subgraphs(0).InputsLength()
+      input_metadata = [_metadata_fb.TensorMetadataT()] * num_input_tensors
+
+    if not output_metadata:
+      model = _schema_fb.Model.GetRootAsModel(model_buffer, 0)
+      num_output_tensors = model.Subgraphs(0).OutputsLength()
+      output_metadata = [_metadata_fb.TensorMetadataT()] * num_output_tensors
 
     subgraph_metadata = _metadata_fb.SubGraphMetadataT()
     subgraph_metadata.inputTensorMetadata = input_metadata
