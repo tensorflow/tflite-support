@@ -1,0 +1,23 @@
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+    licenses = ["notice"],  # Apache 2.0
+)
+
+# AudioClassifier protos.
+
+proto_library(
+    name = "audio_classifier_options_proto",
+    srcs = ["audio_classifier_options.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "audio_classifier_options_cc_proto",
+    deps = [
+        ":audio_classifier_options_proto",
+    ],
+)

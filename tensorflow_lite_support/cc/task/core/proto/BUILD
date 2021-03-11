@@ -46,3 +46,30 @@ cc_library(
         ":external_file_proto_inc",
     ],
 )
+
+proto_library(
+    name = "classifications_proto",
+    srcs = ["classifications.proto"],
+    deps = [
+        ":class_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "classifications_cc_proto",
+    deps = [
+        ":classifications_proto",
+    ],
+)
+
+proto_library(
+    name = "class_proto",
+    srcs = ["class.proto"],
+)
+
+cc_proto_library(
+    name = "class_cc_proto",
+    deps = [
+        ":class_proto",
+    ],
+)
