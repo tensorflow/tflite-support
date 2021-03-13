@@ -15,6 +15,9 @@ cc_library(
     srcs = [
         ":libtask_text_jni.so",
     ],
+    deps = [
+        "@org_tensorflow//tensorflow/lite/kernels:deprecated_backends",
+    ],
 )
 
 # Note: "libtask_text_jni" is hardcoded in Java to look up the .so, therefore
