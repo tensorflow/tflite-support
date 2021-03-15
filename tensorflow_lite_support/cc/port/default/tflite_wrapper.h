@@ -170,6 +170,9 @@ class TfLiteInterpreterWrapper {
   // returned `TfLiteStatus` to an `absl::Status`.
   absl::Status AllocateTensors();
 
+  absl::Status LoadDelegatePlugin(const std::string&,
+                                  const tflite::TFLiteSettings&);
+
   // The interpreter instance being used.
   std::unique_ptr<tflite::Interpreter> interpreter_;
   // The function used to initialize the interpreter and store it into the

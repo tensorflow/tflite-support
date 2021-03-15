@@ -50,7 +50,8 @@ class TaskAPIFactory {
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings()) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
-    RETURN_IF_ERROR(engine->BuildModelFromFlatBuffer(buffer_data, buffer_size));
+    RETURN_IF_ERROR(engine->BuildModelFromFlatBuffer(buffer_data, buffer_size,
+                                                     compute_settings));
     return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
                                      compute_settings);
   }
@@ -64,7 +65,7 @@ class TaskAPIFactory {
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings()) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
-    RETURN_IF_ERROR(engine->BuildModelFromFile(file_name));
+    RETURN_IF_ERROR(engine->BuildModelFromFile(file_name, compute_settings));
     return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
                                      compute_settings);
   }
@@ -78,7 +79,8 @@ class TaskAPIFactory {
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings()) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
-    RETURN_IF_ERROR(engine->BuildModelFromFileDescriptor(file_descriptor));
+    RETURN_IF_ERROR(engine->BuildModelFromFileDescriptor(file_descriptor,
+                                                         compute_settings));
     return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
                                      compute_settings);
   }
@@ -93,7 +95,8 @@ class TaskAPIFactory {
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings()) {
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
-    RETURN_IF_ERROR(engine->BuildModelFromExternalFileProto(external_file));
+    RETURN_IF_ERROR(engine->BuildModelFromExternalFileProto(external_file,
+                                                            compute_settings));
     return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
                                      compute_settings);
   }

@@ -30,12 +30,6 @@ using tflite::delegates::DelegatePluginRegistry;
 using tflite::delegates::InterpreterUtils;
 using tflite::proto::ComputeSettings;
 using tflite::proto::Delegate;
-
-// The constant names for initializing delegates from the `DelegateRegistry`.
-constexpr char kGpuPluginName[] = "GpuPlugin";
-constexpr char kHexagonPluginName[] = "HexagonPlugin";
-constexpr char kNnApiPluginName[] = "NnapiPlugin";
-constexpr char kXnnPackPluginName[] = "XNNPackPlugin";
 }  // namespace
 
 /* static */
@@ -44,7 +38,7 @@ absl::Status TfLiteInterpreterWrapper::SanityCheckComputeSettings(
   Delegate delegate = compute_settings.tflite_settings().delegate();
   if (delegate != Delegate::NONE && delegate != Delegate::GPU &&
       delegate != Delegate::HEXAGON && delegate != Delegate::NNAPI &&
-      delegate != Delegate::XNNPACK) {
+      delegate != Delegate::XNNPACK && delegate != Delegate::EDGETPU_CORAL) {
     return absl::UnimplementedError(absl::StrFormat(
         "Using delegate '%s' is not supported.", Delegate_Name(delegate)));
   }
@@ -150,66 +144,30 @@ absl::Status TfLiteInterpreterWrapper::InitializeWithFallbackAndResize(
 }
 
 absl::Status TfLiteInterpreterWrapper::InitializeDelegate() {
-  if (delegate_ != nullptr) {
-    // Nothing to do.
-    return absl::OkStatus();
-  }
+  if (delegate_ == nullptr) {
+    Delegate which_delegate = compute_settings_.tflite_settings().delegate();
+    const tflite::ComputeSettings* compute_settings =
+        tflite::ConvertFromProto(compute_settings_, &flatbuffers_builder_);
 
-  // Delegates are initialized from the FlatBuffer counterpart of the
-  // `ComputeSettings` proto.
-  const tflite::ComputeSettings* compute_settings =
-      tflite::ConvertFromProto(compute_settings_, &flatbuffers_builder_);
-  switch (compute_settings_.tflite_settings().delegate()) {
-    case Delegate::NNAPI:
-      delegate_plugin_ = DelegatePluginRegistry::CreateByName(
-          kNnApiPluginName, *compute_settings->tflite_settings());
-      if (!delegate_plugin_) {
-        return absl::NotFoundError(
-            "Unable to find NNAPI delegate plugin. Have you linked in the "
-            "`nnapi_plugin` target?");
-      }
-      delegate_ = delegate_plugin_->Create();
-      break;
-    case Delegate::GPU:
-      delegate_plugin_ = DelegatePluginRegistry::CreateByName(
-          kGpuPluginName, *compute_settings->tflite_settings());
-      if (!delegate_plugin_) {
-        return absl::NotFoundError(
-            "Unable to find GPU delegate plugin. Have you linked in the "
-            "`gpu_plugin` target?");
-      }
-      delegate_ = delegate_plugin_->Create();
-      break;
-    case Delegate::HEXAGON:
-      delegate_plugin_ = DelegatePluginRegistry::CreateByName(
-          kHexagonPluginName, *compute_settings->tflite_settings());
-      if (!delegate_plugin_) {
-        return absl::NotFoundError(
-            "Unable to find HEXAGON delegate plugin. Have you linked in the "
-            "`hexagon_plugin` target?");
-      }
-      delegate_ = delegate_plugin_->Create();
-      break;
-    case Delegate::XNNPACK:
-      delegate_plugin_ = DelegatePluginRegistry::CreateByName(
-          kXnnPackPluginName, *compute_settings->tflite_settings());
-      if (!delegate_plugin_) {
-        return absl::NotFoundError(
-            "Unable to find XNNPACK delegate plugin. Have you linked in the "
-            "`xnnpack_plugin` target?");
-      }
-      delegate_ = delegate_plugin_->Create();
-      break;
-    default:
-      // Nothing to do: this should be caught by sanity checks beforehand, and
-      // will anyway cause the code below to throw an InternalError.
-      break;
-  }
-
-  if (!delegate_) {
-    return absl::InternalError(absl::StrFormat(
-        "Unable to create '%s' delegate.",
-        Delegate_Name(compute_settings_.tflite_settings().delegate())));
+    if (which_delegate == Delegate::NNAPI) {
+      RETURN_IF_ERROR(
+          LoadDelegatePlugin("Nnapi", *compute_settings->tflite_settings()));
+    } else if (which_delegate == Delegate::HEXAGON) {
+      RETURN_IF_ERROR(
+          LoadDelegatePlugin("Hexagon", *compute_settings->tflite_settings()));
+    } else if (which_delegate == Delegate::GPU) {
+      RETURN_IF_ERROR(
+          LoadDelegatePlugin("Gpu", *compute_settings->tflite_settings()));
+    } else if (which_delegate == Delegate::EDGETPU) {
+      RETURN_IF_ERROR(
+          LoadDelegatePlugin("EdgeTpu", *compute_settings->tflite_settings()));
+    } else if (which_delegate == Delegate::EDGETPU_CORAL) {
+      RETURN_IF_ERROR(LoadDelegatePlugin("EdgeTpuCoral",
+                                         *compute_settings->tflite_settings()));
+    } else if (which_delegate == Delegate::XNNPACK) {
+      RETURN_IF_ERROR(
+          LoadDelegatePlugin("XNNPack", *compute_settings->tflite_settings()));
+    }
   }
   return absl::OkStatus();
 }
@@ -274,6 +232,26 @@ void TfLiteInterpreterWrapper::SetTfLiteCancellation() {
   };
   interpreter_->SetCancellationFunction(reinterpret_cast<void*>(&cancel_flag_),
                                         check_cancel_flag);
+}
+
+absl::Status TfLiteInterpreterWrapper::LoadDelegatePlugin(
+    const std::string& name, const tflite::TFLiteSettings& tflite_settings) {
+  delegate_plugin_ = DelegatePluginRegistry::CreateByName(
+      absl::StrFormat("%sPlugin", name), tflite_settings);
+
+  if (delegate_plugin_ == nullptr) {
+    return absl::InternalError(absl::StrFormat(
+        "Could not create %s plugin. Have you linked in the %s_plugin target?",
+        name, name));
+  }
+
+  delegate_ = delegate_plugin_->Create();
+  if (delegate_ == nullptr) {
+    return absl::InternalError(
+        absl::StrFormat("Plugin did not create %s delegate.", name));
+  }
+
+  return absl::OkStatus();
 }
 
 }  // namespace support

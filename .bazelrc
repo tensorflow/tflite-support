@@ -106,7 +106,6 @@ build:dbg --copt -DDEBUG_BUILD
 build --define=use_fast_cpp_protos=true
 build --define=allow_oversize_protos=true
 
-build --spawn_strategy=standalone
 build -c opt
 
 # Adding "--cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0" creates parity with TF

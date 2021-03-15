@@ -32,6 +32,9 @@ bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text:task-library-text \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision:task-library-vision
 
+# Build Coral plugin
+bazel build --sandbox_debug --subcommands --define=darwinn_portable=1 \
+    //tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin
 
 # Run Metadata tests.
 bazel clean --expunge

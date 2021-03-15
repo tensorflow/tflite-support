@@ -25,16 +25,15 @@ limitations under the License.
 #include "absl/strings/string_view.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/core/shims/c/common.h"
+#include "tensorflow/lite/core/shims/cc/interpreter.h"
 #include "tensorflow/lite/core/shims/cc/kernels/register.h"
+#include "tensorflow/lite/core/shims/cc/model.h"
 #include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/tflite_wrapper.h"
 #include "tensorflow_lite_support/cc/task/core/error_reporter.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
-
-#include "tensorflow/lite/core/shims/cc/interpreter.h"
-#include "tensorflow/lite/core/shims/cc/model.h"
 
 namespace tflite {
 namespace task {
@@ -98,19 +97,29 @@ class TfLiteEngine {
   // whose ownership remains with the caller, and which must outlive the current
   // object. This performs extra verification on the input data using
   // tflite::Verify.
-  absl::Status BuildModelFromFlatBuffer(const char* buffer_data,
-                                        size_t buffer_size);
+  absl::Status BuildModelFromFlatBuffer(
+      const char* buffer_data, size_t buffer_size,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings());
 
   // Builds the TF Lite model from a given file.
-  absl::Status BuildModelFromFile(const std::string& file_name);
+  absl::Status BuildModelFromFile(
+      const std::string& file_name,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings());
 
   // Builds the TF Lite model from a given file descriptor using mmap(2).
-  absl::Status BuildModelFromFileDescriptor(int file_descriptor);
+  absl::Status BuildModelFromFileDescriptor(
+      int file_descriptor,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings());
 
   // Builds the TFLite model from the provided ExternalFile proto, which must
   // outlive the current object.
   absl::Status BuildModelFromExternalFileProto(
-      const ExternalFile* external_file);
+      const ExternalFile* external_file,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings());
 
   // Initializes interpreter with encapsulated model.
   // Note: setting num_threads to -1 has for effect to let TFLite runtime set
@@ -125,9 +134,7 @@ class TfLiteEngine {
   // Cancels the on-going `Invoke()` call if any and if possible. This method
   // can be called from a different thread than the one where `Invoke()` is
   // running.
-  void Cancel() {
-    interpreter_.Cancel();
-  }
+  void Cancel() { interpreter_.Cancel(); }
 
  protected:
   // Custom error reporter capturing and printing to stderr low-level TF Lite
@@ -152,13 +159,16 @@ class TfLiteEngine {
   // that was passed to the TfLiteEngine constructor, and then builds
   // the model from the buffer and stores it in 'model_'.
   void VerifyAndBuildModelFromBuffer(const char* buffer_data,
-                                     size_t buffer_size);
+                                     size_t buffer_size,
+                                     TfLiteVerifier* extra_verifier = nullptr);
 
   // Gets the buffer from the file handler; verifies and builds the model
   // from the buffer; if successful, sets 'model_metadata_extractor_' to be
   // a TF Lite Metadata extractor for the model; and calculates an appropriate
   // return Status,
-  absl::Status InitializeFromModelFileHandler();
+  absl::Status InitializeFromModelFileHandler(
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings());
 
   // TF Lite model and interpreter for actual inference.
   std::unique_ptr<Model, ModelDeleter> model_;

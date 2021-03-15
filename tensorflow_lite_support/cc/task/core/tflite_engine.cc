@@ -20,13 +20,12 @@ limitations under the License.
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
 #include "tensorflow/lite/builtin_ops.h"
+#include "tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow/lite/stderr_reporter.h"
 #include "tensorflow/lite/tools/verifier.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
-
-#include "tensorflow/lite/core/shims/cc/kernels/register.h"
 
 namespace tflite {
 namespace task {
@@ -83,16 +82,26 @@ std::vector<const TfLiteTensor*> TfLiteEngine::GetOutputs() {
   return tensors;
 }
 
-void TfLiteEngine::VerifyAndBuildModelFromBuffer(const char* buffer_data,
-                                                 size_t buffer_size) {
+void TfLiteEngine::VerifyAndBuildModelFromBuffer(
+    const char* buffer_data, size_t buffer_size,
+    TfLiteVerifier* extra_verifier) {
   model_ = tflite_shims::FlatBufferModel::VerifyAndBuildFromBuffer(
-      buffer_data, buffer_size, &verifier_, &error_reporter_);
+      buffer_data, buffer_size, extra_verifier, &error_reporter_);
 }
 
-absl::Status TfLiteEngine::InitializeFromModelFileHandler() {
+absl::Status TfLiteEngine::InitializeFromModelFileHandler(
+    const tflite::proto::ComputeSettings& compute_settings) {
   const char* buffer_data = model_file_handler_->GetFileContent().data();
   size_t buffer_size = model_file_handler_->GetFileContent().size();
-  VerifyAndBuildModelFromBuffer(buffer_data, buffer_size);
+  if (compute_settings.tflite_settings().delegate() ==
+  ::tflite::proto::Delegate::EDGETPU_CORAL) {
+    // Skip verifying the ops because Coral EdgeTPU models have EdgeTPU custom
+    // op which can be recognized by the Coral delegate.
+    VerifyAndBuildModelFromBuffer(buffer_data, buffer_size,
+                                  /*extra_verifier=*/nullptr);
+  } else {
+    VerifyAndBuildModelFromBuffer(buffer_data, buffer_size, &verifier_);
+  }
   if (model_ == nullptr) {
     static constexpr char kInvalidFlatbufferMessage[] =
         "The model is not a valid Flatbuffer";
@@ -128,8 +137,9 @@ absl::Status TfLiteEngine::InitializeFromModelFileHandler() {
   return absl::OkStatus();
 }
 
-absl::Status TfLiteEngine::BuildModelFromFlatBuffer(const char* buffer_data,
-                                                    size_t buffer_size) {
+absl::Status TfLiteEngine::BuildModelFromFlatBuffer(
+    const char* buffer_data, size_t buffer_size,
+    const tflite::proto::ComputeSettings& compute_settings) {
   if (model_) {
     return CreateStatusWithPayload(StatusCode::kInternal,
                                    "Model already built");
@@ -138,10 +148,12 @@ absl::Status TfLiteEngine::BuildModelFromFlatBuffer(const char* buffer_data,
   ASSIGN_OR_RETURN(
       model_file_handler_,
       ExternalFileHandler::CreateFromExternalFile(&external_file_));
-  return InitializeFromModelFileHandler();
+  return InitializeFromModelFileHandler(compute_settings);
 }
 
-absl::Status TfLiteEngine::BuildModelFromFile(const std::string& file_name) {
+absl::Status TfLiteEngine::BuildModelFromFile(
+    const std::string& file_name,
+    const tflite::proto::ComputeSettings& compute_settings) {
   if (model_) {
     return CreateStatusWithPayload(StatusCode::kInternal,
                                    "Model already built");
@@ -150,10 +162,12 @@ absl::Status TfLiteEngine::BuildModelFromFile(const std::string& file_name) {
   ASSIGN_OR_RETURN(
       model_file_handler_,
       ExternalFileHandler::CreateFromExternalFile(&external_file_));
-  return InitializeFromModelFileHandler();
+  return InitializeFromModelFileHandler(compute_settings);
 }
 
-absl::Status TfLiteEngine::BuildModelFromFileDescriptor(int file_descriptor) {
+absl::Status TfLiteEngine::BuildModelFromFileDescriptor(
+    int file_descriptor,
+    const tflite::proto::ComputeSettings& compute_settings) {
   if (model_) {
     return CreateStatusWithPayload(StatusCode::kInternal,
                                    "Model already built");
@@ -162,18 +176,19 @@ absl::Status TfLiteEngine::BuildModelFromFileDescriptor(int file_descriptor) {
   ASSIGN_OR_RETURN(
       model_file_handler_,
       ExternalFileHandler::CreateFromExternalFile(&external_file_));
-  return InitializeFromModelFileHandler();
+  return InitializeFromModelFileHandler(compute_settings);
 }
 
 absl::Status TfLiteEngine::BuildModelFromExternalFileProto(
-    const ExternalFile* external_file) {
+    const ExternalFile* external_file,
+    const tflite::proto::ComputeSettings& compute_settings) {
   if (model_) {
     return CreateStatusWithPayload(StatusCode::kInternal,
                                    "Model already built");
   }
   ASSIGN_OR_RETURN(model_file_handler_,
                    ExternalFileHandler::CreateFromExternalFile(external_file));
-  return InitializeFromModelFileHandler();
+  return InitializeFromModelFileHandler(compute_settings);
 }
 
 absl::Status TfLiteEngine::InitInterpreter(int num_threads) {
