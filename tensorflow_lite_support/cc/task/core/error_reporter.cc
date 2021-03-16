@@ -26,6 +26,7 @@ namespace task {
 namespace core {
 
 int ErrorReporter::Report(const char* format, va_list args) {
+  std::strcpy(second_last_message_, last_message_);
   last_message_[0] = '\0';
   int num_characters = vsnprintf(last_message_, kBufferSize, format, args);
   // To mimic tflite::StderrReporter.
@@ -35,6 +36,8 @@ int ErrorReporter::Report(const char* format, va_list args) {
 }
 
 std::string ErrorReporter::message() { return last_message_; }
+
+std::string ErrorReporter::previous_message() { return second_last_message_; }
 
 }  // namespace core
 }  // namespace task

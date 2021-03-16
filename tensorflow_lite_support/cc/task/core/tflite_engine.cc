@@ -54,11 +54,11 @@ using ::tflite::support::InterpreterCreationResources;
 
 bool TfLiteEngine::Verifier::Verify(const char* data, int length,
                                     tflite::ErrorReporter* reporter) {
-  return tflite::Verify(data, length, *op_resolver_, reporter);
+  return tflite::Verify(data, length, reporter);
 }
 
 TfLiteEngine::TfLiteEngine(std::unique_ptr<tflite::OpResolver> resolver)
-    : model_(), resolver_(std::move(resolver)), verifier_(resolver_.get()) {}
+    : model_(), resolver_(std::move(resolver)), verifier_() {}
 
 std::vector<TfLiteTensor*> TfLiteEngine::GetInputs() {
   Interpreter* interpreter = this->interpreter();
@@ -93,15 +93,7 @@ absl::Status TfLiteEngine::InitializeFromModelFileHandler(
     const tflite::proto::ComputeSettings& compute_settings) {
   const char* buffer_data = model_file_handler_->GetFileContent().data();
   size_t buffer_size = model_file_handler_->GetFileContent().size();
-  if (compute_settings.tflite_settings().delegate() ==
-  ::tflite::proto::Delegate::EDGETPU_CORAL) {
-    // Skip verifying the ops because Coral EdgeTPU models have EdgeTPU custom
-    // op which can be recognized by the Coral delegate.
-    VerifyAndBuildModelFromBuffer(buffer_data, buffer_size,
-                                  /*extra_verifier=*/nullptr);
-  } else {
-    VerifyAndBuildModelFromBuffer(buffer_data, buffer_size, &verifier_);
-  }
+  VerifyAndBuildModelFromBuffer(buffer_data, buffer_size, &verifier_);
   if (model_ == nullptr) {
     static constexpr char kInvalidFlatbufferMessage[] =
         "The model is not a valid Flatbuffer";
@@ -226,10 +218,21 @@ absl::Status TfLiteEngine::InitInterpreter(
 
   absl::Status status =
       interpreter_.InitializeWithFallback(initializer, compute_settings);
-
-  if (!status.ok() &&
-      !status.GetPayload(tflite::support::kTfLiteSupportPayload).has_value()) {
-    status = CreateStatusWithPayload(status.code(), status.message());
+  if (!status.ok()) {
+    if (absl::StrContains(error_reporter_.previous_message(),
+                          "Encountered unresolved custom op")) {
+      return CreateStatusWithPayload(StatusCode::kInvalidArgument,
+                                     error_reporter_.previous_message(),
+                                     TfLiteSupportStatus::kUnsupportedCustomOp);
+    } else if (absl::StrContains(error_reporter_.previous_message(),
+                                 "Didn't find op for builtin opcode")) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument, error_reporter_.previous_message(),
+          TfLiteSupportStatus::kUnsupportedBuiltinOp);
+    } else if (!status.GetPayload(tflite::support::kTfLiteSupportPayload)
+                    .has_value()) {
+      return CreateStatusWithPayload(status.code(), status.message());
+    }
   }
   return status;
 }

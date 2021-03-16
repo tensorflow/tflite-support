@@ -53,6 +53,12 @@ enum class TfLiteSupportStatus {
   kInvalidArgumentError = 2,
   // Invalid FlatBuffer file or buffer specified.
   kInvalidFlatBufferError = 3,
+  // Model contains a builtin op that isn't supported by the OpResolver or
+  // delegates.
+  kUnsupportedBuiltinOp = 4,
+  // Model contains a custom op that isn't supported by the OpResolver or
+  // delegates.
+  kUnsupportedCustomOp = 5,
 
   // File I/O error codes.
 

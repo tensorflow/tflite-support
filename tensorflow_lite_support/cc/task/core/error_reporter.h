@@ -25,10 +25,13 @@ namespace tflite {
 namespace task {
 namespace core {
 
-// An ErrorReporter that logs to stderr and captures the last message.
+// An ErrorReporter that logs to stderr and captures the last two messages.
 class ErrorReporter : public tflite::StatefulErrorReporter {
  public:
-  ErrorReporter() { last_message_[0] = '\0'; }
+  ErrorReporter() {
+    last_message_[0] = '\0';
+    second_last_message_[0] = '\0';
+  }
 
   // We declared two functions with name 'Report', so that the variadic Report
   // function in tflite::ErrorReporter is hidden.
@@ -38,10 +41,12 @@ class ErrorReporter : public tflite::StatefulErrorReporter {
   int Report(const char* format, std::va_list args) override;
 
   std::string message() override;
+  std::string previous_message();
 
  private:
   static constexpr int kBufferSize = 1024;
   char last_message_[kBufferSize];
+  char second_last_message_[kBufferSize];
 };
 
 }  // namespace core

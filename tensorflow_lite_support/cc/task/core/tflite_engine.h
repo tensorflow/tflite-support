@@ -146,12 +146,8 @@ class TfLiteEngine {
   // the FlatBuffer data provided as input.
   class Verifier : public tflite::TfLiteVerifier {
    public:
-    explicit Verifier(const tflite::OpResolver* op_resolver)
-        : op_resolver_(op_resolver) {}
     bool Verify(const char* data, int length,
                 tflite::ErrorReporter* reporter) override;
-    // The OpResolver to be used to build the TF Lite interpreter.
-    const tflite::OpResolver* op_resolver_;
   };
 
   // Verifies that the supplied buffer refers to a valid flatbuffer model,
