@@ -1,4 +1,4 @@
-/* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image.ops;
 
+import static org.tensorflow.lite.support.image.ColorSpaceType.GRAYSCALE;
+
 import android.graphics.Canvas;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
@@ -28,10 +30,9 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import org.tensorflow.lite.DataType;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import static org.tensorflow.lite.support.image.ColorSpaceType.GRAYSCALE;
 
 /**
- * As a computation unit for processing images, it could transform a colored image to grayscale.
+ * Transforms an RGB image to GrayScale as a image processing unit.
  *
  * The conversion is based on OpenCV RGB to GRAY conversion
  * https://docs.opencv.org/master/de/d25/imgproc_color_conversions.html#color_convert_rgb_gray
@@ -42,15 +43,13 @@ import static org.tensorflow.lite.support.image.ColorSpaceType.GRAYSCALE;
 public class TransformToGrayscaleOp implements ImageOperator {
 
     /**
-     * Creates a TransformToGrayscaleOp
-     *
-     * No parameters are used
+     * Creates a TransformToGrayscaleOp.
      */
     public TransformToGrayscaleOp() {
     }
 
     /**
-     * Applies the defined transformation to grayscale and returns a TensorImage
+     * Applies the defined transformation to grayscale and returns a TensorImage.
      *
      * Because the 3 channels of the image are identical only one is used to create the TensorBuffer
      *
@@ -60,7 +59,6 @@ public class TransformToGrayscaleOp implements ImageOperator {
     @Override
     @NonNull
     public TensorImage apply(@NonNull TensorImage image) {
-
         int height = image.getBitmap().getHeight();
         int width = image.getBitmap().getWidth();
         Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -69,12 +67,15 @@ public class TransformToGrayscaleOp implements ImageOperator {
         // A matrix is created that will be applied to canvas to generate grayscale image
         // The luminance of each pixel is calculated as the weighted sum of the 3 RGB values
         // Y = 0.299R + 0.587G + 0.114B
-        float[] matrix = new float[]{0.299F, 0.587F, 0.114F, 0.0F, 0.0F, 0.299F, 0.587F, 0.114F, 0.0F, 0.0F, 0.299F, 0.587F, 0.114F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F};
+        float[] matrix = new float[]{0.299F, 0.587F, 0.114F, 0.0F, 0.0F,
+                                     0.299F, 0.587F, 0.114F, 0.0F, 0.0F,
+                                     0.299F, 0.587F, 0.114F, 0.0F, 0.0F,
+                                     0.0F, 0.0F, 0.0F, 1.0F, 0.0F};
         ColorMatrixColorFilter colorMatrixFilter = new ColorMatrixColorFilter(matrix);
         paint.setColorFilter((ColorFilter) colorMatrixFilter);
         canvas.drawBitmap(image.getBitmap(), 0.0F, 0.0F, paint);
 
-        // Getting the pixels from the generated grayscale image
+        // Get the pixels from the generated grayscale image
         int w = bmpGrayscale.getWidth();
         int h = bmpGrayscale.getHeight();
         int[] intValues = new int[w * h];
@@ -84,7 +85,6 @@ public class TransformToGrayscaleOp implements ImageOperator {
 
         switch (image.getDataType()) {
             case UINT8:
-
                 // Create byte array and use one of the 3 identical channels
                 byte[] byteArr = new byte[w * h * 1];
                 for (int i = 0, j = 0; i < intValues.length; i++) {
@@ -101,7 +101,6 @@ public class TransformToGrayscaleOp implements ImageOperator {
 
                 break;
             case FLOAT32:
-
                 // Create float array and use one of the 3 identical channels
                 float[] floatArr = new float[w * h * 1];
                 for (int i = 0, j = 0; i < intValues.length; i++) {
@@ -121,7 +120,6 @@ public class TransformToGrayscaleOp implements ImageOperator {
         }
 
         return image;
-
     }
 
     @Override
