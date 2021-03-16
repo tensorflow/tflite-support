@@ -249,7 +249,7 @@ public class TensorImage {
    * {@link TensorImage} backed by {@link Image} is not supported by {#link ImageProcessor}.
    *
    * <p>* @throws IllegalArgumentException if the {@link ImageFormat} of {@code image} is not
-   * ARGB_8888
+   * YUV_420_888
    */
   public void load(Image image) {
     container = MediaImageContainer.create(image);
