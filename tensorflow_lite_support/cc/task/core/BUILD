@@ -1,21 +1,16 @@
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
     licenses = ["notice"],  # Apache 2.0
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "tflite_engine",
     srcs = ["tflite_engine.cc"],
     hdrs = ["tflite_engine.h"],
-    deps = [
-        ":error_reporter",
-        ":external_file_handler",
-        "@com_google_absl//absl/memory",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/strings",
-        "@org_tensorflow//tensorflow/lite:kernel_api",
+    tflite_deps = [
         "@org_tensorflow//tensorflow/lite/core/shims:common",
-        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
         # The dependency on builtin_ops here is only for the default
         # value of the OpResolver parameter:
         #     std::unique_ptr<tflite::IterableOpResolver> resolver =
@@ -25,37 +20,50 @@ cc_library(
         # to get included in the executable.
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "@org_tensorflow//tensorflow/lite/core/shims:framework",
-        "@org_tensorflow//tensorflow/lite/tools:verifier",
+        "//tensorflow_lite_support/cc/port:tflite_wrapper",
+    ],
+    deps = [
+        ":error_reporter",
+        ":external_file_handler",
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
-        "//tensorflow_lite_support/cc/port:tflite_wrapper",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
         "//tensorflow_lite_support/metadata/cc:metadata_extractor",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@org_tensorflow//tensorflow/lite:kernel_api",
+        "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
+        "@org_tensorflow//tensorflow/lite/tools:verifier",
     ],
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "base_task_api",
     hdrs = ["base_task_api.h"],
-    deps = [
+    tflite_deps = [
         ":tflite_engine",
+        "//tensorflow_lite_support/cc/port:tflite_wrapper",
+    ],
+    deps = [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
-        "//tensorflow_lite_support/cc/port:tflite_wrapper",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite/c:common",
     ],
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "task_api_factory",
     hdrs = ["task_api_factory.h"],
-    deps = [
+    tflite_deps = [
         ":base_task_api",
         ":tflite_engine",
+    ],
+    deps = [
         "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
