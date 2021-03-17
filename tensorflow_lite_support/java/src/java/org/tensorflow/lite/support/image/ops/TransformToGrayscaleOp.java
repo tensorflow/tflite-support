@@ -28,7 +28,6 @@ import org.tensorflow.lite.support.image.ImageOperator;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import org.tensorflow.lite.DataType;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -42,10 +41,19 @@ import java.nio.ByteOrder;
  */
 public class TransformToGrayscaleOp implements ImageOperator {
 
+  private final float[] matrix;
+
   /**
    * Creates a TransformToGrayscaleOp.
    */
   public TransformToGrayscaleOp() {
+    // A matrix is created that will be applied later to canvas to generate grayscale image
+    // The luminance of each pixel is calculated as the weighted sum of the 3 RGB values
+    // Y = 0.299R + 0.587G + 0.114B
+    this.matrix = new float[]{0.299F, 0.587F, 0.114F, 0.0F, 0.0F,
+            0.299F, 0.587F, 0.114F, 0.0F, 0.0F,
+            0.299F, 0.587F, 0.114F, 0.0F, 0.0F,
+            0.0F, 0.0F, 0.0F, 1.0F, 0.0F};
   }
 
   /**
@@ -64,13 +72,6 @@ public class TransformToGrayscaleOp implements ImageOperator {
     Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bmpGrayscale);
     Paint paint = new Paint();
-    // A matrix is created that will be applied to canvas to generate grayscale image
-    // The luminance of each pixel is calculated as the weighted sum of the 3 RGB values
-    // Y = 0.299R + 0.587G + 0.114B
-    float[] matrix = new float[]{0.299F, 0.587F, 0.114F, 0.0F, 0.0F,
-            0.299F, 0.587F, 0.114F, 0.0F, 0.0F,
-            0.299F, 0.587F, 0.114F, 0.0F, 0.0F,
-            0.0F, 0.0F, 0.0F, 1.0F, 0.0F};
     ColorMatrixColorFilter colorMatrixFilter = new ColorMatrixColorFilter(matrix);
     paint.setColorFilter((ColorFilter) colorMatrixFilter);
     canvas.drawBitmap(image.getBitmap(), 0.0F, 0.0F, paint);
