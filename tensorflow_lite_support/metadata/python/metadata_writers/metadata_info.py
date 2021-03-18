@@ -24,6 +24,10 @@ from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 _MIN_UINT8 = 0
 _MAX_UINT8 = 255
 
+# Default description for vocabulary files.
+_VOCAB_FILE_DESCRIPTION = ("Vocabulary file to convert natural language "
+                           "words to embedding vectors.")
+
 
 class GeneralMd:
   """A container for common metadata information of a model.
@@ -79,7 +83,7 @@ class AssociatedFileMd:
 
   def __init__(
       self,
-      file_path: Optional[str] = None,
+      file_path: str,
       description: Optional[str] = None,
       file_type: Optional[_metadata_fb.AssociatedFileType] = _metadata_fb
       .AssociatedFileType.UNKNOWN,
@@ -110,9 +114,7 @@ class LabelFileMd(AssociatedFileMd):
                              "recognize.")
   _FILE_TYPE = _metadata_fb.AssociatedFileType.TENSOR_AXIS_LABELS
 
-  def __init__(self,
-               file_path: Optional[str] = None,
-               locale: Optional[str] = None):
+  def __init__(self, file_path: str, locale: Optional[str] = None):
     """Creates a LabelFileMd object.
 
     Args:
@@ -123,6 +125,125 @@ class LabelFileMd(AssociatedFileMd):
     """
     super().__init__(file_path, self._LABEL_FILE_DESCRIPTION, self._FILE_TYPE,
                      locale)
+
+
+class RegexTokenizerMd:
+  """A container for the Regex tokenizer [1] metadata information.
+
+  [1]:
+    https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L459
+  """
+
+  def __init__(self, delim_regex_pattern: str, vocab_file_path: str):
+    """Initializes a RegexTokenizerMd object.
+
+    Args:
+      delim_regex_pattern: the regular expression to segment strings and create
+        tokens.
+      vocab_file_path: path to the vocabulary file.
+    """
+    self._delim_regex_pattern = delim_regex_pattern
+    self._vocab_file_path = vocab_file_path
+
+  def create_metadata(self) -> _metadata_fb.ProcessUnitT:
+    """Creates the Bert tokenizer metadata based on the information.
+
+    Returns:
+      A Flatbuffers Python object of the Bert tokenizer metadata.
+    """
+    vocab = _metadata_fb.AssociatedFileT()
+    vocab.name = self._vocab_file_path
+    vocab.description = _VOCAB_FILE_DESCRIPTION
+    vocab.type = _metadata_fb.AssociatedFileType.VOCABULARY
+
+    # Create the RegexTokenizer.
+    tokenizer = _metadata_fb.ProcessUnitT()
+    tokenizer.optionsType = (
+        _metadata_fb.ProcessUnitOptions.RegexTokenizerOptions)
+    tokenizer.options = _metadata_fb.RegexTokenizerOptionsT()
+    tokenizer.options.delimRegexPattern = self._delim_regex_pattern
+    tokenizer.options.vocabFile = [vocab]
+    return tokenizer
+
+
+class BertTokenizerMd:
+  """A container for the Bert tokenizer [1] metadata information.
+
+  [1]:
+    https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L436
+  """
+
+  def __init__(self, vocab_file_path: str):
+    """Initializes a BertTokenizerMd object.
+
+    Args:
+      vocab_file_path: path to the vocabulary file.
+    """
+    self._vocab_file_path = vocab_file_path
+
+  def create_metadata(self) -> _metadata_fb.ProcessUnitT:
+    """Creates the Bert tokenizer metadata based on the information.
+
+    Returns:
+      A Flatbuffers Python object of the Bert tokenizer metadata.
+    """
+    vocab = _metadata_fb.AssociatedFileT()
+    vocab.name = self._vocab_file_path
+    vocab.description = _VOCAB_FILE_DESCRIPTION
+    vocab.type = _metadata_fb.AssociatedFileType.VOCABULARY
+    tokenizer = _metadata_fb.ProcessUnitT()
+    tokenizer.optionsType = _metadata_fb.ProcessUnitOptions.BertTokenizerOptions
+    tokenizer.options = _metadata_fb.BertTokenizerOptionsT()
+    tokenizer.options.vocabFile = [vocab]
+    return tokenizer
+
+
+class SentencePieceTokenizerMd:
+  """A container for the sentence piece tokenizer [1] metadata information.
+
+  [1]:
+    https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L473
+  """
+
+  _SP_MODEL_DESCRIPTION = "The sentence piece model file."
+  _SP_VOCAB_FILE_DESCRIPTION = _VOCAB_FILE_DESCRIPTION + (
+      " This file is optional during tokenization, while the sentence piece "
+      "model is mandatory.")
+
+  def __init__(self,
+               sentence_piece_model_path: str,
+               vocab_file_path: Optional[str] = None):
+    """Initializes a SentencePieceTokenizerMd object.
+
+    Args:
+      sentence_piece_model_path: path to the sentence piece model file.
+      vocab_file_path: path to the vocabulary file.
+    """
+    self._sentence_piece_model_path = sentence_piece_model_path
+    self._vocab_file_path = vocab_file_path
+
+  def create_metadata(self) -> _metadata_fb.ProcessUnitT:
+    """Creates the sentence piece tokenizer metadata based on the information.
+
+    Returns:
+      A Flatbuffers Python object of the sentence piece tokenizer metadata.
+    """
+    tokenizer = _metadata_fb.ProcessUnitT()
+    tokenizer.optionsType = (
+        _metadata_fb.ProcessUnitOptions.SentencePieceTokenizerOptions)
+    tokenizer.options = _metadata_fb.SentencePieceTokenizerOptionsT()
+
+    sp_model = _metadata_fb.AssociatedFileT()
+    sp_model.name = self._sentence_piece_model_path
+    sp_model.description = self._SP_MODEL_DESCRIPTION
+    tokenizer.options.sentencePieceModel = [sp_model]
+    if self._vocab_file_path:
+      vocab = _metadata_fb.AssociatedFileT()
+      vocab.name = self._vocab_file_path
+      vocab.description = self._SP_VOCAB_FILE_DESCRIPTION
+      vocab.type = _metadata_fb.AssociatedFileType.VOCABULARY
+      tokenizer.options.vocabFile = [vocab]
+    return tokenizer
 
 
 class TensorMd:
@@ -189,7 +310,7 @@ class TensorMd:
 
 
 class InputImageTensorMd(TensorMd):
-  """A container for input tensor metadata information.
+  """A container for input image tensor metadata information.
 
   Attributes:
     norm_mean: the mean value used in tensor normalization [1].
@@ -281,6 +402,56 @@ class InputImageTensorMd(TensorMd):
       normalization.options.mean = self.norm_mean
       normalization.options.std = self.norm_std
       tensor_metadata.processUnits = [normalization]
+    return tensor_metadata
+
+
+class InputTextTensorMd(TensorMd):
+  """A container for the input text tensor metadata information.
+
+  Attributes:
+    tokenizer_md: information of the tokenizer in the input text tensor, if any.
+  """
+
+  def __init__(self,
+               name: Optional[str] = None,
+               description: Optional[str] = None,
+               tokenizer_md: Optional[RegexTokenizerMd] = None):
+    """Initializes the instance of InputTextTensorMd.
+
+    Args:
+      name: name of the tensor.
+      description: description of what the tensor is.
+      tokenizer_md: information of the tokenizer in the input text tensor, if
+        any. Only `RegexTokenizer` [1] is currenly supported. If the tokenizer
+        is `BertTokenizer` [2] or `SentencePieceTokenizer` [3], refer to
+        `bert_nl_classifier.MetadataWriter`.
+        [1]:
+        https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L475
+        [2]:
+        https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L436
+        [3]:
+        https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L473
+    """
+    super().__init__(name, description)
+    self.tokenizer_md = tokenizer_md
+
+  def create_metadata(self) -> _metadata_fb.TensorMetadataT:
+    """Creates the input text metadata based on the information.
+
+    Returns:
+      A Flatbuffers Python object of the input text metadata.
+
+    Raises:
+      ValueError: if the type of tokenizer_md is unsupported.
+    """
+    if not isinstance(self.tokenizer_md, (type(None), RegexTokenizerMd)):
+      raise ValueError(
+          "The type of tokenizer_options, {}, is unsupported".format(
+              type(self.tokenizer_md)))
+
+    tensor_metadata = super().create_metadata()
+    if self.tokenizer_md:
+      tensor_metadata.processUnits = [self.tokenizer_md.create_metadata()]
     return tensor_metadata
 
 

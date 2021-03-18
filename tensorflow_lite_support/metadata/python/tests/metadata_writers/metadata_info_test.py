@@ -117,7 +117,7 @@ class TensorMdTest(tf.test.TestCase, parameterized.TestCase):
     tensor_metadata = tensor_md.create_metadata()
 
     metadata_json = _metadata.convert_to_json(
-        _create_dummy_model_metadata(tensor_metadata))
+        _create_dummy_model_metadata_with_tensor(tensor_metadata))
     expected_json = test_utils.load_file(golden_json, "r")
     self.assertEqual(metadata_json, expected_json)
 
@@ -158,7 +158,7 @@ class InputImageTensorMdTest(tf.test.TestCase, parameterized.TestCase):
     tensor_metadata = tesnor_md.create_metadata()
 
     metadata_json = _metadata.convert_to_json(
-        _create_dummy_model_metadata(tensor_metadata))
+        _create_dummy_model_metadata_with_tensor(tensor_metadata))
     expected_json = test_utils.load_file(golden_json, "r")
     self.assertEqual(metadata_json, expected_json)
 
@@ -171,6 +171,54 @@ class InputImageTensorMdTest(tf.test.TestCase, parameterized.TestCase):
     self.assertEqual(
         "norm_mean and norm_std are expected to be the same dim. But got " +
         "{} and {}".format(len(norm_mean), len(norm_std)), str(error.exception))
+
+
+class InputTextTensorMdTest(tf.test.TestCase):
+
+  _NAME = "input text"
+  _DESCRIPTION = "The input string."
+  _VOCAB_FILE = "vocab.txt"
+  _DELIM_REGEX_PATTERN = r"[^\w\']+"
+  _EXPECTED_TENSOR_JSON = "../testdata/input_text_tesnor_meta.json"
+  _EXPECTED_TENSOR_DEFAULT_JSON = "../testdata/input_text_tesnor_default_meta.json"
+
+  def test_create_metadata_should_succeed(self):
+    regex_tokenizer_md = metadata_info.RegexTokenizerMd(
+        self._DELIM_REGEX_PATTERN, self._VOCAB_FILE)
+
+    text_tensor_md = metadata_info.InputTextTensorMd(self._NAME,
+                                                     self._DESCRIPTION,
+                                                     regex_tokenizer_md)
+
+    metadata_json = _metadata.convert_to_json(
+        _create_dummy_model_metadata_with_tensor(
+            text_tensor_md.create_metadata()))
+    expected_json = test_utils.load_file(self._EXPECTED_TENSOR_JSON, "r")
+    self.assertEqual(metadata_json, expected_json)
+
+  def test_create_metadata_by_default_should_succeed(self):
+    text_tensor_md = metadata_info.InputTextTensorMd()
+
+    metadata_json = _metadata.convert_to_json(
+        _create_dummy_model_metadata_with_tensor(
+            text_tensor_md.create_metadata()))
+    expected_json = test_utils.load_file(self._EXPECTED_TENSOR_DEFAULT_JSON,
+                                         "r")
+    self.assertEqual(metadata_json, expected_json)
+
+  def test_create_metadata_throws_exception_with_unsupported_tokenizer(self):
+    invalid_tokenzier = metadata_info.BertTokenizerMd("vocab.txt")
+
+    with self.assertRaises(ValueError) as error:
+      tensor_md = metadata_info.InputTextTensorMd(
+          tokenizer_md=invalid_tokenzier)
+      tensor_md.create_metadata()
+
+    # TODO(b/175843689): f string cannot be used. Python version cannot be
+    # specified in Kokoro bazel test.
+    self.assertEqual(
+        "The type of tokenizer_options, {}, is unsupported".format(
+            type(invalid_tokenzier)), str(error.exception))
 
 
 class ClassificationTensorMdTest(tf.test.TestCase, parameterized.TestCase):
@@ -210,7 +258,7 @@ class ClassificationTensorMdTest(tf.test.TestCase, parameterized.TestCase):
     tensor_metadata = tesnor_md.create_metadata()
 
     metadata_json = _metadata.convert_to_json(
-        _create_dummy_model_metadata(tensor_metadata))
+        _create_dummy_model_metadata_with_tensor(tensor_metadata))
     expected_json = test_utils.load_file(golden_json, "r")
     self.assertEqual(metadata_json, expected_json)
 
@@ -235,16 +283,81 @@ class CategoryTensorMdTest(tf.test.TestCase, parameterized.TestCase):
     tensor_metadata = tesnor_md.create_metadata()
 
     metadata_json = _metadata.convert_to_json(
-        _create_dummy_model_metadata(tensor_metadata))
+        _create_dummy_model_metadata_with_tensor(tensor_metadata))
     expected_json = test_utils.load_file(self._EXPECTED_TENSOR_JSON, "r")
     self.assertEqual(metadata_json, expected_json)
 
 
-def _create_dummy_model_metadata(
+class RegexTokenizerMdTest(tf.test.TestCase):
+
+  _VOCAB_FILE = "vocab.txt"
+  _DELIM_REGEX_PATTERN = r"[^\w\']+"
+  _EXPECTED_TENSOR_JSON = "../testdata/regex_tokenizer_meta.json"
+
+  def test_create_metadata_should_succeed(self):
+    tokenizer_md = metadata_info.RegexTokenizerMd(self._DELIM_REGEX_PATTERN,
+                                                  self._VOCAB_FILE)
+    tokenizer_metadata = tokenizer_md.create_metadata()
+
+    metadata_json = _metadata.convert_to_json(
+        _create_dummy_model_metadata_with_process_uint(tokenizer_metadata))
+    expected_json = test_utils.load_file(self._EXPECTED_TENSOR_JSON, "r")
+    self.assertEqual(metadata_json, expected_json)
+
+
+class BertTokenizerMdTest(tf.test.TestCase):
+
+  _VOCAB_FILE = "vocab.txt"
+  _EXPECTED_TENSOR_JSON = "../testdata/bert_tokenizer_meta.json"
+
+  def test_create_metadata_should_succeed(self):
+    tokenizer_md = metadata_info.BertTokenizerMd(self._VOCAB_FILE)
+    tokenizer_metadata = tokenizer_md.create_metadata()
+
+    metadata_json = _metadata.convert_to_json(
+        _create_dummy_model_metadata_with_process_uint(tokenizer_metadata))
+    expected_json = test_utils.load_file(self._EXPECTED_TENSOR_JSON, "r")
+    self.assertEqual(metadata_json, expected_json)
+
+
+class SentencePieceTokenizerMd(tf.test.TestCase):
+
+  _VOCAB_FILE = "vocab.txt"
+  _SP_MODEL = "sp.model"
+  _EXPECTED_TENSOR_JSON = "../testdata/sentence_piece_tokenizer_meta.json"
+
+  def test_create_metadata_should_succeed(self):
+    tokenizer_md = metadata_info.SentencePieceTokenizerMd(
+        self._SP_MODEL, self._VOCAB_FILE)
+    tokenizer_metadata = tokenizer_md.create_metadata()
+
+    metadata_json = _metadata.convert_to_json(
+        _create_dummy_model_metadata_with_process_uint(tokenizer_metadata))
+    expected_json = test_utils.load_file(self._EXPECTED_TENSOR_JSON, "r")
+    self.assertEqual(metadata_json, expected_json)
+
+
+def _create_dummy_model_metadata_with_tensor(
     tensor_metadata: _metadata_fb.TensorMetadataT) -> bytes:
   # Create a dummy model using the tensor metadata.
   subgraph_metadata = _metadata_fb.SubGraphMetadataT()
   subgraph_metadata.inputTensorMetadata = [tensor_metadata]
+  model_metadata = _metadata_fb.ModelMetadataT()
+  model_metadata.subgraphMetadata = [subgraph_metadata]
+
+  # Create the Flatbuffers object and convert it to the json format.
+  builder = flatbuffers.Builder(0)
+  builder.Finish(
+      model_metadata.Pack(builder),
+      _metadata.MetadataPopulator.METADATA_FILE_IDENTIFIER)
+  return bytes(builder.Output())
+
+
+def _create_dummy_model_metadata_with_process_uint(
+    process_unit_metadata: _metadata_fb.ProcessUnitT) -> bytes:
+  # Create a dummy model using the tensor metadata.
+  subgraph_metadata = _metadata_fb.SubGraphMetadataT()
+  subgraph_metadata.inputProcessUnits = [process_unit_metadata]
   model_metadata = _metadata_fb.ModelMetadataT()
   model_metadata.subgraphMetadata = [subgraph_metadata]
 
