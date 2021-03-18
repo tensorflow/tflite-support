@@ -20,7 +20,7 @@ package tflite.task.audio;
 import "tensorflow_lite_support/cc/task/core/proto/base_options.proto";
 
 // Options for setting up an AudioClassifier.
-// Next Id: 5
+// Next Id: 7
 message AudioClassifierOptions {
   // Base options for configuring the external model file.
   optional tflite.task.core.BaseOptions base_options = 1;
@@ -37,4 +37,14 @@ message AudioClassifierOptions {
   // Score threshold in [0,1), overrides the ones provided in the model metadata
   // (if any). Results below this value are rejected.
   optional float score_threshold = 4;
+
+  // Optional whitelist of class names. If non-empty, classifications whose
+  // class name is not in this set will be filtered out. Duplicate or unknown
+  // class names are ignored. Mutually exclusive with class_name_blacklist.
+  repeated string class_name_whitelist = 5;
+
+  // Optional blacklist of class names. If non-empty, classifications whose
+  // class name is in this set will be filtered out. Duplicate or unknown
+  // class names are ignored. Mutually exclusive with class_name_whitelist.
+  repeated string class_name_blacklist = 6;
 }

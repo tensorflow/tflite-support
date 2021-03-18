@@ -21,3 +21,19 @@ cc_proto_library(
         ":audio_classifier_options_proto",
     ],
 )
+
+cc_library(
+    name = "classifications_proto_inc",
+    hdrs = ["classifications_proto_inc.h"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:classifications_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "class_proto_inc",
+    hdrs = ["class_proto_inc.h"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:class_cc_proto",
+    ],
+)

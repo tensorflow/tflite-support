@@ -23,7 +23,8 @@ bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata_lib \
     //tensorflow_lite_support/metadata/cc:metadata_extractor \
     //tensorflow_lite_support/custom_ops/kernel:all \
-    //tensorflow_lite_support/custom_ops/python:tflite_text_api
+    //tensorflow_lite_support/custom_ops/python:tflite_text_api \
+    //tensorflow_lite_support/cc/task/audio:audio_classifier
 
 # Build Task libraries.
 bazel build -c opt --config=monolithic \
