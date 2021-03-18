@@ -39,6 +39,8 @@ http_archive(
 
 # TF on 2021-02-24
 # The following variables are needed when set up libedgetpu.
+# TODO(fergus): update this to a version that incorporates the following
+#               pending CL: CL/363545235.
 TENSORFLOW_COMMIT = "b1de80b78f1a9523e4bcdd6f906c8ebdf227d3fe"
 TENSORFLOW_SHA256 = "2fcbd8a1928cce6b9fb338983391a35e2f4a4dab218ffdfdd5ebcf47b623988f"
 # These values come from tensorflow/workspace3.bzl. If the TF commit is updated,

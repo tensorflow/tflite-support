@@ -25,7 +25,7 @@ cc_library(
         # to get included in the executable.
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "@org_tensorflow//tensorflow/lite/core/shims:framework",
-        "@org_tensorflow//tensorflow/lite/tools:verifier",
+        "@org_tensorflow//tensorflow/lite/core/shims:verifier",
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
