@@ -15,6 +15,7 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image.ops;
 
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
 import static org.tensorflow.lite.support.image.ColorSpaceType.GRAYSCALE;
 
 import android.graphics.Canvas;
@@ -24,6 +25,7 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.ColorFilter;
 import android.graphics.PointF;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.tensorflow.lite.support.image.ColorSpaceType;
 import org.tensorflow.lite.support.image.ImageOperator;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -60,6 +62,9 @@ public class TransformToGrayscaleOp implements ImageOperator {
    * Applies the defined transformation to grayscale and returns a TensorImage.
    * <p>
    * Because the 3 channels of the image are identical only one is used to create the TensorBuffer
+   * <p>
+   * In case the ColorSpaceType of the TensorImage is GRAYSCALE it skips and returns the same image,
+   * otherwise it checks for RGB type of the TensorImage and proceeds.
    *
    * @param image input image.
    * @return output image.
@@ -67,6 +72,13 @@ public class TransformToGrayscaleOp implements ImageOperator {
   @Override
   @NonNull
   public TensorImage apply(@NonNull TensorImage image) {
+    if (image.getColorSpaceType() == GRAYSCALE) {
+      return image;
+    } else {
+      checkArgument(
+              image.getColorSpaceType() == ColorSpaceType.RGB,
+              "Only RGB images are supported in TransformToGrayscaleOp, but not " + image.getColorSpaceType().name());
+    }
     int height = image.getBitmap().getHeight();
     int width = image.getBitmap().getWidth();
     Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
