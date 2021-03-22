@@ -62,6 +62,7 @@ py_test(
         ":test_utils",
         # tensorflow dep,
         "//tensorflow_lite_support/metadata:schema_py",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "//tensorflow_lite_support/metadata/python/metadata_writers:writer_utils",
     ],
 )
@@ -106,6 +107,22 @@ py_test(
         ":test_utils",
         # tensorflow dep,
         "//tensorflow_lite_support/metadata/python/metadata_writers:image_segmenter",
+        "@flatbuffers//:runtime_py",
+    ],
+)
+
+py_test(
+    name = "nl_classifier_test",
+    srcs = ["nl_classifier_test.py"],
+    data = ["//tensorflow_lite_support/metadata/python/tests/testdata/nl_classifier:test_files"],
+    python_version = "PY3",
+    srcs_version = "PY3",
+    deps = [
+        ":test_utils",
+        # tensorflow dep,
+        "//tensorflow_lite_support/metadata/python:metadata",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:nl_classifier",
         "@flatbuffers//:runtime_py",
     ],
 )

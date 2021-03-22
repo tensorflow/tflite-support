@@ -14,8 +14,9 @@
 # ==============================================================================
 """Helper methods for writing metadata into TFLite models."""
 
-from typing import List, Union
+from typing import List, Union, Optional
 
+from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 
 
@@ -72,6 +73,46 @@ def save_file(file_bytes: Union[bytes, bytearray],
   """
   with open(save_to_path, mode) as file:
     file.write(file_bytes)
+
+
+def get_tokenizer_associated_files(
+    tokenizer_options: Union[None, _metadata_fb.BertTokenizerOptionsT,
+                             _metadata_fb.SentencePieceTokenizerOptionsT,
+                             _metadata_fb.RegexTokenizerOptionsT]
+) -> List[Optional[str]]:
+  """Gets a list of associated files packed in the tokenzier_options.
+
+  Args:
+    tokenizer_options: a tokenizer metadata object. Support the following
+      tokenizer types:
+      1. BertTokenizerOptions:
+        https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L436
+      2. SentencePieceTokenizerOptions:
+        https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L473
+      3. RegexTokenizerOptions:
+        https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L475
+
+  Returns:
+    A list of associated files included in tokenizer_options.
+  """
+
+  if not tokenizer_options:
+    return []
+
+  def _get_file_path(files: _metadata_fb.AssociatedFileT) -> List[str]:
+    if not files:
+      return []
+    return [file.name for file in files]
+
+  if isinstance(tokenizer_options, (_metadata_fb.BertTokenizerOptionsT,
+                                    _metadata_fb.RegexTokenizerOptionsT)):
+    return _get_file_path(tokenizer_options.vocabFile)
+  elif isinstance(tokenizer_options,
+                  _metadata_fb.SentencePieceTokenizerOptionsT):
+    return _get_file_path(tokenizer_options.vocabFile) + _get_file_path(
+        tokenizer_options.sentencePieceModel)
+  else:
+    return []
 
 
 def _get_subgraph(model_buffer: bytearray) -> _schema_fb.SubGraph:

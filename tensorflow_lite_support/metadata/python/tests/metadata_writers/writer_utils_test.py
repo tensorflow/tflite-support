@@ -17,6 +17,7 @@
 import tensorflow as tf
 
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
+from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.metadata_writers import writer_utils
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
@@ -47,6 +48,36 @@ class WriterUtilsTest(tf.test.TestCase):
     writer_utils.save_file(expected_file_bytes, file_path)
     file_bytes = writer_utils.load_file(file_path)
     self.assertEqual(file_bytes, expected_file_bytes)
+
+  def test_get_tokenizer_associated_files_with_bert_tokenizer(self):
+    # Create Bert tokenizer
+    vocab_file = "vocab.txt"
+    tokenizer_md = metadata_info.BertTokenizerMd(vocab_file)
+
+    associated_files = writer_utils.get_tokenizer_associated_files(
+        tokenizer_md.create_metadata().options)
+    self.assertEqual(associated_files, [vocab_file])
+
+  def test_get_tokenizer_associated_files_with_sentence_piece_tokenizer(self):
+    # Create Sentence Piece tokenizer
+    vocab_file = "vocab.txt"
+    sp_model = "sp.model"
+    tokenizer_md = metadata_info.SentencePieceTokenizerMd(sp_model, vocab_file)
+
+    associated_files = writer_utils.get_tokenizer_associated_files(
+        tokenizer_md.create_metadata().options)
+    self.assertEqual(set(associated_files), set([vocab_file, sp_model]))
+
+  def test_get_tokenizer_associated_files_with_regex_tokenizer(self):
+    # Create Regex tokenizer
+    delim_regex_pattern = r"[^\w\']+"
+    vocab_file = "vocab.txt"
+    tokenizer_md = metadata_info.RegexTokenizerMd(delim_regex_pattern,
+                                                  vocab_file)
+
+    associated_files = writer_utils.get_tokenizer_associated_files(
+        tokenizer_md.create_metadata().options)
+    self.assertEqual(associated_files, [vocab_file])
 
 
 if __name__ == "__main__":
