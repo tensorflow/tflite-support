@@ -70,9 +70,9 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":_pywrap_whitespace_tokenizer_op_resolver",
-        # numpy dep,
-        # tensorflow dep,
-        # tensorflow_text dep,
+        # build rule placeholder: numpy dep,
+        # build rule placeholder: tensorflow dep,
+        # build rule placeholder: tensorflow_text dep,
         "@absl_py//absl/logging",
         "@absl_py//absl/testing:parameterized",
     ],
@@ -137,8 +137,8 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":_pywrap_ngrams_op_resolver",
-        # tensorflow dep,
-        # tensorflow_text dep,
+        # build rule placeholder: tensorflow dep,
+        # build rule placeholder: tensorflow_text dep,
         "//tensorflow_lite_support/custom_ops/python:tflite_text_api",
         "@absl_py//absl/logging",
         "@absl_py//absl/testing:parameterized",

@@ -25,7 +25,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
-        # tensorflow dep,
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata/python:metadata",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
@@ -42,7 +42,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
-        # tensorflow dep,
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata:schema_py",
         "//tensorflow_lite_support/metadata/python:metadata",
@@ -60,7 +60,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
-        # tensorflow dep,
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:schema_py",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "//tensorflow_lite_support/metadata/python/metadata_writers:writer_utils",
@@ -75,7 +75,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
-        # tensorflow dep,
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata/python/metadata_writers:image_classifier",
         "@absl_py//absl/testing:parameterized",
         "@flatbuffers//:runtime_py",
@@ -90,7 +90,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
-        # tensorflow dep,
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata/python/metadata_writers:object_detector",
         "@absl_py//absl/testing:parameterized",
         "@flatbuffers//:runtime_py",
@@ -105,7 +105,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
-        # tensorflow dep,
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata/python/metadata_writers:image_segmenter",
         "@flatbuffers//:runtime_py",
     ],
@@ -119,7 +119,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
-        # tensorflow dep,
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata/python:metadata",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "//tensorflow_lite_support/metadata/python/metadata_writers:nl_classifier",

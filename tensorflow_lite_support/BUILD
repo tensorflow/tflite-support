@@ -12,7 +12,7 @@ exports_files(["LICENSE"])
 package_group(
     name = "users",
     packages = [
-        # tensorflow_examples/... dep,
+        # build rule placeholder: tensorflow_examples/... dep,
         "//tensorflow_lite_support/...",
         "//third_party/tensorflow_models/...",
     ],

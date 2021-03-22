@@ -12,8 +12,8 @@ py_test(
     python_version = "PY3",
     srcs_version = "PY2AND3",
     deps = [
-        # six dep,
-        # tensorflow dep,
+        # build rule placeholder: six dep,
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata:schema_py",
         "//tensorflow_lite_support/metadata/python:metadata",
@@ -27,7 +27,7 @@ py_test(
     python_version = "PY3",
     srcs_version = "PY2AND3",
     deps = [
-        # tensorflow dep,
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata/python:metadata",
     ],
 )
