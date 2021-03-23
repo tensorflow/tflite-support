@@ -20,12 +20,12 @@ limitations under the License.
 #include "absl/container/node_hash_set.h"
 #include "absl/memory/memory.h"
 #include "absl/status/status.h"
-#include "absl/status/statusor.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/string_view.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
+#include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils.h"
@@ -42,8 +42,9 @@ using ::tflite::task::core::TaskAPIFactory;
 
 // Performs actual cosine similarity computation.
 template <typename T>
-absl::StatusOr<double> ComputeCosineSimilarity(const T* u, const T* v,
-                                               int num_elements) {
+tflite::support::StatusOr<double> ComputeCosineSimilarity(const T* u,
+                                                          const T* v,
+                                                          int num_elements) {
   if (num_elements <= 0) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
@@ -70,8 +71,8 @@ absl::StatusOr<double> ComputeCosineSimilarity(const T* u, const T* v,
 }  // namespace
 
 /* static */
-absl::StatusOr<double> ImageEmbedder::CosineSimilarity(const FeatureVector& u,
-                                                       const FeatureVector& v) {
+tflite::support::StatusOr<double> ImageEmbedder::CosineSimilarity(
+    const FeatureVector& u, const FeatureVector& v) {
   if (u.has_value_string() && v.has_value_string()) {
     if (u.value_string().size() != v.value_string().size()) {
       return CreateStatusWithPayload(
@@ -113,9 +114,9 @@ absl::Status ImageEmbedder::SanityCheckOptions(
 }
 
 /* static */
-absl::StatusOr<std::unique_ptr<ImageEmbedder>> ImageEmbedder::CreateFromOptions(
-    const ImageEmbedderOptions& options,
-    std::unique_ptr<tflite::OpResolver> resolver) {
+tflite::support::StatusOr<std::unique_ptr<ImageEmbedder>>
+ImageEmbedder::CreateFromOptions(const ImageEmbedderOptions& options,
+                                 std::unique_ptr<tflite::OpResolver> resolver) {
   RETURN_IF_ERROR(SanityCheckOptions(options));
 
   // Copy options to ensure the ExternalFile-s outlive the constructed object.
@@ -230,7 +231,7 @@ absl::Status ImageEmbedder::CheckAndSetOutputs() {
   return absl::OkStatus();
 }
 
-absl::StatusOr<EmbeddingResult> ImageEmbedder::Embed(
+tflite::support::StatusOr<EmbeddingResult> ImageEmbedder::Embed(
     const FrameBuffer& frame_buffer) {
   BoundingBox roi;
   roi.set_width(frame_buffer.dimension().width);
@@ -238,12 +239,12 @@ absl::StatusOr<EmbeddingResult> ImageEmbedder::Embed(
   return Embed(frame_buffer, roi);
 }
 
-absl::StatusOr<EmbeddingResult> ImageEmbedder::Embed(
+tflite::support::StatusOr<EmbeddingResult> ImageEmbedder::Embed(
     const FrameBuffer& frame_buffer, const BoundingBox& roi) {
   return InferWithFallback(frame_buffer, roi);
 }
 
-absl::StatusOr<EmbeddingResult> ImageEmbedder::Postprocess(
+tflite::support::StatusOr<EmbeddingResult> ImageEmbedder::Postprocess(
     const std::vector<const TfLiteTensor*>& output_tensors,
     const FrameBuffer& /*frame_buffer*/, const BoundingBox& /*roi*/) {
   EmbeddingResult result;
@@ -328,9 +329,9 @@ void ImageEmbedder::QuantizeFeatureVector(FeatureVector* feature_vector) const {
   auto* quantized_values = feature_vector->mutable_value_string();
   quantized_values->resize(feature_vector->value_float().size());
   for (int i = 0; i < feature_vector->value_float().size(); ++i) {
-    (*quantized_values)[i] = static_cast<char>(std::clamp(
-        static_cast<int>(roundf(feature_vector->value_float(i) * 128)), -128,
-        127));
+    int value = static_cast<int>(roundf(feature_vector->value_float(i) * 128));
+    (*quantized_values)[i] =
+        static_cast<char>(std::max(-128, std::min(value, 127)));
   }
 }
 

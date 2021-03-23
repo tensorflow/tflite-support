@@ -16,6 +16,5 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_PROTO_EMBEDDINGS_PROTO_INC_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_PROTO_EMBEDDINGS_PROTO_INC_H_
 
-#include
-"third_party/tensorflow_lite_support/cc/task/vision/proto/embeddings.pb.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/embeddings.pb.h"
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_PROTO_EMBEDDINGS_PROTO_INC_H_

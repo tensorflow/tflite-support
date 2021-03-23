@@ -66,7 +66,8 @@ class ImageEmbedder
   // Creates an ImageEmbedder from the provided options. A non-default
   // OpResolver can be specified in order to support custom Ops or specify a
   // subset of built-in Ops.
-  static absl::StatusOr<std::unique_ptr<ImageEmbedder>> CreateFromOptions(
+  static tflite::support::StatusOr<std::unique_ptr<ImageEmbedder>>
+  CreateFromOptions(
       const ImageEmbedderOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
@@ -82,13 +83,14 @@ class ImageEmbedder
   //   only supported colorspace for now),
   // - rotate it according to its `Orientation` so that inference is performed
   //   on an "upright" image.
-  absl::StatusOr<EmbeddingResult> Embed(const FrameBuffer& frame_buffer);
+  tflite::support::StatusOr<EmbeddingResult> Embed(
+      const FrameBuffer& frame_buffer);
 
   // Same as above, except the inference is performed only on the provided
   // region of interest. Note that the region of interest is not clamped, so
   // this method will fail if the region is out of bounds of the input image.
-  absl::StatusOr<EmbeddingResult> Embed(const FrameBuffer& frame_buffer,
-                                        const BoundingBox& roi);
+  tflite::support::StatusOr<EmbeddingResult> Embed(
+      const FrameBuffer& frame_buffer, const BoundingBox& roi);
 
   // Returns the Embedding output by the output_index'th layer. In (the most
   // common) case where a single embedding is produced, you can just call
@@ -110,15 +112,15 @@ class ImageEmbedder
   // an L2-norm of 0.
   //
   // [1]: https://en.wikipedia.org/wiki/Cosine_similarity
-  static absl::StatusOr<double> CosineSimilarity(const FeatureVector& u,
-                                                 const FeatureVector& v);
+  static tflite::support::StatusOr<double> CosineSimilarity(
+      const FeatureVector& u, const FeatureVector& v);
 
  protected:
   // The options used to build this ImageEmbedder.
   std::unique_ptr<ImageEmbedderOptions> options_;
 
   // Post-processing to transform the raw model outputs into embedding results.
-  absl::StatusOr<EmbeddingResult> Postprocess(
+  tflite::support::StatusOr<EmbeddingResult> Postprocess(
       const std::vector<const TfLiteTensor*>& output_tensors,
       const FrameBuffer& frame_buffer, const BoundingBox& roi) override;
 

@@ -145,7 +145,6 @@ cc_library(
         "@com_google_absl//absl/container:node_hash_set",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
-        "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
         "@org_tensorflow//tensorflow/lite/c:common",
