@@ -37,10 +37,9 @@ http_archive(
     ],
 )
 
-# TF on 2021-02-24
-# The following variables are needed when set up libedgetpu.
-TENSORFLOW_COMMIT = "b1de80b78f1a9523e4bcdd6f906c8ebdf227d3fe"
-TENSORFLOW_SHA256 = "2fcbd8a1928cce6b9fb338983391a35e2f4a4dab218ffdfdd5ebcf47b623988f"
+# TF on 2021-03-24.
+TENSORFLOW_COMMIT = "68e84dbe85428c83db9e5302d290d8a927f54522"
+TENSORFLOW_SHA256 = "d45f6fd83af808e6405a00578f6054e68f3fbab201ce980905922882aff1b88c"
 # These values come from tensorflow/workspace3.bzl. If the TF commit is updated,
 # these should be updated to match.
 IO_BAZEL_RULES_CLOSURE_COMMIT = "308b05b2419edb5c8ee0471b67a40403df940149"
