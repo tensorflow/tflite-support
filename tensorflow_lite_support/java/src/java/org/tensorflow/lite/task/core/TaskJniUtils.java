@@ -44,6 +44,11 @@ public class TaskJniUtils {
         int fileDescriptor, long fileDescriptorLength, long fileDescriptorOffset, T options);
   }
 
+  /** Syntax sugar to get nativeHandle from model path and options. */
+  public interface ModelPathAndOptionsHandleProvider<T> {
+    long createHandle(String modelPath, T options);
+  }
+
   /**
    * Initializes the JNI and returns C++ handle with file descriptor and options for task API.
    *
@@ -76,6 +81,32 @@ public class TaskJniUtils {
           },
           libName);
     }
+  }
+
+  /**
+   * Initializes the JNI and returns C++ handle with model path and options for task API.
+   *
+   * @param provider provider to get C++ handle, usually returned from native call
+   * @param libName name of C++ lib to be loaded
+   * @param modelPath path of the file to be loaded
+   * @param options options to set up the task API, used by the provider
+   * @return C++ handle as long
+   * @throws IOException If model file fails to load.
+   */
+  public static <T> long createHandleFromModelPathAndOptions(
+      final ModelPathAndOptionsHandleProvider<T> provider,
+      String libName,
+      final String modelPath,
+      final T options)
+      throws IOException {
+    return createHandleFromLibrary(
+        new EmptyHandleProvider() {
+          @Override
+          public long createHandle() {
+            return provider.createHandle(modelPath, options);
+          }
+        },
+        libName);
   }
 
   /**

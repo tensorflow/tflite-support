@@ -35,6 +35,7 @@ const char kIndexOutOfBoundsException[] = "java/lang/IndexOutOfBoundsException";
 const char kUnsupportedOperationException[] =
     "java/lang/UnsupportedOperationException";
 const char kAssertionError[] = "java/lang/AssertionError";
+const char kIOException[] = "java/io/IOException";
 
 constexpr int kInvalidPointer = 0;
 
