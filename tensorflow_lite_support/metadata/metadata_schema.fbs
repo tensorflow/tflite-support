@@ -242,8 +242,10 @@ table AudioProperties {
   // The channel count of the audio.
   channels:uint;
 
-  // The minimum required number of samples in order to run inference properly.
-  // Optional for fixed-size audio tensors.
+  // The minimum required number of per-channel samples in order to run
+  // inference properly. Optional for fixed-size audio tensors and default to 0.
+  // The minimum required flat size of the audio tensor is
+  // `min_required_samples x channels`.
   min_required_samples:uint;
 }
 
