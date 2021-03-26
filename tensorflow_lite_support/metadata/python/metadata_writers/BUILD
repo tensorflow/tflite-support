@@ -109,3 +109,17 @@ py_library(
         ":writer_utils",
     ],
 )
+
+py_library(
+    name = "audio_classifier",
+    srcs = [
+        "audio_classifier.py",
+    ],
+    srcs_version = "PY3",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":metadata_info",
+        ":metadata_writer",
+        ":writer_utils",
+    ],
+)

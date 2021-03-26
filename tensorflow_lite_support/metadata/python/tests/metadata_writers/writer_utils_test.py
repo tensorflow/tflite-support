@@ -14,6 +14,7 @@
 # ==============================================================================
 """Tests for wrtier util methods."""
 
+import array
 import tensorflow as tf
 
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
@@ -25,11 +26,27 @@ _FLOAT_TYPE = _schema_fb.TensorType.FLOAT32
 _UINT8_TYPE = _schema_fb.TensorType.UINT8
 # mobilebert_float.tflite has 1 input tensor and 4 output tensors.
 _MODEL_NAME = "../testdata/object_detector/ssd_mobilenet_v1.tflite"
+_IMAGE_TENSOR_INDEX = 0
 _EXPECTED_INPUT_TYPES = _UINT8_TYPE
+_EXPECTED_INPUT_IMAGE_SHAPE = (1, 300, 300, 3)
 _EXPECTED_OUTPUT_TYPES = (_FLOAT_TYPE, _FLOAT_TYPE, _FLOAT_TYPE, _FLOAT_TYPE)
 
 
 class WriterUtilsTest(tf.test.TestCase):
+
+  def test_compute_flat_size(self):
+    shape = array.array("i", [1, 2, 3])
+    expected_flat_size = 6
+
+    flat_size = writer_utils.compute_flat_size(shape)
+    self.assertEqual(flat_size, expected_flat_size)
+
+  def test_compute_flat_size_with_none_shape(self):
+    shape = None
+    expected_flat_size = 0
+
+    flat_size = writer_utils.compute_flat_size(shape)
+    self.assertEqual(flat_size, expected_flat_size)
 
   def test_get_input_tensor_types(self):
     tensor_types = writer_utils.get_input_tensor_types(
@@ -40,6 +57,11 @@ class WriterUtilsTest(tf.test.TestCase):
     tensor_types = writer_utils.get_output_tensor_types(
         model_buffer=test_utils.load_file(_MODEL_NAME))
     self.assertEqual(tensor_types, list(_EXPECTED_OUTPUT_TYPES))
+
+  def test_get_input_tensor_shape(self):
+    tensor_shape = writer_utils.get_input_tensor_shape(
+        test_utils.load_file(_MODEL_NAME), _IMAGE_TENSOR_INDEX)
+    self.assertEqual(list(tensor_shape), list(_EXPECTED_INPUT_IMAGE_SHAPE))
 
   def test_save_and_load_file(self):
     expected_file_bytes = b"This is a test file."

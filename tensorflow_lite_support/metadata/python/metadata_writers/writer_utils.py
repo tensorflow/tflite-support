@@ -14,10 +14,26 @@
 # ==============================================================================
 """Helper methods for writing metadata into TFLite models."""
 
+import array
+import functools
 from typing import List, Union, Optional
 
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
+
+
+def compute_flat_size(tensor_shape: Optional[array.array]) -> int:
+  """Computes the flat size (number of elements) of tensor shape.
+
+  Args:
+    tensor_shape: an array of the tensor shape values.
+
+  Returns:
+    The flat size of the tensor shape. Return 0 if tensor_shape is None.
+  """
+  if not tensor_shape:
+    return 0
+  return functools.reduce(lambda x, y: x * y, tensor_shape)
 
 
 def get_input_tensor_types(
@@ -40,6 +56,13 @@ def get_output_tensor_types(
     index = subgraph.Outputs(i)
     tensor_types.append(subgraph.Tensors(index).Type())
   return tensor_types
+
+
+def get_input_tensor_shape(model_buffer: bytearray,
+                           tensor_index: int) -> array.array:
+  """Gets the shape of the specified input tensor."""
+  subgraph = _get_subgraph(model_buffer)
+  return subgraph.Tensors(subgraph.Inputs(tensor_index)).ShapeAsNumpy()
 
 
 def load_file(file_path: str, mode: str = "rb") -> Union[str, bytes]:

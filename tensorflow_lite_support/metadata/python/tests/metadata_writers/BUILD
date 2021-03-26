@@ -126,3 +126,18 @@ py_test(
         "@flatbuffers//:runtime_py",
     ],
 )
+
+py_test(
+    name = "audio_classifier_test",
+    srcs = ["audio_classifier_test.py"],
+    data = ["//tensorflow_lite_support/metadata/python/tests/testdata/audio_classifier:test_files"],
+    python_version = "PY3",
+    srcs_version = "PY3",
+    deps = [
+        ":test_utils",
+        # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/metadata/python/metadata_writers:audio_classifier",
+        "@absl_py//absl/testing:parameterized",
+        "@flatbuffers//:runtime_py",
+    ],
+)
