@@ -17,17 +17,17 @@ limitations under the License.
 
 #include <fstream>
 
-#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
-#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
-#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
 #include "absl/status/status.h"
 #include "absl/strings/str_format.h"
 #include "src/sentencepiece.pb.h"
 #include "src/sentencepiece_processor.h"
 #include "tensorflow/core/platform/env.h"
-
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"
 
 namespace tflite {
 namespace ops {
@@ -39,7 +39,8 @@ namespace internal {
 tensorflow::Status TFReadFileToString(
     const std::string& filepath, std::string* data) {
   return tensorflow::ReadFileToString(
-      tensorflow::Env::Default(), /*test_path*/ filepath, data);
+      tensorflow::Env::Default(), /*test_path*/ filepath,
+      data);
 }
 
 absl::Status StdReadFileToString(

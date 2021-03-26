@@ -19,6 +19,7 @@ limitations under the License.
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
 #include "src/sentencepiece.pb.h"
 #include "src/sentencepiece_processor.h"
 #include "tensorflow/core/platform/env.h"
@@ -33,8 +34,9 @@ namespace internal {
 
 tensorflow::Status TFReadFileToString(const std::string& filepath,
                                       std::string* data) {
-  return tensorflow::ReadFileToString(tensorflow::Env::Default(),
-                                      /*test_path*/ filepath, data);
+  return tensorflow::ReadFileToString(
+      tensorflow::Env::Default(), /*test_path*/ filepath,
+      data);
 }
 
 absl::Status StdReadFileToString(const std::string& filepath,
