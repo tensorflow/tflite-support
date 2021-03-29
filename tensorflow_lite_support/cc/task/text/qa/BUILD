@@ -1,3 +1,8 @@
+load(
+    "@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl",
+    "cc_library_with_tflite",
+)
+
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
     licenses = ["notice"],  # Apache 2.0
@@ -7,18 +12,18 @@ exports_files([
     "bert_qa_c_api.h",
 ])
 
-cc_library(
+cc_library_with_tflite(
     name = "question_answerer",
     hdrs = [
         "question_answerer.h",
     ],
-    deps = [
+    tflite_deps = [
         "//tensorflow_lite_support/cc/task/core:base_task_api",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
     ],
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "bert_question_answerer",
     srcs = [
         "bert_question_answerer.cc",
@@ -26,14 +31,16 @@ cc_library(
     hdrs = [
         "bert_question_answerer.h",
     ],
-    deps = [
+    tflite_deps = [
         ":question_answerer",
-        "//tensorflow_lite_support/cc/port:status_macros",
-        "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:base_task_api",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
-        "//tensorflow_lite_support/cc/task/core:task_utils",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core:task_utils",
         "//tensorflow_lite_support/cc/text/tokenizers:bert_tokenizer",
         "//tensorflow_lite_support/cc/text/tokenizers:sentencepiece_tokenizer",
         "//tensorflow_lite_support/cc/text/tokenizers:tokenizer",
@@ -46,7 +53,7 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "bert_qa_c_api",
     srcs = [
         "bert_qa_c_api.cc",
@@ -54,9 +61,9 @@ cc_library(
     hdrs = [
         "bert_qa_c_api.h",
     ],
-    visibility = ["//tensorflow_lite_support:__subpackages__"],
-    deps = [
+    tflite_deps = [
         ":bert_question_answerer",
         ":question_answerer",
     ],
+    visibility = ["//tensorflow_lite_support:__subpackages__"],
 )
