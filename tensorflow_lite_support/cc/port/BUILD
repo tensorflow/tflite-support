@@ -1,3 +1,5 @@
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
     licenses = ["notice"],  # Apache 2.0
@@ -29,12 +31,10 @@ cc_library(
     deps = ["@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_cc_proto"],
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "tflite_wrapper",
     hdrs = ["tflite_wrapper.h"],
-    deps = [
-        "//tensorflow_lite_support/cc/port/default:tflite_wrapper",
-    ],
+    deps = ["//tensorflow_lite_support/cc/port/default:tflite_wrapper"],
 )
 
 cc_library(
