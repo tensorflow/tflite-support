@@ -1,3 +1,5 @@
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+
 package(
     default_visibility = [
         "//visibility:public",
@@ -7,22 +9,24 @@ package(
 
 exports_files(srcs = ["base_vision_task_api.h"])
 
-cc_library(
+cc_library_with_tflite(
     name = "base_vision_task_api",
     hdrs = [
         "base_vision_task_api.h",
+    ],
+    tflite_deps = [
+        "//tensorflow_lite_support/cc/task/core:base_task_api",
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+        "//tensorflow_lite_support/cc/task/vision/utils:image_tensor_specs",
     ],
     deps = [
         ":frame_buffer",
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
-        "//tensorflow_lite_support/cc/task/core:base_task_api",
         "//tensorflow_lite_support/cc/task/core:task_utils",
-        "//tensorflow_lite_support/cc/task/core:tflite_engine",
         "//tensorflow_lite_support/cc/task/vision/proto:bounding_box_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_utils",
-        "//tensorflow_lite_support/cc/task/vision/utils:image_tensor_specs",
         "//tensorflow_lite_support/metadata:metadata_schema_cc",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",

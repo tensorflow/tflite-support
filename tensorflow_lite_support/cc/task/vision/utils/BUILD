@@ -1,3 +1,5 @@
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+
 package(
     default_visibility = [
         "//tensorflow_lite_support:users",
@@ -90,21 +92,22 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "image_tensor_specs",
     srcs = ["image_tensor_specs.cc"],
     hdrs = ["image_tensor_specs.h"],
+    tflite_deps = [
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+    ],
     deps = [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
-        "//tensorflow_lite_support/cc/task/core:tflite_engine",
         "//tensorflow_lite_support/metadata:metadata_schema_cc",
         "//tensorflow_lite_support/metadata/cc:metadata_extractor",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/types:optional",
-        "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite/c:common",
     ],
 )

@@ -1,3 +1,5 @@
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+
 package(
     default_visibility = [
         "//visibility:public",
@@ -9,19 +11,22 @@ package(
 # `compute_settings` field of the ObjectDetectorOptions, you must additionally link to
 # the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
-cc_library(
+cc_library_with_tflite(
     name = "object_detector",
     srcs = ["object_detector.cc"],
     hdrs = ["object_detector.h"],
+    tflite_deps = [
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "//tensorflow_lite_support/cc/task/core:task_api_factory",
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+    ],
     deps = [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:external_file_handler",
-        "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:task_utils",
-        "//tensorflow_lite_support/cc/task/core:tflite_engine",
-        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/core:label_map_item",
         "//tensorflow_lite_support/cc/task/vision/proto:bounding_box_proto_inc",
@@ -38,7 +43,6 @@ cc_library(
         "@com_google_absl//absl/strings:str_format",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )
 
@@ -46,20 +50,23 @@ cc_library(
 # `compute_settings` field of the ImageClassifierOptions, you must additionally link to
 # the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
-cc_library(
+cc_library_with_tflite(
     name = "image_classifier",
     srcs = ["image_classifier.cc"],
     hdrs = ["image_classifier.h"],
+    tflite_deps = [
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "//tensorflow_lite_support/cc/task/core:task_api_factory",
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+    ],
     deps = [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:external_file_handler",
-        "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:task_utils",
-        "//tensorflow_lite_support/cc/task/core:tflite_engine",
-        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
         "//tensorflow_lite_support/cc/task/vision/core:classification_head",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/core:label_map_item",
@@ -79,7 +86,6 @@ cc_library(
         "@flatbuffers",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )
 
@@ -87,20 +93,23 @@ cc_library(
 # `compute_settings` field of the ImageSegmenterOptions, you must additionally link to
 # the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
-cc_library(
+cc_library_with_tflite(
     name = "image_segmenter",
     srcs = ["image_segmenter.cc"],
     hdrs = ["image_segmenter.h"],
+    tflite_deps = [
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+        "//tensorflow_lite_support/cc/task/core:task_api_factory",
+        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+    ],
     deps = [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:external_file_handler",
-        "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:task_utils",
-        "//tensorflow_lite_support/cc/task/core:tflite_engine",
-        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/core:label_map_item",
         "//tensorflow_lite_support/cc/task/vision/proto:bounding_box_proto_inc",
@@ -116,7 +125,6 @@ cc_library(
         "@flatbuffers",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )
 
@@ -124,19 +132,22 @@ cc_library(
 # `compute_settings` field of the ImageEmbedderOptions, you must additionally link to
 # the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
-cc_library(
+cc_library_with_tflite(
     name = "image_embedder",
     srcs = ["image_embedder.cc"],
     hdrs = ["image_embedder.h"],
+    tflite_deps = [
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "//tensorflow_lite_support/cc/task/core:task_api_factory",
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+    ],
     deps = [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:external_file_handler",
-        "//tensorflow_lite_support/cc/task/core:task_api_factory",
-        "//tensorflow_lite_support/cc/task/core:tflite_engine",
-        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/proto:bounding_box_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/proto:embeddings_proto_inc",
@@ -149,6 +160,5 @@ cc_library(
         "@com_google_absl//absl/strings:str_format",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )
