@@ -261,6 +261,16 @@ http_archive(
   ],
 )
 
+http_archive(
+  name = "miniz",
+  build_file = "@//third_party:miniz.BUILD",
+  sha256 = "95f9b23c92219ad2670389a23a4ed5723b7329c82c3d933b7047673ecdfc1fea",
+  strip_prefix = "miniz-2.1.0",
+  urls = [
+    "https://github.com/richgel999/miniz/archive/2.1.0.tar.gz"
+  ],
+)
+
 # Set up TensorFlow version for Coral.
 load("@libedgetpu//:workspace.bzl", "libedgetpu_dependencies")
 libedgetpu_dependencies(TENSORFLOW_COMMIT, TENSORFLOW_SHA256,

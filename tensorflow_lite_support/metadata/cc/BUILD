@@ -47,3 +47,21 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/tools:logging",
     ],
 )
+
+cc_library(
+    name = "metadata_populator",
+    srcs = ["metadata_populator.cc"],
+    hdrs = ["metadata_populator.h"],
+    deps = [
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
+        "@flatbuffers//:runtime_cc",
+        "@miniz//:libminiz",
+        "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
+    ],
+)
