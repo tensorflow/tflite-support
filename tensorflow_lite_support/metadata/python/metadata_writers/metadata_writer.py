@@ -21,6 +21,7 @@ from tensorflow_lite_support.metadata import metadata_schema_py_generated as _me
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 from tensorflow_lite_support.metadata.python import metadata as _metadata
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
+from tensorflow_lite_support.metadata.python.metadata_writers import writer_utils
 
 
 class MetadataWriter:
@@ -115,6 +116,12 @@ class MetadataWriter:
       num_output_tensors = model.Subgraphs(0).OutputsLength()
       output_metadata = [_metadata_fb.TensorMetadataT()] * num_output_tensors
 
+    _fill_default_tensor_names(
+        input_metadata, writer_utils.get_input_tensor_names(model_buffer))
+
+    _fill_default_tensor_names(
+        output_metadata, writer_utils.get_output_tensor_names(model_buffer))
+
     subgraph_metadata = _metadata_fb.SubGraphMetadataT()
     subgraph_metadata.inputTensorMetadata = input_metadata
     subgraph_metadata.outputTensorMetadata = output_metadata
@@ -146,3 +153,12 @@ class MetadataWriter:
   def get_metadata_json(self) -> str:
     """Gets the generated metadata string in JSON format."""
     return _metadata.convert_to_json(bytes(self._metadata_buffer))
+
+
+# If tensor name in metadata is empty, default to the tensor name saved in
+# the model.
+def _fill_default_tensor_names(
+    tensor_metadata: List[_metadata_fb.TensorMetadataT],
+    tensor_names_from_model: List[str]):
+  for metadata, name in zip(tensor_metadata, tensor_names_from_model):
+    metadata.name = metadata.name or name

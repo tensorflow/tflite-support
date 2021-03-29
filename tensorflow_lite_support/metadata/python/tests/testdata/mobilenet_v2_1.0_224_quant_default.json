@@ -3,10 +3,12 @@
     {
       "input_tensor_metadata": [
         {
+          "name": "input"
         }
       ],
       "output_tensor_metadata": [
         {
+          "name": "output"
         }
       ]
     }

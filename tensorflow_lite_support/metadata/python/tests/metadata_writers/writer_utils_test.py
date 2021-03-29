@@ -30,6 +30,11 @@ _IMAGE_TENSOR_INDEX = 0
 _EXPECTED_INPUT_TYPES = _UINT8_TYPE
 _EXPECTED_INPUT_IMAGE_SHAPE = (1, 300, 300, 3)
 _EXPECTED_OUTPUT_TYPES = (_FLOAT_TYPE, _FLOAT_TYPE, _FLOAT_TYPE, _FLOAT_TYPE)
+_EXOECTED_INPUT_TENSOR_NAMES = "normalized_input_image_tensor"
+_EXOECTED_OUTPUT_TENSOR_NAMES = ("TFLite_Detection_PostProcess",
+                                 "TFLite_Detection_PostProcess:1",
+                                 "TFLite_Detection_PostProcess:2",
+                                 "TFLite_Detection_PostProcess:3")
 
 
 class WriterUtilsTest(tf.test.TestCase):
@@ -47,6 +52,16 @@ class WriterUtilsTest(tf.test.TestCase):
 
     flat_size = writer_utils.compute_flat_size(shape)
     self.assertEqual(flat_size, expected_flat_size)
+
+  def test_get_input_tensor_names(self):
+    tensor_names = writer_utils.get_input_tensor_names(
+        model_buffer=test_utils.load_file(_MODEL_NAME))
+    self.assertEqual(tensor_names, [_EXOECTED_INPUT_TENSOR_NAMES])
+
+  def test_get_output_tensor_names(self):
+    tensor_names = writer_utils.get_output_tensor_names(
+        model_buffer=test_utils.load_file(_MODEL_NAME))
+    self.assertEqual(tensor_names, list(_EXOECTED_OUTPUT_TENSOR_NAMES))
 
   def test_get_input_tensor_types(self):
     tensor_types = writer_utils.get_input_tensor_types(

@@ -36,6 +36,26 @@ def compute_flat_size(tensor_shape: Optional[array.array]) -> int:
   return functools.reduce(lambda x, y: x * y, tensor_shape)
 
 
+def get_input_tensor_names(model_buffer: bytearray) -> List[str]:
+  """Gets a list of the input tensor names."""
+  subgraph = _get_subgraph(model_buffer)
+  tensor_names = []
+  for i in range(subgraph.InputsLength()):
+    index = subgraph.Inputs(i)
+    tensor_names.append(subgraph.Tensors(index).Name().decode("utf-8"))
+  return tensor_names
+
+
+def get_output_tensor_names(model_buffer: bytearray) -> List[str]:
+  """Gets a list of the output tensor names."""
+  subgraph = _get_subgraph(model_buffer)
+  tensor_names = []
+  for i in range(subgraph.OutputsLength()):
+    index = subgraph.Outputs(i)
+    tensor_names.append(subgraph.Tensors(index).Name().decode("utf-8"))
+  return tensor_names
+
+
 def get_input_tensor_types(
     model_buffer: bytearray) -> List[_schema_fb.TensorType]:
   """Gets a list of the input tensor types."""
