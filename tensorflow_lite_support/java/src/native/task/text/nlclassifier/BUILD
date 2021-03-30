@@ -1,4 +1,8 @@
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
+load(
+    "@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl",
+    "cc_library_with_tflite",
+)
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -34,14 +38,16 @@ tflite_jni_binary(
 
 # Shared native logic for NLClassifier. Combine this target and customized
 # version of op_resolver to build customized nl_classifier_native target.
-cc_library(
+cc_library_with_tflite(
     name = "native_without_resolver",
     srcs = [
         "nl_classifier_jni.cc",
     ],
-    deps = [
+    tflite_deps = [
         ":nl_classifier_jni_utils",
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
+    ],
+    deps = [
         "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
         "@org_tensorflow//tensorflow/lite:op_resolver",
@@ -50,7 +56,7 @@ cc_library(
     alwayslink = 1,
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "nl_classifier_jni_utils",
     srcs = [
         "nl_classifier_jni_utils.cc",
@@ -58,8 +64,10 @@ cc_library(
     hdrs = [
         "nl_classifier_jni_utils.h",
     ],
-    deps = [
+    tflite_deps = [
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
+    ],
+    deps = [
         "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
     ],
