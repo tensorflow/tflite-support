@@ -29,7 +29,8 @@ int ErrorReporter::Report(const char* format, va_list args) {
   last_message_[0] = '\0';
   int num_characters = vsnprintf(last_message_, kBufferSize, format, args);
   // To mimic tflite::StderrReporter.
-  tflite::logging_internal::MinimalLogger::Log(TFLITE_LOG_ERROR, last_message_);
+  tflite::logging_internal::MinimalLogger::Log(TFLITE_LOG_ERROR, "%s",
+                                               last_message_);
   return num_characters;
 }
 
