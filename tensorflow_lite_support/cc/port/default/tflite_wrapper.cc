@@ -113,6 +113,13 @@ absl::Status TfLiteInterpreterWrapper::InitializeWithFallbackAndResize(
   RETURN_IF_ERROR(
       interpreter_initializer_(InterpreterCreationResources(), &interpreter_));
   RETURN_IF_ERROR(resize(interpreter_.get()));
+  if (compute_settings_.tflite_settings().cpu_settings().num_threads() != -1) {
+    if (interpreter_->SetNumThreads(
+            compute_settings_.tflite_settings().cpu_settings().num_threads()) !=
+        kTfLiteOk) {
+      return absl::InternalError("Failed setting number of CPU threads");
+    }
+  }
   SetTfLiteCancellation();
 
   if (got_error_do_not_delegate_anymore_ ||

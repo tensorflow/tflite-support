@@ -79,9 +79,9 @@ class TfLiteInterpreterWrapper {
   // actually want fallback to happen; if they don't, it will ensure that the
   // configuration doesn't accidentally trigger fallback.
   //
-  // IMPORTANT: The only supported delegates are NONE, GPU, HEXAGON and NNAPI.
-  // Trying to use this method with EDGETPU or XNNPACK delegates will cause an
-  // UnimplementedError to be thrown.
+  // IMPORTANT: Supported delegate type includes: NONE, NNAPI, GPU, HEXAGON,
+  // XNNPACK, EDGETPU (Google internal), and EDGETPU_CORAL. Specifying another
+  // delegate type may cause an UnimplementedError to be thrown.
   absl::Status InitializeWithFallback(
       std::function<absl::Status(const InterpreterCreationResources&,
                                  std::unique_ptr<tflite::Interpreter>*)>
