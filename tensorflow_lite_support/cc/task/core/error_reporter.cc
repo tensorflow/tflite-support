@@ -26,7 +26,7 @@ namespace task {
 namespace core {
 
 int ErrorReporter::Report(const char* format, va_list args) {
-  std::memset(last_message_, 0, kBufferSize);
+  last_message_[0] = '\0';
   int num_characters = vsnprintf(last_message_, kBufferSize, format, args);
   // To mimic tflite::StderrReporter.
   tflite::logging_internal::MinimalLogger::Log(TFLITE_LOG_ERROR, last_message_);
