@@ -16,6 +16,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_PROTO_BASE_OPTIONS_PROTO_INC_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_PROTO_BASE_OPTIONS_PROTO_INC_H_
 
+#include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/core/proto/base_options.pb.h"
+#include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_PROTO_BASE_OPTIONS_PROTO_INC_H_

@@ -25,6 +25,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/base_task_api.h"
+#include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 
@@ -41,6 +42,8 @@ class TaskAPIFactory {
  public:
   TaskAPIFactory() = delete;
 
+  // Deprecated: use CreateFromBaseOptions and configure model input from
+  // tensorflow_lite_support/cc/task/core/proto/base_options.proto
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromBuffer(
       const char* buffer_data, size_t buffer_size,
@@ -56,6 +59,8 @@ class TaskAPIFactory {
                                      compute_settings);
   }
 
+  // Deprecated: use CreateFromBaseOptions and configure model input from
+  // tensorflow_lite_support/cc/task/core/proto/base_options.proto
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromFile(
       const string& file_name,
@@ -70,6 +75,8 @@ class TaskAPIFactory {
                                      compute_settings);
   }
 
+  // Deprecated: use CreateFromBaseOptions and configure model input from
+  // tensorflow_lite_support/cc/task/core/proto/base_options.proto
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromFileDescriptor(
       int file_descriptor,
@@ -85,6 +92,8 @@ class TaskAPIFactory {
                                      compute_settings);
   }
 
+  // Deprecated: use CreateFromBaseOptions and configure model input from
+  // tensorflow_lite_support/cc/task/core/proto/base_options.proto
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>>
   CreateFromExternalFileProto(
@@ -101,13 +110,45 @@ class TaskAPIFactory {
                                      compute_settings);
   }
 
+  template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
+  static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromBaseOptions(
+      const BaseOptions* base_options,
+      std::unique_ptr<tflite::OpResolver> resolver =
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>()) {
+    if (!base_options->has_model_file()) {
+      return CreateStatusWithPayload(
+          absl::StatusCode::kInvalidArgument,
+          "Missing mandatory `model_file` field in `base_options`",
+          tflite::support::TfLiteSupportStatus::kInvalidArgumentError);
+    }
+
+    auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
+    RETURN_IF_ERROR(engine->BuildModelFromExternalFileProto(
+        &base_options->model_file(), base_options->compute_settings()));
+    return CreateFromTfLiteEngine<T>(std::move(engine),
+                                     base_options->compute_settings());
+  }
+
  private:
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromTfLiteEngine(
       std::unique_ptr<TfLiteEngine> engine, int num_threads,
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings()) {
-    RETURN_IF_ERROR(engine->InitInterpreter(compute_settings, num_threads));
+    tflite::proto::ComputeSettings settings_copy =
+        tflite::proto::ComputeSettings(compute_settings);
+    settings_copy.mutable_tflite_settings()
+        ->mutable_cpu_settings()
+        ->set_num_threads(num_threads);
+    return CreateFromTfLiteEngine<T>(std::move(engine), settings_copy);
+  }
+
+  template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>
+  static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromTfLiteEngine(
+      std::unique_ptr<TfLiteEngine> engine,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings()) {
+    RETURN_IF_ERROR(engine->InitInterpreter(compute_settings));
     return absl::make_unique<T>(std::move(engine));
   }
 };

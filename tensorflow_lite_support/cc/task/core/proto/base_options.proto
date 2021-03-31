@@ -17,10 +17,12 @@ syntax = "proto2";
 
 package tflite.task.core;
 
+import "tensorflow/lite/experimental/acceleration/configuration/configuration.proto";
+
 import "tensorflow_lite_support/cc/task/core/proto/external_file.proto";
 
 // Base options for task libraries.
-// Next Id: 2
+// Next Id: 4
 message BaseOptions {
   // The external model file, as a single standalone TFLite file. It could be
   // packed with TFLite Model Metadata[1] and associated files if exist. Fail to
@@ -29,4 +31,21 @@ message BaseOptions {
   // [1]: https://www.tensorflow.org/lite/convert/metadata
 
   optional core.ExternalFile model_file = 1;
+
+  // Advanced settings specifying how to accelerate the model inference using
+  // dedicated delegates. Supported delegate type includes:
+  // NONE, NNAPI, GPU, HEXAGON, XNNPACK, EDGETPU (Google internal),
+  // and EDGETPU_CORAL.
+  //
+  // IMPORTANT: in order to use a delegate, the appropriate delegate plugin
+  // needs to be linked at build time.
+  //
+  // For example, `gpu_plugin` for GPU from:
+  // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
+  // To use EDGETPU_CORAL, link to `edgetpu_coral_plugin` from:
+  // https://github.com/tensorflow/tflite-support/blob/a58a4f9225c411fa9ba29f821523e6e283988d23/tensorflow_lite_support/acceleration/configuration/BUILD#L11
+  //
+  // See settings definition at:
+  // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/configuration.proto
+  optional tflite.proto.ComputeSettings compute_settings = 2;
 }

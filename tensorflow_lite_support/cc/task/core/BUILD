@@ -67,6 +67,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
         "@com_google_absl//absl/status",
         "@org_tensorflow//tensorflow/lite/c:common",
