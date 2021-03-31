@@ -45,6 +45,15 @@
             "content_properties": {
             }
           },
+          "process_units": [
+            {
+              "options_type": "ScoreCalibrationOptions",
+              "options": {
+                "score_transformation": "LOG",
+                "default_score": 0.2
+              }
+            }
+          ],
           "stats": {
             "max": [
               1.0
@@ -58,6 +67,11 @@
               "name": "labels.txt",
               "description": "Labels for categories that the model can recognize.",
               "type": "TENSOR_AXIS_LABELS"
+            },
+            {
+              "name": "score_calibration.txt",
+              "description": "Contains sigmoid-based score calibration parameters. The main purposes of score calibration is to make scores across classes comparable, so that a common threshold can be used for all output classes.",
+              "type": "TENSOR_AXIS_SCORE_CALIBRATION"
             }
           ]
         }

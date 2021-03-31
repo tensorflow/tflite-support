@@ -76,7 +76,9 @@ py_test(
     deps = [
         ":test_utils",
         # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata/python/metadata_writers:image_classifier",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "@absl_py//absl/testing:parameterized",
         "@flatbuffers//:runtime_py",
     ],
@@ -136,7 +138,9 @@ py_test(
     deps = [
         ":test_utils",
         # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata/python/metadata_writers:audio_classifier",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "@absl_py//absl/testing:parameterized",
         "@flatbuffers//:runtime_py",
     ],

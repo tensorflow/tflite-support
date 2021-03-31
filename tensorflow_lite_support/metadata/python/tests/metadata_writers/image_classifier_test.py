@@ -18,12 +18,16 @@ from absl.testing import parameterized
 
 import tensorflow as tf
 
+from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
 from tensorflow_lite_support.metadata.python.metadata_writers import image_classifier
+from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
 _FLOAT_MODEL = "../testdata/image_classifier/mobilenet_v2_1.0_224.tflite"
 _QUANT_MODEL = "../testdata/image_classifier/mobilenet_v2_1.0_224_quant.tflite"
 _LABEL_FILE = "../testdata/image_classifier/labels.txt"
+_SCORE_CALIBRATION_FILE = "../testdata/image_classifier/score_calibration.txt"
+_DEFAULT_SCORE_CALIBRATION_VALUE = 0.2
 _NORM_MEAN = 127.5
 _NORM_STD = 127.5
 _FLOAT_JSON_FOR_INFERENCE = "../testdata/image_classifier/mobilenet_v2_1.0_224.json"
@@ -47,7 +51,10 @@ class MetadataWriterTest(tf.test.TestCase, parameterized.TestCase):
   def test_create_for_inference_should_succeed(self, model_file, golden_json):
     writer = image_classifier.MetadataWriter.create_for_inference(
         test_utils.load_file(model_file), [_NORM_MEAN], [_NORM_STD],
-        [_LABEL_FILE])
+        [_LABEL_FILE],
+        metadata_info.ScoreCalibrationMd(
+            _metadata_fb.ScoreTransformationType.LOG,
+            _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
 
     metadata_json = writer.get_metadata_json()
     expected_json = test_utils.load_file(golden_json, "r")

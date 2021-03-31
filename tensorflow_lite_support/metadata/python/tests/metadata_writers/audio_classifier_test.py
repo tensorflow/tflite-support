@@ -15,15 +15,18 @@
 """Tests for AudioClassifier.MetadataWriter."""
 
 from absl.testing import parameterized
-
 import tensorflow as tf
 
+from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
 from tensorflow_lite_support.metadata.python.metadata_writers import audio_classifier
+from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
 _FIXED_INPUT_SIZE_MODEL = "../testdata/audio_classifier/daredevil_sound_recognizer_320ms.tflite"
 _DYNAMIC_INPUT_SIZE_MODEL = "../testdata/audio_classifier/yamnet_tfhub.tflite"
 _LABEL_FILE = "../testdata/audio_classifier/labelmap.txt"
+_SCORE_CALIBRATION_FILE = "../testdata/audio_classifier/score_calibration.txt"
+_DEFAULT_SCORE_CALIBRATION_VALUE = 0.2
 _JSON_FOR_INFERENCE_DYNAMIC = "../testdata/audio_classifier/yamnet_tfhub.json"
 _JSON_FOR_INFERENCE_FIXED = "../testdata/audio_classifier/daredevil_sound_recognizer_320ms.json"
 _JSON_DEFAULT = "../testdata/audio_classifier/daredevil_sound_recognizer_320ms_default.json"
@@ -38,7 +41,10 @@ class MetadataWriterTest(tf.test.TestCase):
   def test_create_for_inference_should_succeed_dynaamic_input_shape_model(self):
     writer = audio_classifier.MetadataWriter.create_for_inference(
         test_utils.load_file(_DYNAMIC_INPUT_SIZE_MODEL), _SAMPLE_RATE,
-        _CHANNELS, _MIN_REQUIRED_SAMPLES_DYNAMIC, [_LABEL_FILE])
+        _CHANNELS, _MIN_REQUIRED_SAMPLES_DYNAMIC, [_LABEL_FILE],
+        metadata_info.ScoreCalibrationMd(
+            _metadata_fb.ScoreTransformationType.LOG,
+            _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
 
     metadata_json = writer.get_metadata_json()
     expected_json = test_utils.load_file(_JSON_FOR_INFERENCE_DYNAMIC, "r")
@@ -48,7 +54,10 @@ class MetadataWriterTest(tf.test.TestCase):
       self):
     writer = audio_classifier.MetadataWriter.create_for_inference(
         test_utils.load_file(_FIXED_INPUT_SIZE_MODEL), _SAMPLE_RATE, _CHANNELS,
-        _MIN_REQUIRED_SAMPLES_FIXED, [_LABEL_FILE])
+        _MIN_REQUIRED_SAMPLES_FIXED, [_LABEL_FILE],
+        metadata_info.ScoreCalibrationMd(
+            _metadata_fb.ScoreTransformationType.LOG,
+            _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
 
     metadata_json = writer.get_metadata_json()
     expected_json = test_utils.load_file(_JSON_FOR_INFERENCE_FIXED, "r")
@@ -79,7 +88,10 @@ class MetadataWriterSampleRateTest(tf.test.TestCase, parameterized.TestCase):
     with self.assertRaises(ValueError) as error:
       audio_classifier.MetadataWriter.create_for_inference(
           test_utils.load_file(_DYNAMIC_INPUT_SIZE_MODEL), wrong_sample_rate,
-          _CHANNELS, _MIN_REQUIRED_SAMPLES_DYNAMIC, [_LABEL_FILE])
+          _CHANNELS, _MIN_REQUIRED_SAMPLES_DYNAMIC, [_LABEL_FILE],
+          metadata_info.ScoreCalibrationMd(
+              _metadata_fb.ScoreTransformationType.LOG,
+              _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
 
     self.assertEqual(
         "sample_rate should be positive, but got {}.".format(wrong_sample_rate),
@@ -101,7 +113,10 @@ class MetadataWriterChannelsTest(tf.test.TestCase, parameterized.TestCase):
     with self.assertRaises(ValueError) as error:
       audio_classifier.MetadataWriter.create_for_inference(
           test_utils.load_file(_DYNAMIC_INPUT_SIZE_MODEL), _SAMPLE_RATE,
-          wrong_channels, _MIN_REQUIRED_SAMPLES_DYNAMIC, [_LABEL_FILE])
+          wrong_channels, _MIN_REQUIRED_SAMPLES_DYNAMIC, [_LABEL_FILE],
+          metadata_info.ScoreCalibrationMd(
+              _metadata_fb.ScoreTransformationType.LOG,
+              _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
 
     self.assertEqual(
         "channels should be positive, but got {}.".format(wrong_channels),
@@ -133,7 +148,10 @@ class MetadataWriterMinRequiredSamplesTest(tf.test.TestCase,
     with self.assertRaises(ValueError) as error:
       audio_classifier.MetadataWriter.create_for_inference(
           test_utils.load_file(_DYNAMIC_INPUT_SIZE_MODEL), _SAMPLE_RATE,
-          _CHANNELS, wrong_min_required_samples, [_LABEL_FILE])
+          _CHANNELS, wrong_min_required_samples, [_LABEL_FILE],
+          metadata_info.ScoreCalibrationMd(
+              _metadata_fb.ScoreTransformationType.LOG,
+              _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
 
     self.assertEqual(expected_error_message, str(error.exception))
 

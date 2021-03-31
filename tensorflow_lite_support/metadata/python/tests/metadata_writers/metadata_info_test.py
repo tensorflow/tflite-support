@@ -291,6 +291,8 @@ class ClassificationTensorMdTest(tf.test.TestCase, parameterized.TestCase):
   _DESCRIPTION = "The classification result tensor."
   _LABEL_FILE_EN = "labels.txt"
   _LABEL_FILE_CN = "labels_cn.txt"  # Locale label file in Chinese.
+  _SCORE_CALIBRATION_FILE = "score_calibration.txt"
+  _CALIBRATION_DEFAULT_SCORE = 0.2
   _EXPECTED_FLOAT_TENSOR_JSON = "../testdata/classification_tensor_float_meta.json"
   _EXPECTED_UINT8_TENSOR_JSON = "../testdata/classification_tensor_uint8_meta.json"
   _EXPECTED_UNSUPPORTED_TENSOR_JSON = "../testdata/classification_tensor_unsupported_meta.json"
@@ -314,11 +316,16 @@ class ClassificationTensorMdTest(tf.test.TestCase, parameterized.TestCase):
         file_path=self._LABEL_FILE_EN, locale="en")
     label_file_cn = metadata_info.LabelFileMd(
         file_path=self._LABEL_FILE_CN, locale="cn")
+    score_calibration_md = metadata_info.ScoreCalibrationMd(
+        _metadata_fb.ScoreTransformationType.IDENTITY,
+        self._CALIBRATION_DEFAULT_SCORE, self._SCORE_CALIBRATION_FILE)
+
     tesnor_md = metadata_info.ClassificationTensorMd(
         name=self._NAME,
         description=self._DESCRIPTION,
         label_files=[label_file_en, label_file_cn],
-        tensor_type=tensor_type)
+        tensor_type=tensor_type,
+        score_calibration_md=score_calibration_md)
     tensor_metadata = tesnor_md.create_metadata()
 
     metadata_json = _metadata.convert_to_json(
@@ -384,7 +391,7 @@ class BertTokenizerMdTest(tf.test.TestCase):
     self.assertEqual(metadata_json, expected_json)
 
 
-class SentencePieceTokenizerMd(tf.test.TestCase):
+class SentencePieceTokenizerMdTest(tf.test.TestCase):
 
   _VOCAB_FILE = "vocab.txt"
   _SP_MODEL = "sp.model"
@@ -398,6 +405,45 @@ class SentencePieceTokenizerMd(tf.test.TestCase):
     metadata_json = _metadata.convert_to_json(
         _create_dummy_model_metadata_with_process_uint(tokenizer_metadata))
     expected_json = test_utils.load_file(self._EXPECTED_TENSOR_JSON, "r")
+    self.assertEqual(metadata_json, expected_json)
+
+
+class ScoreClalibrationMdTest(tf.test.TestCase):
+  _DEFAULT_VALUE = 0.2
+  _SCORE_CALIBRATION_FILE = "score_calibration.txt"
+  _EXPECTED_TENSOR_JSON = "../testdata/score_calibration_tensor_meta.json"
+  _EXPECTED_MODEL_META_JSON = "../testdata/score_calibration_file_meta.json"
+
+  def test_create_metadata_should_succeed(self):
+    score_calibration_md = metadata_info.ScoreCalibrationMd(
+        _metadata_fb.ScoreTransformationType.LOG, self._DEFAULT_VALUE,
+        self._SCORE_CALIBRATION_FILE)
+    score_calibration_metadata = score_calibration_md.create_metadata()
+
+    metadata_json = _metadata.convert_to_json(
+        _create_dummy_model_metadata_with_process_uint(
+            score_calibration_metadata))
+    expected_json = test_utils.load_file(self._EXPECTED_TENSOR_JSON, "r")
+    self.assertEqual(metadata_json, expected_json)
+
+  def test_create_score_calibration_file_md_should_succeed(self):
+    score_calibration_md = metadata_info.ScoreCalibrationMd(
+        _metadata_fb.ScoreTransformationType.LOG, self._DEFAULT_VALUE,
+        self._SCORE_CALIBRATION_FILE)
+    score_calibration_file_md = (
+        score_calibration_md.create_score_calibration_file_md())
+    file_metadata = score_calibration_file_md.create_metadata()
+
+    # Create the Flatbuffers object and convert it to the json format.
+    model_metadata = _metadata_fb.ModelMetadataT()
+    model_metadata.associatedFiles = [file_metadata]
+    builder = flatbuffers.Builder(0)
+    builder.Finish(
+        model_metadata.Pack(builder),
+        _metadata.MetadataPopulator.METADATA_FILE_IDENTIFIER)
+    metadata_json = _metadata.convert_to_json(bytes(builder.Output()))
+
+    expected_json = test_utils.load_file(self._EXPECTED_MODEL_META_JSON, "r")
     self.assertEqual(metadata_json, expected_json)
 
 

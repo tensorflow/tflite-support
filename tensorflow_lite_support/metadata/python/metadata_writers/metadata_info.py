@@ -246,6 +246,59 @@ class SentencePieceTokenizerMd:
     return tokenizer
 
 
+class ScoreCalibrationMd:
+  """A container for score calibration [1] metadata information.
+
+  [1]:
+    https://github.com/tensorflow/tflite-support/blob/5e0cdf5460788c481f5cd18aab8728ec36cf9733/tensorflow_lite_support/metadata/metadata_schema.fbs#L434
+  """
+
+  _SCORE_CALIBRATION_FILE_DESCRIPTION = (
+      "Contains sigmoid-based score calibration parameters. The main purposes "
+      "of score calibration is to make scores across classes comparable, so "
+      "that a common threshold can be used for all output classes.")
+  _FILE_TYPE = _metadata_fb.AssociatedFileType.TENSOR_AXIS_SCORE_CALIBRATION
+
+  def __init__(self,
+               score_transformation_type: _metadata_fb.ScoreTransformationType,
+               default_score: float, file_path: str):
+    """Creates a ScoreCalibrationMd object.
+
+    Args:
+      score_transformation_type: type of the function used for transforming the
+        uncalibrated score before applying score calibration.
+      default_score: the default calibrated score to apply if the uncalibrated
+        score is below min_score or if no parameters were specified for a given
+        index.
+      file_path: file_path of the score calibration file [1].
+      [1]:
+        https://github.com/tensorflow/tflite-support/blob/5e0cdf5460788c481f5cd18aab8728ec36cf9733/tensorflow_lite_support/metadata/metadata_schema.fbs#L122
+    """
+    self._score_transformation_type = score_transformation_type
+    self._default_score = default_score
+    self._file_path = file_path
+
+  def create_metadata(self) -> _metadata_fb.ProcessUnitT:
+    """Creates the score calibration metadata based on the information.
+
+    Returns:
+      A Flatbuffers Python object of the score calibration metadata.
+    """
+    score_calibration = _metadata_fb.ProcessUnitT()
+    score_calibration.optionsType = (
+        _metadata_fb.ProcessUnitOptions.ScoreCalibrationOptions)
+    options = _metadata_fb.ScoreCalibrationOptionsT()
+    options.scoreTransformation = self._score_transformation_type
+    options.defaultScore = self._default_score
+    score_calibration.options = options
+    return score_calibration
+
+  def create_score_calibration_file_md(self) -> AssociatedFileMd:
+    return AssociatedFileMd(self._file_path,
+                            self._SCORE_CALIBRATION_FILE_DESCRIPTION,
+                            self._FILE_TYPE)
+
+
 class TensorMd:
   """A container for common tensor metadata information.
 
@@ -534,8 +587,12 @@ class ClassificationTensorMd(TensorMd):
   Attributes:
     label_files: information of the label files [1] in the classification
       tensor.
+    score_calibration_md: information of the score calibration operation [2] in
+      the classification tensor.
     [1]:
       https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L95
+    [2]:
+      https://github.com/tensorflow/tflite-support/blob/5e0cdf5460788c481f5cd18aab8728ec36cf9733/tensorflow_lite_support/metadata/metadata_schema.fbs#L434
   """
 
   # Min and max float values for classification results.
@@ -546,7 +603,8 @@ class ClassificationTensorMd(TensorMd):
                name: Optional[str] = None,
                description: Optional[str] = None,
                label_files: Optional[List[LabelFileMd]] = None,
-               tensor_type: Optional[_schema_fb.TensorType] = None):
+               tensor_type: Optional[_schema_fb.TensorType] = None,
+               score_calibration_md: Optional[ScoreCalibrationMd] = None):
     """Initializes the instance of ClassificationTensorMd.
 
     Args:
@@ -555,9 +613,15 @@ class ClassificationTensorMd(TensorMd):
       label_files: information of the label files [1] in the classification
         tensor.
       tensor_type: data type of the tensor.
+      score_calibration_md: information of the score calibration files operation
+        [2] in the classification tensor.
       [1]:
         https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L95
+      [2]:
+        https://github.com/tensorflow/tflite-support/blob/5e0cdf5460788c481f5cd18aab8728ec36cf9733/tensorflow_lite_support/metadata/metadata_schema.fbs#L434
     """
+    self._score_calibration_md = score_calibration_md
+
     if tensor_type is _schema_fb.TensorType.UINT8:
       min_values = [_MIN_UINT8]
       max_values = [_MAX_UINT8]
@@ -570,9 +634,23 @@ class ClassificationTensorMd(TensorMd):
       min_values = None
       max_values = None
 
+    associated_files = label_files or []
+    if self._score_calibration_md:
+      associated_files.append(
+          score_calibration_md.create_score_calibration_file_md())
+
     super().__init__(name, description, min_values, max_values,
                      _metadata_fb.ContentProperties.FeatureProperties,
-                     label_files)
+                     associated_files)
+
+  def create_metadata(self) -> _metadata_fb.TensorMetadataT:
+    """Creates the classification tensor metadata based on the information."""
+    tensor_metadata = super().create_metadata()
+    if self._score_calibration_md:
+      tensor_metadata.processUnits = [
+          self._score_calibration_md.create_metadata()
+      ]
+    return tensor_metadata
 
 
 class CategoryTensorMd(TensorMd):
