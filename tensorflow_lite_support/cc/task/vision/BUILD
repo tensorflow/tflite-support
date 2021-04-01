@@ -11,6 +11,8 @@ package(
 # `compute_settings` field of the ObjectDetectorOptions, you must additionally link to
 # the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
+# To use EDGETPU_CORAL, link to `edgetpu_coral_plugin` from:
+# https://github.com/tensorflow/tflite-support/blob/a58a4f9225c411fa9ba29f821523e6e283988d23/tensorflow_lite_support/acceleration/configuration/BUILD#L11
 cc_library_with_tflite(
     name = "object_detector",
     srcs = ["object_detector.cc"],
@@ -50,6 +52,8 @@ cc_library_with_tflite(
 # `compute_settings` field of the ImageClassifierOptions, you must additionally link to
 # the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
+# To use EDGETPU_CORAL, link to `edgetpu_coral_plugin` from:
+# https://github.com/tensorflow/tflite-support/blob/a58a4f9225c411fa9ba29f821523e6e283988d23/tensorflow_lite_support/acceleration/configuration/BUILD#L11
 cc_library_with_tflite(
     name = "image_classifier",
     srcs = ["image_classifier.cc"],
@@ -93,6 +97,8 @@ cc_library_with_tflite(
 # `compute_settings` field of the ImageSegmenterOptions, you must additionally link to
 # the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
+# To use EDGETPU_CORAL, link to `edgetpu_coral_plugin` from:
+# https://github.com/tensorflow/tflite-support/blob/a58a4f9225c411fa9ba29f821523e6e283988d23/tensorflow_lite_support/acceleration/configuration/BUILD#L11
 cc_library_with_tflite(
     name = "image_segmenter",
     srcs = ["image_segmenter.cc"],
@@ -132,6 +138,8 @@ cc_library_with_tflite(
 # `compute_settings` field of the ImageEmbedderOptions, you must additionally link to
 # the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
+# To use EDGETPU_CORAL, link to `edgetpu_coral_plugin` from:
+# https://github.com/tensorflow/tflite-support/blob/a58a4f9225c411fa9ba29f821523e6e283988d23/tensorflow_lite_support/acceleration/configuration/BUILD#L11
 cc_library_with_tflite(
     name = "image_embedder",
     srcs = ["image_embedder.cc"],

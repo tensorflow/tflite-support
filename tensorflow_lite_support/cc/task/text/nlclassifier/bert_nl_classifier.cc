@@ -135,15 +135,15 @@ StatusOr<std::vector<core::Category>> BertNLClassifier::Postprocess(
   return BuildResults(scores, /*labels=*/nullptr);
 }
 
-StatusOr<std::unique_ptr<BertNLClassifier>>
-BertNLClassifier::CreateFromOptions(const BertNLClassifierOptions& options,
+StatusOr<std::unique_ptr<BertNLClassifier>> BertNLClassifier::CreateFromOptions(
+    const BertNLClassifierOptions& options,
     std::unique_ptr<tflite::OpResolver> resolver) {
   auto options_copy = absl::make_unique<BertNLClassifierOptions>(options);
 
   ASSIGN_OR_RETURN(
       auto bert_nl_classifier,
-      core::TaskAPIFactory::CreateFromExternalFileProto<BertNLClassifier>(
-          &options_copy->base_options().model_file(), std::move(resolver)));
+      core::TaskAPIFactory::CreateFromBaseOptions<BertNLClassifier>(
+          &options_copy->base_options(), std::move(resolver)));
   RETURN_IF_ERROR(bert_nl_classifier->Initialize(std::move(options_copy)));
   return std::move(bert_nl_classifier);
 }

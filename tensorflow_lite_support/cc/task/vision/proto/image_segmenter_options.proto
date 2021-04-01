@@ -58,10 +58,9 @@ message ImageSegmenterOptions {
   optional int32 num_threads = 7 [default = -1];
 
   // Advanced settings specifying how to accelerate the model inference using
-  // dedicated delegates.
-  // Only NONE, GPU, NNAPI and HEXAGON delegates are supported for now;
-  // specifying another delegate will cause an UnimplementedError to be thrown
-  // at initialization time.
+  // dedicated delegates. Supported delegate type includes:
+  // NONE, NNAPI, GPU, HEXAGON, XNNPACK, EDGETPU (Google internal),
+  // and EDGETPU_CORAL.
   //
   // IMPORTANT: in order to use a delegate, the appropriate delegate plugin
   // needs to be linked at build time. See comment above the "image_segmenter"
