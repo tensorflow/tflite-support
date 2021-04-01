@@ -63,10 +63,9 @@ StatusOr<std::unique_ptr<AudioClassifier>> AudioClassifier::CreateFromOptions(
   // Copy options to ensure the ExternalFile outlives the constructed object.
   auto options_copy = absl::make_unique<AudioClassifierOptions>(options);
 
-  ASSIGN_OR_RETURN(
-      auto audio_classifier,
-      TaskAPIFactory::CreateFromExternalFileProto<AudioClassifier>(
-          &options_copy->base_options().model_file(), std::move(resolver)));
+  ASSIGN_OR_RETURN(auto audio_classifier,
+                   TaskAPIFactory::CreateFromBaseOptions<AudioClassifier>(
+                       &options_copy->base_options(), std::move(resolver)));
 
   // TODO(b/182625132): Retrieve the required audio format from the model
   // metadata. Return an error status if the audio format metadata are missed in
@@ -83,12 +82,6 @@ absl::Status AudioClassifier::SanityCheckOptions(
     return CreateStatusWithPayload(StatusCode::kInvalidArgument,
                                    "Missing mandatory `base_options` field",
                                    TfLiteSupportStatus::kInvalidArgumentError);
-  }
-  if (!options.base_options().has_model_file()) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        "Missing mandatory `model_file` field in `base_options`",
-        TfLiteSupportStatus::kInvalidArgumentError);
   }
   if (options.max_results() == 0) {
     return CreateStatusWithPayload(
