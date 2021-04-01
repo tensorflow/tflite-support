@@ -28,7 +28,6 @@ proto_library(
     srcs = ["base_options.proto"],
     deps = [
         ":external_file_proto",
-        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
     ],
 )
 
@@ -45,7 +44,6 @@ cc_library(
     deps = [
         ":base_options_cc_proto",
         ":external_file_proto_inc",
-        "//tensorflow_lite_support/cc/port:configuration_proto_inc",
     ],
 )
 

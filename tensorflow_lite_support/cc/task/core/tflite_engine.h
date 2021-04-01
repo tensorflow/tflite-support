@@ -126,17 +126,10 @@ class TfLiteEngine {
   // the value.
   absl::Status InitInterpreter(int num_threads = 1);
 
-  // Initializes interpreter with acceleration configurations.
-  absl::Status InitInterpreter(
-      const tflite::proto::ComputeSettings& compute_settings);
-
-  // Deprecated. Use the following method, and configure `num_threads` through
-  // `compute_settings`, i.e. in `CPUSettings`:
-  // absl::Status TfLiteEngine::InitInterpreter(
-  //    const tflite::proto::ComputeSettings& compute_settings)
+  // Same as above, but allows specifying `compute_settings` for acceleration.
   absl::Status InitInterpreter(
       const tflite::proto::ComputeSettings& compute_settings,
-      int num_threads);
+      int num_threads = 1);
 
   // Cancels the on-going `Invoke()` call if any and if possible. This method
   // can be called from a different thread than the one where `Invoke()` is

@@ -47,10 +47,10 @@ static std::ios_base::Init s_iostream_initializer;
 #endif
 
 using ::absl::StatusCode;
-using ::tflite::proto::ComputeSettings;
 using ::tflite::support::CreateStatusWithPayload;
-using ::tflite::support::InterpreterCreationResources;
 using ::tflite::support::TfLiteSupportStatus;
+
+using ::tflite::support::InterpreterCreationResources;
 
 bool TfLiteEngine::Verifier::Verify(const char* data, int length,
                                     tflite::ErrorReporter* reporter) {
@@ -185,28 +185,11 @@ absl::Status TfLiteEngine::BuildModelFromExternalFileProto(
 
 absl::Status TfLiteEngine::InitInterpreter(int num_threads) {
   tflite::proto::ComputeSettings compute_settings;
-  compute_settings.mutable_tflite_settings()
-      ->mutable_cpu_settings()
-      ->set_num_threads(num_threads);
-  return InitInterpreter(compute_settings);
+  return InitInterpreter(compute_settings, num_threads);
 }
 
-// TODO(b/183798104): deprecate num_threads in VK task protos.
-// Deprecated. Use the following method, and configure `num_threads` through
-// `compute_settings`, i.e. in `CPUSettings`:
-// absl::Status TfLiteEngine::InitInterpreter(
-//    const tflite::proto::ComputeSettings& compute_settings)
 absl::Status TfLiteEngine::InitInterpreter(
     const tflite::proto::ComputeSettings& compute_settings, int num_threads) {
-  ComputeSettings settings_copy = ComputeSettings(compute_settings);
-  settings_copy.mutable_tflite_settings()
-      ->mutable_cpu_settings()
-      ->set_num_threads(num_threads);
-  return InitInterpreter(settings_copy);
-}
-
-absl::Status TfLiteEngine::InitInterpreter(
-    const tflite::proto::ComputeSettings& compute_settings) {
   if (model_ == nullptr) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
@@ -214,13 +197,13 @@ absl::Status TfLiteEngine::InitInterpreter(
         "BuildModelFrom methods before calling InitInterpreter.");
   }
   auto initializer =
-      [this](
+      [this, num_threads](
           const InterpreterCreationResources& resources,
           std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
       -> absl::Status {
     tflite_shims::InterpreterBuilder interpreter_builder(*model_, *resolver_);
     resources.ApplyTo(&interpreter_builder);
-    if (interpreter_builder(interpreter_out) != kTfLiteOk) {
+    if (interpreter_builder(interpreter_out, num_threads) != kTfLiteOk) {
       return CreateStatusWithPayload(
           StatusCode::kUnknown,
           absl::StrCat("Could not build the TF Lite interpreter: ",
