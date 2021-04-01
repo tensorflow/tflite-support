@@ -14,8 +14,10 @@
 # ==============================================================================
 """An import entry for the metadata writers library."""
 
+from tensorflow_lite_support.metadata.python.metadata_writers import audio_classifier
 from tensorflow_lite_support.metadata.python.metadata_writers import image_classifier
 from tensorflow_lite_support.metadata.python.metadata_writers import image_segmenter
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
+from tensorflow_lite_support.metadata.python.metadata_writers import nl_classifier
 from tensorflow_lite_support.metadata.python.metadata_writers import object_detector
 from tensorflow_lite_support.metadata.python.metadata_writers import writer_utils

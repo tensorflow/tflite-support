@@ -17,6 +17,8 @@ COMMON_PIP_DEPS = [
     "//tensorflow_lite_support/metadata/python/metadata_writers:image_classifier",
     "//tensorflow_lite_support/metadata/python/metadata_writers:object_detector",
     "//tensorflow_lite_support/metadata/python/metadata_writers:image_segmenter",
+    "//tensorflow_lite_support/metadata/python/metadata_writers:audio_classifier",
+    "//tensorflow_lite_support/metadata/python/metadata_writers:nl_classifier",
 ]
 
 filegroup(
