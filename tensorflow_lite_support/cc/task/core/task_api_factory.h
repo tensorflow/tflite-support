@@ -66,7 +66,7 @@ class TaskAPIFactory {
       "Use CreateFromBaseOptions and configure model input from "
       "tensorflow_lite_support/cc/task/core/proto/base_options.proto")
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromFile(
-      const string& file_name,
+      const std::string& file_name,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
       int num_threads = 1,
