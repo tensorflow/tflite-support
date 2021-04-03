@@ -236,3 +236,23 @@ cc_library(
     hdrs = ["embeddings_proto_inc.h"],
     deps = [":embeddings_cc_proto"],
 )
+
+# PoseEstimation protos
+
+proto_library(
+    name = "poses_proto"
+    srcs = ["poses.proto"]
+)
+
+cc_proto_library(
+    name = "poses_cc_proto",
+    deps = [
+        ":poses_proto",
+    ],
+)
+
+cc_library(
+    name = "poses_proto_inc"
+    hdrs = ["poses_proto_inc.h"]
+    deps = [":poses_cc_proto"]
+)
