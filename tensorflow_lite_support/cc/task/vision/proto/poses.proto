@@ -1,0 +1,58 @@
+/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
+
+syntax = "proto2";
+
+package tflite.task.vision;
+
+// Results of performing pose estimation.
+// The "person" object which stores the keypoints and the average score.
+message PoseResult {
+  repeated KeyPoint keypoint = 1;
+  optional float score = 2 [default = 0.0];
+}
+
+message KeyPoint {
+  optional BodyPart bodypart = 1 [default = NOSE];
+  optional Position position = 2;
+
+
+  message Position {
+    // The X coordinate of a point.
+    optional int32 pos_x = 1 [default = 0];
+    // The Y coordinate of a point.
+    optional int32 pos_y = 2 [default = 0];
+  }
+
+  // The individual points to be taken into consideration.
+  enum BodyPart {
+    NOSE = 0;
+    LEFT_EYE = 1;
+    RIGHT_EYE = 2;
+    LEFT_EAR = 3;
+    RIGHT_EAR = 4;
+    LEFT_SHOULDER = 5;
+    RIGHT_SHOULDER = 6;
+    LEFT_ELBOW = 7;
+    LEFT_WRIST = 8;
+    RIGHT_WRIST = 9;
+    LEFT_HIP = 10;
+    RIGHT_HIP = 11;
+    LEFT_KNEE = 12;
+    RIGHT_KNEE = 13;
+    LEFT_ANKLE = 14;
+    RIGHT_ANKLE = 15;
+  }
+}
