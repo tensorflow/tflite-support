@@ -33,6 +33,7 @@ cc_library_with_tflite(
     ],
     tflite_deps = [
         ":question_answerer",
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "//tensorflow_lite_support/cc/task/core:base_task_api",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
@@ -49,7 +50,6 @@ cc_library_with_tflite(
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
     ],
 )
 
