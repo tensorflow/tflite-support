@@ -46,9 +46,9 @@ cc_library_with_tflite(
     tflite_deps = [
         ":nl_classifier_jni_utils",
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
+        "//tensorflow_lite_support/cc/utils:jni_utils",
     ],
     deps = [
-        "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
         "@org_tensorflow//tensorflow/lite:op_resolver",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
@@ -66,9 +66,9 @@ cc_library_with_tflite(
     ],
     tflite_deps = [
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
+        "//tensorflow_lite_support/cc/utils:jni_utils",
     ],
     deps = [
-        "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
     ],
 )
