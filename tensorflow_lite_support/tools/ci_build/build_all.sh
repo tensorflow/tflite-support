@@ -17,6 +17,8 @@
 
 set -ex
 
+bash tensorflow_lite_support/custom_ops/tf_configure.sh
+
 bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/java:tensorflowlite_support \
     //tensorflow_lite_support/codegen/python:codegen \
@@ -43,5 +45,6 @@ bazel clean --expunge
 
 bazel test --test_output=all \
     //tensorflow_lite_support/metadata/python/tests:metadata_test \
-    //tensorflow_lite_support/metadata/python/tests/metadata_writers:all
+    //tensorflow_lite_support/metadata/python/tests/metadata_writers:all \
+    //tensorflow_lite_support/custom_ops/kernel/sentencepiece:all
 

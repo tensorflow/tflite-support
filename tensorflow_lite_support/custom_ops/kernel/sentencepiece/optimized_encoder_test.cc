@@ -73,12 +73,16 @@ TEST(OptimizedEncoder, NormalizeStringWhitestpaces) {
   FinishEncoderConfigBuffer(builder, ecb.Finish());
   const EncoderConfig* config = GetEncoderConfig(builder.GetBufferPointer());
   {
-    const auto [res_string, offsets] = NormalizeString("x  y", *config);
+    const auto result = NormalizeString("x  y", *config);
+    const auto res_string = std::get<0>(result);
+    const auto offsets = std::get<1>(result);
     EXPECT_EQ(res_string, "\xe2\x96\x81x\xe2\x96\x81y");
     EXPECT_THAT(offsets, ::testing::ElementsAre(0, 0, 0, 0, 1, 1, 1, 3));
   }
   {
-    const auto [res_string, offsets] = NormalizeString("\tx  y\n", *config);
+    const auto result = NormalizeString("\tx  y\n", *config);
+    const auto res_string = std::get<0>(result);
+    const auto offsets = std::get<1>(result);
     EXPECT_EQ(res_string, "\xe2\x96\x81x\xe2\x96\x81y");
     EXPECT_THAT(offsets, ::testing::ElementsAre(0, 0, 0, 1, 2, 2, 2, 4));
   }
@@ -103,8 +107,9 @@ TEST(OptimizedEncoder, NormalizeStringReplacement) {
   FinishEncoderConfigBuffer(builder, ecb.Finish());
   const EncoderConfig* config = GetEncoderConfig(builder.GetBufferPointer());
   {
-    const auto [res_string, offsets] =
-        NormalizeString("ABAABAAABAAAA", *config);
+    const auto result = NormalizeString("ABAABAAABAAAA", *config);
+    const auto res_string = std::get<0>(result);
+    const auto offsets = std::get<1>(result);
     EXPECT_EQ(res_string, "A1BA2BA3BA4");
     EXPECT_THAT(offsets,
                 ::testing::ElementsAre(0, 0, 1, 2, 2, 4, 5, 5, 8, 9, 9));
@@ -131,8 +136,9 @@ TEST(OptimizedEncoder, NormalizeStringWhitespacesRemove) {
   FinishEncoderConfigBuffer(builder, ecb.Finish());
   const EncoderConfig* config = GetEncoderConfig(builder.GetBufferPointer());
   {
-    const auto [res_string, offsets] =
-        NormalizeString("XXABAABAAABAAAA", *config);
+    const auto result = NormalizeString("XXABAABAAABAAAA", *config);
+    const auto res_string = std::get<0>(result);
+    const auto offsets = std::get<1>(result);
     EXPECT_EQ(res_string, " A1BA2BA3BA4");
     EXPECT_THAT(offsets,
                 ::testing::ElementsAre(0, 2, 2, 3, 4, 4, 6, 7, 7, 10, 11, 11));

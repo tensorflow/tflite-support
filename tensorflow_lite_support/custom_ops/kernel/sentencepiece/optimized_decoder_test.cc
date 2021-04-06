@@ -20,6 +20,7 @@ limitations under the License.
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "absl/strings/str_format.h"
 #include "src/sentencepiece.pb.h"
 #include "src/sentencepiece_processor.h"
 #include "tensorflow/core/platform/env.h"
@@ -67,11 +68,11 @@ TEST(OptimizedEncoder, ConfigConverter) {
   ASSERT_TRUE(status.ok());
 
   ::sentencepiece::SentencePieceProcessor processor;
-  ASSERT_OK(processor.LoadFromSerializedProto(config));
+  ASSERT_TRUE(processor.LoadFromSerializedProto(config).ok());
   const auto converted_model = ConvertSentencepieceModelForDecoder(config);
   const std::string test_string("Hello world!\\xF0\\x9F\\x8D\\x95");
   ::sentencepiece::SentencePieceText reference_encoded;
-  CHECK_OK(processor.Encode(test_string, &reference_encoded));
+  ASSERT_TRUE(processor.Encode(test_string, &reference_encoded).ok());
 
   std::vector<int> encoded_vector;
   encoded_vector.reserve(reference_encoded.pieces_size());
@@ -79,7 +80,7 @@ TEST(OptimizedEncoder, ConfigConverter) {
     encoded_vector.push_back(piece.id());
   }
   std::string ref_decoded;
-  ASSERT_OK(processor.Decode(encoded_vector, &ref_decoded));
+  ASSERT_TRUE(processor.Decode(encoded_vector, &ref_decoded).ok());
   const auto decoded = DecodeString(encoded_vector, converted_model.data());
   ASSERT_EQ(decoded.type, DecoderResultType::SUCCESS);
   ASSERT_EQ(ref_decoded, decoded.decoded);

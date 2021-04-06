@@ -93,8 +93,10 @@ tflite::support::StatusOr<std::string> ConvertSentencepieceModelToFlatBuffer(
   const auto pieces_trie_fbs = pieces_trie_builder.Finish();
 
   // Converting normalization.
-  const auto [normalization_trie, normalization_strings] =
+  const auto normalization =
       DecodePrecompiledCharsmap(model_config.normalizer_spec());
+  const auto normalization_trie = std::get<0>(normalization);
+  const auto normalization_strings = std::get<1>(normalization);
   const auto normalization_trie_vector =
       builder.CreateVector(normalization_trie);
   TrieBuilder normalization_trie_builder(builder);
