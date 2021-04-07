@@ -9,8 +9,7 @@
             "content_properties_type": "AudioProperties",
             "content_properties": {
               "sample_rate": 10,
-              "channels": 2,
-              "min_required_samples": 100
+              "channels": 2
             }
           },
           "stats": {

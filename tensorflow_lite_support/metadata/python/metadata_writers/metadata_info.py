@@ -517,16 +517,13 @@ class InputAudioTensorMd(TensorMd):
   Attributes:
     sample_rate: the sample rate in Hz when the audio was captured.
     channels: the channel count of the audio.
-    min_required_samples: the minimum required number of samples in order to run
-      inference properly.
   """
 
   def __init__(self,
                name: Optional[str] = None,
                description: Optional[str] = None,
                sample_rate: int = 0,
-               channels: int = 0,
-               min_required_samples: int = 0):
+               channels: int = 0):
     """Initializes the instance of InputAudioTensorMd.
 
     Args:
@@ -534,10 +531,6 @@ class InputAudioTensorMd(TensorMd):
       description: description of what the tensor is.
       sample_rate: the sample rate in Hz when the audio was captured.
       channels: the channel count of the audio.
-      min_required_samples: the minimum required number of per-channel samples
-        in order to run inference properly. Optional for fixed-size audio
-        tensors and default to 0. The minimum required flat size of the audio
-        tensor is `min_required_samples x channels`.
     """
     super().__init__(
         name,
@@ -546,7 +539,6 @@ class InputAudioTensorMd(TensorMd):
 
     self.sample_rate = sample_rate
     self.channels = channels
-    self.min_required_samples = min_required_samples
 
   def create_metadata(self) -> _metadata_fb.TensorMetadataT:
     """Creates the input audio metadata based on the information.
@@ -555,8 +547,7 @@ class InputAudioTensorMd(TensorMd):
       A Flatbuffers Python object of the input audio metadata.
 
     Raises:
-      ValueError: if any value of sample_rate, channels, min_required_samples is
-      negative.
+      ValueError: if any value of sample_rate, channels is negative.
     """
     # 0 is the default value in Flatbuffers.
     if self.sample_rate < 0:
@@ -567,16 +558,10 @@ class InputAudioTensorMd(TensorMd):
       raise ValueError("channels should be non-negative, but got {}.".format(
           self.channels))
 
-    if self.min_required_samples < 0:
-      raise ValueError(
-          "min_required_samples should be non-negative, but got {}.".format(
-              self.min_required_samples))
-
     tensor_metadata = super().create_metadata()
     properties = tensor_metadata.content.contentProperties
     properties.sampleRate = self.sample_rate
     properties.channels = self.channels
-    properties.minRequiredSamples = self.min_required_samples
 
     return tensor_metadata
 

@@ -85,7 +85,6 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       model_buffer: bytearray,
       sample_rate: int,
       channels: int,
-      min_required_samples: int,
       label_file_paths: List[str],
       score_calibration_md: Optional[metadata_info.ScoreCalibrationMd] = None):
     """Creates mandatory metadata for TFLite Support inference.
@@ -99,10 +98,6 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       model_buffer: valid buffer of the model file.
       sample_rate: the sample rate in Hz when the audio was captured.
       channels: the channel count of the audio.
-      min_required_samples: the minimum required number of per-channel samples
-        in order to run inference properly. Optional for fixed-size audio
-        tensors and default to 0. The minimum required flat size of the audio
-        tensor is min_required_samples x channels.
       label_file_paths: paths to the label files [1] in the classification
         tensor. Pass in an empty list if the model does not have any label file.
       score_calibration_md: information of the score calibration operation [2]
@@ -115,15 +110,9 @@ class MetadataWriter(metadata_writer.MetadataWriter):
 
     Returns:
       A MetadataWriter object.
-
-    Raises:
-      ValueError: if either sample_rate or channels is non-positive, or if
-        min_required_samples is negative.
-      ValueError: if min_required_samples is 0, but the input audio tensor is
-        not fixed-size.
     """
-    # To make Task Library working properly, sample_rate, channels,
-    # min_required_samples need to be positive.
+    # To make Task Library working properly, sample_rate, channels need to be
+    # positive.
     if sample_rate <= 0:
       raise ValueError(
           "sample_rate should be positive, but got {}.".format(sample_rate))
@@ -132,29 +121,8 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       raise ValueError(
           "channels should be positive, but got {}.".format(channels))
 
-    if min_required_samples < 0:
-      raise ValueError(
-          "min_required_samples should be non-negative, but got {}.".format(
-              min_required_samples))
-
-    if min_required_samples == 0:
-      tensor_shape = writer_utils.get_input_tensor_shape(
-          model_buffer, _AUDIO_TENSOR_INDEX)
-
-      # The dynamic size input shape can be an empty array or arrays like [1]
-      # and [1, 1], where the flat size is 1.
-      flat_size = writer_utils.compute_flat_size(tensor_shape)
-      if not tensor_shape or flat_size == 1:
-        raise ValueError(
-            "The audio tensor is not fixed-size, therefore min_required_samples"
-            "is required, and should be a positive value.")
-      # Update min_required_samples if the audio tensor is fixed-size using
-      # ceiling division.
-      min_required_samples = (flat_size + channels - 1) // channels
-
     input_md = metadata_info.InputAudioTensorMd(_INPUT_NAME, _INPUT_DESCRIPTION,
-                                                sample_rate, channels,
-                                                min_required_samples)
+                                                sample_rate, channels)
 
     output_md = metadata_info.ClassificationTensorMd(
         name=_OUTPUT_NAME,

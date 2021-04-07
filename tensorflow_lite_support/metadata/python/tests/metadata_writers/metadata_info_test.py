@@ -227,14 +227,14 @@ class InputAudioTensorMd(tf.test.TestCase):
   _DESCRIPTION = "The input string."
   _SAMPLE_RATE = 10
   _CHANNELS = 2
-  _MIN_REQUIRED_SAMPLES = 100
   _EXPECTED_TENSOR_JSON = "../testdata/input_audio_tesnor_meta.json"
   _EXPECTED_TENSOR_DEFAULT_JSON = "../testdata/input_audio_tesnor_default_meta.json"
 
   def test_create_metadata_should_succeed(self):
-    text_tensor_md = metadata_info.InputAudioTensorMd(
-        self._NAME, self._DESCRIPTION, self._SAMPLE_RATE, self._CHANNELS,
-        self._MIN_REQUIRED_SAMPLES)
+    text_tensor_md = metadata_info.InputAudioTensorMd(self._NAME,
+                                                      self._DESCRIPTION,
+                                                      self._SAMPLE_RATE,
+                                                      self._CHANNELS)
 
     metadata_json = _metadata.convert_to_json(
         _create_dummy_model_metadata_with_tensor(
@@ -272,17 +272,6 @@ class InputAudioTensorMd(tf.test.TestCase):
     self.assertEqual(
         "channels should be non-negative, but got {}.".format(
             negative_channels), str(error.exception))
-
-  def test_create_metadata_fail_with_negative_min_required_samples(self):
-    negative_min_required_samples = -1
-    with self.assertRaises(ValueError) as error:
-      tensor_md = metadata_info.InputAudioTensorMd(
-          min_required_samples=negative_min_required_samples)
-      tensor_md.create_metadata()
-
-    self.assertEqual(
-        "min_required_samples should be non-negative, but got {}.".format(
-            negative_min_required_samples), str(error.exception))
 
 
 class ClassificationTensorMdTest(tf.test.TestCase, parameterized.TestCase):
