@@ -12,8 +12,8 @@ This Python API is based on the C++ Text Task APIs. It uses shared libraries whi
 You will need:
 
 * a TFLite text classification model with certain format.
-(e.g. [movie_review_model][3], a model to classify movie reviews), you'll need
-to configure the input tensor and out tensor for the API, see the [doc][4] for 
+(e.g. [movie_review_model][1], a model to classify movie reviews), you'll need
+to configure the input tensor and out tensor for the API, see the [doc][2] for 
 details.
 * Shared library (.so) for NLClassifier
 #### Usage
@@ -45,3 +45,6 @@ In the console, you should get:
 category[0]: 'Negative' : '0.81313'
 category[1]: 'Positive' : '0.18687'
 ```
+
+[1]: https://www.tensorflow.org/lite/models/text_classification/overview
+[2]: https://github.com/tensorflow/tflite-support/blob/fe8b69002f5416900285dc69e2baa078c91bd994/tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h#L55
