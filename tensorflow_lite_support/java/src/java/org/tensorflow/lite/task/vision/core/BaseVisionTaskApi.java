@@ -23,7 +23,6 @@ import android.media.Image;
 import android.media.Image.Plane;
 import com.google.auto.value.AutoValue;
 import java.nio.ByteBuffer;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.image.ColorSpaceType;
 import org.tensorflow.lite.support.image.TensorImage;
@@ -119,7 +118,7 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
             orientation),
         // FrameBuffer created with direct ByteBuffer does not require memory freeing.
         /*byteArrayHandle=*/ 0,
-        /*byteArray=*/ null);
+        /*byteArray=*/ new byte[0]);
   }
 
   /** Creates FrameBuffer from the {@link ByteBuffer} stored in the given {@link TensorImage}. */
@@ -144,7 +143,7 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
               colorSpaceType.getValue()),
           // FrameBuffer created with direct ByteBuffer does not require memory freeing.
           /*byteArrayHandle=*/ 0,
-          /*byteArray=*/ null);
+          /*byteArray=*/ new byte[0]);
     } else {
       // If the the byte array is copied in jni (during GetByteArrayElements), need to free
       // the copied array once inference is done.
@@ -176,10 +175,12 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
      *     after inference is done. If the FrameBuffer is created on a direct ByteBuffer, no byte
      *     array needs to be freed, and byteArrayHandle will be 0.
      * @param byteArray the byte array that is used to create the c++ byte array object, which is
-     *     needed when releasing byteArrayHandle.
+     *     needed when releasing byteArrayHandle. If the FrameBuffer is created on a direct
+     *     ByteBuffer (no byte array needs to be freed), pass in an empty array for {@code
+     *     byteArray}.
      */
     public static FrameBufferData create(
-        long frameBufferHandle, long byteArrayHandle, @Nullable byte[] byteArray) {
+        long frameBufferHandle, long byteArrayHandle, byte[] byteArray) {
       return new AutoValue_BaseVisionTaskApi_FrameBufferData(
           frameBufferHandle, byteArrayHandle, byteArray);
     }
@@ -190,7 +191,6 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
 
     // Package private method for transfering data.
     @SuppressWarnings("mutable")
-    @Nullable
     abstract byte[] getByteArray();
   }
 
