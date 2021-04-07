@@ -26,7 +26,7 @@ curl \
  -L 'https://storage.googleapis.com/download.tensorflow.org/models/tflite/text_classification/text_classification_v2.tflite' \
  -o /tmp/movie_review.tflite
 
-# Generate the shared library. This is a one time task
+# Generate the shared library. This is a one time task:
 bazel build -c opt tensorflow_lite_support/examples/task/text/desktop/python/cc:invoke_nl_classifier
 
 # Run the detection tool:
