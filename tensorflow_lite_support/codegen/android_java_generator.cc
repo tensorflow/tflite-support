@@ -647,7 +647,7 @@ public static {{MODEL_CLASS_NAME}} newInstance(Context context, Model.Options ru
 public static {{MODEL_CLASS_NAME}} newInstance(Context context, String modelPath, Model.Options runningOptions) throws IOException {
   Model model = Model.createModel(context, modelPath, runningOptions);
   Metadata metadata = new Metadata(model.getData(), model);
-  MyImageClassifier instance = new MyImageClassifier(model, metadata);)");
+  {{MODEL_CLASS_NAME}} instance = new {{MODEL_CLASS_NAME}}(model, metadata);)");
   for (const auto& tensor : model.inputs) {
     SetCodeWriterWithTensorInfo(code_writer, tensor);
     code_writer->Append(
