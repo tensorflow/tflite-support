@@ -27,8 +27,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
-#include "tensorflow/lite/model_builder.h"
-
 namespace tflite {
 namespace metadata {
 

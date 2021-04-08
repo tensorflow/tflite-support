@@ -27,7 +27,6 @@ cc_library(
         "@com_google_absl//absl/strings:str_format",
         "@flatbuffers",
         "@org_libzip//:zip",
-        "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
     ],
 )
