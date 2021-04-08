@@ -1,11 +1,12 @@
 load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
     licenses = ["notice"],  # Apache 2.0
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "jni_utils",
     srcs = [
         "jni_utils.cc",
@@ -13,13 +14,15 @@ cc_library(
     hdrs = [
         "jni_utils.h",
     ],
+    tflite_deps = [
+        "//tensorflow_lite_support/cc/utils:jni_utils",
+    ],
     deps = [
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/proto:class_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
-        "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
         "@com_google_absl//absl/strings",
     ],
