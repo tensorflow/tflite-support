@@ -175,10 +175,8 @@ def _get_subgraph(model_buffer: bytearray) -> _schema_fb.SubGraph:
   """
 
   model = _schema_fb.Model.GetRootAsModel(model_buffer, 0)
-  # There should be exactly one SubGraph in the model.
-  if model.SubgraphsLength() != 1:
-    # TODO(b/175843689): Python version cannot be specified in Kokoro bazel test
-    raise ValueError("The model should have exactly one subgraph, but found " +
-                     "{}.".format(model.SubgraphsLength()))
 
+  # Use the first subgraph as default. TFLite Interpreter doesn't support
+  # multiple subgraphs yet, but models with mini-benchmark may have multiple
+  # subgraphs for acceleration evaluation purpose.
   return model.Subgraphs(0)
