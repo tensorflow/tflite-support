@@ -21,8 +21,8 @@ limitations under the License.
 #include "absl/strings/str_cat.h"
 #include "tensorflow/lite/builtin_ops.h"
 #include "tensorflow/lite/core/shims/cc/kernels/register.h"
+#include "tensorflow/lite/core/shims/cc/tools/verifier.h"
 #include "tensorflow/lite/stderr_reporter.h"
-#include "tensorflow/lite/tools/verifier.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
@@ -54,7 +54,7 @@ using ::tflite::support::TfLiteSupportStatus;
 
 bool TfLiteEngine::Verifier::Verify(const char* data, int length,
                                     tflite::ErrorReporter* reporter) {
-  return tflite::Verify(data, length, reporter);
+  return tflite_shims::Verify(data, length, reporter);
 }
 
 TfLiteEngine::TfLiteEngine(std::unique_ptr<tflite::OpResolver> resolver)

@@ -20,6 +20,7 @@ cc_library_with_tflite(
         # to get included in the executable.
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "@org_tensorflow//tensorflow/lite/core/shims:framework",
+        "@org_tensorflow//tensorflow/lite/core/shims:verifier",
         "//tensorflow_lite_support/cc/port:tflite_wrapper",
     ],
     deps = [
@@ -35,7 +36,6 @@ cc_library_with_tflite(
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite:kernel_api",
         "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
-        "@org_tensorflow//tensorflow/lite/tools:verifier",
     ],
 )
 
