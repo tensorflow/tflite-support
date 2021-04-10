@@ -2,7 +2,7 @@ import ctypes
 import time
 import argparse
 
-def Classify(model_path, text, input_tensor_name, output_score_tensor_name):
+def classify(model_path, text, input_tensor_name, output_score_tensor_name):
     """Classifies input text into different categories
 
     Initially the function will import shared library (.so) of the 
@@ -53,8 +53,8 @@ def main():
     parser.add_argument('--input_tensor_name', required=True)
     parser.add_argument('--output_score_tensor_name', required=True)
     args = parser.parse_args()
-    # Call the Classify method
-    Classify(args.model_path, args.text, args.input_tensor_name, args.output_score_tensor_name)
+    # Call the classify method
+    classify(args.model_path, args.text, args.input_tensor_name, args.output_score_tensor_name)
 
 if __name__ == '__main__':
     main()
