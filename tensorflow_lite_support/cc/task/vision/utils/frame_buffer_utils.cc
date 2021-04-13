@@ -593,16 +593,32 @@ absl::Status FrameBufferUtils::Preprocess(
         CropResizeOperation(0, 0, buffer.dimension(), pre_orient_dimension));
   }
 
-  // Handle color space conversion.
-  if (output_buffer->format() != buffer.format()) {
-    frame_buffer_operations.push_back(
-        ConvertOperation(output_buffer->format()));
-  }
-
-  // Handle orientation conversion.
-  if (output_buffer->orientation() != buffer.orientation()) {
-    frame_buffer_operations.push_back(
-        OrientOperation(output_buffer->orientation()));
+  // Handle color space conversion first if the input format is RGB or RGBA,
+  // because the rotation performance for RGB and RGBA formats are not optimzed
+  // in libyuv.
+  if (buffer.format() == FrameBuffer::Format::kRGB ||
+      buffer.format() == FrameBuffer::Format::kRGBA) {
+    if (output_buffer->format() != buffer.format()) {
+      frame_buffer_operations.push_back(
+          ConvertOperation(output_buffer->format()));
+    }
+    // Handle orientation conversion
+    if (output_buffer->orientation() != buffer.orientation()) {
+      frame_buffer_operations.push_back(
+          OrientOperation(output_buffer->orientation()));
+    }
+  } else {
+    // Handle orientation conversion first if the input format is not RGB or
+    // RGBA.
+    if (output_buffer->orientation() != buffer.orientation()) {
+      frame_buffer_operations.push_back(
+          OrientOperation(output_buffer->orientation()));
+    }
+    // Handle color space conversion
+    if (output_buffer->format() != buffer.format()) {
+      frame_buffer_operations.push_back(
+          ConvertOperation(output_buffer->format()));
+    }
   }
 
   // Execute the processing pipeline.
