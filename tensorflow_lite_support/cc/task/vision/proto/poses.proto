@@ -17,13 +17,6 @@ syntax = "proto2";
 
 package tflite.task.vision;
 
-// Results of performing pose estimation.
-// The "person" object which stores the keypoints and the average score.
-message PoseResult {
-  repeated KeyPoint keypoint = 1;
-  optional float score = 2 [default = 0.0];
-}
-
 message KeyPoint {
   optional BodyPart bodypart = 1 [default = NOSE];
   optional Position position = 2;
@@ -55,4 +48,19 @@ message KeyPoint {
     LEFT_ANKLE = 14;
     RIGHT_ANKLE = 15;
   }
+}
+
+// The "person" object which stores the keypoints and the average score.
+// Result produced from one "person" object.
+message Person {
+  repeated KeyPoint keypoint = 1;
+  optional float score = 2 [default = 0.0];
+}
+
+message PoseEstimationResult {
+  // The pose estimation result produced by each of the model output.
+  //
+  // Except in advanced cases, the pose estimation model has a single output,
+  // and this list is thus made of a single element.
+  repeated Person = 3;
 }
