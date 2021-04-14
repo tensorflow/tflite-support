@@ -1,3 +1,5 @@
+load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_cc_proto_library")
+
 package(
     default_visibility = [
         "//visibility:public",
@@ -32,7 +34,7 @@ proto_library(
     ],
 )
 
-cc_proto_library(
+support_cc_proto_library(
     name = "base_options_cc_proto",
     deps = [
         ":base_options_proto",
