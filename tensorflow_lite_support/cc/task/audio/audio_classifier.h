@@ -90,7 +90,7 @@ class AudioClassifier
   absl::Status Init(std::unique_ptr<AudioClassifierOptions> options);
 
   // Sets up input audio format from the model metadata;
-  void SetAudioFormatFromMetadata();
+  absl::Status SetAudioFormatFromMetadata();
 
   // Performs sanity checks on the model outputs and extracts their metadata.
   absl::Status CheckAndSetOutputs();

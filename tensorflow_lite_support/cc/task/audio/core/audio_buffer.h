@@ -32,20 +32,9 @@ namespace audio {
 // TODO(b/182675479): Support quantized input format.
 class AudioBuffer {
  public:
-  // Audio encoding formats.
-  enum class Encoding {
-    kUnknown,
-    kPCM8Bit,
-    kPCM16Bit,
-    kPCMFloat,
-    kPCM24BitPacked,
-    kPCM32Bit,
-  };
-
   // Audio format metadata.
   struct AudioFormat {
     int channels;
-    Encoding encoding_format;
     int sample_rate;
   };
 
@@ -53,14 +42,6 @@ class AudioBuffer {
   // not take the ownership of the input backing buffer.
   static tflite::support::StatusOr<std::unique_ptr<AudioBuffer>> Create(
       const float* audio_buffer, const AudioFormat& audio_format) {
-    if (audio_format.encoding_format != Encoding::kPCMFloat) {
-      return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrFormat("Expect audio encoding format being %d, but get "
-                             "the encoding format as %d",
-                             Encoding::kPCMFloat, audio_format.encoding_format),
-          tflite::support::TfLiteSupportStatus::kInvalidArgumentError);
-    }
     return absl::make_unique<AudioBuffer>(audio_buffer, audio_format);
   }
 

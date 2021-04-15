@@ -29,6 +29,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/core:classification_head",
         "//tensorflow_lite_support/cc/task/core:label_map_item",
         "//tensorflow_lite_support/cc/task/core:task_utils",
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings:str_format",
         "@org_tensorflow//tensorflow/lite/c:c_api_types",
