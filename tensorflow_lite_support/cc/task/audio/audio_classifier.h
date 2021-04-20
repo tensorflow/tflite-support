@@ -82,7 +82,7 @@ class AudioClassifier
   // metadata.
   tflite::support::StatusOr<AudioBuffer::AudioFormat> GetRequiredAudioFormat();
 
-  // Returns the required input buffer size.
+  // Returns the required input buffer size in number of float elements.
   int64 GetRequiredInputBufferSize() { return input_buffer_size_; }
 
  private:
@@ -145,7 +145,7 @@ class AudioClassifier
   // Expected input audio format by the model.
   AudioBuffer::AudioFormat audio_format_;
 
-  // Expected input audio buffer size.
+  // Expected input audio buffer size in number of float elements.
   int64 input_buffer_size_;
 };
 
