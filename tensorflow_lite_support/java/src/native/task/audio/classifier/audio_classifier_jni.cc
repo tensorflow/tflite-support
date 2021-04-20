@@ -102,12 +102,12 @@ jlong CreateAudioClassifierFromOptions(JNIEnv* env,
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_deinitJni(
+Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_deinitJni(
     JNIEnv* env, jobject thiz, jlong native_handle) {
   delete reinterpret_cast<AudioClassifier*>(native_handle);
 }
 
-// Creates an ImageClassifier instance from the model file descriptor.
+// Creates an AudioClassifier instance from the model file descriptor.
 // file_descriptor_length and file_descriptor_offset are optional. Non-possitive
 // values will be ignored.
 extern "C" JNIEXPORT jlong JNICALL

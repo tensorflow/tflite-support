@@ -350,9 +350,7 @@ public final class AudioClassifier extends BaseTaskApi {
       ByteBuffer modelBuffer, AudioClassifierOptions options);
 
   /**
-   * Releases memory pointed by the pointer in the native layer.
-   *
-   * <p>TODO(b/183343074): This method is being implemented. For now, it does nothing.
+   * Releases memory pointed by {@code nativeHandle}, namely a C++ `AudioClassifier` instance.
    *
    * @param nativeHandle pointer to memory allocated
    */
@@ -362,7 +360,8 @@ public final class AudioClassifier extends BaseTaskApi {
   }
 
   /**
-   * Native implementation to release memory pointed by the pointer.
+   * Native method to release memory pointed by {@code nativeHandle}, namely a C++ `AudioClassifier`
+   * instance.
    *
    * @param nativeHandle pointer to memory allocated
    */
