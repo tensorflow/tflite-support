@@ -115,9 +115,6 @@ StatusOr<std::unique_ptr<AudioClassifier>> AudioClassifier::CreateFromOptions(
                    TaskAPIFactory::CreateFromBaseOptions<AudioClassifier>(
                        &options_copy->base_options(), std::move(resolver)));
 
-  // TODO(b/182625132): Retrieve the required audio format from the model
-  // metadata. Return an error status if the audio format metadata are missed in
-  // the model metadata.
   RETURN_IF_ERROR(audio_classifier->Init(std::move(options_copy)));
 
   return audio_classifier;
