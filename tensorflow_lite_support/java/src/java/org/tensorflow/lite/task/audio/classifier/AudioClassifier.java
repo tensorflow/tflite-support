@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.tensorflow.lite.annotations.UsedByReflection;
+import org.tensorflow.lite.support.audio.TensorAudio.TensorAudioFormat;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
@@ -339,6 +340,30 @@ public final class AudioClassifier extends BaseTaskApi {
       labelDenyList = builder.labelDenyList;
     }
   }
+
+  /**
+   * Returns the {@link TensorAudioFormat} required by the model.
+   *
+   * @throws AssertionError if error occurs when invoking the native code
+   */
+  public TensorAudioFormat getRequiredTensorAudioFormat() {
+    return TensorAudioFormat.builder()
+        .setChannels(getRequiredChannels())
+        .setSampleRate(getRequiredSampleRate())
+        .build();
+  }
+
+  private int getRequiredChannels() {
+    return getRequiredChannelsNative(getNativeHandle());
+  }
+
+  private int getRequiredSampleRate() {
+    return getRequiredSampleRateNative(getNativeHandle());
+  }
+
+  private static native int getRequiredChannelsNative(long nativeHandle);
+
+  private static native int getRequiredSampleRateNative(long nativeHandle);
 
   private static native long initJniWithModelFdAndOptions(
       int fileDescriptor,

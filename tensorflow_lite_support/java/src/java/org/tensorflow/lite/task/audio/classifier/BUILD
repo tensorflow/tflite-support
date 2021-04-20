@@ -26,6 +26,7 @@ android_library(
     javacopts = JAVACOPTS,
     manifest = "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/audio:AndroidManifest.xml",
     deps = [
+        "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],

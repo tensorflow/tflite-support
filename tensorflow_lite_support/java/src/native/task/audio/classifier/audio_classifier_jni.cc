@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/audio/audio_classifier.h"
+#include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/audio_classifier_options.proto.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
@@ -31,6 +32,7 @@ using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::StringListToVector;
 using ::tflite::support::utils::ThrowException;
+using ::tflite::task::audio::AudioBuffer;
 using ::tflite::task::audio::AudioClassifier;
 using ::tflite::task::audio::AudioClassifierOptions;
 
@@ -143,5 +145,39 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_initJniWithByteBu
       static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
       static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
   return CreateAudioClassifierFromOptions(env, proto_options);
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_getRequiredSampleRateNative(
+    JNIEnv* env, jclass thiz, jlong native_handle) {
+  auto* classifier = reinterpret_cast<AudioClassifier*>(native_handle);
+  StatusOr<AudioBuffer::AudioFormat> format_or =
+      classifier->GetRequiredAudioFormat();
+  if (format_or.ok()) {
+    return format_or->sample_rate;
+  } else {
+    ThrowException(
+        env, kAssertionError,
+        "Error occurred when getting sample rate from AudioClassifier: %s",
+        format_or.status().message());
+    return kInvalidPointer;
+  }
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_getRequiredChannelsNative(
+    JNIEnv* env, jclass thiz, jlong native_handle) {
+  auto* classifier = reinterpret_cast<AudioClassifier*>(native_handle);
+  StatusOr<AudioBuffer::AudioFormat> format_or =
+      classifier->GetRequiredAudioFormat();
+  if (format_or.ok()) {
+    return format_or->channels;
+  } else {
+    ThrowException(
+        env, kAssertionError,
+        "Error occurred when gettng channels from AudioClassifier: %s",
+        format_or.status().message());
+    return kInvalidPointer;
+  }
 }
 }  // namespace
