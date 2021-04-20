@@ -29,6 +29,7 @@ android_library(
     manifest = "AndroidManifest.xml",
     deps = [
         "@com_google_auto_value",
+        "@maven//:androidx_annotation_annotation",
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
     ],
@@ -43,6 +44,7 @@ android_library(
     manifest = "AndroidManifest.xml",
     deps = [
         "@com_google_auto_value",
+        "@maven//:androidx_annotation_annotation",
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
