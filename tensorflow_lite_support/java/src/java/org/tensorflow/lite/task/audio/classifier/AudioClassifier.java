@@ -15,6 +15,7 @@ limitations under the License.
 
 package org.tensorflow.lite.task.audio.classifier;
 
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
 import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
 
 import android.content.Context;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.annotations.UsedByReflection;
+import org.tensorflow.lite.support.audio.TensorAudio;
 import org.tensorflow.lite.support.audio.TensorAudio.TensorAudioFormat;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
@@ -348,6 +350,32 @@ public final class AudioClassifier extends BaseTaskApi {
   }
 
   /**
+   * Creates a {@link TensorAudio} instance to store input audio samples.
+   *
+   * @return a {@link TensorAudio} with the same size as model input tensor
+   * @throws IllegalArgumentException if the model is not compatible
+   */
+  public TensorAudio createInputTensorAudio() {
+    TensorAudioFormat format = getRequiredTensorAudioFormat();
+
+    int bufferSize = getRequiredInputBufferSize();
+    // TODO(b/183343074): Consider upstreaming this change to the constructor in C++ layer.
+    checkArgument(
+        bufferSize % format.getChannels() == 0,
+        String.format(
+            "Model input tensor size (%d) should be a multiplier of the number of channels (%d).",
+            bufferSize, format.getChannels()));
+    int samples = bufferSize / format.getChannels();
+    return TensorAudio.create(format, samples);
+  }
+
+  /** Retruns the size of model input tensor. */
+  public int getRequiredInputBufferSize() {
+    // TODO(b/185689630): Implement and use GetRequiredInputBufferSize instead.
+    return 15600;
+  }
+
+  /**
    * Creates an {@link AudioRecord} instance to record audio stream. The returned AudioRecord
    * instance is initialized and client needs to call {@link AudioRecord#startRecording} method to
    * start recording.
@@ -383,13 +411,11 @@ public final class AudioClassifier extends BaseTaskApi {
       throw new IllegalStateException(
           String.format("AudioRecord.getMinBufferSize failed. Returned: %d", bufferSizeInBytes));
     }
-    // TODO(b/185689630): Implement and use GetRequiredInputBufferSize instead.
-    int modelInputLength = 15600;
     // The buffer of AudioRecord should be strictly longer than what model requires so that clients
     // could run `TensorAudio::load(record)` together with `AudioClassifier::classify`.
     int bufferSizeMultiplier = 2;
     int modelRequiredBufferSize =
-        modelInputLength * DataType.FLOAT32.byteSize() * bufferSizeMultiplier;
+        getRequiredInputBufferSize() * DataType.FLOAT32.byteSize() * bufferSizeMultiplier;
     if (bufferSizeInBytes < modelRequiredBufferSize) {
       bufferSizeInBytes = modelRequiredBufferSize;
     }
