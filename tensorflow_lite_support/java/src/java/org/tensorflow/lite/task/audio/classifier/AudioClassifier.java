@@ -15,7 +15,12 @@ limitations under the License.
 
 package org.tensorflow.lite.task.audio.classifier;
 
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
+
 import android.content.Context;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.os.ParcelFileDescriptor;
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +29,7 @@ import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.audio.TensorAudio.TensorAudioFormat;
 import org.tensorflow.lite.task.core.BaseTaskApi;
@@ -339,6 +345,66 @@ public final class AudioClassifier extends BaseTaskApi {
       labelAllowList = builder.labelAllowList;
       labelDenyList = builder.labelDenyList;
     }
+  }
+
+  /**
+   * Creates an {@link AudioRecord} instance to record audio stream. The returned AudioRecord
+   * instance is initialized and client needs to call {@link AudioRecord#startRecording} method to
+   * start recording.
+   *
+   * @return an {@link AudioRecord} instance in {@link AudioRecord#STATE_INITIALIZED}
+   * @throws IllegalArgumentException if the model required channel count is unsupported
+   * @throws IllegalStateException if AudioRecord instance failed to initialize
+   */
+  public AudioRecord createAudioRecord() {
+    TensorAudioFormat format = getRequiredTensorAudioFormat();
+    int channelConfig = 0;
+
+    switch (format.getChannels()) {
+      case 1:
+        channelConfig = AudioFormat.CHANNEL_IN_MONO;
+        break;
+      case 2:
+        channelConfig = AudioFormat.CHANNEL_IN_STEREO;
+        break;
+      default:
+        throw new IllegalArgumentException(
+            String.format(
+                "Number of channels required by the model is %d. getAudioRecord method only"
+                    + " supports 1 or 2 audio channels.",
+                format.getChannels()));
+    }
+
+    int bufferSizeInBytes =
+        AudioRecord.getMinBufferSize(
+            format.getSampleRate(), channelConfig, AudioFormat.ENCODING_PCM_FLOAT);
+    if (bufferSizeInBytes == AudioRecord.ERROR
+        || bufferSizeInBytes == AudioRecord.ERROR_BAD_VALUE) {
+      throw new IllegalStateException(
+          String.format("AudioRecord.getMinBufferSize failed. Returned: %d", bufferSizeInBytes));
+    }
+    // TODO(b/185689630): Implement and use GetRequiredInputBufferSize instead.
+    int modelInputLength = 15600;
+    // The buffer of AudioRecord should be strictly longer than what model requires so that clients
+    // could run `TensorAudio::load(record)` together with `AudioClassifier::classify`.
+    int bufferSizeMultiplier = 2;
+    int modelRequiredBufferSize =
+        modelInputLength * DataType.FLOAT32.byteSize() * bufferSizeMultiplier;
+    if (bufferSizeInBytes < modelRequiredBufferSize) {
+      bufferSizeInBytes = modelRequiredBufferSize;
+    }
+    AudioRecord audioRecord =
+        new AudioRecord(
+            // including MIC, UNPROCESSED, and CAMCORDER.
+            MediaRecorder.AudioSource.VOICE_RECOGNITION,
+            format.getSampleRate(),
+            channelConfig,
+            AudioFormat.ENCODING_PCM_FLOAT,
+            bufferSizeInBytes);
+    checkState(
+        audioRecord.getState() == AudioRecord.STATE_INITIALIZED,
+        "AudioRecord failed to initialize");
+    return audioRecord;
   }
 
   /**
