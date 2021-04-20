@@ -19,6 +19,7 @@ limitations under the License.
 #include "absl/strings/str_format.h"
 #include "tensorflow/lite/c/c_api_types.h"
 #include "tensorflow_lite_support/cc/common.h"
+#include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/class_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/core/classification_head.h"
@@ -160,6 +161,7 @@ absl::Status AudioClassifier::Init(
   // Set options.
   options_ = std::move(options);
   RETURN_IF_ERROR(SetAudioFormatFromMetadata());
+  RETURN_IF_ERROR(CheckAndSetInputs());
   RETURN_IF_ERROR(CheckAndSetOutputs());
   return absl::OkStatus();
 }
@@ -190,6 +192,23 @@ AudioClassifier::GetRequiredAudioFormat() {
         TfLiteSupportStatus::kMetadataNotFoundError);
   }
   return audio_format_;
+}
+
+absl::Status AudioClassifier::CheckAndSetInputs() {
+  const std::vector<TfLiteTensor*> input_tensors = GetInputTensors();
+  input_buffer_size_ = 1;
+  TfLiteIntArray* dims = input_tensors[0]->dims;
+  for (int i = 0; i < dims->size; ++i) {
+    if (dims->data[i] < 1) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrFormat("Invalid size: %d for input tensor dimension: %d.",
+                          dims->data[i], i),
+          TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
+    }
+    input_buffer_size_ *= input_tensors[0]->dims->data[i];
+  }
+  return absl::OkStatus();
 }
 
 // TODO(b/182537114): Extract into a common library to share between audio and
@@ -342,9 +361,17 @@ absl::Status AudioClassifier::Preprocess(
                         audio_buffer.GetAudioFormat().channels,
                         audio_format_.channels));
   }
-  int num_elements = input_tensors[0]->bytes / sizeof(float);
+  if (audio_buffer.GetBufferSize() != input_buffer_size_) {
+    return tflite::support::CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        absl::StrFormat(
+            "Input audio buffer size %d does not match the model required "
+            "input size %d.",
+            audio_buffer.GetBufferSize(), input_buffer_size_),
+        TfLiteSupportStatus::kInvalidArgumentError);
+  }
   tflite::task::core::PopulateTensor(audio_buffer.GetFloatBuffer(),
-                                     num_elements, input_tensors[0]);
+                                     input_buffer_size_, input_tensors[0]);
   return absl::OkStatus();
 }
 

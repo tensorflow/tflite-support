@@ -20,6 +20,7 @@ limitations under the License.
 #include "absl/status/status.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/core/shims/cc/kernels/register.h"
+#include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/audio_classifier_options.pb.h"
@@ -81,6 +82,9 @@ class AudioClassifier
   // metadata.
   tflite::support::StatusOr<AudioBuffer::AudioFormat> GetRequiredAudioFormat();
 
+  // Returns the required input buffer size.
+  int64 GetRequiredInputBufferSize() { return input_buffer_size_; }
+
  private:
   // Performs sanity checks on the provided AudioClassifierOptions.
   static absl::Status SanityCheckOptions(const AudioClassifierOptions& options);
@@ -91,6 +95,10 @@ class AudioClassifier
 
   // Sets up input audio format from the model metadata;
   absl::Status SetAudioFormatFromMetadata();
+
+  // Performs sanity checks on the model input dimension and sets the input
+  // buffer size accordingly.
+  absl::Status CheckAndSetInputs();
 
   // Performs sanity checks on the model outputs and extracts their metadata.
   absl::Status CheckAndSetOutputs();
@@ -134,8 +142,11 @@ class AudioClassifier
   // post-processing.
   ClassNameSet class_name_set_;
 
-  // Expect input audio format by the model.
+  // Expected input audio format by the model.
   AudioBuffer::AudioFormat audio_format_;
+
+  // Expected input audio buffer size.
+  int64 input_buffer_size_;
 };
 
 }  // namespace audio
