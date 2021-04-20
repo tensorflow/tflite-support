@@ -15,7 +15,13 @@ limitations under the License.
 
 package org.tensorflow.lite.task.audio.classifier;
 
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
+import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
+
 import android.content.Context;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.os.ParcelFileDescriptor;
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +30,11 @@ import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.annotations.UsedByReflection;
+import org.tensorflow.lite.support.audio.TensorAudio;
+import org.tensorflow.lite.support.audio.TensorAudio.TensorAudioFormat;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
@@ -339,6 +349,143 @@ public final class AudioClassifier extends BaseTaskApi {
       labelDenyList = builder.labelDenyList;
     }
   }
+
+  /**
+   * Performs actual classification on the provided audio tensor.
+   *
+   * @param tensor a {@link TensorAudio} containing the input audio clip in float with values
+   *     between [-1, 1). The {@code tensor} argument should have the same flat size as the TFLite
+   *     model's input tensor. It's recommended to create {@code tensor} using {@code
+   *     createInputTensorAudio} method.
+   * @throws AssertionError if error occurs when classifying the audio clip from the native code
+   */
+  public List<Classifications> classify(TensorAudio tensor) {
+    TensorBuffer buffer = tensor.getTensorBuffer();
+    TensorAudioFormat format = tensor.getFormat();
+    checkState(
+        buffer.getBuffer().hasArray(),
+        "Input tensor buffer should be a non-direct buffer with a backed array (i.e. not readonly"
+            + " buffer).");
+    return classifyNative(
+        getNativeHandle(),
+        buffer.getBuffer().array(),
+        format.getChannels(),
+        format.getSampleRate());
+  }
+
+  /**
+   * Creates a {@link TensorAudio} instance to store input audio samples.
+   *
+   * @return a {@link TensorAudio} with the same size as model input tensor
+   * @throws IllegalArgumentException if the model is not compatible
+   */
+  public TensorAudio createInputTensorAudio() {
+    TensorAudioFormat format = getRequiredTensorAudioFormat();
+
+    long bufferSize = getRequiredInputBufferSize();
+    // TODO(b/183343074): Consider upstreaming this change to the constructor in C++ layer.
+    checkArgument(
+        bufferSize % format.getChannels() == 0,
+        String.format(
+            "Model input tensor size (%d) should be a multiplier of the number of channels (%d).",
+            bufferSize, format.getChannels()));
+    long samples = bufferSize / format.getChannels();
+    return TensorAudio.create(format, (int) samples);
+  }
+
+  /** Returns the required input buffer size in number of float elements. */
+  public long getRequiredInputBufferSize() {
+    return getRequiredInputBufferSizeNative(getNativeHandle());
+  }
+
+  /**
+   * Creates an {@link AudioRecord} instance to record audio stream. The returned AudioRecord
+   * instance is initialized and client needs to call {@link AudioRecord#startRecording} method to
+   * start recording.
+   *
+   * @return an {@link AudioRecord} instance in {@link AudioRecord#STATE_INITIALIZED}
+   * @throws IllegalArgumentException if the model required channel count is unsupported
+   * @throws IllegalStateException if AudioRecord instance failed to initialize
+   */
+  public AudioRecord createAudioRecord() {
+    TensorAudioFormat format = getRequiredTensorAudioFormat();
+    int channelConfig = 0;
+
+    switch (format.getChannels()) {
+      case 1:
+        channelConfig = AudioFormat.CHANNEL_IN_MONO;
+        break;
+      case 2:
+        channelConfig = AudioFormat.CHANNEL_IN_STEREO;
+        break;
+      default:
+        throw new IllegalArgumentException(
+            String.format(
+                "Number of channels required by the model is %d. getAudioRecord method only"
+                    + " supports 1 or 2 audio channels.",
+                format.getChannels()));
+    }
+
+    int bufferSizeInBytes =
+        AudioRecord.getMinBufferSize(
+            format.getSampleRate(), channelConfig, AudioFormat.ENCODING_PCM_FLOAT);
+    if (bufferSizeInBytes == AudioRecord.ERROR
+        || bufferSizeInBytes == AudioRecord.ERROR_BAD_VALUE) {
+      throw new IllegalStateException(
+          String.format("AudioRecord.getMinBufferSize failed. Returned: %d", bufferSizeInBytes));
+    }
+    // The buffer of AudioRecord should be strictly longer than what model requires so that clients
+    // could run `TensorAudio::load(record)` together with `AudioClassifier::classify`.
+    int bufferSizeMultiplier = 2;
+    int modelRequiredBufferSize =
+        (int) getRequiredInputBufferSize() * DataType.FLOAT32.byteSize() * bufferSizeMultiplier;
+    if (bufferSizeInBytes < modelRequiredBufferSize) {
+      bufferSizeInBytes = modelRequiredBufferSize;
+    }
+    AudioRecord audioRecord =
+        new AudioRecord(
+            // including MIC, UNPROCESSED, and CAMCORDER.
+            MediaRecorder.AudioSource.VOICE_RECOGNITION,
+            format.getSampleRate(),
+            channelConfig,
+            AudioFormat.ENCODING_PCM_FLOAT,
+            bufferSizeInBytes);
+    checkState(
+        audioRecord.getState() == AudioRecord.STATE_INITIALIZED,
+        "AudioRecord failed to initialize");
+    return audioRecord;
+  }
+
+  /**
+   * Returns the {@link TensorAudioFormat} required by the model.
+   *
+   * @throws AssertionError if error occurs when invoking the native code
+   */
+  public TensorAudioFormat getRequiredTensorAudioFormat() {
+    return TensorAudioFormat.builder()
+        .setChannels(getRequiredChannels())
+        .setSampleRate(getRequiredSampleRate())
+        .build();
+  }
+
+  private int getRequiredChannels() {
+    return getRequiredChannelsNative(getNativeHandle());
+  }
+
+  private int getRequiredSampleRate() {
+    return getRequiredSampleRateNative(getNativeHandle());
+  }
+
+  // TODO(b/183343074): JNI method invocation is very expensive, taking about .2ms
+  // each time. Consider combining the native getter methods into 1 and cache it in Java layer.
+  private static native long getRequiredInputBufferSizeNative(long nativeHandle);
+
+  private static native int getRequiredChannelsNative(long nativeHandle);
+
+  private static native int getRequiredSampleRateNative(long nativeHandle);
+
+  private static native List<Classifications> classifyNative(
+      long nativeHandle, byte[] audioBuffer, int channels, int sampleRate);
 
   private static native long initJniWithModelFdAndOptions(
       int fileDescriptor,
