@@ -46,19 +46,20 @@ NLClassifierOptions ConvertJavaNLClassifierOptions(
   jclass nl_classifier_options_class = env->FindClass(
       "org/tensorflow/lite/task/text/nlclassifier/"
       "NLClassifier$NLClassifierOptions");
-  jmethodID input_tensor_index_method_id =
-      env->GetMethodID(nl_classifier_options_class, "inputTensorIndex", "()I");
+  jmethodID input_tensor_index_method_id = env->GetMethodID(
+      nl_classifier_options_class, "getInputTensorIndex", "()I");
   jmethodID output_score_tensor_index_method_id = env->GetMethodID(
-      nl_classifier_options_class, "outputScoreTensorIndex", "()I");
+      nl_classifier_options_class, "getOutputScoreTensorIndex", "()I");
   jmethodID output_label_tensor_index_method_id = env->GetMethodID(
-      nl_classifier_options_class, "outputLabelTensorIndex", "()I");
-  jmethodID input_tensor_name_method_id = env->GetMethodID(
-      nl_classifier_options_class, "inputTensorName", "()Ljava/lang/String;");
+      nl_classifier_options_class, "getOutputLabelTensorIndex", "()I");
+  jmethodID input_tensor_name_method_id =
+      env->GetMethodID(nl_classifier_options_class, "getInputTensorName",
+                       "()Ljava/lang/String;");
   jmethodID output_score_tensor_name_method_id =
-      env->GetMethodID(nl_classifier_options_class, "outputScoreTensorName",
+      env->GetMethodID(nl_classifier_options_class, "getOutputScoreTensorName",
                        "()Ljava/lang/String;");
   jmethodID output_label_tensor_name_method_id =
-      env->GetMethodID(nl_classifier_options_class, "outputLabelTensorName",
+      env->GetMethodID(nl_classifier_options_class, "getOutputLabelTensorName",
                        "()Ljava/lang/String;");
 
   return {

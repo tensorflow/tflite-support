@@ -80,22 +80,22 @@ public class NLClassifier extends BaseTaskApi {
     private static final String DEFAULT_OUTPUT_LABEL_TENSOR_NAME = "OUTPUT_LABEL";
 
     @UsedByReflection("nl_classifier_jni.cc")
-    abstract int inputTensorIndex();
+    abstract int getInputTensorIndex();
 
     @UsedByReflection("nl_classifier_jni.cc")
-    abstract int outputScoreTensorIndex();
+    abstract int getOutputScoreTensorIndex();
 
     @UsedByReflection("nl_classifier_jni.cc")
-    abstract int outputLabelTensorIndex();
+    abstract int getOutputLabelTensorIndex();
 
     @UsedByReflection("nl_classifier_jni.cc")
-    abstract String inputTensorName();
+    abstract String getInputTensorName();
 
     @UsedByReflection("nl_classifier_jni.cc")
-    abstract String outputScoreTensorName();
+    abstract String getOutputScoreTensorName();
 
     @UsedByReflection("nl_classifier_jni.cc")
-    abstract String outputLabelTensorName();
+    abstract String getOutputLabelTensorName();
 
     public static Builder builder() {
       return new AutoValue_NLClassifier_NLClassifierOptions.Builder()
