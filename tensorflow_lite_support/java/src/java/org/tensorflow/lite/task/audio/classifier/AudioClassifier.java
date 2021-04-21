@@ -382,21 +382,20 @@ public final class AudioClassifier extends BaseTaskApi {
   public TensorAudio createInputTensorAudio() {
     TensorAudioFormat format = getRequiredTensorAudioFormat();
 
-    int bufferSize = getRequiredInputBufferSize();
+    long bufferSize = getRequiredInputBufferSize();
     // TODO(b/183343074): Consider upstreaming this change to the constructor in C++ layer.
     checkArgument(
         bufferSize % format.getChannels() == 0,
         String.format(
             "Model input tensor size (%d) should be a multiplier of the number of channels (%d).",
             bufferSize, format.getChannels()));
-    int samples = bufferSize / format.getChannels();
-    return TensorAudio.create(format, samples);
+    long samples = bufferSize / format.getChannels();
+    return TensorAudio.create(format, (int) samples);
   }
 
-  /** Retruns the size of model input tensor. */
-  public int getRequiredInputBufferSize() {
-    // TODO(b/185689630): Implement and use GetRequiredInputBufferSize instead.
-    return 15600;
+  /** Returns the required input buffer size in number of float elements. */
+  public long getRequiredInputBufferSize() {
+    return getRequiredInputBufferSizeNative(getNativeHandle());
   }
 
   /**
@@ -439,7 +438,7 @@ public final class AudioClassifier extends BaseTaskApi {
     // could run `TensorAudio::load(record)` together with `AudioClassifier::classify`.
     int bufferSizeMultiplier = 2;
     int modelRequiredBufferSize =
-        getRequiredInputBufferSize() * DataType.FLOAT32.byteSize() * bufferSizeMultiplier;
+        (int) getRequiredInputBufferSize() * DataType.FLOAT32.byteSize() * bufferSizeMultiplier;
     if (bufferSizeInBytes < modelRequiredBufferSize) {
       bufferSizeInBytes = modelRequiredBufferSize;
     }
@@ -476,6 +475,10 @@ public final class AudioClassifier extends BaseTaskApi {
   private int getRequiredSampleRate() {
     return getRequiredSampleRateNative(getNativeHandle());
   }
+
+  // TODO(b/183343074): JNI method invocation is very expensive, taking about .2ms
+  // each time. Consider combining the native getter methods into 1 and cache it in Java layer.
+  private static native long getRequiredInputBufferSizeNative(long nativeHandle);
 
   private static native int getRequiredChannelsNative(long nativeHandle);
 

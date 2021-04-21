@@ -262,6 +262,13 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_getRequiredChanne
   }
 }
 
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_getRequiredInputBufferSizeNative(
+    JNIEnv* env, jclass thiz, jlong native_handle) {
+  auto* classifier = reinterpret_cast<AudioClassifier*>(native_handle);
+  return classifier->GetRequiredInputBufferSize();
+}
+
 extern "C" JNIEXPORT jobject JNICALL
 Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_classifyNative(
     JNIEnv* env, jclass thiz, jlong native_handle, jbyteArray java_array,
