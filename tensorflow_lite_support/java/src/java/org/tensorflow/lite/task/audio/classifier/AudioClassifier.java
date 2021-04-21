@@ -34,6 +34,7 @@ import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.audio.TensorAudio;
 import org.tensorflow.lite.support.audio.TensorAudio.TensorAudioFormat;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
@@ -350,6 +351,29 @@ public final class AudioClassifier extends BaseTaskApi {
   }
 
   /**
+   * Performs actual classification on the provided audio tensor.
+   *
+   * @param tensor a {@link TensorAudio} containing the input audio clip in float with values
+   *     between [-1, 1). The {@code tensor} argument should have the same flat size as the TFLite
+   *     model's input tensor. It's recommended to create {@code tensor} using {@code
+   *     createInputTensorAudio} method.
+   * @throws AssertionError if error occurs when classifying the audio clip from the native code
+   */
+  public List<Classifications> classify(TensorAudio tensor) {
+    TensorBuffer buffer = tensor.getTensorBuffer();
+    TensorAudioFormat format = tensor.getFormat();
+    checkState(
+        buffer.getBuffer().hasArray(),
+        "Input tensor buffer should be a non-direct buffer with a backed array (i.e. not readonly"
+            + " buffer).");
+    return classifyNative(
+        getNativeHandle(),
+        buffer.getBuffer().array(),
+        format.getChannels(),
+        format.getSampleRate());
+  }
+
+  /**
    * Creates a {@link TensorAudio} instance to store input audio samples.
    *
    * @return a {@link TensorAudio} with the same size as model input tensor
@@ -456,6 +480,9 @@ public final class AudioClassifier extends BaseTaskApi {
   private static native int getRequiredChannelsNative(long nativeHandle);
 
   private static native int getRequiredSampleRateNative(long nativeHandle);
+
+  private static native List<Classifications> classifyNative(
+      long nativeHandle, byte[] audioBuffer, int channels, int sampleRate);
 
   private static native long initJniWithModelFdAndOptions(
       int fileDescriptor,

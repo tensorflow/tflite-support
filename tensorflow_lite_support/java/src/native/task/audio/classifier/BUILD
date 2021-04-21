@@ -23,6 +23,7 @@ tflite_jni_binary(
         "//tensorflow_lite_support/cc/task/audio:audio_classifier",
         "//tensorflow_lite_support/cc/task/audio/core:audio_buffer",
         "//tensorflow_lite_support/cc/task/audio/proto:audio_classifier_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/audio/proto:class_proto_inc",
         "//tensorflow_lite_support/cc/task/audio/proto:classifications_proto_inc",
         "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
