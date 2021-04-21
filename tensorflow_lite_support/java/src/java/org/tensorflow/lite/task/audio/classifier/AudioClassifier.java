@@ -15,7 +15,6 @@ limitations under the License.
 
 package org.tensorflow.lite.task.audio.classifier;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
 import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
 
 import android.content.Context;
@@ -383,12 +382,6 @@ public final class AudioClassifier extends BaseTaskApi {
     TensorAudioFormat format = getRequiredTensorAudioFormat();
 
     long bufferSize = getRequiredInputBufferSize();
-    // TODO(b/183343074): Consider upstreaming this change to the constructor in C++ layer.
-    checkArgument(
-        bufferSize % format.getChannels() == 0,
-        String.format(
-            "Model input tensor size (%d) should be a multiplier of the number of channels (%d).",
-            bufferSize, format.getChannels()));
     long samples = bufferSize / format.getChannels();
     return TensorAudio.create(format, (int) samples);
   }

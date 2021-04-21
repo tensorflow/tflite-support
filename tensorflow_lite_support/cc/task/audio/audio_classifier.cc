@@ -160,6 +160,7 @@ absl::Status AudioClassifier::Init(
   RETURN_IF_ERROR(SetAudioFormatFromMetadata());
   RETURN_IF_ERROR(CheckAndSetInputs());
   RETURN_IF_ERROR(CheckAndSetOutputs());
+
   return absl::OkStatus();
 }
 
@@ -204,6 +205,17 @@ absl::Status AudioClassifier::CheckAndSetInputs() {
           TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
     }
     input_buffer_size_ *= input_tensors[0]->dims->data[i];
+  }
+
+  // Check if the input buffer size is divisible by the required audio channels.
+  // This needs to be done after loading metadata and input.
+  if (input_buffer_size_ % audio_format_.channels != 0) {
+    return CreateStatusWithPayload(
+        StatusCode::kInternal,
+        absl::StrFormat("Model input tensor size (%d) should be a "
+                        "multiplier of the number of channels (%d).",
+                        input_buffer_size_, audio_format_.channels),
+        TfLiteSupportStatus::kMetadataInconsistencyError);
   }
   return absl::OkStatus();
 }
