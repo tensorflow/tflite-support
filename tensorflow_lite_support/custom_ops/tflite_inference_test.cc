@@ -18,15 +18,15 @@ limitations under the License.
 
 #include <string>
 
-#include <glog/logging.h>
-#include "tensorflow/core/platform/init_main.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include "tensorflow/core/platform/logging.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/model_builder.h"
 #include "tensorflow/lite/string_util.h"
-#include "tensorflow/lite/tools/command_line_flags.h"
 
 void FillRandomString(tflite::DynamicBuffer* buffer,
                       const TfLiteIntArray* dim_array,
@@ -41,7 +41,7 @@ void FillRandomString(tflite::DynamicBuffer* buffer,
   }
 }
 
-void RunWithRandomInputs(const std::string& filename) {
+bool RunWithRandomInputs(const std::string& filename) {
   std::unique_ptr<tflite::FlatBufferModel> model =
       tflite::FlatBufferModel::BuildFromFile(filename.c_str());
 
@@ -49,12 +49,14 @@ void RunWithRandomInputs(const std::string& filename) {
   tflite::ops::builtin::BuiltinOpResolver resolver;
   std::unique_ptr<tflite::Interpreter> interpreter;
   if (tflite::InterpreterBuilder(*model, resolver)(&interpreter) != kTfLiteOk) {
-    LOG(FATAL) << "Could not initialize interpreter for TFLite model.";
+    LOG(ERROR) << "Could not initialize interpreter for TFLite model.";
+    return false;
   }
 
   // Resize input tensors, if desired.
   if (interpreter->AllocateTensors() != kTfLiteOk) {
-    LOG(FATAL) << "Could not allocate tensor.";
+    LOG(ERROR) << "Could not allocate tensor.";
+    return false;
   }
 
   // Fill the random data.
@@ -80,7 +82,8 @@ void RunWithRandomInputs(const std::string& filename) {
 
   // Running inference.
   if (interpreter->Invoke() != kTfLiteOk) {
-    LOG(FATAL) << "Failed to run the model.";
+    LOG(ERROR) << "Failed to run the model.";
+    return false;
   }
 
   // Get the output.
@@ -88,18 +91,19 @@ void RunWithRandomInputs(const std::string& filename) {
     auto tensor = interpreter->tensor(tensor_idx);
     LOG(INFO) << "Output type: " << TfLiteTypeGetName(tensor->type);
   }
+  return true;
 }
 
-int main(int argc, char** argv) {
-  // Parse flags to get the filename.
-  std::string filename;
-  std::vector<tflite::Flag> flag_list{tflite::Flag::CreateFlag(
-      "model", &filename, "The tflite model to run sample inference.",
-      tflite::Flag::kRequired)};
-  tflite::Flags::Parse(&argc, const_cast<const char**>(argv), flag_list);
-  tensorflow::port::InitMain(argv[0], &argc, &argv);
+TEST(SelectiveBuiltTest, SentencePieceTokenizerModel) {
+  std::string model =
+      "tensorflow_lite_support/custom_ops/testdata/"
+      "sentencepiece_tokenizer_flex_op.tflite";
+  EXPECT_THAT(RunWithRandomInputs(model), true);
+}
 
-  // Run the model with random inputs.
-  RunWithRandomInputs(filename);
-  return 0;
+TEST(SelectiveBuiltTest, Wiki40bLmEnModel) {
+  std::string model =
+      "tensorflow_lite_support/custom_ops/testdata/"
+      "wiki40b-lm-en.tflite";
+  EXPECT_THAT(RunWithRandomInputs(model), true);
 }
