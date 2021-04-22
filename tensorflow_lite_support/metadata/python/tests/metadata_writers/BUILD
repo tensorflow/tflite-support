@@ -20,7 +20,10 @@ py_library(
 py_test(
     name = "metadata_writer_test",
     srcs = ["metadata_writer_test.py"],
-    data = ["//tensorflow_lite_support/metadata/python/tests/testdata:test_files"],
+    data = [
+        "//tensorflow_lite_support/metadata/python/tests/testdata:test_files",
+        "//tensorflow_lite_support/metadata/python/tests/testdata/audio_classifier:test_files",
+    ],
     python_version = "PY3",
     srcs_version = "PY3",
     deps = [

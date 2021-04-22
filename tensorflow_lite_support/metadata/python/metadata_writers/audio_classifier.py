@@ -47,10 +47,44 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       model_buffer: valid buffer of the model file.
       general_md: general infromation about the model. If not specified, default
         general metadata will be generated.
-      input_md: input audio tensor informaton, if not specified, default input
+      input_md: input audio tensor informaton. If not specified, default input
         metadata will be generated.
-      output_md: output classification tensor informaton, if not specified,
+      output_md: output classification tensor informaton. If not specified,
         default output metadata will be generated.
+
+    Returns:
+      A MetadataWriter object.
+    """
+    if output_md is None:
+      output_md = metadata_info.ClassificationTensorMd(
+          name=_OUTPUT_NAME, description=_OUTPUT_DESCRIPTION)
+
+    return cls.create_from_metadata_info_for_multihead(model_buffer, general_md,
+                                                       input_md, [output_md])
+
+  @classmethod
+  def create_from_metadata_info_for_multihead(
+      cls,
+      model_buffer: bytearray,
+      general_md: Optional[metadata_info.GeneralMd] = None,
+      input_md: Optional[metadata_info.InputAudioTensorMd] = None,
+      output_md_list: Optional[List[
+          metadata_info.ClassificationTensorMd]] = None):
+    """Creates a MetadataWriter instance for multihead models.
+
+    Args:
+      model_buffer: valid buffer of the model file.
+      general_md: general infromation about the model. If not specified, default
+        general metadata will be generated.
+      input_md: input audio tensor informaton. If not specified, default input
+        metadata will be generated.
+      output_md_list: information of each output tensor head. If not specified,
+        default metadata will be generated for each output tensor. If
+        `tensor_name` in each `ClassificationTensorMd` instance is not
+        specified, elements in `output_md_list` need to have one-to-one mapping
+        with the output tensors [1] in the TFLite model.
+      [1]:
+        https://github.com/tensorflow/tflite-support/blob/b2a509716a2d71dfff706468680a729cc1604cff/tensorflow_lite_support/metadata/metadata_schema.fbs#L605-L612
 
     Returns:
       A MetadataWriter object.
@@ -64,20 +98,17 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       input_md = metadata_info.InputAudioTensorMd(
           name=_INPUT_NAME, description=_INPUT_DESCRIPTION)
 
-    if output_md is None:
-      output_md = metadata_info.ClassificationTensorMd(
-          name=_OUTPUT_NAME, description=_OUTPUT_DESCRIPTION)
-
-    output_md.associated_files = output_md.associated_files or []
+    associated_files = []
+    for md in output_md_list or []:
+      associated_files.extend(
+          [file.file_path for file in md.associated_files or []])
 
     return super().create_from_metadata_info(
         model_buffer=model_buffer,
         general_md=general_md,
         input_md=[input_md],
-        output_md=[output_md],
-        associated_files=[
-            file.file_path for file in output_md.associated_files
-        ])
+        output_md=output_md_list,
+        associated_files=associated_files)
 
   @classmethod
   def create_for_inference(

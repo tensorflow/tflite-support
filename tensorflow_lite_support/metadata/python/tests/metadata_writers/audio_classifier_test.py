@@ -24,12 +24,15 @@ from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_
 
 _FIXED_INPUT_SIZE_MODEL = "../testdata/audio_classifier/daredevil_sound_recognizer_320ms.tflite"
 _DYNAMIC_INPUT_SIZE_MODEL = "../testdata/audio_classifier/yamnet_tfhub.tflite"
+_MULTIHEAD_MODEL = "../testdata/audio_classifier/two_heads.tflite"
 _LABEL_FILE = "../testdata/audio_classifier/labelmap.txt"
 _SCORE_CALIBRATION_FILE = "../testdata/audio_classifier/score_calibration.txt"
 _DEFAULT_SCORE_CALIBRATION_VALUE = 0.2
 _JSON_FOR_INFERENCE_DYNAMIC = "../testdata/audio_classifier/yamnet_tfhub.json"
 _JSON_FOR_INFERENCE_FIXED = "../testdata/audio_classifier/daredevil_sound_recognizer_320ms.json"
 _JSON_DEFAULT = "../testdata/audio_classifier/daredevil_sound_recognizer_320ms_default.json"
+_JSON_DEFAULT_MULTIHEAD = "../testdata/audio_classifier/two_heads_default.json"
+_JSON_MULTIHEAD = "../testdata/audio_classifier/two_heads.json"
 _SAMPLE_RATE = 2
 _CHANNELS = 1
 
@@ -67,6 +70,52 @@ class MetadataWriterTest(tf.test.TestCase):
 
     metadata_json = writer.get_metadata_json()
     expected_json = test_utils.load_file(_JSON_DEFAULT, "r")
+    self.assertEqual(metadata_json, expected_json)
+
+  def test_create_from_metadata_info_by_default_succeeds_for_multihead(self):
+    writer = (
+        audio_classifier.MetadataWriter.create_from_metadata_info_for_multihead(
+            test_utils.load_file(_MULTIHEAD_MODEL)))
+
+    metadata_json = writer.get_metadata_json()
+    expected_json = test_utils.load_file(_JSON_DEFAULT_MULTIHEAD, "r")
+    self.assertEqual(metadata_json, expected_json)
+
+  def test_create_from_metadata_info_succeeds_for_multihead(self):
+    general_md = metadata_info.GeneralMd(name="AudioClassifier")
+    input_md = metadata_info.InputAudioTensorMd(
+        name="audio_clip", sample_rate=_SAMPLE_RATE, channels=_CHANNELS)
+    # The output tensors in the model are: Identity, Identity_1
+    # Create metadata in a different order to test if MetadataWriter can correct
+    # it.
+    output_head_md_1 = metadata_info.ClassificationTensorMd(
+        name="head1",
+        label_files=[
+            metadata_info.LabelFileMd("labels_en_1.txt"),
+            metadata_info.LabelFileMd("labels_cn_1.txt")
+        ],
+        score_calibration_md=metadata_info.ScoreCalibrationMd(
+            _metadata_fb.ScoreTransformationType.LOG,
+            _DEFAULT_SCORE_CALIBRATION_VALUE, "score_cali_1.txt"),
+        tensor_name="Identity_1")
+    output_head_md_2 = metadata_info.ClassificationTensorMd(
+        name="head2",
+        label_files=[
+            metadata_info.LabelFileMd("labels_en_2.txt"),
+            metadata_info.LabelFileMd("labels_cn_2.txt")
+        ],
+        score_calibration_md=metadata_info.ScoreCalibrationMd(
+            _metadata_fb.ScoreTransformationType.LOG,
+            _DEFAULT_SCORE_CALIBRATION_VALUE, "score_cali_2.txt"),
+        tensor_name="Identity")
+
+    writer = (
+        audio_classifier.MetadataWriter.create_from_metadata_info_for_multihead(
+            test_utils.load_file(_MULTIHEAD_MODEL), general_md, input_md,
+            [output_head_md_1, output_head_md_2]))
+
+    metadata_json = writer.get_metadata_json()
+    expected_json = test_utils.load_file(_JSON_MULTIHEAD, "r")
     self.assertEqual(metadata_json, expected_json)
 
 

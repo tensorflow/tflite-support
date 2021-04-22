@@ -25,6 +25,7 @@ from tensorflow_lite_support.metadata.python.metadata_writers import metadata_wr
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
 _MODEL = "../testdata/mobilenet_v2_1.0_224_quant.tflite"
+_MULTI_OUTPUTS_MODEL = "../testdata/audio_classifier/two_heads.tflite"
 _MODEL_NAME = "mobilenet_v2_1.0_224_quant"
 _INPUT_NAME = "image"
 _OUTPUT_NAME = "probability"
@@ -34,6 +35,7 @@ _EXPECTED_META_INFO_JSON = "../testdata/mobilenet_v2_1.0_224_quant_meta_info_.js
 _EXPECTED_DEFAULT_JSON = "../testdata/mobilenet_v2_1.0_224_quant_default.json"
 # Before populated into the model, metadata does not have the verson string
 _EXPECTED_DUMMY_NO_VERSION_JSON = "../testdata/mobilenet_v2_1.0_224_quant_dummy_no_version.json"
+_EXPECTED_MULTI_OUTPUTS_JSON = "../testdata/multi_outputs.json"
 
 
 class MetadataWriterTest(tf.test.TestCase):
@@ -80,6 +82,46 @@ class MetadataWriterTest(tf.test.TestCase):
     model_with_metadata = writer.populate()
 
     self._assert_correct_metadata(model_with_metadata, _EXPECTED_DEFAULT_JSON)
+
+  def test_create_from_metadata_info_fails_with_wrong_input_tesnor_name(self):
+    model_buffer = test_utils.load_file(_MODEL)
+    input_md = metadata_info.TensorMd(tensor_name="wrong_tensor_name")
+    with self.assertRaises(ValueError) as error:
+      metadata_writer.MetadataWriter.create_from_metadata_info(
+          model_buffer, input_md=[input_md])
+    self.assertEqual(
+        "The tensor names from arguments (['wrong_tensor_name']) do not match"
+        " the tensor names read from the model (['input']).",
+        str(error.exception))
+
+  def test_create_from_metadata_info_with_output_tensor_name_should_succeed(
+      self):
+    model_buffer = test_utils.load_file(_MULTI_OUTPUTS_MODEL)
+    # The output tensors in the model are: Identity, Identity_1
+    # Create metadata in a different order to test if MetadataWriter can correct
+    # it.
+    output_md_1 = metadata_info.TensorMd(
+        name="Identity 1", tensor_name="Identity_1")
+    output_md_2 = metadata_info.TensorMd(
+        name="Identity", tensor_name="Identity")
+
+    writer = metadata_writer.MetadataWriter.create_from_metadata_info(
+        model_buffer, output_md=[output_md_1, output_md_2])
+    model_with_metadata = writer.populate()
+
+    self._assert_correct_metadata(model_with_metadata,
+                                  _EXPECTED_MULTI_OUTPUTS_JSON)
+
+  def test_create_from_metadata_info_fails_with_wrong_output_tesnor_name(self):
+    model_buffer = test_utils.load_file(_MODEL)
+    output_md = metadata_info.TensorMd(tensor_name="wrong_tensor_name")
+    with self.assertRaises(ValueError) as error:
+      metadata_writer.MetadataWriter.create_from_metadata_info(
+          model_buffer, output_md=[output_md])
+    self.assertEqual(
+        "The tensor names from arguments (['wrong_tensor_name']) do not match"
+        " the tensor names read from the model (['output']).",
+        str(error.exception))
 
   def test_get_metadata_json_should_succeed(self):
     model_buffer = test_utils.load_file(_MODEL)
