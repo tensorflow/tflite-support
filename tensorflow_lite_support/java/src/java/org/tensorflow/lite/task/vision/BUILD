@@ -1,4 +1,4 @@
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "android_library_with_tflite")
 load("@org_tensorflow//tensorflow/lite/java:aar_with_jni.bzl", "aar_with_jni")
 
 package(
@@ -10,7 +10,7 @@ exports_files([
     "AndroidManifest.xml",
 ])
 
-android_library(
+android_library_with_tflite(
     name = "task_library_vision",
     srcs = [
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/classifier:image_classifier_src",
@@ -21,14 +21,15 @@ android_library(
     # TODO(b/163039980): Use JAVACOPTS in TF. "-Xep:RemoveUnusedImports:ERROR" wierdly break the build.
     javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
+    tflite_exports = [
+        "//tensorflow_lite_support/java/src/native/task/vision:task_vision_native",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "//tensorflow_lite_support/java/src/native/task/vision:task_vision_native",
         "@com_google_auto_value",
         "@maven//:androidx_annotation_annotation",
-        "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
 )
