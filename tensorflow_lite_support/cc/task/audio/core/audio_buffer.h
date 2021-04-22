@@ -41,7 +41,7 @@ class AudioBuffer {
   // Factory method for creating an AudioBuffer object. The internal buffer does
   // not take the ownership of the input backing buffer.
   static tflite::support::StatusOr<std::unique_ptr<AudioBuffer>> Create(
-      const float* audio_buffer, int64 buffer_size,
+      const float* audio_buffer, int buffer_size,
       const AudioFormat& audio_format) {
     return absl::make_unique<AudioBuffer>(audio_buffer, buffer_size,
                                           audio_format);
@@ -50,20 +50,20 @@ class AudioBuffer {
   // AudioBuffer for internal use only. Uses the factory method to construct
   // AudioBuffer instance. The internal buffer does not take the ownership of
   // the input backing buffer.
-  AudioBuffer(const float* audio_buffer, int64 buffer_size,
+  AudioBuffer(const float* audio_buffer, int buffer_size,
               const AudioFormat& audio_format)
       : audio_buffer_(audio_buffer),
         buffer_size_(buffer_size),
         audio_format_(audio_format) {}
 
-  // accessors
+  // Accessors
   AudioFormat GetAudioFormat() const { return audio_format_; }
-  int64 GetBufferSize() const { return buffer_size_; }
+  int GetBufferSize() const { return buffer_size_; }
   const float* GetFloatBuffer() const { return audio_buffer_; }
 
  private:
   const float* audio_buffer_;
-  int64 buffer_size_;
+  int buffer_size_;
   AudioFormat audio_format_;
 };
 

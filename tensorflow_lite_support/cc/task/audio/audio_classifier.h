@@ -20,7 +20,6 @@ limitations under the License.
 #include "absl/status/status.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/core/shims/cc/kernels/register.h"
-#include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/audio_classifier_options.pb.h"
@@ -83,7 +82,7 @@ class AudioClassifier
   tflite::support::StatusOr<AudioBuffer::AudioFormat> GetRequiredAudioFormat();
 
   // Returns the required input buffer size in number of float elements.
-  int64 GetRequiredInputBufferSize() { return input_buffer_size_; }
+  int GetRequiredInputBufferSize() { return input_buffer_size_; }
 
  private:
   // Performs sanity checks on the provided AudioClassifierOptions.
@@ -146,7 +145,7 @@ class AudioClassifier
   AudioBuffer::AudioFormat audio_format_;
 
   // Expected input audio buffer size in number of float elements.
-  int64 input_buffer_size_;
+  int input_buffer_size_;
 };
 
 }  // namespace audio
