@@ -33,9 +33,9 @@ import org.tensorflow.lite.support.label.Category;
 public abstract class Classifications {
 
   @UsedByReflection("audio_classifier_jni.cc")
-  static Classifications create(List<Category> categories, int headIndex) {
+  static Classifications create(List<Category> categories, int headIndex, String headName) {
     return new AutoValue_Classifications(
-        Collections.unmodifiableList(new ArrayList<Category>(categories)), headIndex);
+        Collections.unmodifiableList(new ArrayList<Category>(categories)), headIndex, headName);
   }
 
   // Same reason for not using ImmutableList as stated in
@@ -43,4 +43,6 @@ public abstract class Classifications {
   public abstract List<Category> getCategories();
 
   public abstract int getHeadIndex();
+
+  public abstract String getHeadName();
 }

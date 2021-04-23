@@ -77,10 +77,10 @@ jobject ConvertToClassificationResults(JNIEnv* env,
   // jclass and init of Classifications.
   jclass classifications_class = env->FindClass(
       "org/tensorflow/lite/task/audio/classifier/Classifications");
-  jmethodID classifications_create =
-      env->GetStaticMethodID(classifications_class, "create",
-                             "(Ljava/util/List;I)Lorg/tensorflow/lite/"
-                             "task/audio/classifier/Classifications;");
+  jmethodID classifications_create = env->GetStaticMethodID(
+      classifications_class, "create",
+      "(Ljava/util/List;ILjava/lang/String;)Lorg/tensorflow/lite/"
+      "task/audio/classifier/Classifications;");
 
   // jclass, init, and add of ArrayList.
   jclass array_list_class = env->FindClass("java/util/ArrayList");
@@ -102,12 +102,20 @@ jobject ConvertToClassificationResults(JNIEnv* env,
 
       env->DeleteLocalRef(jcategory);
     }
+
+    std::string head_name_string =
+        classifications.has_head_name()
+            ? classifications.head_name()
+            : std::to_string(classifications.head_index());
+    jstring head_name = env->NewStringUTF(head_name_string.c_str());
+
     jobject jclassifications = env->CallStaticObjectMethod(
         classifications_class, classifications_create, jcategory_list,
-        classifications.head_index());
+        classifications.head_index(), head_name);
     env->CallBooleanMethod(classifications_list, array_list_add_method,
                            jclassifications);
 
+    env->DeleteLocalRef(head_name);
     env->DeleteLocalRef(jcategory_list);
     env->DeleteLocalRef(jclassifications);
   }
