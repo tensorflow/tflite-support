@@ -24,6 +24,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 import com.google.auto.value.AutoValue;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -327,6 +328,7 @@ public class TensorAudio {
       // can be 5x ~ 10x longer compared to non-direct buffer backed by arrays (around 0.01ms), so
       // generally we don't create direct buffer for every invocation.
       ByteBuffer byteBuffer = ByteBuffer.allocate(DataType.FLOAT32.byteSize() * buffer.length);
+      byteBuffer.order(ByteOrder.nativeOrder());
       FloatBuffer result = byteBuffer.asFloatBuffer();
       result.put(buffer, nextIndex, buffer.length - nextIndex);
       result.put(buffer, 0, nextIndex);
