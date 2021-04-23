@@ -403,6 +403,8 @@ AudioClassifier::Postprocess(
     classifications->set_head_index(i);
 
     const auto& head = classification_heads_[i];
+    classifications->set_head_name(head.name);
+
     score_pairs.clear();
     score_pairs.reserve(head.label_map_items.size());
 
