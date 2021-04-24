@@ -38,11 +38,13 @@ java_library(
         "//tensorflow_lite_support/metadata:libmetadata_schema_java.jar",
         "//tensorflow_lite_support/metadata:libschema_fbs_java.jar",
     ],
+    # LINT.IfChange(dep)
     deps = [
         "//tensorflow_lite_support/metadata:metadata_schema_java",
         "//tensorflow_lite_support/metadata:schema_fbs_java",
         "@org_checkerframework_qual",
     ],
+    # LINT.ThenChange(<INTERNAL>/release/build_metadata_pom.sh:dep)
 )
 
 alias(

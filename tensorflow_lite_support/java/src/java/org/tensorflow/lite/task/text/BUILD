@@ -21,12 +21,14 @@ android_library_with_tflite(
         "//tensorflow_lite_support/java/src/native/task/text:task_text_native",
     ],
     visibility = ["//visibility:public"],
+    # LINT.IfChange(dep)
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "@com_google_auto_value",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
+    # LINT.ThenChange(<INTERNAL>/release/build_task_pom.sh:dep)
 )
 
 # AAR target for OSS release.
