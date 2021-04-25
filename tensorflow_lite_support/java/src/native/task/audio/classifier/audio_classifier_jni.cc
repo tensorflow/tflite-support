@@ -21,7 +21,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/audio/audio_classifier.h"
 #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
-#include "tensorflow_lite_support/cc/task/audio/proto/audio_classifier_options.proto.h"
+#include "tensorflow_lite_support/cc/task/audio/proto/audio_classifier_options.pb.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/class_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"

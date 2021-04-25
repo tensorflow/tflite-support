@@ -5,10 +5,8 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-exports_files(["audio_classifier_jni.cc"])
-
 cc_library(
-    name = "audio_classifier_native",
+    name = "task_audio_native",
     srcs = [
         ":libtask_audio_jni.so",
     ],
@@ -17,7 +15,7 @@ cc_library(
 tflite_jni_binary(
     name = "libtask_audio_jni.so",
     srcs = [
-        "audio_classifier_jni.cc",
+        "//tensorflow_lite_support/java/src/native/task/audio/classifier:audio_classifier_jni.cc",
     ],
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [

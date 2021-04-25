@@ -1,10 +1,14 @@
 load("@build_bazel_rules_android//android:rules.bzl", "android_library")
 load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
-load("@org_tensorflow//tensorflow/lite/java:aar_with_jni.bzl", "aar_with_jni")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
     licenses = ["notice"],  # Apache 2.0
+)
+
+filegroup(
+    name = "audio_classifier_src",
+    srcs = glob(["**/*.java"]),
 )
 
 # Default target that uses BuiltInOpResolver, registers all built-in OPs.
@@ -22,7 +26,7 @@ android_library(
 # OPs and/or a subset of BuiltInOps to reduce binary size.
 android_library(
     name = "audio_classifier_java",
-    srcs = glob(["*.java"]),
+    srcs = [":audio_classifier_src"],
     javacopts = JAVACOPTS,
     manifest = "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/audio:AndroidManifest.xml",
     deps = [
@@ -31,13 +35,4 @@ android_library(
         "@com_google_auto_value",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
-)
-
-# AAR target for OSS release.
-#
-# bazel build -c opt --config=monolithic --config=android_arm64 --fat_apk_cpu=x86,x86_64,arm64-v8a,armeabi-v7a \
-#   tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/audio/classifier:audio-classifier
-aar_with_jni(
-    name = "audio-classifier",
-    android_library = ":audio_classifier",
 )
