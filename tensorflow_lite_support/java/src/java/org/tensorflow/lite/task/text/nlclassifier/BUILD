@@ -59,7 +59,7 @@ android_library_with_tflite(
     ],
     javacopts = JAVACOPTS,
     tflite_exports = [
-        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert_nlclassifier:bert_nl_classifier_native",
+        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert:bert_nl_classifier_native",
     ],
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",

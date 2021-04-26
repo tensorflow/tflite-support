@@ -16,7 +16,7 @@ jni_binary_with_tflite(
     name = "libtask_text_jni.so",
     srcs = [
         "//tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_jni.cc",
-        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert_nlclassifier:bert_nl_classifier_jni.cc",
+        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert:bert_nl_classifier_jni.cc",
         "//tensorflow_lite_support/java/src/native/task/text/qa:bert_question_answerer_jni.cc",
     ],
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
