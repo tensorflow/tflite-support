@@ -52,12 +52,6 @@ android_library(
     # LINT.ThenChange(<INTERNAL>/release/build_support_pom.sh:dep)
 )
 
-# TODO(b/156482505): Remove this target.
-alias(
-    name = "tensorflow-lite-support-nogpu",
-    actual = ":tensorflow-lite-support",
-)
-
 # This alias matches the associated .aar library name output style.
 alias(
     name = "tensorflow-lite-support",
