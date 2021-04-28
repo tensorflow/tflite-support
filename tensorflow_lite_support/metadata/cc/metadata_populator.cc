@@ -33,7 +33,7 @@ namespace tflite {
 namespace metadata {
 
 namespace {
-constexpr absl::string_view kMetadataBufferName = "TFLITE_METADATA";
+constexpr char kMetadataBufferName[] = "TFLITE_METADATA";
 
 using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
