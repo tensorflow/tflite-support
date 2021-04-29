@@ -1,8 +1,15 @@
 workspace(name = "org_tensorflow_lite_support")
 
 load("@bazel_tools//tools/build_defs/repo:java.bzl", "java_import_external")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@//third_party/py:python_configure.bzl", "python_configure")
+
+http_file(
+    name = "mobilebert_float",
+    sha256 = "883bf5d40f0b0ae435326bb21ed0f4c9004b22c3fd1539383fd16d68623696dd",
+    urls = ["https://tfhub.dev/tensorflow/lite-model/mobilebert/1/default/1?lite-format=tflite"],
+)
+
 
 http_archive(
     name = "io_bazel_rules_closure",

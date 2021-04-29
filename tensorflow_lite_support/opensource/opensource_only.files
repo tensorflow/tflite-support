@@ -3,6 +3,7 @@ tensorflow_lite_support/opensource/.bazelversion
 tensorflow_lite_support/opensource/BUILD
 tensorflow_lite_support/opensource/WORKSPACE
 tensorflow_lite_support/opensource/cc_build_defs.bzl
+tensorflow_lite_support/opensource/http_files.bzl
 tensorflow_lite_support/third_party/android/BUILD
 tensorflow_lite_support/third_party/android/android.bzl.tpl
 tensorflow_lite_support/third_party/android/android_configure.BUILD.tpl

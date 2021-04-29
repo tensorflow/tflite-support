@@ -25,6 +25,7 @@ from tensorflow_lite_support.metadata.python.metadata_writers import metadata_wr
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
 _MODEL = "../testdata/mobilenet_v2_1.0_224_quant.tflite"
+_MULTI_INPUTS_MODEL = "../testdata/question_answerer/mobilebert_float.tflite"
 _MULTI_OUTPUTS_MODEL = "../testdata/audio_classifier/two_heads.tflite"
 _MODEL_NAME = "mobilenet_v2_1.0_224_quant"
 _INPUT_NAME = "image"
@@ -35,6 +36,7 @@ _EXPECTED_META_INFO_JSON = "../testdata/mobilenet_v2_1.0_224_quant_meta_info_.js
 _EXPECTED_DEFAULT_JSON = "../testdata/mobilenet_v2_1.0_224_quant_default.json"
 # Before populated into the model, metadata does not have the verson string
 _EXPECTED_DUMMY_NO_VERSION_JSON = "../testdata/mobilenet_v2_1.0_224_quant_dummy_no_version.json"
+_EXPECTED_MULTI_INPUTS_JSON = "../testdata/multi_inputs.json"
 _EXPECTED_MULTI_OUTPUTS_JSON = "../testdata/multi_outputs.json"
 
 
@@ -83,6 +85,24 @@ class MetadataWriterTest(tf.test.TestCase):
 
     self._assert_correct_metadata(model_with_metadata, _EXPECTED_DEFAULT_JSON)
 
+  def test_create_from_metadata_info_with_input_tensor_name_should_succeed(
+      self):
+    model_buffer = test_utils.load_file(_MULTI_INPUTS_MODEL)
+    # The input tensors in the model are: input_ids, input_mask, segment_ids.
+    input_md_1 = metadata_info.TensorMd(name="ids", tensor_name="input_ids")
+    input_md_2 = metadata_info.TensorMd(name="mask", tensor_name="input_mask")
+    input_md_3 = metadata_info.TensorMd(
+        name="segment", tensor_name="segment_ids")
+
+    # Create input metadata in a different order to test if MetadataWriter can
+    # correct it.
+    writer = metadata_writer.MetadataWriter.create_from_metadata_info(
+        model_buffer, input_md=[input_md_2, input_md_3, input_md_1])
+    model_with_metadata = writer.populate()
+
+    self._assert_correct_metadata(model_with_metadata,
+                                  _EXPECTED_MULTI_INPUTS_JSON)
+
   def test_create_from_metadata_info_fails_with_wrong_input_tesnor_name(self):
     model_buffer = test_utils.load_file(_MODEL)
     input_md = metadata_info.TensorMd(tensor_name="wrong_tensor_name")
@@ -98,15 +118,15 @@ class MetadataWriterTest(tf.test.TestCase):
       self):
     model_buffer = test_utils.load_file(_MULTI_OUTPUTS_MODEL)
     # The output tensors in the model are: Identity, Identity_1
-    # Create metadata in a different order to test if MetadataWriter can correct
-    # it.
     output_md_1 = metadata_info.TensorMd(
-        name="Identity 1", tensor_name="Identity_1")
-    output_md_2 = metadata_info.TensorMd(
         name="Identity", tensor_name="Identity")
+    output_md_2 = metadata_info.TensorMd(
+        name="Identity 1", tensor_name="Identity_1")
 
+    # Create output metadata in a different order to test if MetadataWriter can
+    # correct it.
     writer = metadata_writer.MetadataWriter.create_from_metadata_info(
-        model_buffer, output_md=[output_md_1, output_md_2])
+        model_buffer, output_md=[output_md_2, output_md_1])
     model_with_metadata = writer.populate()
 
     self._assert_correct_metadata(model_with_metadata,
