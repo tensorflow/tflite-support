@@ -329,6 +329,14 @@ java_import_external(
     default_visibility = ["@com_google_auto_value//:__pkg__"],
 )
 
+http_archive(
+    name = "robolectric",
+    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.4.tar.gz"],
+    strip_prefix = "robolectric-bazel-4.4",
+)
+load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
+robolectric_repositories()
+
 load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 
 flatbuffers()
@@ -385,6 +393,10 @@ python_configure(name = "local_config_python")
 maven_install(
     artifacts = [
         "androidx.annotation:annotation:aar:1.1.0",
+        "androidx.test:core:jar:1.3.0",
+        "org.robolectric:robolectric:jar:4.4",
+        "com.google.truth:truth:jar:1.1",
+        "commons-io:commons-io:jar:2.8.0",
     ],
     repositories = [
         "https://jcenter.bintray.com",

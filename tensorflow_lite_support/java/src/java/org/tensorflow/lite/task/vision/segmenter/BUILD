@@ -42,8 +42,8 @@ android_library(
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "//third_party/java/androidx/annotation",
         "@com_google_auto_value",
+        "@maven//:androidx_annotation_annotation",
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],

@@ -56,6 +56,8 @@ import org.tensorflow.lite.support.metadata.schema.ModelMetadata;
 import org.tensorflow.lite.support.metadata.schema.SubGraphMetadata;
 import org.tensorflow.lite.support.metadata.schema.TensorMetadata;
 
+import org.junit.Ignore;
+
 /** Tests of {@link MetadataExtractor}. */
 @RunWith(Suite.class)
 @SuiteClasses({MetadataExtractorTest.General.class, MetadataExtractorTest.InputTensorType.class})
@@ -102,6 +104,7 @@ public class MetadataExtractorTest {
       assertThat(metadataExtractor.hasMetadata()).isFalse();
     }
 
+    @Ignore
     @Test
     public void getAssociatedFile_validAssociateFile() throws Exception {
       ByteBuffer mobileNetBuffer = loadMobileNetBuffer();
@@ -115,6 +118,7 @@ public class MetadataExtractorTest {
       assertThat(IOUtils.contentEquals(goldenAssociateFileStream, associateFileStream)).isTrue();
     }
 
+    @Ignore
     @Test
     public void getAssociatedFile_invalidAssociateFile() throws Exception {
       ByteBuffer mobileNetBuffer = loadMobileNetBuffer();
@@ -130,6 +134,7 @@ public class MetadataExtractorTest {
                   "The file, %s, does not exist in the zip file.", INVALID_LABEL_FILE_NAME));
     }
 
+    @Ignore
     @Test
     public void getAssociatedFile_nullFileName() throws Exception {
       ByteBuffer mobileNetBuffer = loadMobileNetBuffer();
@@ -171,6 +176,7 @@ public class MetadataExtractorTest {
           .contains("This model does not contain associated files, and is not a Zip file.");
     }
 
+    @Ignore
     @Test
     public void getAssociatedFileNames_validFileNames() throws Exception {
       ByteBuffer mobileNetBuffer = loadMobileNetBuffer();
