@@ -130,13 +130,13 @@ class AudioClassifier
   // is currently detected by checking if all output tensors data type is uint8.
   bool has_uint8_outputs_;
 
-  // Set of whitelisted or blacklisted class names.
+  // Set of allowlisted or denylisted class names.
   struct ClassNameSet {
     absl::flat_hash_set<std::string> values;
-    bool is_whitelist;
+    bool is_allowlist;
   };
 
-  // Whitelisted or blacklisted class names based on provided options at
+  // Allowlisted or denylisted class names based on provided options at
   // construction time. These are used to filter out results during
   // post-processing.
   ClassNameSet class_name_set_;

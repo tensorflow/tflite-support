@@ -38,13 +38,13 @@ message AudioClassifierOptions {
   // (if any). Results below this value are rejected.
   optional float score_threshold = 4;
 
-  // Optional whitelist of class names. If non-empty, classifications whose
+  // Optional allowlist of class names. If non-empty, classifications whose
   // class name is not in this set will be filtered out. Duplicate or unknown
-  // class names are ignored. Mutually exclusive with class_name_blacklist.
-  repeated string class_name_whitelist = 5;
+  // class names are ignored. Mutually exclusive with class_name_denylist.
+  repeated string class_name_allowlist = 5;
 
-  // Optional blacklist of class names. If non-empty, classifications whose
+  // Optional denylist of class names. If non-empty, classifications whose
   // class name is in this set will be filtered out. Duplicate or unknown
-  // class names are ignored. Mutually exclusive with class_name_whitelist.
-  repeated string class_name_blacklist = 6;
+  // class names are ignored. Mutually exclusive with class_name_allowlist.
+  repeated string class_name_denylist = 6;
 }

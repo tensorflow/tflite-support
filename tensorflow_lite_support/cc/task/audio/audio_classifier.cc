@@ -142,11 +142,11 @@ absl::Status AudioClassifier::SanityCheckOptions(
             options.score_threshold()),
         TfLiteSupportStatus::kInvalidArgumentError);
   }
-  if (options.class_name_whitelist_size() > 0 &&
-      options.class_name_blacklist_size() > 0) {
+  if (options.class_name_allowlist_size() > 0 &&
+      options.class_name_denylist_size() > 0) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        "`class_name_whitelist` and `class_name_blacklist` are mutually "
+        "`class_name_allowlist` and `class_name_denylist` are mutually "
         "exclusive options.",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
@@ -470,8 +470,8 @@ AudioClassifier::Postprocess(
 
         bool class_name_found = class_name_set_.values.contains(class_name);
 
-        if ((!class_name_found && class_name_set_.is_whitelist) ||
-            (class_name_found && !class_name_set_.is_whitelist)) {
+        if ((!class_name_found && class_name_set_.is_allowlist) ||
+            (class_name_found && !class_name_set_.is_allowlist)) {
           continue;
         }
 
