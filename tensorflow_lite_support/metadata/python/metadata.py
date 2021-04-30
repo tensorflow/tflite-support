@@ -659,6 +659,7 @@ class MetadataDisplayer(object):
     """
     _assert_model_buffer_identifier(model_buffer)
     _assert_metadata_buffer_identifier(metadata_buffer)
+    self._model_buffer = model_buffer
     self._metadata_buffer = metadata_buffer
     self._associated_file_list = associated_file_list
 
@@ -695,6 +696,29 @@ class MetadataDisplayer(object):
     metadata_buffer = cls._get_metadata_buffer(model_buffer)
     associated_file_list = cls._parse_packed_associted_file_list(model_buffer)
     return cls(model_buffer, metadata_buffer, associated_file_list)
+
+  def get_associated_file_buffer(self, filename):
+    """Get the specified associated file content in bytearray.
+
+    Args:
+      filename: name of the file to be extracted.
+
+    Returns:
+      The file content in bytearray.
+
+    Raises:
+      ValueError: if the file does not exist in the model.
+    """
+    if filename not in self._associated_file_list:
+      raise ValueError(
+          "The file, {}, does not exist in the model.".format(filename))
+
+    with _open_as_zipfile(io.BytesIO(self._model_buffer)) as zf:
+      return zf.read(filename)
+
+  def get_metadata_buffer(self):
+    """Get the metadata buffer in bytearray out from the model."""
+    return copy.deepcopy(self._metadata_buffer)
 
   def get_metadata_json(self):
     """Converts the metadata into a json string."""

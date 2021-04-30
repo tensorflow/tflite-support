@@ -57,6 +57,9 @@ class MetadataTest(tf.test.TestCase, parameterized.TestCase):
         self._metadata_file, "1.0.0")
     self._file1 = self.create_tempfile("file1").full_path
     self._file2 = self.create_tempfile("file2").full_path
+    self._file2_content = b"file2_content"
+    with open(self._file2, "wb") as f:
+      f.write(self._file2_content)
     self._file3 = self.create_tempfile("file3").full_path
 
   def _create_model_buf(self):
@@ -710,6 +713,39 @@ class MetadataDisplayerTest(MetadataTest):
     with open(self._model_with_meta_file, "rb") as f:
       displayer = _metadata.MetadataDisplayer.with_model_buffer(f.read())
     self.assertIsInstance(displayer, _metadata.MetadataDisplayer)
+
+  def testGetAssociatedFileBufferShouldSucceed(self):
+    # _model_with_meta_file contains file1 and file2.
+    displayer = _metadata.MetadataDisplayer.with_model_file(
+        self._model_with_meta_file)
+
+    actual_content = displayer.get_associated_file_buffer("file2")
+    self.assertEqual(actual_content, self._file2_content)
+
+  def testGetAssociatedFileBufferFailsWithNonExistentFile(self):
+    # _model_with_meta_file contains file1 and file2.
+    displayer = _metadata.MetadataDisplayer.with_model_file(
+        self._model_with_meta_file)
+
+    non_existent_file = "non_existent_file"
+    with self.assertRaises(ValueError) as error:
+      displayer.get_associated_file_buffer(non_existent_file)
+    self.assertEqual(
+        "The file, {}, does not exist in the model.".format(non_existent_file),
+        str(error.exception))
+
+  def testGetMetadataBufferShouldSucceed(self):
+    displayer = _metadata.MetadataDisplayer.with_model_file(
+        self._model_with_meta_file)
+    actual_buffer = displayer.get_metadata_buffer()
+    actual_json = _metadata.convert_to_json(actual_buffer)
+
+    # Verifies the generated json file.
+    golden_json_file_path = resource_loader.get_path_to_datafile(
+        "testdata/golden_json.json")
+    with open(golden_json_file_path, "r") as f:
+      expected = f.read()
+    self.assertEqual(actual_json, expected)
 
   def testGetMetadataJsonModelWithMetadata(self):
     displayer = _metadata.MetadataDisplayer.with_model_file(
