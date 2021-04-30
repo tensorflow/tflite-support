@@ -16,7 +16,7 @@ METADATA_SRCS = glob(
 android_library(
     name = "tensorflowlite_support_metadata",
     srcs = METADATA_SRCS,
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     deps = [
         "//tensorflow_lite_support/metadata:metadata_schema_fbs_android",

@@ -25,7 +25,7 @@ android_library(
     srcs = glob(
         ["src/java/org/tensorflow/lite/support/**/*.java"],
     ),
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     deps = [
         "@com_google_auto_value",
@@ -40,7 +40,7 @@ android_library(
     srcs = glob(
         ["src/java/org/tensorflow/lite/support/**/*.java"],
     ),
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     # LINT.IfChange(dep)
     deps = [
@@ -70,7 +70,7 @@ java_library(
 android_library(
     name = "tensorflowlite_support_precondition",
     srcs = ["src/java/org/tensorflow/lite/support/common/SupportPreconditions.java"],
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     deps = [
         "@org_checkerframework_qual",
