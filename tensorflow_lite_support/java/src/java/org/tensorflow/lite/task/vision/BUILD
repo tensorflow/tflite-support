@@ -18,7 +18,6 @@ android_library_with_tflite(
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/detector:object_detector_src",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/segmenter:image_segmenter_src",
     ],
-    # TODO(b/163039980): Use JAVACOPTS in TF. "-Xep:RemoveUnusedImports:ERROR" wierdly break the build.
     javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     tflite_exports = [
