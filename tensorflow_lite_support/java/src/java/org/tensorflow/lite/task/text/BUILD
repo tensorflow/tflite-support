@@ -1,6 +1,5 @@
 load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "android_library_with_tflite")
 load("@org_tensorflow//tensorflow/lite/java:aar_with_jni.bzl", "aar_with_jni")
-load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -15,7 +14,7 @@ android_library_with_tflite(
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text/nlclassifier:nl_classifier_src",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text/qa:bert_question_answerer_src",
     ],
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     tflite_exports = [
         "//tensorflow_lite_support/java/src/native/task/text:task_text_native",

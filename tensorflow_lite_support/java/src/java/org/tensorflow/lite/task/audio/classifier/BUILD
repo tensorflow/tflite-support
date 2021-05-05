@@ -1,5 +1,4 @@
 load("@build_bazel_rules_android//android:rules.bzl", "android_library")
-load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -27,7 +26,7 @@ android_library(
 android_library(
     name = "audio_classifier_java",
     srcs = [":audio_classifier_src"],
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     manifest = "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/audio:AndroidManifest.xml",
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
