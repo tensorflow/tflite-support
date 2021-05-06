@@ -20,7 +20,7 @@ py_library(
         ":metadata_parser_py",
     ],
     data = ["//tensorflow_lite_support/metadata:metadata_schema.fbs"],
-    srcs_version = "PY2AND3",
+    srcs_version = "PY3",
     visibility = ["//visibility:public"],
     deps = [
         "//tensorflow_lite_support/metadata:metadata_schema_py",

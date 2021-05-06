@@ -14,10 +14,6 @@
 # ==============================================================================
 """TensorFlow Lite metadata tools."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import copy
 import inspect
 import io
@@ -129,6 +125,8 @@ class MetadataPopulator(object):
     # populator.load_metadata_buffer(metadata_buf)
     populator.load_metadata_file(metadata_file)
     populator.load_associated_files([label.txt])
+    # For associated file buffer (bytearray read from the file), use:
+    # populator.load_associated_file_buffers({"label.txt": b"file content"})
     populator.populate()
 
     # Populating a metadata file (or a metadta buffer) and associated files to
@@ -169,7 +167,8 @@ class MetadataPopulator(object):
     _assert_model_file_identifier(model_file)
     self._model_file = model_file
     self._metadata_buf = None
-    self._associated_files = set()
+    # _associated_files is a dict of file name and file buffer.
+    self._associated_files = {}
 
   @classmethod
   def with_model_file(cls, model_file):
@@ -246,6 +245,20 @@ class MetadataPopulator(object):
         for file in self._get_recorded_associated_file_object_list(metadata)
     ]
 
+  def load_associated_file_buffers(self, associated_files):
+    """Loads the associated file buffers (in bytearray) to be populated.
+
+    Args:
+      associated_files: a dictionary of associated file names and corresponding
+        file buffers, such as {"file.txt": b"file content"}. If pass in file
+          paths for the file name, only the basename will be populated.
+    """
+
+    self._associated_files.update({
+        os.path.basename(name): buffers
+        for name, buffers in associated_files.items()
+    })
+
   def load_associated_files(self, associated_files):
     """Loads associated files that to be concatenated after the model file.
 
@@ -256,9 +269,10 @@ class MetadataPopulator(object):
       IOError:
         File not found.
     """
-    for af in associated_files:
-      _assert_file_exist(af)
-      self._associated_files.add(af)
+    for af_name in associated_files:
+      _assert_file_exist(af_name)
+      with _open_file(af_name, "rb") as af:
+        self.load_associated_file_buffers({af_name: af.read()})
 
   def load_metadata_buffer(self, metadata_buf):
     """Loads the metadata buffer (in bytearray) to be populated.
@@ -339,9 +353,7 @@ class MetadataPopulator(object):
     packed_files = self.get_packed_associated_file_list()
 
     # Gets the file name of those associated files to be populated.
-    to_be_populated_files = []
-    for af in self._associated_files:
-      to_be_populated_files.append(os.path.basename(af))
+    to_be_populated_files = self._associated_files.keys()
 
     # Checks all files recorded in the metadata will be populated.
     for rf in recorded_files:
@@ -496,9 +508,8 @@ class MetadataPopulator(object):
 
       # (2) Append of to a temp file as a zip.
       with _open_as_zipfile(temp, "a") as zf:
-        for af in self._associated_files:
-          filename = os.path.basename(af)
-          zf.write(af, filename)
+        for file_name, file_buffer in self._associated_files.items():
+          zf.writestr(file_name, file_buffer)
 
       # (3) Copy temp file to model file.
       temp.seek(0)
