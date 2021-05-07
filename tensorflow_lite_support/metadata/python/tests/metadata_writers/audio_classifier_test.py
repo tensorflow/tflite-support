@@ -22,15 +22,16 @@ from tensorflow_lite_support.metadata.python.metadata_writers import audio_class
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
-_FIXED_INPUT_SIZE_MODEL = "../testdata/audio_classifier/daredevil_sound_recognizer_320ms.tflite"
+_FIXED_INPUT_SIZE_MODEL = "../testdata/audio_classifier/yamnet_wavin_quantized_mel_relu6.tflite"
 _DYNAMIC_INPUT_SIZE_MODEL = "../testdata/audio_classifier/yamnet_tfhub.tflite"
 _MULTIHEAD_MODEL = "../testdata/audio_classifier/two_heads.tflite"
+_YAMNET_LABEL_FILE = "../testdata/audio_classifier/yamnet_521_labels.txt"
 _LABEL_FILE = "../testdata/audio_classifier/labelmap.txt"
 _SCORE_CALIBRATION_FILE = "../testdata/audio_classifier/score_calibration.txt"
 _DEFAULT_SCORE_CALIBRATION_VALUE = 0.2
 _JSON_FOR_INFERENCE_DYNAMIC = "../testdata/audio_classifier/yamnet_tfhub.json"
-_JSON_FOR_INFERENCE_FIXED = "../testdata/audio_classifier/daredevil_sound_recognizer_320ms.json"
-_JSON_DEFAULT = "../testdata/audio_classifier/daredevil_sound_recognizer_320ms_default.json"
+_JSON_FOR_INFERENCE_FIXED = "../testdata/audio_classifier/yamnet_wavin_quantized_mel_relu6.json"
+_JSON_DEFAULT = "../testdata/audio_classifier/yamnet_wavin_quantized_mel_relu6_default.json"
 _JSON_DEFAULT_MULTIHEAD = "../testdata/audio_classifier/two_heads_default.json"
 _JSON_MULTIHEAD = "../testdata/audio_classifier/two_heads.json"
 _SAMPLE_RATE = 2
@@ -55,7 +56,7 @@ class MetadataWriterTest(tf.test.TestCase):
       self):
     writer = audio_classifier.MetadataWriter.create_for_inference(
         test_utils.load_file(_FIXED_INPUT_SIZE_MODEL), _SAMPLE_RATE, _CHANNELS,
-        [_LABEL_FILE],
+        [_YAMNET_LABEL_FILE],
         metadata_info.ScoreCalibrationMd(
             _metadata_fb.ScoreTransformationType.LOG,
             _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
