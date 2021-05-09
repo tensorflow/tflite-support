@@ -19,10 +19,13 @@ package tflite.task.text;
 
 import "tensorflow_lite_support/cc/task/core/proto/base_options.proto";
 
-// Options for setting up an BertNLClassifier.
+// Options for setting up a BertNLClassifier.
 // Next Id: 3
 message BertNLClassifierOptions {
+  // Base options for configuring BertNLClassifier, such as specifying the
+  // TfLite model file with metadata, accelerator options, etc.
   optional tflite.task.core.BaseOptions base_options = 1;
+
   // Max number of tokens to pass to the model.
   optional int32 max_seq_len = 2 [default = 128];
 }
