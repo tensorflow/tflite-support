@@ -548,6 +548,31 @@ class MetadataPopulatorTest(MetadataTest):
         ("The number of output tensors (1) should match the number of "
          "output tensor metadata (0)"), str(error.exception))
 
+  def testLoadMetadataAndAssociatedFilesShouldSucceeds(self):
+    # Create a src model with metadata and two associated files.
+    src_model_buf = self._create_model_buf()
+    populator_src = _metadata.MetadataPopulator.with_model_buffer(src_model_buf)
+    populator_src.load_metadata_file(self._metadata_file)
+    populator_src.load_associated_files([self._file1, self._file2])
+    populator_src.populate()
+
+    # Create a model to be populated with the metadata and files from
+    # src_model_buf.
+    dst_model_buf = self._create_model_buf()
+    populator_dst = _metadata.MetadataPopulator.with_model_buffer(dst_model_buf)
+    populator_dst.load_metadata_and_associated_files(
+        populator_src.get_model_buffer())
+    populator_dst.populate()
+
+    # Tests if the metadata and associated files are populated correctly.
+    dst_model_file = self.create_tempfile().full_path
+    with open(dst_model_file, "wb") as f:
+      f.write(populator_dst.get_model_buffer())
+    self._assert_golden_metadata(dst_model_file)
+
+    recorded_files = populator_dst.get_recorded_associated_file_list()
+    self.assertEqual(set(recorded_files), set(self.expected_recorded_files))
+
   @parameterized.named_parameters(
       {
           "testcase_name": "InputTensorWithBert",

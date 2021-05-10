@@ -139,6 +139,14 @@ class MetadataPopulator(object):
     updated_model_buf = populator.get_model_buffer()
     with open("updated_model.tflite", "wb") as f:
       f.write(updated_model_buf)
+
+    # Transferring metadata and associated files from another TFLite model:
+    populator = MetadataPopulator.with_model_buffer(model_buf)
+    populator_dst.load_metadata_and_associated_files(src_model_buf)
+    populator_dst.populate()
+    updated_model_buf = populator.get_model_buffer()
+    with open("updated_model.tflite", "wb") as f:
+      f.write(updated_model_buf)
     ```
 
   Note that existing metadata buffer (if applied) will be overridden by the new
@@ -331,6 +339,24 @@ class MetadataPopulator(object):
     with _open_file(metadata_file, "rb") as f:
       metadata_buf = f.read()
     self.load_metadata_buffer(bytearray(metadata_buf))
+
+  def load_metadata_and_associated_files(self, src_model_buf):
+    """Loads the metadata and associated files from another model buffer.
+
+    Args:
+      src_model_buf: source model buffer (in bytearray) with metadata and
+        associated files.
+    """
+    # Load the model metadata from src_model_buf if exist.
+    metadata_buffer = _get_metadata_buffer(src_model_buf)
+    if metadata_buffer:
+      self.load_metadata_buffer(metadata_buffer)
+
+    # Load the associated files from src_model_buf if exist.
+    if _is_zipfile(io.BytesIO(src_model_buf)):
+      with _open_as_zipfile(io.BytesIO(src_model_buf)) as zf:
+        self.load_associated_file_buffers(
+            {f: zf.read(f) for f in zf.namelist()})
 
   def populate(self):
     """Populates loaded metadata and associated files into the model file."""
@@ -704,7 +730,9 @@ class MetadataDisplayer(object):
     """
     if not model_buffer:
       raise ValueError("model_buffer cannot be empty.")
-    metadata_buffer = cls._get_metadata_buffer(model_buffer)
+    metadata_buffer = _get_metadata_buffer(model_buffer)
+    if not metadata_buffer:
+      raise ValueError("The model does not have metadata.")
     associated_file_list = cls._parse_packed_associted_file_list(model_buffer)
     return cls(model_buffer, metadata_buffer, associated_file_list)
 
@@ -742,32 +770,6 @@ class MetadataDisplayer(object):
       A name list of associated files.
     """
     return copy.deepcopy(self._associated_file_list)
-
-  @staticmethod
-  def _get_metadata_buffer(model_buf):
-    """Returns the metadata in the model file as a buffer.
-
-    Args:
-      model_buf: valid buffer of the model file.
-
-    Returns:
-      Metadata buffer.
-
-    Raises:
-      ValueError: The model does not have metadata.
-    """
-    tflite_model = _schema_fb.Model.GetRootAsModel(model_buf, 0)
-
-    # Gets metadata from the model file.
-    for i in range(tflite_model.MetadataLength()):
-      meta = tflite_model.Metadata(i)
-      if meta.Name().decode("utf-8") == MetadataPopulator.METADATA_FIELD_NAME:
-        buffer_index = meta.Buffer()
-        metadata = tflite_model.Buffers(buffer_index)
-        metadata_buf = metadata.DataAsNumpy().tobytes()
-        return metadata_buf
-
-    raise ValueError("The model does not have metadata.")
 
   @staticmethod
   def _parse_packed_associted_file_list(model_buf):
@@ -839,3 +841,25 @@ def _assert_metadata_buffer_identifier(metadata_buf):
     raise ValueError(
         "The metadata buffer does not have the expected identifier, and may not"
         " be a valid TFLite Metadata.")
+
+
+def _get_metadata_buffer(model_buf):
+  """Returns the metadata in the model file as a buffer.
+
+  Args:
+    model_buf: valid buffer of the model file.
+
+  Returns:
+    Metadata buffer. Returns `None` if the model does not have metadata.
+  """
+  tflite_model = _schema_fb.Model.GetRootAsModel(model_buf, 0)
+
+  # Gets metadata from the model file.
+  for i in range(tflite_model.MetadataLength()):
+    meta = tflite_model.Metadata(i)
+    if meta.Name().decode("utf-8") == MetadataPopulator.METADATA_FIELD_NAME:
+      buffer_index = meta.Buffer()
+      metadata = tflite_model.Buffers(buffer_index)
+      return metadata.DataAsNumpy().tobytes()
+
+  return None
