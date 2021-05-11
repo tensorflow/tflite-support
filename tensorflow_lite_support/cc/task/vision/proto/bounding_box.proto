@@ -19,9 +19,9 @@ package tflite.task.vision;
 
 // An integer bounding box, axis aligned.
 message BoundingBox {
-  // The X coordinate of the top-left corner, in pixels.
+  // The X coordinate of the bottom-left corner, in pixels.
   optional int32 origin_x = 1;
-  // The Y coordinate of the top-left corner, in pixels.
+  // The Y coordinate of the bottom-left corner, in pixels.
   optional int32 origin_y = 2;
   // The width of the bounding box, in pixels.
   optional int32 width = 3;
