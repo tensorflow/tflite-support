@@ -233,11 +233,11 @@ class FrameBuffer {
         timestamp_(timestamp) {}
 
   // Returns number of planes.
-  const int plane_count() const { return planes_.size(); }
+  int plane_count() const { return planes_.size(); }
 
   // Returns plane indexed by the input `index`.
   const Plane plane(int index) const {
-    if (index > -1 && index < planes_.size()) {
+    if (index > -1 && static_cast<size_t>(index) < planes_.size()) {
       return planes_[index];
     }
     return {};
@@ -272,10 +272,10 @@ class FrameBuffer {
   const Dimension dimension() const { return dimension_; }
 
   // Returns FrameBuffer format.
-  const Format format() const { return format_; }
+  Format format() const { return format_; }
 
   // Returns FrameBuffer orientation.
-  const Orientation orientation() const { return orientation_; }
+  Orientation orientation() const { return orientation_; }
 
   // Returns FrameBuffer timestamp.
   const absl::Time timestamp() const { return timestamp_; }
