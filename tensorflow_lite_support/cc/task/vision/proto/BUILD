@@ -157,6 +157,7 @@ proto_library(
     name = "image_segmenter_options_proto",
     srcs = ["image_segmenter_options.proto"],
     deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
     ],
@@ -174,6 +175,7 @@ cc_library(
     hdrs = ["image_segmenter_options_proto_inc.h"],
     deps = [
         ":image_segmenter_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
     ],
 )
