@@ -180,34 +180,34 @@ absl::Status SanityCheckOutputTensors(
 
   // Check dimensions for the other tensors are correct.
   if (output_tensors[0]->dims->data[0] != 1 ||
-      output_tensors[0]->dims->data[1] != num_results ||
+      output_tensors[0]->dims->data[1] < num_results ||
       output_tensors[0]->dims->data[2] != 4) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
-            "Expected locations tensor with dimensions [1,%d,4] at index 0, "
-            "found [%d,%d,%d].",
+            "Expected locations tensor with dimensions [1, num_detected_boxes, "
+            "4] at index 0, num_detected_boxes >= %d, found [%d,%d,%d].",
             num_results, output_tensors[0]->dims->data[0],
             output_tensors[0]->dims->data[1],
             output_tensors[0]->dims->data[2]));
   }
   if (output_tensors[1]->dims->data[0] != 1 ||
-      output_tensors[1]->dims->data[1] != num_results) {
+      output_tensors[1]->dims->data[1] < num_results) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
-            "Expected classes tensor with dimensions [1,%d] at index 1, "
-            "found [%d,%d].",
+            "Expected classes tensor with dimensions [1, num_detected_boxes] "
+            "at index 1, num_detected_boxes >= %d, found [%d,%d].",
             num_results, output_tensors[1]->dims->data[0],
             output_tensors[1]->dims->data[1]));
   }
   if (output_tensors[2]->dims->data[0] != 1 ||
-      output_tensors[2]->dims->data[1] != num_results) {
+      output_tensors[2]->dims->data[1] < num_results) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
-            "Expected scores tensor with dimensions [1,%d] at index 2, "
-            "found [%d,%d].",
+            "Expected scores tensor with dimensions [1, num_detected_boxes] "
+            "at index 2, num_detected_boxes >= %d, found [%d,%d].",
             num_results, output_tensors[2]->dims->data[0],
             output_tensors[2]->dims->data[1]));
   }
