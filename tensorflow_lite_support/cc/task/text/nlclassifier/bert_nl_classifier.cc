@@ -59,6 +59,15 @@ constexpr char kScoreTensorName[] = "probability";
 constexpr char kClassificationToken[] = "[CLS]";
 constexpr char kSeparator[] = "[SEP]";
 constexpr int kTokenizerProcessUnitIndex = 0;
+
+absl::Status SanityCheckOptions(const BertNLClassifierOptions& options) {
+  if (!options.has_base_options()) {
+    return CreateStatusWithPayload(absl::StatusCode::kInvalidArgument,
+                                   "Missing mandatory `base_options` field",
+                                   TfLiteSupportStatus::kInvalidArgumentError);
+  }
+  return absl::OkStatus();
+}
 }  // namespace
 
 absl::Status BertNLClassifier::Preprocess(
@@ -138,6 +147,8 @@ StatusOr<std::vector<core::Category>> BertNLClassifier::Postprocess(
 StatusOr<std::unique_ptr<BertNLClassifier>> BertNLClassifier::CreateFromOptions(
     const BertNLClassifierOptions& options,
     std::unique_ptr<tflite::OpResolver> resolver) {
+  RETURN_IF_ERROR(SanityCheckOptions(options));
+
   auto options_copy = absl::make_unique<BertNLClassifierOptions>(options);
 
   ASSIGN_OR_RETURN(

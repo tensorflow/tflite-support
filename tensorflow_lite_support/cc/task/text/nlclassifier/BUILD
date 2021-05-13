@@ -92,6 +92,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/text/tokenizers:tokenizer",
         "//tensorflow_lite_support/cc/text/tokenizers:tokenizer_utils",
         "//tensorflow_lite_support/metadata/cc:metadata_extractor",
+        "@com_google_absl//absl/base:core_headers",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
