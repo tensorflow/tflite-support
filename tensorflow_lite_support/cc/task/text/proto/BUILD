@@ -52,3 +52,27 @@ cc_library(
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
     ],
 )
+
+proto_library(
+    name = "bert_question_answerer_options_proto",
+    srcs = ["bert_question_answerer_options.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "bert_question_answerer_options_cc_proto",
+    deps = [
+        ":bert_question_answerer_options_proto",
+    ],
+)
+
+cc_library(
+    name = "bert_question_answerer_options_proto_inc",
+    hdrs = ["bert_question_answerer_options_proto_inc.h"],
+    deps = [
+        ":bert_question_answerer_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
+    ],
+)

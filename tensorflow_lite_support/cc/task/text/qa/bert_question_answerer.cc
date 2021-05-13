@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/task/text/qa/bert_question_answerer.h"
 
+#include "absl/status/status.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "tensorflow/lite/core/shims/cc/kernels/register.h"
@@ -35,6 +36,7 @@ constexpr char kSegmentIdsTensorName[] = "segment_ids";
 constexpr char kEndLogitsTensorName[] = "end_logits";
 constexpr char kStartLogitsTensorName[] = "start_logits";
 
+using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
@@ -49,48 +51,63 @@ using ::tflite::task::core::ReverseSortIndices;
 
 namespace {
 constexpr int kTokenizerProcessUnitIndex = 0;
+
+absl::Status SanityCheckOptions(const BertQuestionAnswererOptions& options) {
+  if (!options.has_base_options()) {
+    return CreateStatusWithPayload(StatusCode::kInvalidArgument,
+                                   "Missing mandatory `base_options` field",
+                                   TfLiteSupportStatus::kInvalidArgumentError);
+  }
+  return absl::OkStatus();
+}
+}  // namespace
+
+StatusOr<std::unique_ptr<QuestionAnswerer>>
+BertQuestionAnswerer::CreateFromOptions(
+    const BertQuestionAnswererOptions& options,
+    std::unique_ptr<tflite::OpResolver> resolver) {
+  RETURN_IF_ERROR(SanityCheckOptions(options));
+
+  // Copy options to ensure the ExternalFile outlives the duration of this
+  // created BertQuestionAnswerer object.
+  auto options_copy = absl::make_unique<BertQuestionAnswererOptions>(options);
+
+  ASSIGN_OR_RETURN(
+      auto bert_question_answerer,
+      core::TaskAPIFactory::CreateFromBaseOptions<BertQuestionAnswerer>(
+          &options_copy->base_options(), std::move(resolver)));
+  RETURN_IF_ERROR(
+      bert_question_answerer->InitializeFromMetadata(std::move(options_copy)));
+  return std::move(bert_question_answerer);
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
 BertQuestionAnswerer::CreateFromFile(
     const std::string& path_to_model_with_metadata) {
-  std::unique_ptr<BertQuestionAnswerer> api_to_init;
-  ASSIGN_OR_RETURN(
-      api_to_init,
-      core::TaskAPIFactory::CreateFromFile<BertQuestionAnswerer>(
-          path_to_model_with_metadata,
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
-          kNumLiteThreads));
-  RETURN_IF_ERROR(api_to_init->InitializeFromMetadata());
-  return api_to_init;
+  BertQuestionAnswererOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      path_to_model_with_metadata);
+  return CreateFromOptions(options);
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
 BertQuestionAnswerer::CreateFromBuffer(
     const char* model_with_metadata_buffer_data,
     size_t model_with_metadata_buffer_size) {
-  std::unique_ptr<BertQuestionAnswerer> api_to_init;
-  ASSIGN_OR_RETURN(
-      api_to_init,
-      core::TaskAPIFactory::CreateFromBuffer<BertQuestionAnswerer>(
-          model_with_metadata_buffer_data, model_with_metadata_buffer_size,
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
-          kNumLiteThreads));
-  RETURN_IF_ERROR(api_to_init->InitializeFromMetadata());
-  return api_to_init;
+  BertQuestionAnswererOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_content(
+      model_with_metadata_buffer_data, model_with_metadata_buffer_size);
+  return CreateFromOptions(options);
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>> BertQuestionAnswerer::CreateFromFd(
     int fd) {
-  std::unique_ptr<BertQuestionAnswerer> api_to_init;
-  ASSIGN_OR_RETURN(
-      api_to_init,
-      core::TaskAPIFactory::CreateFromFileDescriptor<BertQuestionAnswerer>(
-          fd,
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
-          kNumLiteThreads));
-  RETURN_IF_ERROR(api_to_init->InitializeFromMetadata());
-  return api_to_init;
+  BertQuestionAnswererOptions options;
+  options.mutable_base_options()
+      ->mutable_model_file()
+      ->mutable_file_descriptor_meta()
+      ->set_fd(fd);
+  return CreateFromOptions(options);
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
@@ -352,7 +369,10 @@ std::string BertQuestionAnswerer::ConvertIndexToString(int start, int end) {
                        orig_tokens_.begin() + end_index + 1, " ");
 }
 
-absl::Status BertQuestionAnswerer::InitializeFromMetadata() {
+absl::Status BertQuestionAnswerer::InitializeFromMetadata(
+    std::unique_ptr<BertQuestionAnswererOptions> options) {
+  options_ = std::move(options);
+
   const ProcessUnit* tokenizer_process_unit =
       GetMetadataExtractor()->GetInputProcessUnit(kTokenizerProcessUnitIndex);
   if (tokenizer_process_unit == nullptr) {
