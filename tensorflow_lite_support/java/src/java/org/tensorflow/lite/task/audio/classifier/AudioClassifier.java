@@ -271,7 +271,7 @@ public final class AudioClassifier extends BaseTaskApi {
       }
 
       /**
-       * Sets the score threshold in [0,1).
+       * Sets the score threshold.
        *
        * <p>It overrides the one provided in the model metadata (if any). Results below this value
        * are rejected.
