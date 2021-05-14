@@ -3,6 +3,29 @@
 This folder contains simple command-line tools for easily trying out the C++
 Vision Task APIs.
 
+## Coral integration
+
+Task Library now supports fast TFLite inference delegated onto
+[Coral Edge TPU devices][4]. See the documentation for more details
+(TODO(b/188094057): add link to tensorflow.org). To run the demo on a Coral
+device, add the following configurations to the bazel command:
+
+```bash
+# On the Linux
+CORAL_SETTING="--define darwinn_portable=1 --linkopt=-lusb-1.0"
+# On the Mac, add '--linkopt=-lusb-1.0 --linkopt=-L/opt/local/lib/' if you are
+# using MacPorts or '--linkopt=-lusb-1.0 --linkopt=-L/opt/homebrew/lib' if you
+# are using Homebrew.
+CORAL_SETTING="--define darwinn_portable=1 --linkopt=-L/opt/local/lib/ --linkopt=-lusb-1.0"
+# Windows is not supported yet.
+```
+
+See the example commands in each task demo below.
+
+You can also explore more [pretrained Coral model](https://coral.ai/models) and
+try them in the demo. All the models have populated with
+[TFLite Model Metadata](https://www.tensorflow.org/lite/convert/metadata).
+
 ## Image Classifier
 
 #### Prerequisites
@@ -35,19 +58,9 @@ $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/sparrow.jpg \
  --max_results=3
 ```
 
-To run the demo on a [Coral EdgeTPU device][4], add the following configurations
-to the command:
-
-```bash
-# From Linux
-CORAL_SETTING="--define darwinn_portable=1 --linkopt=-lusb-1.0"
-# From Mac and MacPorts (https://www.macports.org/). Brew (https://brew.sh/) has
-# a different library location, i.e. --linkopt=-L<path> is different.
-CORAL_SETTING="--define darwinn_portable=1 --linkopt=-L/opt/local/lib/ --linkopt=-lusb-1.0"
-# Windows is not supported yet.
-```
-
-Then run:
+To run the demo on a [Coral Edge TPU device][4], create the Coral
+configurations, `CORAL_SETTING` (see the section,
+[Coral integration](#coral-integration)), then run:
 
 ```bash
 # Download the Coral model:
@@ -70,6 +83,7 @@ $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/sparrow.jpg \
 In the console, you should get:
 
 ```
+Time cost to classify the input image on CPU: 109ms
 Results:
   Rank #0:
    index       : 671
@@ -120,11 +134,32 @@ $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/dogs.jpg \
  --max_results=2
 ```
 
+To run the demo on a [Coral Edge TPU device][4], create the Coral
+configurations, `CORAL_SETTING` (see the section,
+[Coral integration](#coral-integration)), then run:
+
+```bash
+# Download the model:
+curl \
+ -L 'https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v1_coco_quant_postprocess_edgetpu.tflite' \
+ -o /tmp/ssd_mobilenet_v1_coco_quant_postprocess_edgetpu.tflite
+
+# Run the detection tool:
+bazel run -c opt \
+ tensorflow_lite_support/examples/task/vision/desktop:object_detector_demo -- \
+ --model_path=/tmp/ssd_mobilenet_v1_coco_quant_postprocess_edgetpu.tflite \
+ --image_path=\
+$(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/dogs.jpg \
+ --output_png=/tmp/detection-output.png \
+ --max_results=2
+```
+
 #### Results
 
 In the console, you should get:
 
 ```
+Time cost to detect the input image on CPU: 123 ms
 Results saved to: /tmp/detection-output.png
 Results:
  Detection #0 (red):
@@ -181,6 +216,7 @@ $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/plane.jpg \
 In the console, you should get:
 
 ```
+Time cost to segment the input image on CPU: 138 ms
 Category mask saved to: /tmp/segmentation-output.png
 Color Legend:
  (r: 000, g: 000, b: 000):

@@ -5,13 +5,6 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-config_setting(
-    name = "darwinn_portable",
-    values = {
-        "define": "darwinn_portable=1",
-    },
-)
-
 cc_binary(
     name = "image_classifier_demo",
     srcs = ["image_classifier_demo.cc"],
@@ -30,7 +23,7 @@ cc_binary(
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
     ] + select({
-        ":darwinn_portable": [
+        "//tensorflow_lite_support/examples/task:darwinn_portable": [
             "//tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin",
         ],
         "//conditions:default": [
@@ -42,6 +35,11 @@ cc_binary(
     name = "object_detector_demo",
     srcs = ["object_detector_demo.cc"],
     deps = [
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:str_format",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:external_file_handler",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
@@ -52,18 +50,24 @@ cc_binary(
         "//tensorflow_lite_support/cc/task/vision/proto:object_detector_options_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/flags:parse",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/strings:str_format",
-    ],
+    ] + select({
+        "//tensorflow_lite_support/examples/task:darwinn_portable": [
+            "//tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin",
+        ],
+        "//conditions:default": [
+        ],
+    }),
 )
 
 cc_binary(
     name = "image_segmenter_demo",
     srcs = ["image_segmenter_demo.cc"],
     deps = [
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:str_format",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:external_file_handler",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
@@ -72,18 +76,23 @@ cc_binary(
         "//tensorflow_lite_support/cc/task/vision/proto:segmentations_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/flags:parse",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/strings:str_format",
-    ],
+    ] + select({
+        "//tensorflow_lite_support/examples/task:darwinn_portable": [
+            "//tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin",
+        ],
+        "//conditions:default": [
+        ],
+    }),
 )
 
 cc_binary(
     name = "image_embedder_demo",
     srcs = ["image_embedder_demo.cc"],
     deps = [
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:external_file_handler",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
@@ -92,9 +101,11 @@ cc_binary(
         "//tensorflow_lite_support/cc/task/vision/proto:image_embedder_options_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/flags:parse",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/strings:str_format",
-    ],
+    ] + select({
+        "//tensorflow_lite_support/examples/task:darwinn_portable": [
+            "//tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin",
+        ],
+        "//conditions:default": [
+        ],
+    }),
 )
