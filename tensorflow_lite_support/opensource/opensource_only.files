@@ -1,9 +1,8 @@
+tensorflow_lite_support/cc/port/build_defs.bzl
 tensorflow_lite_support/custom_ops/kernel/sentencepiece/native.bzl
 tensorflow_lite_support/opensource/.bazelversion
 tensorflow_lite_support/opensource/BUILD
 tensorflow_lite_support/opensource/WORKSPACE
-tensorflow_lite_support/opensource/cc_build_defs.bzl
-tensorflow_lite_support/opensource/http_files.bzl
 tensorflow_lite_support/third_party/android/BUILD
 tensorflow_lite_support/third_party/android/android.bzl.tpl
 tensorflow_lite_support/third_party/android/android_configure.BUILD.tpl
@@ -26,6 +25,7 @@ tensorflow_lite_support/third_party/stblib.BUILD
 tensorflow_lite_support/third_party/toolchains/java/BUILD
 tensorflow_lite_support/third_party/utf.BUILD
 tensorflow_lite_support/third_party/zlib.BUILD
+tensorflow_lite_support/tools/build_rules/http_files.bzl
 tensorflow_lite_support/tools/ci_build/build_all.sh
 tensorflow_lite_support/tools/ci_build/common.sh
 tensorflow_lite_support/tools/ci_build/common_win.bat
