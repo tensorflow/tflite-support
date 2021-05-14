@@ -770,7 +770,11 @@ bool GenerateBuildGradleContent(CodeWriter* code_writer,
   code_writer->Append(R"(buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()  // For versioned releases
+        maven {         // For snapshot releases
+            name 'ossrh-snapshot'
+            url 'http://oss.sonatype.org/content/repositories/snapshots'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
@@ -826,8 +830,8 @@ preBuild.dependsOn downloadLibs
 
 dependencies {
     compileOnly 'org.checkerframework:checker-qual:2.5.8'
-    api 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
-    api 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly'
+    api 'org.tensorflow:tensorflow-lite:0.0.0-nightly-SNAPSHOT'
+    api 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly-SNAPSHOT'
     api files("$buildDir/libs/tensorflow-lite-support-metadata.jar")
     implementation 'org.apache.commons:commons-compress:1.19'
 })");
