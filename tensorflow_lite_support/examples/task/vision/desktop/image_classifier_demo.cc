@@ -58,6 +58,9 @@ ABSL_FLAG(
     "Comma-separated list of class names that acts as a blacklist. If "
     "non-empty, classification results whose 'class_name' is in this list "
     "are filtered out. Mutually exclusive with 'class_name_whitelist'.");
+ABSL_FLAG(bool, use_coral, false,
+          "If true, inference will be delegated to a connected Coral EdgeTPU "
+          "device.");
 
 namespace tflite {
 namespace task {
@@ -78,6 +81,10 @@ ImageClassifierOptions BuildOptions() {
   for (const std::string& class_name :
        absl::GetFlag(FLAGS_class_name_blacklist)) {
     options.add_class_name_blacklist(class_name);
+  }
+  if (absl::GetFlag(FLAGS_use_coral)) {
+    options.mutable_compute_settings()->mutable_tflite_settings()->set_delegate(
+        ::tflite::proto::Delegate::EDGETPU_CORAL);
   }
   return options;
 }

@@ -9,9 +9,10 @@ Vision Task APIs.
 
 You will need:
 
-* a TFLite image classification model (e.g. [aiy/vision/classifier/birds_V1][1],
-a bird classification model available on TensorFlow Hub),
-* a PNG, JPEG or GIF image to run classification on, e.g.:
+*   a TFLite image classification model (e.g.
+    [aiy/vision/classifier/birds_V1][1], a bird classification model available
+    on TensorFlow Hub),
+*   a PNG, JPEG or GIF image to run classification on, e.g.:
 
 ![sparrow](g3doc/sparrow.jpg)
 
@@ -32,6 +33,36 @@ bazel run -c opt \
  --image_path=\
 $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/sparrow.jpg \
  --max_results=3
+```
+
+To run the demo on a [Coral EdgeTPU device][4], add the following configurations
+to the command:
+
+```bash
+# From Linux
+CORAL_SETTING="--define darwinn_portable=1 --linkopt=-lusb-1.0"
+# From Mac and MacPorts (https://www.macports.org/). Brew (https://brew.sh/) has
+# a different library location, i.e. --linkopt=-L<path> is different.
+CORAL_SETTING="--define darwinn_portable=1 --linkopt=-L/opt/local/lib/ --linkopt=-lusb-1.0"
+# Windows is not supported yet.
+```
+
+Then run:
+
+```bash
+# Download the Coral model:
+curl \
+ -L 'https://github.com/google-coral/test_data/raw/master/mobilenet_v2_1.0_224_inat_bird_quant_edgetpu.tflite' \
+ -o /tmp/mobilenet_v2_1.0_224_inat_bird_quant_edgetpu.tflite
+
+# Run the classification tool:
+bazel run -c opt ${CORAL_SETTING} \
+ tensorflow_lite_support/examples/task/vision/desktop:image_classifier_demo -- \
+ --model_path=/tmp/mobilenet_v2_1.0_224_inat_bird_quant_edgetpu.tflite \
+ --image_path=\
+$(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/sparrow.jpg \
+ --max_results=3 \
+ --use_coral=true
 ```
 
 #### Results
@@ -63,9 +94,9 @@ Results:
 
 You will need:
 
-* a TFLite object detection model (e.g. [ssd_mobilenet_v1][2], a generic object
-detection model available on TensorFlow Hub),
-* a PNG, JPEG or GIF image to run detection on, e.g.:
+*   a TFLite object detection model (e.g. [ssd_mobilenet_v1][2], a generic
+    object detection model available on TensorFlow Hub),
+*   a PNG, JPEG or GIF image to run detection on, e.g.:
 
 ![dogs](g3doc/dogs.jpg)
 
@@ -120,9 +151,9 @@ And `/tmp/detection-output.jpg` should contain:
 
 You will need:
 
-* a TFLite image segmentation model (e.g. [deeplab_v3][3], a generic
-segmentation model available on TensorFlow Hub),
-* a PNG, JPEG or GIF image to run segmentation on, e.g.:
+*   a TFLite image segmentation model (e.g. [deeplab_v3][3], a generic
+    segmentation model available on TensorFlow Hub),
+*   a PNG, JPEG or GIF image to run segmentation on, e.g.:
 
 ![plane](g3doc/plane.jpg)
 
@@ -178,3 +209,4 @@ And `/tmp/segmentation-output.jpg` should contain the segmentation mask:
 [1]: https://tfhub.dev/google/lite-model/aiy/vision/classifier/birds_V1/3
 [2]: https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/2
 [3]: https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/2
+[4]: https://coral.ai/docs/edgetpu/inference/

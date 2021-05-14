@@ -5,10 +5,21 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+config_setting(
+    name = "darwinn_portable",
+    values = {
+        "define": "darwinn_portable=1",
+    },
+)
+
 cc_binary(
     name = "image_classifier_demo",
     srcs = ["image_classifier_demo.cc"],
     deps = [
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:external_file_handler",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
@@ -18,11 +29,13 @@ cc_binary(
         "//tensorflow_lite_support/cc/task/vision/proto:image_classifier_options_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/flags:parse",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/strings:str_format",
-    ],
+    ] + select({
+        ":darwinn_portable": [
+            "//tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin",
+        ],
+        "//conditions:default": [
+        ],
+    }),
 )
 
 cc_binary(
