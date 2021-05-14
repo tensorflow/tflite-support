@@ -103,14 +103,6 @@ absl::Status ImageClassifier::SanityCheckOptions(
         "Invalid `max_results` option: value must be != 0",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
-  if (options.score_threshold() < 0 || options.score_threshold() >= 1) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat(
-            "`score_threshold` out of range: %f. Valid range is [0,1[.",
-            options.score_threshold()),
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
   if (options.class_name_whitelist_size() > 0 &&
       options.class_name_blacklist_size() > 0) {
     return CreateStatusWithPayload(
