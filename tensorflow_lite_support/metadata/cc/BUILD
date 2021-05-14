@@ -11,6 +11,31 @@ stamp_metadata_parser_version(
     outs = ["metadata_parser.h"],
 )
 
+# This is a DL-Team custom library that just exposes metadata of interest for
+# model inspection on the phone.
+#
+# We use this library rather than the metadata_extractor directly because the
+# metadata_extractor.h header brings in a bunch of dependencies
+# would clutter the phone.
+#
+# This is a cc_binary rather than a cc_library target as we want to link
+# all static library dependencies to avoid unresolved symbols in Xcode.
+# The resulting binaries are pretty large, but should thin down on ultimate
+# linking.
+#
+cc_binary(
+    name = "dl_tflite_metadata",
+    srcs = [
+         "dl_tflite_metadata.cc",
+         "dl_tflite_metadata.h"
+    ],
+    deps = [
+         ":metadata_extractor",
+    ],
+    linkstatic=1,
+    linkshared=True,
+)
+
 cc_library(
     name = "metadata_extractor",
     srcs = ["metadata_extractor.cc"],
