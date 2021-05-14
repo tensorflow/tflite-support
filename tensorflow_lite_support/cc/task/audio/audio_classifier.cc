@@ -134,14 +134,6 @@ absl::Status AudioClassifier::SanityCheckOptions(
         "Invalid `max_results` option: value must be != 0",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
-  if (options.score_threshold() < 0 || options.score_threshold() >= 1) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat(
-            "`score_threshold` out of range: %f. Valid range is [0,1[.",
-            options.score_threshold()),
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
   if (options.class_name_allowlist_size() > 0 &&
       options.class_name_denylist_size() > 0) {
     return CreateStatusWithPayload(

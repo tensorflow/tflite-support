@@ -34,7 +34,7 @@ message AudioClassifierOptions {
   // returned.
   optional int32 max_results = 3 [default = -1];
 
-  // Score threshold in [0,1), overrides the ones provided in the model metadata
+  // Score threshold, overrides the ones provided in the model metadata
   // (if any). Results below this value are rejected.
   optional float score_threshold = 4;
 
