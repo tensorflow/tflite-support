@@ -37,7 +37,6 @@ namespace text {
 namespace qa {
 
 namespace {
-using std::chrono::duration_cast;
 using std::chrono::microseconds;
 using std::chrono::steady_clock;
 }  // namespace
