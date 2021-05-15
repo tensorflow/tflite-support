@@ -20,6 +20,19 @@ CORAL_SETTING="--define darwinn_portable=1 --linkopt=-L/opt/local/lib/ --linkopt
 # Windows is not supported yet.
 ```
 
+Note, the `libusb-1.0-0-dev` package is required. It can be installed as
+follows:
+
+```bash
+# On the Linux
+sudo apt-get install libusb-1.0-0-dev
+
+# On the macOS
+port install libusb
+# or
+brew install libusb
+```
+
 See the example commands in each task demo below.
 
 You can also explore more [pretrained Coral model](https://coral.ai/models) and
