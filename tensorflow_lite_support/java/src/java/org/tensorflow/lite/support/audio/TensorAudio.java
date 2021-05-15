@@ -65,8 +65,8 @@ public class TensorAudio {
   private final TensorAudioFormat format;
 
   /**
-   * Creates a {@link TensorAudio} instance with a ring buffer whose size is {@code sampleCounts} *
-   * {@code format.getChannels()}.
+   * Creates a {@link android.media.AudioRecord} instance with a ring buffer whose size is {@code
+   * sampleCounts} * {@code format.getChannels()}.
    *
    * @param format the expected {@link TensorAudioFormat} of audio data loaded into this class.
    * @param sampleCounts the number of samples to be fed into the model
@@ -76,11 +76,11 @@ public class TensorAudio {
   }
 
   /**
-   * Creates a {@link TensorAudio} instance with a ring buffer whose size is {@code sampleCounts} *
-   * {@code format.getChannelCount()}.
+   * Creates a {@link android.media.TensorAudio} instance with a ring buffer whose size is {@code
+   * sampleCounts} * {@code format.getChannelCount()}.
    *
-   * @param format the {@link AudioFormat} required by the TFLite model. It defines the number of
-   *     channels and sample rate.
+   * @param format the {@link android.media.AudioFormat} required by the TFLite model. It defines
+   *     the number of channels and sample rate.
    * @param sampleCounts the number of samples to be fed into the model
    */
   public static TensorAudio create(AudioFormat format, int sampleCounts) {
@@ -135,8 +135,8 @@ public class TensorAudio {
   /**
    * Stores the input audio samples {@code src} in the ring buffer.
    *
-   * @param src input audio samples in {@link AudioFormat#ENCODING_PCM_FLOAT}. For multi-channel
-   *     input, the array is interleaved.
+   * @param src input audio samples in {@link android.media.AudioFormat#ENCODING_PCM_FLOAT}. For
+   *     multi-channel input, the array is interleaved.
    */
   public void load(float[] src) {
     load(src, 0, src.length);
@@ -145,8 +145,8 @@ public class TensorAudio {
   /**
    * Stores the input audio samples {@code src} in the ring buffer.
    *
-   * @param src input audio samples in {@link AudioFormat#ENCODING_PCM_FLOAT}. For multi-channel
-   *     input, the array is interleaved.
+   * @param src input audio samples in {@link android.media.AudioFormat#ENCODING_PCM_FLOAT}. For
+   *     multi-channel input, the array is interleaved.
    * @param offsetInFloat starting position in the {@code src} array
    * @param sizeInFloat the number of float values to be copied
    * @throws IllegalArgumentException for incompatible audio format or incorrect input size
@@ -164,8 +164,8 @@ public class TensorAudio {
    * Converts the input audio samples {@code src} to ENCODING_PCM_FLOAT, then stores it in the ring
    * buffer.
    *
-   * @param src input audio samples in {@link AudioFormat#ENCODING_PCM_16BIT}. For multi-channel
-   *     input, the array is interleaved.
+   * @param src input audio samples in {@link android.media.AudioFormat#ENCODING_PCM_16BIT}. For
+   *     multi-channel input, the array is interleaved.
    */
   public void load(short[] src) {
     load(src, 0, src.length);
@@ -175,8 +175,8 @@ public class TensorAudio {
    * Converts the input audio samples {@code src} to ENCODING_PCM_FLOAT, then stores it in the ring
    * buffer.
    *
-   * @param src input audio samples in {@link AudioFormat#ENCODING_PCM_16BIT}. For multi-channel
-   *     input, the array is interleaved.
+   * @param src input audio samples in {@link android.media.AudioFormat#ENCODING_PCM_16BIT}. For
+   *     multi-channel input, the array is interleaved.
    * @param offsetInShort starting position in the src array
    * @param sizeInShort the number of short values to be copied
    * @throws IllegalArgumentException if the source array can't be copied
@@ -196,10 +196,10 @@ public class TensorAudio {
   }
 
   /**
-   * Loads latest data from the {@link AudioRecord} in a non-blocking way. Only supporting
-   * ENCODING_PCM_16BIT and ENCODING_PCM_FLOAT.
+   * Loads latest data from the {@link android.media.AudioRecord} in a non-blocking way. Only
+   * supporting ENCODING_PCM_16BIT and ENCODING_PCM_FLOAT.
    *
-   * @param record an instance of {@link AudioRecord}
+   * @param record an instance of {@link android.media.AudioRecord}
    * @return number of captured audio values whose size is {@code channelCount * sampleCount}. If
    *     there was no new data in the AudioRecord or an error occured, this method will return 0.
    * @throws IllegalArgumentException for unsupported audio encoding format
@@ -250,7 +250,7 @@ public class TensorAudio {
 
   /**
    * Returns a float {@link TensorBuffer} holding all the available audio samples in {@link
-   * AudioFormat#ENCODING_PCM_FLOAT} i.e. values are in the range of [-1, 1].
+   * android.media.AudioFormat#ENCODING_PCM_FLOAT} i.e. values are in the range of [-1, 1].
    */
   public TensorBuffer getTensorBuffer() {
     ByteBuffer byteBuffer = buffer.getBuffer();
