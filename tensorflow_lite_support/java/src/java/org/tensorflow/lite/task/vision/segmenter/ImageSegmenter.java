@@ -60,7 +60,7 @@ import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi.InferenceProvider;
  *             is the number of classes supported by the model.
  *         <li>optional (but recommended) label map(s) can be attached as AssociatedFile-s with type
  *             TENSOR_AXIS_LABELS, containing one label per line. The first such AssociatedFile (if
- *             any) is used to fill the class name, i.e. {@link ColoredLabel#getClassName} of the
+ *             any) is used to fill the class name, i.e. {@link ColoredLabel#getlabel} of the
  *             results. The display name, i.e. {@link ColoredLabel#getDisplayName}, is filled from
  *             the AssociatedFile (if any) whose locale matches the `display_names_locale` field of
  *             the `ImageSegmenterOptions` used at creation time ("en" by default, i.e. English). If
@@ -256,11 +256,11 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    * <p>{@link ImageSegmenter} supports the following {@link TensorImage} color space types:
    *
    * <ul>
-   *   <li>{@link ColorSpaceType#RGB}
-   *   <li>{@link ColorSpaceType#NV12}
-   *   <li>{@link ColorSpaceType#NV21}
-   *   <li>{@link ColorSpaceType#YV12}
-   *   <li>{@link ColorSpaceType#YV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
@@ -281,17 +281,17 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    * <p>{@link ImageSegmenter} supports the following {@link TensorImage} color space types:
    *
    * <ul>
-   *   <li>{@link ColorSpaceType#RGB}
-   *   <li>{@link ColorSpaceType#NV12}
-   *   <li>{@link ColorSpaceType#NV21}
-   *   <li>{@link ColorSpaceType#YV12}
-   *   <li>{@link ColorSpaceType#YV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @param options {@link ImageSegmenter} only supports image rotation (through {@link
-   *     ImageProcessingOptions#Builder#setOrientation}) currently. The orientation of an image
-   *     defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.
+   *     ImageProcessingOptions.Builder#setOrientation}) currently. The orientation of an image
+   *     defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}.
    * @return results of performing image segmentation. Note that at the time, a single {@link
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation

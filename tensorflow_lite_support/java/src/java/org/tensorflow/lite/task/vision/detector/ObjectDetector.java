@@ -397,11 +397,11 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    * <p>{@link ObjectDetector} supports the following {@link TensorImage} color space types:
    *
    * <ul>
-   *   <li>{@link ColorSpaceType#RGB}
-   *   <li>{@link ColorSpaceType#NV12}
-   *   <li>{@link ColorSpaceType#NV21}
-   *   <li>{@link ColorSpaceType#YV12}
-   *   <li>{@link ColorSpaceType#YV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
@@ -418,17 +418,17 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    * <p>{@link ObjectDetector} supports the following {@link TensorImage} color space types:
    *
    * <ul>
-   *   <li>{@link ColorSpaceType#RGB}
-   *   <li>{@link ColorSpaceType#NV12}
-   *   <li>{@link ColorSpaceType#NV21}
-   *   <li>{@link ColorSpaceType#YV12}
-   *   <li>{@link ColorSpaceType#YV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @param options {@link ObjectDetector} only supports image rotation (through {@link
-   *     ImageProcessingOptions#Builder#setOrientation}) currently. The orientation of an image
-   *     defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.
+   *     ImageProcessingOptions.Builder#setOrientation}) currently. The orientation of an image
+   *     defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}.
    * @throws AssertionError if error occurs when processing the image from the native code
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
