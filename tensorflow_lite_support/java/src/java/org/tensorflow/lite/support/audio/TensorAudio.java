@@ -45,7 +45,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
  * <pre>
  *   val tensor = TensorAudio.create(format, modelInputLength)
  *   tensor.load(newData)
- *   interpreter.run(tensor.getFloatBuffer(), outputBuffer);
+ *   interpreter.run(tensor.getTensorBuffer(), outputBuffer);
  * </pre>
  *
  * <p>Another sample usage with {@link AudioRecord}
@@ -54,7 +54,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
  *   val tensor = TensorAudio.create(format, modelInputLength)
  *   Timer().scheduleAtFixedRate(delay, period) {
  *     tensor.load(audioRecord)
- *     interpreter.run(tensor.getFloatBuffer(), outputBuffer)
+ *     interpreter.run(tensor.getTensorBuffer(), outputBuffer)
  *   }
  * </pre>
  */
@@ -250,7 +250,7 @@ public class TensorAudio {
 
   /**
    * Returns a float {@link TensorBuffer} holding all the available audio samples in {@link
-   * AudioFormat#ENCODING_PCM_16BIT} i.e. values are in the range of [-1, 1].
+   * AudioFormat#ENCODING_PCM_FLOAT} i.e. values are in the range of [-1, 1].
    */
   public TensorBuffer getTensorBuffer() {
     ByteBuffer byteBuffer = buffer.getBuffer();
