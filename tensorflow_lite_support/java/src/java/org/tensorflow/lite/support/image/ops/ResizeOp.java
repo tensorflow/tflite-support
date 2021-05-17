@@ -46,9 +46,9 @@ public class ResizeOp implements ImageOperator {
   /**
    * Creates a ResizeOp which can resize images to specified size in specified method.
    *
-   * @param targetHeight: The expected height of resized image.
-   * @param targetWidth: The expected width of resized image.
-   * @param resizeMethod: The algorithm to use for resizing. Options: {@link ResizeMethod}
+   * @param targetHeight The expected height of resized image.
+   * @param targetWidth The expected width of resized image.
+   * @param resizeMethod The algorithm to use for resizing. Options: {@link ResizeMethod}
    */
   public ResizeOp(int targetHeight, int targetWidth, ResizeMethod resizeMethod) {
     this.targetHeight = targetHeight;

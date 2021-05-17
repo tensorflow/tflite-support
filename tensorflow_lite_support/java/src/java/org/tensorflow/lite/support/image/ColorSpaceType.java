@@ -159,8 +159,8 @@ public enum ColorSpaceType {
   },
 
   /**
-   * YUV420 format corresponding to {@link ImageFormat#YUV_420_888}. The actual encoding format
-   * (i.e. NV12 / Nv21 / YV12 / YV21) depends on the implementation of the image.
+   * YUV420 format corresponding to {@link android.graphics.ImageFormat#YUV_420_888}. The actual
+   * encoding format (i.e. NV12 / Nv21 / YV12 / YV21) depends on the implementation of the image.
    *
    * <p>Use this format only when you load an {@link android.media.Image}.
    */

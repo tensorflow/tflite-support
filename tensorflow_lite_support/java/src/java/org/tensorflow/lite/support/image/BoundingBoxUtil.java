@@ -29,8 +29,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 /**
  * Helper class for converting values that represents bounding boxes into rectangles.
  *
- * <p>The class provides a static function to create bounding boxes as {@link RectF} from different
- * types of configurations.
+ * <p>The class provides a static function to create bounding boxes as {@link
+ * android.graphics.RectF} from different types of configurations.
  *
  * <p>Generally, a bounding box could be represented by 4 float values, but the values could be
  * interpreted in many ways. We now support 3 {@link Type} of configurations, and the order of
@@ -229,8 +229,7 @@ public final class BoundingBoxUtil {
       int imageWidth,
       CoordinateType coordinateType) {
     if (coordinateType == CoordinateType.PIXEL) {
-      return new RectF(
-          left, top, right, bottom);
+      return new RectF(left, top, right, bottom);
     } else if (coordinateType == CoordinateType.RATIO) {
       return new RectF(
           left * imageWidth, top * imageHeight, right * imageWidth, bottom * imageHeight);
