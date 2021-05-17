@@ -108,8 +108,8 @@ public class Model {
     /**
      * Creates a builder which loads tflite model from asset folder using memory-mapped files.
      *
-     * @param context: Application context to access assets.
-     * @param modelPath: Asset path of the model (.tflite file).
+     * @param context Application context to access assets.
+     * @param modelPath Asset path of the model (.tflite file).
      * @throws IOException if an I/O error occurs when loading the tflite model.
      */
     @NonNull

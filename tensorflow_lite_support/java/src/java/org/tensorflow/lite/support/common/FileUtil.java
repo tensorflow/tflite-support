@@ -130,8 +130,10 @@ public class FileUtil {
 
   /**
    * Loads vocabulary from an input stream of an opened vocabulary file (which is a single-column
-   * text file). See details for vocabulary files in {@link FileUtil#loadVocabularyFile(Context,
-   * String)}.
+   * text file).
+   *
+   * <p>A vocabulary file is a single-column plain text file whose contents are split into lines,
+   * and each line is an individual value. The file should be in assets of the context.
    *
    * @param inputStream the input stream of an opened vocabulary file.
    * @return a list of vocabulary words.
@@ -157,7 +159,7 @@ public class FileUtil {
     SupportPreconditions.checkNotNull(context, "Context should not be null.");
     SupportPreconditions.checkNotNull(filePath, "File path cannot be null.");
     try (AssetFileDescriptor fileDescriptor = context.getAssets().openFd(filePath);
-    FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor())) {
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor())) {
       FileChannel fileChannel = inputStream.getChannel();
       long startOffset = fileDescriptor.getStartOffset();
       long declaredLength = fileDescriptor.getDeclaredLength();

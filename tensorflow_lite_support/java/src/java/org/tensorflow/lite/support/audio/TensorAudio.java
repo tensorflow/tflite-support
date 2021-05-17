@@ -37,8 +37,9 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
  * aggregated audio samples via `getTensorBuffer` method.
  *
  * <p>Note that this class can only handle input audio in Float (in {@link
- * AudioFormat#ENCODING_PCM_16BIT}) or Short (in {@link AudioFormat#ENCODING_PCM_FLOAT}). Internally
- * it converts and stores all the audio samples in PCM Float encoding.
+ * android.media.AudioFormat#ENCODING_PCM_16BIT}) or Short (in {@link
+ * android.media.AudioFormat#ENCODING_PCM_FLOAT}). Internally it converts and stores all the audio
+ * samples in PCM Float encoding.
  *
  * <p>Typical usage in Kotlin
  *
@@ -48,7 +49,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
  *   interpreter.run(tensor.getTensorBuffer(), outputBuffer);
  * </pre>
  *
- * <p>Another sample usage with {@link AudioRecord}
+ * <p>Another sample usage with {@link android.media.AudioRecord}
  *
  * <pre>
  *   val tensor = TensorAudio.create(format, modelInputLength)
@@ -76,8 +77,8 @@ public class TensorAudio {
   }
 
   /**
-   * Creates a {@link android.media.TensorAudio} instance with a ring buffer whose size is {@code
-   * sampleCounts} * {@code format.getChannelCount()}.
+   * Creates a {@link TensorAudio} instance with a ring buffer whose size is {@code sampleCounts} *
+   * {@code format.getChannelCount()}.
    *
    * @param format the {@link android.media.AudioFormat} required by the TFLite model. It defines
    *     the number of channels and sample rate.
