@@ -275,7 +275,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       }
 
       /**
-       * Sets the score threshold in [0,1).
+       * Sets the score threshold.
        *
        * <p>It overrides the one provided in the model metadata (if any). Results below this value
        * are rejected.
@@ -377,11 +377,11 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    * <p>{@link ImageClassifier} supports the following {@link TensorImage} color space types:
    *
    * <ul>
-   *   <li>{@link ColorSpaceType#RGB}
-   *   <li>{@link ColorSpaceType#NV12}
-   *   <li>{@link ColorSpaceType#NV21}
-   *   <li>{@link ColorSpaceType#YV12}
-   *   <li>{@link ColorSpaceType#YV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
@@ -398,20 +398,20 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    * <p>{@link ImageClassifier} supports the following options:
    *
    * <ul>
-   *   <li>Region of interest (ROI) (through {@link ImageProcessingOptions#Builder#setRoi}). It
+   *   <li>Region of interest (ROI) (through {@link ImageProcessingOptions.Builder#setRoi}). It
    *       defaults to the entire image.
-   *   <li>image rotation (through {@link ImageProcessingOptions#Builder#setOrientation}). It
-   *       defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.
+   *   <li>image rotation (through {@link ImageProcessingOptions.Builder#setOrientation}). It
+   *       defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}.
    * </ul>
    *
    * <p>{@link ImageClassifier} supports the following {@link TensorImage} color space types:
    *
    * <ul>
-   *   <li>{@link ColorSpaceType#RGB}
-   *   <li>{@link ColorSpaceType#NV12}
-   *   <li>{@link ColorSpaceType#NV21}
-   *   <li>{@link ColorSpaceType#YV12}
-   *   <li>{@link ColorSpaceType#YV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image

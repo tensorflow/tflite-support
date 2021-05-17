@@ -45,8 +45,8 @@ public class ResizeWithCropOrPadOp implements ImageOperator {
    * Creates a ResizeWithCropOrPadOp which could crop/pad images to specified size. It adopts
    * center-crop and zero-padding.
    *
-   * @param targetHeight: The expected height of cropped/padded image.
-   * @param targetWidth: The expected width of cropped/padded image.
+   * @param targetHeight The expected height of cropped/padded image.
+   * @param targetWidth The expected width of cropped/padded image.
    */
   public ResizeWithCropOrPadOp(int targetHeight, int targetWidth) {
     this.targetHeight = targetHeight;

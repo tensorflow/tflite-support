@@ -26,54 +26,45 @@ limitations under the License.
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' classification model.");
 ABSL_FLAG(std::string, text, "", "Text to classify.");
-ABSL_FLAG(int, input_tensor_index, -1, "Input tensor index of the model.");
-ABSL_FLAG(int, output_score_tensor_index, -1,
-          "Output score tensor index of the model.");
-ABSL_FLAG(int, output_label_tensor_index, -1,
-          "Output label tensor index of the model.");
-ABSL_FLAG(std::string, input_tensor_name, "",
-          "Input tensor name of the model.");
-ABSL_FLAG(std::string, output_score_tensor_name, "",
-          "Output score tensor name of the model.");
-ABSL_FLAG(std::string, output_label_tensor_name, "",
-          "Output label tensor name of the model.");
+ABSL_FLAG(bool, use_coral, false,
+          "If true, inference will be delegated to a connected Coral Edge TPU "
+          "device.");
 
 namespace tflite {
 namespace task {
 namespace text {
 namespace nlclassifier {
 
+namespace {
+using std::chrono::microseconds;
+using std::chrono::steady_clock;
+}  // namespace
+
 absl::Status Classify() {
-  NLClassifierOptions options{};
-  if (absl::GetFlag(FLAGS_input_tensor_index) >= 0) {
-    options.input_tensor_index = absl::GetFlag(FLAGS_input_tensor_index);
-  }
-  if (absl::GetFlag(FLAGS_output_score_tensor_index) >= 0) {
-    options.output_score_tensor_index =
-        absl::GetFlag(FLAGS_output_score_tensor_index);
-  }
-  if (absl::GetFlag(FLAGS_output_label_tensor_index) >= 0) {
-    options.output_label_tensor_index =
-        absl::GetFlag(FLAGS_output_label_tensor_index);
-  }
-  if (!absl::GetFlag(FLAGS_input_tensor_name).empty()) {
-    options.input_tensor_name = absl::GetFlag(FLAGS_input_tensor_name);
-  }
-  if (!absl::GetFlag(FLAGS_output_score_tensor_name).empty()) {
-    options.output_score_tensor_name =
-        absl::GetFlag(FLAGS_output_score_tensor_name);
-  }
-  if (!absl::GetFlag(FLAGS_output_label_tensor_name).empty()) {
-    options.output_label_tensor_name =
-        absl::GetFlag(FLAGS_output_label_tensor_name);
+  tflite::task::text::NLClassifierOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      absl::GetFlag(FLAGS_model_path));
+  if (absl::GetFlag(FLAGS_use_coral)) {
+    options.mutable_base_options()
+        ->mutable_compute_settings()
+        ->mutable_tflite_settings()
+        ->set_delegate(::tflite::proto::Delegate::EDGETPU_CORAL);
   }
 
   ASSIGN_OR_RETURN(std::unique_ptr<NLClassifier> classifier,
-                   NLClassifier::CreateFromFileAndOptions(
-                       absl::GetFlag(FLAGS_model_path), options));
+                   NLClassifier::CreateFromOptions(options));
 
+  auto start_classify = steady_clock::now();
   std::vector<core::Category> categories =
       classifier->Classify(absl::GetFlag(FLAGS_text));
+  auto end_classify = steady_clock::now();
+  std::string delegate =
+      absl::GetFlag(FLAGS_use_coral) ? "Coral Edge TPU" : "CPU";
+  std::cout << "Time cost to classify the input text on " << delegate << ": "
+            << std::chrono::duration<float, std::milli>(end_classify -
+                                                        start_classify)
+                   .count()
+            << " ms" << std::endl;
 
   for (int i = 0; i < categories.size(); ++i) {
     const core::Category& category = categories[i];

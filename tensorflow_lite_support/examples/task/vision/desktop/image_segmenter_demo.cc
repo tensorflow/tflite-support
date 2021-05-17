@@ -46,17 +46,32 @@ ABSL_FLAG(std::string, image_path, "",
 ABSL_FLAG(std::string, output_mask_png, "",
           "Absolute path to the output category mask (confidence masks outputs "
           "are not supported by this tool). Must have a '.png' extension.");
+ABSL_FLAG(bool, use_coral, false,
+          "If true, inference will be delegated to a connected Coral Edge TPU "
+          "device.");
 
 namespace tflite {
 namespace task {
 namespace vision {
 
+namespace {
+using std::chrono::microseconds;
+using std::chrono::steady_clock;
+}  // namespace
+
 ImageSegmenterOptions BuildOptions() {
   ImageSegmenterOptions options;
-  options.mutable_model_file_with_metadata()->set_file_name(
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
       absl::GetFlag(FLAGS_model_path));
   // Confidence masks are not supported by this tool: output_type is set to
   // CATEGORY_MASK by default.
+
+  if (absl::GetFlag(FLAGS_use_coral)) {
+    options.mutable_base_options()
+        ->mutable_compute_settings()
+        ->mutable_tflite_settings()
+        ->set_delegate(::tflite::proto::Delegate::EDGETPU_CORAL);
+  }
   return options;
 }
 
@@ -154,8 +169,18 @@ absl::Status Segment() {
   }
 
   // Run segmentation and save category mask.
+  auto start_segment = steady_clock::now();
   ASSIGN_OR_RETURN(SegmentationResult result,
                    image_segmenter->Segment(*frame_buffer));
+  auto end_segment = steady_clock::now();
+  std::string delegate =
+      absl::GetFlag(FLAGS_use_coral) ? "Coral Edge TPU" : "CPU";
+  std::cout << "Time cost to segment the input image on " << delegate << ": "
+            << std::chrono::duration<float, std::milli>(end_segment -
+                                                        start_segment)
+                   .count()
+            << " ms" << std::endl;
+
   RETURN_IF_ERROR(EncodeMaskToPngFile(result));
 
   // Display the legend.

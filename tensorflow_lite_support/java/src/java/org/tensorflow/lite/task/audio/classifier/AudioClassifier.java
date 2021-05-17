@@ -271,7 +271,7 @@ public final class AudioClassifier extends BaseTaskApi {
       }
 
       /**
-       * Sets the score threshold in [0,1).
+       * Sets the score threshold.
        *
        * <p>It overrides the one provided in the model metadata (if any). Results below this value
        * are rejected.
@@ -392,11 +392,12 @@ public final class AudioClassifier extends BaseTaskApi {
   }
 
   /**
-   * Creates an {@link AudioRecord} instance to record audio stream. The returned AudioRecord
-   * instance is initialized and client needs to call {@link AudioRecord#startRecording} method to
-   * start recording.
+   * Creates an {@link android.media.AudioRecord} instance to record audio stream. The returned
+   * AudioRecord instance is initialized and client needs to call {@link
+   * android.media.AudioRecord#startRecording} method to start recording.
    *
-   * @return an {@link AudioRecord} instance in {@link AudioRecord#STATE_INITIALIZED}
+   * @return an {@link android.media.AudioRecord} instance in {@link
+   *     android.media.AudioRecord#STATE_INITIALIZED}
    * @throws IllegalArgumentException if the model required channel count is unsupported
    * @throws IllegalStateException if AudioRecord instance failed to initialize
    */

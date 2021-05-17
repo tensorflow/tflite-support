@@ -38,7 +38,7 @@ public class Rot90Op implements ImageOperator {
   /**
    * Creates a Rot90 Op which will rotate image by 90 degree for {@code k} times counter-clockwise.
    *
-   * @param k: The number of times the image is rotated by 90 degrees. If it's positive, the image
+   * @param k The number of times the image is rotated by 90 degrees. If it's positive, the image
    *     will be rotated counter-clockwise. If it's negative, the op will rotate image clockwise.
    */
   public Rot90Op(int k) {

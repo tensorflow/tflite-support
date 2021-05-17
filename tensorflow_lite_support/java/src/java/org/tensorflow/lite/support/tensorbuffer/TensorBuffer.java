@@ -158,7 +158,7 @@ public abstract class TensorBuffer {
   }
 
   /**
-   * Gets the {@link TensorBuffer#flatSize} of the buffer.
+   * Gets the flatSize of the buffer.
    *
    * @throws IllegalStateException if the underlying data is corrupted
    */

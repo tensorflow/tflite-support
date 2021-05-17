@@ -40,9 +40,10 @@ namespace audio {
 //   (kTfLiteFloat32)
 //    - input audio buffer of size `[batch * samples]`.
 //    - batch inference is not supported (`batch` is required to be 1).
+//    - for multi-channel models, the channels need be interleaved.
 // At least one output tensor with:
 //   (kTfLiteFloat32)
-//    - `[1 x N]` array with `N ` represents the class number.
+//    - `[1 x N]` array with `N` represents the class number.
 //    - optional (but recommended) label map(s) as AssociatedFile-s with type
 //      TENSOR_AXIS_LABELS, containing one label per line. The first such
 //      AssociatedFile (if any) is used to fill the `class_name` field of the

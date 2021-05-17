@@ -32,7 +32,7 @@ public abstract class ColoredLabel {
    * @param label the label string, as provided in the label map packed in the TFLite Model
    *     Metadata.
    * @param displayName the display name of label, as configured through {@link
-   *     ImageSegmenter#ImageSegmenterOptions#Builder#setDisplayNamesLocale}
+   *     ImageSegmenter.ImageSegmenterOptions.Builder#setDisplayNamesLocale}
    * @param argb the color components for the label in ARGB. See <a
    *     href="https://developer.android.com/reference/android/graphics/Color#color-ints">Android
    *     Color ints.</a> for more details.
@@ -43,12 +43,12 @@ public abstract class ColoredLabel {
   }
 
   /**
-   * Creates a {@link ColoredLabel} object with a {@link Color} instance.
+   * Creates a {@link ColoredLabel} object with a {@link android.graphics.Color} instance.
    *
    * @param label the label string, as provided in the label map packed in the TFLite Model
    *     Metadata.
    * @param displayName the display name of label, as configured through {@link
-   *     ImageSegmenter#ImageSegmenterOptions#Builder#setDisplayNamesLocale}
+   *     ImageSegmenter.ImageSegmenterOptions.Builder#setDisplayNamesLocale}
    * @param color the color components for the label. The Color instatnce is supported on Android
    *     API level 26 and above. For API level lower than 26, use {@link #create(String, String,
    *     int)}. See <a
@@ -74,7 +74,7 @@ public abstract class ColoredLabel {
   public abstract int getArgb();
 
   /**
-   * Gets the {@link Color} instance of the underlying color.
+   * Gets the {@link android.graphics.Color} instance of the underlying color.
    *
    * <p>The Color instatnce is supported on Android API level 26 and above. For API level lower than
    * 26, use {@link #getArgb()}. See <a

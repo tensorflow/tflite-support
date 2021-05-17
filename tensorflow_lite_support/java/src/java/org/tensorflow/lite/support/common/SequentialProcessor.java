@@ -23,7 +23,7 @@ import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * A processor base class that chains a serial of {@link Operator<T>} and executes them.
+ * A processor base class that chains a serial of {@code Operator<T>} and executes them.
  *
  * <p>Typically, users could use its subclasses, e.g. {@link
  * org.tensorflow.lite.support.image.ImageProcessor} rather than directly use this one.

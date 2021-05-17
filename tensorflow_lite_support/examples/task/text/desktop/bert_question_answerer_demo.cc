@@ -27,19 +27,46 @@ ABSL_FLAG(std::string, model_path, "",
 ABSL_FLAG(std::string, question, "", "Question to ask.");
 ABSL_FLAG(std::string, context, "",
           "Context the asked question is based upon.");
+ABSL_FLAG(bool, use_coral, false,
+          "If true, inference will be delegated to a connected Coral Edge TPU "
+          "device.");
 
 namespace tflite {
 namespace task {
 namespace text {
 namespace qa {
 
-absl::Status Answer() {
-  ASSIGN_OR_RETURN(
-      std::unique_ptr<QuestionAnswerer> answerer,
-      BertQuestionAnswerer::CreateFromFile(absl::GetFlag(FLAGS_model_path)));
+namespace {
+using std::chrono::microseconds;
+using std::chrono::steady_clock;
+}  // namespace
 
+absl::Status Answer() {
+  BertQuestionAnswererOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      absl::GetFlag(FLAGS_model_path));
+  if (absl::GetFlag(FLAGS_use_coral)) {
+    options.mutable_base_options()
+        ->mutable_compute_settings()
+        ->mutable_tflite_settings()
+        ->set_delegate(::tflite::proto::Delegate::EDGETPU_CORAL);
+  }
+
+  ASSIGN_OR_RETURN(std::unique_ptr<QuestionAnswerer> answerer,
+                   BertQuestionAnswerer::CreateFromOptions(options));
+
+  auto start_answer = steady_clock::now();
   std::vector<QaAnswer> answers = answerer->Answer(
       absl::GetFlag(FLAGS_context), absl::GetFlag(FLAGS_question));
+  auto end_answer = steady_clock::now();
+  std::string delegate =
+      absl::GetFlag(FLAGS_use_coral) ? "Coral Edge TPU" : "CPU";
+  std::cout << "Time cost to answer the input question on " << delegate << ": "
+            << std::chrono::duration<float, std::milli>(end_answer -
+                                                        start_answer)
+                   .count()
+            << " ms" << std::endl;
+
   for (int i = 0; i < answers.size(); ++i) {
     const QaAnswer& answer = answers[i];
     std::cout << absl::StrFormat(
