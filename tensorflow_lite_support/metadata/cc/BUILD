@@ -1,6 +1,5 @@
 load("//tensorflow_lite_support/metadata:build_defs.bzl", "stamp_metadata_parser_version")
 
-
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
     licenses = ["notice"],  # Apache 2.0
@@ -14,6 +13,13 @@ stamp_metadata_parser_version(
 
 load("@build_bazel_rules_apple//apple:ios.bzl", "ios_static_framework")
 
+
+# Generates a statically linked framework for use on iOS. This is plump, but
+# the final binary will trim the fat on linking. To build fat, we need use the following
+# command
+#
+# bazel build -c opt --config=ios_fat //tensorflow_lite_support/metadata/cc:TfliteMetadata_framework
+#
 ios_static_framework(
     name = "TfliteMetadata_framework",
     hdrs = [
@@ -22,40 +28,20 @@ ios_static_framework(
     bundle_name = "TfliteMetadata",
     minimum_os_version = "9.0",
     deps = [
-        "//tensorflow_lite_support/metadata/cc:dl_tflite_metadata_2",
+        "//tensorflow_lite_support/metadata/cc:dl_tflite_metadata",
     ],
 )
-
-
-cc_library(
-  name="dl_tflite_metadata_2",
-    srcs = [
-         "dl_tflite_metadata.cc",
-         "dl_tflite_metadata.h"
-    ],
-    deps = [
-         ":metadata_extractor",
-    ],
-)  
-  
-
-
 
 
 # This is a DL-Team custom library that just exposes metadata of interest for
 # model inspection on the phone.
 #
 # We use this library rather than the metadata_extractor directly because the
-# metadata_extractor.h header brings in a bunch of dependencies
+# metadata_extractor.h header brings in a bunch of dependencies that
 # would clutter the phone.
 #
-# This is a cc_binary rather than a cc_library target as we want to link
-# all static library dependencies to avoid unresolved symbols in Xcode.
-# The resulting binaries are pretty large, but should thin down on ultimate
-# linking.
-#
-cc_binary(
-    name = "dl_tflite_metadata",
+cc_library(
+  name="dl_tflite_metadata",
     srcs = [
          "dl_tflite_metadata.cc",
          "dl_tflite_metadata.h"
@@ -63,8 +49,6 @@ cc_binary(
     deps = [
          ":metadata_extractor",
     ],
-    linkstatic=1,
-    linkshared=True,
 )
 
 cc_library(
