@@ -1,10 +1,5 @@
 #include "tensorflow_lite_support/metadata/cc/dl_tflite_metadata.h"
 
-#include <memory>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
@@ -16,7 +11,7 @@ namespace {
 
   constexpr char kMetadataBufferName[] = "TFLITE_METADATA";
 
-}
+}  // namespace
 
 const char* get_version(void* buffer_data, size_t buffer_size) {
   flatbuffers::Verifier verifier = flatbuffers::Verifier(
@@ -44,8 +39,8 @@ const char* get_version(void* buffer_data, size_t buffer_size) {
     if (meta_data and meta_data->version()) {
       return meta_data->version()->c_str();
     }
-    return "";
   }
+  return "";
 }
 
 }  // namespace metadata
