@@ -47,7 +47,9 @@ cc_library(
          "dl_tflite_metadata.h"
     ],
     deps = [
-         ":metadata_extractor",
+        "@flatbuffers",
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
+        "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
     ],
 )
 
