@@ -70,6 +70,11 @@ void BertQuestionAnswererDelete(BertQuestionAnswerer* bert_question_answerer) {
 }
 
 void BertQuestionAnswererQaAnswersDelete(QaAnswers* qa_answers) {
+  for (int i = 0; i < qa_answers->size; i++) {
+    // `strdup` obtains memory using `malloc` and the memory needs to be
+    // released using `free`.
+    free(qa_answers->answers[i].text);
+  }
   delete[] qa_answers->answers;
   delete qa_answers;
 }

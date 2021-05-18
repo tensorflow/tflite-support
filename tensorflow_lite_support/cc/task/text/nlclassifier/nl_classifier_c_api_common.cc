@@ -15,12 +15,18 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier_c_api_common.h"
 
+#include <memory>
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
 void NLClassifierCategoriesDelete(Categories* categories) {
+  for (int i = 0; i < categories->size; i++) {
+    // `strdup` obtains memory using `malloc` and the memory needs to be
+    // released using `free`.
+    free(categories->categories[i].text);
+  }
   delete[] categories->categories;
   delete categories;
 }

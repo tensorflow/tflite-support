@@ -6,9 +6,10 @@ Vision Task APIs.
 ## Coral integration
 
 Task Library now supports fast TFLite inference delegated onto
-[Coral Edge TPU devices][4]. See the documentation for more details
-(TODO(b/188094057): add link to tensorflow.org). To run the demo on a Coral
-device, add the following configurations to the bazel command:
+[Coral Edge TPU devices][4]. See the
+[documentation](https://www.tensorflow.org/lite/inference_with_metadata/task_library/overview#run_task_library_with_delegates)
+for more details. To run the demo on a Coral device, add the following
+configurations to the bazel command:
 
 ```bash
 # On the Linux
@@ -203,7 +204,7 @@ You will need:
     segmentation model available on TensorFlow Hub),
 *   a PNG, JPEG or GIF image to run segmentation on, e.g.:
 
-![plane](g3doc/plane.jpg)
+![cat](g3doc/cat.jpg)
 
 #### Usage
 
@@ -212,15 +213,34 @@ In the console, run:
 ```bash
 # Download the model:
 curl \
- -L 'https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1?lite-format=tflite' \
- -o /tmp/deeplabv3_1_metadata_1.tflite
+ -L 'https://github.com/google-coral/test_data/raw/master/keras_post_training_unet_mv2_128_quant.tflite' \
+ -o /tmp/keras_post_training_unet_mv2_128_quant.tflite
 
 # Run the segmentation tool:
 bazel run -c opt \
  tensorflow_lite_support/examples/task/vision/desktop:image_segmenter_demo -- \
- --model_path=/tmp/deeplabv3_1_metadata_1.tflite \
+ --model_path=/tmp/keras_post_training_unet_mv2_128_quant.tflite \
  --image_path=\
-$(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/plane.jpg \
+$(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/cat.jpg \
+ --output_mask_png=/tmp/segmentation-output.png
+```
+
+To run the demo on a [Coral Edge TPU device][4], create the Coral
+configurations, `CORAL_SETTING` (see the section,
+[Coral integration](#coral-integration)), then run:
+
+```bash
+# Download the model:
+curl
+ -L 'https://github.com/google-coral/test_data/raw/master/keras_post_training_unet_mv2_128_quant_edgetpu.tflite' \
+ -o /tmp/keras_post_training_unet_mv2_128_quant_edgetpu.tflite
+
+# Run the segmentation tool:
+bazel run -c opt \
+ tensorflow_lite_support/examples/task/vision/desktop:image_segmenter_demo -- \
+ --model_path=/tmp/keras_post_training_unet_mv2_128_quant_edgetpu.tflite \
+ --image_path=\
+$(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/cat.jpg \
  --output_mask_png=/tmp/segmentation-output.png
 ```
 
@@ -229,24 +249,18 @@ $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/plane.jpg \
 In the console, you should get:
 
 ```
-Time cost to segment the input image on CPU: 138 ms
+Time cost to segment the input image on CPU: 89.9316 ms
 Category mask saved to: /tmp/segmentation-output.png
 Color Legend:
  (r: 000, g: 000, b: 000):
   index       : 0
-  class name  : background
+  class name  : pet
  (r: 128, g: 000, b: 000):
   index       : 1
-  class name  : aeroplane
-
-# (omitting multiple lines for conciseness) ...
-
- (r: 128, g: 192, b: 000):
-  index       : 19
-  class name  : train
- (r: 000, g: 064, b: 128):
-  index       : 20
-  class name  : tv
+  class name  : background
+ (r: 000, g: 128, b: 000):
+  index       : 2
+  class name  : border
 Tip: use a color picker on the output PNG file to inspect the output mask with
 this legend.
 ```
