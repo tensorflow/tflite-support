@@ -14,8 +14,7 @@ stamp_metadata_parser_version(
 load("@build_bazel_rules_apple//apple:ios.bzl", "ios_static_framework")
 
 
-# Generates a statically linked framework for use on iOS. This is plump, but
-# the final binary will trim the fat on linking. To build fat, we need use the following
+# Generates a statically linked framework for use on iOS.  To build fat, we need use the following
 # command
 #
 # bazel build -c opt --config=ios_fat //tensorflow_lite_support/metadata/cc:TfliteMetadata_framework
@@ -32,13 +31,13 @@ ios_static_framework(
     ],
 )
 
-
 # This is a DL-Team custom library that just exposes metadata of interest for
 # model inspection on the phone.
 #
 # We use this library rather than the metadata_extractor directly because the
 # metadata_extractor.h header brings in a bunch of dependencies that
-# would clutter the phone.
+# would clutter the phone. Wrapping teh metadata_extractor also results in a
+# pretty fat binary; so this is bare-bones (35K vs. 700K delta on the phone)!
 #
 cc_library(
   name="dl_tflite_metadata",
