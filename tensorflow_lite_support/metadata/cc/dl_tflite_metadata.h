@@ -8,9 +8,10 @@ namespace metadata {
 
 
 // Retrieves a tflite model's version information from the
-// ModelMetadata. If not set, null is returned.
-// In future, we may want to move this to a class-based implementation
-// if other metadata need to be exposed.
+// ModelMetadata.
+//
+// This is a super-thinned-down version with just "return-safely"
+// error handling. Goal was to keep binary small.
 //
 // Args:
 //    buffer_data: The tflite model's memory-mapped address
