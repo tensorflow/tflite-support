@@ -36,8 +36,9 @@ ios_static_framework(
 #
 # We use this library rather than the metadata_extractor directly because the
 # metadata_extractor.h header brings in a bunch of dependencies that
-# would clutter the phone. Wrapping teh metadata_extractor also results in a
-# pretty fat binary; so this is bare-bones (35K vs. 700K delta on the phone)!
+# would clutter the phone. I tried just wrapping the metadata_extractor, but
+# this results in a pretty fat binary ~700k. This "just-what-we-need" approach
+# results in a phone binary delta of ~35K, which seems reasonable if not awesome.
 #
 cc_library(
   name="dl_tflite_metadata",
