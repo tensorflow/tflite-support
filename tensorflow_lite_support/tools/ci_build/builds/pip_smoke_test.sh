@@ -27,7 +27,7 @@ function run_smoke_test() {
     VENV_TMP_DIR="$(cygpath -m $VENV_TMP_DIR)"
   fi
 
-  ${PYTHON_BIN_PATH} -m virtualenv -p ${PYTHON_BIN_PATH} "${VENV_TMP_DIR}" || \
+  python -m virtualenv "${VENV_TMP_DIR}" || \
       die "FAILED: Unable to create virtualenv"
 
   if [[ "$OSTYPE" == "msys" ]]; then
@@ -109,6 +109,9 @@ if [[ -z "${1}" ]]; then
   echo "TFLite Support WHL path not given, unable to install and test."
   return 1
 fi
+
+which python
+python --version
 
 WHL_NAME=${1}
 run_smoke_test
