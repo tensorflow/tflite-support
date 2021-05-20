@@ -362,6 +362,14 @@ absl::Status AudioClassifier::Preprocess(
                         audio_buffer.GetAudioFormat().channels,
                         audio_format_.channels));
   }
+  if (audio_buffer.GetAudioFormat().sample_rate != audio_format_.sample_rate) {
+    return tflite::support::CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        absl::StrFormat("Input audio sample rate %d does not match "
+                        "the model required audio sample rate %d.",
+                        audio_buffer.GetAudioFormat().sample_rate,
+                        audio_format_.sample_rate));
+  }
   if (audio_buffer.GetBufferSize() != input_buffer_size_) {
     return tflite::support::CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
