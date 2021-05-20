@@ -256,13 +256,14 @@ tflite::support::StatusOr<EmbeddingResult> ImageEmbedder::Postprocess(
       const uint8* output_data =
           engine_->interpreter()->typed_output_tensor<uint8>(i);
       // Get the zero_point and scale parameters from the tensor metadata.
-      const int output_tensor_index = engine_->interpreter()->outputs()[i];
-      const TfLiteTensor* output_tensor =
-          engine_->interpreter()->tensor(output_tensor_index);
+      // const int output_tensor_index = engine_->interpreter()->outputs()[i];
+      // const TfLiteTensor* output_tensor =
+      //     engine_->interpreter()->tensor(output_tensor_index);
       for (int j = 0; j < embedding_dimensions_[i]; ++j) {
-        feature_vector->add_value_float(output_tensor->params.scale *
-                                        (static_cast<int>(output_data[j]) -
-                                         output_tensor->params.zero_point));
+        // feature_vector->add_value_float(output_tensor->params.scale *
+        //                                 (static_cast<int>(output_data[j]) -
+        //                                  output_tensor->params.zero_point));
+        feature_vector->add_value_float(static_cast<float>(output_data[j]));
       }
     } else {
       const float* output_data =
