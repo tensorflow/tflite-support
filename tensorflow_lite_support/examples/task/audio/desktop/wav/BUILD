@@ -15,6 +15,7 @@ cc_library(
     ],
     hdrs = ["wav_io.h"],
     deps = [
+        "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
         "@com_google_absl//absl/base",
         "@com_google_absl//absl/status",

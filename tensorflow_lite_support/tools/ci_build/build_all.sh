@@ -37,7 +37,11 @@ bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision:task-library-vision \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/audio:task-library-audio
 
-# Build Coral plugin
+# Build desktop demos.
+bazel build -c opt --config=monolithic \
+    //tensorflow_lite_support/examples/task/audio/desktop:audio_classifier_demo
+
+# Build Coral plugin.
 bazel build --sandbox_debug --subcommands --define=darwinn_portable=1 \
     //tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin
 

@@ -21,8 +21,10 @@ limitations under the License.
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include "absl/status/status.h"
+#include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
 namespace tflite {
