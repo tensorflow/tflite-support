@@ -37,9 +37,7 @@ android_library(
 
 android_library(
     name = "tensorflowlite_support_java",
-    srcs = glob(
-        ["src/java/org/tensorflow/lite/support/**/*.java"],
-    ),
+    srcs = glob(["src/java/org/tensorflow/lite/support/**/*.java"]),
     javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     # LINT.IfChange(dep)

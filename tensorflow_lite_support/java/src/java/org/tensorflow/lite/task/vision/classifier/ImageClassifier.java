@@ -203,7 +203,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *
    * @param nativeHandle a pointer referencing memory allocated in C++
    */
-  private ImageClassifier(long nativeHandle) {
+  ImageClassifier(long nativeHandle) {
     super(nativeHandle);
   }
 
@@ -243,7 +243,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       private List<String> labelDenyList = new ArrayList<>();
       private int numThreads = -1;
 
-      private Builder() {}
+      Builder() {}
 
       /**
        * Sets the locale to use for display names specified through the TFLite Model Metadata, if
@@ -360,7 +360,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       return numThreads;
     }
 
-    private ImageClassifierOptions(Builder builder) {
+    ImageClassifierOptions(Builder builder) {
       displayNamesLocale = builder.displayNamesLocale;
       maxResults = builder.maxResults;
       scoreThreshold = builder.scoreThreshold;
