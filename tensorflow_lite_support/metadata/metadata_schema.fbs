@@ -81,7 +81,8 @@ enum AssociatedFileType : byte {
   // Files such as readme.txt.
   DESCRIPTIONS = 1,
 
-  // Contains labels that annotate certain axis of the tensor. For example,
+  // Contains a list of labels (characters separated by "\n" or in lines) that
+  // annotate certain axis of the tensor. For example,
   // the label file in image classification. Those labels annotate the
   // the output tensor, such that each value in the output tensor is the
   // probability of that corresponding category specified by the label.
@@ -95,7 +96,8 @@ enum AssociatedFileType : byte {
   // specified locale.
   TENSOR_AXIS_LABELS = 2,
 
-  // Contains labels that tensor values correspond to. For example, in
+  // Contains a list of labels (characters separated by "\n" or in lines) that
+  // tensor values correspond to. For example, in
   // the object detection model, one of the output tensors is the detected
   // classes. And each value in the tensor refers to the index of label in the
   // category label file.
