@@ -22,7 +22,7 @@ from tensorflow_lite_support.metadata import metadata_schema_py_generated as _me
 from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 
 
-def compute_flat_size(tensor_shape: Optional[array.array]) -> int:
+def compute_flat_size(tensor_shape: Optional["array.array[int]"]) -> int:
   """Computes the flat size (number of elements) of tensor shape.
 
   Args:
