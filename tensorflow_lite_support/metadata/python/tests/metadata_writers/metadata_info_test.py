@@ -214,11 +214,12 @@ class InputTextTensorMdTest(tf.test.TestCase):
           tokenizer_md=invalid_tokenzier)
       tensor_md.create_metadata()
 
-    # TODO(b/175843689): f string cannot be used. Python version cannot be
-    # specified in Kokoro bazel test.
-    self.assertEqual(
-        "The type of tokenizer_options, {}, is unsupported".format(
-            type(invalid_tokenzier)), str(error.exception))
+      self.assertEqual(
+          "The type of tokenizer_options, {}, is unsupported".format(
+              type(invalid_tokenzier)), str(error.exception))
+
+    # self.assertEqual(
+    #     f"The type of tokenizer_options, {type(invalid_tokenzier)}, is unsupported", str(error.exception))
 
 
 class InputAudioTensorMd(tf.test.TestCase):
@@ -259,9 +260,14 @@ class InputAudioTensorMd(tf.test.TestCase):
           sample_rate=negative_sample_rate)
       tensor_md.create_metadata()
 
+    import sys
+    print("sys.version")
+    print(sys.version)
+    print(sys.executable)
+
     self.assertEqual(
-        "sample_rate should be non-negative, but got {}.".format(
-            negative_sample_rate), str(error.exception))
+        f"sample_rate should be non-negative, but got {negative_sample_rate}.",
+        str(error.exception))
 
   def test_create_metadata_fail_with_negative_channels(self):
     negative_channels = -1
