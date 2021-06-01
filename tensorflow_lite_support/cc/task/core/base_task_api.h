@@ -38,9 +38,6 @@ class BaseUntypedTaskApi {
 
   virtual ~BaseUntypedTaskApi() = default;
 
-  TfLiteEngine* GetTfLiteEngine() { return engine_.get(); }
-  const TfLiteEngine* GetTfLiteEngine() const { return engine_.get(); }
-
   const metadata::ModelMetadataExtractor* GetMetadataExtractor() const {
     return engine_->metadata_extractor();
   }
