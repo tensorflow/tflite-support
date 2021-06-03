@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/examples/task/audio/desktop/audio_classifier_lib.h"
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -75,7 +76,16 @@ tflite::support::StatusOr<ClassificationResult> Classify(
       LoadAudioBufferFromFile(
           wav_file, classifier->GetRequiredInputBufferSize(), &wav_data));
 
-  return classifier->Classify(buffer);
+  auto start_classify = std::chrono::steady_clock::now();
+  ASSIGN_OR_RETURN(ClassificationResult result, classifier->Classify(buffer));
+  auto end_classify = std::chrono::steady_clock::now();
+  std::string delegate = use_coral ? "Coral Edge TPU" : "CPU";
+  const auto duration_ms =
+      std::chrono::duration<float, std::milli>(end_classify - start_classify);
+  std::cout << "Time cost to classify the input audio clip on " << delegate
+            << ": " << duration_ms.count() << " ms" << std::endl;
+
+  return result;
 }
 
 void Display(const ClassificationResult& result, float score_threshold) {
