@@ -2,11 +2,7 @@
 # https://github.com/tensorflow/tensorflow/blob/v2.2.0/.bazelrc
 
 # Sets the default Apple platform to macOS.
-
-build --apple_platform_type=macos
-
-# Enable using platform specific build settings
-build --enable_platform_specific_config
+build:macos --apple_platform_type=macos
 
 # Flag to enable remote config. Required starting from TF 2.2.
 common --experimental_repo_remote_exec
@@ -92,10 +88,6 @@ build:asan --copt -g
 build:asan --copt -fno-omit-frame-pointer
 build:asan --linkopt -fsanitize=address
 
-# Flags for open source build, always set to be true.
-build --define open_source_build=true
-test --define open_source_build=true
-
 # dbg config, as a shorthand for '--config=opt -c dbg'
 build:dbg --config=opt -c dbg
 # for now, disable arm_neon. see: https://github.com/tensorflow/tensorflow/issues/33360
@@ -106,6 +98,8 @@ build:dbg --copt -DDEBUG_BUILD
 build --define=use_fast_cpp_protos=true
 build --define=allow_oversize_protos=true
 
+# TF uses `standalone`, which is deprecated.
+build --spawn_strategy=local
 build -c opt
 
 # Adding "--cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0" creates parity with TF
@@ -161,9 +155,6 @@ build:v1 --action_env=TF2_BEHAVIOR=0
 build:v2 --action_env=TF2_BEHAVIOR=1
 build --config=v2
 test --config=v2
-
-# Options from ./configure
-try-import %workspace%/.tf_configure.bazelrc
 
 # Put user-specific options in .bazelrc.user
 try-import %workspace%/.bazelrc.user
