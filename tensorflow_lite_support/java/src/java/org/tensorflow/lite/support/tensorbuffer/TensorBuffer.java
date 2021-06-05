@@ -333,7 +333,10 @@ public abstract class TensorBuffer {
     int flatSize = computeFlatSize(shape);
     checkArgument(
         (buffer.limit() == getTypeSize() * flatSize),
-        "The size of byte buffer and the shape do not match.");
+        "The size of byte buffer and the shape do not match. Expected: "
+            + getTypeSize() * flatSize
+            + " Actual: "
+            + buffer.limit());
 
     resize(shape);
     buffer.rewind();
@@ -355,6 +358,8 @@ public abstract class TensorBuffer {
    *
    * <p>For the best performance, always load a direct {@link ByteBuffer} or a {@link ByteBuffer}
    * backed by an array.
+   *
+   * <p>If the {@code buffer} is read-only, we adopt a copy-on-write strategy for performance.
    *
    * @param buffer The byte buffer to load.
    */
@@ -402,6 +407,18 @@ public abstract class TensorBuffer {
       checkArgument(Arrays.equals(shape, this.shape));
       this.shape = shape.clone();
     }
+  }
+
+  /** Copies the underlying {@link ByteBuffer} if it's readonly. */
+  protected synchronized void copyByteBufferIfReadOnly() {
+    if (!buffer.isReadOnly()) {
+      return;
+    }
+    ByteBuffer newByteBuffer = ByteBuffer.allocateDirect(buffer.capacity());
+    newByteBuffer.order(buffer.order());
+    newByteBuffer.put(buffer);
+    newByteBuffer.rewind();
+    buffer = newByteBuffer;
   }
 
   /**

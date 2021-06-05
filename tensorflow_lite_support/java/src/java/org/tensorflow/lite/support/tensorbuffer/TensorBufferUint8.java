@@ -91,6 +91,7 @@ public final class TensorBufferUint8 extends TensorBuffer {
     SupportPreconditions.checkArgument(
         src.length == computeFlatSize(shape),
         "The size of the array to be loaded does not match the specified shape.");
+    copyByteBufferIfReadOnly();
     resize(shape);
     buffer.rewind();
 
@@ -108,6 +109,7 @@ public final class TensorBufferUint8 extends TensorBuffer {
     SupportPreconditions.checkArgument(
         src.length == computeFlatSize(shape),
         "The size of the array to be loaded does not match the specified shape.");
+    copyByteBufferIfReadOnly();
     resize(shape);
     buffer.rewind();
 
