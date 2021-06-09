@@ -1,7 +1,7 @@
 package(
     default_visibility = [
-        "//tensorflow_lite_support/cc/port:__pkg__",
-        "//tensorflow_lite_support/cc/test:__pkg__",
+        "//tensorflow_lite_support/cc/port:__subpackages__",
+        "//tensorflow_lite_support/cc/test:__subpackages__",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
@@ -32,6 +32,15 @@ cc_library(
     deps = [
         "@com_google_absl//absl/base:core_headers",
         "@com_google_absl//absl/status",
+    ],
+)
+
+cc_library(
+    name = "status_matchers",
+    testonly = 1,
+    hdrs = ["status_matchers.h"],
+    deps = [
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

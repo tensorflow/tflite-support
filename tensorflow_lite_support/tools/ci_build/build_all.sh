@@ -49,6 +49,7 @@ bazel build --sandbox_debug --subcommands --define=darwinn_portable=1 \
 bazel clean --expunge
 
 bazel test --test_output=all \
+    //tensorflow_lite_support/cc/test/task/vision:all \
     //tensorflow_lite_support/metadata/python/tests:metadata_test \
     //tensorflow_lite_support/metadata/python/tests/metadata_writers:all \
     //tensorflow_lite_support/custom_ops/kernel/sentencepiece:all

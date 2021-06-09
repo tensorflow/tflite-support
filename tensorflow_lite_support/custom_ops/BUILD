@@ -26,7 +26,7 @@ cc_test(
     ],
     deps = [
         ":tf_text_flex_delegate",
-        "@com_google_googletest//:gtest",
+        "//testing/base/public:gunit",
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite:string_util",
         "@org_tensorflow//tensorflow/lite/c:common",
