@@ -45,7 +45,7 @@ cc_test_with_tflite(
     ],
 )
 
-# To test it externally, plugin a Coral device, and run the following command:
+# To test it with Bazel, plugin a Coral device, and run the following command:
 # bazel test tensorflow_lite_support/cc/test/task/vision:image_classifier_coral_test \
 # --define darwinn_portable=1 --linkopt=-lusb-1.0
 cc_test(
