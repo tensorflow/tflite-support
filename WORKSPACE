@@ -398,15 +398,23 @@ apple_support_dependencies()
 load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
 bazel_version_repository(name = "bazel_version")
 
-
 python_configure(name = "local_config_python")
 
+ATS_TAG = "androidx-test-1.3.0"
+http_archive(
+    name = "android_test_support",
+    strip_prefix = "android-test-%s" % ATS_TAG,
+    urls = ["https://github.com/android/android-test/archive/%s.tar.gz" % ATS_TAG],
+)
+load("@android_test_support//:repo.bzl", "android_test_repositories")
+android_test_repositories()
 
 # Maven dependencies.
 
 maven_install(
     artifacts = [
         "androidx.annotation:annotation:aar:1.1.0",
+        "androidx.annotation:annotation-experimental:1.1.0",
         "androidx.test:core:jar:1.3.0",
         "org.robolectric:robolectric:jar:4.4",
         "com.google.truth:truth:jar:1.1",
