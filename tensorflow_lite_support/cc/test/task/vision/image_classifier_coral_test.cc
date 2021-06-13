@@ -36,13 +36,13 @@ namespace {
 using ::tflite::support::StatusOr;
 
 constexpr char kEdgeTpuModelFilePath[] =
-    "third_party/tensorflow_lite_support/acceleration/configuration/testdata/"
+    "tensorflow_lite_support/acceleration/configuration/testdata/"
     "mobilenet_v1_1.0_224_quant_edgetpu.tflite";
 constexpr char kRegularModelFilePath[] =
-    "third_party/tensorflow_lite_support/acceleration/configuration/testdata/"
+    "tensorflow_lite_support/acceleration/configuration/testdata/"
     "mobilenet_v1_1.0_224_quant.tflite";
 constexpr char kImagePath[] =
-    "third_party/tensorflow_lite_support/acceleration/configuration/testdata/"
+    "tensorflow_lite_support/acceleration/configuration/testdata/"
     "burger.jpg";
 
 using ClassifyTest = testing::TestWithParam<std::string>;
