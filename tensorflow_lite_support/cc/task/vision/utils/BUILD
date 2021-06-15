@@ -58,6 +58,7 @@ cc_library(
     deps = [
         ":frame_buffer_common_utils",
         ":libyuv_frame_buffer_utils",
+        "//base:logging",
         "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
