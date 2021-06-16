@@ -43,13 +43,6 @@ constexpr char kRiffType[] = "WAVE";
 constexpr char kFormatChunkId[] = "fmt ";
 constexpr char kDataChunkId[] = "data";
 
-inline int16_t FloatToInt16Sample(float data) {
-  constexpr float kMultiplier = 1.0f * (1 << 15);
-  return std::min<float>(std::max<float>(roundf(data * kMultiplier),
-                                         std::numeric_limits<int16_t>::min()),
-                         std::numeric_limits<int16_t>::max());
-}
-
 inline float Int16SampleToFloat(int16_t data) {
   constexpr float kMultiplier = 1.0f / (1 << 15);
   return data * kMultiplier;
