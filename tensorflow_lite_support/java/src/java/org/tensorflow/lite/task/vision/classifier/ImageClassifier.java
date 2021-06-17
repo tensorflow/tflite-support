@@ -372,7 +372,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
   }
 
   /**
-   * Performs actual classification on the provided {@link TensorImage}.
+   * Performs actual classification on the provided image.
    *
    * <p>{@link ImageClassifier} supports the following {@link TensorImage} color space types:
    *
@@ -393,8 +393,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
   }
 
   /**
-   * Performs actual classification on the provided {@link TensorImage} with {@link
-   * ImageProcessingOptions}.
+   * Performs actual classification on the provided image with {@link ImageProcessingOptions}.
    *
    * <p>{@link ImageClassifier} supports the following options:
    *
