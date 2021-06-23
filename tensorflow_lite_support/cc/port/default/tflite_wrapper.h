@@ -34,8 +34,17 @@ namespace support {
 // retains ownership of the included options, and will ensure that they remain
 // valid for the duration of the created interpreter's lifetime.
 struct InterpreterCreationResources {
+  // The delegate created, based on the parameters in `ComputeSettings`.
+  // `TfLiteInterpreterWrapper` exclusively owns the `TfLiteDelegate` object,
+  // and maintains it through out the lifetime of `TfLiteInterpreterWrapper`.
+  TfLiteDelegate* optional_delegate;
+
   // Apply the InterpreterCreationResources to the InterpreterBuilder.
-  void ApplyTo(tflite::InterpreterBuilder*) const {}
+  void ApplyTo(tflite::InterpreterBuilder* interpreter_builder) const {
+    if (optional_delegate != nullptr) {
+      interpreter_builder->AddDelegate(optional_delegate);
+    }
+  }
 };
 
 // Wrapper for a TfLiteInterpreter that may be accelerated [1]. Meant to be
