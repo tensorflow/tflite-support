@@ -31,7 +31,6 @@ import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi;
-import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi.InferenceProvider;
 
 /**
  * Performs object detection on images.
@@ -425,10 +424,15 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
+   * <p>{@link ObjectDetector} supports the following options:
+   *
+   * <ul>
+   *   <li>image rotation (through {@link ImageProcessingOptions.Builder#setOrientation}). It
+   *       defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}.
+   * </ul>
+   *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
-   * @param options {@link ObjectDetector} only supports image rotation (through {@link
-   *     ImageProcessingOptions.Builder#setOrientation}) currently. The orientation of an image
-   *     defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}.
+   * @param options the options to configure how to preprocess the image
    * @throws AssertionError if error occurs when processing the image from the native code
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
