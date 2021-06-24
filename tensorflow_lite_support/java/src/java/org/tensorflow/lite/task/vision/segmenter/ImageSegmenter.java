@@ -288,10 +288,15 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
+   * <p>{@link ImageSegmenter} supports the following options:
+   *
+   * <ul>
+   *   <li>image rotation (through {@link ImageProcessingOptions.Builder#setOrientation}). It
+   *       defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}
+   * </ul>
+   *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
-   * @param options {@link ImageSegmenter} only supports image rotation (through {@link
-   *     ImageProcessingOptions.Builder#setOrientation}) currently. The orientation of an image
-   *     defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}.
+   * @param options the options configure how to preprocess the image
    * @return results of performing image segmentation. Note that at the time, a single {@link
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
