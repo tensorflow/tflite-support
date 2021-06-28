@@ -55,6 +55,20 @@ class BaseTaskApi : public BaseUntypedTaskApi {
   BaseTaskApi(const BaseTaskApi&) = delete;
   BaseTaskApi& operator=(const BaseTaskApi&) = delete;
 
+  int32_t GetInputCount() { return engine_->interpreter()->inputs().size(); }
+
+  const TfLiteIntArray* GetInputShape(int index) {
+    auto interpreter = engine_->interpreter();
+    return interpreter->tensor(interpreter->inputs()[index])->dims;
+  }
+
+  int32_t GetOutputCount() { return engine_->interpreter()->outputs().size(); }
+
+  const TfLiteIntArray* GetOutputShape(int index) {
+    auto interpreter = engine_->interpreter();
+    return interpreter->tensor(interpreter->outputs()[index])->dims;
+  }
+
   // Cancels the current running TFLite invocation on CPU.
   //
   // Usually called on a different thread than the one inference is running on.

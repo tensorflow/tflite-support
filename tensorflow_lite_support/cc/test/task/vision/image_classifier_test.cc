@@ -48,6 +48,7 @@ namespace {
 
 using ::testing::HasSubstr;
 using ::testing::Optional;
+using ::testing::ElementsAreArray;
 using ::tflite::support::kTfLiteSupportPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
