@@ -48,15 +48,31 @@ absl::Status TfLiteInterpreterWrapper::SanityCheckComputeSettings(
 TfLiteInterpreterWrapper::TfLiteInterpreterWrapper()
     : delegate_(nullptr, nullptr), got_error_do_not_delegate_anymore_(false) {}
 
+// This is the deprecated overload that doesn't take an
+// InterpreterCreationResources parameter.
 absl::Status TfLiteInterpreterWrapper::InitializeWithFallback(
     std::function<absl::Status(std::unique_ptr<tflite::Interpreter>*)>
         interpreter_initializer,
     const ComputeSettings& compute_settings) {
   return InitializeWithFallback(
       [interpreter_initializer](
-          const InterpreterCreationResources& /*resources*/,
+          const InterpreterCreationResources& resources,
           std::unique_ptr<tflite::Interpreter>* interpreter_out)
-          -> absl::Status { return interpreter_initializer(interpreter_out); },
+          -> absl::Status {
+        RETURN_IF_ERROR(interpreter_initializer(interpreter_out));
+        if (*interpreter_out != nullptr &&
+            resources.optional_delegate != nullptr) {
+          TfLiteStatus status =
+              (*interpreter_out)
+                  ->ModifyGraphWithDelegate(resources.optional_delegate);
+          if (status != kTfLiteOk) {
+            *interpreter_out = nullptr;
+            RETURN_IF_ERROR(
+                absl::InvalidArgumentError("Applying delegate failed"));
+          }
+        }
+        return absl::OkStatus();
+      },
       compute_settings);
 }
 
@@ -109,9 +125,40 @@ absl::Status TfLiteInterpreterWrapper::AllocateTensors() {
 // TODO(b/173406463): the `resize` parameter is going to be used by
 // ResizeAndAllocateTensors functions, coming soon.
 absl::Status TfLiteInterpreterWrapper::InitializeWithFallbackAndResize(
-    std::function<absl::Status(Interpreter* interpreter)> resize) {
-  RETURN_IF_ERROR(
-      interpreter_initializer_(InterpreterCreationResources(), &interpreter_));
+    std::function<absl::Status(Interpreter*)> resize) {
+  InterpreterCreationResources resources{};
+  if (got_error_do_not_delegate_anymore_ ||
+      compute_settings_.tflite_settings().delegate() == Delegate::NONE) {
+    delegate_.reset(nullptr);
+  } else {
+    // Initialize delegate and add it to 'resources'.
+    RETURN_IF_ERROR(InitializeDelegate());
+    resources.optional_delegate = delegate_.get();
+  }
+
+  absl::Status status = interpreter_initializer_(resources, &interpreter_);
+  if (resources.optional_delegate == nullptr) {
+    RETURN_IF_ERROR(status);
+  }
+  if (resources.optional_delegate != nullptr && !status.ok()) {
+    // Any error when constructing the interpreter is assumed to be a delegate
+    // compilation error.  If a delegate compilation error occurs, stop
+    // delegation from happening in the future.
+    got_error_do_not_delegate_anymore_ = true;
+    delegate_.reset(nullptr);
+    if (fallback_on_compilation_error_) {
+      InterpreterCreationResources fallback_resources{};
+      fallback_resources.optional_delegate = nullptr;
+      RETURN_IF_ERROR(
+          interpreter_initializer_(fallback_resources, &interpreter_));
+    } else {
+      // If instructed not to fallback, return error.
+      return absl::InternalError(absl::StrFormat(
+          "ModifyGraphWithDelegate() failed for delegate '%s'.",
+          Delegate_Name(compute_settings_.tflite_settings().delegate())));
+    }
+  }
+
   RETURN_IF_ERROR(resize(interpreter_.get()));
   if (compute_settings_.tflite_settings().cpu_settings().num_threads() != -1) {
     if (interpreter_->SetNumThreads(
@@ -122,26 +169,9 @@ absl::Status TfLiteInterpreterWrapper::InitializeWithFallbackAndResize(
   }
   SetTfLiteCancellation();
 
-  if (got_error_do_not_delegate_anymore_ ||
-      compute_settings_.tflite_settings().delegate() == Delegate::NONE) {
+  if (!delegate_) {
     // Just allocate tensors and return.
-    delegate_.reset(nullptr);
     return AllocateTensors();
-  }
-
-  // Initialize delegate and modify graph.
-  RETURN_IF_ERROR(InitializeDelegate());
-  if (interpreter_->ModifyGraphWithDelegate(delegate_.get()) != kTfLiteOk) {
-    // If a compilation error occurs, stop delegation from happening in the
-    // future.
-    got_error_do_not_delegate_anymore_ = true;
-    delegate_.reset(nullptr);
-    if (!fallback_on_compilation_error_) {
-      // If instructed not to fallback, return error.
-      return absl::InternalError(absl::StrFormat(
-          "ModifyGraphWithDelegate() failed for delegate '%s'.",
-          Delegate_Name(compute_settings_.tflite_settings().delegate())));
-    }
   }
 
   // The call to ModifyGraphWithDelegate() leaves the interpreter in a usable
