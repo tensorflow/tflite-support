@@ -23,6 +23,9 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/core/shims:verifier",
         "//tensorflow_lite_support/cc/port:tflite_wrapper",
     ],
+    visibility = [
+        "//tensorflow_lite_support:users",
+    ],
     deps = [
         ":error_reporter",
         ":external_file_handler",
