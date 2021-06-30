@@ -77,3 +77,15 @@ cc_proto_library(
         ":class_proto",
     ],
 )
+
+proto_library(
+    name = "embedding_proto",
+    srcs = ["embedding.proto"],
+)
+
+cc_proto_library(
+    name = "embedding_cc_proto",
+    deps = [
+        ":embedding_proto",
+    ],
+)
