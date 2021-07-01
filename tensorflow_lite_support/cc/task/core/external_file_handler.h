@@ -62,8 +62,8 @@ class ExternalFileHandler {
   // contents are already loaded in memory.
   absl::Status MapExternalFile();
 
-  // Reference to the input ExternalFile.
-  const ExternalFile& external_file_;
+  // The input ExternalFile.
+  const ExternalFile external_file_;
 
   // The file descriptor of the ExternalFile if provided by path, as it is
   // opened and owned by this class. Set to -1 otherwise.
