@@ -330,6 +330,8 @@ public abstract class TensorBuffer {
    */
   public void loadBuffer(@NonNull ByteBuffer buffer, @NonNull int[] shape) {
     checkNotNull(buffer, "Byte buffer cannot be null.");
+    checkArgument(isShapeValid(shape), "Values in TensorBuffer shape should be non-negative.");
+
     int flatSize = computeFlatSize(shape);
     checkArgument(
         (buffer.limit() == getTypeSize() * flatSize),
@@ -338,7 +340,15 @@ public abstract class TensorBuffer {
             + " Actual: "
             + buffer.limit());
 
-    resize(shape);
+    if (!isDynamic) {
+      // Make sure the new shape fits the buffer size when TensorBuffer has fixed size.
+      checkArgument(Arrays.equals(shape, this.shape));
+    }
+
+    // Update to the new shape, since shape dim values might change.
+    this.shape = shape.clone();
+    this.flatSize = flatSize;
+
     buffer.rewind();
     this.buffer = buffer;
   }
