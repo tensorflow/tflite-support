@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_IMAGE_CLASSIFIER_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_IMAGE_CLASSIFIER_H_
 
+#include <initializer_list>
 #include <memory>
 #include <vector>
 
@@ -27,6 +28,8 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
+#include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
+#include "tensorflow_lite_support/cc/task/processor/classification_postprocessor.h"
 #include "tensorflow_lite_support/cc/task/vision/core/base_vision_task_api.h"
 #include "tensorflow_lite_support/cc/task/vision/core/classification_head.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
@@ -112,12 +115,16 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
       const FrameBuffer& frame_buffer, const BoundingBox& roi);
 
  protected:
+  absl::StatusOr<std::unique_ptr<processor::ClassificationPostprocessor>>
+  CreatePostprocessor(core::TfLiteEngine* engine,
+                      const std::initializer_list<int> output_indices,
+                      const ImageClassifierOptions& options);
+
   // The options used to build this ImageClassifier.
   std::unique_ptr<ImageClassifierOptions> options_;
 
-  // The list of classification heads associated with the corresponding output
-  // tensors. Built from TFLite Model Metadata.
-  std::vector<ClassificationHead> classification_heads_;
+  std::vector<std::unique_ptr<processor::ClassificationPostprocessor>>
+      postprocessors_;
 
   // Post-processing to transform the raw model outputs into classification
   // results.
@@ -134,46 +141,6 @@ class ImageClassifier : public BaseVisionTaskApi<ClassificationResult> {
 
   // Performs pre-initialization actions.
   virtual absl::Status PreInit();
-  // Performs post-initialization actions.
-  virtual absl::Status PostInit();
-
- private:
-  // Performs sanity checks on the model outputs and extracts their metadata.
-  absl::Status CheckAndSetOutputs();
-
-  // Performs sanity checks on the class whitelist/blacklist and forms the class
-  // name set.
-  absl::Status CheckAndSetClassNameSet();
-
-  // Initializes the score calibration parameters based on corresponding TFLite
-  // Model Metadata, if any.
-  absl::Status InitScoreCalibrations();
-
-  // Given a ClassificationResult object containing class indices, fills the
-  // name and display name from the label map(s).
-  absl::Status FillResultsFromLabelMaps(ClassificationResult* result);
-
-  // The number of output tensors. This corresponds to the number of
-  // classification heads.
-  int num_outputs_;
-  // Whether the model features quantized inference type (QUANTIZED_UINT8). This
-  // is currently detected by checking if all output tensors data type is uint8.
-  bool has_uint8_outputs_;
-
-  // Set of whitelisted or blacklisted class names.
-  struct ClassNameSet {
-    absl::flat_hash_set<std::string> values;
-    bool is_whitelist;
-  };
-
-  // Whitelisted or blacklisted class names based on provided options at
-  // construction time. These are used to filter out results during
-  // post-processing.
-  ClassNameSet class_name_set_;
-
-  // List of score calibration parameters, if any. Built from TFLite Model
-  // Metadata.
-  std::vector<std::unique_ptr<ScoreCalibration>> score_calibrations_;
 };
 
 }  // namespace vision

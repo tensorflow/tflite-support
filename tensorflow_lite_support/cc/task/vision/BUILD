@@ -63,6 +63,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+        "//tensorflow_lite_support/cc/task/processor:classification_postprocessor",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",
@@ -71,6 +72,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:external_file_handler",
         "//tensorflow_lite_support/cc/task/core:task_utils",
+        "//tensorflow_lite_support/cc/task/processor/proto:classification_options_cc_proto",
         "//tensorflow_lite_support/cc/task/vision/core:classification_head",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/core:label_map_item",
