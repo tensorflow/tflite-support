@@ -7,7 +7,6 @@ cc_library(
     name = "test_utils",
     srcs = ["test_utils.cc"],
     hdrs = ["test_utils.h"],
-    visibility = ["//tensorflow_lite_support/cc/test:__subpackages__"],
     deps = [
         "@com_google_absl//absl/strings",
     ],
