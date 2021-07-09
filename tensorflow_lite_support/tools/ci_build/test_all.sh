@@ -15,9 +15,14 @@
 # ==============================================================================
 # External `test_all.sh`
 
-# Due to resource limits, we don't always run these tests. We will have
-# continuous tests to monitor code health instead.
+# Due to resource limits, we don't always run these tests as presubmits. We will
+# have continuous tests to monitor code health instead.
 
 set -ex
 
 source tensorflow_lite_support/tools/ci_build/tests/run_metadata_tests.sh
+source tensorflow_lite_support/tools/ci_build/tests/run_support_lib_tests.sh
+
+bazel test --test_output=all \
+    //tensorflow_lite_support/cc/test/task/vision:all \
+    //tensorflow_lite_support/custom_ops/kernel/sentencepiece:all

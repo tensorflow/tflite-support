@@ -16,5 +16,5 @@
 # External `run_metadata_tests.sh`
 
 bazel test --test_output=all \
-    //tensorflow_lite_support/metadata/python/... \
-    //tensorflow_lite_support/metadata/java/src/javatests/...
+    //tensorflow_lite_support/metadata/python/tests:metadata_test \
+    //tensorflow_lite_support/metadata/python/tests/metadata_writers:all \

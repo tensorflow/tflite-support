@@ -44,13 +44,3 @@ bazel build -c opt --config=monolithic \
 # Build Coral plugin.
 bazel build --sandbox_debug --subcommands --define=darwinn_portable=1 \
     //tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin
-
-# Run Metadata tests.
-bazel clean --expunge
-
-bazel test --test_output=all \
-    //tensorflow_lite_support/cc/test/task/vision:all \
-    //tensorflow_lite_support/metadata/python/tests:metadata_test \
-    //tensorflow_lite_support/metadata/python/tests/metadata_writers:all \
-    //tensorflow_lite_support/custom_ops/kernel/sentencepiece:all
-
