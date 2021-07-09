@@ -149,6 +149,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+        "//tensorflow_lite_support/cc/task/processor:embedding_postprocessor",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",

@@ -25,6 +25,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
+#include "tensorflow_lite_support/cc/task/processor/embedding_postprocessor.h"
 #include "tensorflow_lite_support/cc/task/vision/core/base_vision_task_api.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"
@@ -140,28 +141,9 @@ class ImageEmbedder
   // clamped to -128 or 127).
   void QuantizeFeatureVector(FeatureVector* feature_vector) const;
 
-  // Quantizes all the feature vectors in result.
-  virtual void QuantizeResult(EmbeddingResult* result) const;
-
  private:
-  // Performs sanity checks on the model outputs and extracts their metadata.
-  absl::Status CheckAndSetOutputs();
-
-  // Makes the input feature vector unit-norm via L2 normalization.
-  void NormalizeFeatureVector(FeatureVector* feature_vector) const;
-
-  // Applies L2 normalization to all the feature vectors in result.
-  void NormalizeResult(EmbeddingResult* result) const;
-
-  // Whether the model features quantized inference type (QUANTIZED_UINT8). This
-  // is currently detected by checking if all output tensors data type is uint8.
-  bool has_uint8_outputs_;
-
-  // Number of output layers.
-  int num_output_layers_;
-  // Dimensionality of the (1D) embeddings produced by the output layers. This
-  // vector has num_output_layers_ elements.
-  std::vector<int> embedding_dimensions_;
+  std::vector<std::unique_ptr<processor::EmbeddingPostprocessor>>
+      postprocessors_;
 };
 
 }  // namespace vision

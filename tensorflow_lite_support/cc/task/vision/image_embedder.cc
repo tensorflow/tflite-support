@@ -40,70 +40,22 @@ using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::core::TaskAPIFactory;
 
-// Performs actual cosine similarity computation.
-template <typename T>
-tflite::support::StatusOr<double> ComputeCosineSimilarity(const T* u,
-                                                          const T* v,
-                                                          int num_elements) {
-  if (num_elements <= 0) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        "Cannot compute cosine similarity on empty feature vectors",
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
-  double dot_product = 0.0;
-  double norm_u = 0.0;
-  double norm_v = 0.0;
-  for (int i = 0; i < num_elements; ++i) {
-    dot_product += u[i] * v[i];
-    norm_u += u[i] * u[i];
-    norm_v += v[i] * v[i];
-  }
-  if (norm_u <= 0.0 || norm_v <= 0.0) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        "Cannot compute cosine similarity on feature vector with 0 norm",
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
-  return dot_product / std::sqrt(norm_u * norm_v);
+absl::StatusOr<std::unique_ptr<processor::EmbeddingPostprocessor>>
+CreatePostprocessor(core::TfLiteEngine* engine,
+                    const std::initializer_list<int> output_indices,
+                    const ImageEmbedderOptions& options) {
+  auto new_options = std::make_unique<processor::EmbeddingOptions>();
+  new_options->set_l2_normalize(options.l2_normalize());
+  new_options->set_quantize(options.quantize());
+  return processor::EmbeddingPostprocessor::Create(engine, output_indices,
+                                                   std::move(new_options));
 }
-
 }  // namespace
 
 /* static */
 tflite::support::StatusOr<double> ImageEmbedder::CosineSimilarity(
     const FeatureVector& u, const FeatureVector& v) {
-  if (u.has_value_string() && v.has_value_string()) {
-    if (u.value_string().size() != v.value_string().size()) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          absl::StrFormat("Cannot compute cosine similarity on quantized "
-                          "feature vectors of different sizes (%d vs %d)",
-                          u.value_string().size(), v.value_string().size()),
-          TfLiteSupportStatus::kInvalidArgumentError);
-    }
-    return ComputeCosineSimilarity(
-        reinterpret_cast<const int8_t*>(&u.value_string()[0]),
-        reinterpret_cast<const int8_t*>(&v.value_string()[0]),
-        u.value_string().size());
-  }
-  if (!u.has_value_string() && !v.has_value_string()) {
-    if (u.value_float_size() != v.value_float_size()) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          absl::StrFormat("Cannot compute cosine similarity on float "
-                          "feature vectors of different sizes (%d vs %d)",
-                          u.value_float_size(), v.value_float_size()),
-          TfLiteSupportStatus::kInvalidArgumentError);
-    }
-    return ComputeCosineSimilarity(
-        u.value_float().data(), v.value_float().data(), u.value_float().size());
-  }
-  return CreateStatusWithPayload(
-      StatusCode::kInvalidArgument,
-      "Cannot compute cosine similarity between quantized and float "
-      "feature vectors",
-      TfLiteSupportStatus::kInvalidArgumentError);
+  return processor::EmbeddingPostprocessor::CosineSimilarity(u, v);
 }
 
 /* static */
@@ -153,80 +105,18 @@ absl::Status ImageEmbedder::Init(
 
   // Sanity check and set inputs and outputs.
   RETURN_IF_ERROR(CheckAndSetInputs());
-  RETURN_IF_ERROR(CheckAndSetOutputs());
 
   // Perform post-initialization actions.
   RETURN_IF_ERROR(PostInit());
 
-  return absl::OkStatus();
-}
-
-absl::Status ImageEmbedder::CheckAndSetOutputs() {
-  // First, sanity checks on the model itself.
-  num_output_layers_ = engine_->interpreter()->outputs().size();
-  embedding_dimensions_.resize(num_output_layers_);
-
-  int num_quantized_outputs = 0;
-  for (int i = 0; i < num_output_layers_; ++i) {
-    int output_tensor_index = engine_->interpreter()->outputs()[i];
-    const TfLiteTensor* output_tensor =
-        engine_->interpreter()->tensor(output_tensor_index);
-    int num_dimensions = output_tensor->dims->size;
-    if (num_dimensions == 4) {
-      if (output_tensor->dims->data[1] != 1 ||
-          output_tensor->dims->data[2] != 1) {
-        return CreateStatusWithPayload(
-            StatusCode::kInvalidArgument,
-            absl::StrFormat("Unexpected WxH sizes for output index %d: got "
-                            "%dx%d, expected 1x1.",
-                            i, output_tensor->dims->data[2],
-                            output_tensor->dims->data[1]),
-            TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
-      }
-    } else if (num_dimensions != 2) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          absl::StrFormat(
-              "Unexpected number of dimensions for output index %d: got %dD, "
-              "expected either 2D (BxN with B=1) or 4D (BxHxWxN with B=1, "
-              "W=1, "
-              "H=1).",
-              i, num_dimensions),
-          TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
-    }
-    if (output_tensor->dims->data[0] != 1) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          absl::StrFormat("The output array is expected to have a batch size "
-                          "of 1. Got %d for output index %d.",
-                          output_tensor->dims->data[0], i),
-          TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
-    }
-    embedding_dimensions_[i] = output_tensor->dims->data[num_dimensions - 1];
-    if (output_tensor->type == kTfLiteUInt8) {
-      num_quantized_outputs++;
-    } else if (output_tensor->type != kTfLiteFloat32) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          absl::StrFormat("Type mismatch for output tensor %s. Requested one "
-                          "of these types: "
-                          "kTfLiteUint8/kTfLiteFloat32, got %s.",
-                          output_tensor->name,
-                          TfLiteTypeGetName(output_tensor->type)),
-          TfLiteSupportStatus::kInvalidOutputTensorTypeError);
-    }
+  // ImageEmbedder assumes that all output tensors share the same
+  // embedding option.
+  postprocessors_.reserve(engine_->OutputCount(engine_->interpreter()));
+  for (int i = 0; i < engine_->OutputCount(engine_->interpreter()); i++) {
+    ASSIGN_OR_RETURN(auto processor,
+                     CreatePostprocessor(engine_.get(), {i}, *options_));
+    postprocessors_.emplace_back(std::move(processor));
   }
-
-  if (num_quantized_outputs > 0 &&
-      num_quantized_outputs != num_output_layers_) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat("Got %d quantized output(s), expected %d (i.e. all "
-                        "provided outputs must be quantized).",
-                        num_quantized_outputs, num_output_layers_),
-        TfLiteSupportStatus::kInvalidOutputTensorTypeError);
-  }
-  has_uint8_outputs_ = (num_quantized_outputs > 0);
 
   return absl::OkStatus();
 }
@@ -248,35 +138,9 @@ tflite::support::StatusOr<EmbeddingResult> ImageEmbedder::Postprocess(
     const std::vector<const TfLiteTensor*>& output_tensors,
     const FrameBuffer& /*frame_buffer*/, const BoundingBox& /*roi*/) {
   EmbeddingResult result;
-  for (int i = 0; i < num_output_layers_; ++i) {
-    Embedding* embedding = result.add_embeddings();
-    embedding->set_output_index(i);
-    FeatureVector* feature_vector = embedding->mutable_feature_vector();
-    if (has_uint8_outputs_) {
-      const uint8* output_data =
-          engine_->interpreter()->typed_output_tensor<uint8>(i);
-      // Get the zero_point and scale parameters from the tensor metadata.
-      const int output_tensor_index = engine_->interpreter()->outputs()[i];
-      const TfLiteTensor* output_tensor =
-          engine_->interpreter()->tensor(output_tensor_index);
-      for (int j = 0; j < embedding_dimensions_[i]; ++j) {
-        feature_vector->add_value_float(output_tensor->params.scale *
-                                        (static_cast<int>(output_data[j]) -
-                                         output_tensor->params.zero_point));
-      }
-    } else {
-      const float* output_data =
-          engine_->interpreter()->typed_output_tensor<float>(i);
-      for (int j = 0; j < embedding_dimensions_[i]; ++j) {
-        feature_vector->add_value_float(output_data[j]);
-      }
-    }
-  }
-  if (options_->l2_normalize()) {
-    NormalizeResult(&result);
-  }
-  if (options_->quantize()) {
-    QuantizeResult(&result);
+  for (int i = 0; i < postprocessors_.size(); ++i) {
+    RETURN_IF_ERROR(
+        postprocessors_.at(i)->Postprocess(result.add_embeddings()));
   }
 
   return result;
@@ -284,64 +148,21 @@ tflite::support::StatusOr<EmbeddingResult> ImageEmbedder::Postprocess(
 
 Embedding ImageEmbedder::GetEmbeddingByIndex(const EmbeddingResult& result,
                                              int output_index) {
-  if (output_index < 0 || output_index >= num_output_layers_) {
+  if (output_index < 0 || output_index >= postprocessors_.size()) {
     return Embedding();
   }
   return result.embeddings(output_index);
 }
 
 int ImageEmbedder::GetEmbeddingDimension(int output_index) const {
-  if (output_index < 0 || output_index >= num_output_layers_) {
+  if (output_index < 0 || output_index >= postprocessors_.size()) {
     return -1;
   }
-  return embedding_dimensions_[output_index];
+  return postprocessors_.at(output_index)->GetEmbeddingDimension();
 }
 
 int ImageEmbedder::GetNumberOfOutputLayers() const {
-  return num_output_layers_;
-}
-
-void ImageEmbedder::NormalizeFeatureVector(
-    FeatureVector* feature_vector) const {
-  float squared_l2_norm = 0.0f;
-  for (const float val : feature_vector->value_float()) {
-    squared_l2_norm += val * val;
-  }
-  if (squared_l2_norm == 0.0f) {
-    return;
-  }
-  const float inv_l2_norm = 1.0f / std::sqrt(squared_l2_norm);
-  for (int i = 0; i < feature_vector->value_float().size(); ++i) {
-    feature_vector->set_value_float(
-        i, feature_vector->value_float(i) * inv_l2_norm);
-  }
-}
-
-void ImageEmbedder::NormalizeResult(EmbeddingResult* result) const {
-  for (int i = 0; i < num_output_layers_; ++i) {
-    FeatureVector* feature_vector =
-        result->mutable_embeddings(i)->mutable_feature_vector();
-    NormalizeFeatureVector(feature_vector);
-  }
-}
-
-void ImageEmbedder::QuantizeFeatureVector(FeatureVector* feature_vector) const {
-  auto* quantized_values = feature_vector->mutable_value_string();
-  quantized_values->resize(feature_vector->value_float().size());
-  for (int i = 0; i < feature_vector->value_float().size(); ++i) {
-    int value = static_cast<int>(roundf(feature_vector->value_float(i) * 128));
-    (*quantized_values)[i] =
-        static_cast<char>(std::max(-128, std::min(value, 127)));
-  }
-}
-
-void ImageEmbedder::QuantizeResult(EmbeddingResult* result) const {
-  for (int i = 0; i < num_output_layers_; ++i) {
-    FeatureVector* feature_vector =
-        result->mutable_embeddings(i)->mutable_feature_vector();
-    QuantizeFeatureVector(feature_vector);
-    feature_vector->clear_value_float();
-  }
+  return postprocessors_.size();
 }
 
 }  // namespace vision
