@@ -50,7 +50,7 @@ def generate_instrumentation_tests(
         manifest_values = _manifest_values,
         testonly = 1,
         deps = deps + [
-            "@android_test_support//runner/android_junit_runner",
+            "@maven//:androidx_test_runner",
         ],
         **binary_args
     )

@@ -51,6 +51,7 @@ android_local_test(
     test_class = "org.tensorflow.lite.support.metadata.ByteBufferChannelTest",
     deps = [
         "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
+        "@maven//:androidx_test_core",
         "@maven//:com_google_truth_truth",  # android
         "@maven//:org_robolectric_robolectric",
         "@robolectric//bazel:android-all",
@@ -88,6 +89,7 @@ android_local_test(
     test_class = "org.tensorflow.lite.support.metadata.BoundedInputStreamTest",
     deps = [
         "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata",
+        "@maven//:androidx_test_core",
         "@maven//:com_google_truth_truth",  # android
         "@maven//:org_robolectric_robolectric",
         "@robolectric//bazel:android-all",
@@ -103,7 +105,7 @@ java_test(
     test_class = "org.tensorflow.lite.support.metadata.MetadataParserTest",
     deps = [
         "//tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata_lib",
-        "@junit",
         "@maven//:com_google_truth_truth",
+        "@maven//:junit_junit",
     ],
 )

@@ -37,6 +37,7 @@ tensorflow_lite_support/tools/ci_build/common.sh
 tensorflow_lite_support/tools/ci_build/common_win.bat
 tensorflow_lite_support/tools/ci_build/test_all.sh
 tensorflow_lite_support/tools/ci_build/tests/run_metadata_tests.sh
+tensorflow_lite_support/tools/ci_build/tests/run_support_lib_tests.sh
 tensorflow_lite_support/tools/pip_package/BUILD
 tensorflow_lite_support/tools/pip_package/MANIFEST.in
 tensorflow_lite_support/tools/pip_package/README
