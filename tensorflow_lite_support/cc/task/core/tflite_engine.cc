@@ -17,6 +17,8 @@ limitations under the License.
 
 #include <unistd.h>
 
+#include <memory>
+
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
 #include "tensorflow/lite/builtin_ops.h"
@@ -24,6 +26,7 @@ limitations under the License.
 #include "tensorflow/lite/core/shims/cc/tools/verifier.h"
 #include "tensorflow/lite/stderr_reporter.h"
 #include "tensorflow_lite_support/cc/common.h"
+#include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 
@@ -136,10 +139,11 @@ absl::Status TfLiteEngine::BuildModelFromFlatBuffer(
     return CreateStatusWithPayload(StatusCode::kInternal,
                                    "Model already built");
   }
-  external_file_.set_file_content(std::string(buffer_data, buffer_size));
+  external_file_ = std::make_unique<ExternalFile>();
+  external_file_->set_file_content(std::string(buffer_data, buffer_size));
   ASSIGN_OR_RETURN(
       model_file_handler_,
-      ExternalFileHandler::CreateFromExternalFile(&external_file_));
+      ExternalFileHandler::CreateFromExternalFile(external_file_.get()));
   return InitializeFromModelFileHandler(compute_settings);
 }
 
@@ -150,10 +154,13 @@ absl::Status TfLiteEngine::BuildModelFromFile(
     return CreateStatusWithPayload(StatusCode::kInternal,
                                    "Model already built");
   }
-  external_file_.set_file_name(file_name);
+  if (external_file_ == nullptr) {
+    external_file_ = std::make_unique<ExternalFile>();
+  }
+  external_file_->set_file_name(file_name);
   ASSIGN_OR_RETURN(
       model_file_handler_,
-      ExternalFileHandler::CreateFromExternalFile(&external_file_));
+      ExternalFileHandler::CreateFromExternalFile(external_file_.get()));
   return InitializeFromModelFileHandler(compute_settings);
 }
 
@@ -164,10 +171,13 @@ absl::Status TfLiteEngine::BuildModelFromFileDescriptor(
     return CreateStatusWithPayload(StatusCode::kInternal,
                                    "Model already built");
   }
-  external_file_.mutable_file_descriptor_meta()->set_fd(file_descriptor);
+  if (external_file_ == nullptr) {
+    external_file_ = std::make_unique<ExternalFile>();
+  }
+  external_file_->mutable_file_descriptor_meta()->set_fd(file_descriptor);
   ASSIGN_OR_RETURN(
       model_file_handler_,
-      ExternalFileHandler::CreateFromExternalFile(&external_file_));
+      ExternalFileHandler::CreateFromExternalFile(external_file_.get()));
   return InitializeFromModelFileHandler(compute_settings);
 }
 
@@ -180,6 +190,21 @@ absl::Status TfLiteEngine::BuildModelFromExternalFileProto(
   }
   ASSIGN_OR_RETURN(model_file_handler_,
                    ExternalFileHandler::CreateFromExternalFile(external_file));
+  return InitializeFromModelFileHandler(compute_settings);
+}
+
+absl::Status TfLiteEngine::BuildModelFromExternalFileProto(
+    std::unique_ptr<ExternalFile> external_file) {
+  if (model_) {
+    return CreateStatusWithPayload(StatusCode::kInternal,
+                                   "Model already built");
+  }
+  external_file_ = std::move(external_file);
+  ASSIGN_OR_RETURN(
+      model_file_handler_,
+      ExternalFileHandler::CreateFromExternalFile(external_file_.get()));
+  // Dummy proto. InitializeFromModelFileHandler doesn't use this proto.
+  tflite::proto::ComputeSettings compute_settings;
   return InitializeFromModelFileHandler(compute_settings);
 }
 
@@ -214,9 +239,8 @@ absl::Status TfLiteEngine::InitInterpreter(
         "BuildModelFrom methods before calling InitInterpreter.");
   }
   auto initializer =
-      [this](
-          const InterpreterCreationResources& resources,
-          std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
+      [this](const InterpreterCreationResources& resources,
+             std::unique_ptr<Interpreter, InterpreterDeleter>* interpreter_out)
       -> absl::Status {
     tflite_shims::InterpreterBuilder interpreter_builder(*model_, *resolver_);
     resources.ApplyTo(&interpreter_builder);
