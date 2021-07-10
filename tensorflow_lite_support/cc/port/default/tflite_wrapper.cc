@@ -19,7 +19,9 @@ limitations under the License.
 #include "absl/strings/str_format.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/delegates/interpreter_utils.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/flatbuffer_to_proto.h"
 #include "tensorflow/lite/experimental/acceleration/configuration/proto_to_flatbuffer.h"
+#include "tensorflow/lite/minimal_logging.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
 namespace tflite {
@@ -45,8 +47,27 @@ absl::Status TfLiteInterpreterWrapper::SanityCheckComputeSettings(
   return absl::OkStatus();
 }
 
-TfLiteInterpreterWrapper::TfLiteInterpreterWrapper()
-    : delegate_(nullptr, nullptr), got_error_do_not_delegate_anymore_(false) {}
+TfLiteInterpreterWrapper::TfLiteInterpreterWrapper(
+    const std::string& default_model_namespace,
+    const std::string& default_model_id)
+    : delegate_(nullptr, nullptr),
+      got_error_do_not_delegate_anymore_(false),
+      default_model_namespace_(default_model_namespace),
+      default_model_id_(default_model_id) {}
+
+std::string TfLiteInterpreterWrapper::ModelNamespace() {
+  const auto& ns_from_acceleration =
+      compute_settings_.model_namespace_for_statistics();
+  return ns_from_acceleration.empty() ? default_model_namespace_
+                                      : ns_from_acceleration;
+}
+
+std::string TfLiteInterpreterWrapper::ModelID() {
+  const auto& id_from_acceleration =
+      compute_settings_.model_identifier_for_statistics();
+  return id_from_acceleration.empty() ? default_model_id_
+                                      : id_from_acceleration;
+}
 
 // This is the deprecated overload that doesn't take an
 // InterpreterCreationResources parameter.
@@ -91,6 +112,25 @@ absl::Status TfLiteInterpreterWrapper::InitializeWithFallback(
   // Sanity check and copy ComputeSettings.
   RETURN_IF_ERROR(SanityCheckComputeSettings(compute_settings));
   compute_settings_ = compute_settings;
+  if (compute_settings_.has_settings_to_test_locally()) {
+    flatbuffers::FlatBufferBuilder mini_benchmark_settings_fbb;
+    const auto* mini_benchmark_settings =
+        tflite::ConvertFromProto(compute_settings_.settings_to_test_locally(),
+                                 &mini_benchmark_settings_fbb);
+    mini_benchmark_ = tflite::acceleration::CreateMiniBenchmark(
+        *mini_benchmark_settings, ModelNamespace(), ModelID());
+    const tflite::ComputeSettingsT from_minibenchmark =
+        mini_benchmark_->GetBestAcceleration();
+    if (from_minibenchmark.tflite_settings != nullptr) {
+      TFLITE_LOG_PROD_ONCE(TFLITE_LOG_INFO, "Using mini benchmark results\n");
+      compute_settings_ = tflite::ConvertFromFlatbuffer(
+          from_minibenchmark, /*skip_mini_benchmark_settings=*/true);
+    }
+    // Trigger mini benchmark if it hasn't already run. Vast majority of cases
+    // should not actually do anything, since first runs are rare.
+    mini_benchmark_->TriggerMiniBenchmark();
+    mini_benchmark_->MarkAndGetEventsToLog();
+  }
 
   // Initialize fallback behavior.
   fallback_on_compilation_error_ =

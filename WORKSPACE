@@ -51,9 +51,9 @@ http_archive(
     ],
 )
 
-# TF on 2021-05-20.
-TENSORFLOW_COMMIT = "5497a509e4f6bb9ead686b113fca53183f421565"
-TENSORFLOW_SHA256 = "aa01329bbd5262cd4e8e51085a27de3dc848ecc1b8c2b4045915b38459b00642"
+# TF on 2021-07-08.
+TENSORFLOW_COMMIT = "5c7c11eeb4e046cd974e6984f4dd0910d099b2d0"
+TENSORFLOW_SHA256 = "b35a3c8349ffb2b042745b5d8c08fa1b88f6f14bb621a7371b8ad517a32ef8f2"
 # These values come from tensorflow/workspace3.bzl. If the TF commit is updated,
 # these should be updated to match.
 IO_BAZEL_RULES_CLOSURE_COMMIT = "308b05b2419edb5c8ee0471b67a40403df940149"
@@ -143,13 +143,14 @@ http_archive(
     ],
 )
 
-# ABSL cpp library lts_2020_02_25
-# Needed for absl/status
+# ABSL cpp library lts_2021_03_24 Patch2
+# See https://github.com/abseil/abseil-cpp/releases for details.
+# Needed for absl/status and absl/status:statusor
 http_archive(
     name = "com_google_absl",
     build_file = "//third_party:com_google_absl.BUILD",
     urls = [
-        "https://github.com/abseil/abseil-cpp/archive/20200225.tar.gz",
+        "https://github.com/abseil/abseil-cpp/archive/20210324.2.tar.gz",
     ],
     # Remove after https://github.com/abseil/abseil-cpp/issues/326 is solved.
     patches = [
@@ -158,8 +159,8 @@ http_archive(
     patch_args = [
         "-p1",
     ],
-    strip_prefix = "abseil-cpp-20200225",
-    sha256 = "728a813291bdec2aa46eab8356ace9f75ac2ed9dfe2df5ab603c4e6c09f1c353"
+    strip_prefix = "abseil-cpp-20210324.2",
+    sha256 = "59b862f50e710277f8ede96f083a5bb8d7c9595376146838b9580be90374ee1f"
 )
 
 http_archive(
