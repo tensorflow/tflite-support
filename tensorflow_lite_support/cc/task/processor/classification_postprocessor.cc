@@ -23,7 +23,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/label_map_item.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
-#include "tensorflow_lite_support/cc/task/processor/proto/class.proto.h"
 
 namespace tflite {
 namespace task {
@@ -34,30 +33,10 @@ namespace {
 using ::absl::StatusCode;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::TfLiteSupportStatus;
-using ::tflite::task::core::AssertAndReturnTypedTensor;
 using ::tflite::task::core::BuildClassificationHead;
 using ::tflite::task::core::LabelMapItem;
 using ::tflite::task::core::ScoreCalibration;
 
-// Default score value used as a fallback for classes that (1) have no score
-// calibration data or (2) have a very low confident uncalibrated score, i.e.
-// lower than the `min_uncalibrated_score` threshold.
-//
-// (1) This happens when the ScoreCalibration does not cover all the classes
-// listed in the label map. This can be used to enforce the denylisting of
-// given classes so that they are never returned.
-//
-// (2) This is an optional threshold provided part of the calibration data. It
-// is used to mitigate false alarms on some classes.
-//
-// In both cases, a class that gets assigned a score of -1 is never returned as
-// it gets discarded by the `score_threshold` check (see post-processing logic).
-constexpr float kDefaultCalibratedScore = -1.0f;
-
-// Calibrated scores should be in the [0, 1] range, otherwise an error is
-// returned at post-processing time.
-constexpr float kMinCalibratedScore = 0.0f;
-constexpr float kMaxCalibratedScore = 1.0f;
 }  // namespace
 
 absl::Status ClassificationPostprocessor::Init() {
@@ -220,141 +199,6 @@ absl::Status ClassificationPostprocessor::Init() {
   return absl::OkStatus();
 }
 
-absl::Status ClassificationPostprocessor::Postprocess(
-    Classifications* classifications) {
-  classifications->set_head_index(output_tensor_indices_.at(0));
-  std::vector<std::pair<int, float>> score_pairs;
-  const auto& head = classification_head_;
-  score_pairs.reserve(head.label_map_items.size());
-
-  const TfLiteTensor* output_tensor = Tensor();
-  if (output_tensor->type == kTfLiteUInt8) {
-    const uint8* output_data = AssertAndReturnTypedTensor<uint8>(output_tensor);
-    for (int j = 0; j < head.label_map_items.size(); ++j) {
-      score_pairs.emplace_back(
-          j, output_tensor->params.scale * (static_cast<int>(output_data[j]) -
-                                            output_tensor->params.zero_point));
-    }
-  } else {
-    const float* output_data = AssertAndReturnTypedTensor<float>(output_tensor);
-    for (int j = 0; j < head.label_map_items.size(); ++j) {
-      score_pairs.emplace_back(j, output_data[j]);
-    }
-  }
-
-  // Optional score calibration.
-  if (score_calibration_ != nullptr) {
-    for (auto& score_pair : score_pairs) {
-      const std::string& class_name =
-          head.label_map_items[score_pair.first].name;
-      score_pair.second = score_calibration_->ComputeCalibratedScore(
-          class_name, score_pair.second);
-      if (score_pair.second > kMaxCalibratedScore) {
-        return CreateStatusWithPayload(
-            StatusCode::kInternal,
-            absl::StrFormat("calibrated score is too high: got %f, expected "
-                            "%f as maximum.",
-                            score_pair.second, kMaxCalibratedScore));
-      }
-      if (score_pair.second != kDefaultCalibratedScore &&
-          score_pair.second < kMinCalibratedScore) {
-        return CreateStatusWithPayload(
-            StatusCode::kInternal,
-            absl::StrFormat("calibrated score is too low: got %f, expected "
-                            "%f as minimum.",
-                            score_pair.second, kMinCalibratedScore));
-      }
-    }
-  }
-
-  int num_results =
-      options_->max_results() >= 0
-          ? std::min(static_cast<int>(head.label_map_items.size()),
-                     options_->max_results())
-          : head.label_map_items.size();
-  float score_threshold = options_->has_score_threshold()
-                              ? options_->score_threshold()
-                              : head.score_threshold;
-
-  if (class_name_set_.values.empty()) {
-    // Partially sort in descending order (higher score is better).
-    absl::c_partial_sort(
-        score_pairs, score_pairs.begin() + num_results,
-        [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
-          return a.second > b.second;
-        });
-
-    for (int j = 0; j < num_results; ++j) {
-      float score = score_pairs[j].second;
-      if (score < score_threshold) {
-        break;
-      }
-      auto* cl = classifications->add_classes();
-      cl->set_index(score_pairs[j].first);
-      cl->set_score(score);
-    }
-  } else {
-    // Sort in descending order (higher score is better).
-    absl::c_sort(score_pairs, [](const std::pair<int, float>& a,
-                                 const std::pair<int, float>& b) {
-      return a.second > b.second;
-    });
-
-    for (int j = 0; j < head.label_map_items.size(); ++j) {
-      float score = score_pairs[j].second;
-      if (score < score_threshold ||
-          classifications->classes_size() >= num_results) {
-        break;
-      }
-
-      const int class_index = score_pairs[j].first;
-      const std::string& class_name = head.label_map_items[class_index].name;
-
-      bool class_name_found = class_name_set_.values.contains(class_name);
-
-      if ((!class_name_found && class_name_set_.is_allowlist) ||
-          (class_name_found && !class_name_set_.is_allowlist)) {
-        continue;
-      }
-
-      auto* cl = classifications->add_classes();
-      cl->set_index(class_index);
-      cl->set_score(score);
-    }
-  }
-  return FillResultsFromLabelMaps(classifications);
-}
-
-absl::Status ClassificationPostprocessor::FillResultsFromLabelMaps(
-    Classifications* classifications) {
-  int head_index = classifications->head_index();
-  const std::vector<LabelMapItem>& label_map_items =
-      classification_head_.label_map_items;
-  for (int j = 0; j < classifications->classes_size(); ++j) {
-    Class* current_class = classifications->mutable_classes(j);
-    int current_class_index = current_class->index();
-    if (current_class_index < 0 ||
-        current_class_index >= label_map_items.size()) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          absl::StrFormat("Invalid class index (%d) with respect to label "
-                          "map size (%d) for head #%d.",
-                          current_class_index, label_map_items.size(),
-                          head_index),
-          TfLiteSupportStatus::kMetadataInconsistencyError);
-    }
-    const std::string& name = label_map_items[current_class_index].name;
-    if (!name.empty()) {
-      current_class->set_class_name(name);
-    }
-    const std::string& display_name =
-        label_map_items[current_class_index].display_name;
-    if (!display_name.empty()) {
-      current_class->set_display_name(display_name);
-    }
-  }
-  return absl::OkStatus();
-}
 
 }  // namespace processor
 }  // namespace task
