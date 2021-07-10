@@ -3,7 +3,7 @@
 A Python wrapper for the C++ Text Task APIs.
 
 ## Background
-This Python API is based on the C++ Text Task APIs. It uses shared libraries which are built using `bazel`. To bridge C++ and Python APIs,  [ctypes](https://docs.python.org/3/library/ctypes.html) which is a foreign function library for Python is used.
+This Python API is based on the C++ Text Task APIs. It uses Python's [subprocess](https://docs.python.org/3/library/subprocess.html) to call C++ Text Task APIs.
 
 ## NLClassifier
 
