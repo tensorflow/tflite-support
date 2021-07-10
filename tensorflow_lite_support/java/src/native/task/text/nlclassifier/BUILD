@@ -1,8 +1,4 @@
-load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
-load(
-    "@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl",
-    "cc_library_with_tflite",
-)
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite", "jni_binary_with_tflite")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -14,9 +10,9 @@ exports_files([
 ])
 
 # Default native target for nl_classifier to provide BuiltInOpResolver.
-cc_library(
+cc_library_with_tflite(
     name = "nl_classifier_native",
-    srcs = [
+    tflite_jni_binaries = [
         ":libtask_text_jni.so",
     ],
     deps = [
@@ -27,10 +23,10 @@ cc_library(
 # Note: "libtask_text_jni" is hardcoded in Java to look up the .so, therefore
 # the name should remain the same when creating customized version of
 # nl_classifier_native
-tflite_jni_binary(
+jni_binary_with_tflite(
     name = "libtask_text_jni.so",
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
-    deps = [
+    tflite_deps = [
         ":native_without_resolver",
         "//tensorflow_lite_support/java/src/native/task/core:builtin_op_resolver",
     ],

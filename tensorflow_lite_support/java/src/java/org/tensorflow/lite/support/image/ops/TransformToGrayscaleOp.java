@@ -34,7 +34,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
  * <p>Supported color spaces:
  *
  * <ul>
- *   <li>{@link ColorSpaceType.RGB}
+ *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
  * </ul>
  *
  * <p>The conversion is based on OpenCV RGB to GRAY conversion
@@ -57,10 +57,12 @@ public class TransformToGrayscaleOp implements ImageOperator {
   /**
    * Applies the transformation to grayscale and returns a {@link TensorImage}.
    *
-   * <p>If the input image is already {@link ColorSpaceType.GRAYSCALE}, this op will be a no-op.
+   * <p>If the input image is already {@link
+   * org.tensorflow.lite.support.image.ColorSpaceType#GRAYSCALE}, this op will be a no-op.
    *
-   * @throws IllegalArgumentException if the {@code image} is not {@link ColorSpaceType.RGB} or
-   *     {@link ColorSpaceType.GRAYSCALE}.
+   * @throws IllegalArgumentException if the {@code image} is not {@link
+   *     org.tensorflow.lite.support.image.ColorSpaceType#RGB} or {@link
+   *     org.tensorflow.lite.support.image.ColorSpaceType#GRAYSCALE}.
    */
   @Override
   public TensorImage apply(TensorImage image) {

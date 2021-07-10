@@ -144,7 +144,6 @@ public final class SupportPreconditions {
    *
    * @param expression a boolean expression
    * @throws IllegalStateException if {@code expression} is false
-   * @see Verify#verify Verify.verify()
    */
   public static void checkState(boolean expression) {
     if (!expression) {
@@ -160,7 +159,6 @@ public final class SupportPreconditions {
    * @param errorMessage the exception message to use if the check fails; will be converted to a
    *     string using {@link String#valueOf(Object)}
    * @throws IllegalStateException if {@code expression} is false
-   * @see Verify#verify Verify.verify()
    */
   public static void checkState(boolean expression, @Nullable Object errorMessage) {
     if (!expression) {

@@ -77,11 +77,25 @@ StatusOr<std::unique_ptr<ImageClassifier>> ImageClassifier::CreateFromOptions(
   // Copy options to ensure the ExternalFile outlives the constructed object.
   auto options_copy = absl::make_unique<ImageClassifierOptions>(options);
 
-  ASSIGN_OR_RETURN(
-      auto image_classifier,
-      TaskAPIFactory::CreateFromExternalFileProto<ImageClassifier>(
-          &options_copy->model_file_with_metadata(), std::move(resolver),
-          options_copy->num_threads(), options_copy->compute_settings()));
+  std::unique_ptr<ImageClassifier> image_classifier;
+  if (options_copy->has_model_file_with_metadata()) {
+    ASSIGN_OR_RETURN(
+        image_classifier,
+        TaskAPIFactory::CreateFromExternalFileProto<ImageClassifier>(
+            &options_copy->model_file_with_metadata(), std::move(resolver),
+            options_copy->num_threads(), options_copy->compute_settings()));
+  } else if (options_copy->base_options().has_model_file()) {
+    ASSIGN_OR_RETURN(image_classifier,
+                     TaskAPIFactory::CreateFromBaseOptions<ImageClassifier>(
+                         &options_copy->base_options(), std::move(resolver)));
+  } else {
+    // Should never happen because of SanityCheckOptions.
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        absl::StrFormat("Expected exactly one of `base_options.model_file` or "
+                        "`model_file_with_metadata` to be provided, found 0."),
+        TfLiteSupportStatus::kInvalidArgumentError);
+  }
 
   RETURN_IF_ERROR(image_classifier->Init(std::move(options_copy)));
 
@@ -91,24 +105,20 @@ StatusOr<std::unique_ptr<ImageClassifier>> ImageClassifier::CreateFromOptions(
 /* static */
 absl::Status ImageClassifier::SanityCheckOptions(
     const ImageClassifierOptions& options) {
-  if (!options.has_model_file_with_metadata()) {
+  int num_input_models = (options.base_options().has_model_file() ? 1 : 0) +
+                         (options.has_model_file_with_metadata() ? 1 : 0);
+  if (num_input_models != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        "Missing mandatory `model_file_with_metadata` field",
+        absl::StrFormat("Expected exactly one of `base_options.model_file` or "
+                        "`model_file_with_metadata` to be provided, found %d.",
+                        num_input_models),
         TfLiteSupportStatus::kInvalidArgumentError);
   }
   if (options.max_results() == 0) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         "Invalid `max_results` option: value must be != 0",
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
-  if (options.score_threshold() < 0 || options.score_threshold() >= 1) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat(
-            "`score_threshold` out of range: %f. Valid range is [0,1[.",
-            options.score_threshold()),
         TfLiteSupportStatus::kInvalidArgumentError);
   }
   if (options.class_name_whitelist_size() > 0 &&

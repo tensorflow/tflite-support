@@ -40,9 +40,10 @@ namespace audio {
 //   (kTfLiteFloat32)
 //    - input audio buffer of size `[batch * samples]`.
 //    - batch inference is not supported (`batch` is required to be 1).
+//    - for multi-channel models, the channels need be interleaved.
 // At least one output tensor with:
 //   (kTfLiteFloat32)
-//    - `[1 x N]` array with `N ` represents the class number.
+//    - `[1 x N]` array with `N` represents the class number.
 //    - optional (but recommended) label map(s) as AssociatedFile-s with type
 //      TENSOR_AXIS_LABELS, containing one label per line. The first such
 //      AssociatedFile (if any) is used to fill the `class_name` field of the
@@ -81,6 +82,9 @@ class AudioClassifier
   // metadata.
   tflite::support::StatusOr<AudioBuffer::AudioFormat> GetRequiredAudioFormat();
 
+  // Returns the required input buffer size in number of float elements.
+  int GetRequiredInputBufferSize() { return input_buffer_size_; }
+
  private:
   // Performs sanity checks on the provided AudioClassifierOptions.
   static absl::Status SanityCheckOptions(const AudioClassifierOptions& options);
@@ -90,7 +94,11 @@ class AudioClassifier
   absl::Status Init(std::unique_ptr<AudioClassifierOptions> options);
 
   // Sets up input audio format from the model metadata;
-  void SetAudioFormatFromMetadata();
+  absl::Status SetAudioFormatFromMetadata();
+
+  // Performs sanity checks on the model input dimension and sets the input
+  // buffer size accordingly.
+  absl::Status CheckAndSetInputs();
 
   // Performs sanity checks on the model outputs and extracts their metadata.
   absl::Status CheckAndSetOutputs();
@@ -123,19 +131,22 @@ class AudioClassifier
   // is currently detected by checking if all output tensors data type is uint8.
   bool has_uint8_outputs_;
 
-  // Set of whitelisted or blacklisted class names.
+  // Set of allowlisted or denylisted class names.
   struct ClassNameSet {
     absl::flat_hash_set<std::string> values;
-    bool is_whitelist;
+    bool is_allowlist;
   };
 
-  // Whitelisted or blacklisted class names based on provided options at
+  // Allowlisted or denylisted class names based on provided options at
   // construction time. These are used to filter out results during
   // post-processing.
   ClassNameSet class_name_set_;
 
-  // Expect input audio format by the model.
+  // Expected input audio format by the model.
   AudioBuffer::AudioFormat audio_format_;
+
+  // Expected input audio buffer size in number of float elements.
+  int input_buffer_size_;
 };
 
 }  // namespace audio

@@ -43,26 +43,16 @@ cc_library(
 )
 
 cc_library(
-    name = "gtest",
-    testonly = 1,
-    hdrs = [
-        "gmock.h",
-        "gtest.h",
-    ],
-    deps = [
-        "//testing/base/public:gunit_for_library_testonly",
-    ],
-)
-
-cc_library(
     name = "gtest_main",
     testonly = 1,
     hdrs = [
         "benchmark.h",
         "gmock.h",
         "gtest.h",
+        "status_matchers.h",
     ],
     deps = [
+        "//tensorflow_lite_support/cc/port/default:status_matchers",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -32,50 +32,38 @@ namespace audio {
 // TODO(b/182675479): Support quantized input format.
 class AudioBuffer {
  public:
-  // Audio encoding formats.
-  enum class Encoding {
-    kUnknown,
-    kPCM8Bit,
-    kPCM16Bit,
-    kPCMFloat,
-    kPCM24BitPacked,
-    kPCM32Bit,
-  };
-
   // Audio format metadata.
   struct AudioFormat {
     int channels;
-    Encoding encoding_format;
     int sample_rate;
   };
 
   // Factory method for creating an AudioBuffer object. The internal buffer does
   // not take the ownership of the input backing buffer.
   static tflite::support::StatusOr<std::unique_ptr<AudioBuffer>> Create(
-      const float* audio_buffer, const AudioFormat& audio_format) {
-    if (audio_format.encoding_format != Encoding::kPCMFloat) {
-      return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrFormat("Expect audio encoding format being %d, but get "
-                             "the encoding format as %d",
-                             Encoding::kPCMFloat, audio_format.encoding_format),
-          tflite::support::TfLiteSupportStatus::kInvalidArgumentError);
-    }
-    return absl::make_unique<AudioBuffer>(audio_buffer, audio_format);
+      const float* audio_buffer, int buffer_size,
+      const AudioFormat& audio_format) {
+    return absl::make_unique<AudioBuffer>(audio_buffer, buffer_size,
+                                          audio_format);
   }
 
   // AudioBuffer for internal use only. Uses the factory method to construct
   // AudioBuffer instance. The internal buffer does not take the ownership of
   // the input backing buffer.
-  AudioBuffer(const float* audio_buffer, const AudioFormat& audio_format)
-      : audio_buffer_(audio_buffer), audio_format_(audio_format) {}
+  AudioBuffer(const float* audio_buffer, int buffer_size,
+              const AudioFormat& audio_format)
+      : audio_buffer_(audio_buffer),
+        buffer_size_(buffer_size),
+        audio_format_(audio_format) {}
 
-  // accessors
+  // Accessors
   AudioFormat GetAudioFormat() const { return audio_format_; }
+  int GetBufferSize() const { return buffer_size_; }
   const float* GetFloatBuffer() const { return audio_buffer_; }
 
  private:
   const float* audio_buffer_;
+  int buffer_size_;
   AudioFormat audio_format_;
 };
 

@@ -25,10 +25,11 @@ android_library(
     srcs = glob(
         ["src/java/org/tensorflow/lite/support/**/*.java"],
     ),
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     deps = [
         "@com_google_auto_value",
+        "@maven//:androidx_annotation_annotation",
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
     ],
@@ -36,22 +37,17 @@ android_library(
 
 android_library(
     name = "tensorflowlite_support_java",
-    srcs = glob(
-        ["src/java/org/tensorflow/lite/support/**/*.java"],
-    ),
-    javacopts = JAVACOPTS,
+    srcs = glob(["src/java/org/tensorflow/lite/support/**/*.java"]),
+    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
+    # LINT.IfChange(dep)
     deps = [
         "@com_google_auto_value",
+        "@maven//:androidx_annotation_annotation",
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
-)
-
-# TODO(b/156482505): Remove this target.
-alias(
-    name = "tensorflow-lite-support-nogpu",
-    actual = ":tensorflow-lite-support",
+    # LINT.ThenChange(<INTERNAL>/release/build_support_pom.sh:dep)
 )
 
 # This alias matches the associated .aar library name output style.
@@ -72,7 +68,7 @@ java_library(
 android_library(
     name = "tensorflowlite_support_precondition",
     srcs = ["src/java/org/tensorflow/lite/support/common/SupportPreconditions.java"],
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     deps = [
         "@org_checkerframework_qual",

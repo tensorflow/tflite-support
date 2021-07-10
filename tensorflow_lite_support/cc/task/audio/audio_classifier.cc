@@ -19,12 +19,14 @@ limitations under the License.
 #include "absl/strings/str_format.h"
 #include "tensorflow/lite/c/c_api_types.h"
 #include "tensorflow_lite_support/cc/common.h"
+#include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/class_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/core/classification_head.h"
 #include "tensorflow_lite_support/cc/task/core/label_map_item.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
+#include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
 namespace task {
@@ -33,6 +35,9 @@ namespace audio {
 namespace {
 
 using ::absl::StatusCode;
+using ::tflite::AudioProperties;
+using ::tflite::ContentProperties;
+using ::tflite::ContentProperties_AudioProperties;
 using ::tflite::metadata::ModelMetadataExtractor;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::StatusOr;
@@ -44,13 +49,56 @@ using ::tflite::task::core::LabelMapItem;
 using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
 
-// Default audio channel number.
-constexpr int kMonoChannel = 1;
-// Default audio encoding formats.
-constexpr AudioBuffer::Encoding kDefaultEncoding =
-    AudioBuffer::Encoding::kPCMFloat;
-// Default audio sample rate.
-constexpr int kDefaultSampleRate = 16000;
+StatusOr<const TensorMetadata*> GetInputTensorMetadata(
+    const ModelMetadataExtractor& metadata_extractor) {
+  if (metadata_extractor.GetModelMetadata() == nullptr ||
+      metadata_extractor.GetModelMetadata()->subgraph_metadata() == nullptr) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "Models are assumed to have the ModelMetadata and SubGraphMetadata.",
+        TfLiteSupportStatus::kMetadataNotFoundError);
+  } else if (metadata_extractor.GetInputTensorCount() != 1) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "Models are assumed to have a single input TensorMetadata.",
+        TfLiteSupportStatus::kInvalidNumInputTensorsError);
+  }
+
+  const TensorMetadata* metadata = metadata_extractor.GetInputTensorMetadata(0);
+
+  if (metadata == nullptr) {
+    // Should never happen.
+    return CreateStatusWithPayload(StatusCode::kInternal,
+                                   "Input TensorMetadata is null.");
+  }
+
+  return metadata;
+}
+
+StatusOr<const AudioProperties*> GetAudioProperties(
+    const TensorMetadata& tensor_metadata) {
+  if (tensor_metadata.content() == nullptr ||
+      tensor_metadata.content()->content_properties() == nullptr) {
+    return CreateStatusWithPayload(
+        StatusCode::kInternal,
+        "Missing audio format metadata in the model metadata.",
+        TfLiteSupportStatus::kMetadataNotFoundError);
+  }
+
+  ContentProperties type = tensor_metadata.content()->content_properties_type();
+
+  if (type != ContentProperties_AudioProperties) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        absl::StrCat(
+            "Expected AudioProperties for tensor ",
+            tensor_metadata.name() ? tensor_metadata.name()->str() : "#0",
+            ", got ", EnumNameContentProperties(type), "."),
+        TfLiteSupportStatus::kMetadataInvalidContentPropertiesError);
+  }
+
+  return tensor_metadata.content()->content_properties_as_AudioProperties();
+}
 
 }  // namespace
 
@@ -67,9 +115,6 @@ StatusOr<std::unique_ptr<AudioClassifier>> AudioClassifier::CreateFromOptions(
                    TaskAPIFactory::CreateFromBaseOptions<AudioClassifier>(
                        &options_copy->base_options(), std::move(resolver)));
 
-  // TODO(b/182625132): Retrieve the required audio format from the model
-  // metadata. Return an error status if the audio format metadata are missed in
-  // the model metadata.
   RETURN_IF_ERROR(audio_classifier->Init(std::move(options_copy)));
 
   return audio_classifier;
@@ -89,19 +134,11 @@ absl::Status AudioClassifier::SanityCheckOptions(
         "Invalid `max_results` option: value must be != 0",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
-  if (options.score_threshold() < 0 || options.score_threshold() >= 1) {
+  if (options.class_name_allowlist_size() > 0 &&
+      options.class_name_denylist_size() > 0) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrFormat(
-            "`score_threshold` out of range: %f. Valid range is [0,1[.",
-            options.score_threshold()),
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
-  if (options.class_name_whitelist_size() > 0 &&
-      options.class_name_blacklist_size() > 0) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        "`class_name_whitelist` and `class_name_blacklist` are mutually "
+        "`class_name_allowlist` and `class_name_denylist` are mutually "
         "exclusive options.",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
@@ -112,29 +149,67 @@ absl::Status AudioClassifier::Init(
     std::unique_ptr<AudioClassifierOptions> options) {
   // Set options.
   options_ = std::move(options);
-  SetAudioFormatFromMetadata();
+  RETURN_IF_ERROR(SetAudioFormatFromMetadata());
+  RETURN_IF_ERROR(CheckAndSetInputs());
   RETURN_IF_ERROR(CheckAndSetOutputs());
+
   return absl::OkStatus();
 }
 
-void AudioClassifier::SetAudioFormatFromMetadata() {
-  // TODO(b/182625132): Retrieve the required audio format from the model
-  // metadata.
-  audio_format_.channels = kMonoChannel;
-  audio_format_.encoding_format = kDefaultEncoding;
-  audio_format_.sample_rate = kDefaultSampleRate;
+absl::Status AudioClassifier::SetAudioFormatFromMetadata() {
+  const ModelMetadataExtractor* metadata_extractor =
+      engine_->metadata_extractor();
+  ASSIGN_OR_RETURN(const TensorMetadata* metadata,
+                   GetInputTensorMetadata(*metadata_extractor));
+  ASSIGN_OR_RETURN(const AudioProperties* props, GetAudioProperties(*metadata));
+  if (props == nullptr) {
+    return CreateStatusWithPayload(
+        StatusCode::kInternal,
+        "Missing audio format metadata in the model metadata.",
+        TfLiteSupportStatus::kMetadataNotFoundError);
+  }
+  audio_format_.channels = props->channels();
+  audio_format_.sample_rate = props->sample_rate();
+  return absl::OkStatus();
 }
 
 tflite::support::StatusOr<AudioBuffer::AudioFormat>
 AudioClassifier::GetRequiredAudioFormat() {
-  if (audio_format_.channels <= 0 ||
-      audio_format_.encoding_format == AudioBuffer::Encoding::kUnknown ||
-      audio_format_.sample_rate <= 0) {
-    return CreateStatusWithPayload(StatusCode::kInvalidArgument,
-                                   "Missing audio format metadata in the model",
-                                   TfLiteSupportStatus::kMetadataNotFoundError);
+  if (audio_format_.channels <= 0 || audio_format_.sample_rate <= 0) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "Missing audio format metadata in the model.",
+        TfLiteSupportStatus::kMetadataNotFoundError);
   }
   return audio_format_;
+}
+
+absl::Status AudioClassifier::CheckAndSetInputs() {
+  const std::vector<TfLiteTensor*> input_tensors = GetInputTensors();
+  input_buffer_size_ = 1;
+  TfLiteIntArray* dims = input_tensors[0]->dims;
+  for (int i = 0; i < dims->size; ++i) {
+    if (dims->data[i] < 1) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrFormat("Invalid size: %d for input tensor dimension: %d.",
+                          dims->data[i], i),
+          TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
+    }
+    input_buffer_size_ *= input_tensors[0]->dims->data[i];
+  }
+
+  // Check if the input buffer size is divisible by the required audio channels.
+  // This needs to be done after loading metadata and input.
+  if (input_buffer_size_ % audio_format_.channels != 0) {
+    return CreateStatusWithPayload(
+        StatusCode::kInternal,
+        absl::StrFormat("Model input tensor size (%d) should be a "
+                        "multiplier of the number of channels (%d).",
+                        input_buffer_size_, audio_format_.channels),
+        TfLiteSupportStatus::kMetadataInconsistencyError);
+  }
+  return absl::OkStatus();
 }
 
 // TODO(b/182537114): Extract into a common library to share between audio and
@@ -287,34 +362,25 @@ absl::Status AudioClassifier::Preprocess(
                         audio_buffer.GetAudioFormat().channels,
                         audio_format_.channels));
   }
-  if (audio_buffer.GetAudioFormat().encoding_format !=
-      audio_format_.encoding_format) {
+  if (audio_buffer.GetAudioFormat().sample_rate != audio_format_.sample_rate) {
     return tflite::support::CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Input audio buffer encoding format %d does not match "
-                        "the model required audio encoding format %d.",
-                        audio_buffer.GetAudioFormat().encoding_format,
-                        audio_format_.encoding_format));
+        absl::StrFormat("Input audio sample rate %d does not match "
+                        "the model required audio sample rate %d.",
+                        audio_buffer.GetAudioFormat().sample_rate,
+                        audio_format_.sample_rate));
   }
-  // TODO(b/182675479): Support quantized input format.
-  switch (input_tensors[0]->type) {
-    case kTfLiteFloat32:
-      if (audio_buffer.GetAudioFormat().encoding_format !=
-          AudioBuffer::Encoding::kPCMFloat) {
-        return tflite::support::CreateStatusWithPayload(
-            absl::StatusCode::kInvalidArgument,
-            absl::StrFormat("Input tensor format kTfLiteFloat32 does not match "
-                            "the input data format %d.",
-                            audio_buffer.GetAudioFormat().encoding_format));
-      }
-      break;
-    default:
-      return tflite::support::CreateStatusWithPayload(
-          absl::StatusCode::kUnimplemented, "Unsupported input tensor format.");
+  if (audio_buffer.GetBufferSize() != input_buffer_size_) {
+    return tflite::support::CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        absl::StrFormat(
+            "Input audio buffer size %d does not match the model required "
+            "input size %d.",
+            audio_buffer.GetBufferSize(), input_buffer_size_),
+        TfLiteSupportStatus::kInvalidArgumentError);
   }
-  int num_elements = input_tensors[0]->bytes / sizeof(float);
   tflite::task::core::PopulateTensor(audio_buffer.GetFloatBuffer(),
-                                     num_elements, input_tensors[0]);
+                                     input_buffer_size_, input_tensors[0]);
   return absl::OkStatus();
 }
 
@@ -337,6 +403,8 @@ AudioClassifier::Postprocess(
     classifications->set_head_index(i);
 
     const auto& head = classification_heads_[i];
+    classifications->set_head_name(head.name);
+
     score_pairs.clear();
     score_pairs.reserve(head.label_map_items.size());
 
@@ -402,8 +470,8 @@ AudioClassifier::Postprocess(
 
         bool class_name_found = class_name_set_.values.contains(class_name);
 
-        if ((!class_name_found && class_name_set_.is_whitelist) ||
-            (class_name_found && !class_name_set_.is_whitelist)) {
+        if ((!class_name_found && class_name_set_.is_allowlist) ||
+            (class_name_found && !class_name_set_.is_allowlist)) {
           continue;
         }
 

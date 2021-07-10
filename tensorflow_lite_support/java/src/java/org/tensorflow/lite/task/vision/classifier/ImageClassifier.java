@@ -203,7 +203,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *
    * @param nativeHandle a pointer referencing memory allocated in C++
    */
-  private ImageClassifier(long nativeHandle) {
+  ImageClassifier(long nativeHandle) {
     super(nativeHandle);
   }
 
@@ -243,7 +243,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       private List<String> labelDenyList = new ArrayList<>();
       private int numThreads = -1;
 
-      private Builder() {}
+      Builder() {}
 
       /**
        * Sets the locale to use for display names specified through the TFLite Model Metadata, if
@@ -275,7 +275,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       }
 
       /**
-       * Sets the score threshold in [0,1).
+       * Sets the score threshold.
        *
        * <p>It overrides the one provided in the model metadata (if any). Results below this value
        * are rejected.
@@ -360,7 +360,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       return numThreads;
     }
 
-    private ImageClassifierOptions(Builder builder) {
+    ImageClassifierOptions(Builder builder) {
       displayNamesLocale = builder.displayNamesLocale;
       maxResults = builder.maxResults;
       scoreThreshold = builder.scoreThreshold;
@@ -372,16 +372,16 @@ public final class ImageClassifier extends BaseVisionTaskApi {
   }
 
   /**
-   * Performs actual classification on the provided image.
+   * Performs actual classification on the provided {@link TensorImage}.
    *
    * <p>{@link ImageClassifier} supports the following {@link TensorImage} color space types:
    *
    * <ul>
-   *   <li>{@link ColorSpaceType#RGB}
-   *   <li>{@link ColorSpaceType#NV12}
-   *   <li>{@link ColorSpaceType#NV21}
-   *   <li>{@link ColorSpaceType#YV12}
-   *   <li>{@link ColorSpaceType#YV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
@@ -393,25 +393,26 @@ public final class ImageClassifier extends BaseVisionTaskApi {
   }
 
   /**
-   * Performs actual classification on the provided image with {@link ImageProcessingOptions}.
+   * Performs actual classification on the provided {@link TensorImage} with {@link
+   * ImageProcessingOptions}.
    *
    * <p>{@link ImageClassifier} supports the following options:
    *
    * <ul>
-   *   <li>Region of interest (ROI) (through {@link ImageProcessingOptions#Builder#setRoi}). It
+   *   <li>Region of interest (ROI) (through {@link ImageProcessingOptions.Builder#setRoi}). It
    *       defaults to the entire image.
-   *   <li>image rotation (through {@link ImageProcessingOptions#Builder#setOrientation}). It
-   *       defaults to {@link ImageProcessingOptions#Orientation#TOP_LEFT}.
+   *   <li>image rotation (through {@link ImageProcessingOptions.Builder#setOrientation}). It
+   *       defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}.
    * </ul>
    *
    * <p>{@link ImageClassifier} supports the following {@link TensorImage} color space types:
    *
    * <ul>
-   *   <li>{@link ColorSpaceType#RGB}
-   *   <li>{@link ColorSpaceType#NV12}
-   *   <li>{@link ColorSpaceType#NV21}
-   *   <li>{@link ColorSpaceType#YV12}
-   *   <li>{@link ColorSpaceType#YV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
+   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image

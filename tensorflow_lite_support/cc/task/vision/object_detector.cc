@@ -180,34 +180,34 @@ absl::Status SanityCheckOutputTensors(
 
   // Check dimensions for the other tensors are correct.
   if (output_tensors[0]->dims->data[0] != 1 ||
-      output_tensors[0]->dims->data[1] != num_results ||
+      output_tensors[0]->dims->data[1] < num_results ||
       output_tensors[0]->dims->data[2] != 4) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
-            "Expected locations tensor with dimensions [1,%d,4] at index 0, "
-            "found [%d,%d,%d].",
+            "Expected locations tensor with dimensions [1, num_detected_boxes, "
+            "4] at index 0, num_detected_boxes >= %d, found [%d,%d,%d].",
             num_results, output_tensors[0]->dims->data[0],
             output_tensors[0]->dims->data[1],
             output_tensors[0]->dims->data[2]));
   }
   if (output_tensors[1]->dims->data[0] != 1 ||
-      output_tensors[1]->dims->data[1] != num_results) {
+      output_tensors[1]->dims->data[1] < num_results) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
-            "Expected classes tensor with dimensions [1,%d] at index 1, "
-            "found [%d,%d].",
+            "Expected classes tensor with dimensions [1, num_detected_boxes] "
+            "at index 1, num_detected_boxes >= %d, found [%d,%d].",
             num_results, output_tensors[1]->dims->data[0],
             output_tensors[1]->dims->data[1]));
   }
   if (output_tensors[2]->dims->data[0] != 1 ||
-      output_tensors[2]->dims->data[1] != num_results) {
+      output_tensors[2]->dims->data[1] < num_results) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
-            "Expected scores tensor with dimensions [1,%d] at index 2, "
-            "found [%d,%d].",
+            "Expected scores tensor with dimensions [1, num_detected_boxes] "
+            "at index 2, num_detected_boxes >= %d, found [%d,%d].",
             num_results, output_tensors[2]->dims->data[0],
             output_tensors[2]->dims->data[1]));
   }
@@ -220,10 +220,14 @@ absl::Status SanityCheckOutputTensors(
 /* static */
 absl::Status ObjectDetector::SanityCheckOptions(
     const ObjectDetectorOptions& options) {
-  if (!options.has_model_file_with_metadata()) {
+  int num_input_models = (options.base_options().has_model_file() ? 1 : 0) +
+                         (options.has_model_file_with_metadata() ? 1 : 0);
+  if (num_input_models != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        "Missing mandatory `model_file_with_metadata` field",
+        absl::StrFormat("Expected exactly one of `base_options.model_file` or "
+                        "`model_file_with_metadata` to be provided, found %d.",
+                        num_input_models),
         TfLiteSupportStatus::kInvalidArgumentError);
   }
   if (options.max_results() == 0) {
@@ -258,11 +262,25 @@ StatusOr<std::unique_ptr<ObjectDetector>> ObjectDetector::CreateFromOptions(
   // Copy options to ensure the ExternalFile outlives the constructed object.
   auto options_copy = absl::make_unique<ObjectDetectorOptions>(options);
 
-  ASSIGN_OR_RETURN(
-      auto object_detector,
-      TaskAPIFactory::CreateFromExternalFileProto<ObjectDetector>(
-          &options_copy->model_file_with_metadata(), std::move(resolver),
-          options_copy->num_threads(), options_copy->compute_settings()));
+  std::unique_ptr<ObjectDetector> object_detector;
+  if (options_copy->has_model_file_with_metadata()) {
+    ASSIGN_OR_RETURN(
+        object_detector,
+        TaskAPIFactory::CreateFromExternalFileProto<ObjectDetector>(
+            &options_copy->model_file_with_metadata(), std::move(resolver),
+            options_copy->num_threads(), options_copy->compute_settings()));
+  } else if (options_copy->base_options().has_model_file()) {
+    ASSIGN_OR_RETURN(object_detector,
+                     TaskAPIFactory::CreateFromBaseOptions<ObjectDetector>(
+                         &options_copy->base_options(), std::move(resolver)));
+  } else {
+    // Should never happen because of SanityCheckOptions.
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        absl::StrFormat("Expected exactly one of `base_options.model_file` or "
+                        "`model_file_with_metadata` to be provided, found 0."),
+        TfLiteSupportStatus::kInvalidArgumentError);
+  }
 
   RETURN_IF_ERROR(object_detector->Init(std::move(options_copy)));
 

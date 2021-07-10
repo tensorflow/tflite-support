@@ -158,7 +158,7 @@ public abstract class TensorBuffer {
   }
 
   /**
-   * Gets the {@link TensorBuffer#flatSize} of the buffer.
+   * Gets the flatSize of the buffer.
    *
    * @throws IllegalStateException if the underlying data is corrupted
    */
@@ -330,12 +330,25 @@ public abstract class TensorBuffer {
    */
   public void loadBuffer(@NonNull ByteBuffer buffer, @NonNull int[] shape) {
     checkNotNull(buffer, "Byte buffer cannot be null.");
+    checkArgument(isShapeValid(shape), "Values in TensorBuffer shape should be non-negative.");
+
     int flatSize = computeFlatSize(shape);
     checkArgument(
         (buffer.limit() == getTypeSize() * flatSize),
-        "The size of byte buffer and the shape do not match.");
+        "The size of byte buffer and the shape do not match. Expected: "
+            + getTypeSize() * flatSize
+            + " Actual: "
+            + buffer.limit());
 
-    resize(shape);
+    if (!isDynamic) {
+      // Make sure the new shape fits the buffer size when TensorBuffer has fixed size.
+      checkArgument(Arrays.equals(shape, this.shape));
+    }
+
+    // Update to the new shape, since shape dim values might change.
+    this.shape = shape.clone();
+    this.flatSize = flatSize;
+
     buffer.rewind();
     this.buffer = buffer;
   }
@@ -355,6 +368,8 @@ public abstract class TensorBuffer {
    *
    * <p>For the best performance, always load a direct {@link ByteBuffer} or a {@link ByteBuffer}
    * backed by an array.
+   *
+   * <p>If the {@code buffer} is read-only, we adopt a copy-on-write strategy for performance.
    *
    * @param buffer The byte buffer to load.
    */
@@ -402,6 +417,18 @@ public abstract class TensorBuffer {
       checkArgument(Arrays.equals(shape, this.shape));
       this.shape = shape.clone();
     }
+  }
+
+  /** Copies the underlying {@link ByteBuffer} if it's readonly. */
+  protected synchronized void copyByteBufferIfReadOnly() {
+    if (!buffer.isReadOnly()) {
+      return;
+    }
+    ByteBuffer newByteBuffer = ByteBuffer.allocateDirect(buffer.capacity());
+    newByteBuffer.order(buffer.order());
+    newByteBuffer.put(buffer);
+    newByteBuffer.rewind();
+    buffer = newByteBuffer;
   }
 
   /**

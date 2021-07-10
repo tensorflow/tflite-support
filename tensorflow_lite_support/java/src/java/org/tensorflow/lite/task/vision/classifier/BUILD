@@ -1,6 +1,6 @@
 load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "android_library_with_tflite")
 load("@org_tensorflow//tensorflow/lite/java:aar_with_jni.bzl", "aar_with_jni")
-load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -13,15 +13,19 @@ exports_files([
 
 filegroup(
     name = "image_classifier_src",
-    srcs = glob(["**/*.java"]),
+    srcs = glob(
+        ["**/*.java"],
+    ),
 )
 
 # Default target that uses BuiltInOpResolver, registers all built-in OPs.
-android_library(
+android_library_with_tflite(
     name = "image_classifier",
+    tflite_exports = [
+        "//tensorflow_lite_support/java/src/native/task/vision/classifier:image_classifier_native",
+    ],
     exports = [
         ":image_classifier_java",
-        "//tensorflow_lite_support/java/src/native/task/vision/classifier:image_classifier_native",
     ],
 )
 
@@ -31,16 +35,16 @@ android_library(
 # OPs and/or a subset of BuiltInOps to reduce binary size.
 android_library(
     name = "image_classifier_java",
-    srcs = glob(["*.java"]) + [
+    srcs = [
+        ":image_classifier_src",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/core:base_vision_api_src",
     ],
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "@com_google_auto_value",
-        "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
 )

@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_PROTO_BERT_NL_CLASSIFIER_OPTIONS_PROTO_INC_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_PROTO_BERT_NL_CLASSIFIER_OPTIONS_PROTO_INC_H_
 
+#include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_nl_classifier_options.pb.h"
 
 #endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_PROTO_BERT_NL_CLASSIFIER_OPTIONS_PROTO_INC_H_

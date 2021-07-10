@@ -1,6 +1,6 @@
-load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "android_library_with_tflite")
 load("@org_tensorflow//tensorflow/lite/java:aar_with_jni.bzl", "aar_with_jni")
+load("@build_bazel_rules_android//android:rules.bzl", "android_library")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -13,11 +13,13 @@ filegroup(
 )
 
 # Default target that uses BuiltInOpResolver, registers all built-in OPs.
-android_library(
+android_library_with_tflite(
     name = "bert_question_answerer",
+    tflite_exports = [
+        "//tensorflow_lite_support/java/src/native/task/text/qa:bert_question_answerer_native",
+    ],
     exports = [
         ":bert_question_answerer_java",
-        "//tensorflow_lite_support/java/src/native/task/text/qa:bert_question_answerer_native",
     ],
 )
 
@@ -28,7 +30,7 @@ android_library(
 android_library(
     name = "bert_question_answerer_java",
     srcs = glob(["*.java"]),
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     deps = [
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",

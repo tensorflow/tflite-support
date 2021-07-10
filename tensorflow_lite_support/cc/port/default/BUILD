@@ -1,7 +1,7 @@
 package(
     default_visibility = [
-        "//tensorflow_lite_support/cc/port:__pkg__",
-        "//tensorflow_lite_support/cc/test:__pkg__",
+        "//tensorflow_lite_support/cc/port:__subpackages__",
+        "//tensorflow_lite_support/cc/test:__subpackages__",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
@@ -36,6 +36,15 @@ cc_library(
 )
 
 cc_library(
+    name = "status_matchers",
+    testonly = 1,
+    hdrs = ["status_matchers.h"],
+    deps = [
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "tflite_wrapper",
     srcs = ["tflite_wrapper.cc"],
     hdrs = [
@@ -48,10 +57,14 @@ cc_library(
         "@com_google_absl//absl/synchronization",
         "@flatbuffers",
         "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite:minimal_logging",
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/delegates:interpreter_utils",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_cc_proto",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:delegate_registry",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:flatbuffer_to_proto",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:proto_to_flatbuffer",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/mini_benchmark",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/mini_benchmark:mini_benchmark_implementation",
     ],
 )

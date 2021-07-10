@@ -121,6 +121,11 @@ class TfLiteEngine {
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings());
 
+  // Builds the TFLite model from the provided ExternalFile proto, and take
+  // ownership of ExternalFile proto.
+  absl::Status BuildModelFromExternalFileProto(
+      std::unique_ptr<ExternalFile> external_file);
+
   // Initializes interpreter with encapsulated model.
   // Note: setting num_threads to -1 has for effect to let TFLite runtime set
   // the value.
@@ -135,8 +140,7 @@ class TfLiteEngine {
   // absl::Status TfLiteEngine::InitInterpreter(
   //    const tflite::proto::ComputeSettings& compute_settings)
   absl::Status InitInterpreter(
-      const tflite::proto::ComputeSettings& compute_settings,
-      int num_threads);
+      const tflite::proto::ComputeSettings& compute_settings, int num_threads);
 
   // Cancels the on-going `Invoke()` call if any and if possible. This method
   // can be called from a different thread than the one where `Invoke()` is
@@ -169,9 +173,16 @@ class TfLiteEngine {
   // from the buffer; if successful, sets 'model_metadata_extractor_' to be
   // a TF Lite Metadata extractor for the model; and calculates an appropriate
   // return Status,
+  // TODO(b/192726981): Remove `compute_settings` as it's not in use.
   absl::Status InitializeFromModelFileHandler(
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings());
+
+  // ExternalFile and corresponding ExternalFileHandler for models loaded from
+  // disk or file descriptor.
+  // Make sure ExternalFile proto outlives the model and the interpreter.
+  std::unique_ptr<ExternalFile> external_file_;
+  std::unique_ptr<ExternalFileHandler> model_file_handler_;
 
   // TF Lite model and interpreter for actual inference.
   std::unique_ptr<Model, ModelDeleter> model_;
@@ -189,11 +200,6 @@ class TfLiteEngine {
 
   // Extra verifier for FlatBuffer input data.
   Verifier verifier_;
-
-  // ExternalFile and corresponding ExternalFileHandler for models loaded from
-  // disk or file descriptor.
-  ExternalFile external_file_;
-  std::unique_ptr<ExternalFileHandler> model_file_handler_;
 };
 
 }  // namespace core

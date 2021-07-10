@@ -157,6 +157,8 @@ jlong CreateImageClassifierFromOptions(JNIEnv* env,
   }
 }
 
+}  // namespace
+
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_deinitJni(
     JNIEnv* env, jobject thiz, jlong native_handle) {
@@ -227,4 +229,3 @@ Java_org_tensorflow_lite_task_vision_classifier_ImageClassifier_classifyNative(
     return nullptr;
   }
 }
-}  // namespace

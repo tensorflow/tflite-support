@@ -22,6 +22,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
+#include "absl/base/macros.h"
 #include "absl/status/status.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
@@ -53,8 +54,16 @@ class BertNLClassifier : public NLClassifier {
  public:
   using NLClassifier::NLClassifier;
 
+  // Factory function to create a BertNLClassifier from BertNLClassifierOptions.
+  static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
+  CreateFromOptions(
+      const BertNLClassifierOptions& options,
+      std::unique_ptr<tflite::OpResolver> resolver =
+          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
+
   // Factory function to create a BertNLClassifier from TFLite model with
   // metadata.
+  ABSL_DEPRECATED("Prefer using `CreateFromOptions`")
   static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
   CreateFromFile(
       const std::string& path_to_model_with_metadata,
@@ -68,6 +77,7 @@ class BertNLClassifier : public NLClassifier {
 
   // Factory function to create a BertNLClassifier from in memory buffer of a
   // TFLite model with metadata.
+  ABSL_DEPRECATED("Prefer using `CreateFromOptions`")
   static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
   CreateFromBuffer(
       const char* model_with_metadata_buffer_data,
@@ -82,6 +92,7 @@ class BertNLClassifier : public NLClassifier {
 
   // Factory function to create a BertNLClassifier from the file descriptor of a
   // TFLite model with metadata.
+  ABSL_DEPRECATED("Prefer using `CreateFromOptions`")
   static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
   CreateFromFd(
       int fd,
@@ -94,13 +105,6 @@ class BertNLClassifier : public NLClassifier {
         ->set_fd(fd);
     return CreateFromOptions(options, std::move(resolver));
   }
-
-  // Factory function to create a BertNLClassifier from BertNLClassifierOptions.
-  static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
-  CreateFromOptions(
-      const BertNLClassifierOptions& options,
-      std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 
  protected:
   // Run tokenization on input text and construct three input tensors ids, mask

@@ -47,10 +47,44 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       model_buffer: valid buffer of the model file.
       general_md: general infromation about the model. If not specified, default
         general metadata will be generated.
-      input_md: input audio tensor informaton, if not specified, default input
+      input_md: input audio tensor informaton. If not specified, default input
         metadata will be generated.
-      output_md: output classification tensor informaton, if not specified,
+      output_md: output classification tensor informaton. If not specified,
         default output metadata will be generated.
+
+    Returns:
+      A MetadataWriter object.
+    """
+    if output_md is None:
+      output_md = metadata_info.ClassificationTensorMd(
+          name=_OUTPUT_NAME, description=_OUTPUT_DESCRIPTION)
+
+    return cls.create_from_metadata_info_for_multihead(model_buffer, general_md,
+                                                       input_md, [output_md])
+
+  @classmethod
+  def create_from_metadata_info_for_multihead(
+      cls,
+      model_buffer: bytearray,
+      general_md: Optional[metadata_info.GeneralMd] = None,
+      input_md: Optional[metadata_info.InputAudioTensorMd] = None,
+      output_md_list: Optional[List[
+          metadata_info.ClassificationTensorMd]] = None):
+    """Creates a MetadataWriter instance for multihead models.
+
+    Args:
+      model_buffer: valid buffer of the model file.
+      general_md: general infromation about the model. If not specified, default
+        general metadata will be generated.
+      input_md: input audio tensor informaton. If not specified, default input
+        metadata will be generated.
+      output_md_list: information of each output tensor head. If not specified,
+        default metadata will be generated for each output tensor. If
+        `tensor_name` in each `ClassificationTensorMd` instance is not
+        specified, elements in `output_md_list` need to have one-to-one mapping
+        with the output tensors [1] in the TFLite model.
+      [1]:
+        https://github.com/tensorflow/tflite-support/blob/b2a509716a2d71dfff706468680a729cc1604cff/tensorflow_lite_support/metadata/metadata_schema.fbs#L605-L612
 
     Returns:
       A MetadataWriter object.
@@ -64,20 +98,17 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       input_md = metadata_info.InputAudioTensorMd(
           name=_INPUT_NAME, description=_INPUT_DESCRIPTION)
 
-    if output_md is None:
-      output_md = metadata_info.ClassificationTensorMd(
-          name=_OUTPUT_NAME, description=_OUTPUT_DESCRIPTION)
-
-    output_md.associated_files = output_md.associated_files or []
+    associated_files = []
+    for md in output_md_list or []:
+      associated_files.extend(
+          [file.file_path for file in md.associated_files or []])
 
     return super().create_from_metadata_info(
         model_buffer=model_buffer,
         general_md=general_md,
         input_md=[input_md],
-        output_md=[output_md],
-        associated_files=[
-            file.file_path for file in output_md.associated_files
-        ])
+        output_md=output_md_list,
+        associated_files=associated_files)
 
   @classmethod
   def create_for_inference(
@@ -85,7 +116,6 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       model_buffer: bytearray,
       sample_rate: int,
       channels: int,
-      min_required_samples: int,
       label_file_paths: List[str],
       score_calibration_md: Optional[metadata_info.ScoreCalibrationMd] = None):
     """Creates mandatory metadata for TFLite Support inference.
@@ -99,10 +129,6 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       model_buffer: valid buffer of the model file.
       sample_rate: the sample rate in Hz when the audio was captured.
       channels: the channel count of the audio.
-      min_required_samples: the minimum required number of per-channel samples
-        in order to run inference properly. Optional for fixed-size audio
-        tensors and default to 0. The minimum required flat size of the audio
-        tensor is min_required_samples x channels.
       label_file_paths: paths to the label files [1] in the classification
         tensor. Pass in an empty list if the model does not have any label file.
       score_calibration_md: information of the score calibration operation [2]
@@ -115,15 +141,9 @@ class MetadataWriter(metadata_writer.MetadataWriter):
 
     Returns:
       A MetadataWriter object.
-
-    Raises:
-      ValueError: if either sample_rate or channels is non-positive, or if
-        min_required_samples is negative.
-      ValueError: if min_required_samples is 0, but the input audio tensor is
-        not fixed-size.
     """
-    # To make Task Library working properly, sample_rate, channels,
-    # min_required_samples need to be positive.
+    # To make Task Library working properly, sample_rate, channels need to be
+    # positive.
     if sample_rate <= 0:
       raise ValueError(
           "sample_rate should be positive, but got {}.".format(sample_rate))
@@ -132,29 +152,8 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       raise ValueError(
           "channels should be positive, but got {}.".format(channels))
 
-    if min_required_samples < 0:
-      raise ValueError(
-          "min_required_samples should be non-negative, but got {}.".format(
-              min_required_samples))
-
-    if min_required_samples == 0:
-      tensor_shape = writer_utils.get_input_tensor_shape(
-          model_buffer, _AUDIO_TENSOR_INDEX)
-
-      # The dynamic size input shape can be an empty array or arrays like [1]
-      # and [1, 1], where the flat size is 1.
-      flat_size = writer_utils.compute_flat_size(tensor_shape)
-      if not tensor_shape or flat_size == 1:
-        raise ValueError(
-            "The audio tensor is not fixed-size, therefore min_required_samples"
-            "is required, and should be a positive value.")
-      # Update min_required_samples if the audio tensor is fixed-size using
-      # ceiling division.
-      min_required_samples = (flat_size + channels - 1) // channels
-
     input_md = metadata_info.InputAudioTensorMd(_INPUT_NAME, _INPUT_DESCRIPTION,
-                                                sample_rate, channels,
-                                                min_required_samples)
+                                                sample_rate, channels)
 
     output_md = metadata_info.ClassificationTensorMd(
         name=_OUTPUT_NAME,

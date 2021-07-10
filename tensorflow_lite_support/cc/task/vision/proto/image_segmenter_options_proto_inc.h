@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_PROTO_IMAGE_SEGMENTER_OPTIONS_PROTO_INC_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_PROTO_IMAGE_SEGMENTER_OPTIONS_PROTO_INC_H_
 
+#include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 
 #include "tensorflow_lite_support/cc/task/vision/proto/image_segmenter_options.pb.h"

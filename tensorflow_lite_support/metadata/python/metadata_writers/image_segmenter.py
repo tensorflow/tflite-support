@@ -28,10 +28,11 @@ _INPUT_NAME = "image"
 _INPUT_DESCRIPTION = "Input image to be segmented."
 _OUTPUT_NAME = "segmentation_masks"
 _OUTPUT_DESCRIPTION = "Masks over the target objects with high accuracy."
-# The output tensor is in the shape of [1, ImageWidth, ImageHeight, N], where N
-# is the number of objects that the segmentation model can recognize. The tensor
-# is essentially a list of grayscale bitmap, and the content dimension range is
-# [1, 2].
+# The output tensor is in the shape of [1, ImageHeight, ImageWidth, N], where N
+# is the number of objects that the segmentation model can recognize. The output
+# tensor is essentially a list of grayscale bitmaps, where each value is the
+# probability of the corresponding pixel belonging to a certain object type.
+# Therefore, the content dimension range of the output tensor is [1, 2].
 _CONTENT_DIM_MIN = 1
 _CONTENT_DIM_MAX = 2
 

@@ -51,8 +51,10 @@ SETUP_PACKAGES = [
 
 REQUIRED_PACKAGES = [
     'absl-py >= 0.7.0',
-    'numpy >= 1.16.0',
-    'flatbuffers >= 1.12',
+    'numpy >= 1.19.2',
+    # TODO(b/187981032): remove the constraint for 2.0 once the incompatibile
+    # issue is resolved.
+    'flatbuffers >= 1.12, <2',
 ] + SETUP_PACKAGES
 
 project_name = 'tflite-support'

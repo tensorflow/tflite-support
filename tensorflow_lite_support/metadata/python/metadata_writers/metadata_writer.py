@@ -14,6 +14,7 @@
 # ==============================================================================
 """Helper class to write metadata into TFLite models."""
 
+import collections
 from typing import List, Optional, Type
 
 import flatbuffers
@@ -61,6 +62,10 @@ class MetadataWriter:
 
     Returns:
       A MetadataWriter Object.
+
+    Raises:
+      ValueError: if the tensor names from `input_md` and `output_md` do not
+      match the tensor names read from the model.
     """
 
     if general_md is None:
@@ -69,6 +74,12 @@ class MetadataWriter:
       input_md = []
     if output_md is None:
       output_md = []
+
+    # Order the input/output metadata according to tensor orders from the model.
+    input_md = _order_tensor_metadata(
+        input_md, writer_utils.get_input_tensor_names(model_buffer))
+    output_md = _order_tensor_metadata(
+        output_md, writer_utils.get_output_tensor_names(model_buffer))
 
     model_metadata = general_md.create_metadata()
     input_metadata = [m.create_metadata() for m in input_md]
@@ -109,12 +120,16 @@ class MetadataWriter:
     if not input_metadata:
       model = _schema_fb.Model.GetRootAsModel(model_buffer, 0)
       num_input_tensors = model.Subgraphs(0).InputsLength()
-      input_metadata = [_metadata_fb.TensorMetadataT()] * num_input_tensors
+      input_metadata = [
+          _metadata_fb.TensorMetadataT() for i in range(num_input_tensors)
+      ]
 
     if not output_metadata:
       model = _schema_fb.Model.GetRootAsModel(model_buffer, 0)
       num_output_tensors = model.Subgraphs(0).OutputsLength()
-      output_metadata = [_metadata_fb.TensorMetadataT()] * num_output_tensors
+      output_metadata = [
+          _metadata_fb.TensorMetadataT() for i in range(num_output_tensors)
+      ]
 
     _fill_default_tensor_names(
         input_metadata, writer_utils.get_input_tensor_names(model_buffer))
@@ -162,3 +177,26 @@ def _fill_default_tensor_names(
     tensor_names_from_model: List[str]):
   for metadata, name in zip(tensor_metadata, tensor_names_from_model):
     metadata.name = metadata.name or name
+
+
+def _order_tensor_metadata(
+    tensor_md: List[Type[metadata_info.TensorMd]],
+    tensor_names_from_model: List[str]) -> List[Type[metadata_info.TensorMd]]:
+  """Orders tensor_md according to the tensor names from the model."""
+  tensor_names_from_arg = [
+      md.tensor_name for md in tensor_md or [] if md.tensor_name is not None
+  ]
+  if not tensor_names_from_arg:
+    return tensor_md
+
+  if collections.Counter(tensor_names_from_arg) != collections.Counter(
+      tensor_names_from_model):
+    raise ValueError(
+        "The tensor names from arguments ({}) do not match the tensor names"
+        " read from the model ({}).".format(tensor_names_from_arg,
+                                            tensor_names_from_model))
+  ordered_tensor_md = []
+  name_md_dict = dict(zip(tensor_names_from_arg, tensor_md))
+  for name in tensor_names_from_model:
+    ordered_tensor_md.append(name_md_dict[name])
+  return ordered_tensor_md

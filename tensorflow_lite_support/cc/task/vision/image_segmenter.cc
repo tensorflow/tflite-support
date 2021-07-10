@@ -136,10 +136,14 @@ StatusOr<std::vector<LabelMapItem>> GetLabelMapIfAny(
 /* static */
 absl::Status ImageSegmenter::SanityCheckOptions(
     const ImageSegmenterOptions& options) {
-  if (!options.has_model_file_with_metadata()) {
+  int num_input_models = (options.base_options().has_model_file() ? 1 : 0) +
+                         (options.has_model_file_with_metadata() ? 1 : 0);
+  if (num_input_models != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        "Missing mandatory `model_file_with_metadata` field",
+        absl::StrFormat("Expected exactly one of `base_options.model_file` or "
+                        "`model_file_with_metadata` to be provided, found %d.",
+                        num_input_models),
         TfLiteSupportStatus::kInvalidArgumentError);
   }
   if (options.output_type() == ImageSegmenterOptions::UNSPECIFIED) {
@@ -165,11 +169,25 @@ StatusOr<std::unique_ptr<ImageSegmenter>> ImageSegmenter::CreateFromOptions(
   // Copy options to ensure the ExternalFile outlives the constructed object.
   auto options_copy = absl::make_unique<ImageSegmenterOptions>(options);
 
-  ASSIGN_OR_RETURN(
-      auto image_segmenter,
-      TaskAPIFactory::CreateFromExternalFileProto<ImageSegmenter>(
-          &options_copy->model_file_with_metadata(), std::move(resolver),
-          options_copy->num_threads(), options_copy->compute_settings()));
+  std::unique_ptr<ImageSegmenter> image_segmenter;
+  if (options_copy->has_model_file_with_metadata()) {
+    ASSIGN_OR_RETURN(
+        image_segmenter,
+        TaskAPIFactory::CreateFromExternalFileProto<ImageSegmenter>(
+            &options_copy->model_file_with_metadata(), std::move(resolver),
+            options_copy->num_threads(), options_copy->compute_settings()));
+  } else if (options_copy->base_options().has_model_file()) {
+    ASSIGN_OR_RETURN(image_segmenter,
+                     TaskAPIFactory::CreateFromBaseOptions<ImageSegmenter>(
+                         &options_copy->base_options(), std::move(resolver)));
+  } else {
+    // Should never happen because of SanityCheckOptions.
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        absl::StrFormat("Expected exactly one of `base_options.model_file` or "
+                        "`model_file_with_metadata` to be provided, found 0."),
+        TfLiteSupportStatus::kInvalidArgumentError);
+  }
 
   RETURN_IF_ERROR(image_segmenter->Init(std::move(options_copy)));
 

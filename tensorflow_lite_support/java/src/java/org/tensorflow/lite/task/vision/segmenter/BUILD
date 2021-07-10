@@ -1,4 +1,5 @@
 load("@org_tensorflow//tensorflow/lite/java:aar_with_jni.bzl", "aar_with_jni")
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "android_library_with_tflite")
 load("@build_bazel_rules_android//android:rules.bzl", "android_library")
 
 package(
@@ -16,11 +17,13 @@ filegroup(
 )
 
 # Default target that uses BuiltInOpResolver, registers all built-in OPs.
-android_library(
+android_library_with_tflite(
     name = "image_segmenter",
+    tflite_exports = [
+        "//tensorflow_lite_support/java/src/native/task/vision/segmenter:image_segmenter_native",
+    ],
     exports = [
         ":image_segmenter_java",
-        "//tensorflow_lite_support/java/src/native/task/vision/segmenter:image_segmenter_native",
     ],
 )
 
@@ -33,15 +36,13 @@ android_library(
     srcs = glob(["*.java"]) + [
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/core:base_vision_api_src",
     ],
-    # TODO(b/163039980): Use JAVACOPTS in TF. "-Xep:RemoveUnusedImports:ERROR" wierdly break the build.
     javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "//third_party/java/androidx/annotation",
         "@com_google_auto_value",
-        "@org_checkerframework_qual",
+        "@maven//:androidx_annotation_annotation",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
 )

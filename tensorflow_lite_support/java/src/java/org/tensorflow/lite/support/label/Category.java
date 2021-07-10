@@ -26,6 +26,7 @@ import org.tensorflow.lite.annotations.UsedByReflection;
 @UsedByReflection("TFLiteSupport/Task")
 public final class Category {
   private static final int DEFAULT_INDEX = -1;
+  private static final float TOLERANCE = 1e-6f;
   private final int index;
   private final String label;
   private final String displayName;
@@ -99,7 +100,7 @@ public final class Category {
       Category other = (Category) o;
       return (other.getLabel().equals(this.label)
           && other.getDisplayName().equals(this.displayName)
-          && other.getScore() == this.score
+          && Math.abs(other.getScore() - this.score) < TOLERANCE
           && other.getIndex() == this.index);
     }
     return false;

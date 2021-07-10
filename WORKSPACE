@@ -1,8 +1,15 @@
 workspace(name = "org_tensorflow_lite_support")
 
 load("@bazel_tools//tools/build_defs/repo:java.bzl", "java_import_external")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@//third_party/py:python_configure.bzl", "python_configure")
+
+http_file(
+    name = "mobilebert_float",
+    sha256 = "883bf5d40f0b0ae435326bb21ed0f4c9004b22c3fd1539383fd16d68623696dd",
+    urls = ["https://tfhub.dev/tensorflow/lite-model/mobilebert/1/default/1?lite-format=tflite"],
+)
+
 
 http_archive(
     name = "io_bazel_rules_closure",
@@ -12,6 +19,13 @@ http_archive(
         "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_closure/archive/308b05b2419edb5c8ee0471b67a40403df940149.tar.gz",
         "https://github.com/bazelbuild/rules_closure/archive/308b05b2419edb5c8ee0471b67a40403df940149.tar.gz",  # 2019-06-13
     ],
+)
+
+http_archive(
+    name = "com_google_googletest",
+    urls = ["https://github.com/google/googletest/archive/aee0f9d9b5b87796ee8a0ab26b7587ec30e8858e.zip"],
+    strip_prefix = "googletest-aee0f9d9b5b87796ee8a0ab26b7587ec30e8858e",
+    sha256 = "04a1751f94244307cebe695a69cc945f9387a80b0ef1af21394a490697c5c895",
 )
 
 # Apple and Swift rules.
@@ -37,9 +51,9 @@ http_archive(
     ],
 )
 
-# TF on 2021-03-31.
-TENSORFLOW_COMMIT = "6f898e658a7469cecb10db224ec27e40d027378e"
-TENSORFLOW_SHA256 = "4fc9a7fd771e85be639a8b5d2fd72b4530db44275035eb2f4bc90d6f6c5bf0a9"
+# TF on 2021-07-08.
+TENSORFLOW_COMMIT = "5c7c11eeb4e046cd974e6984f4dd0910d099b2d0"
+TENSORFLOW_SHA256 = "b35a3c8349ffb2b042745b5d8c08fa1b88f6f14bb621a7371b8ad517a32ef8f2"
 # These values come from tensorflow/workspace3.bzl. If the TF commit is updated,
 # these should be updated to match.
 IO_BAZEL_RULES_CLOSURE_COMMIT = "308b05b2419edb5c8ee0471b67a40403df940149"
@@ -129,13 +143,14 @@ http_archive(
     ],
 )
 
-# ABSL cpp library lts_2020_02_25
-# Needed for absl/status
+# ABSL cpp library lts_2021_03_24 Patch2
+# See https://github.com/abseil/abseil-cpp/releases for details.
+# Needed for absl/status and absl/status:statusor
 http_archive(
     name = "com_google_absl",
     build_file = "//third_party:com_google_absl.BUILD",
     urls = [
-        "https://github.com/abseil/abseil-cpp/archive/20200225.tar.gz",
+        "https://github.com/abseil/abseil-cpp/archive/20210324.2.tar.gz",
     ],
     # Remove after https://github.com/abseil/abseil-cpp/issues/326 is solved.
     patches = [
@@ -144,8 +159,8 @@ http_archive(
     patch_args = [
         "-p1",
     ],
-    strip_prefix = "abseil-cpp-20200225",
-    sha256 = "728a813291bdec2aa46eab8356ace9f75ac2ed9dfe2df5ab603c4e6c09f1c353"
+    strip_prefix = "abseil-cpp-20210324.2",
+    sha256 = "59b862f50e710277f8ede96f083a5bb8d7c9595376146838b9580be90374ee1f"
 )
 
 http_archive(
@@ -329,6 +344,14 @@ java_import_external(
     default_visibility = ["@com_google_auto_value//:__pkg__"],
 )
 
+http_archive(
+    name = "robolectric",
+    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.4.tar.gz"],
+    strip_prefix = "robolectric-bazel-4.4",
+)
+load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
+robolectric_repositories()
+
 load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 
 flatbuffers()
@@ -376,18 +399,37 @@ apple_support_dependencies()
 load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
 bazel_version_repository(name = "bazel_version")
 
-
 python_configure(name = "local_config_python")
 
+ATS_TAG = "androidx-test-1.3.0"
+http_archive(
+    name = "android_test_support",
+    strip_prefix = "android-test-%s" % ATS_TAG,
+    urls = ["https://github.com/android/android-test/archive/%s.tar.gz" % ATS_TAG],
+)
+load("@android_test_support//:repo.bzl", "android_test_repositories")
+android_test_repositories()
 
 # Maven dependencies.
 
 maven_install(
     artifacts = [
         "androidx.annotation:annotation:aar:1.1.0",
+        "androidx.annotation:annotation-experimental:1.1.0",
+        "androidx.multidex:multidex:jar:2.0.1",
+        "androidx.test:core:jar:1.3.0",
+        "androidx.test.ext:junit:jar:1.1.2",
+        "androidx.test:runner:jar:1.3.0",
+        "com.google.truth:truth:jar:1.1",
+        "commons-io:commons-io:jar:2.8.0",
+        # Mockito >= 3.4.6 cannot pass bazel desugar.
+        "org.mockito:mockito-android:jar:3.0.0",
+        "org.mockito:mockito-core:jar:3.0.0",
+        "org.mockito:mockito-inline:jar:3.0.0",
+        "org.robolectric:robolectric:jar:4.4",
+        "junit:junit:jar:4.13",
     ],
     repositories = [
-        "https://jcenter.bintray.com",
         "https://maven.google.com",
         "https://dl.google.com/dl/android/maven2",
         "https://repo1.maven.org/maven2",

@@ -309,6 +309,13 @@ class TensorMd:
     max_values: per-channel maximum value of the tensor.
     content_type: content_type of the tensor.
     associated_files: information of the associated files in the tensor.
+    tensor_name: name of the corresponding tensor [1] in the TFLite model. It is
+      used to locate the corresponding tensor and decide the order of the tensor
+      metadata [2] when populating model metadata.
+    [1]:
+      https://github.com/tensorflow/tensorflow/blob/cb67fef35567298b40ac166b0581cd8ad68e5a3a/tensorflow/lite/schema/schema.fbs#L1129-L1136
+    [2]:
+      https://github.com/tensorflow/tflite-support/blob/b2a509716a2d71dfff706468680a729cc1604cff/tensorflow_lite_support/metadata/metadata_schema.fbs#L595-L612
   """
 
   def __init__(self,
@@ -318,13 +325,15 @@ class TensorMd:
                max_values: Optional[List[float]] = None,
                content_type: _metadata_fb.ContentProperties = _metadata_fb
                .ContentProperties.FeatureProperties,
-               associated_files: Optional[List[Type[AssociatedFileMd]]] = None):
+               associated_files: Optional[List[Type[AssociatedFileMd]]] = None,
+               tensor_name: Optional[str] = None):
     self.name = name
     self.description = description
     self.min_values = min_values
     self.max_values = max_values
     self.content_type = content_type
     self.associated_files = associated_files
+    self.tensor_name = tensor_name
 
   def create_metadata(self) -> _metadata_fb.TensorMetadataT:
     """Creates the input tensor metadata based on the information.
@@ -357,6 +366,7 @@ class TensorMd:
     content.contentPropertiesType = self.content_type
     tensor_metadata.content = content
 
+    # TODO(b/174091474): check if multiple label files have populated locale.
     # Create associated files
     if self.associated_files:
       tensor_metadata.associatedFiles = [
@@ -517,16 +527,13 @@ class InputAudioTensorMd(TensorMd):
   Attributes:
     sample_rate: the sample rate in Hz when the audio was captured.
     channels: the channel count of the audio.
-    min_required_samples: the minimum required number of samples in order to run
-      inference properly.
   """
 
   def __init__(self,
                name: Optional[str] = None,
                description: Optional[str] = None,
                sample_rate: int = 0,
-               channels: int = 0,
-               min_required_samples: int = 0):
+               channels: int = 0):
     """Initializes the instance of InputAudioTensorMd.
 
     Args:
@@ -534,10 +541,6 @@ class InputAudioTensorMd(TensorMd):
       description: description of what the tensor is.
       sample_rate: the sample rate in Hz when the audio was captured.
       channels: the channel count of the audio.
-      min_required_samples: the minimum required number of per-channel samples
-        in order to run inference properly. Optional for fixed-size audio
-        tensors and default to 0. The minimum required flat size of the audio
-        tensor is `min_required_samples x channels`.
     """
     super().__init__(
         name,
@@ -546,7 +549,6 @@ class InputAudioTensorMd(TensorMd):
 
     self.sample_rate = sample_rate
     self.channels = channels
-    self.min_required_samples = min_required_samples
 
   def create_metadata(self) -> _metadata_fb.TensorMetadataT:
     """Creates the input audio metadata based on the information.
@@ -555,8 +557,7 @@ class InputAudioTensorMd(TensorMd):
       A Flatbuffers Python object of the input audio metadata.
 
     Raises:
-      ValueError: if any value of sample_rate, channels, min_required_samples is
-      negative.
+      ValueError: if any value of sample_rate, channels is negative.
     """
     # 0 is the default value in Flatbuffers.
     if self.sample_rate < 0:
@@ -567,16 +568,10 @@ class InputAudioTensorMd(TensorMd):
       raise ValueError("channels should be non-negative, but got {}.".format(
           self.channels))
 
-    if self.min_required_samples < 0:
-      raise ValueError(
-          "min_required_samples should be non-negative, but got {}.".format(
-              self.min_required_samples))
-
     tensor_metadata = super().create_metadata()
     properties = tensor_metadata.content.contentProperties
     properties.sampleRate = self.sample_rate
     properties.channels = self.channels
-    properties.minRequiredSamples = self.min_required_samples
 
     return tensor_metadata
 
@@ -604,7 +599,8 @@ class ClassificationTensorMd(TensorMd):
                description: Optional[str] = None,
                label_files: Optional[List[LabelFileMd]] = None,
                tensor_type: Optional[_schema_fb.TensorType] = None,
-               score_calibration_md: Optional[ScoreCalibrationMd] = None):
+               score_calibration_md: Optional[ScoreCalibrationMd] = None,
+               tensor_name: Optional[str] = None):
     """Initializes the instance of ClassificationTensorMd.
 
     Args:
@@ -615,12 +611,19 @@ class ClassificationTensorMd(TensorMd):
       tensor_type: data type of the tensor.
       score_calibration_md: information of the score calibration files operation
         [2] in the classification tensor.
+      tensor_name: name of the corresponding tensor [3] in the TFLite model. It
+        is used to locate the corresponding classification tensor and decide the
+        order of the tensor metadata [4] when populating model metadata.
       [1]:
         https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L95
       [2]:
         https://github.com/tensorflow/tflite-support/blob/5e0cdf5460788c481f5cd18aab8728ec36cf9733/tensorflow_lite_support/metadata/metadata_schema.fbs#L434
+      [3]:
+        https://github.com/tensorflow/tensorflow/blob/cb67fef35567298b40ac166b0581cd8ad68e5a3a/tensorflow/lite/schema/schema.fbs#L1129-L1136
+      [4]:
+        https://github.com/tensorflow/tflite-support/blob/b2a509716a2d71dfff706468680a729cc1604cff/tensorflow_lite_support/metadata/metadata_schema.fbs#L595-L612
     """
-    self._score_calibration_md = score_calibration_md
+    self.score_calibration_md = score_calibration_md
 
     if tensor_type is _schema_fb.TensorType.UINT8:
       min_values = [_MIN_UINT8]
@@ -635,20 +638,20 @@ class ClassificationTensorMd(TensorMd):
       max_values = None
 
     associated_files = label_files or []
-    if self._score_calibration_md:
+    if self.score_calibration_md:
       associated_files.append(
           score_calibration_md.create_score_calibration_file_md())
 
     super().__init__(name, description, min_values, max_values,
                      _metadata_fb.ContentProperties.FeatureProperties,
-                     associated_files)
+                     associated_files, tensor_name)
 
   def create_metadata(self) -> _metadata_fb.TensorMetadataT:
     """Creates the classification tensor metadata based on the information."""
     tensor_metadata = super().create_metadata()
-    if self._score_calibration_md:
+    if self.score_calibration_md:
       tensor_metadata.processUnits = [
-          self._score_calibration_md.create_metadata()
+          self.score_calibration_md.create_metadata()
       ]
     return tensor_metadata
 

@@ -65,10 +65,18 @@ ABSL_FLAG(std::vector<std::string>, class_name_blacklist, {},
           "Comma-separated list of class names that acts as a blacklist. If "
           "non-empty, detections results whose 'class_name' is in this list "
           "are filtered out. Mutually exclusive with 'class_name_whitelist'.");
+ABSL_FLAG(bool, use_coral, false,
+          "If true, inference will be delegated to a connected Coral Edge TPU "
+          "device.");
 
 namespace tflite {
 namespace task {
 namespace vision {
+
+namespace {
+using std::chrono::microseconds;
+using std::chrono::steady_clock;
+}  // namespace
 
 namespace {
 // The line thickness (in pixels) for drawing the detection results.
@@ -91,7 +99,7 @@ constexpr uint8 kColorMapComponents[30] = {
 
 ObjectDetectorOptions BuildOptions() {
   ObjectDetectorOptions options;
-  options.mutable_model_file_with_metadata()->set_file_name(
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
       absl::GetFlag(FLAGS_model_path));
   options.set_max_results(absl::GetFlag(FLAGS_max_results));
   if (absl::GetFlag(FLAGS_score_threshold) >
@@ -105,6 +113,12 @@ ObjectDetectorOptions BuildOptions() {
   for (const std::string& class_name :
        absl::GetFlag(FLAGS_class_name_blacklist)) {
     options.add_class_name_blacklist(class_name);
+  }
+  if (absl::GetFlag(FLAGS_use_coral)) {
+    options.mutable_base_options()
+        ->mutable_compute_settings()
+        ->mutable_tflite_settings()
+        ->set_delegate(::tflite::proto::Delegate::EDGETPU_CORAL);
   }
   return options;
 }
@@ -198,8 +212,18 @@ absl::Status Detect() {
   }
 
   // Run object detection and draw results on input image.
+  auto start_detect = steady_clock::now();
   ASSIGN_OR_RETURN(DetectionResult result,
                    object_detector->Detect(*frame_buffer));
+  auto end_detect = steady_clock::now();
+  std::string delegate =
+      absl::GetFlag(FLAGS_use_coral) ? "Coral Edge TPU" : "CPU";
+  std::cout << "Time cost to detect the input image on " << delegate << ": "
+            << std::chrono::duration<float, std::milli>(end_detect -
+                                                        start_detect)
+                   .count()
+            << " ms" << std::endl;
+
   RETURN_IF_ERROR(EncodeResultToPngFile(result, &image));
 
   // Display results as text.

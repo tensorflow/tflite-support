@@ -2,7 +2,7 @@ package(
     default_visibility = ["//visibility:public"],
 )
 
-load("@org_tensorflow_lite_support//tensorflow_lite_support/tools:build_rules/expand_template.bzl", "cmake_substitutions", "expand_template")
+load("@org_tensorflow_lite_support//tensorflow_lite_support/tools/build_rules:expand_template.bzl", "cmake_substitutions", "expand_template")
 
 _CMAKE_VARIABLES = {
     "INT16_T_LIBZIP": 2,

@@ -60,14 +60,19 @@ ABSL_FLAG(
     "If true, the raw feature vectors returned by the image embedder will "
     "be quantized to 8 bit integers (uniform quantization) via post-processing "
     "before cosine similarity is computed.");
+ABSL_FLAG(bool, use_coral, false,
+          "If true, inference will be delegated to a connected Coral Edge TPU "
+          "device.");
 
 namespace tflite {
 namespace task {
 namespace vision {
 
 namespace {
+using std::chrono::microseconds;
+using std::chrono::steady_clock;
 using ::tflite::support::StatusOr;
-}
+}  // namespace
 
 ImageEmbedderOptions BuildOptions() {
   ImageEmbedderOptions options;
@@ -75,6 +80,11 @@ ImageEmbedderOptions BuildOptions() {
       absl::GetFlag(FLAGS_model_path));
   options.set_l2_normalize(absl::GetFlag(FLAGS_l2_normalize));
   options.set_quantize(absl::GetFlag(FLAGS_quantize));
+
+  if (absl::GetFlag(FLAGS_use_coral)) {
+    options.mutable_compute_settings()->mutable_tflite_settings()->set_delegate(
+        ::tflite::proto::Delegate::EDGETPU_CORAL);
+  }
   return options;
 }
 
@@ -110,8 +120,17 @@ absl::Status ComputeCosineSimilarity() {
                    BuildFrameBufferFromImageData(second_image));
 
   // Extract feature vectors.
+  auto start_embed = steady_clock::now();
   ASSIGN_OR_RETURN(const EmbeddingResult& first_embedding_result,
                    image_embedder->Embed(*first_frame_buffer));
+  auto end_embed = steady_clock::now();
+  std::string delegate =
+      absl::GetFlag(FLAGS_use_coral) ? "Coral Edge TPU" : "CPU";
+  std::cout << "Time cost to embed the input image on " << delegate << ": "
+            << std::chrono::duration<float, std::milli>(end_embed - start_embed)
+                   .count()
+            << " ms" << std::endl;
+
   ASSIGN_OR_RETURN(const EmbeddingResult& second_embedding_result,
                    image_embedder->Embed(*second_frame_buffer));
   // Compute cosine similarity.

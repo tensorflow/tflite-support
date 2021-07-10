@@ -14,10 +14,6 @@
 # ==============================================================================
 """TensorFlow Lite metadata tools."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import copy
 import inspect
 import io
@@ -129,6 +125,8 @@ class MetadataPopulator(object):
     # populator.load_metadata_buffer(metadata_buf)
     populator.load_metadata_file(metadata_file)
     populator.load_associated_files([label.txt])
+    # For associated file buffer (bytearray read from the file), use:
+    # populator.load_associated_file_buffers({"label.txt": b"file content"})
     populator.populate()
 
     # Populating a metadata file (or a metadta buffer) and associated files to
@@ -138,6 +136,14 @@ class MetadataPopulator(object):
     populator.load_associated_files([label.txt])
     populator.populate()
     # Writing the updated model buffer into a file.
+    updated_model_buf = populator.get_model_buffer()
+    with open("updated_model.tflite", "wb") as f:
+      f.write(updated_model_buf)
+
+    # Transferring metadata and associated files from another TFLite model:
+    populator = MetadataPopulator.with_model_buffer(model_buf)
+    populator_dst.load_metadata_and_associated_files(src_model_buf)
+    populator_dst.populate()
     updated_model_buf = populator.get_model_buffer()
     with open("updated_model.tflite", "wb") as f:
       f.write(updated_model_buf)
@@ -169,7 +175,8 @@ class MetadataPopulator(object):
     _assert_model_file_identifier(model_file)
     self._model_file = model_file
     self._metadata_buf = None
-    self._associated_files = set()
+    # _associated_files is a dict of file name and file buffer.
+    self._associated_files = {}
 
   @classmethod
   def with_model_file(cls, model_file):
@@ -246,6 +253,20 @@ class MetadataPopulator(object):
         for file in self._get_recorded_associated_file_object_list(metadata)
     ]
 
+  def load_associated_file_buffers(self, associated_files):
+    """Loads the associated file buffers (in bytearray) to be populated.
+
+    Args:
+      associated_files: a dictionary of associated file names and corresponding
+        file buffers, such as {"file.txt": b"file content"}. If pass in file
+          paths for the file name, only the basename will be populated.
+    """
+
+    self._associated_files.update({
+        os.path.basename(name): buffers
+        for name, buffers in associated_files.items()
+    })
+
   def load_associated_files(self, associated_files):
     """Loads associated files that to be concatenated after the model file.
 
@@ -256,9 +277,10 @@ class MetadataPopulator(object):
       IOError:
         File not found.
     """
-    for af in associated_files:
-      _assert_file_exist(af)
-      self._associated_files.add(af)
+    for af_name in associated_files:
+      _assert_file_exist(af_name)
+      with _open_file(af_name, "rb") as af:
+        self.load_associated_file_buffers({af_name: af.read()})
 
   def load_metadata_buffer(self, metadata_buf):
     """Loads the metadata buffer (in bytearray) to be populated.
@@ -318,6 +340,24 @@ class MetadataPopulator(object):
       metadata_buf = f.read()
     self.load_metadata_buffer(bytearray(metadata_buf))
 
+  def load_metadata_and_associated_files(self, src_model_buf):
+    """Loads the metadata and associated files from another model buffer.
+
+    Args:
+      src_model_buf: source model buffer (in bytearray) with metadata and
+        associated files.
+    """
+    # Load the model metadata from src_model_buf if exist.
+    metadata_buffer = _get_metadata_buffer(src_model_buf)
+    if metadata_buffer:
+      self.load_metadata_buffer(metadata_buffer)
+
+    # Load the associated files from src_model_buf if exist.
+    if _is_zipfile(io.BytesIO(src_model_buf)):
+      with _open_as_zipfile(io.BytesIO(src_model_buf)) as zf:
+        self.load_associated_file_buffers(
+            {f: zf.read(f) for f in zf.namelist()})
+
   def populate(self):
     """Populates loaded metadata and associated files into the model file."""
     self._assert_validate()
@@ -339,9 +379,7 @@ class MetadataPopulator(object):
     packed_files = self.get_packed_associated_file_list()
 
     # Gets the file name of those associated files to be populated.
-    to_be_populated_files = []
-    for af in self._associated_files:
-      to_be_populated_files.append(os.path.basename(af))
+    to_be_populated_files = self._associated_files.keys()
 
     # Checks all files recorded in the metadata will be populated.
     for rf in recorded_files:
@@ -496,9 +534,8 @@ class MetadataPopulator(object):
 
       # (2) Append of to a temp file as a zip.
       with _open_as_zipfile(temp, "a") as zf:
-        for af in self._associated_files:
-          filename = os.path.basename(af)
-          zf.write(af, filename)
+        for file_name, file_buffer in self._associated_files.items():
+          zf.writestr(file_name, file_buffer)
 
       # (3) Copy temp file to model file.
       temp.seek(0)
@@ -659,6 +696,7 @@ class MetadataDisplayer(object):
     """
     _assert_model_buffer_identifier(model_buffer)
     _assert_metadata_buffer_identifier(metadata_buffer)
+    self._model_buffer = model_buffer
     self._metadata_buffer = metadata_buffer
     self._associated_file_list = associated_file_list
 
@@ -692,9 +730,34 @@ class MetadataDisplayer(object):
     """
     if not model_buffer:
       raise ValueError("model_buffer cannot be empty.")
-    metadata_buffer = cls._get_metadata_buffer(model_buffer)
+    metadata_buffer = _get_metadata_buffer(model_buffer)
+    if not metadata_buffer:
+      raise ValueError("The model does not have metadata.")
     associated_file_list = cls._parse_packed_associted_file_list(model_buffer)
     return cls(model_buffer, metadata_buffer, associated_file_list)
+
+  def get_associated_file_buffer(self, filename):
+    """Get the specified associated file content in bytearray.
+
+    Args:
+      filename: name of the file to be extracted.
+
+    Returns:
+      The file content in bytearray.
+
+    Raises:
+      ValueError: if the file does not exist in the model.
+    """
+    if filename not in self._associated_file_list:
+      raise ValueError(
+          "The file, {}, does not exist in the model.".format(filename))
+
+    with _open_as_zipfile(io.BytesIO(self._model_buffer)) as zf:
+      return zf.read(filename)
+
+  def get_metadata_buffer(self):
+    """Get the metadata buffer in bytearray out from the model."""
+    return copy.deepcopy(self._metadata_buffer)
 
   def get_metadata_json(self):
     """Converts the metadata into a json string."""
@@ -707,32 +770,6 @@ class MetadataDisplayer(object):
       A name list of associated files.
     """
     return copy.deepcopy(self._associated_file_list)
-
-  @staticmethod
-  def _get_metadata_buffer(model_buf):
-    """Returns the metadata in the model file as a buffer.
-
-    Args:
-      model_buf: valid buffer of the model file.
-
-    Returns:
-      Metadata buffer.
-
-    Raises:
-      ValueError: The model does not have metadata.
-    """
-    tflite_model = _schema_fb.Model.GetRootAsModel(model_buf, 0)
-
-    # Gets metadata from the model file.
-    for i in range(tflite_model.MetadataLength()):
-      meta = tflite_model.Metadata(i)
-      if meta.Name().decode("utf-8") == MetadataPopulator.METADATA_FIELD_NAME:
-        buffer_index = meta.Buffer()
-        metadata = tflite_model.Buffers(buffer_index)
-        metadata_buf = metadata.DataAsNumpy().tobytes()
-        return metadata_buf
-
-    raise ValueError("The model does not have metadata.")
 
   @staticmethod
   def _parse_packed_associted_file_list(model_buf):
@@ -804,3 +841,25 @@ def _assert_metadata_buffer_identifier(metadata_buf):
     raise ValueError(
         "The metadata buffer does not have the expected identifier, and may not"
         " be a valid TFLite Metadata.")
+
+
+def _get_metadata_buffer(model_buf):
+  """Returns the metadata in the model file as a buffer.
+
+  Args:
+    model_buf: valid buffer of the model file.
+
+  Returns:
+    Metadata buffer. Returns `None` if the model does not have metadata.
+  """
+  tflite_model = _schema_fb.Model.GetRootAsModel(model_buf, 0)
+
+  # Gets metadata from the model file.
+  for i in range(tflite_model.MetadataLength()):
+    meta = tflite_model.Metadata(i)
+    if meta.Name().decode("utf-8") == MetadataPopulator.METADATA_FIELD_NAME:
+      buffer_index = meta.Buffer()
+      metadata = tflite_model.Buffers(buffer_index)
+      return metadata.DataAsNumpy().tobytes()
+
+  return None

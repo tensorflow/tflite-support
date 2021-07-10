@@ -27,6 +27,10 @@ message Classifications {
   // The index of the classifier head these classes refer to. This is useful for
   // multi-head models.
   optional int32 head_index = 2;
+  // The name of the classifier head, which is the corresponding tensor metadata
+  // name. See
+  // https://github.com/tensorflow/tflite-support/blob/710e323265bfb71fdbdd72b3516e00cff15c0326/tensorflow_lite_support/metadata/metadata_schema.fbs#L545
+  optional string head_name = 3;
 }
 
 // Contains one set of results per classifier head.

@@ -5,6 +5,38 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+cc_library(
+    name = "gpu_plugin",
+    deps = [
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:gpu_plugin",
+    ],
+    alwayslink = 1,  # For registration to always run.
+)
+
+cc_library(
+    name = "nnapi_plugin",
+    deps = [
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:nnapi_plugin",
+    ],
+    alwayslink = 1,  # For registration to always run.
+)
+
+cc_library(
+    name = "hexagon_plugin",
+    deps = [
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:hexagon_plugin",
+    ],
+    alwayslink = 1,  # For registration to always run.
+)
+
+cc_library(
+    name = "xnnpack_plugin",
+    deps = [
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:xnnpack_plugin",
+    ],
+    alwayslink = 1,  # For registration to always run.
+)
+
 # To use the Coral_edgetpu_plugin externally, add the following flags to the bazel command.
 # --linkopt=-lusb-1.0  --define darwinn_portable=1.
 cc_library(

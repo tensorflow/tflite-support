@@ -1,6 +1,6 @@
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
-load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "android_library_with_tflite")
 load("@org_tensorflow//tensorflow/lite/java:aar_with_jni.bzl", "aar_with_jni")
+load("@build_bazel_rules_android//android:rules.bzl", "android_library")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -13,11 +13,13 @@ filegroup(
 )
 
 # Default target that uses BuiltInOpResolver, registers all built-in OPs.
-android_library(
+android_library_with_tflite(
     name = "nl_classifier",
+    tflite_exports = [
+        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_native",
+    ],
     exports = [
         ":nl_classifier_java",
-        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_native",
     ],
 )
 
@@ -30,7 +32,7 @@ android_library(
     srcs = [
         "NLClassifier.java",
     ],
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
@@ -49,16 +51,18 @@ aar_with_jni(
 )
 
 # Default target that uses BuiltInOpResolver, registers all built-in OPs.
-android_library(
+android_library_with_tflite(
     name = "bert_nl_classifier",
     srcs = [
         "BertNLClassifier.java",
     ],
-    javacopts = JAVACOPTS,
+    javacopts = ["-source 7 -target 7"],
+    tflite_exports = [
+        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert:bert_nl_classifier_native",
+    ],
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
-        "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert_nlclassifier:bert_nl_classifier_native",
         "@com_google_auto_value",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],

@@ -38,9 +38,6 @@ class BaseUntypedTaskApi {
 
   virtual ~BaseUntypedTaskApi() = default;
 
-  TfLiteEngine* GetTfLiteEngine() { return engine_.get(); }
-  const TfLiteEngine* GetTfLiteEngine() const { return engine_.get(); }
-
   const metadata::ModelMetadataExtractor* GetMetadataExtractor() const {
     return engine_->metadata_extractor();
   }
@@ -57,6 +54,20 @@ class BaseTaskApi : public BaseUntypedTaskApi {
   // BaseTaskApi is neither copyable nor movable.
   BaseTaskApi(const BaseTaskApi&) = delete;
   BaseTaskApi& operator=(const BaseTaskApi&) = delete;
+
+  int32_t GetInputCount() { return engine_->interpreter()->inputs().size(); }
+
+  const TfLiteIntArray* GetInputShape(int index) {
+    auto interpreter = engine_->interpreter();
+    return interpreter->tensor(interpreter->inputs()[index])->dims;
+  }
+
+  int32_t GetOutputCount() { return engine_->interpreter()->outputs().size(); }
+
+  const TfLiteIntArray* GetOutputShape(int index) {
+    auto interpreter = engine_->interpreter();
+    return interpreter->tensor(interpreter->outputs()[index])->dims;
+  }
 
   // Cancels the current running TFLite invocation on CPU.
   //
