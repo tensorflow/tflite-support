@@ -61,3 +61,19 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/c:c_api_types",
     ],
 )
+
+cc_library_with_tflite(
+    name = "embedding_postprocessor",
+    srcs = ["embedding_postprocessor.cc"],
+    hdrs = ["embedding_postprocessor.h"],
+    tflite_deps = [
+        ":processor",
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_cc_proto",
+        "@com_google_absl//absl/status",
+    ],
+)
