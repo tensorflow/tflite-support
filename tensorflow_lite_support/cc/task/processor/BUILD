@@ -38,3 +38,26 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_utils",
     ],
 )
+
+cc_library_with_tflite(
+    name = "classification_postprocessor",
+    srcs = ["classification_postprocessor.cc"],
+    hdrs = ["classification_postprocessor.h"],
+    tflite_deps = [
+        ":processor",
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/task/core:classification_head",
+        "//tensorflow_lite_support/cc/task/core:label_map_item",
+        "//tensorflow_lite_support/cc/task/core:score_calibration",
+        "//tensorflow_lite_support/cc/task/core:task_utils",
+        "//tensorflow_lite_support/cc/task/processor/proto:class_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:classification_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:classifications_cc_proto",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
+        "@org_tensorflow//tensorflow/lite/c:c_api_types",
+    ],
+)
