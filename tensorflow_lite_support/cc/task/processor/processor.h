@@ -51,28 +51,31 @@ class Preprocessor {
   Preprocessor& operator=(const Preprocessor&) = delete;
 
  protected:
-  core::TfLiteEngine* engine_ = nullptr;
-  std::vector<int> input_tensor_indices_{};
+  explicit Preprocessor(core::TfLiteEngine* engine,
+                        const std::initializer_list<int> input_indices)
+      : engine_(engine), input_indices_(input_indices) {}
+
+  core::TfLiteEngine* engine_;
+  const std::vector<int> input_indices_;
 
   // Get the associated input tensor.
   // Note: Calling this method before `VerifyAndInit` method will cause a crash.
   // Note: Caller is responsible for passing in a valid `i`.
-  inline TfLiteTensor* Tensor(int i = 0) {
-    return engine_->GetInput(engine_->interpreter(),
-                             input_tensor_indices_.at(i));
+  inline TfLiteTensor* Tensor(int i = 0) const {
+    return engine_->GetInput(engine_->interpreter(), input_indices_.at(i));
   }
 
   // Get the associated input metadata.
   // Note: Calling this method before `VerifyAndInit` method will cause a crash.
   // Note: Caller is responsible for passing in a valid `i`.
-  inline const tflite::TensorMetadata* Metadata(int i = 0) {
+  inline const tflite::TensorMetadata* Metadata(int i = 0) const {
     return engine_->metadata_extractor()->GetInputTensorMetadata(
-        input_tensor_indices_.at(i));
+        input_indices_.at(i));
   }
 
-  absl::Status VerifyAndInit(int num_expected_tensors,
-                             core::TfLiteEngine* engine,
-                             const std::initializer_list<int> input_indices);
+  static absl::Status SanityCheck(
+      int num_expected_tensors, core::TfLiteEngine* engine,
+      const std::initializer_list<int> input_indices);
 };
 
 // Abstract base class for all Postprocessors.
@@ -96,28 +99,31 @@ class Postprocessor {
   Postprocessor& operator=(const Postprocessor&) = delete;
 
  protected:
-  core::TfLiteEngine* engine_ = nullptr;
-  std::vector<int> output_tensor_indices_{};
+  explicit Postprocessor(core::TfLiteEngine* engine,
+                         const std::initializer_list<int> output_indices)
+      : engine_(engine), output_indices_(output_indices) {}
+
+  core::TfLiteEngine* engine_;
+  const std::vector<int> output_indices_;
 
   // Get the associated output tensor.
   // Note: Calling this method before `VerifyAndInit` method will cause a crash.
   // Note: Caller is responsible for passing in a valid `i`.
-  inline TfLiteTensor* Tensor(int i = 0) {
-    return engine_->GetOutput(engine_->interpreter(),
-                              output_tensor_indices_.at(i));
+  inline TfLiteTensor* Tensor(int i = 0) const {
+    return engine_->GetOutput(engine_->interpreter(), output_indices_.at(i));
   }
 
   // Get the associated output metadata.
   // Note: Calling this method before `VerifyAndInit` method will cause a crash.
   // Note: Caller is responsible for passing in a valid `i`.
-  inline const tflite::TensorMetadata* Metadata(int i = 0) {
+  inline const tflite::TensorMetadata* Metadata(int i = 0) const {
     return engine_->metadata_extractor()->GetOutputTensorMetadata(
-        output_tensor_indices_.at(i));
+        output_indices_.at(i));
   }
 
-  absl::Status VerifyAndInit(int num_expected_tensors,
-                             core::TfLiteEngine* engine,
-                             const std::initializer_list<int> output_indices);
+  static absl::Status SanityCheck(
+      int num_expected_tensors, core::TfLiteEngine* engine,
+      const std::initializer_list<int> output_indices);
 };
 }  // namespace processor
 }  // namespace task

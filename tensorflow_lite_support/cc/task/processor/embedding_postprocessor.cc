@@ -19,8 +19,11 @@ namespace tflite {
 namespace task {
 namespace processor {
 
-absl::Status EmbeddingPostprocessor::Init() {
-  int output_index = output_tensor_indices_.at(0);
+absl::Status EmbeddingPostprocessor::Init(
+    std::unique_ptr<EmbeddingOptions> options) {
+  options_ = std::move(options);
+
+  int output_index = output_indices_.at(0);
   auto* output_tensor = Tensor();
   int num_dimensions = output_tensor->dims->size;
   if (num_dimensions == 4) {

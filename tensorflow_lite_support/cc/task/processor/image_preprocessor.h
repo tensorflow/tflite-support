@@ -42,11 +42,12 @@ class ImagePreprocessor : public Preprocessor {
       const std::initializer_list<int> input_indices,
       const vision::FrameBufferUtils::ProcessEngine& process_engine =
           vision::FrameBufferUtils::ProcessEngine::kLibyuv) {
-    auto task = absl::WrapUnique(new ImagePreprocessor(process_engine));
+    RETURN_IF_ERROR(Preprocessor::SanityCheck(/* num_expected_tensors = */ 1,
+                                              engine, input_indices));
 
-    static constexpr int tensor_count = 1;
-    RETURN_IF_ERROR(task->VerifyAndInit(tensor_count, engine, input_indices));
-    RETURN_IF_ERROR(task->InitInputSpec());
+    auto task = absl::WrapUnique(new ImagePreprocessor(engine, input_indices));
+
+    RETURN_IF_ERROR(task->Init(process_engine));
     return task;
   }
 
@@ -75,23 +76,21 @@ class ImagePreprocessor : public Preprocessor {
   absl::Status Preprocess(const vision::FrameBuffer& frame_buffer,
                           const vision::BoundingBox& roi);
 
- protected:
-  ImagePreprocessor(
-      const vision::FrameBufferUtils::ProcessEngine& process_engine)
-      : frame_buffer_utils_(process_engine) {}
-
  private:
+  using Preprocessor::Preprocessor;
+
   // Returns false if image preprocessing could be skipped, true otherwise.
   bool IsImagePreprocessingNeeded(const vision::FrameBuffer& frame_buffer,
                                   const vision::BoundingBox& roi);
 
-  absl::Status InitInputSpec();
+  absl::Status Init(
+      const vision::FrameBufferUtils::ProcessEngine& process_engine);
 
   // Parameters related to the input tensor which represents an image.
   vision::ImageTensorSpecs input_specs_;
 
   // Utils for input image preprocessing (resizing, colorspace conversion, etc).
-  vision::FrameBufferUtils frame_buffer_utils_;
+  std::unique_ptr<vision::FrameBufferUtils> frame_buffer_utils_;
 };
 
 }  // namespace processor

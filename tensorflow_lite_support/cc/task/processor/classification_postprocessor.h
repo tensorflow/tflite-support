@@ -50,33 +50,27 @@ class ClassificationPostprocessor : public Postprocessor {
       core::TfLiteEngine* engine,
       const std::initializer_list<int> output_indices,
       std::unique_ptr<ClassificationOptions> options) {
-    auto processer =
-        absl::WrapUnique(new ClassificationPostprocessor(std::move(options)));
+    RETURN_IF_ERROR(Postprocessor::SanityCheck(/* num_expected_tensors = */ 1,
+                                               engine, output_indices));
 
-    static constexpr int tensor_count = 1;
-    RETURN_IF_ERROR(
-        processer->VerifyAndInit(tensor_count, engine, output_indices));
-    RETURN_IF_ERROR(processer->Init());
-    return processer;
+    auto processor = absl::WrapUnique(
+        new ClassificationPostprocessor(engine, output_indices));
+
+    RETURN_IF_ERROR(processor->Init(std::move(options)));
+    return processor;
   }
 
   template <typename T>
   absl::Status Postprocess(T* classifications);
 
- protected:
-  ClassificationPostprocessor(std::unique_ptr<ClassificationOptions> options)
-      : options_(std::move(options)) {}
-
-  absl::Status Init();
-
  private:
+  using Postprocessor::Postprocessor;
+
+  absl::Status Init(std::unique_ptr<ClassificationOptions> options);
   // Given a ClassificationResult object containing class indices, fills the
   // name and display name from the label map(s).
   template <typename T>
   absl::Status FillResultsFromLabelMaps(T* classifications);
-
-  // Released after `Init`.
-  std::unique_ptr<ClassificationOptions> options_;
 
   // The list of classification heads associated with the corresponding output
   // tensors. Built from TFLite Model Metadata.
@@ -96,6 +90,14 @@ class ClassificationPostprocessor : public Postprocessor {
   // Score calibration parameters, if any. Built from TFLite Model
   // Metadata.
   std::unique_ptr<core::ScoreCalibration> score_calibration_;
+
+  // Number of classes returned by `Postprocess` method.
+  int num_results_;
+
+  // Recommended score threshold typically in [0,1[. Classification results with
+  // a score below this value are considered low-confidence and should be
+  // rejected from returned results.
+  float score_threshold_;
 
   // Default score value used as a fallback for classes that (1) have no score
   // calibration data or (2) have a very low confident uncalibrated score, i.e.
@@ -121,7 +123,7 @@ class ClassificationPostprocessor : public Postprocessor {
 
 template <typename T>
 absl::Status ClassificationPostprocessor::Postprocess(T* classifications) {
-  classifications->set_head_index(output_tensor_indices_.at(0));
+  classifications->set_head_index(output_indices_.at(0));
   std::vector<std::pair<int, float>> score_pairs;
   const auto& head = classification_head_;
   score_pairs.reserve(head.label_map_items.size());
@@ -168,26 +170,17 @@ absl::Status ClassificationPostprocessor::Postprocess(T* classifications) {
     }
   }
 
-  int num_results =
-      options_->max_results() >= 0
-          ? std::min(static_cast<int>(head.label_map_items.size()),
-                     options_->max_results())
-          : head.label_map_items.size();
-  float score_threshold = options_->has_score_threshold()
-                              ? options_->score_threshold()
-                              : head.score_threshold;
-
   if (class_name_set_.values.empty()) {
     // Partially sort in descending order (higher score is better).
     absl::c_partial_sort(
-        score_pairs, score_pairs.begin() + num_results,
+        score_pairs, score_pairs.begin() + num_results_,
         [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
           return a.second > b.second;
         });
 
-    for (int j = 0; j < num_results; ++j) {
+    for (int j = 0; j < num_results_; ++j) {
       float score = score_pairs[j].second;
-      if (score < score_threshold) {
+      if (score < score_threshold_) {
         break;
       }
       auto* cl = classifications->add_classes();
@@ -203,8 +196,8 @@ absl::Status ClassificationPostprocessor::Postprocess(T* classifications) {
 
     for (int j = 0; j < head.label_map_items.size(); ++j) {
       float score = score_pairs[j].second;
-      if (score < score_threshold ||
-          classifications->classes_size() >= num_results) {
+      if (score < score_threshold_ ||
+          classifications->classes_size() >= num_results_) {
         break;
       }
 

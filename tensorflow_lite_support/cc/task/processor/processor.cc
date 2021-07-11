@@ -18,7 +18,8 @@ namespace tflite {
 namespace task {
 namespace processor {
 
-absl::Status Preprocessor::VerifyAndInit(
+/* static */
+absl::Status Preprocessor::SanityCheck(
     int num_expected_tensors, core::TfLiteEngine* engine,
     const std::initializer_list<int> input_indices) {
   if (input_indices.size() != num_expected_tensors) {
@@ -49,13 +50,11 @@ absl::Status Preprocessor::VerifyAndInit(
     }
   }
 
-  engine_ = engine;
-  input_tensor_indices_ = input_indices;
-
   return absl::OkStatus();
 }
 
-absl::Status Postprocessor::VerifyAndInit(
+/* static */
+absl::Status Postprocessor::SanityCheck(
     int num_expected_tensors, core::TfLiteEngine* engine,
     const std::initializer_list<int> output_indices) {
   if (output_indices.size() != num_expected_tensors) {
@@ -85,9 +84,6 @@ absl::Status Postprocessor::VerifyAndInit(
           support::TfLiteSupportStatus::kMetadataNotFoundError);
     }
   }
-
-  engine_ = engine;
-  output_tensor_indices_ = output_indices;
 
   return absl::OkStatus();
 }

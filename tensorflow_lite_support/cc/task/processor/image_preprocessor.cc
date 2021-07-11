@@ -18,6 +18,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/image_tensor_specs.h"
 
 namespace tflite {
@@ -53,7 +54,10 @@ bool ImagePreprocessor::IsImagePreprocessingNeeded(
   return false;
 }
 
-absl::Status ImagePreprocessor::InitInputSpec() {
+absl::Status ImagePreprocessor::Init(
+    const vision::FrameBufferUtils::ProcessEngine& process_engine) {
+  frame_buffer_utils_ = vision::FrameBufferUtils::Create(process_engine);
+
   ASSIGN_OR_RETURN(input_specs_, vision::BuildInputImageTensorSpecs(
                                      *engine_->interpreter(),
                                      *engine_->metadata_extractor()));
@@ -105,7 +109,7 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
         {preprocessed_plane}, to_buffer_dimension, FrameBuffer::Format::kRGB,
         FrameBuffer::Orientation::kTopLeft);
 
-    RETURN_IF_ERROR(frame_buffer_utils_.Preprocess(
+    RETURN_IF_ERROR(frame_buffer_utils_->Preprocess(
         frame_buffer, roi, preprocessed_frame_buffer.get()));
   } else {
     // Input frame buffer already targets model requirements: skip image

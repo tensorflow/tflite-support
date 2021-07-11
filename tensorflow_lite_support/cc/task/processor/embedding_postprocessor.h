@@ -39,13 +39,13 @@ class EmbeddingPostprocessor : public Postprocessor {
       core::TfLiteEngine* engine,
       const std::initializer_list<int> output_indices,
       std::unique_ptr<EmbeddingOptions> options) {
-    auto processor =
-        absl::WrapUnique(new EmbeddingPostprocessor(std::move(options)));
+    RETURN_IF_ERROR(Postprocessor::SanityCheck(/* num_expected_tensors = */ 1,
+                                               engine, output_indices));
 
-    static constexpr int num_tensors = 1;
-    RETURN_IF_ERROR(
-        processor->VerifyAndInit(num_tensors, engine, output_indices));
-    RETURN_IF_ERROR(processor->Init());
+    auto processor =
+        absl::WrapUnique(new EmbeddingPostprocessor(engine, output_indices));
+
+    RETURN_IF_ERROR(processor->Init(std::move(options)));
     return processor;
   }
 
@@ -63,10 +63,9 @@ class EmbeddingPostprocessor : public Postprocessor {
                                                             const T& v);
 
  private:
-  EmbeddingPostprocessor(std::unique_ptr<EmbeddingOptions> options)
-      : options_(std::move(options)) {}
+  using Postprocessor::Postprocessor;
 
-  absl::Status Init();
+  absl::Status Init(std::unique_ptr<EmbeddingOptions> options);
 
   std::unique_ptr<EmbeddingOptions> options_;
 
@@ -86,15 +85,15 @@ class EmbeddingPostprocessor : public Postprocessor {
 
 template <typename T>
 absl::Status EmbeddingPostprocessor::Postprocess(T* embedding) {
-  embedding->set_output_index(output_tensor_indices_.at(0));
+  embedding->set_output_index(output_indices_.at(0));
   auto* feature_vector = embedding->mutable_feature_vector();
   if (Tensor()->type == kTfLiteUInt8) {
     const uint8* output_data =
         engine_->interpreter()->typed_output_tensor<uint8>(
-            output_tensor_indices_.at(0));
+            output_indices_.at(0));
     // Get the zero_point and scale parameters from the tensor metadata.
     const int output_tensor_index =
-        engine_->interpreter()->outputs()[output_tensor_indices_.at(0)];
+        engine_->interpreter()->outputs()[output_indices_.at(0)];
     const TfLiteTensor* output_tensor =
         engine_->interpreter()->tensor(output_tensor_index);
     for (int j = 0; j < embedding_dimension_; ++j) {
@@ -106,7 +105,7 @@ absl::Status EmbeddingPostprocessor::Postprocess(T* embedding) {
     // Float
     const float* output_data =
         engine_->interpreter()->typed_output_tensor<float>(
-            output_tensor_indices_.at(0));
+            output_indices_.at(0));
     for (int j = 0; j < embedding_dimension_; ++j) {
       feature_vector->add_value_float(output_data[j]);
     }

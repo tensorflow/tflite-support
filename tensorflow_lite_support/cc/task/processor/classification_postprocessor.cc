@@ -39,16 +39,17 @@ using ::tflite::task::core::ScoreCalibration;
 
 }  // namespace
 
-absl::Status ClassificationPostprocessor::Init() {
+absl::Status ClassificationPostprocessor::Init(
+    std::unique_ptr<ClassificationOptions> options) {
   // Sanity check options
-  if (options_->max_results() == 0) {
+  if (options->max_results() == 0) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         "Invalid `max_results` option: value must be != 0",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
-  if (options_->class_name_allowlist_size() > 0 &&
-      options_->class_name_denylist_size() > 0) {
+  if (options->class_name_allowlist_size() > 0 &&
+      options->class_name_denylist_size() > 0) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         "`class_name_allowlist` and `class_name_denylist` are mutually "
@@ -59,7 +60,7 @@ absl::Status ClassificationPostprocessor::Init() {
   ASSIGN_OR_RETURN(
       classification_head_,
       BuildClassificationHead(*engine_->metadata_extractor(), *Metadata(),
-                              options_->display_names_locale()));
+                              options->display_names_locale()));
 
   // Sanity check output tensors
   const TfLiteTensor* output_tensor = Tensor();
@@ -71,8 +72,7 @@ absl::Status ClassificationPostprocessor::Init() {
           StatusCode::kInvalidArgument,
           absl::StrFormat("Unexpected WxH sizes for output index %d: got "
                           "%dx%d, expected 1x1.",
-                          output_tensor_indices_.at(0),
-                          output_tensor->dims->data[2],
+                          output_indices_.at(0), output_tensor->dims->data[2],
                           output_tensor->dims->data[1]),
           TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
     }
@@ -83,7 +83,7 @@ absl::Status ClassificationPostprocessor::Init() {
             "Unexpected number of dimensions for output index %d: got %dD, "
             "expected either 2D (BxN with B=1) or 4D (BxHxWxN with B=1, W=1, "
             "H=1).",
-            output_tensor_indices_.at(0), num_dimensions),
+            output_indices_.at(0), num_dimensions),
         TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
   }
   if (output_tensor->dims->data[0] != 1) {
@@ -91,8 +91,7 @@ absl::Status ClassificationPostprocessor::Init() {
         StatusCode::kInvalidArgument,
         absl::StrFormat("The output array is expected to have a batch size "
                         "of 1. Got %d for output index %d.",
-                        output_tensor->dims->data[0],
-                        output_tensor_indices_.at(0)),
+                        output_tensor->dims->data[0], output_indices_.at(0)),
         TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
   }
   int num_classes = output_tensor->dims->data[num_dimensions - 1];
@@ -112,7 +111,7 @@ absl::Status ClassificationPostprocessor::Init() {
         absl::StrFormat("Got %d class(es) for output index %d, expected %d "
                         "according to the label map.",
                         output_tensor->dims->data[num_dimensions - 1],
-                        output_tensor_indices_.at(0), num_label_map_items),
+                        output_indices_.at(0), num_label_map_items),
         TfLiteSupportStatus::kMetadataInconsistencyError);
   }
   if (output_tensor->type != kTfLiteUInt8 &&
@@ -128,8 +127,8 @@ absl::Status ClassificationPostprocessor::Init() {
   }
 
   // Set class name set
-  if (options_->class_name_denylist_size() != 0 ||
-      options_->class_name_allowlist_size() != 0) {
+  if (options->class_name_denylist_size() != 0 ||
+      options->class_name_allowlist_size() != 0) {
     // Before processing class names allowlist or denylist from the input
     // options create a set with _all_ known class names from the label map(s).
     absl::flat_hash_set<std::string> head_class_names;
@@ -142,7 +141,7 @@ absl::Status ClassificationPostprocessor::Init() {
     if (head_class_names.empty()) {
       std::string name = classification_head_.name;
       if (name.empty()) {
-        name = absl::StrFormat("#%d", output_tensor_indices_.at(0));
+        name = absl::StrFormat("#%d", output_indices_.at(0));
       }
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
@@ -154,10 +153,10 @@ absl::Status ClassificationPostprocessor::Init() {
           TfLiteSupportStatus::kMetadataMissingLabelsError);
     }
 
-    class_name_set_.is_allowlist = options_->class_name_allowlist_size() > 0;
+    class_name_set_.is_allowlist = options->class_name_allowlist_size() > 0;
     const auto& class_names = class_name_set_.is_allowlist
-                                  ? options_->class_name_allowlist()
-                                  : options_->class_name_denylist();
+                                  ? options->class_name_allowlist()
+                                  : options->class_name_denylist();
 
     // Note: duplicate or unknown classes are just ignored.
     class_name_set_.values.clear();
@@ -196,9 +195,19 @@ absl::Status ClassificationPostprocessor::Init() {
     RETURN_IF_ERROR(score_calibration_->InitializeFromParameters(
         classification_head_.calibration_params.value()));
   }
+
+  num_results_ =
+      options->max_results() >= 0
+          ? std::min(
+                static_cast<int>(classification_head_.label_map_items.size()),
+                options->max_results())
+          : classification_head_.label_map_items.size();
+  score_threshold_ = options->has_score_threshold()
+                         ? options->score_threshold()
+                         : classification_head_.score_threshold;
+
   return absl::OkStatus();
 }
-
 
 }  // namespace processor
 }  // namespace task
