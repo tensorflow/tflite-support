@@ -50,7 +50,7 @@ class EmbeddingPostprocessor : public Postprocessor {
   }
 
   template <typename T>
-  absl::Status Postprocess(T* feature_vector);
+  absl::Status Postprocess(T* embedding);
 
   // Utility function to compute cosine similarity [1] between two feature
   // vectors. May return an InvalidArgumentError if e.g. the feature vectors are
@@ -85,7 +85,9 @@ class EmbeddingPostprocessor : public Postprocessor {
 };
 
 template <typename T>
-absl::Status EmbeddingPostprocessor::Postprocess(T* feature_vector) {
+absl::Status EmbeddingPostprocessor::Postprocess(T* embedding) {
+  embedding->set_output_index(output_tensor_indices_.at(0));
+  auto* feature_vector = embedding->mutable_feature_vector();
   if (Tensor()->type == kTfLiteUInt8) {
     const uint8* output_data =
         engine_->interpreter()->typed_output_tensor<uint8>(
