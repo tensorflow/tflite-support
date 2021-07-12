@@ -36,7 +36,6 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/proto:bounding_box_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_utils",
-        "@com_google_absl//absl/memory",
     ],
 )
 
