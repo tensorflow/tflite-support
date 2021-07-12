@@ -51,7 +51,6 @@ cc_library(
         "tflite_wrapper.h",
     ],
     deps = [
-        "//tensorflow_lite_support/cc/port:status_macros",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings:str_format",
         "@com_google_absl//absl/synchronization",
@@ -65,6 +64,18 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:flatbuffer_to_proto",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:proto_to_flatbuffer",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/mini_benchmark",
-        "@org_tensorflow//tensorflow/lite/experimental/acceleration/mini_benchmark:mini_benchmark_implementation",
-    ],
+        "//tensorflow_lite_support/cc/port:status_macros",
+    ] + select({
+        # We only intend to use TFLite mini-benchmark on arm-based Andorid and x86_64 Linux.
+        "@org_tensorflow//tensorflow:android_arm": [
+            "@org_tensorflow//tensorflow/lite/experimental/acceleration/mini_benchmark:mini_benchmark_implementation",
+        ],
+        "@org_tensorflow//tensorflow:android_arm64": [
+            "@org_tensorflow//tensorflow/lite/experimental/acceleration/mini_benchmark:mini_benchmark_implementation",
+        ],
+        "@org_tensorflow//tensorflow:linux_x86_64": [
+            "@org_tensorflow//tensorflow/lite/experimental/acceleration/mini_benchmark:mini_benchmark_implementation",
+        ],
+        "//conditions:default": [],
+    }),
 )
