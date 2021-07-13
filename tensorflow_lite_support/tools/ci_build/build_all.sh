@@ -41,6 +41,7 @@ bazel build -c opt --config=monolithic \
 bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/examples/task/audio/desktop:audio_classifier_demo
 
+bazel clean --expunge
 # Build Coral plugin.
 bazel build --sandbox_debug --subcommands --define=darwinn_portable=1 \
     //tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin

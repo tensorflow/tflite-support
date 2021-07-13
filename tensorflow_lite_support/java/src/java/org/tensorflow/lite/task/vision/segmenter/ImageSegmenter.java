@@ -18,6 +18,7 @@ package org.tensorflow.lite.task.vision.segmenter;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.os.ParcelFileDescriptor;
+import com.google.android.odml.image.MlImage;
 import com.google.auto.value.AutoValue;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.tensorflow.lite.support.image.MlImageAdapter;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
@@ -315,6 +317,50 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
         },
         image,
         options);
+  }
+
+  /**
+   * Performs actual segmentation on the provided {@code MlImage}.
+   *
+   * @param image an {@code MlImage} to segment.
+   * @return results of performing image segmentation. Note that at the time, a single {@link
+   *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
+   *     for later extension to e.g. instance segmentation models, which may return one segmentation
+   *     per object.
+   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalArgumentException if the storage type or format of the image is unsupported
+   */
+  public List<Segmentation> segment(MlImage image) {
+    return segment(image, ImageProcessingOptions.builder().build());
+  }
+
+  /**
+   * Performs actual segmentation on the provided {@code MlImage} with {@link
+   * ImageProcessingOptions}.
+   *
+   * <p>{@link ImageSegmenter} supports the following options:
+   *
+   * <ul>
+   *   <li>image rotation (through {@link ImageProcessingOptions.Builder#setOrientation}). It
+   *       defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}. {@link
+   *       MlImage#getRotation()} is not effective.
+   * </ul>
+   *
+   * @param image an {@code MlImage} to segment.
+   * @param options the options configure how to preprocess the image.
+   * @return results of performing image segmentation. Note that at the time, a single {@link
+   *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
+   *     for later extension to e.g. instance segmentation models, which may return one segmentation
+   *     per object.
+   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalArgumentException if the color space type of image is unsupported
+   */
+  public List<Segmentation> segment(MlImage image, ImageProcessingOptions options) {
+    image.getInternal().acquire();
+    TensorImage tensorImage = MlImageAdapter.createTensorImageFrom(image);
+    List<Segmentation> result = segment(tensorImage, options);
+    image.close();
+    return result;
   }
 
   public List<Segmentation> segment(long frameBufferHandle, ImageProcessingOptions options) {

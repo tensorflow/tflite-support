@@ -18,6 +18,7 @@ package org.tensorflow.lite.task.vision.classifier;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.ParcelFileDescriptor;
+import com.google.android.odml.image.MlImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.tensorflow.lite.annotations.UsedByReflection;
+import org.tensorflow.lite.support.image.MlImageAdapter;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
@@ -430,6 +432,44 @@ public final class ImageClassifier extends BaseVisionTaskApi {
         },
         image,
         options);
+  }
+
+  /**
+   * Performs actual classification on the provided {@code MlImage}.
+   *
+   * @param image an {@code MlImage} object that represents an image
+   * @throws AssertionError if error occurs when classifying the image from the native code
+   * @throws IllegalArgumentException if the storage type or format of the image is unsupported
+   */
+  public List<Classifications> classify(MlImage image) {
+    return classify(image, ImageProcessingOptions.builder().build());
+  }
+
+  /**
+   * Performs actual classification on the provided {@code MlImage} with {@link
+   * ImageProcessingOptions}.
+   *
+   * <p>{@link ImageClassifier} supports the following options:
+   *
+   * <ul>
+   *   <li>Region of interest (ROI) (through {@link ImageProcessingOptions.Builder#setRoi}). It
+   *       defaults to the entire image.
+   *   <li>image rotation (through {@link ImageProcessingOptions.Builder#setOrientation}). It
+   *       defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}. {@link
+   *       MlImage#getRotation()} is not effective.
+   * </ul>
+   *
+   * @param image a {@code MlImage} object that represents an image
+   * @param options configures options including ROI and rotation
+   * @throws AssertionError if error occurs when classifying the image from the native code
+   * @throws IllegalArgumentException if the storage type or format of the image is unsupported
+   */
+  public List<Classifications> classify(MlImage image, ImageProcessingOptions options) {
+    image.getInternal().acquire();
+    TensorImage tensorImage = MlImageAdapter.createTensorImageFrom(image);
+    List<Classifications> result = classify(tensorImage, options);
+    image.close();
+    return result;
   }
 
   private List<Classifications> classify(

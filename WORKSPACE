@@ -420,6 +420,7 @@ maven_install(
         "androidx.test:core:jar:1.3.0",
         "androidx.test.ext:junit:jar:1.1.2",
         "androidx.test:runner:jar:1.3.0",
+        "com.google.android.odml:image:aar:1.0.0-beta1",
         "com.google.truth:truth:jar:1.1",
         "commons-io:commons-io:jar:2.8.0",
         # Mockito >= 3.4.6 cannot pass bazel desugar.

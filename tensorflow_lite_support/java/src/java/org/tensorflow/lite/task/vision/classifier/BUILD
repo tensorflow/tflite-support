@@ -45,6 +45,7 @@ android_library(
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "@com_google_auto_value",
+        "@maven//:com_google_android_odml_image",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],
 )

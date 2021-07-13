@@ -17,6 +17,7 @@ package org.tensorflow.lite.task.vision.detector;
 
 import android.content.Context;
 import android.os.ParcelFileDescriptor;
+import com.google.android.odml.image.MlImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.tensorflow.lite.annotations.UsedByReflection;
+import org.tensorflow.lite.support.image.MlImageAdapter;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
@@ -447,6 +449,42 @@ public final class ObjectDetector extends BaseVisionTaskApi {
         },
         image,
         options);
+  }
+
+  /**
+   * Performs actual detection on the provided {@code MlImage}.
+   *
+   * @param image an {@code MlImage} object that represents an image
+   * @throws AssertionError if error occurs when processing the image from the native code
+   * @throws IllegalArgumentException if the storage type or format of the image is unsupported
+   */
+  public List<Detection> detect(MlImage image) {
+    return detect(image, ImageProcessingOptions.builder().build());
+  }
+
+  /**
+   * Performs actual detection on the provided {@code MlImage} with {@link
+   * ImageProcessingOptions}.
+   *
+   * <p>{@link ObjectDetector} supports the following options:
+   *
+   * <ul>
+   *   <li>image rotation (through {@link ImageProcessingOptions.Builder#setOrientation}). It
+   *       defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}. {@link
+   *       MlImage#getRotation()} is not effective.
+   * </ul>
+   *
+   * @param image an {@code MlImage} object that represents an image
+   * @param options the options to configure how to preprocess the image
+   * @throws AssertionError if error occurs when classifying the image from the native code
+   * @throws IllegalArgumentException if the storage type or format of the image is unsupported
+   */
+  public List<Detection> detect(MlImage image, ImageProcessingOptions options) {
+    image.getInternal().acquire();
+    TensorImage tensorImage = MlImageAdapter.createTensorImageFrom(image);
+    List<Detection> result = detect(tensorImage, options);
+    image.close();
+    return result;
   }
 
   private List<Detection> detect(long frameBufferHandle, ImageProcessingOptions options) {

@@ -30,6 +30,7 @@ android_library(
     deps = [
         "@com_google_auto_value",
         "@maven//:androidx_annotation_annotation",
+        "@maven//:com_google_android_odml_image",
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
     ],
@@ -44,6 +45,7 @@ android_library(
     deps = [
         "@com_google_auto_value",
         "@maven//:androidx_annotation_annotation",
+        "@maven//:com_google_android_odml_image",
         "@org_checkerframework_qual",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
     ],

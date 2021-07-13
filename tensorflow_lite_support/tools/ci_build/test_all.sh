@@ -20,6 +20,8 @@
 
 set -ex
 
+bazel clean --expunge
+
 source tensorflow_lite_support/tools/ci_build/tests/run_metadata_tests.sh
 source tensorflow_lite_support/tools/ci_build/tests/run_support_lib_tests.sh
 
