@@ -8,6 +8,8 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+exports_files(["task_jni_utils.cc"])
+
 # Default provider for BuiltInOpResover. Create your own target, overwrite the
 # function to provide a MutableOpResolver for customized OPs and/or a subset of
 # builtin OPs.

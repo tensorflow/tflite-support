@@ -37,6 +37,7 @@ cc_library_with_tflite(
 jni_binary_with_tflite(
     name = "libtask_vision_jni.so",
     srcs = [
+        "//tensorflow_lite_support/java/src/native/task/core:task_jni_utils.cc",
         "//tensorflow_lite_support/java/src/native/task/vision/classifier:image_classifier_jni.cc",
         "//tensorflow_lite_support/java/src/native/task/vision/core:base_vision_task_api_jni.cc",
         "//tensorflow_lite_support/java/src/native/task/vision/detector:object_detector_jni.cc",
@@ -52,6 +53,7 @@ jni_binary_with_tflite(
     ],
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/proto:bounding_box_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/proto:classifications_proto_inc",

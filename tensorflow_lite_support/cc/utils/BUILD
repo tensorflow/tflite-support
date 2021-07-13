@@ -17,7 +17,14 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/core/shims:jni_initialization",
     ],
     deps = [
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:configuration_proto_inc",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:str_format",
         "@org_tensorflow//tensorflow/lite/java/jni",
     ],
 )

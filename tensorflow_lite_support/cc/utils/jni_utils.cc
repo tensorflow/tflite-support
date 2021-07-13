@@ -17,9 +17,36 @@ limitations under the License.
 
 #include <string.h>
 
+#include "absl/memory/memory.h"
+#include "absl/status/status.h"
+#include "absl/strings/str_format.h"
+#include "tensorflow_lite_support/cc/common.h"
+#include "tensorflow_lite_support/cc/port/status_macros.h"
+
 namespace tflite {
 namespace support {
 namespace utils {
+
+using ::absl::StatusCode;
+using ::tflite::proto::Delegate;
+using ::tflite::support::CreateStatusWithPayload;
+
+tflite::support::StatusOr<Delegate> ConvertToProtoDelegate(jint delegate) {
+  // The supported delegate types should match
+  // org.tensorflow.lite.task.core.ComputeSettings.Delegate.
+  switch (delegate) {
+    case 0:
+      return Delegate::NONE;
+    case 1:
+      return Delegate::NNAPI;
+    default:
+      break;
+  }
+  // Should never happen.
+  return CreateStatusWithPayload(
+      StatusCode::kInternal,
+      absl::StrFormat("The delegate type is unsupported: %d", delegate));
+}
 
 std::string JStringToString(JNIEnv* env, jstring jstr) {
   if (jstr == nullptr) {

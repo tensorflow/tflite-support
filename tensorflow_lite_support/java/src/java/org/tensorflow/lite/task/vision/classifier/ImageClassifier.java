@@ -29,6 +29,7 @@ import java.util.List;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.image.MlImageAdapter;
 import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.task.core.BaseOptions;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
@@ -136,7 +137,11 @@ public final class ImageClassifier extends BaseVisionTaskApi {
                   long fileDescriptorOffset,
                   ImageClassifierOptions options) {
                 return initJniWithModelFdAndOptions(
-                    fileDescriptor, fileDescriptorLength, fileDescriptorOffset, options);
+                    fileDescriptor,
+                    fileDescriptorLength,
+                    fileDescriptorOffset,
+                    options,
+                    TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
               }
             },
             IMAGE_CLASSIFIER_NATIVE_LIB,
@@ -165,7 +170,8 @@ public final class ImageClassifier extends BaseVisionTaskApi {
                       descriptor.getFd(),
                       /*fileDescriptorLength=*/ OPTIONAL_FD_LENGTH,
                       /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET,
-                      options);
+                      options,
+                      TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
                 }
               },
               IMAGE_CLASSIFIER_NATIVE_LIB));
@@ -194,7 +200,10 @@ public final class ImageClassifier extends BaseVisionTaskApi {
             new EmptyHandleProvider() {
               @Override
               public long createHandle() {
-                return initJniWithByteBuffer(modelBuffer, options);
+                return initJniWithByteBuffer(
+                    modelBuffer,
+                    options,
+                    TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
               }
             },
             IMAGE_CLASSIFIER_NATIVE_LIB));
@@ -218,6 +227,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
     // 1. java.util.Optional require Java 8 while we need to support Java 7.
     // 2. The Guava library (com.google.common.base.Optional) is avoided in this project. See the
     // comments for labelAllowList.
+    private final BaseOptions baseOptions;
     private final String displayNamesLocale;
     private final int maxResults;
     private final float scoreThreshold;
@@ -237,6 +247,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
 
     /** A builder that helps to configure an instance of ImageClassifierOptions. */
     public static class Builder {
+      private BaseOptions baseOptions = BaseOptions.builder().build();
       private String displayNamesLocale = "en";
       private int maxResults = -1;
       private float scoreThreshold;
@@ -246,6 +257,12 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       private int numThreads = -1;
 
       Builder() {}
+
+      /** Sets the general options to configure Task APIs, such as accelerators. */
+      public Builder setBaseOptions(BaseOptions baseOptions) {
+        this.baseOptions = baseOptions;
+        return this;
+      }
 
       /**
        * Sets the locale to use for display names specified through the TFLite Model Metadata, if
@@ -362,6 +379,10 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       return numThreads;
     }
 
+    public BaseOptions getBaseOptions() {
+      return baseOptions;
+    }
+
     ImageClassifierOptions(Builder builder) {
       displayNamesLocale = builder.displayNamesLocale;
       maxResults = builder.maxResults;
@@ -370,6 +391,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       labelAllowList = builder.labelAllowList;
       labelDenyList = builder.labelDenyList;
       numThreads = builder.numThreads;
+      baseOptions = builder.baseOptions;
     }
   }
 
@@ -488,10 +510,11 @@ public final class ImageClassifier extends BaseVisionTaskApi {
       int fileDescriptor,
       long fileDescriptorLength,
       long fileDescriptorOffset,
-      ImageClassifierOptions options);
+      ImageClassifierOptions options,
+      long baseOptionsHandle);
 
   private static native long initJniWithByteBuffer(
-      ByteBuffer modelBuffer, ImageClassifierOptions options);
+      ByteBuffer modelBuffer, ImageClassifierOptions options, long baseOptionsHandle);
 
   /**
    * The native method to classify an image with the ROI and orientation.

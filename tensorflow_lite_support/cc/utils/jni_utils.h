@@ -23,6 +23,8 @@ limitations under the License.
 #include <vector>
 
 #include "absl/strings/string_view.h"
+#include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
+#include "tensorflow_lite_support/cc/port/statusor.h"
 
 namespace tflite {
 namespace support {
@@ -69,6 +71,10 @@ jobject ConvertVectorToArrayList(JNIEnv* env, const std::vector<T>& results,
   }
   return array_list_object;
 }
+
+// Converts delegate Java int type to delegate proto type.
+tflite::support::StatusOr<tflite::proto::Delegate> ConvertToProtoDelegate(
+    jint delegate);
 
 std::string JStringToString(JNIEnv* env, jstring jstr);
 
