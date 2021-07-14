@@ -38,8 +38,6 @@ def classify(model_path, text):
 
 def main(argv):
     del argv  # Unused.
-    print(FLAGS.model_path)
-    print(FLAGS.text)
     classify(FLAGS.model_path, FLAGS.text)
 
 if __name__ == '__main__':
