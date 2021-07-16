@@ -15,6 +15,7 @@ cc_library_with_tflite(
     ],
     tflite_deps = [
         "@org_tensorflow//tensorflow/lite/core/shims:jni_initialization",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:delegate_plugin_converter",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",
@@ -25,6 +26,8 @@ cc_library_with_tflite(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:delegate_registry",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration/c:delegate_plugin",
         "@org_tensorflow//tensorflow/lite/java/jni",
     ],
 )

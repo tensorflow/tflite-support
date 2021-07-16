@@ -15,11 +15,15 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
+#include <dlfcn.h>
 #include <string.h>
 
 #include "absl/memory/memory.h"
 #include "absl/status/status.h"
 #include "absl/strings/str_format.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/c/delegate_plugin.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/delegate_plugin_converter.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
@@ -28,8 +32,50 @@ namespace support {
 namespace utils {
 
 using ::absl::StatusCode;
+using ::tflite::delegates::DelegatePluginRegistry;
 using ::tflite::proto::Delegate;
 using ::tflite::support::CreateStatusWithPayload;
+
+// delegate_name should be one of the following:
+// gpu / hexagon
+absl::Status loadDelegatePluginLibrary(const std::string& delegate_name) {
+  // Load "lib<delegate_name>_plugin.so".
+  std::string lib_name =
+      absl::StrFormat("lib%s_delegate_plugin.so", delegate_name);
+
+  // RTLD_NOW: load symbols now and make sure there's no unresolved symbols.
+  // RTLD_LOCAL: the symbols should be not available for subsequently loaded
+  // libraries.
+  void* handle = dlopen(lib_name.c_str(), RTLD_NOW | RTLD_LOCAL);
+  if (!handle) {
+    return CreateStatusWithPayload(
+        StatusCode::kInternal,
+        absl::StrFormat("Error loading %s. %s", lib_name, dlerror()));
+  }
+  // Load the method "TfLiteNew<camel_name>".
+  std::string camel_name(delegate_name);
+  camel_name[0] = toupper(camel_name[0]);
+  std::string new_method_name =
+      absl::StrFormat("TfLite%sDelegatePluginCApi", camel_name);
+  TfLiteDelegatePlugin* (*new_delegate_c)();
+  new_delegate_c = reinterpret_cast<decltype(new_delegate_c)>(
+      dlsym(handle, new_method_name.c_str()));
+  if (!new_delegate_c) {
+    dlclose(handle);
+    handle = nullptr;
+    return CreateStatusWithPayload(
+        StatusCode::kInternal,
+        absl::StrFormat("Error loading method, %s from %s", new_method_name,
+                        lib_name));
+  }
+
+  // Register the delegate.
+  new DelegatePluginRegistry::Register(
+      absl::StrFormat("%sPlugin", camel_name),
+      tflite::delegates::DelegatePluginConverter(*new_delegate_c()));
+
+  return absl::OkStatus();
+}
 
 tflite::support::StatusOr<Delegate> ConvertToProtoDelegate(jint delegate) {
   // The supported delegate types should match
@@ -39,6 +85,9 @@ tflite::support::StatusOr<Delegate> ConvertToProtoDelegate(jint delegate) {
       return Delegate::NONE;
     case 1:
       return Delegate::NNAPI;
+    case 2:
+      RETURN_IF_ERROR(loadDelegatePluginLibrary("gpu"));
+      return Delegate::GPU;
     default:
       break;
   }
