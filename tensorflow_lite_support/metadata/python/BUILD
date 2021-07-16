@@ -30,3 +30,13 @@ py_library(
         "@flatbuffers//:runtime_py",
     ],
 )
+
+py_binary(
+    name = "metadata_displayer",
+    srcs = ["metadata_displayer.py"],
+    deps = [
+        ":metadata",
+        "@absl_py//absl:app",
+        "@absl_py//absl/flags",
+    ],
+)
