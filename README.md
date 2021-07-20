@@ -55,6 +55,10 @@ Utils, you need to set up following env variables correctly:
 *   `ANDROID_SDK_API_LEVEL`
 *   `ANDROID_BUILD_TOOLS_VERSION`
 
+## How to contribute
+
+Please issue a pull request and assign @xunkai55 or @lu-wang-g for a code review.
+
 ## Contact us
 
 Let us know what you think about TFLite Support by creating a
