@@ -41,10 +41,20 @@ struct InterpreterCreationResources {
   // and maintains it through out the lifetime of `TfLiteInterpreterWrapper`.
   TfLiteDelegate* optional_delegate;
 
+  // Number of threads to use, or -1 to use the default number of threads.
+  int num_threads = -1;
+
   // Apply the InterpreterCreationResources to the InterpreterBuilder.
+  // Note: caller is responsible for ensuring that arguments are valid,
+  // e.g. that num_threads >= -1.
   void ApplyTo(tflite::InterpreterBuilder* interpreter_builder) const {
     if (optional_delegate != nullptr) {
       interpreter_builder->AddDelegate(optional_delegate);
+    }
+    if (num_threads != -1) {
+      // We ignore the TfLiteStatus return value here; caller is responsible
+      // for checking that num_threads is valid.
+      (void)interpreter_builder->SetNumThreads(num_threads);
     }
   }
 };
