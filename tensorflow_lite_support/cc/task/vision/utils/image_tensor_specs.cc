@@ -177,10 +177,12 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
 
   // The expected layout is BHWD, i.e. batch x height x width x color
   // See https://www.tensorflow.org/guide/tensors
-  const int batch = input_tensor->dims->data[0];
-  const int height = input_tensor->dims->data[1];
-  const int width = input_tensor->dims->data[2];
-  const int depth = input_tensor->dims->data[3];
+  int batch = input_tensor->dims->data[0];
+  int height = input_tensor->dims->data[1];
+  int width = input_tensor->dims->data[2];
+  int depth = input_tensor->dims->data[3];
+  // Determine if the input shape is resizable.
+  const TfLiteIntArray* dims_signature = input_tensor->dims_signature;
 
   if (props != nullptr && props->color_space() != ColorSpaceType_RGB) {
     return CreateStatusWithPayload(StatusCode::kInvalidArgument,
