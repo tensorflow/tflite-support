@@ -20,6 +20,7 @@ limitations under the License.
 #include "absl/memory/memory.h"
 #include "absl/status/status.h"
 #include "absl/strings/str_format.h"
+#include "third_party/icu/include/unicode/unistr.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
@@ -52,9 +53,12 @@ std::string JStringToString(JNIEnv* env, jstring jstr) {
   if (jstr == nullptr) {
     return std::string();
   }
-  const char* cstring = env->GetStringUTFChars(jstr, nullptr);
-  std::string result(cstring);
-  env->ReleaseStringUTFChars(jstr, cstring);
+  const jchar* in_jchars = env->GetStringChars(jstr, nullptr);
+  icu::UnicodeString in_utf16(reinterpret_cast<const UChar*>(in_jchars));
+  std::string result;
+  result.reserve(in_utf16.length() * 3);
+  in_utf16.toUTF8String(result);
+  env->ReleaseStringChars(jstr, in_jchars);
   return result;
 }
 

@@ -21,6 +21,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
+        "//third_party/icu:headers",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
