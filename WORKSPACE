@@ -51,9 +51,9 @@ http_archive(
     ],
 )
 
-# TF on 2021-07-08.
-TENSORFLOW_COMMIT = "5c7c11eeb4e046cd974e6984f4dd0910d099b2d0"
-TENSORFLOW_SHA256 = "b35a3c8349ffb2b042745b5d8c08fa1b88f6f14bb621a7371b8ad517a32ef8f2"
+# TF on 2021-07-21.
+TENSORFLOW_COMMIT = "01036686e6cc57e6dd25864654e7f864670e5fa9"
+TENSORFLOW_SHA256 = "eeff4ee9c333bf2b17fd694b40c7203c600ce2f3f3df4932536d072f7e0e6e6b"
 # These values come from tensorflow/workspace3.bzl. If the TF commit is updated,
 # these should be updated to match.
 IO_BAZEL_RULES_CLOSURE_COMMIT = "308b05b2419edb5c8ee0471b67a40403df940149"
