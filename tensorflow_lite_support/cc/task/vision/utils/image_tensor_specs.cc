@@ -193,14 +193,16 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
       
       const int height_mutable = dims_signature->data[1];
       const int width_mutable = dims_signature->data[2];
-      
-      // How do I get the image height and width???
-      if (height_mutable) height = ???;
-      if (width_mutable) width = ???;
-      
-      const std::vector<int> new_dims {batch, height, width, depth};
-      // This will modify the entire graph as per the input.
-      interpreter.ResizeInputTensorStrict(0, new_dims);
+
+      if (height_mutable || width_mutable)
+      {
+        // How do I get the image height and width???
+        height = height_mutable ? height : ???;
+        width = width_mutable ? width : ???;
+        const std::vector<int> new_dims {batch, height, width, depth};
+        // This will re-dim the entire graph as per the input.
+        interpreter.ResizeInputTensorStrict(0, new_dims);
+      }
   }
 
   if (props != nullptr && props->color_space() != ColorSpaceType_RGB) {
