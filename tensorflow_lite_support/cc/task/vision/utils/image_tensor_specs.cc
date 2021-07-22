@@ -195,8 +195,8 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
       const int width_mutable = dims_signature->data[2];
       
       // How do I get the image height and width???
-      height = ???;
-      width = ???;
+      if (height_mutable) height = ???;
+      if (width_mutable) width = ???;
       
       const std::vector<int> new_dims {batch, height, width, depth};
       // This will modify the entire graph as per the input.
