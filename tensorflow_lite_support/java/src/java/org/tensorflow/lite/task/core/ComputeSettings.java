@@ -24,7 +24,8 @@ public abstract class ComputeSettings {
   /** TFLite accelerator delegate options. */
   public enum Delegate {
     NONE(0),
-    NNAPI(1);
+    NNAPI(1),
+    GPU(2);
 
     private final int value;
 

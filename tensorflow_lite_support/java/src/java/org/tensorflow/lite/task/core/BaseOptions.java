@@ -29,16 +29,30 @@ public abstract class BaseOptions {
      * Sets the advanced accelerator options.
      *
      * <p>Note: this method will override those highlevel API to choose an delegate, such as {@link
-     * useNnapi}.
+     * useGpu} and {@link useNnapi}.
      */
     public abstract Builder setComputeSettings(ComputeSettings computeSettings);
 
     /**
-     * Uses NNAPI for inference. The advanced NNAPI configurations will be set to default.
+     * Uses GPU for inference. The advanced GPU configuration settings will be set to default
+     * values.
      *
      * <p>Note: this method will override the settings from {@link #setComputeSettings}.
      *
-     * <p>To manipulate the advanced NNAPI configurations, use {@link #setComputeSettings}.
+     * <p>To manipulate the advanced GPU configuration settings, use {@link #setComputeSettings}.
+     */
+    public Builder useGpu() {
+      return setComputeSettings(
+          ComputeSettings.builder().setDelegate(ComputeSettings.Delegate.GPU).build());
+    }
+
+    /**
+     * Uses NNAPI for inference. The advanced NNAPI configuration settings will be set to default
+     * values.
+     *
+     * <p>Note: this method will override the settings from {@link #setComputeSettings}.
+     *
+     * <p>To manipulate the advanced NNAPI configuration settings, use {@link #setComputeSettings}.
      */
     public Builder useNnapi() {
       return setComputeSettings(
