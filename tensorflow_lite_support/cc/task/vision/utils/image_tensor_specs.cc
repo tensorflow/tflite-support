@@ -191,8 +191,8 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
                                        "Only height and width is mutable for now.",
                                        TfLiteSupportStatus::kInvalidArgumentError);
       
-      const int height_mutable = dims_signature->data[1];
-      const int width_mutable = dims_signature->data[2];
+      const bool height_mutable = dims_signature->data[1] == -1;
+      const bool width_mutable = dims_signature->data[2] == -1;
 
       if (height_mutable || width_mutable)
       {
