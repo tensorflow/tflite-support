@@ -58,6 +58,7 @@ cc_library(
         "@org_tensorflow//tensorflow/lite:framework",
         "@org_tensorflow//tensorflow/lite:minimal_logging",
         "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:nnapi_plugin",
         "@org_tensorflow//tensorflow/lite/delegates:interpreter_utils",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_cc_proto",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:delegate_registry",
