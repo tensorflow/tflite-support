@@ -3,7 +3,9 @@
 A Python wrapper for the C++ Text Task APIs.
 
 ## Background
-This Python API is based on the C++ Text Task APIs. It uses Python's [subprocess](https://docs.python.org/3/library/subprocess.html) to call C++ Text Task APIs.
+This Python API is based on the C++ Text Task APIs. It uses Python's 
+[subprocess](https://docs.python.org/3/library/subprocess.html) 
+to call C++ Text Task APIs.
 
 ## NLClassifier
 
@@ -11,7 +13,8 @@ This Python API is based on the C++ Text Task APIs. It uses Python's [subprocess
 
 You will need:
 
-* a TFLite text classification model with certain format. (e.g. [movie_review_model][1], a model to classify movie reviews).
+* a TFLite text classification model with certain format. 
+(e.g. [movie_review_model][1], a model to classify movie reviews).
 
 #### Usage
 
@@ -24,9 +27,10 @@ curl \
  -o /tmp/movie_review.tflite
 
 # Run the detection tool:
-python tensorflow_lite_support/examples/task/text/desktop/python/nl_classifier_demo.py \
+python \
+ tensorflow_lite_support/examples/task/text/desktop/python/nl_classifier_demo.py \
  --model_path=/tmp/movie_review.tflite \
- --text="What a waste of my time." \
+ --text="What a waste of my time."
 ```
 
 #### Results

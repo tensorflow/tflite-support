@@ -15,39 +15,32 @@
 import subprocess
 from absl import app
 from absl import flags
-import os
 
 FLAGS = flags.FLAGS
-flags.DEFINE_string('model_path', None, 'Model Path') 
-flags.DEFINE_string('text', None, 'Text to Predict') 
+flags.DEFINE_string('model_path', None, 'Model Path')
+flags.DEFINE_string('text', None, 'Text to Predict')
 
 # Required flag.
-flags.mark_flag_as_required("model_path")
-flags.mark_flag_as_required("text")
+flags.mark_flag_as_required('model_path')
+flags.mark_flag_as_required('text')
 
 def classify(model_path, text):
-    """Classifies input text into different categories
+  """Classifies input text into different categories
 
-    Args:
-        model_path: path to model
-        text: input text
-
-    """
-    # Run the detection tool:
-    subprocess.run(["bazel run -c opt  tensorflow_lite_support/examples/task/text/desktop:nl_classifier_demo --  --model_path=" + model_path + "  --text='" + text + "'"], shell=True)
+  Args:
+      model_path: path to model
+      text: input text
+    
+  """
+  # Run the detection tool:
+  subprocess.run(['bazel run -c opt  '
+    'tensorflow_lite_support/examples/task/text/desktop:nl_classifier_demo --  '
+    '--model_path="' + model_path + '"  --text="' + text + '"'],
+    shell=True, check=True)
 
 def main(argv):
-    del argv  # Unused.
-    classify(FLAGS.model_path, FLAGS.text)
+  del argv  # Unused.
+  classify(FLAGS.model_path, FLAGS.text)
 
 if __name__ == '__main__':
-    app.run(main)
-
-
-    
-
-
-
-
-
-
+  app.run(main)
