@@ -29,6 +29,10 @@ bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/cc/task/audio:audio_classifier \
     //tensorflow_lite_support/cc/task/vision:image_embedder
 
+# Build ODML.
+bazel build -c opt --config=monolithic --config=android_arm64 \
+    //tensorflow_lite_support/odml/java/image
+
 # Build Task libraries.
 bazel build -c opt --config=monolithic \
     --config=android_arm64 --fat_apk_cpu=x86,x86_64,arm64-v8a,armeabi-v7a \
