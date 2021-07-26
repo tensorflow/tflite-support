@@ -178,32 +178,9 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
   // The expected layout is BHWD, i.e. batch x height x width x color
   // See https://www.tensorflow.org/guide/tensors
   const int batch = input_tensor->dims->data[0];
-  int height = input_tensor->dims->data[1];
-  int width = input_tensor->dims->data[2];
+  const int height = input_tensor->dims->data[1];
+  const int width = input_tensor->dims->data[2];
   const int depth = input_tensor->dims->data[3];
-  // Determine if the input shape is resizable.
-  const TfLiteIntArray* dims_signature = input_tensor->dims_signature;
-
-  if (dims_signature != nullptr)
-  {
-      if (dims_signature->data[3] == -1 || dims_signature->data[0] == -1)
-        return CreateStatusWithPayload(StatusCode::kInvalidArgument,
-                                       "Only height and width is mutable for now.",
-                                       TfLiteSupportStatus::kInvalidArgumentError);
-      
-      const bool height_mutable = dims_signature->data[1] == -1;
-      const bool width_mutable = dims_signature->data[2] == -1;
-
-      if (height_mutable || width_mutable)
-      {
-        // How do I get the image height and width???
-        height = height_mutable ? height : ???;
-        width = width_mutable ? width : ???;
-        const std::vector<int> new_dims {batch, height, width, depth};
-        // This will re-dim the entire graph as per the input.
-        interpreter.ResizeInputTensorStrict(0, new_dims);
-      }
-  }
 
   if (props != nullptr && props->color_space() != ColorSpaceType_RGB) {
     return CreateStatusWithPayload(StatusCode::kInvalidArgument,
