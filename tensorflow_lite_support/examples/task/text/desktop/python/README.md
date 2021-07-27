@@ -3,8 +3,8 @@
 A Python wrapper for the C++ Text Task APIs.
 
 ## Background
-This Python API is based on the C++ Text Task APIs. It uses Python's 
-[subprocess](https://docs.python.org/3/library/subprocess.html) 
+This Python API is based on the C++ Text Task APIs. It uses Python's
+[subprocess](https://docs.python.org/3/library/subprocess.html)
 to call C++ Text Task APIs.
 
 ## NLClassifier
@@ -13,7 +13,7 @@ to call C++ Text Task APIs.
 
 You will need:
 
-* a TFLite text classification model with certain format. 
+* a TFLite text classification model with certain format.
 (e.g. [movie_review_model][1], a model to classify movie reviews).
 
 #### Usage

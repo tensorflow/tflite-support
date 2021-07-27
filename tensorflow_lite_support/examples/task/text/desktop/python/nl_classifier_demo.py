@@ -24,23 +24,29 @@ flags.DEFINE_string('text', None, 'Text to Predict')
 flags.mark_flag_as_required('model_path')
 flags.mark_flag_as_required('text')
 
+
 def classify(model_path, text):
   """Classifies input text into different categories
 
   Args:
       model_path: path to model
       text: input text
-    
+
   """
   # Run the detection tool:
-  subprocess.run(['bazel run -c opt  '
-    'tensorflow_lite_support/examples/task/text/desktop:nl_classifier_demo --  '
-    '--model_path="' + model_path + '"  --text="' + text + '"'],
-    shell=True, check=True)
+  subprocess.run([
+      'bazel run -c opt  '
+      'tensorflow_lite_support/examples/task/text/desktop:nl_classifier_demo --  '
+      '--model_path="' + model_path + '"  --text="' + text + '"'
+  ],
+                 shell=True,
+                 check=True)
+
 
 def main(argv):
   del argv  # Unused.
   classify(FLAGS.model_path, FLAGS.text)
+
 
 if __name__ == '__main__':
   app.run(main)
