@@ -161,7 +161,6 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
 
         const std::vector<int> new_dims {expected_batch, height, width, expected_depth};
 
-         
         interpreter->ResizeInputTensorStrict(0, new_dims);
       }
     }
