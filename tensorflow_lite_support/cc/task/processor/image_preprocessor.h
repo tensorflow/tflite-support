@@ -84,11 +84,12 @@ class ImagePreprocessor : public Preprocessor {
 
  private:
   using Preprocessor::Preprocessor;
-
+  // Returns true if the model expects dynamic image shape, false otherwise.
+  bool IsInputImageDynamic();
   // Returns false if image preprocessing could be skipped, true otherwise.
   bool IsImagePreprocessingNeeded(const vision::FrameBuffer& frame_buffer,
                                   const vision::BoundingBox& roi);
-
+ 
   absl::Status Init(
       const vision::FrameBufferUtils::ProcessEngine& process_engine);
 
