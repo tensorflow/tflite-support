@@ -17,6 +17,7 @@ package com.google.android.odml.image;
 
 import com.google.android.odml.image.MlImage.ImageFormat;
 import com.google.android.odml.image.MlImage.StorageType;
+import com.google.android.odml.image.annotation.KeepForSdk;
 import com.google.auto.value.AutoValue;
 
 /** Groups a set of properties to describe how an image is stored. */
@@ -44,12 +45,14 @@ public abstract class ImageProperties {
    *
    * @see ImageProperties.Builder
    */
+  @KeepForSdk
   static Builder builder() {
     return new AutoValue_ImageProperties.Builder();
   }
 
   /** Builds a {@link ImageProperties}. */
   @AutoValue.Builder
+  @KeepForSdk
   abstract static class Builder {
 
     /**
@@ -57,6 +60,7 @@ public abstract class ImageProperties {
      *
      * @see ImageProperties#getImageFormat
      */
+    @KeepForSdk
     abstract Builder setImageFormat(@ImageFormat int value);
 
     /**
@@ -64,9 +68,11 @@ public abstract class ImageProperties {
      *
      * @see ImageProperties#getStorageType
      */
+    @KeepForSdk
     abstract Builder setStorageType(@StorageType int value);
 
     /** Builds the {@link ImageProperties}. */
+    @KeepForSdk
     abstract ImageProperties build();
   }
 

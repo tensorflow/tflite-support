@@ -12,19 +12,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+package com.google.android.odml.image.annotation;
 
-package com.google.android.odml.image;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 
-import com.google.android.odml.image.annotation.KeepForSdk;
-
-/** Manages internal image data storage. The interface is package-private. */
-@KeepForSdk
-interface ImageContainer {
-  /** Returns the properties of the contained image. */
-  @KeepForSdk
-  ImageProperties getImageProperties();
-
-  /** Close the image container and releases the image resource inside. */
-  @KeepForSdk
-  void close();
-}
+/**
+ * Indicates that this object (class, method, etc) should be retained and not renamed when
+ * generating the SDK, but should be allowed to be stripped or renamed in end developer apps.
+ */
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
+@Documented // Technically not needed as this doesn't impact end apps, but kept for consistency.
+public @interface KeepForSdk {}
