@@ -2,7 +2,7 @@
 # TensorFlow Lite Support API in Java for metadata.
 
 load("@build_bazel_rules_android//android:rules.bzl", "android_library")
-load("@org_tensorflow//tensorflow/java:build_defs.bzl", "JAVACOPTS")
+load("//tensorflow_lite_support/java:build_defs.bzl", "JAVACOPTS")
 
 package(
     default_visibility = ["//visibility:public"],
