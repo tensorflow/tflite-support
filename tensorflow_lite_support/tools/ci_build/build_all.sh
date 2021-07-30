@@ -41,6 +41,11 @@ bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision:task-library-vision \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/audio:task-library-audio
 
+# Build A@S delegate plugin libraries.
+bazel build -c opt \
+    --config=android_arm64 --fat_apk_cpu=x86,x86_64,arm64-v8a,armeabi-v7a \
+    //tensorflow_lite_support/acceleration/configuration:gpu-delegate-plugin
+
 # Build desktop demos.
 bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/examples/task/audio/desktop:audio_classifier_demo
