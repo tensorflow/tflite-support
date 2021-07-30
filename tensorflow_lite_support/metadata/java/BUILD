@@ -33,6 +33,10 @@ java_library(
     name = "tensorflowlite_support_metadata_lib",
     srcs = METADATA_SRCS,
     javacopts = ["--release 7"],
+    resource_jars = [
+        "//tensorflow_lite_support/metadata:libmetadata_schema_java.jar",
+        "//tensorflow_lite_support/metadata:libschema_fbs_java.jar",
+    ],
     # LINT.IfChange(dep)
     deps = [
         "//tensorflow_lite_support/metadata:metadata_schema_java",
