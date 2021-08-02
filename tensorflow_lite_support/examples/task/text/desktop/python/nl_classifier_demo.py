@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+"""Python demo tool for NLClassifier."""
+
+import inspect
+import os.path as _os_path
 import subprocess
+import sys
+
 from absl import app
 from absl import flags
 
@@ -24,29 +30,36 @@ flags.DEFINE_string('text', None, 'Text to Predict')
 flags.mark_flag_as_required('model_path')
 flags.mark_flag_as_required('text')
 
+_NL_CLASSIFIER_NATIVE_PATH = _os_path.join(
+    _os_path.dirname(inspect.getfile(inspect.currentframe())),
+    '../nl_classifier_demo')
+
 
 def classify(model_path, text):
-  """Classifies input text into different categories
+  """Classifies input text into different categories.
 
   Args:
       model_path: path to model
       text: input text
-
   """
   # Run the detection tool:
   subprocess.run([
-      'bazel run -c opt  '
-      'tensorflow_lite_support/examples/task/text/desktop:nl_classifier_demo --  '
-      '--model_path="' + model_path + '"  --text="' + text + '"'
+      _NL_CLASSIFIER_NATIVE_PATH + ' --model_path=' + model_path + ' --text="' +
+      text + '"'
   ],
                  shell=True,
                  check=True)
 
 
-def main(argv):
+def run_main(argv):
   del argv  # Unused.
   classify(FLAGS.model_path, FLAGS.text)
 
 
+# Simple wrapper to make the code pip-friendly
+def main():
+  app.run(main=run_main, argv=sys.argv)
+
+
 if __name__ == '__main__':
-  app.run(main)
+  main()

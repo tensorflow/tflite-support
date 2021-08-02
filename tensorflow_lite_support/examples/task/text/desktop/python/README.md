@@ -3,9 +3,10 @@
 A Python wrapper for the C++ Text Task APIs.
 
 ## Background
+
 This Python API is based on the C++ Text Task APIs. It uses Python's
-[subprocess](https://docs.python.org/3/library/subprocess.html)
-to call C++ Text Task APIs.
+[subprocess](https://docs.python.org/3/library/subprocess.html) to call C++ Text
+Task APIs.
 
 ## NLClassifier
 
@@ -13,22 +14,46 @@ to call C++ Text Task APIs.
 
 You will need:
 
-* a TFLite text classification model with certain format.
-(e.g. [movie_review_model][1], a model to classify movie reviews).
+*   a TFLite text classification model with certain format. (e.g.
+    [movie_review_model][1], a model to classify movie reviews).
 
 #### Usage
 
-In the console, run:
+First, download the pretrained model by:
 
 ```bash
-# Download the model:
 curl \
  -L 'https://storage.googleapis.com/download.tensorflow.org/models/tflite/text_classification/text_classification_v2.tflite' \
  -o /tmp/movie_review.tflite
+```
 
-# Run the detection tool:
-python \
- tensorflow_lite_support/examples/task/text/desktop/python/nl_classifier_demo.py \
+You can either use the prebuilt demo tool from TFLite Support Pypi package or
+build from source. See the instruction below.
+
+##### Access from TFLite Support Pypi package
+
+Install the Support Pypi package by:
+
+```bash
+pip install tflite-support-nightly
+```
+
+Run the demo tool:
+
+```bash
+nl_classifier_demo  \
+--model_path=/tmp/movie_review.tflite \
+--text="What a waste of my time."
+```
+
+##### Build the demo from source
+
+Run the demo tool:
+
+```bash
+bazel run \
+ tensorflow_lite_support/examples/task/text/desktop/python:nl_classifier_demo \
+ -- \
  --model_path=/tmp/movie_review.tflite \
  --text="What a waste of my time."
 ```

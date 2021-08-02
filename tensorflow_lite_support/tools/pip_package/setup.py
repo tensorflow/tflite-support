@@ -29,9 +29,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import fnmatch
-import os
-import re
 import sys
 
 from setuptools import Command
@@ -68,7 +65,13 @@ DOCLINES = __doc__.split('\n')
 
 CONSOLE_SCRIPTS = [
     'tflite_codegen = tensorflow_lite_support.codegen.python.codegen:main',
+    'nl_classifier_demo = '
+    'tensorflow_lite_support.examples.task.text.desktop.python.nl_classifier_demo:main',
 ]
+
+TASK_TEXT_DEMO_PACKAGE = 'tensorflow_lite_support.examples.task.text.desktop'
+TASK_TEXT_DEMO_PACKAGE_DIR = 'tensorflow_lite_support/examples/task/text/desktop/'
+TASK_TEXT_DEMO_PACKAGE_DATA = 'nl_classifier_demo'
 
 
 class BinaryDistribution(Distribution):
@@ -85,24 +88,6 @@ class InstallCommand(InstallCommandBase):
     self.install_lib = self.install_platlib
     return ret
 
-
-def find_files(pattern, root):
-  """Return all the files matching pattern below root dir."""
-  for dirpath, _, files in os.walk(root):
-    for filename in fnmatch.filter(files, pattern):
-      yield os.path.join(dirpath, filename)
-
-
-so_lib_paths = [
-    i for i in os.listdir('.')
-    if os.path.isdir(i) and fnmatch.fnmatch(i, '_solib_*')
-]
-
-matches = []
-for path in so_lib_paths:
-  matches.extend(['../' + x for x in find_files('*', path) if '.py' not in x])
-
-EXTENSIONS = ['codegen/_pywrap_codegen.so']
 
 headers = ()
 
@@ -127,9 +112,8 @@ setup(
     tests_require=REQUIRED_PACKAGES,
     # Add in any packaged data.
     include_package_data=True,
-    package_data={
-        'tflite-support': EXTENSIONS + matches,
-    },
+    package_dir={TASK_TEXT_DEMO_PACKAGE: TASK_TEXT_DEMO_PACKAGE_DIR},
+    package_data={TASK_TEXT_DEMO_PACKAGE: [TASK_TEXT_DEMO_PACKAGE_DATA]},
     zip_safe=False,
     distclass=BinaryDistribution,
     cmdclass={
