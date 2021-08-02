@@ -41,8 +41,8 @@ cc_library(
     alwayslink = 1,  # For registration to always run.
 )
 
-# To use the Coral_edgetpu_plugin externally, add the following flags to the bazel command.
-# --linkopt=-lusb-1.0  --define darwinn_portable=1.
+# To use the edgetpu_coral_plugin externally, add the following flags to the bazel command:
+# --define darwinn_portable=1
 cc_library(
     name = "edgetpu_coral_plugin",
     srcs = ["edgetpu_coral_plugin.cc"],
@@ -61,7 +61,7 @@ cc_library(
 
 # To test it externally, plugin a Coral device, and run the following command:
 # bazel test tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin_test \
-# --define darwinn_portable=1 --linkopt=-lusb-1.0
+# --define darwinn_portable=1
 cc_test(
     name = "edgetpu_coral_plugin_test",
     srcs = ["edgetpu_coral_plugin_test.cc"],
