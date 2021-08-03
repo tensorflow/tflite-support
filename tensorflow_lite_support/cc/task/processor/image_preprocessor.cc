@@ -157,8 +157,8 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
     const int expected_depth = Tensor()->dims->data[3];
 
     // HxW of the input image.
-    const int image_height = frame_buffer.dimension().height;
-    const int image_width = frame_buffer.dimension().width;
+    const int image_height = roi.height();
+    const int image_width = roi.width();
 
     const int height = height_mutable ? image_height : expected_height;
     const int width = width_mutable ? image_width : expected_width;
