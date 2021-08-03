@@ -173,6 +173,18 @@ class TfLiteInterpreterWrapper {
   // Whether an error has occurred with the delegate.
   bool HasDelegateError() { return got_error_do_not_delegate_anymore_; }
 
+  // Whether the on-device mini-benchmark has completed for those TfLite
+  // acceleration configurations that are specified in passed-in
+  // ComputeSettings. If it finishes, the next time this same InterpreterWrapper
+  // object is created (i.e. w/ the same model and the same
+  // mini-benchmark-related configurations), the best acceleration configuration
+  // will be picked up and used.
+  bool HasMiniBenchmarkCompleted();
+
+  const tflite::proto::ComputeSettings& compute_settings() const {
+    return compute_settings_;
+  }
+
  protected:
   // The delegate used to accelerate inference.
   Interpreter::TfLiteDelegatePtr delegate_;
@@ -216,6 +228,8 @@ class TfLiteInterpreterWrapper {
       interpreter_initializer_;
 
   // The ComputeSettings provided at initialization time.
+  // Note when TfLite mini-benchmark is enabled, it could be changed to the
+  // best TfLite acceleration setting selected.
   tflite::proto::ComputeSettings compute_settings_;
 
   // Set to true if an occurs with the specified delegate (if any), causing

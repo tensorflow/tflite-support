@@ -53,7 +53,7 @@ TfLiteInterpreterWrapper::TfLiteInterpreterWrapper(
     : delegate_(nullptr, nullptr),
       got_error_do_not_delegate_anymore_(false),
       default_model_namespace_(default_model_namespace),
-      default_model_id_(default_model_id) {}
+      default_model_id_(default_model_id), mini_benchmark_(nullptr) {}
 
 std::string TfLiteInterpreterWrapper::ModelNamespace() {
   const auto& ns_from_acceleration =
@@ -329,6 +329,14 @@ absl::Status TfLiteInterpreterWrapper::LoadDelegatePlugin(
   }
 
   return absl::OkStatus();
+}
+
+bool TfLiteInterpreterWrapper::HasMiniBenchmarkCompleted() {
+  if (mini_benchmark_ != nullptr &&
+      mini_benchmark_->NumRemainingAccelerationTests() == 0) {
+    return true;
+  }
+  return false;
 }
 
 }  // namespace support
