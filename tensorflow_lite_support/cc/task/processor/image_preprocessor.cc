@@ -140,7 +140,6 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
   } else {
     // Input frame buffer already targets model requirements: skip image
     // preprocessing. For RGB, the data is always stored in a single plane.
-
     input_data = frame_buffer.plane(0).buffer;
     input_data_byte_size = frame_buffer.plane(0).stride.row_stride_bytes *
                            frame_buffer.dimension().height;
@@ -157,7 +156,7 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
     const int expected_width = Tensor()->dims->data[2];
     const int expected_depth = Tensor()->dims->data[3];
 
-    // HXW of the input image.
+    // HxW of the input image.
     const int image_height = frame_buffer.dimension().height;
     const int image_width = frame_buffer.dimension().width;
 
