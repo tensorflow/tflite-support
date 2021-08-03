@@ -84,8 +84,6 @@ class ImagePreprocessor : public Preprocessor {
 
  private:
   using Preprocessor::Preprocessor;
-  // Returns true if the model expects dynamic image shape, false otherwise.
-  bool IsInputImageDynamic();
   // Returns false if image preprocessing could be skipped, true otherwise.
   bool IsImagePreprocessingNeeded(const vision::FrameBuffer& frame_buffer,
                                   const vision::BoundingBox& roi);
@@ -98,6 +96,9 @@ class ImagePreprocessor : public Preprocessor {
 
   // Utils for input image preprocessing (resizing, colorspace conversion, etc).
   std::unique_ptr<vision::FrameBufferUtils> frame_buffer_utils_;
+
+  // Is true if the model expects dynamic image shape, false otherwise.
+  bool is_input_dynamic_ = false;
 };
 
 }  // namespace processor
