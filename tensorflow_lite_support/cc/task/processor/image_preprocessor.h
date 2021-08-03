@@ -84,10 +84,11 @@ class ImagePreprocessor : public Preprocessor {
 
  private:
   using Preprocessor::Preprocessor;
+
   // Returns false if image preprocessing could be skipped, true otherwise.
   bool IsImagePreprocessingNeeded(const vision::FrameBuffer& frame_buffer,
                                   const vision::BoundingBox& roi);
- 
+
   absl::Status Init(
       const vision::FrameBufferUtils::ProcessEngine& process_engine);
 
