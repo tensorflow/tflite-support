@@ -71,18 +71,15 @@ absl::Status ImagePreprocessor::Init(
   // Determine if the input shape is resizable.
   const TfLiteIntArray* dims_signature = Tensor()->dims_signature;
 
-  if (dims_signature != nullptr)
-  {
-    const bool height_or_width_mutable = dims_signature->data[1] == -1 || 
-                                         dims_signature->data[2] == -1;
-
+  if (dims_signature != nullptr) {
     // Only the HxW dimensions support mutability.
     if (dims_signature->data[0] == -1 || dims_signature->data[3] == -1)
       return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kUnimplemented,
           "Only Height and Width are mutable for now.");
 
-    is_input_dynamic_ = height_or_width_mutable;
+    is_height_mutable_ = dims_signature->data[1] == -1;
+    is_width_mutable_ = dims_signature->data[2] == -1;
   }
   return absl::OkStatus();
 }
@@ -116,10 +113,10 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
     // Preprocess input image to fit model requirements.
     // For now RGB is the only color space supported, which is ensured by
     // `InitInternal`.
-    input_specs_.image_width = width_mutable ? roi.width() :
-                               input_specs_.image_width;
-    input_specs_.image_height = height_mutable ? roi.height() :
-                               input_specs_.image_height;
+    input_specs_.image_width =
+        is_width_mutable_ ? roi.width() : input_specs_.image_width;
+    input_specs_.image_height =
+        is_height_mutable_ ? roi.height() : input_specs_.image_height;
 
     FrameBuffer::Dimension to_buffer_dimension = {input_specs_.image_width,
                                                   input_specs_.image_height};
@@ -146,24 +143,16 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
   }
 
   // If dynamic, it will re-dim the entire graph as per the input.
-  if (is_input_dynamic_) {    
+  if (is_height_mutable_ || is_width_mutable_) {
     const TfLiteIntArray* dims = Tensor()->dims;
     const Interpreter* interpreter = engine_->interpreter();
 
-    // The expected BxHxWxD values of the model.
+    // The expected BxD values of the model.
     const int expected_batch = Tensor()->dims->data[0];
-    const int expected_height = Tensor()->dims->data[1];
-    const int expected_width = Tensor()->dims->data[2];
     const int expected_depth = Tensor()->dims->data[3];
 
-    // HxW of the input image.
-    const int image_height = roi.height();
-    const int image_width = roi.width();
-
-    const int height = height_mutable ? image_height : expected_height;
-    const int width = width_mutable ? image_width : expected_width;
-
-    const std::vector<int> new_dims {expected_batch, height, width, expected_depth};
+    const std::vector<int> new_dims{expected_batch, input_specs_.image_height,
+                                    input_specs_.image_width, expected_depth};
 
     interpreter->ResizeInputTensorStrict(0, new_dims);
   }
