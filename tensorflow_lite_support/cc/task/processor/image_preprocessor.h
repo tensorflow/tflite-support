@@ -37,18 +37,20 @@ namespace processor {
 //      attached to the metadata for input normalization.
 class ImagePreprocessor : public Preprocessor {
  public:
-  static absl::StatusOr<std::unique_ptr<ImagePreprocessor>> Create(
+  static tflite::support::StatusOr<std::unique_ptr<ImagePreprocessor>> Create(
       core::TfLiteEngine* engine,
       const std::initializer_list<int> input_indices,
       const vision::FrameBufferUtils::ProcessEngine& process_engine =
           vision::FrameBufferUtils::ProcessEngine::kLibyuv) {
     RETURN_IF_ERROR(Preprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                              engine, input_indices));
+                                              engine, input_indices,
+                                              /* requires_metadata = */ false));
 
-    auto task = absl::WrapUnique(new ImagePreprocessor(engine, input_indices));
+    auto processor =
+        absl::WrapUnique(new ImagePreprocessor(engine, input_indices));
 
-    RETURN_IF_ERROR(task->Init(process_engine));
-    return task;
+    RETURN_IF_ERROR(processor->Init(process_engine));
+    return processor;
   }
 
   // Processes the provided FrameBuffer and populate tensor values.
@@ -75,6 +77,10 @@ class ImagePreprocessor : public Preprocessor {
   // status if the region is out of these bounds.
   absl::Status Preprocess(const vision::FrameBuffer& frame_buffer,
                           const vision::BoundingBox& roi);
+
+  // Returns the spec of model. Passing in an image with this spec will speed up
+  // the inference as it bypasses image cropping and resizing.
+  const vision::ImageTensorSpecs& GetInputSpecs() const { return input_specs_; }
 
  private:
   using Preprocessor::Preprocessor;
