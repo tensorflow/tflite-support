@@ -11,7 +11,6 @@ COMMON_PIP_DEPS = [
     "README",
     "setup.py",
     "//tensorflow_lite_support/codegen/python:codegen",
-    "//tensorflow_lite_support/examples/task/text/desktop/python:nl_classifier_demo",
     "//tensorflow_lite_support/metadata/python:metadata",
     "//tensorflow_lite_support/metadata/python/metadata_writers:writer_utils",
     "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
