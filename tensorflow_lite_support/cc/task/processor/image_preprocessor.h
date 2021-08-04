@@ -99,7 +99,8 @@ class ImagePreprocessor : public Preprocessor {
   std::unique_ptr<vision::FrameBufferUtils> frame_buffer_utils_;
 
   // Is true if the model expects dynamic image shape, false otherwise.
-  bool is_input_dynamic_ = false;
+  bool is_height_mutable_ = false;
+  bool is_width_mutable_ = false;
 };
 
 }  // namespace processor
