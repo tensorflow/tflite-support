@@ -106,8 +106,6 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
 
   // Determine if the input shape is resizable.
   const TfLiteIntArray* dims_signature = Tensor()->dims_signature;
-  const bool height_mutable = dims_signature->data[1] == -1;
-  const bool width_mutable = dims_signature->data[2] == -1;
 
   if (IsImagePreprocessingNeeded(frame_buffer, roi)) {
     // Preprocess input image to fit model requirements.
