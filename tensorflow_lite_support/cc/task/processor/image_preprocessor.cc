@@ -104,9 +104,6 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
   std::unique_ptr<FrameBuffer> preprocessed_frame_buffer;
   std::vector<uint8> preprocessed_data;
 
-  // Determine if the input shape is resizable.
-  const TfLiteIntArray* dims_signature = Tensor()->dims_signature;
-
   if (IsImagePreprocessingNeeded(frame_buffer, roi)) {
     // Preprocess input image to fit model requirements.
     // For now RGB is the only color space supported, which is ensured by
