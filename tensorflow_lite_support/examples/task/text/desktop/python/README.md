@@ -126,6 +126,7 @@ In the console, you should get:
 Time cost to classify the input text on CPU: 491 ms
 category[0]: 'negative' : '0.00006'
 category[1]: 'positive' : '0.99994'
+```
 
 [1]: https://www.tensorflow.org/lite/models/text_classification/overview
 [2]: https://github.com/tensorflow/tflite-support/blob/fe8b69002f5416900285dc69e2baa078c91bd994/tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h#L55
