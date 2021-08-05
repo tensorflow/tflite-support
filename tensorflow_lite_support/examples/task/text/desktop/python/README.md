@@ -27,25 +27,6 @@ curl \
  -o /tmp/movie_review.tflite
 ```
 
-You can either use the prebuilt demo tool from TFLite Support Pypi package or
-build from source. See the instruction below.
-
-##### Access from TFLite Support Pypi package
-
-Install the Support Pypi package by:
-
-```bash
-pip install tflite-support-nightly
-```
-
-Run the demo tool:
-
-```bash
-nl_classifier_demo  \
---model_path=/tmp/movie_review.tflite \
---text="What a waste of my time."
-```
-
 ##### Build the demo from source
 
 Run the demo tool:
@@ -85,25 +66,6 @@ First, download the pretrained model by:
 curl \
  -L 'https://url/to/bert/nl/classifier' \
  -o /tmp/bert_movie_review.tflite
-```
-
-You can either use the prebuilt demo tool from TFLite Support Pypi package or
-build from source. See the instruction below.
-
-##### Access from TFLite Support Pypi package
-
-Install the Support Pypi package by:
-
-```bash
-pip install tflite-support-nightly
-```
-
-Run the demo tool:
-
-```bash
-bert_nl_classifier_demo  \
---model_path=/tmp/bert_movie_review.tflite \
---text="it's a charming and often affecting journey"
 ```
 
 ##### Build the demo from source
