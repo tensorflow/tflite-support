@@ -20,23 +20,16 @@ limitations under the License.
 #include "absl/flags/flag.h"
 #include "absl/status/status.h"
 #include "absl/strings/cord.h"
-#include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/shims/cc/shims_test_util.h"
 #include "tensorflow/lite/kernels/builtin_op_kernels.h"
 #include "tensorflow/lite/mutable_op_resolver.h"
-#include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
-#include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
-#include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
-#include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils.h"
 #include "tensorflow_lite_support/cc/test/test_utils.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 
@@ -59,21 +52,23 @@ using ::tflite::task::core::TfLiteEngine;
 constexpr char kTestDataDirectory[] =
     "tensorflow_lite_support/cc/test/testdata/task/vision/";
 // Float model.
-constexpr char kMobileNetFloatWithMetadata[] = "mobilenet_v2_1.0_224.tflite";
-// Quantized model.
-constexpr char kMobileNetQuantizedWithMetadata[] =
-    "mobilenet_v1_0.25_224_quant.tflite";
-// Hello world flowers classifier supporting 5 classes (quantized model).
-constexpr char kAutoMLModelWithMetadata[] = "automl_labeler_model.tflite";
+constexpr char kDilatedConvFloat[] = "dilated_conv.tflite";
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
   return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
                                       kTestDataDirectory, image_name));
 }
 
-TEST_F(DynamicInput, HeightandWidthMutable)
+class DynamicInputTest : public tflite_shims::testing::Test {};
+
+TEST_F(DynamicInputTest, HeightandWidthMutable)
 {
     
+}
+
+TEST_F(DynamicInputTest, ErrorOnBatchOrDepthChange)
+{
+
 }
 
 }  // namespace
