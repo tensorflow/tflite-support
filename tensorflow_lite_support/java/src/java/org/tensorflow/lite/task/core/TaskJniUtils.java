@@ -162,10 +162,11 @@ public class TaskJniUtils {
   }
 
   public static long createProtoBaseOptionsHandle(BaseOptions baseOptions) {
-    return createProtoBaseOptions(baseOptions.getComputeSettings().getDelegate().getValue());
+    return createProtoBaseOptions(
+        baseOptions.getComputeSettings().getDelegate().getValue(), baseOptions.getNumThreads());
   }
 
   private TaskJniUtils() {}
 
-  private static native long createProtoBaseOptions(int delegate);
+  private static native long createProtoBaseOptions(int delegate, int numThreads);
 }

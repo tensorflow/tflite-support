@@ -130,6 +130,17 @@ class TaskAPIFactory {
           tflite::support::TfLiteSupportStatus::kInvalidArgumentError);
     }
 
+    int num_threads = base_options->compute_settings()
+                          .tflite_settings()
+                          .cpu_settings()
+                          .num_threads();
+    if (num_threads == 0 || num_threads < -1) {
+      return CreateStatusWithPayload(
+          absl::StatusCode::kInvalidArgument,
+          "`num_threads` must be greater than 0 or equal to -1.",
+          tflite::support::TfLiteSupportStatus::kInvalidArgumentError);
+    }
+
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
     RETURN_IF_ERROR(engine->BuildModelFromExternalFileProto(
         &base_options->model_file(), base_options->compute_settings()));

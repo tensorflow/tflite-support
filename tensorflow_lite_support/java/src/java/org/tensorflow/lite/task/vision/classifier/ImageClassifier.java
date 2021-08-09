@@ -333,7 +333,11 @@ public final class ImageClassifier extends BaseVisionTaskApi {
        *
        * <p>numThreads should be greater than 0 or equal to -1. Setting numThreads to -1 has the
        * effect to let TFLite runtime set the value.
+       *
+       * @deprecated use {@link BaseOptions} to configure number of threads instead. This method
+       *     will override the number of threads configured from {@link BaseOptions}.
        */
+      @Deprecated
       public Builder setNumThreads(int numThreads) {
         this.numThreads = numThreads;
         return this;

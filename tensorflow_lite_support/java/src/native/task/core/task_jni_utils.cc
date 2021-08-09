@@ -30,7 +30,7 @@ using ::tflite::task::core::BaseOptions;
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_core_TaskJniUtils_createProtoBaseOptions(
-    JNIEnv* env, jclass thiz, jint delegate) {
+    JNIEnv* env, jclass thiz, jint delegate, jint num_threads) {
   StatusOr<Delegate> delegate_proto_or = ConvertToProtoDelegate(delegate);
   if (!delegate_proto_or.ok()) {
     ThrowException(env, kAssertionError,
@@ -42,9 +42,10 @@ Java_org_tensorflow_lite_task_core_TaskJniUtils_createProtoBaseOptions(
   // base_options will be owned by the task proto options, such as
   // ImageClassifierOptions.
   BaseOptions* base_options = new BaseOptions();
-  base_options->mutable_compute_settings()
-      ->mutable_tflite_settings()
-      ->set_delegate(delegate_proto_or.value());
+  auto tflite_settings =
+      base_options->mutable_compute_settings()->mutable_tflite_settings();
+  tflite_settings->set_delegate(delegate_proto_or.value());
+  tflite_settings->mutable_cpu_settings()->set_num_threads(num_threads);
   return reinterpret_cast<jlong>(base_options);
 }
 
