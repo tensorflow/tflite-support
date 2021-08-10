@@ -15,6 +15,7 @@ cc_library_with_tflite(
 jni_binary_with_tflite(
     name = "libtask_text_jni.so",
     srcs = [
+        "//tensorflow_lite_support/java/src/native/task/core:task_jni_utils.cc",
         "//tensorflow_lite_support/java/src/native/task/text/nlclassifier:nl_classifier_jni.cc",
         "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert:bert_nl_classifier_jni.cc",
         "//tensorflow_lite_support/java/src/native/task/text/qa:bert_question_answerer_jni.cc",
@@ -29,6 +30,7 @@ jni_binary_with_tflite(
         "//tensorflow_lite_support/java/src/native/task/core:builtin_op_resolver",
     ],
     deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
         "//tensorflow_lite_support/cc/task/text/proto:bert_nl_classifier_options_proto_inc",
         "//tensorflow_lite_support/java/jni",
         "@org_tensorflow//tensorflow/lite:op_resolver",

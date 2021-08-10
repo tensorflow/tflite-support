@@ -53,19 +53,22 @@ message NLClassifierOptions {
   // input tensor specified will be used for inference; other input tensors will
   // be ignored. Default to "INPUT".
   //
-  // See "Configure the input/output tensors for NLClassifier" for the details.
+  // See the "Configure the input/output tensors for NLClassifier" section above
+  // for more details.
   optional string input_tensor_name = 2 [default = "INPUT"];
 
   // Name of the output score tensor, if the model has multiple outputs. Default
   // to "OUTPUT_SCORE".
   //
-  // See "Configure the input/output tensors for NLClassifier" for the details.
+  // See the "Configure the input/output tensors for NLClassifier" section above
+  // for more details.
   optional string output_score_tensor_name = 3 [default = "OUTPUT_SCORE"];
 
   // Name of the output label tensor, if the model has multiple outputs. Default
   // to "OUTPUT_LABEL".
   //
-  // See "Configure the input/output tensors for NLClassifier" for the details.
+  // See the "Configure the input/output tensors for NLClassifier" section above
+  // for more details.
   //
   // By default, label file should be packed with
   // the output score tensor through Model Metadata. See the MetadataWriter for
@@ -82,15 +85,15 @@ message NLClassifierOptions {
   // multiple inputs. Only the input tensor specified will be used for
   // inference; other input tensors will be ignored. Default to 0.
   //
-  // See "Configure the input/output tensors for NLClassifier" section above for
-  // the details.
+  // See the "Configure the input/output tensors for NLClassifier" section above
+  // for more details.
   optional int32 input_tensor_index = 5 [default = 0];
 
   // Index of the output score tensor among all output tensors, if the model has
   // multiple outputs. Default to 0.
   //
-  // See "Configure the input/output tensors for NLClassifier" section above for
-  // the details.
+  // See the "Configure the input/output tensors for NLClassifier" section above
+  // for more details.
   optional int32 output_score_tensor_index = 6 [default = 0];
 
   // Index of the optional output label tensor among all output tensors, if the
@@ -99,8 +102,8 @@ message NLClassifierOptions {
   // See the comment above `output_label_tensor_name` for more information about
   // what the output label tensor is.
   //
-  // See "Configure the input/output tensors for NLClassifier" section above for
-  // the details.
+  // See the "Configure the input/output tensors for NLClassifier" section above
+  // for more details.
   //
   // `output_label_tensor_index` defaults to -1, meaning to disable searching
   // the output label tensor as it might be optional.

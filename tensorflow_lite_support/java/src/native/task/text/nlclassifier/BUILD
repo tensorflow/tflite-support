@@ -38,6 +38,7 @@ cc_library_with_tflite(
     name = "native_without_resolver",
     srcs = [
         "nl_classifier_jni.cc",
+        "//tensorflow_lite_support/java/src/native/task/core:task_jni_utils.cc",
     ],
     tflite_deps = [
         ":nl_classifier_jni_utils",
@@ -45,6 +46,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/utils:jni_utils",
     ],
     deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
         "//tensorflow_lite_support/java/jni",
         "@org_tensorflow//tensorflow/lite:op_resolver",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",

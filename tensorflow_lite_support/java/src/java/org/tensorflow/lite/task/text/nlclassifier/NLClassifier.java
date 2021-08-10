@@ -17,6 +17,7 @@ package org.tensorflow.lite.task.text.nlclassifier;
 
 import android.content.Context;
 import android.os.ParcelFileDescriptor;
+import androidx.annotation.Nullable;
 import com.google.auto.value.AutoValue;
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.nio.MappedByteBuffer;
 import java.util.List;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.label.Category;
+import org.tensorflow.lite.task.core.BaseOptions;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
@@ -97,6 +99,9 @@ public class NLClassifier extends BaseTaskApi {
     @UsedByReflection("nl_classifier_jni.cc")
     abstract String getOutputLabelTensorName();
 
+    @Nullable
+    abstract BaseOptions getBaseOptions();
+
     public static Builder builder() {
       return new AutoValue_NLClassifier_NLClassifierOptions.Builder()
           .setInputTensorIndex(DEFAULT_INPUT_TENSOR_INDEX)
@@ -110,17 +115,92 @@ public class NLClassifier extends BaseTaskApi {
     /** Builder for {@link NLClassifierOptions}. */
     @AutoValue.Builder
     public abstract static class Builder {
-      public abstract Builder setInputTensorIndex(int value);
+      /** Sets the general options to configure Task APIs, such as accelerators. */
+      public abstract Builder setBaseOptions(@Nullable BaseOptions baseOptions);
 
-      public abstract Builder setOutputScoreTensorIndex(int value);
+      /**
+       * Configure the input/output tensors for NLClassifier:
+       *
+       * <p>- No special configuration is needed if the model has only one input tensor and one
+       * output tensor.
+       *
+       * <p>- When the model has multiple input or output tensors, use the following configurations
+       * to specifiy the desired tensors: <br>
+       * -- tensor names: {@code inputTensorName}, {@code outputScoreTensorName}, {@code
+       * outputLabelTensorName}<br>
+       * -- tensor indices: {@code inputTensorIndex}, {@code outputScoreTensorIndex}, {@code
+       * outputLabelTensorIndex} <br>
+       * Tensor names has higher priorities than tensor indices in locating the tensors. It means
+       * the tensors will be first located according to tensor names. If not found, then the tensors
+       * will be located according to tensor indices.
+       *
+       * <p>- Failing to match the input text tensor or output score tensor with neither tensor
+       * names nor tensor indices will trigger a runtime error. However, failing to locate the
+       * output label tensor will not trigger an error because the label tensor is optional.
+       */
 
-      public abstract Builder setOutputLabelTensorIndex(int value);
+      /**
+       * Set the name of the input text tensor, if the model has multiple inputs. Only the input
+       * tensor specified will be used for inference; other input tensors will be ignored. Dafualt
+       * to {@code "INPUT"}.
+       *
+       * <p>See the section, Configure the input/output tensors for NLClassifier, for more details.
+       */
+      public abstract Builder setInputTensorName(String inputTensorName);
 
-      public abstract Builder setInputTensorName(String value);
+      /**
+       * Set the name of the output score tensor, if the model has multiple outputs. Dafualt to
+       * {@code "OUTPUT_SCORE"}.
+       *
+       * <p>See the section, Configure the input/output tensors for NLClassifier, for more details.
+       */
+      public abstract Builder setOutputScoreTensorName(String outputScoreTensorName);
 
-      public abstract Builder setOutputScoreTensorName(String value);
+      /**
+       * Set the name of the output label tensor, if the model has multiple outputs. Dafualt to
+       * {@code "OUTPUT_LABEL"}.
+       *
+       * <p>See the section, Configure the input/output tensors for NLClassifier, for more details.
+       *
+       * <p>By default, label file should be packed with the output score tensor through Model
+       * Metadata. See the <a
+       * href="https://www.tensorflow.org/lite/convert/metadata_writer_tutorial#natural_language_classifiers">MetadataWriter
+       * for NLClassifier</a>. NLClassifier reads and parses labels from the label file
+       * automatically. However, some models may output a specific label tensor instead. In this
+       * case, NLClassifier reads labels from the output label tensor.
+       */
+      public abstract Builder setOutputLabelTensorName(String outputLabelTensorName);
 
-      public abstract Builder setOutputLabelTensorName(String value);
+      /**
+       * Set the index of the input text tensor among all input tensors, if the model has multiple
+       * inputs. Only the input tensor specified will be used for inference; other input tensors
+       * will be ignored. Dafualt to 0.
+       *
+       * <p>See the section, Configure the input/output tensors for NLClassifier, for more details.
+       */
+      public abstract Builder setInputTensorIndex(int inputTensorIndex);
+
+      /**
+       * Set the index of the output score tensor among all output tensors, if the model has
+       * multiple outputs. Dafualt to 0.
+       *
+       * <p>See the section, Configure the input/output tensors for NLClassifier, for more details.
+       */
+      public abstract Builder setOutputScoreTensorIndex(int outputScoreTensorIndex);
+
+      /**
+       * Set the index of the optional output label tensor among all output tensors, if the model
+       * has multiple outputs.
+       *
+       * <p>See the document above {@code outputLabelTensorName} for more information about what the
+       * output label tensor is.
+       *
+       * <p>See the section, Configure the input/output tensors for NLClassifier, for more details.
+       *
+       * <p>{@code outputLabelTensorIndex} dafualts to -1, meaning to disable the output label
+       * tensor.
+       */
+      public abstract Builder setOutputLabelTensorIndex(int outputLabelTensorIndex);
 
       public abstract NLClassifierOptions build();
     }
@@ -192,7 +272,11 @@ public class NLClassifier extends BaseTaskApi {
               new EmptyHandleProvider() {
                 @Override
                 public long createHandle() {
-                  return initJniWithFileDescriptor(options, descriptor.getFd());
+                  long baseOptionsHandle =
+                      options.getBaseOptions() == null
+                          ? 0 // pass an invalid native handle
+                          : TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions());
+                  return initJniWithFileDescriptor(options, descriptor.getFd(), baseOptionsHandle);
                 }
               },
               NL_CLASSIFIER_NATIVE_LIBNAME));
@@ -215,12 +299,17 @@ public class NLClassifier extends BaseTaskApi {
       throw new IllegalArgumentException(
           "The model buffer should be either a direct ByteBuffer or a MappedByteBuffer.");
     }
+
     return new NLClassifier(
         TaskJniUtils.createHandleFromLibrary(
             new EmptyHandleProvider() {
               @Override
               public long createHandle() {
-                return initJniWithByteBuffer(options, modelBuffer);
+                long baseOptionsHandle =
+                    options.getBaseOptions() == null
+                        ? 0 // pass an invalid native handle
+                        : TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions());
+                return initJniWithByteBuffer(options, modelBuffer, baseOptionsHandle);
               }
             },
             NL_CLASSIFIER_NATIVE_LIBNAME));
@@ -237,9 +326,10 @@ public class NLClassifier extends BaseTaskApi {
   }
 
   private static native long initJniWithByteBuffer(
-      NLClassifierOptions options, ByteBuffer modelBuffer);
+      NLClassifierOptions options, ByteBuffer modelBuffer, long baseOptionsHandle);
 
-  private static native long initJniWithFileDescriptor(NLClassifierOptions options, int fd);
+  private static native long initJniWithFileDescriptor(
+      NLClassifierOptions options, int fd, long baseOptionsHandle);
 
   private static native List<Category> classifyNative(long nativeHandle, String text);
 
