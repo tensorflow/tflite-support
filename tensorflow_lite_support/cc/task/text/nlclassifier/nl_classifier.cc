@@ -315,8 +315,13 @@ absl::Status NLClassifier::Initialize(
     std::unique_ptr<tflite::task::text::NLClassifierOptions> options) {
   proto_options_ = std::move(options);
 
-  // To be removed once the struct NLClassifierOptions is deprecated.
-  RETURN_IF_ERROR(Initialize());
+  RETURN_IF_ERROR(Initialize(NLClassifierOptions{
+      .input_tensor_index = proto_options_->input_tensor_index(),
+      .output_score_tensor_index = proto_options_->output_score_tensor_index(),
+      .output_label_tensor_index = proto_options_->output_label_tensor_index(),
+      .input_tensor_name = proto_options_->input_tensor_name(),
+      .output_score_tensor_name = proto_options_->output_score_tensor_name(),
+      .output_label_tensor_name = proto_options_->output_label_tensor_name()}));
   return absl::OkStatus();
 }
 
@@ -434,7 +439,6 @@ StatusOr<std::unique_ptr<NLClassifier>> NLClassifier::CreateFromOptions(
   ASSIGN_OR_RETURN(auto nl_classifier,
                    TaskAPIFactory::CreateFromBaseOptions<NLClassifier>(
                        &options_copy->base_options(), std::move(resolver)));
-
   RETURN_IF_ERROR(nl_classifier->Initialize(std::move(options_copy)));
 
   return nl_classifier;
