@@ -115,6 +115,7 @@ cc_binary(
     srcs = ["image_classifier_demo.c"],
     deps = [
         "//tensorflow_lite_support/cc/task/vision:image_classifier_c_api",
+        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils_c",
         "@stblib//:stb_image",
        
     ] + select({

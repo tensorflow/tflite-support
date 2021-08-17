@@ -23,22 +23,17 @@ limitations under the License.
 #include <stdio.h>
 #include <stdint.h>
 
-// Thhis need to be defined for stb_image.h to include
-// the actual implementations of image decoding/encoding functions.
-#define STB_IMAGE_IMPLEMENTATION
-
 #include "tensorflow_lite_support/cc/task/vision/image_classifier_c_api.h"
-#include "stb_image.h"
-#include "stb_image_write.h"
+#include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils_c.h""
 
 
 struct ImageClassifierOptions* BuildImageClassifierOptions(const char* model_path) {
 
   ImageClassifierOptions *options = ImageClassifierOptionsCreate();
-  ImageClassifierOptionsAddClassNameBlackList(options, "/m/01bwbt");
-  ImageClassifierOptionsAddClassNameBlackList(options, "/m/0bwm6m");
+  // ImageClassifierOptionsAddClassNameBlackList(options, "/m/01bwbt");
+  // ImageClassifierOptionsAddClassNameBlackList(options, "/m/0bwm6m");
   ImageClassifierOptionsSetScoreThreshold(options, 0);
-  ImageClassifierOptionsSetMaxResults(options, 5);
+  ImageClassifierOptionsSetMaxResults(options, 3);
   ImageClassifierOptionsSetModelFilePath(options, model_path);
 
   return options;
@@ -70,36 +65,27 @@ void Classify(const char* model_path, const char* image_path) {
     printf("An error occured while instantiating the Image Classifier\n");
     return;
   }
-
-  int image_width;
-  int image_height;
-  int channels;
-
-  uint8_t *pixel_data = stbi_load(image_path, &image_width,
-                                    &image_height, &channels,
-                                    /*desired_channels=*/0);
   
-  printf("%p\n",pixel_data);
-  struct FrameBuffer frame_buffer = {.dimension.width = image_width, 
-                                    .dimension.height = image_height, 
-                                    .plane.buffer = pixel_data, 
-                                    .plane.stride.row_stride_bytes = image_width  * channels, 
-                                    .plane.stride.pixel_stride_bytes = channels, 
-                                    .format = kRGB};
-
-
+  struct ImageData image_data = DecodeImageFromFile(image_path);
+  
+  struct FrameBuffer frame_buffer = {.dimension.width = image_data.width, 
+                                     .dimension.height = image_data.height, 
+                                     .plane.buffer = image_data.pixel_data, 
+                                     .plane.stride.row_stride_bytes = image_data.width  * image_data.channels, 
+                                     .plane.stride.pixel_stride_bytes = image_data.channels, 
+                                     .format = kRGB};
+  
   struct ClassificationResult *classification_result = ImageClassifierClassify(image_classifier, &frame_buffer);
-  
+  ImageClassifierDelete(image_classifier);
+
   if (classification_result == NULL) {
     printf("An error occured while classifying the image\n");
     return;
   }
-  
   DisplayClassificationResults(classification_result);
   
-  ImageClassifierDelete(image_classifier);
   ImageClassifierClassificationResultDelete(classification_result);
-
+  ImageDataFree(&image_data);
 }
 
 int main(int argc, char** argv) {
