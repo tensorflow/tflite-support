@@ -20,7 +20,7 @@ jni_binary_with_tflite(
         "//tensorflow_lite_support/java/src/native/task/text/nlclassifier/bert:bert_nl_classifier_jni.cc",
         "//tensorflow_lite_support/java/src/native/task/text/qa:bert_question_answerer_jni.cc",
     ],
-    linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
+    linkscript = "task_text_version_script.lds",
     tflite_deps = [
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
         "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier",
