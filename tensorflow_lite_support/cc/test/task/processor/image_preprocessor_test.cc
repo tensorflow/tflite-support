@@ -59,16 +59,29 @@ StatusOr<ImageData> LoadImage(std::string image_name) {
                                       kTestDataDirectory, image_name));
 }
 
-class DynamicInputTest : public tflite_shims::testing::Test {};
+class DynamicInputTest : public tflite_shims::testing::Test {
+    public:
+        void SetUp()
+        {
+            preprocessor = std::make_unique<ImagePreprocessor>();
+            interpreter = preprocessor
+            
+
+        }
+
+    private:
+        std::unique_ptr<ImagePreprocessor> preprocessor;
+};
 
 TEST_F(DynamicInputTest, HeightandWidthMutable)
-{
-    
+{  
+    // See if input tensor dims signature for height and width is -1 
+    // because it is so in the model.
 }
 
 TEST_F(DynamicInputTest, ErrorOnBatchOrDepthChange)
 {
-
+    // See if 
 }
 
 }  // namespace
