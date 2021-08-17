@@ -74,6 +74,25 @@ cc_test(
 )
 
 cc_test_with_tflite(
+    name = "image_classifier_c_api_test",
+    srcs = ["image_classifier_c_api_test.cc"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
+    ],
+    tflite_deps = [
+        "//tensorflow_lite_support/cc/task/vision:image_classifier_c_api",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:gtest_main",
+        "//tensorflow_lite_support/cc/test:test_utils",
+        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils_c",
+       
+    ],
+)
+
+cc_test_with_tflite(
     name = "object_detector_test",
     srcs = ["object_detector_test.cc"],
     data = [
