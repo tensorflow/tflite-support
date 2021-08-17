@@ -85,7 +85,8 @@ enum AssociatedFileType : byte {
   // annotate certain axis of the tensor. For example,
   // the label file in image classification. Those labels annotate the
   // the output tensor, such that each value in the output tensor is the
-  // probability of that corresponding category specified by the label.
+  // probability of that corresponding category specified by the label. See the
+  // example label file used in image classification [1].
   //
   // <Codegen usage>:
   // If an output tensor has an associated file as TENSOR_AXIS_LABELS, return
@@ -94,13 +95,16 @@ enum AssociatedFileType : byte {
   // If multiple files of the same type are present, the first one is used by
   // default; additional ones are to be distinguished from one another by their
   // specified locale.
+  //
+  // [1]: https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/metadata/python/tests/testdata/image_classifier/labels.txt
   TENSOR_AXIS_LABELS = 2,
 
   // Contains a list of labels (characters separated by "\n" or in lines) that
   // tensor values correspond to. For example, in
   // the object detection model, one of the output tensors is the detected
   // classes. And each value in the tensor refers to the index of label in the
-  // category label file.
+  // category label file. See the example label file used in object detection
+  // [1].
   //
   // <Codegen usage>:
   // If an output tensor has an associated file as TENSOR_VALUE_LABELS, convert
@@ -108,6 +112,8 @@ enum AssociatedFileType : byte {
   // If multiple files of the same type are present, the first one is used by
   // default; additional ones are to be distinguished from one another by their
   // specified locale.
+  //
+  // [1]: https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/metadata/python/tests/testdata/object_detector/labelmap.txt
   TENSOR_VALUE_LABELS = 3,
 
   // Contains sigmoid-based score calibration parameters, formatted as CSV.
@@ -118,13 +124,20 @@ enum AssociatedFileType : byte {
   // default_score.
   // In summary, each line should thus contain 0, 3 or 4 comma-separated values.
   //
+  // See the example score calibration file used in image classification [2].
+  //
   // See documentation for ScoreCalibrationOptions for details.
   //
   // [1]: https://en.cppreference.com/w/c/string/byte/strtof
+  // [2]: https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/metadata/python/tests/testdata/image_classifier/score_calibration.txt
   TENSOR_AXIS_SCORE_CALIBRATION = 4,
 
   // Contains a list of unique words (characters separated by "\n" or in lines)
   // that help to convert natural language words to embedding vectors.
+  //
+  // See the example vocab file used in text classification [1].
+  //
+  // [1]: https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/metadata/python/tests/testdata/nl_classifier/vocab.txt
   // Added in: 1.0.1
   VOCABULARY = 5,
 }
@@ -427,6 +440,9 @@ enum ScoreTransformationType : byte {
 // An AssociatedFile with type TANSOR_AXIS_SCORE_CALIBRATION specifying the
 // index-specific parameters must be associated with the corresponding
 // TensorMetadata for score calibration be applied.
+//
+// See the example score calibration file used in image classification [1].
+// [1]: https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/metadata/python/tests/testdata/image_classifier/score_calibration.txt
 table ScoreCalibrationOptions {
   // The function to use for transforming the uncalibrated score before
   // applying score calibration.
