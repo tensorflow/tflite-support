@@ -38,4 +38,10 @@ android_library_with_tflite(
 aar_with_jni(
     name = "task-library-text",
     android_library = ":task_library_text",
+    headers = [
+        "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier_c_api.h",
+        "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier_c_api.h",
+        "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier_c_api_common.h",
+        "//tensorflow_lite_support/cc/task/text/qa:bert_qa_c_api.h",
+    ],
 )
