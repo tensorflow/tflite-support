@@ -20,3 +20,14 @@ cc_library(
         "@stblib//:stb_image_write",
     ],
 )
+
+cc_library(
+    name = "image_utils_c",
+    srcs = ["image_utils_c.c"],
+    hdrs = ["image_utils_c.h"],
+    deps = [
+        "@stblib//:stb_image",
+        "@stblib//:stb_image_write",
+    ],
+)
+
