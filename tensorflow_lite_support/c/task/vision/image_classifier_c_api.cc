@@ -46,41 +46,43 @@ struct ImageClassifierOptions {
 };
 
 ImageClassifierOptions* ImageClassifierOptionsCreate() {
-  return new ImageClassifierOptions{.impl = std::unique_ptr<ImageClassifierOptionsCPP> (new ImageClassifierOptionsCPP)};
+  return new ImageClassifierOptions{.impl = 
+                                    std::unique_ptr<ImageClassifierOptionsCPP> 
+                                    (new ImageClassifierOptionsCPP)};
 }
 
-void ImageClassifierOptionsSetModelFilePath(
-    ImageClassifierOptions* options,
-    const char* model_path){
-  options->impl->mutable_base_options()->mutable_model_file()->set_file_name(model_path);
+void ImageClassifierOptionsSetModelFilePath(ImageClassifierOptions* options,
+    const char* model_path) {
+  options->impl->mutable_base_options()->mutable_model_file()
+      ->set_file_name(model_path);
 }
 void ImageClassifierOptionsSetDisplayNamesLocal(
     ImageClassifierOptions* options, char *display_names_locale) {
   options->impl->set_display_names_locale(display_names_locale);
 }
 
-void ImageClassifierOptionsSetMaxResults(
-  ImageClassifierOptions* options, int max_results){
+void ImageClassifierOptionsSetMaxResults(ImageClassifierOptions* options, 
+    int max_results) {
   options->impl->set_max_results(max_results);
 }
 
-void ImageClassifierOptionsSetScoreThreshold(
-    ImageClassifierOptions* options, float score_threshold){
+void ImageClassifierOptionsSetScoreThreshold(ImageClassifierOptions* options, 
+    float score_threshold) {
   options->impl->set_score_threshold(score_threshold);
 }
 
-void ImageClassifierOptionsSetNumThreads(
-    ImageClassifierOptions* options, int num_threads){
+void ImageClassifierOptionsSetNumThreads(ImageClassifierOptions* options, 
+    int num_threads) {
   options->impl->set_num_threads(num_threads);
 }
 
 void ImageClassifierOptionsAddClassNameWhiteList(
-    ImageClassifierOptions* options, char* class_name){
+    ImageClassifierOptions* options, char* class_name) {
   options->impl->add_class_name_whitelist(class_name);
 }
 
 void ImageClassifierOptionsAddClassNameBlackList(
-    ImageClassifierOptions* options, char* class_name){
+  ImageClassifierOptions* options, char* class_name) {
   options->impl->add_class_name_blacklist(class_name);
 }
 
@@ -89,7 +91,8 @@ void ImageClassifierOptionsDelete(
 
 
 ImageClassifierOptions* ImageClassifierOptionsDefault() {
-  ImageClassifierOptions* image_classifier_options = ImageClassifierOptionsCreate();
+  ImageClassifierOptions* image_classifier_options = 
+      ImageClassifierOptionsCreate();
   ImageClassifierOptionsSetMaxResults(image_classifier_options, 5);
   ImageClassifierOptionsSetScoreThreshold(image_classifier_options, 0);
   
@@ -97,16 +100,17 @@ ImageClassifierOptions* ImageClassifierOptionsDefault() {
 }
 
 
-ImageClassifier* ImageClassifierFromOptions(const ImageClassifierOptions* options) {
-  auto classifier_status = ImageClassifierCPP::CreateFromOptions(*(options->impl));
+ImageClassifier* ImageClassifierFromOptions(
+    const ImageClassifierOptions* options) {
+  auto classifier_status = 
+      ImageClassifierCPP::CreateFromOptions(*(options->impl));
 
   if (classifier_status.ok()) {
     return new ImageClassifier{.impl = std::unique_ptr<ImageClassifierCPP>(
                                     dynamic_cast<ImageClassifierCPP*>(
                                         classifier_status.value().release()))};
   } else {
-    return nullptr;
-    
+    return nullptr; 
   }
 }
 
@@ -118,10 +122,12 @@ ImageClassifier* ImageClassifierFromFile(const char* model_path) {
 
 ClassificationResult* GetClassificationResultCStruct(
     const ClassificationResultCPP classification_result_cpp) {
-  auto* c_classifications = new Classifications[classification_result_cpp.classifications_size()];
+  auto* c_classifications = 
+      new Classifications[classification_result_cpp.classifications_size()];
 
-  for (int head = 0; head < classification_result_cpp.classifications_size(); ++head) {
-    const ClassificationsCPP& classifications = classification_result_cpp.classifications(head);
+  for(int head = 0; head < classification_result_cpp.classifications_size(); ++head) {
+    const ClassificationsCPP& classifications = 
+        classification_result_cpp.classifications(head);
     c_classifications[head].head_index = head;
     
     auto* c_classes = new Class[classifications.classes_size()];
@@ -133,17 +139,20 @@ ClassificationResult* GetClassificationResultCStruct(
       c_classes[rank].score = classification.score();
       
       if (classification.has_class_name())
-        c_classes[rank].class_name = strdup(classification.class_name().c_str());
+        c_classes[rank].class_name = 
+            strdup(classification.class_name().c_str());
       
       if (classification.has_display_name())
-        c_classes[rank].display_name = strdup(classification.display_name().c_str());
+        c_classes[rank].display_name = 
+            strdup(classification.display_name().c_str());
     }
     c_classifications[head].classes = c_classes;
   }
   
   ClassificationResult *c_classification_result = new ClassificationResult;
   c_classification_result->classifications = c_classifications;
-  c_classification_result->size = classification_result_cpp.classifications_size();
+  c_classification_result->size = 
+      classification_result_cpp.classifications_size();
   
   return c_classification_result;
 }
@@ -156,13 +165,15 @@ struct ClassificationResult* ImageClassifierClassify(
   if (cpp_frame_buffer == nullptr)
     return nullptr;
     
-  StatusOr<ClassificationResultCPP> classification_result_cpp = classifier->impl->Classify(*cpp_frame_buffer);
+  StatusOr<ClassificationResultCPP> classification_result_cpp = 
+      classifier->impl->Classify(*cpp_frame_buffer);
   
   if (!classification_result_cpp.ok())
     return nullptr;
 
-  ClassificationResult *c_classification_result = GetClassificationResultCStruct(
-                                                      ClassificationResultCPP(classification_result_cpp.value()));
+  ClassificationResult *c_classification_result = 
+      GetClassificationResultCStruct(
+          ClassificationResultCPP(classification_result_cpp.value()));
 
   return c_classification_result;
 }
@@ -177,14 +188,17 @@ struct ClassificationResult* ImageClassifierClassifyWithBoundingBox(
     cc_roi.set_width(roi->width);
     cc_roi.set_height(roi->height);
   
-    std::unique_ptr<FrameBufferCPP> cpp_frame_buffer = CreateCPPFrameBuffer(frame_buffer);
-    StatusOr<ClassificationResultCPP> classification_result_cpp = classifier->impl->Classify(*cpp_frame_buffer, cc_roi);
+    std::unique_ptr<FrameBufferCPP> cpp_frame_buffer = 
+        CreateCPPFrameBuffer(frame_buffer);
+    StatusOr<ClassificationResultCPP> classification_result_cpp = 
+        classifier->impl->Classify(*cpp_frame_buffer, cc_roi);
     
     if (!classification_result_cpp.ok())
       return nullptr;
 
-    ClassificationResult *c_classification_result = GetClassificationResultCStruct(
-                                                        ClassificationResultCPP(classification_result_cpp.value()));
+    ClassificationResult *c_classification_result = 
+        GetClassificationResultCStruct(
+            ClassificationResultCPP(classification_result_cpp.value()));
 
     return c_classification_result;
 }

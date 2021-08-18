@@ -25,10 +25,18 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
+// Holds the region of interest used for image classification.
 struct BoundingBox {
+  // The X coordinate of the top-left corner, in pixels.
   int32_t origin_x;
+
+  // The Y coordinate of the top-left corner, in pixels.
   int32_t origin_y;
+
+  // The width of the bounding box, in pixels.
   int32_t width;
+
+  // The height of the bounding box, in pixels.
   int32_t height;
 };
 
