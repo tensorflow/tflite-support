@@ -59,13 +59,6 @@ void DisplayClassificationResults(struct ClassificationResult *classification_re
 }
 
 void Classify(const char* model_path, const char* image_path) {
-  struct ImageClassifierOptions *options = BuildImageClassifierOptions(model_path);
-  ImageClassifier *image_classifier = ImageClassifierFromOptions(options);
-  if (image_classifier == NULL) {
-    printf("An error occured while instantiating the Image Classifier\n");
-    return;
-  }
-  
   struct ImageData image_data = DecodeImageFromFile(image_path);
   
   struct FrameBuffer frame_buffer = {.dimension.width = image_data.width, 
@@ -74,7 +67,26 @@ void Classify(const char* model_path, const char* image_path) {
                                      .plane.stride.row_stride_bytes = image_data.width  * image_data.channels, 
                                      .plane.stride.pixel_stride_bytes = image_data.channels, 
                                      .format = kRGB};
+
   
+  switch (image_data.channels) {
+    case 3:
+    case 4:
+      break;
+    default:
+      ImageDataFree(&image_data);
+      printf("RGB Image with 3 or 4 channels expected\n");
+      return;
+  }
+
+  struct ImageClassifierOptions *options = BuildImageClassifierOptions(model_path);
+  ImageClassifier *image_classifier = ImageClassifierFromOptions(options);
+  if (image_classifier == NULL) {
+    ImageDataFree(&image_data);
+    printf("An error occured while instantiating the Image Classifier\n");
+    return;
+  }
+
   struct ClassificationResult *classification_result = ImageClassifierClassify(image_classifier, &frame_buffer);
   ImageClassifierDelete(image_classifier);
 
