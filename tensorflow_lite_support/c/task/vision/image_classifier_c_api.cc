@@ -73,7 +73,9 @@ void ImageClassifierOptionsSetScoreThreshold(ImageClassifierOptions* options,
 
 void ImageClassifierOptionsSetNumThreads(ImageClassifierOptions* options, 
     int num_threads) {
-  options->impl->set_num_threads(num_threads);
+  options->impl->mutable_base_options()->mutable_compute_settings()
+      ->mutable_tflite_settings()->mutable_cpu_settings()
+      ->set_num_threads(num_threads);
 }
 
 void ImageClassifierOptionsAddClassNameWhiteList(
