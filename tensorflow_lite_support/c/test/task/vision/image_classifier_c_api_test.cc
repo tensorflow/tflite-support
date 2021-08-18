@@ -46,8 +46,6 @@ ImageData LoadImage(const char* image_name) {
 }
 
 TEST(ImageClassifierFromFileTest, FailsWithMissingModelPath) {
-//   ImageClassifierOptions *options = ImageClassifierOptionsCreate();
-
   ImageClassifier *image_classifier = ImageClassifierFromFile("");
   ASSERT_EQ(image_classifier, nullptr);
 }
@@ -91,7 +89,7 @@ class ImageClassifierClassifyTest : public ::testing::Test {
   ImageClassifier *image_classifier;
 };
   
-TEST_F(ImageClassifierClassifyTest, SucceedsWithModelPath) {  
+TEST_F(ImageClassifierClassifyTest, SucceedsWithImageData) {  
   struct ImageData image_data = LoadImage("burger-224.png");
 
   struct FrameBuffer frame_buffer = {.dimension.width = image_data.width, 
