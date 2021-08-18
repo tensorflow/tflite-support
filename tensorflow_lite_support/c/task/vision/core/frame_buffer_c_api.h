@@ -18,14 +18,20 @@ limitations under the License.
 #include <stdint.h>
 
 // --------------------------------------------------------------------------
-/// C Struct for FrameBuffer.
+/// C Struct for Holding the FrameBuffer.
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
+// Colorspace formats.
 enum Format { kRGBA, kRGB, kNV12, kNV21, kYV12, kYV21, kGRAY, kUNKNOWN};
+
+// FrameBuffer content orientation follows EXIF specification. The name of
+// each enum value defines the position of the 0th row and the 0th column of
+// the image content. See http://jpegclub.org/exif_orientation.html for
+// details.
 enum Orientation {
   kTopLeft = 1,
   kTopRight = 2,
@@ -37,6 +43,7 @@ enum Orientation {
   kLeftBottom = 8
 };
 
+// Dimension information for the whole frame.
 struct Dimension {
   // The width dimension in pixel unit.
   int width;
@@ -44,9 +51,11 @@ struct Dimension {
   int height;
 };
 
+// Plane encapsulates the backing buffer and stride information.
 struct Plane {
   uint8_t* buffer;
   
+  // Stride information.
   struct Stride {
     // The row stride in bytes. This is the distance between the start pixels of
     // two consecutive rows in the image.
@@ -58,10 +67,18 @@ struct Plane {
   } stride;
 };
 
+// A `FrameBuffer` provides a view into the provided backing buffer (e.g. camera
+// frame or still image) with buffer format information. FrameBuffer doesn't
+// take ownership of the provided backing buffer. The caller is responsible to
+// manage the backing buffer lifecycle for the lifetime of the FrameBuffer.
 struct FrameBuffer {
+  // Colorspace format of the frame buffer.
   enum Format format;
+  // Orientation of the frame buffer.
   enum Orientation orientation;
+  // Dimension information for the whole frame.
   struct Dimension dimension;
+  // Holds the stride and backing buffer for the frame buffer.
   struct Plane plane;
 };
 
