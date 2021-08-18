@@ -21,9 +21,10 @@ limitations under the License.
 
 // Utils for Conversions between C and C++ FrameBuffer
 // -----------------------------------------------------------------
-// Meant to bee used with vision C apis.
+// Meant to be used with vision C apis.
 
 // Creates the C++ FrameBuffer from the C FrameBuffer
-extern std::unique_ptr<::tflite::task::vision::FrameBuffer> CreateCPPFrameBuffer(const struct FrameBuffer  *frame_buffer);
+std::unique_ptr<::tflite::task::vision::FrameBuffer> 
+    CreateCPPFrameBuffer(const struct FrameBuffer  *frame_buffer);
 
 #endif //TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_FRAME_BUFFER_CPP_C_UTILS_H_

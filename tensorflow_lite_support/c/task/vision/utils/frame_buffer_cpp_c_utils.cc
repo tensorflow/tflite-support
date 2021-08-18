@@ -18,13 +18,16 @@ limitations under the License.
 
 using FrameBufferCPP = ::tflite::task::vision::FrameBuffer;
 
-std::unique_ptr<FrameBufferCPP> CreateCPPFrameBuffer(const struct FrameBuffer *frame_buffer) {
-  FrameBufferCPP::Format frame_buffer_format = FrameBufferCPP::Format((*frame_buffer).format);
+std::unique_ptr<FrameBufferCPP> CreateCPPFrameBuffer(
+    const struct FrameBuffer *frame_buffer) {
+  FrameBufferCPP::Format frame_buffer_format = 
+    FrameBufferCPP::Format((*frame_buffer).format);
 
-  auto cpp_frame_buffer = tflite::task::vision::CreateFromRawBuffer(frame_buffer->plane.buffer, 
-                                                               {frame_buffer->dimension.width, 
-                                                               frame_buffer->dimension.height}, 
-                                                               frame_buffer_format);
+  auto cpp_frame_buffer = 
+    tflite::task::vision::CreateFromRawBuffer(frame_buffer->plane.buffer, 
+                                              {frame_buffer->dimension.width, 
+                                              frame_buffer->dimension.height}, 
+                                              frame_buffer_format);
   
   if (!cpp_frame_buffer.ok()) {
        return nullptr;
