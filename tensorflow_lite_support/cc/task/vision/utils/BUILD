@@ -112,18 +112,3 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/c:common",
     ],
 )
-
-cc_library(
-    name = "frame_buffer_cpp_c_utils",
-    srcs = [
-        "frame_buffer_cpp_c_utils.cc",
-    ],
-    hdrs = [
-       "frame_buffer_cpp_c_utils.h",
-    ],
-    deps = [
-        "//tensorflow_lite_support/cc/task/vision/core:frame_buffer_c_api",
-        ":frame_buffer_common_utils",
-        
-    ],
-)

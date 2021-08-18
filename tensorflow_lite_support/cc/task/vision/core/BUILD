@@ -53,13 +53,6 @@ cc_library(
 )
 
 cc_library(
-    name = "frame_buffer_c_api",
-    hdrs = [
-        "frame_buffer_c_api.h",
-    ],
-)
-
-cc_library(
     name = "label_map_item",
     srcs = ["label_map_item.cc"],
     hdrs = ["label_map_item.h"],
