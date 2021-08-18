@@ -98,7 +98,7 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithModelPath) {
   struct ImageData image_data = LoadImage("burger-224.png");
 
   struct FrameBuffer frame_buffer = {.dimension.width = image_data.width, 
-                                     .dimension.height = image_data.width, 
+                                     .dimension.height = image_data.height, 
                                      .plane.buffer = image_data.pixel_data, 
                                      .plane.stride.row_stride_bytes = image_data.width  * image_data.channels, 
                                      .plane.stride.pixel_stride_bytes = image_data.channels, 
