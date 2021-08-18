@@ -45,7 +45,7 @@ struct Dimension {
 };
 
 struct Plane {
-  const uint8_t* buffer;
+  uint8_t* buffer;
   
   struct Stride {
     // The row stride in bytes. This is the distance between the start pixels of

@@ -100,8 +100,7 @@ ImageClassifierOptions* ImageClassifierOptionsDefault() {
 }
 
 
-ImageClassifier* ImageClassifierFromOptions(
-    const ImageClassifierOptions* options) {
+ImageClassifier* ImageClassifierFromOptions(const ImageClassifierOptions* options) {
   auto classifier_status = ImageClassifierCPP::CreateFromOptions(*(options->impl));
 
   if (classifier_status.ok()) {
@@ -156,6 +155,10 @@ struct ClassificationResult* ImageClassifierClassify(
     const ImageClassifier* classifier,
     const struct FrameBuffer* frame_buffer) {
   std::unique_ptr<FrameBufferCPP> cpp_frame_buffer = CreateCPPFrameBuffer(frame_buffer);
+
+  if (cpp_frame_buffer == nullptr)
+    return nullptr;
+    
   StatusOr<ClassificationResultCPP> classification_result_cpp = classifier->impl->Classify(*cpp_frame_buffer);
   
   if (!classification_result_cpp.ok())

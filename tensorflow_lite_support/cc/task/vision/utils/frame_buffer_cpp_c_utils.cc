@@ -19,21 +19,19 @@ limitations under the License.
 using FrameBufferCPP = ::tflite::task::vision::FrameBuffer;
 
 std::unique_ptr<FrameBufferCPP> CreateCPPFrameBuffer(const struct FrameBuffer *frame_buffer) {
+  FrameBufferCPP::Format frame_buffer_format = FrameBufferCPP::Format((*frame_buffer).format);
 
-  std::unique_ptr<FrameBufferCPP> cpp_frame_buffer;
-
-  if (frame_buffer->format == kRGB) {
-    cpp_frame_buffer =
-    tflite::task::vision::CreateFromRgbRawBuffer(frame_buffer->plane.buffer, {frame_buffer->dimension.width, frame_buffer->dimension.height});
-  } else if (frame_buffer->format == kRGBA) {
-    cpp_frame_buffer =
-    tflite::task::vision::CreateFromRgbaRawBuffer(frame_buffer->plane.buffer, {frame_buffer->dimension.width, frame_buffer->dimension.height});
-  } else if (frame_buffer->format == kGRAY) {
-    cpp_frame_buffer =
-    tflite::task::vision::CreateFromGrayRawBuffer(frame_buffer->plane.buffer, {frame_buffer->dimension.width, frame_buffer->dimension.height});
-  }else {
-    return nullptr;
+  auto cpp_frame_buffer = tflite::task::vision::CreateFromRawBuffer(frame_buffer->plane.buffer, 
+                                                               {frame_buffer->dimension.width, 
+                                                               frame_buffer->dimension.height}, 
+                                                               frame_buffer_format);
+  
+  if (!cpp_frame_buffer.ok()) {
+       return nullptr;
   }
-  return cpp_frame_buffer;
+  
+  return std::unique_ptr<FrameBufferCPP>(
+                              dynamic_cast<FrameBufferCPP*>(
+                                cpp_frame_buffer.value().release()));
 }
 
