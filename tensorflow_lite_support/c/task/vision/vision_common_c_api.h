@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_VISION_COMMON_C_API_H_
-#define TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_VISION_COMMON_C_API_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_VISION_COMMON_C_API_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_VISION_COMMON_C_API_H_
 
 #include <stdint.h>
 
@@ -36,4 +36,4 @@ struct BoundingBox {
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_VISION_COMMON_C_API_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_VISION_COMMON_C_API_H_

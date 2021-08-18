@@ -12,14 +12,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_IMAGE_CLASSIFIER_C_API_H_
-#define TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_IMAGE_CLASSIFIER_C_API_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_IMAGE_CLASSIFIER_C_API_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_IMAGE_CLASSIFIER_C_API_H_
 
 #include <stdint.h>
 
-#include "tensorflow_lite_support/cc/task/vision/core/frame_buffer_c_api.h"
-#include "tensorflow_lite_support/cc/task/vision/classification_result_c_api.h"
-#include "tensorflow_lite_support/cc/task/vision/vision_common_c_api.h"
+#include "tensorflow_lite_support/c/task/vision/core/frame_buffer_c_api.h"
+#include "tensorflow_lite_support/c/task/vision/classification_result_c_api.h"
+#include "tensorflow_lite_support/c/task/vision/vision_common_c_api.h"
 
 // --------------------------------------------------------------------------
 /// C API for ImageClassifiier.
@@ -114,4 +114,4 @@ extern void ImageClassifierDelete(ImageClassifier* classifier);
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_VISION_IMAGE_CLASSIFIER_C_API_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_IMAGE_CLASSIFIER_C_API_H_

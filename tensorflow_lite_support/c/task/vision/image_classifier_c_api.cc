@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/vision/image_classifier_c_api.h"
+#include "tensorflow_lite_support/c/task/vision/image_classifier_c_api.h"
 
 #include <memory>
 
@@ -22,10 +22,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
-#include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_cpp_c_utils.h"
-#include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
-#include "tensorflow_lite_support/cc/task/vision/classification_result_c_api.h"
-
+#include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
 
 using ::tflite::support::StatusOr;
 using ClassificationResultCPP = ::tflite::task::vision::ClassificationResult;

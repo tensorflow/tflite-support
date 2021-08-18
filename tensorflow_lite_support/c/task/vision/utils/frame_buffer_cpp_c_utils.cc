@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_cpp_c_utils.h"
+#include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
 #include "absl/strings/str_format.h"
 
 using FrameBufferCPP = ::tflite::task::vision::FrameBuffer;

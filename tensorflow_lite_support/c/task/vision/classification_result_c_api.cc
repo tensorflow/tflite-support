@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/vision/classification_result_c_api.h"
+#include "tensorflow_lite_support/c/task/vision/classification_result_c_api.h"
 
 #include <memory>
 
