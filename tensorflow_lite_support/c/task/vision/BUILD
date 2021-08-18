@@ -36,7 +36,7 @@ cc_library_with_tflite(
     visibility = ["//tensorflow_lite_support:__subpackages__"],
     deps = [
         "//tensorflow_lite_support/c/task/vision/utils:frame_buffer_cpp_c_utils",
-        ":classification_result_c_api",
+        "//tensorflow_lite_support/c/task/processor:classification_result_c_api",
         ":vision_common_c_api",
     ],
 )

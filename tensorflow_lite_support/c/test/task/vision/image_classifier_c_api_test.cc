@@ -18,7 +18,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/test/test_utils.h"
 #include "tensorflow_lite_support/c/task/vision/image_classifier_c_api.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils_c.h"
-#include "tensorflow_lite_support/c/task/vision/classification_result_c_api.h"
+#include "tensorflow_lite_support/c/task/processor/classification_result_c_api.h"
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer_c_api.h"
 
 
@@ -74,6 +74,18 @@ TEST(ImageClassifierFromOptionsTest, SucceedsWithModelPath) {
   ImageClassifierDelete(image_classifier);
 }
 
+TEST(ImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
+  ImageClassifierOptions *options = ImageClassifierOptionsCreate();
+  const char *model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetQuantizedWithMetadata).data();
+  
+  ImageClassifierOptionsSetModelFilePath(options, model_path);
+  ImageClassifierOptionsSetNumThreads(options, 3);
+  ImageClassifier *image_classifier = ImageClassifierFromOptions(options);
+  EXPECT_NE(image_classifier, nullptr);
+  ImageClassifierDelete(image_classifier);
+}
+
 class ImageClassifierClassifyTest : public ::testing::Test {
  protected:
   void SetUp() override {
@@ -111,7 +123,6 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithImageData) {
 
   ImageClassifierClassificationResultDelete(classification_result);
 }
-
 
 }  // namespace
 }  // namespace vision

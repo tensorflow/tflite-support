@@ -18,7 +18,7 @@ limitations under the License.
 #include <stdint.h>
 
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer_c_api.h"
-#include "tensorflow_lite_support/c/task/vision/classification_result_c_api.h"
+#include "tensorflow_lite_support/c/task/processor/classification_result_c_api.h"
 #include "tensorflow_lite_support/c/task/vision/vision_common_c_api.h"
 
 // --------------------------------------------------------------------------
