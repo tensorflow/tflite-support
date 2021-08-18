@@ -109,23 +109,3 @@ cc_binary(
         ],
     }),
 )
-
-cc_binary(
-    name = "image_classifier_c_demo",
-    srcs = ["image_classifier_demo.c"],
-    deps = [
-        "//tensorflow_lite_support/c/task/vision:image_classifier_c_api",
-        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils_c",
-        "@stblib//:stb_image",
-       
-    ] + select({
-        "//tensorflow_lite_support/examples/task:darwinn_portable": [
-            "//tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin",
-        ],
-        "//conditions:default": [
-        ],
-    }),
-)
-
-
-
