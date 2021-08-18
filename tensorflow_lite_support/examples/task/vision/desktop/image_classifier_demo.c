@@ -23,7 +23,7 @@ limitations under the License.
 #include <stdio.h>
 #include <stdint.h>
 
-#include "tensorflow_lite_support/cc/task/vision/image_classifier_c_api.h"
+#include "tensorflow_lite_support/c/task/vision/image_classifier_c_api.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils_c.h""
 
 
