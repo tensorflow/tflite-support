@@ -45,25 +45,28 @@ ImageData LoadImage(const char* image_name) {
                                       kTestDataDirectory, image_name).data());
 }
 
-TEST(ImageClassifierFromFileTest, FailsWithMissingModelPath) {
+TEST(CImageClassifierFromFileTest, FailsWithMissingModelPath) {
   ImageClassifier *image_classifier = ImageClassifierFromFile("");
   ASSERT_EQ(image_classifier, nullptr);
 }
 
-TEST(ImageClassifierFromFileTest, SucceedsWithModelPath) {  
-  ImageClassifier *image_classifier = ImageClassifierFromFile(JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata).data());
+TEST(CImageClassifierFromFileTest, SucceedsWithModelPath) {  
+  ImageClassifier *image_classifier = ImageClassifierFromFile(
+                                          JoinPath("./" /*test src dir*/, 
+                                          kTestDataDirectory,
+                                          kMobileNetQuantizedWithMetadata)
+                                          .data());
   EXPECT_NE(image_classifier, nullptr);
   ImageClassifierDelete(image_classifier);
 }
 
-TEST(ImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
+TEST(CImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
   ImageClassifierOptions *options = ImageClassifierOptionsCreate();
   ImageClassifier *image_classifier = ImageClassifierFromOptions(options);
   ASSERT_EQ(image_classifier, nullptr);
 }
 
-TEST(ImageClassifierFromOptionsTest, SucceedsWithModelPath) {
+TEST(CImageClassifierFromOptionsTest, SucceedsWithModelPath) {
   ImageClassifierOptions *options = ImageClassifierOptionsCreate();
   const char *model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata).data();
@@ -74,7 +77,7 @@ TEST(ImageClassifierFromOptionsTest, SucceedsWithModelPath) {
   ImageClassifierDelete(image_classifier);
 }
 
-TEST(ImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
+TEST(CImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
   ImageClassifierOptions *options = ImageClassifierOptionsCreate();
   const char *model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata).data();
@@ -86,11 +89,12 @@ TEST(ImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
   ImageClassifierDelete(image_classifier);
 }
 
-class ImageClassifierClassifyTest : public ::testing::Test {
+class CImageClassifierClassifyTest : public ::testing::Test {
  protected:
   void SetUp() override {
-     image_classifier = ImageClassifierFromFile(JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata).data());
+     image_classifier = ImageClassifierFromFile(
+                            JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                            kMobileNetQuantizedWithMetadata).data());
      ASSERT_NE(image_classifier, nullptr);
   }
 
@@ -101,25 +105,33 @@ class ImageClassifierClassifyTest : public ::testing::Test {
   ImageClassifier *image_classifier;
 };
   
-TEST_F(ImageClassifierClassifyTest, SucceedsWithImageData) {  
+TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {  
   struct ImageData image_data = LoadImage("burger-224.png");
 
   struct FrameBuffer frame_buffer = {.dimension.width = image_data.width, 
                                      .dimension.height = image_data.height, 
                                      .plane.buffer = image_data.pixel_data, 
-                                     .plane.stride.row_stride_bytes = image_data.width  * image_data.channels, 
-                                     .plane.stride.pixel_stride_bytes = image_data.channels, 
+                                     .plane.stride.row_stride_bytes = 
+                                     image_data.width  * image_data.channels, 
+                                     .plane.stride.pixel_stride_bytes = 
+                                     image_data.channels, 
                                      .format = kRGB};
   
-  struct ClassificationResult *classification_result = ImageClassifierClassify(image_classifier, &frame_buffer);
+  struct ClassificationResult *classification_result = 
+      ImageClassifierClassify(image_classifier, &frame_buffer);
   
   ImageDataFree(&image_data);
   
-  ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
-  EXPECT_TRUE(classification_result->size >= 1) << "Classification Result size is 0";
-  EXPECT_NE(classification_result->classifications, nullptr) << "Classification Result Classifications is NULL";
-  EXPECT_TRUE(classification_result->classifications->size >= 1) << "Classification Result Classifications Size is NULL";
-  EXPECT_NE(classification_result->classifications->classes, nullptr) << "Classification Result Classifications Classes is NULL";
+  ASSERT_NE(classification_result, nullptr) 
+      << "Classification Result is NULL";
+  EXPECT_TRUE(classification_result->size >= 1) 
+      << "Classification Result size is 0";
+  EXPECT_NE(classification_result->classifications, nullptr) 
+      << "Classification Result Classifications is NULL";
+  EXPECT_TRUE(classification_result->classifications->size >= 1) 
+      << "Classification Result Classifications Size is NULL";
+  EXPECT_NE(classification_result->classifications->classes, nullptr) 
+      << "Classification Result Classifications Classes is NULL";
 
   ImageClassifierClassificationResultDelete(classification_result);
 }
