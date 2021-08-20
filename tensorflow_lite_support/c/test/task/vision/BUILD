@@ -14,7 +14,7 @@ package(
 # bazel test tensorflow_lite_support/c/test/task/vision:image_classifier_c_api_test
 cc_test_with_tflite(
     name = "image_classifier_c_api_test",
-    srcs = ["image_classifier_c_api_test.cc"],
+    srcs = ["image_classifier_test.cc"],
     data = [
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",

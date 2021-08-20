@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/c/task/vision/image_classifier_c_api.h"
+#include "tensorflow_lite_support/c/task/vision/image_classifier.h"
 
 #include <memory>
 

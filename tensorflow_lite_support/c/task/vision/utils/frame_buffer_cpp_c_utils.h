@@ -16,7 +16,7 @@ limitations under the License.
 #define TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_FRAME_BUFFER_CPP_C_UTILS_H_
 
 
-#include "tensorflow_lite_support/c/task/vision/core/frame_buffer_c_api.h"
+#include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 
 // Utils for Conversions between C and C++ FrameBuffer

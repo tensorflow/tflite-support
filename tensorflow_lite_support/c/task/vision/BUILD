@@ -8,26 +8,18 @@ package(
 )
 
 cc_library(
-    name = "classification_result_c_api",
-    srcs = [
-        "classification_result_c_api.cc",
-    ],
-    hdrs = ["classification_result_c_api.h"],
-)
-
-cc_library(
     name = "vision_common_c_api",
-    hdrs = ["vision_common_c_api.h"],
+    hdrs = ["vision_common.h"],
 )
 
 cc_library_with_tflite(
     name = "image_classifier_c_api",
     srcs = [
-        "image_classifier_c_api.cc",
+        "image_classifier.cc",
     ],
     hdrs = [
-        "image_classifier_c_api.h",
-        ":classification_result_c_api",
+        "image_classifier.h",
+        "//tensorflow_lite_support/c/task/processor:classification_result_c_api",
         ":vision_common_c_api"
     ],
     tflite_deps = [

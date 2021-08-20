@@ -1,5 +1,3 @@
-load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
-
 package(
     default_visibility = [
         "//visibility:public",
@@ -10,6 +8,6 @@ package(
 cc_library(
     name = "frame_buffer_c_api",
     hdrs = [
-        "frame_buffer_c_api.h",
+        "frame_buffer.h",
     ],
 )
