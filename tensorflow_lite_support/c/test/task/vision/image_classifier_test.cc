@@ -29,16 +29,11 @@ namespace {
 
 using ::tflite::task::JoinPath;
 
-
 constexpr char kTestDataDirectory[] =
     "tensorflow_lite_support/cc/test/testdata/task/vision/";
-// Float model.
-constexpr char kMobileNetFloatWithMetadata[] = "mobilenet_v2_1.0_224.tflite";
 // Quantized model.
 constexpr char kMobileNetQuantizedWithMetadata[] =
     "mobilenet_v1_0.25_224_quant.tflite";
-// Hello world flowers classifier supporting 5 classes (quantized model).
-constexpr char kAutoMLModelWithMetadata[] = "automl_labeler_model.tflite";
 
 ImageData LoadImage(const char* image_name) {
   return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
@@ -129,11 +124,11 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
   EXPECT_NE(classification_result->classifications, nullptr) 
       << "Classification Result Classifications is NULL";
   EXPECT_TRUE(classification_result->classifications->size >= 1) 
-      << "Classification Result Classifications Size is NULL";
+      << "Classification Result Classifications Size is 0";
   EXPECT_NE(classification_result->classifications->classes, nullptr) 
       << "Classification Result Classifications Classes is NULL";
 
-  ImageClassifierClassificationResultDelete(classification_result);
+   ImageClassifierClassificationResultDelete(classification_result);
 }
 
 }  // namespace

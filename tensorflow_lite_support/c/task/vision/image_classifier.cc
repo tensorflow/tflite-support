@@ -143,10 +143,14 @@ ClassificationResult* GetClassificationResultCStruct(
       if (classification.has_class_name())
         c_classes[rank].class_name = 
             strdup(classification.class_name().c_str());
+      else
+        c_classes[rank].class_name = nullptr;
       
       if (classification.has_display_name())
         c_classes[rank].display_name = 
             strdup(classification.display_name().c_str());
+      else
+        c_classes[rank].display_name = nullptr;
     }
     c_classifications[head].classes = c_classes;
   }

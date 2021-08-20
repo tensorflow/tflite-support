@@ -27,13 +27,20 @@ void ImageClassifierClassificationResultDelete(struct ClassificationResult* clas
     for (int rank = 0; rank < classification_result->classifications->size; ++rank) {
       // `strdup` obtains memory using `malloc` and the memory needs to be
       // released using `free`.
-      free(classification_result->classifications->classes[rank].display_name);
-      free(classification_result->classifications->classes[rank].class_name);
+      if (classification_result->classifications->classes[rank].display_name)
+        free(classification_result->classifications->classes[rank].display_name);
+
+      if (classification_result->classifications->classes[rank].class_name) 
+        free(classification_result->classifications->classes[rank].class_name);
     }
     
-    delete[] classification_result->classifications->classes;
+    if (classification_result->classifications->size >= 1)
+        delete[] classification_result->classifications->classes;
   }
-  delete[] classification_result->classifications;
+  
+  if (classification_result->size >= 1)
+      delete[] classification_result->classifications;
+  
   delete classification_result;
 }
 
