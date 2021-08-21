@@ -170,3 +170,42 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
     ],
 )
+
+# IMPORTANT: in order to use hardware acceleration delegates, configurable through the
+# `compute_settings` field of the LandmarkDetectorOptions, you must additionally link to
+# the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
+# https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
+# To use EDGETPU_CORAL, link to `edgetpu_coral_plugin` from:
+# https://github.com/tensorflow/tflite-support/blob/a58a4f9225c411fa9ba29f821523e6e283988d23/tensorflow_lite_support/acceleration/configuration/BUILD#L11
+cc_library_with_tflite(
+    name = "landmark_detector",
+    srcs = ["landmark_detector.cc"],
+    hdrs = ["landmark_detector.h"],
+    tflite_deps = [
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "//tensorflow_lite_support/cc/task/core:task_api_factory",
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core:external_file_handler",
+        "//tensorflow_lite_support/cc/task/core:task_utils",
+        "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
+        "//tensorflow_lite_support/cc/task/vision/core:label_map_item",
+        "//tensorflow_lite_support/cc/task/vision/proto:landmarks_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/proto:landmark_detector_options_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_utils",
+        "//tensorflow_lite_support/metadata:metadata_schema_cc",
+        "//tensorflow_lite_support/metadata/cc:metadata_extractor",
+        "@com_google_absl//absl/container:flat_hash_set",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:str_format",
+        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/core/api",
+    ],
+)
