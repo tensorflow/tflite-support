@@ -378,6 +378,68 @@ SegmentationResult result = result_or.value();
 
 A CLI demo tool is available [here][4] for easily trying out this API.
 
+
+ 
+### Landmark Detector
+
+`LandmarkDetector` accepts movenet model (with mandatory TFLite Model Metadata)  that 
+conforms  to the following spec:
+
+Input tensor (type: `kTfLiteUInt8`):
+
+   - image input of size `[batch x height x width x channels]`.
+   - batch inference is not supported (`batch` is required to be 1).
+   - only RGB inputs are supported (`channels` is required to be 3).
+   - `NormalizationOptions` is not required
+
+Output tensor (type: `kTfLiteFloat32`):
+
+   - one output tensor with 4 dimensions `[1 x 1 x num_keypoints x 3]`,
+     where, `num_keypoints` is required to be 17 and the inner array represents 
+     y-x coordinates of the keypoint with score in the form  `[y, x, score]`.
+
+An example of such model can be found at:
+https://tfhub.dev/google/movenet/singlepose/lightning/4
+
+Example usage:
+
+```cc
+LandmarkDetectorOptions options;
+options.mutable_base_options()->mutable_model_file()->set_file_name(
+    "/path/to/model.tflite");
+// Create an LandmarkDetector instance from the options.
+StatusOr<std::unique_ptr<LandmarkDetector>> landmark_detector_or =
+    LandmarkDetector::CreateFromOptions(options);
+// Check if an error occurred.
+if (!landmark_detector_or.ok()) {
+  std::cerr << "An error occurred during LandmarkDetector creation: "
+            << landmark_detector_or.status().message();
+  return;
+}
+std::unique_ptr<LandmarkDetector> landmark_detector =
+    std::move(landmark_detector_or.value());
+// Prepare FrameBuffer input from e.g. image RGBA data, width and height:
+std::unique_ptr<FrameBuffer> frame_buffer =
+    CreateFromRgbaRawBuffer(image_rgba_data, {image_width, image_height});
+// Run inference:
+StatusOr<LandmarkResult> result_or = landmark_detector->Detect(*frame_buffer);
+// Check if an error occurred.
+if (!result_or.ok()) {
+  std::cerr << "An error occurred during detection: "
+            << result_or.status().message();
+  return;
+}
+LandmarkResult result = result_or.value();
+// Example value for 'result':
+//
+// landmarks {key_y : 0.31545776 key_x : 0.4260728 score : 0.70056206}
+// landmarks {key_y : 0.29907033 key_x : 0.44246024 score : 0.6350124}
+// landmarks {key_y : 0.3031672 key_x : 0.44655707 score : 0.24581124}
+// ....
+// landmarks {key_y : 0.27858606 key_x : 0.8685331 score : 0.6350124}
+// landmarks {key_y : 0.9299859 key_x : 0.7128526 score : 0.9422764}
+```
+
 [1]: https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/examples/task/vision/desktop/image_classifier_demo.cc
 [2]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/kernels/detection_postprocess.cc
 [3]: https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/examples/task/vision/desktop/object_detector_demo.cc
