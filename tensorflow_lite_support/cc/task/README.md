@@ -375,6 +375,7 @@ SegmentationResult result = result_or.value();
 // human-friendly colored image.
 //
 ```
+
 A CLI demo tool is available [here][4] for easily trying out this API.
 
 
