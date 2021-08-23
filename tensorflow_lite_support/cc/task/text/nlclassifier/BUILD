@@ -8,12 +8,6 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-exports_files([
-    "bert_nl_classifier_c_api.h",
-    "nl_classifier_c_api.h",
-    "nl_classifier_c_api_common.h",
-])
-
 cc_library_with_tflite(
     name = "nl_classifier",
     srcs = [
@@ -51,26 +45,6 @@ cc_library_with_tflite(
 )
 
 cc_library_with_tflite(
-    name = "nl_classifier_c_api",
-    srcs = [
-        "nl_classifier_c_api.cc",
-    ],
-    hdrs = [
-        "nl_classifier_c_api.h",
-        "nl_classifier_c_api_common.h",
-    ],
-    tflite_deps = [
-        ":nl_classifier",
-    ],
-    visibility = ["//tensorflow_lite_support:__subpackages__"],
-    deps = [
-        ":nl_classifier_c_api_common",
-        "//tensorflow_lite_support/cc/task/core:category",
-        "@com_google_absl//absl/strings",
-    ],
-)
-
-cc_library_with_tflite(
     name = "bert_nl_classifier",
     srcs = [
         "bert_nl_classifier.cc",
@@ -100,36 +74,4 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
     ],
-)
-
-cc_library_with_tflite(
-    name = "bert_nl_classifier_c_api",
-    srcs = [
-        "bert_nl_classifier_c_api.cc",
-    ],
-    hdrs = [
-        "bert_nl_classifier_c_api.h",
-        "nl_classifier_c_api_common.h",
-    ],
-    tflite_deps = [
-        ":bert_nl_classifier",
-    ],
-    visibility = ["//tensorflow_lite_support:__subpackages__"],
-    deps = [
-        ":nl_classifier_c_api_common",
-        "//tensorflow_lite_support/cc/task/core:category",
-        "//tensorflow_lite_support/cc/task/text/proto:bert_nl_classifier_options_proto_inc",
-        "@com_google_absl//absl/strings",
-    ],
-)
-
-cc_library(
-    name = "nl_classifier_c_api_common",
-    srcs = [
-        "nl_classifier_c_api_common.cc",
-    ],
-    hdrs = [
-        "nl_classifier_c_api_common.h",
-    ],
-    visibility = ["//tensorflow_lite_support:__subpackages__"],
 )

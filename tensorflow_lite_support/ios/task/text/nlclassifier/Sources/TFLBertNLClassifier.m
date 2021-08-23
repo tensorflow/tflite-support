@@ -14,8 +14,8 @@ limitations under the License.
 ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/text/nlclassifier/Sources/TFLBertNLClassifier.h"
 #import "GTMDefines.h"
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/bert_nl_classifier_c_api.h"
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier_c_api_common.h"
+#include "tensorflow_lite_support/c/task/text/bert_nl_classifier.h"
+#include "tensorflow_lite_support/c/task/text/nl_classifier_common.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

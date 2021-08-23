@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/text/qa/Sources/TFLBertQuestionAnswerer.h"
 #import "GTMDefines.h"
-#include "tensorflow_lite_support/cc/task/text/qa/bert_qa_c_api.h"
+#include "tensorflow_lite_support/c/task/text/bert_question_answerer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

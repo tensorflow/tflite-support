@@ -8,10 +8,6 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-exports_files([
-    "bert_qa_c_api.h",
-])
-
 cc_library_with_tflite(
     name = "question_answerer",
     hdrs = [
@@ -53,19 +49,4 @@ cc_library_with_tflite(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
     ],
-)
-
-cc_library_with_tflite(
-    name = "bert_qa_c_api",
-    srcs = [
-        "bert_qa_c_api.cc",
-    ],
-    hdrs = [
-        "bert_qa_c_api.h",
-    ],
-    tflite_deps = [
-        ":bert_question_answerer",
-        ":question_answerer",
-    ],
-    visibility = ["//tensorflow_lite_support:__subpackages__"],
 )

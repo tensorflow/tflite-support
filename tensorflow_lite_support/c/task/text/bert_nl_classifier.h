@@ -12,10 +12,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_BERT_NL_CLASSIFIER_C_API_H_
-#define TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_BERT_NL_CLASSIFIER_C_API_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_TEXT_BERT_NL_CLASSIFIER_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TASK_TEXT_BERT_NL_CLASSIFIER_H_
 
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier_c_api_common.h"
+#include "tensorflow_lite_support/c/task/text/nl_classifier_common.h"
 // --------------------------------------------------------------------------
 /// C API for BertNLClassifier.
 ///
@@ -68,4 +68,4 @@ extern void BertNLClassifierDelete(BertNLClassifier* classifier);
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_BERT_NL_CLASSIFIER_C_API_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_TEXT_BERT_NL_CLASSIFIER_H_

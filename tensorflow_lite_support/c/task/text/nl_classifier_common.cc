@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier_c_api_common.h"
+#include "tensorflow_lite_support/c/task/text/nl_classifier_common.h"
 
 #include <memory>
 

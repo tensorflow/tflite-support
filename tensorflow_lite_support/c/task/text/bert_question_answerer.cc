@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/text/qa/bert_qa_c_api.h"
+#include "tensorflow_lite_support/c/task/text/bert_question_answerer.h"
 
 #include <memory>
 

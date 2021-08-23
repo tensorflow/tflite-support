@@ -14,7 +14,7 @@ objc_library(
     hdrs = ["Sources/TFLBertQuestionAnswerer.h"],
     module_name = "TFLBertQuestionAnswerer",
     deps = [
-        "//tensorflow_lite_support/cc/task/text/qa:bert_qa_c_api",
+        "//tensorflow_lite_support/c/task/text:bert_question_answerer",
         "@google_toolbox_for_mac//:GTM_Defines",
     ],
 )
