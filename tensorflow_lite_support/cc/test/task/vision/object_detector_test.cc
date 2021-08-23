@@ -92,6 +92,8 @@ constexpr char kExpectResults[] =
            classes { index: 17 score: 0.51171875 class_name: "dog" }
          }
     )pb";
+constexpr char kMobileSsdWithMetadataDummyScoreCalibration[] =
+    "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29_score_calibration.tflite";
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
   return DecodeImageFromFile(JoinPath("./" /*test src dir*/,

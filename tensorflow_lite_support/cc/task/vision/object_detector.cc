@@ -20,6 +20,7 @@ limitations under the License.
 #include <vector>
 
 #include "absl/memory/memory.h"
+#include "absl/status/status.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/string_view.h"
 #include "tensorflow/lite/c/common.h"
@@ -32,6 +33,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/class_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/utils/score_calibration.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
@@ -60,6 +62,22 @@ using ::tflite::task::core::TfLiteEngine;
 // The expected number of dimensions of the 4 output tensors, representing in
 // that order: locations, classes, scores, num_results.
 static constexpr int kOutputTensorsExpectedDims[4] = {3, 2, 2, 1};
+
+// Default score value used as a fallback for classes that (1) have no score
+// calibration data or (2) have a very low confident uncalibrated score, i.e.
+// lower than the `min_uncalibrated_score` threshold.
+//
+// (1) This happens when the ScoreCalibration does not cover all the classes
+// listed in the label map. This can be used to enforce the blacklisting of
+// given classes so that they are never returned.
+//
+// (2) This is an optional threshold provided part of the calibration data. It
+// is used to mitigate false alarms on some classes.
+//
+// In both cases, a class that gets assigned a deterministic lowest score that
+// never returned as it gets discarded by the `score_threshold` check
+// (see post-processing logic).
+constexpr float kLowestCalibratedScore = std::numeric_limits<float>::lowest();
 
 StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
     const TensorMetadata& tensor_metadata) {
@@ -136,7 +154,7 @@ StatusOr<std::vector<LabelMapItem>> GetLabelMapIfAny(
       ModelMetadataExtractor::FindFirstAssociatedFileName(
           tensor_metadata, tflite::AssociatedFileType_TENSOR_VALUE_LABELS,
           locale);
-  absl::string_view display_names_file = nullptr;
+  absl::string_view display_names_file;
   if (!display_names_filename.empty()) {
     ASSIGN_OR_RETURN(display_names_file, metadata_extractor.GetAssociatedFile(
                                              display_names_filename));
@@ -152,7 +170,7 @@ StatusOr<float> GetScoreThreshold(
       metadata_extractor.FindFirstProcessUnit(
           tensor_metadata, ProcessUnitOptions_ScoreThresholdingOptions));
   if (score_thresholding_process_unit == nullptr) {
-    return std::numeric_limits<float>::lowest();
+    return kLowestCalibratedScore;
   }
   return score_thresholding_process_unit->options_as_ScoreThresholdingOptions()
       ->global_score_threshold();
@@ -303,11 +321,107 @@ absl::Status ObjectDetector::Init(
   // Initialize class whitelisting/blacklisting, if any.
   RETURN_IF_ERROR(CheckAndSetClassIndexSet());
 
+  // Perform final initialization (by default, initialize score calibration
+  // parameters, if any).
+  RETURN_IF_ERROR(PostInit());
+
   return absl::OkStatus();
 }
 
 absl::Status ObjectDetector::PreInit() {
   SetProcessEngine(FrameBufferUtils::ProcessEngine::kLibyuv);
+  return absl::OkStatus();
+}
+
+absl::Status ObjectDetector::PostInit() { return InitScoreCalibrations(); }
+
+StatusOr<SigmoidCalibrationParameters> BuildCalibrationParametersIfAny(
+    const tflite::metadata::ModelMetadataExtractor& metadata_extractor,
+    const tflite::TensorMetadata& output_tensor_metadata,
+    const std::vector<LabelMapItem>& label_map_items, bool* is_score_found) {
+  SigmoidCalibrationParameters sigmoid_params;
+  *is_score_found = false;
+  // Build score calibration parameters, if present.
+  ASSIGN_OR_RETURN(const tflite::ProcessUnit* score_calibration_process_unit,
+                   ModelMetadataExtractor::FindFirstProcessUnit(
+                       output_tensor_metadata,
+                       tflite::ProcessUnitOptions_ScoreCalibrationOptions));
+  if (score_calibration_process_unit != nullptr) {
+    const std::string score_calibration_filename =
+        ModelMetadataExtractor::FindFirstAssociatedFileName(
+            output_tensor_metadata,
+            tflite::AssociatedFileType_TENSOR_AXIS_SCORE_CALIBRATION);
+    ASSIGN_OR_RETURN(
+        absl::string_view score_calibration_file,
+        metadata_extractor.GetAssociatedFile(score_calibration_filename));
+
+    // Set is_score_found to true, only if sigmoid_params is built correctly.
+    ASSIGN_OR_RETURN(sigmoid_params,
+                     BuildSigmoidCalibrationParams(
+                         *score_calibration_process_unit
+                              ->options_as_ScoreCalibrationOptions(),
+                         score_calibration_file, label_map_items));
+    *is_score_found = true;
+  }
+  return sigmoid_params;
+}
+
+absl::Status ObjectDetector::InitScoreCalibrations() {
+  StatusOr<SigmoidCalibrationParameters> calibration_params_status;
+  bool is_score_found = false;
+
+  // Search the output tensor metadata, can try to get calibration_params.
+  int num_outputs = TfLiteEngine::OutputCount(engine_->interpreter());
+  const ModelMetadataExtractor* metadata_extractor =
+      engine_->metadata_extractor();
+  const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
+      output_tensor_metadata = metadata_extractor->GetOutputTensorMetadata();
+  if (output_tensor_metadata != nullptr) {
+    int num_output_tensors = output_tensor_metadata->size();
+
+    if (num_outputs != num_output_tensors) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrFormat("Mismatch between number of output tensors (%d) and "
+                          "output tensors metadata (%d).",
+                          num_outputs, num_output_tensors),
+          TfLiteSupportStatus::kMetadataInconsistencyError);
+    }
+
+    for (int i = 0; i < num_output_tensors; ++i) {
+      const tflite::TensorMetadata* output_tensor =
+          output_tensor_metadata->Get(i);
+      calibration_params_status = BuildCalibrationParametersIfAny(
+          *metadata_extractor, *output_tensor, label_map_, &is_score_found);
+
+      // If an error occurs, returns an error.
+      if (!calibration_params_status.ok()) {
+        return calibration_params_status.status();
+      }
+      // Finds the first valid one, and goes to build score calibration.
+      if (is_score_found) {
+        break;
+      }
+    }
+  }
+
+  // If no calibration_params is found, just skip score calibration.
+  if (!is_score_found) {
+    return absl::OkStatus();
+  }
+  auto& calibration_params = calibration_params_status.value();
+  // Use a specific default score instead of the one specified by default in
+  // cc/task/vision/utils/score_calibration.h. See `kLowestCalibratedScore`
+  // documentation for more details.
+  calibration_params.default_score = kLowestCalibratedScore;
+
+  score_calibration_ = absl::make_unique<ScoreCalibration>();
+  if (score_calibration_ == nullptr) {
+    return CreateStatusWithPayload(
+        StatusCode::kInternal, "Could not create score calibration object.");
+  }
+  RETURN_IF_ERROR(
+      score_calibration_->InitializeFromParameters(calibration_params));
   return absl::OkStatus();
 }
 
@@ -489,10 +603,20 @@ StatusOr<DetectionResult> ObjectDetector::Postprocess(
   DetectionResult results;
   for (int i = 0; i < num_results; ++i) {
     const int class_index = static_cast<int>(classes[i]);
-    const float score = scores[i];
-    if (!IsClassIndexAllowed(class_index) || score < score_threshold_) {
+    if (!IsClassIndexAllowed(class_index)) {
       continue;
     }
+
+    float score = scores[i];
+    // Calibrate score only if score_calibration_ is presented.
+    if (score_calibration_ != nullptr) {
+      const std::string& class_name = label_map_[class_index].name;
+      score = score_calibration_->ComputeCalibratedScore(class_name, score);
+    }
+    if (score == kLowestCalibratedScore || score < score_threshold_) {
+      continue;
+    }
+
     Detection* detection = results.add_detections();
     // Denormalize the bounding box cooordinates in the upright frame
     // coordinates system, then rotate back from frame_buffer.orientation() to

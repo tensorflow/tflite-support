@@ -14,7 +14,7 @@
 # ==============================================================================
 """Writes metadata and label file to the object detector models."""
 
-from typing import List, Optional
+from typing import List, Optional, Type
 
 import flatbuffers
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
@@ -77,6 +77,18 @@ def _create_metadata_with_value_range(
   return tensor_metadata
 
 
+def extend_new_files(
+    file_list: List[str],
+    associated_files: Optional[List[Type[metadata_info.AssociatedFileMd]]]):
+  """Extends new associated files to the file list."""
+  if not associated_files:
+    return
+
+  for file in associated_files:
+    if file.file_path not in file_list:
+      file_list.append(file.file_path)
+
+
 class MetadataWriter(metadata_writer.MetadataWriter):
   """Writes metadata into an object detector."""
 
@@ -126,6 +138,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
           description=_INPUT_DESCRIPTION,
           color_space_type=_metadata_fb.ColorSpaceType.RGB)
 
+    associated_files = []
     if output_location_md is None:
       output_location_md = metadata_info.TensorMd(
           name=_OUTPUT_LOCATION_NAME, description=_OUTPUT_LOCATION_DESCRIPTION)
@@ -147,6 +160,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       output_score_metadata.processUnits = [
           score_calibration_md.create_metadata()
       ]
+      extend_new_files(associated_files, output_score_md.associated_files)
 
     if output_number_md is None:
       output_number_md = metadata_info.TensorMd(
@@ -182,12 +196,8 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         model_metadata.Pack(b),
         _metadata.MetadataPopulator.METADATA_FILE_IDENTIFIER)
 
-    return cls(
-        model_buffer,
-        b.Output(),
-        associated_files=[
-            file.file_path for file in output_category_md.associated_files
-        ])
+    extend_new_files(associated_files, output_category_md.associated_files)
+    return cls(model_buffer, b.Output(), associated_files=associated_files)
 
   @classmethod
   def create_for_inference(
