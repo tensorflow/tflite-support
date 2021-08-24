@@ -1,4 +1,4 @@
-/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/vision/core/base_vision_task_api.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/landmarks_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/landmark_detector_options_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/landmarks_proto_inc.h"
 
 namespace tflite {
 namespace task {
@@ -38,37 +38,30 @@ namespace vision {
 
 // Performs landmark detection on images.
 //
-// The API expects a TFLite model with optional, but strongly recommended,
-// TFLite Model Metadata.
+// The API expects MoveNet model with optional, TFLite Model Metadata.
 //
 // Input tensor:
 //  (kTfLiteUInt8)
 //    - image input of size `[batch x height x width x channels]`.
 //    - batch inference is not supported (`batch` is required to be 1).
 //    - only RGB inputs are supported (`channels` is required to be 3).
-//    - `height` and  `width` are required to be (192,192).
-//    - Normalization is not required.
+//    - `NormalizationOptions` is not required.
 // Output tensor:
-//  (kTfLiteFloat32) 
+//  (kTfLiteFloat32)
 //    - one output tensor with 4 dimensions `[1 x 1 x num_keypoints x 3]`,
-//      where, `num_keypoints` is required to be 1 and the inner array   
-//      representing y-x coordinates of keypoints withscore in the form 
-//      `[y, x, score]`.
+//      where, `num_keypoints` is required to be 17.
 //
-// An example of such model can be found at:
+// The MoveNet model can be found at:
 // https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/int8/4
 
 class LandmarkDetector : public BaseVisionTaskApi<LandmarkResult> {
  public:
   using BaseVisionTaskApi::BaseVisionTaskApi;
 
-
   static tflite::support::StatusOr<std::unique_ptr<LandmarkDetector>>
-  CreateFromOptions(
-      const LandmarkDetectorOptions& options
-      );
+  CreateFromOptions(const LandmarkDetectorOptions& options);
 
-  // Performs actual classification on the provided FrameBuffer.
+  // Performs actual detection on the provided FrameBuffer.
   //
   // The FrameBuffer can be of any size and any of the supported formats, i.e.
   // RGBA, RGB, NV12, NV21, YV12, YV21. It is automatically pre-processed before
@@ -83,7 +76,7 @@ class LandmarkDetector : public BaseVisionTaskApi<LandmarkResult> {
   tflite::support::StatusOr<LandmarkResult> Detect(
       const FrameBuffer& frame_buffer);
 
-  // Same as above, except that the classification is performed based on the
+  // Same as above, except that the detection is performed based on the
   // input region of interest. Cropping according to this region of interest is
   // prepended to the pre-processing operations.
   //
@@ -109,7 +102,8 @@ class LandmarkDetector : public BaseVisionTaskApi<LandmarkResult> {
       const FrameBuffer& frame_buffer, const BoundingBox& roi) override;
 
   // Performs sanity checks on the provided LandmarkDetectorOptions.
-  static absl::Status SanityCheckOptions(const LandmarkDetectorOptions& options);
+  static absl::Status SanityCheckOptions(
+      const LandmarkDetectorOptions& options);
 
   // Initializes the LandmarkDetector from the provided LandmarkDetectorOptions,
   // whose ownership is transferred to this object.
@@ -117,7 +111,6 @@ class LandmarkDetector : public BaseVisionTaskApi<LandmarkResult> {
 
   // Performs pre-initialization actions.
   virtual absl::Status PreInit();
-
 };
 
 }  // namespace vision
