@@ -16,60 +16,55 @@ limitations under the License.
 #define TENSORFLOW_LITE_SUPPORT_C_TASK_TEXT_BERT_QUESTION_ANSWERER_H_
 
 // --------------------------------------------------------------------------
-/// C API for BertQuestionAnswerer.
-///
-/// The API leans towards simplicity and uniformity instead of convenience, as
-/// most usage will be by language-specific wrappers. It provides largely the
-/// same set of functionality as that of the C++ TensorFlow Lite
-/// `BertQuestionAnswerer` API, but is useful for shared libraries where having
-/// a stable ABI boundary is important.
-///
-/// Usage:
-/// <pre><code>
-/// // Create the model and interpreter options.
-/// BertQuestionAnswerer* qa_answerer =
-///   BertQuestionAnswererFromFile("/path/to/model.tflite");
-///
-/// // answer a question.
-/// QaAnswers* answers = Answer(qa_answerer, context, question);
-///
-/// // Dispose of the API and QaAnswers objects.
-/// BertQuestionAnswererDelete(qa_answerer);
-/// BertQuestionAnswererQaAnswersDelete(answers);
+// C API for BertQuestionAnswerer.
+//
+// Usage:
+// <pre><code>
+// // Create the model and interpreter options.
+// TfLiteBertQuestionAnswerer* qa_answerer =
+//     TfLiteBertQuestionAnswererCreate("/path/to/model.tflite");
+//
+// // Answer a question.
+// TfLiteQaAnswers* answers = TfLiteBertQuestionAnswererAnswer(qa_answerer,
+//     question);
+//
+// // Dispose of the API and QaAnswers objects.
+// TfLiteBertQuestionAnswererDelete(qa_answerer);
+// TfLiteQaAnswersDelete(answers);
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-typedef struct BertQuestionAnswerer BertQuestionAnswerer;
+typedef struct TfLiteBertQuestionAnswerer TfLiteBertQuestionAnswerer;
 
-struct QaAnswer {
+typedef struct TfLiteQaAnswer {
   int start;
   int end;
   float logit;
   char* text;
-};
+} TfLiteQaAnswer;
 
-struct QaAnswers {
+typedef struct TfLiteQaAnswers {
   int size;
-  struct QaAnswer* answers;
-};
+  TfLiteQaAnswer* answers;
+} TfLiteQaAnswers;
 
-// Creates BertQuestionAnswerer from model path, returns nullptr if the file
-// doesn't exist or is not a well formatted TFLite model path.
-extern BertQuestionAnswerer* BertQuestionAnswererFromFile(
+// Creates TfLiteBertQuestionAnswerer from model path, returns nullptr if the
+// file doesn't exist or is not a well formatted TFLite model path.
+TfLiteBertQuestionAnswerer* TfLiteBertQuestionAnswererCreate(
     const char* model_path);
 
 // Invokes the encapsulated TFLite model and answers a question based on
 // context.
-extern struct QaAnswers* BertQuestionAnswererAnswer(
-    const BertQuestionAnswerer* question_answerer, const char* context,
+TfLiteQaAnswers* TfLiteBertQuestionAnswererAnswer(
+    const TfLiteBertQuestionAnswerer* question_answerer, const char* context,
     const char* question);
 
-extern void BertQuestionAnswererDelete(
-    BertQuestionAnswerer* bert_question_answerer);
+void TfLiteBertQuestionAnswererDelete(
+    TfLiteBertQuestionAnswerer* bert_question_answerer);
 
-extern void BertQuestionAnswererQaAnswersDelete(struct QaAnswers* qa_answers);
+void TfLiteQaAnswersDelete(TfLiteQaAnswers* qa_answers);
 
 #ifdef __cplusplus
 }  // extern "C"

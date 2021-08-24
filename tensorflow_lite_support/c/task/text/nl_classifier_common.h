@@ -15,26 +15,26 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_TEXT_NL_CLASSIFIER_COMMON_H_
 #define TENSORFLOW_LITE_SUPPORT_C_TASK_TEXT_NL_CLASSIFIER_COMMON_H_
 
-// Common structs shared between NLClassifier APIs
-//
-/// // Dispose of the Categories object.
-/// NLClassifierCategoriesDelete(categories);
+// C API for the NLClassifier results, Catergory.
+
+// TODO(b/197355311): deprecate this class and use the unified one with image
+// and audio.
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-struct Category {
+typedef struct Category {
   char* text;
   double score;
-};
+} Category;
 
-struct Categories {
+typedef struct Categories {
   int size;
-  struct Category* categories;
-};
+  Category* categories;
+} Categories;
 
-extern void NLClassifierCategoriesDelete(struct Categories* categories);
+void NLClassifierCategoriesDelete(Categories* categories);
 
 #ifdef __cplusplus
 }  // extern "C"

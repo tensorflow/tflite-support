@@ -17,52 +17,45 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/task/text/nl_classifier_common.h"
 // --------------------------------------------------------------------------
-/// C API for BertNLClassifier.
-///
-/// The API leans towards simplicity and uniformity instead of convenience, as
-/// most usage will be by language-specific wrappers. It provides largely the
-/// same set of functionality as that of the C++ TensorFlow Lite
-/// `BertNLClassifier` API, but is useful for shared libraries where having
-/// a stable ABI boundary is important.
-///
-/// Usage:
-/// <pre><code>
-/// // Create the model and interpreter options.
-/// BertNLClassifier* classifier =
-///   BertNLClassifierFromFile("/path/to/model.tflite");
-///
-/// // classification.
-/// Categories* categories = Classify(classifier, context, question);
-///
-/// // Dispose of the API object.
-/// BertNLClassifierrDelete(classifier);
+// C API for BertNLClassifier.
+//
+// Usage:
+// // Create the model and interpreter options.
+// TfLiteBertNLClassifier* classifier =
+//     TfLiteBertNLClassifierCreate("/path/to/model.tflite");
+//
+// // Classification.
+// Categories* categories = TfLiteBertNLClassifierClassify(classifier,
+//     question);
+//
+// // Dispose of the API object.
+// TfLiteBertNLClassifierDelete(classifier);
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-typedef struct BertNLClassifier BertNLClassifier;
+typedef struct TfLiteBertNLClassifier TfLiteBertNLClassifier;
 
-struct BertNLClassifierOptions {
+typedef struct TfLiteBertNLClassifierOptions {
   int max_seq_len;
-};
+} TfLiteBertNLClassifierOptions;
 
-extern const struct BertNLClassifierOptions BertNLClassifierOptions_default;
-
-// Creates BertNLClassifier from model path and options, returns nullptr if the
-// file doesn't exist or is not a well formatted TFLite model path.
-extern BertNLClassifier* BertNLClassifierFromFileAndOptions(
-    const char* model_path, const struct BertNLClassifierOptions* options);
-
-// Creates BertNLClassifier from model path and default options, returns nullptr
+// Creates TfLiteBertNLClassifier from model path and options, returns nullptr
 // if the file doesn't exist or is not a well formatted TFLite model path.
-extern BertNLClassifier* BertNLClassifierFromFile(const char* model_path);
+TfLiteBertNLClassifier* TfLiteBertNLClassifierCreateFromOptions(
+    const char* model_path, const TfLiteBertNLClassifierOptions* options);
+
+// Creates TfLiteBertNLClassifier from model path and default options, returns
+// nullptr if the file doesn't exist or is not a well formatted TFLite model
+// path.
+TfLiteBertNLClassifier* TfLiteBertNLClassifierCreate(const char* model_path);
 
 // Invokes the encapsulated TFLite model and classifies the input text.
-extern struct Categories* BertNLClassifierClassify(
-    const BertNLClassifier* classifier, const char* text);
+Categories* TfLiteBertNLClassifierClassify(
+    const TfLiteBertNLClassifier* classifier, const char* text);
 
-extern void BertNLClassifierDelete(BertNLClassifier* classifier);
+void TfLiteBertNLClassifierDelete(TfLiteBertNLClassifier* classifier);
 
 #ifdef __cplusplus
 }  // extern "C"

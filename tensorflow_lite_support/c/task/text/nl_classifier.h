@@ -17,52 +17,44 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/task/text/nl_classifier_common.h"
 // --------------------------------------------------------------------------
-/// C API for NLClassifier.
-///
-/// The API leans towards simplicity and uniformity instead of convenience, as
-/// most usage will be by language-specific wrappers. It provides largely the
-/// same set of functionality as that of the C++ TensorFlow Lite `NLClassifier`
-/// API, but is useful for shared libraries where having a stable ABI boundary
-/// is important.
-///
-/// Usage:
-/// <pre><code>
-/// // Create the model and interpreter options.
-/// NLClassifier* classifier = NLClassifierFromFileAndOptions(
-///   "/path/to/model.tflite");
-///
-/// // classification.
-/// Categories* categories = Classify(classifier, context, question);
-///
-/// // Dispose of the API object.
-/// NLClassifierDelete(classifier);
+// C API for NLClassifier.
+//
+// Usage:
+// // Create the model and interpreter options.
+// TfLiteNLClassifier* classifier = TfLiteNLClassifierCreate(
+//     "/path/to/model.tflite");
+//
+// // Classification.
+// Categories* categories = TfLiteNLClassifierClassify(classifier, question);
+//
+// // Dispose of the API object.
+// TfLiteNLClassifierDelete(classifier);
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-typedef struct NLClassifier NLClassifier;
+typedef struct TfLiteNLClassifier TfLiteNLClassifier;
 
-struct NLClassifierOptions {
+typedef struct TfLiteNLClassifierOptions {
   int input_tensor_index;
   int output_score_tensor_index;
   int output_label_tensor_index;
   const char* input_tensor_name;
   const char* output_score_tensor_name;
   const char* output_label_tensor_name;
-};
+} TfLiteNLClassifierOptions;
 
-// Creates NLClassifier from model path and options, returns nullptr if the file
-// doesn't exist or is not a well formatted TFLite model path.
-extern NLClassifier* NLClassifierFromFileAndOptions(
-    const char* model_path,
-    const struct NLClassifierOptions* options);
+// Creates TfLiteNLClassifier from model path and options, returns nullptr if
+// the file doesn't exist or is not a well formatted TFLite model path.
+TfLiteNLClassifier* TfLiteNLClassifierCreateFromOptions(
+    const char* model_path, const TfLiteNLClassifierOptions* options);
 
 // Invokes the encapsulated TFLite model and classifies the input text.
-extern struct Categories* NLClassifierClassify(const NLClassifier* classifier,
-                                               const char* text);
+Categories* TfLiteNLClassifierClassify(const TfLiteNLClassifier* classifier,
+                                       const char* text);
 
-extern void NLClassifierDelete(NLClassifier* classifier);
+void TfLiteNLClassifierDelete(TfLiteNLClassifier* classifier);
 
 #ifdef __cplusplus
 }  // extern "C"
