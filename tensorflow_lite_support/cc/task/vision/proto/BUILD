@@ -250,8 +250,6 @@ proto_library(
     srcs = ["landmark_detector_options.proto"],
     deps = [
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
-        "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
-        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
     ],
 )
 
@@ -268,7 +266,6 @@ cc_library(
     deps = [
         ":landmark_detector_options_cc_proto",
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
-        "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
     ],
 )
 
