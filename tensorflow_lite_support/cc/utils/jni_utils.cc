@@ -184,6 +184,26 @@ void ThrowExceptionWithMessage(JNIEnv* env, const char* clazz,
   env->ThrowNew(e_class, message);
 }
 
+const char* GetExceptionClassNameForStatusCode(StatusCode status_code) {
+  switch (status_code) {
+    case StatusCode::kOk:
+      return nullptr;
+    case StatusCode::kInvalidArgument:
+      return kIllegalArgumentException;
+    // TODO(b/197650198): Uncomment this before the next major version bump
+    //  and update the signature, as IOException is a checked exception.
+    // case StatusCode::kNotFound:
+    //   return kIOException;
+    case StatusCode::kInternal:
+      return kIllegalStateException;
+    // kUnknown and all other status codes are mapped to a generic
+    // RuntimeException.
+    case StatusCode::kUnknown:
+    default:
+      return kRuntimeException;
+  }
+}
+
 }  // namespace utils
 }  // namespace support
 }  // namespace tflite

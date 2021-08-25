@@ -81,8 +81,9 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *
    * @param modelPath path of the classification model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageClassifier createFromFile(Context context, String modelPath)
       throws IOException {
@@ -94,8 +95,9 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *
    * @param modelFile the classification model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageClassifier createFromFile(File modelFile) throws IOException {
     return createFromFileAndOptions(modelFile, ImageClassifierOptions.builder().build());
@@ -107,10 +109,10 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
    *     classification model
-   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
-   *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageClassifier createFromBuffer(final ByteBuffer modelBuffer) {
     return createFromBufferAndOptions(modelBuffer, ImageClassifierOptions.builder().build());
@@ -121,8 +123,9 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *
    * @param modelPath path of the classification model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageClassifier createFromFileAndOptions(
       Context context, String modelPath, ImageClassifierOptions options) throws IOException {
@@ -154,8 +157,9 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *
    * @param modelFile the classification model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageClassifier createFromFileAndOptions(
       File modelFile, final ImageClassifierOptions options) throws IOException {
@@ -188,6 +192,8 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageClassifier createFromBufferAndOptions(
       final ByteBuffer modelBuffer, final ImageClassifierOptions options) {
