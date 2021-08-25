@@ -24,7 +24,7 @@ std::unique_ptr<FrameBufferCPP> CreateCPPFrameBuffer(
     FrameBufferCPP::Format((*frame_buffer).format);
 
   auto cpp_frame_buffer = 
-    tflite::task::vision::CreateFromRawBuffer(frame_buffer->plane.buffer, 
+    tflite::task::vision::CreateFromRawBuffer(frame_buffer->buffer, 
                                               {frame_buffer->dimension.width, 
                                               frame_buffer->dimension.height}, 
                                               frame_buffer_format);

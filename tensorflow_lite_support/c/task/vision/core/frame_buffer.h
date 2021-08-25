@@ -51,22 +51,6 @@ struct Dimension {
   int height;
 };
 
-// Plane encapsulates the backing buffer and stride information.
-struct Plane {
-  uint8_t* buffer;
-  
-  // Stride information.
-  struct Stride {
-    // The row stride in bytes. This is the distance between the start pixels of
-    // two consecutive rows in the image.
-    int row_stride_bytes;
-    // This is the distance between two consecutive pixel values in a row of
-    // pixels in bytes. It may be larger than the size of a single pixel to
-    // account for interleaved image data or padded formats.
-    int pixel_stride_bytes;
-  } stride;
-};
-
 // A `FrameBuffer` provides a view into the provided backing buffer (e.g. camera
 // frame or still image) with buffer format information. FrameBuffer doesn't
 // take ownership of the provided backing buffer. The caller is responsible to
@@ -78,8 +62,9 @@ struct FrameBuffer {
   enum Orientation orientation;
   // Dimension information for the whole frame.
   struct Dimension dimension;
-  // Holds the stride and backing buffer for the frame buffer.
-  struct Plane plane;
+  // Holds the backing buffer for the frame buffer. Only single planar images
+  // are supported as of now.
+  uint8_t* buffer;
 };
 
 #ifdef __cplusplus
