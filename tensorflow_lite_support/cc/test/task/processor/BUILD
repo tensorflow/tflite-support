@@ -17,7 +17,7 @@ cc_test_with_tflite(
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
     ],
-    tflite_deps = [
+    deps = [
         "@org_tensorflow//tensorflow/lite/core/shims:cc_shims_test_util",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/preprocessor:image_preprocessor"",
