@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/preprocessor/image_preprocessor.h"
+#include "tensorflow_lite_support/cc/task/processor/image_preprocessor.h"
 
 #include <memory>
 
@@ -105,19 +105,6 @@ TEST_F(DynamicInputTest, OutputHeightAndWidthMutable)
     EXPECT_EQ(input_height, output_height);
     EXPECT_EQ(input_width, output_width);
 }
-
-// Expect an error when batch or depth dims signature is
-// dynamic.
-TEST_F(DynamicInputTest, ErrorOnBatchOrDepthChange)
-{
-}
-
-// Compare the processed image with a golden image.
-TEST_F(DynamicInputTest, CompareWithIdealImage)
-{
-
-}
-
 }  // namespace
 }  // namespace vision
 }  // namespace task

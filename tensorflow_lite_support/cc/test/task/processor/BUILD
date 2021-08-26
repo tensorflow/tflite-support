@@ -20,7 +20,7 @@ cc_test_with_tflite(
     deps = [
         "@org_tensorflow//tensorflow/lite/core/shims:cc_shims_test_util",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
-        "//tensorflow_lite_support/cc/task/preprocessor:image_preprocessor"",
+        "//tensorflow_lite_support/cc/task/processor:image_preprocessor",
         "//tensorflow_lite_support/cc/port:gtest_main",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
         "//tensorflow_lite_support/cc/test:test_utils",
