@@ -73,15 +73,31 @@ class DynamicInputTest : public tflite_shims::testing::Test {
         std::unique_ptr<ImagePreprocessor> preprocessor;
 };
 
-TEST_F(DynamicInputTest, HeightandWidthMutable)
-{  
-    // See if input tensor dims signature for height and width is -1 
-    // because it is so in the model.
+// See if input tensor dims signature for height and width is -1 
+// because it is so in the model.
+TEST_F(DynamicInputTest, InputHeightAndWidthMutable)
+{
+
 }
 
+// See if output tensor has been re-dimmed as per the input
+// tensor.
+TEST_F(DynamicInputTest, OutputHeightAndWidthMutable)
+{
+
+}
+
+// Expect an error when batch or depth dims signature is
+// dynamic.
 TEST_F(DynamicInputTest, ErrorOnBatchOrDepthChange)
 {
-    // See if 
+ 
+}
+
+// Compare the processed image with a golden image.
+TEST_F(DynamicInputTest, CompareWithIdealImage)
+{
+
 }
 
 }  // namespace
