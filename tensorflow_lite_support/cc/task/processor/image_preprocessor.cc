@@ -140,14 +140,14 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
   // If dynamic, it will re-dim the entire graph as per the input.
   if (is_height_mutable_ || is_width_mutable_) {
     const TfLiteIntArray* dims = Tensor()->dims;
-    const Interpreter* interpreter = engine_->interpreter();
+    Interpreter* interpreter = engine_->interpreter();
 
     // The expected BxD values of the model.
     const int expected_batch = Tensor()->dims->data[0];
     const int expected_depth = Tensor()->dims->data[3];
 
     const std::vector<int> new_dims{expected_batch, input_specs_.image_height,
-                                    input_specs_.image_width, expected_depth};
+                              input_specs_.image_width, expected_depth};
 
     interpreter->ResizeInputTensorStrict(0, new_dims);
   }
