@@ -22,6 +22,10 @@ strip_c_api_include_path_prefix(
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier_c_api.h",
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier_c_api_common.h",
         "//tensorflow_lite_support/cc/task/text/qa:bert_qa_c_api.h",
+        "//tensorflow_lite_support/c/task/vision:image_classifier.h",
+        "//tensorflow_lite_support/c/task/vision:vision_common.h",
+        "//tensorflow_lite_support/c/task/vision/core:frame_buffer.h",
+        "//tensorflow_lite_support/c/task/processor:classification_result.h",
     ],
 )
 
@@ -44,5 +48,22 @@ tflite_ios_framework(
         "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier_c_api",
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier_c_api",
         "//tensorflow_lite_support/cc/task/text/qa:bert_qa_c_api",
+    ],
+)
+
+# bazel build -c opt --config=ios_fat //tensorflow_lite_support/ios:TensorFlowLiteTaskVisionC_framework
+tflite_ios_framework(
+    name = "TensorFlowLiteTaskVisionC_framework",
+    hdrs = [
+        ":image_classifier.h",
+        ":vision_common.h",
+        ":frame_buffer.h",
+        ":classification_result.h"
+    ],
+    allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
+    bundle_name = "TensorFlowLiteTaskVisionC",
+    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    deps = [
+        "//tensorflow_lite_support/c/task/vision:image_classifier_c_api",
     ],
 )
