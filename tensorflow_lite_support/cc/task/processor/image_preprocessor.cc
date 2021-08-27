@@ -138,11 +138,10 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
   }
 
   // If dynamic, it will re-dim the entire graph as per the input.
-  if (is_height_mutable_ || is_width_mutable_) {
+  if (is_height_mutable_ || is_width_mutable_)
     engine_->interpreter()->ResizeInputTensorStrict(
-          0, {Tensor()->dims->data[0], input_specs_.image_height,
-              input_specs_.image_width, Tensor()->dims->data[3]});
-  }
+        0, {Tensor()->dims->data[0], input_specs_.image_height,
+            input_specs_.image_width, Tensor()->dims->data[3]});
 
   // Then normalize pixel data (if needed) and populate the input tensor.
   switch (input_specs_.tensor_type) {
