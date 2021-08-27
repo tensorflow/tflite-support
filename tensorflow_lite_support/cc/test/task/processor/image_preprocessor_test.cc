@@ -38,9 +38,9 @@ namespace task {
 namespace vision {
 namespace {
 
+using ::testing::ElementsAreArray;
 using ::testing::HasSubstr;
 using ::testing::Optional;
-using ::testing::ElementsAreArray;
 using ::tflite::support::kTfLiteSupportPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
@@ -56,54 +56,52 @@ constexpr std::string kModelPath =
     "tensorflow_lite_support/cc/test/testdata/task/vision/dilated_conv.tflite";
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
-  return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
-                                      kTestDataDirectory, image_name));
+  return DecodeImageFromFile(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory, image_name));
 }
 
 class DynamicInputTest : public tflite_shims::testing::Test {
-    public:
-        void SetUp()
-        {
-            engine = absl::make_unique<TfLiteEngine>();
-            engine->BuildModelFromFile(kModelPath);
-            engine->InitInterpreter();
+ public:
+  void SetUp() {
+    engine = absl::make_unique<TfLiteEngine>();
+    engine->BuildModelFromFile(kModelPath);
+    engine->InitInterpreter();
 
-            ASSERT_OK_AND_ASSIGN(preprocessor， processor::ImagePreprocessor::Create(
-                engine.get(), {0}));
-        }
-    private:
-        std::unique_ptr<ImagePreprocessor> preprocessor;
-        std::unique_ptr<TfLiteEngine> engine;
+    ASSERT_OK_AND_ASSIGN(
+        preprocessor， processor::ImagePreprocessor::Create(engine.get(), {0}));
+  }
+
+ private:
+  std::unique_ptr<ImagePreprocessor> preprocessor;
+  std::unique_ptr<TfLiteEngine> engine;
 };
 
-// See if input tensor dims signature for height and width is -1 
+// See if input tensor dims signature for height and width is -1
 // because it is so in the model.
-TEST_F(DynamicInputTest, InputHeightAndWidthMutable)
-{
-    const TfLiteIntArray* input_dims_signature = 
-        preprocessor->Tensor()->dims_signature;
-    EXPECT_EQ(input_dims_signature->data[1], -1);
-    EXPECT_EQ(input_dims_signature->data[2], -1);    
+TEST_F(DynamicInputTest, InputHeightAndWidthMutable) {
+  const TfLiteIntArray* input_dims_signature =
+      preprocessor->Tensor()->dims_signature;
+  EXPECT_EQ(input_dims_signature->data[1], -1);
+  EXPECT_EQ(input_dims_signature->data[2], -1);
 }
 
 // See if output tensor has been re-dimmed as per the input
 // tensor.
-TEST_F(DynamicInputTest, OutputHeightAndWidthMutable)
-{
-    SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
-    std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
-        image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
+TEST_F(DynamicInputTest, OutputHeightAndWidthMutable) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
+  std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
+      image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
 
-    preprocessor->Preprocess(image_frame_buffer);
-    const TFLiteIntArray* output_dims = engine->GetOutputs()[0]->dims;
-    
-    const size_t input_height = Tensor()->dims->data[1];
-    const size_t input_width = Tensor()->dims->data[2];
-    const size_t output_height = output_dims->data[1];
-    const size_t output_width = output_dims->data[2];
-    
-    EXPECT_EQ(input_height, output_height);
-    EXPECT_EQ(input_width, output_width);
+  preprocessor->Preprocess(image_frame_buffer);
+  const TFLiteIntArray* output_dims = engine->GetOutputs()[0]->dims;
+
+  const size_t input_height = Tensor()->dims->data[1];
+  const size_t input_width = Tensor()->dims->data[2];
+  const size_t output_height = output_dims->data[1];
+  const size_t output_width = output_dims->data[2];
+
+  EXPECT_EQ(input_height, output_height);
+  EXPECT_EQ(input_width, output_width);
 }
 }  // namespace
 }  // namespace vision
