@@ -35,7 +35,7 @@ limitations under the License.
 
 namespace tflite {
 namespace task {
-namespace vision {
+namespace processor {
 namespace {
 
 using ::testing::ElementsAreArray;
@@ -48,11 +48,14 @@ using ::tflite::task::JoinPath;
 using ::tflite::task::core::PopulateTensor;
 using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
+using ::tflite::task::vision::DecodeImageFromFile;
+using ::tflite::task::vision::FrameBuffer;
+using ::tflite::task::vision::ImageData;
 
 constexpr char kTestDataDirectory[] =
     "tensorflow_lite_support/cc/test/testdata/task/vision/";
 
-constexpr std::string kModelPath =
+constexpr char kModelPath[] =
     "tensorflow_lite_support/cc/test/testdata/task/vision/dilated_conv.tflite";
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
@@ -67,11 +70,11 @@ class DynamicInputTest : public tflite_shims::testing::Test {
     engine->BuildModelFromFile(kModelPath);
     engine->InitInterpreter();
 
-    ASSERT_OK_AND_ASSIGN(
-        preprocessor， processor::ImagePreprocessor::Create(engine.get(), {0}));
+    SUPPORT_ASSERT_OK_AND_ASSIGN(preprocessor,
+                                 ImagePreprocessor::Create(engine.get(), {0}));
   }
 
- private:
+ protected:
   std::unique_ptr<ImagePreprocessor> preprocessor;
   std::unique_ptr<TfLiteEngine> engine;
 };
@@ -80,7 +83,7 @@ class DynamicInputTest : public tflite_shims::testing::Test {
 // because it is so in the model.
 TEST_F(DynamicInputTest, InputHeightAndWidthMutable) {
   const TfLiteIntArray* input_dims_signature =
-      preprocessor->Tensor()->dims_signature;
+      engine->GetInputs()[0]->dims_signature;
   EXPECT_EQ(input_dims_signature->data[1], -1);
   EXPECT_EQ(input_dims_signature->data[2], -1);
 }
@@ -92,18 +95,14 @@ TEST_F(DynamicInputTest, OutputHeightAndWidthMutable) {
   std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
       image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
 
-  preprocessor->Preprocess(image_frame_buffer);
-  const TFLiteIntArray* output_dims = engine->GetOutputs()[0]->dims;
+  preprocessor->Preprocess(*image_frame_buffer);
 
-  const size_t input_height = Tensor()->dims->data[1];
-  const size_t input_width = Tensor()->dims->data[2];
-  const size_t output_height = output_dims->data[1];
-  const size_t output_width = output_dims->data[2];
-
-  EXPECT_EQ(input_height, output_height);
-  EXPECT_EQ(input_width, output_width);
+  EXPECT_EQ(engine->GetInputs()[0]->dims->data[1],
+            engine->GetOutputs()[0]->dims->data[1]);
+  EXPECT_EQ(engine->GetInputs()[0]->dims->data[2],
+            engine->GetOutputs()[0]->dims->data[2]);
 }
 }  // namespace
-}  // namespace vision
+}  // namespace processor
 }  // namespace task
 }  // namespace tflite
