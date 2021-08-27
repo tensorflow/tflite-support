@@ -55,8 +55,7 @@ using ::tflite::task::vision::ImageData;
 constexpr char kTestDataDirectory[] =
     "tensorflow_lite_support/cc/test/testdata/task/vision/";
 
-constexpr char kModelPath[] =
-    "tensorflow_lite_support/cc/test/testdata/task/vision/dilated_conv.tflite";
+constexpr char kDilatedConvolutionModel[] = "dilated_conv.tflite";
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
   return DecodeImageFromFile(
@@ -67,7 +66,8 @@ class DynamicInputTest : public tflite_shims::testing::Test {
  public:
   void SetUp() {
     engine = absl::make_unique<TfLiteEngine>();
-    engine->BuildModelFromFile(kModelPath);
+    engine->BuildModelFromFile(
+        JoinPath("./", kTestDataDirectory, kDilatedConvolutionModel));
     engine->InitInterpreter();
 
     SUPPORT_ASSERT_OK_AND_ASSIGN(preprocessor,
