@@ -242,3 +242,49 @@ cc_library(
     hdrs = ["embeddings_proto_inc.h"],
     deps = [":embeddings_cc_proto"],
 )
+
+# LandmarkDetector protos.
+
+proto_library(
+    name = "landmark_detector_options_proto",
+    srcs = ["landmark_detector_options.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "landmark_detector_options_cc_proto",
+    deps = [
+        ":landmark_detector_options_proto",
+    ],
+)
+
+cc_library(
+    name = "landmark_detector_options_proto_inc",
+    hdrs = ["landmark_detector_options_proto_inc.h"],
+    deps = [
+        ":landmark_detector_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
+    ],
+)
+
+proto_library(
+    name = "landmarks_proto",
+    srcs = ["landmarks.proto"],
+)
+
+cc_proto_library(
+    name = "landmarks_cc_proto",
+    deps = [
+        ":landmarks_proto",
+    ],
+)
+
+cc_library(
+    name = "landmarks_proto_inc",
+    hdrs = ["landmarks_proto_inc.h"],
+    deps = [
+        ":landmarks_cc_proto",
+    ],
+)
