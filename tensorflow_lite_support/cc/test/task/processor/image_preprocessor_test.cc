@@ -96,7 +96,8 @@ TEST_F(DynamicInputTest, OutputHeightAndWidthMutable) {
       image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
 
   preprocessor_->Preprocess(*image_frame_buffer);
-
+  absl::Status status = engine_->interpreter_wrapper()->InvokeWithoutFallback();
+  EXPECT_TRUE(status.ok());
   EXPECT_EQ(engine_->GetInputs()[0]->dims->data[1],
             engine_->GetOutputs()[0]->dims->data[1]);
   EXPECT_EQ(engine_->GetInputs()[0]->dims->data[2],
