@@ -248,7 +248,7 @@ public class TensorImage {
    * <p>The main usage of this method is to load an {@link android.media.Image} object as model
    * input to the <a href="TFLite Task
    * Library">https://www.tensorflow.org/lite/inference_with_metadata/task_library/overview</a>.
-   * {@link TensorImage} backed by {@link android.media.Image} is not supported by {#link
+   * {@link TensorImage} backed by {@link android.media.Image} is not supported by {@link
    * ImageProcessor}.
    *
    * <p>* @throws IllegalArgumentException if the {@link android.graphics.ImageFormat} of {@code
