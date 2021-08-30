@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/task/processor/image_preprocessor.h"
 
+#include <fstream>
 #include <memory>
 
 #include "absl/flags/flag.h"
@@ -32,7 +33,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/test/test_utils.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
-#include <fstream>
 
 namespace tflite {
 namespace task {
@@ -64,7 +64,7 @@ StatusOr<ImageData> LoadImage(std::string image_name) {
 }
 
 class DynamicInputTest : public tflite_shims::testing::Test {
-public:
+ public:
   void SetUp() {
     engine_ = absl::make_unique<TfLiteEngine>();
     engine_->BuildModelFromFile(JoinPath("./", kTestDataDirectory,
@@ -75,7 +75,7 @@ public:
                                  ImagePreprocessor::Create(engine_.get(), {0}));
   }
 
-protected:
+ protected:
   std::unique_ptr<ImagePreprocessor> preprocessor_ = nullptr;
   std::unique_ptr<TfLiteEngine> engine_ = nullptr;
 };
@@ -121,23 +121,27 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
       tflite::task::core::AssertAndReturnTypedTensor<float>(
           engine_->GetInputs()[0]);
 
-  std::string file_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                                   "burger_normalized.bin");
-
-  std::ifstream golden_image(file_path);
-  std::string curr_line;
   bool is_equal = true;
   float epsilon = 0.1f;
+  std::string file_path =
+      JoinPath("./", kTestDataDirectory, "burger_normalized.bin");
 
-  while (std::getline(golden_image, curr_line)) {
-    float val = std::stof(curr_line);
-    is_equal &= std::fabs(val - *processed_input_data) <= epsilon;
+  std::ifstream golden_image(file_path, std::ios::binary);
+  // Input read success check.
+  is_equal &= golden_image.peek() != std::ifstream::traits_type::eof();
+
+  std::vector<uint8_t> buffer(std::istreambuf_iterator<char>(golden_image), {});
+  float *val_ptr = reinterpret_cast<float *>(buffer.data());
+
+  for (size_t i = 0; i < buffer.size() / sizeof(float); ++i) {
+    is_equal &= std::fabs(*val_ptr - *processed_input_data) <= epsilon;
+    ++val_ptr;
     ++processed_input_data;
   }
 
   EXPECT_TRUE(is_equal);
 }
-} // namespace
-} // namespace processor
-} // namespace task
-} // namespace tflite
+}  // namespace
+}  // namespace processor
+}  // namespace task
+}  // namespace tflite
