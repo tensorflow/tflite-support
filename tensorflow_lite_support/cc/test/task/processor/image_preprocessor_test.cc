@@ -122,7 +122,7 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
           engine_->GetInputs()[0]);
 
   std::string file_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                                   "burger_normalized.txt");
+                                   "burger_normalized.bin");
 
   std::ifstream golden_image(file_path);
   std::string curr_line;
