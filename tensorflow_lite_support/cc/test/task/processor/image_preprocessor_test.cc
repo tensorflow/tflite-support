@@ -55,7 +55,7 @@ using ::tflite::task::vision::ImageData;
 constexpr char kTestDataDirectory[] =
     "tensorflow_lite_support/cc/test/testdata/task/vision/";
 
-constexpr char kDilatedConvolutionModel[] = "dilated_conv.tflite";
+constexpr char kDilatedConvolutionModelWithMetaData[] = "dilated_conv.tflite";
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
   return DecodeImageFromFile(
@@ -63,27 +63,27 @@ StatusOr<ImageData> LoadImage(std::string image_name) {
 }
 
 class DynamicInputTest : public tflite_shims::testing::Test {
- public:
+public:
   void SetUp() {
-    engine = absl::make_unique<TfLiteEngine>();
-    engine->BuildModelFromFile(
-        JoinPath("./", kTestDataDirectory, kDilatedConvolutionModel));
-    engine->InitInterpreter();
+    engine_ = absl::make_unique<TfLiteEngine>();
+    engine_->BuildModelFromFile(JoinPath("./", kTestDataDirectory,
+                                         kDilatedConvolutionModelWithMetaData));
+    engine_->InitInterpreter();
 
-    SUPPORT_ASSERT_OK_AND_ASSIGN(preprocessor,
-                                 ImagePreprocessor::Create(engine.get(), {0}));
+    SUPPORT_ASSERT_OK_AND_ASSIGN(preprocessor_,
+                                 ImagePreprocessor::Create(engine_.get(), {0}));
   }
 
- protected:
-  std::unique_ptr<ImagePreprocessor> preprocessor;
-  std::unique_ptr<TfLiteEngine> engine;
+protected:
+  std::unique_ptr<ImagePreprocessor> preprocessor_ = nullptr;
+  std::unique_ptr<TfLiteEngine> engine_ = nullptr;
 };
 
 // See if input tensor dims signature for height and width is -1
 // because it is so in the model.
 TEST_F(DynamicInputTest, InputHeightAndWidthMutable) {
-  const TfLiteIntArray* input_dims_signature =
-      engine->GetInputs()[0]->dims_signature;
+  const TfLiteIntArray *input_dims_signature =
+      engine_->GetInputs()[0]->dims_signature;
   EXPECT_EQ(input_dims_signature->data[1], -1);
   EXPECT_EQ(input_dims_signature->data[2], -1);
 }
@@ -95,14 +95,14 @@ TEST_F(DynamicInputTest, OutputHeightAndWidthMutable) {
   std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
       image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
 
-  preprocessor->Preprocess(*image_frame_buffer);
+  preprocessor_->Preprocess(*image_frame_buffer);
 
-  EXPECT_EQ(engine->GetInputs()[0]->dims->data[1],
-            engine->GetOutputs()[0]->dims->data[1]);
-  EXPECT_EQ(engine->GetInputs()[0]->dims->data[2],
-            engine->GetOutputs()[0]->dims->data[2]);
+  EXPECT_EQ(engine_->GetInputs()[0]->dims->data[1],
+            engine_->GetOutputs()[0]->dims->data[1]);
+  EXPECT_EQ(engine_->GetInputs()[0]->dims->data[2],
+            engine_->GetOutputs()[0]->dims->data[2]);
 }
-}  // namespace
-}  // namespace processor
-}  // namespace task
-}  // namespace tflite
+} // namespace
+} // namespace processor
+} // namespace task
+} // namespace tflite
