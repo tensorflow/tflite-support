@@ -32,6 +32,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/test/test_utils.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include <fstream>
 
 namespace tflite {
 namespace task {
@@ -104,6 +105,37 @@ TEST_F(DynamicInputTest, OutputDimensionCheck) {
   EXPECT_EQ(engine_->GetOutputs()[0]->dims->data[2],
             engine_->GetInputs()[0]->dims->data[2]);
   EXPECT_EQ(engine_->GetOutputs()[0]->dims->data[3], 16);
+}
+
+// Compare pre-processed input with an already pre-processed
+// golden image.
+TEST_F(DynamicInputTest, GoldenImageComparison) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
+  std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
+      image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
+
+  preprocessor_->Preprocess(*image_frame_buffer);
+
+  // Check the processed input image.
+  float *processed_input_data =
+      tflite::task::core::AssertAndReturnTypedTensor<float>(
+          engine_->GetInputs()[0]);
+
+  std::string file_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                   "burger_normalized.txt");
+
+  std::ifstream golden_image(file_path);
+  std::string curr_line;
+  bool is_equal = true;
+  float epsilon = 0.1f;
+
+  while (std::getline(golden_image, curr_line)) {
+    float val = std::stof(curr_line);
+    is_equal &= std::fabs(val - *processed_input_data) <= epsilon;
+    ++processed_input_data;
+  }
+
+  EXPECT_TRUE(is_equal);
 }
 } // namespace
 } // namespace processor
