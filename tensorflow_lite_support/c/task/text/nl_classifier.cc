@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier_c_api.h"
+#include "tensorflow_lite_support/c/task/text/nl_classifier.h"
 
 #include <memory>
 
@@ -21,22 +21,24 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/category.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
 
-using CategoryCPP = ::tflite::task::core::Category;
-using NLClassifierCPP = ::tflite::task::text::nlclassifier::NLClassifier;
-using NLClassifierOptionsCPP =
+namespace {
+using CategoryCpp = ::tflite::task::core::Category;
+using NLClassifierCpp = ::tflite::task::text::nlclassifier::NLClassifier;
+using NLClassifierOptionsCpp =
     ::tflite::task::text::nlclassifier::NLClassifierOptions;
+}  // namespace
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-struct NLClassifier {
-  std::unique_ptr<NLClassifierCPP> impl;
+struct TfLiteNLClassifier {
+  std::unique_ptr<NLClassifierCpp> impl;
 };
 
-NLClassifier* NLClassifierFromFileAndOptions(
-    const char* model_path, const NLClassifierOptions* options) {
-  auto classifier_status = NLClassifierCPP::CreateFromFileAndOptions(
+TfLiteNLClassifier* TfLiteNLClassifierCreateFromOptions(
+    const char* model_path, const TfLiteNLClassifierOptions* options) {
+  auto classifier_status = NLClassifierCpp::CreateFromFileAndOptions(
       std::string(model_path),
       {
           .input_tensor_index = options->input_tensor_index,
@@ -56,17 +58,17 @@ NLClassifier* NLClassifierFromFileAndOptions(
       });
 
   if (classifier_status.ok()) {
-    return new NLClassifier{
-        .impl = std::unique_ptr<NLClassifierCPP>(dynamic_cast<NLClassifierCPP*>(
+    return new TfLiteNLClassifier{
+        .impl = std::unique_ptr<NLClassifierCpp>(dynamic_cast<NLClassifierCpp*>(
             classifier_status.value().release()))};
   } else {
     return nullptr;
   }
 }
 
-Categories* NLClassifierClassify(const NLClassifier* classifier,
-                                 const char* text) {
-  std::vector<CategoryCPP> results =
+Categories* TfLiteNLClassifierClassify(const TfLiteNLClassifier* classifier,
+                                       const char* text) {
+  std::vector<CategoryCpp> results =
       classifier->impl->Classify(absl::string_view(text).data());
   size_t size = results.size();
   auto* categories = new Category[size];
@@ -82,7 +84,9 @@ Categories* NLClassifierClassify(const NLClassifier* classifier,
   return c_categories;
 }
 
-void NLClassifierDelete(NLClassifier* classifier) { delete classifier; }
+void TfLiteNLClassifierDelete(TfLiteNLClassifier* classifier) {
+  delete classifier;
+}
 
 #ifdef __cplusplus
 }  // extern "C"

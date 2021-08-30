@@ -39,9 +39,9 @@ aar_with_jni(
     name = "task-library-text",
     android_library = ":task_library_text",
     headers = [
-        "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier_c_api.h",
-        "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier_c_api.h",
-        "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier_c_api_common.h",
-        "//tensorflow_lite_support/cc/task/text/qa:bert_qa_c_api.h",
+        "//tensorflow_lite_support/c/task/text:bert_nl_classifier.h",
+        "//tensorflow_lite_support/c/task/text:nl_classifier.h",
+        "//tensorflow_lite_support/c/task/text:nl_classifier_common.h",
+        "//tensorflow_lite_support/c/task/text:bert_question_answerer.h",
     ],
 )

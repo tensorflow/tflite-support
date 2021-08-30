@@ -14,7 +14,7 @@ objc_library(
     hdrs = ["Sources/TFLBertNLClassifier.h"],
     module_name = "TFLBertNLClassifier",
     deps = [
-        "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier_c_api",
+        "//tensorflow_lite_support/c/task/text:bert_nl_classifier",
         "@google_toolbox_for_mac//:GTM_Defines",
     ],
 )
@@ -72,7 +72,7 @@ objc_library(
     hdrs = ["Sources/TFLNLClassifier.h"],
     module_name = "TFLNLClassifier",
     deps = [
-        "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier_c_api",
+        "//tensorflow_lite_support/c/task/text:nl_classifier",
         "@google_toolbox_for_mac//:GTM_Defines",
     ],
 )

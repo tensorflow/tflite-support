@@ -91,7 +91,7 @@ public class MlImage implements Closeable {
     STORAGE_TYPE_BITMAP,
     STORAGE_TYPE_BYTEBUFFER,
     STORAGE_TYPE_MEDIA_IMAGE,
-    STORAGE_TYPE_IMAGE_PROXY
+    STORAGE_TYPE_IMAGE_PROXY,
   })
   @Retention(RetentionPolicy.SOURCE)
   public @interface StorageType {}

@@ -12,25 +12,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_TEXT_NL_CLASSIFIER_COMMON_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TASK_TEXT_NL_CLASSIFIER_COMMON_H_
 
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier_c_api_common.h"
+// C API for the NLClassifier results, Catergory.
 
-#include <memory>
+// TODO(b/197355311): deprecate this class and use the unified one with image
+// and audio.
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-void NLClassifierCategoriesDelete(Categories* categories) {
-  for (int i = 0; i < categories->size; i++) {
-    // `strdup` obtains memory using `malloc` and the memory needs to be
-    // released using `free`.
-    free(categories->categories[i].text);
-  }
-  delete[] categories->categories;
-  delete categories;
-}
+typedef struct Category {
+  char* text;
+  double score;
+} Category;
+
+typedef struct Categories {
+  int size;
+  Category* categories;
+} Categories;
+
+void NLClassifierCategoriesDelete(Categories* categories);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
+
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_TEXT_NL_CLASSIFIER_COMMON_H_

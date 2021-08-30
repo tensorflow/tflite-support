@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/bert_nl_classifier_c_api.h"
+#include "tensorflow_lite_support/c/task/text/bert_nl_classifier.h"
 
 #include <memory>
 
@@ -22,46 +22,53 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/bert_nl_classifier.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_nl_classifier_options_proto_inc.h"
 
-using CategoryCPP = ::tflite::task::core::Category;
-using BertNLClassifierCPP =
+namespace {
+using CategoryCpp = ::tflite::task::core::Category;
+using BertNLClassifierCpp =
     ::tflite::task::text::nlclassifier::BertNLClassifier;
-using BertNLClassifierOptionsCPP =
+using BertNLClassifierOptionsCpp =
     ::tflite::task::text::BertNLClassifierOptions;
+
+const TfLiteBertNLClassifierOptions kBertNLClassifierOptionsDefault = {128};
+}  // namespace
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-struct BertNLClassifier {
-  std::unique_ptr<BertNLClassifierCPP> impl;
+struct TfLiteBertNLClassifier {
+  std::unique_ptr<BertNLClassifierCpp> impl;
 };
 
-const struct BertNLClassifierOptions BertNLClassifierOptions_default = {128};
+TfLiteBertNLClassifier* TfLiteBertNLClassifierCreateFromOptions(
+    const char* model_path, const TfLiteBertNLClassifierOptions* options) {
+  BertNLClassifierOptionsCpp cc_options;
 
-BertNLClassifier* BertNLClassifierFromFileAndOptions(
-    const char* model_path, const struct BertNLClassifierOptions* options) {
-  BertNLClassifierOptionsCPP cc_options;
   cc_options.set_max_seq_len(options->max_seq_len);
   cc_options.mutable_base_options()->mutable_model_file()->set_file_name(
       model_path);
-  auto classifier_status = BertNLClassifierCPP::CreateFromOptions(cc_options);
+  auto classifier_status = BertNLClassifierCpp::CreateFromOptions(cc_options);
+
   if (classifier_status.ok()) {
-    return new BertNLClassifier{.impl = std::unique_ptr<BertNLClassifierCPP>(
-                                    dynamic_cast<BertNLClassifierCPP*>(
-                                        classifier_status.value().release()))};
+    return new TfLiteBertNLClassifier{
+        .impl = std::unique_ptr<BertNLClassifierCpp>(
+            dynamic_cast<BertNLClassifierCpp*>(
+                classifier_status.value().release()))};
+
   } else {
     return nullptr;
   }
 }
 
-BertNLClassifier* BertNLClassifierFromFile(const char* model_path) {
-  return BertNLClassifierFromFileAndOptions(model_path,
-                                            &BertNLClassifierOptions_default);
+TfLiteBertNLClassifier* TfLiteBertNLClassifierCreate(const char* model_path) {
+  return TfLiteBertNLClassifierCreateFromOptions(
+      model_path, &kBertNLClassifierOptionsDefault);
 }
 
-Categories* BertNLClassifierClassify(const BertNLClassifier* classifier,
-                                     const char* text) {
-  std::vector<CategoryCPP> results =
+Categories* TfLiteBertNLClassifierClassify(
+    const TfLiteBertNLClassifier* classifier, const char* text) {
+  std::vector<CategoryCpp> results =
+
       classifier->impl->Classify(absl::string_view(text).data());
   size_t size = results.size();
   auto* categories = new Category[size];
@@ -77,7 +84,9 @@ Categories* BertNLClassifierClassify(const BertNLClassifier* classifier,
   return c_categories;
 }
 
-void BertNLClassifierDelete(BertNLClassifier* classifier) { delete classifier; }
+void TfLiteBertNLClassifierDelete(TfLiteBertNLClassifier* classifier) {
+  delete classifier;
+}
 
 #ifdef __cplusplus
 }  // extern "C"

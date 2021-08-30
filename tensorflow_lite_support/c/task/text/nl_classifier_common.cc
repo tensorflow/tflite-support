@@ -12,32 +12,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_NL_CLASSIFIER_C_API_COMMON_H_
-#define TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_NL_CLASSIFIER_C_API_COMMON_H_
 
-// Common structs shared between NLClassifier APIs
-//
-/// // Dispose of the Categories object.
-/// NLClassifierCategoriesDelete(categories);
+#include "tensorflow_lite_support/c/task/text/nl_classifier_common.h"
+
+#include <memory>
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-struct Category {
-  char* text;
-  double score;
-};
-
-struct Categories {
-  int size;
-  struct Category* categories;
-};
-
-extern void NLClassifierCategoriesDelete(struct Categories* categories);
+void NLClassifierCategoriesDelete(Categories* categories) {
+  for (int i = 0; i < categories->size; i++) {
+    // `strdup` obtains memory using `malloc` and the memory needs to be
+    // released using `free`.
+    free(categories->categories[i].text);
+  }
+  delete[] categories->categories;
+  delete categories;
+}
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
-
-#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_NL_CLASSIFIER_C_API_COMMON_H_

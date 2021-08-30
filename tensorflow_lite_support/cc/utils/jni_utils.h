@@ -22,6 +22,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
+#include "absl/status/status.h"
 #include "absl/strings/string_view.h"
 #include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
@@ -34,6 +35,8 @@ const char kIllegalArgumentException[] = "java/lang/IllegalArgumentException";
 const char kIllegalStateException[] = "java/lang/IllegalStateException";
 const char kNullPointerException[] = "java/lang/NullPointerException";
 const char kIndexOutOfBoundsException[] = "java/lang/IndexOutOfBoundsException";
+const char kIOException[] = "java/io/IOException";
+const char kRuntimeException[] = "java/lang/RuntimeException";
 const char kUnsupportedOperationException[] =
     "java/lang/UnsupportedOperationException";
 const char kAssertionError[] = "java/lang/AssertionError";
@@ -90,6 +93,8 @@ void ThrowException(JNIEnv* env, const char* clazz, const char* fmt, ...);
 
 void ThrowExceptionWithMessage(JNIEnv* env, const char* clazz,
                                const char* message);
+
+const char* GetExceptionClassNameForStatusCode(absl::StatusCode status_code);
 
 }  // namespace utils
 }  // namespace support
