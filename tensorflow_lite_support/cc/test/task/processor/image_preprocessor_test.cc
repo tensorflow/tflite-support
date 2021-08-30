@@ -89,8 +89,8 @@ TEST_F(DynamicInputTest, InputHeightAndWidthMutable) {
 }
 
 // See if output tensor has been re-dimmed as per the input
-// tensor.
-TEST_F(DynamicInputTest, OutputHeightAndWidthMutable) {
+// tensor. Expected shape: (1, input_height, input_width, 16).
+TEST_F(DynamicInputTest, OutputDimensionCheck) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
   std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
       image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
@@ -98,10 +98,12 @@ TEST_F(DynamicInputTest, OutputHeightAndWidthMutable) {
   preprocessor_->Preprocess(*image_frame_buffer);
   absl::Status status = engine_->interpreter_wrapper()->InvokeWithoutFallback();
   EXPECT_TRUE(status.ok());
-  EXPECT_EQ(engine_->GetInputs()[0]->dims->data[1],
-            engine_->GetOutputs()[0]->dims->data[1]);
-  EXPECT_EQ(engine_->GetInputs()[0]->dims->data[2],
-            engine_->GetOutputs()[0]->dims->data[2]);
+  EXPECT_EQ(engine_->GetOutputs()[0]->dims->data[0], 1);
+  EXPECT_EQ(engine_->GetOutputs()[0]->dims->data[1],
+            engine_->GetInputs()[0]->dims->data[1]);
+  EXPECT_EQ(engine_->GetOutputs()[0]->dims->data[2],
+            engine_->GetInputs()[0]->dims->data[2]);
+  EXPECT_EQ(engine_->GetOutputs()[0]->dims->data[3], 16);
 }
 } // namespace
 } // namespace processor
