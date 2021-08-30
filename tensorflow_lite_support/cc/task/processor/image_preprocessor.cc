@@ -73,11 +73,6 @@ absl::Status ImagePreprocessor::Init(
 
   if (dims_signature != nullptr) {
     // Only the HxW dimensions support mutability.
-    if (dims_signature->data[0] == -1 || dims_signature->data[3] == -1)
-      return tflite::support::CreateStatusWithPayload(
-          absl::StatusCode::kUnimplemented,
-          "Only Height and Width are mutable for now.");
-
     is_height_mutable_ = dims_signature->data[1] == -1;
     is_width_mutable_ = dims_signature->data[2] == -1;
   }
