@@ -18,17 +18,12 @@ limitations under the License.
 #include <fstream>
 #include <memory>
 
-#include "absl/flags/flag.h"
 #include "absl/status/status.h"
-#include "absl/strings/cord.h"
 #include "tensorflow/lite/core/shims/cc/shims_test_util.h"
-#include "tensorflow/lite/kernels/builtin_op_kernels.h"
-#include "tensorflow/lite/mutable_op_resolver.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
-#include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/test/test_utils.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
@@ -80,8 +75,7 @@ class DynamicInputTest : public tflite_shims::testing::Test {
 // See if output tensor has been re-dimmed as per the input
 // tensor. Expected shape: (1, input_height, input_width, 16).
 TEST_F(DynamicInputTest, OutputDimensionCheck) {
-  absl::Status status = engine_->interpreter_wrapper()->InvokeWithoutFallback();
-  EXPECT_TRUE(status.ok());
+  EXPECT_TRUE(engine_->interpreter_wrapper()->InvokeWithoutFallback().ok());
   EXPECT_EQ(engine_->GetOutputs()[0]->dims->data[0], 1);
   EXPECT_EQ(engine_->GetOutputs()[0]->dims->data[1],
             engine_->GetInputs()[0]->dims->data[1]);
