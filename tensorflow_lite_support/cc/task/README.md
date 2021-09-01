@@ -381,8 +381,9 @@ A CLI demo tool is available [here][4] for easily trying out this API.
 
 ### Landmark Detector
 
-`LandmarkDetector` accepts [MoveNet](https://tfhub.dev/google/movenet/singlepose/lightning/4) model (with optional TFLite Model Metadata) that 
-conforms to the following spec:
+`LandmarkDetector` accepts 
+[MoveNet](https://tfhub.dev/google/movenet/singlepose/lightning/4) model 
+(with optional TFLite Model Metadata) that conforms to the following spec:
 
 Input tensor (type: `kTfLiteUInt8`):
 
@@ -393,8 +394,10 @@ Input tensor (type: `kTfLiteUInt8`):
 
 Output tensor (type: `kTfLiteFloat32`):
 
-   - one output tensor with 4 dimensions `[1 x 1 x num_keypoints x 3]`,
-     where, `num_keypoints` is required to be 17.
+   - one output tensor with 4 dimensions `[1 x 1 x 17 x 3]`, the 
+     last dimension representing keypoint coordinates with predicted
+     confidence score in the form [y, x, score].
+     
 
 Example usage:
 
