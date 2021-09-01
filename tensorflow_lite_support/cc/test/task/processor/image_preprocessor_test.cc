@@ -27,7 +27,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
-#include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
