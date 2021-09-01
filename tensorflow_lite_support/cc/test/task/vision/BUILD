@@ -185,7 +185,6 @@ cc_test_with_tflite(
         "//tensorflow_lite_support/cc/task/vision:landmark_detector",
     ],
     deps = [
-        "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:gtest_main",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/task/core:task_utils",
