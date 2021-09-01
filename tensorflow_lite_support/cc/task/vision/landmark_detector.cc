@@ -19,7 +19,6 @@ limitations under the License.
 #include "absl/strings/str_format.h"
 #include "absl/strings/string_view.h"
 #include "flatbuffers/flatbuffers.h"
-#include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
@@ -78,14 +77,15 @@ absl::Status LandmarkDetector::SanityCheckOptions(
   // Nothing to check
   return absl::OkStatus();
 }
-/* static */
-absl::Status SanityCheckOutputTensors(
-    const std::vector<const TfLiteTensor*>& output_tensors) {
-  if (output_tensors.size() != 1) {
+
+absl::Status LandmarkDetector::SanityCheckOutputTensors() {
+  const TfLiteEngine::Interpreter* interpreter = engine_->interpreter();
+  // Check the number of output tensors.
+  if (TfLiteEngine::OutputCount(interpreter) != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
-        absl::StrFormat("Expected 1 output tensors, found %d",
-                        output_tensors.size()));
+        absl::StrFormat("Expected 1 output tensor, found %d",
+                        TfLiteEngine::OutputCount(interpreter)));
   }
   return absl::OkStatus();
 }
@@ -101,6 +101,9 @@ absl::Status LandmarkDetector::Init(
 
   // Sanity check and set inputs and outputs.
   RETURN_IF_ERROR(CheckAndSetInputs());
+    
+  // Sanity check for output_tensors.
+  RETURN_IF_ERROR(SanityCheckOutputTensors());
 
   return absl::OkStatus();
 }
@@ -126,10 +129,6 @@ StatusOr<LandmarkResult> LandmarkDetector::Detect(
 StatusOr<LandmarkResult> LandmarkDetector::Postprocess(
     const std::vector<const TfLiteTensor*>& output_tensors,
     const FrameBuffer& /*frame_buffer*/, const BoundingBox& /*roi*/) {
-  // Most of the checks here should never happen, as outputs have been validated
-  // at construction time. Checking nonetheless and returning internal errors if
-  // something bad happens.
-  RETURN_IF_ERROR(SanityCheckOutputTensors(output_tensors));
 
   // Get number of keypoints.
   const int num_keypoints = output_tensors[0]->dims->data[2];
