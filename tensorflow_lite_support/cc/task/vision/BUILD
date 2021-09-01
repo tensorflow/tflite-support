@@ -181,7 +181,6 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
     ],
     deps = [
-        "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:task_utils",
@@ -195,7 +194,6 @@ cc_library_with_tflite(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
-        "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/core/api",
     ],
 )
