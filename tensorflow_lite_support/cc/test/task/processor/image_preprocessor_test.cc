@@ -94,17 +94,12 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
 
   bool is_equal = true;
   float epsilon = 0.1f;
-  // std::string file_path =
-  //     JoinPath("./", kTestDataDirectory, "burger_normalized.bin");
 
   std::string file_path =
-      "/home/psykik/open_source/tflite-support/tensorflow_lite_support/cc/test/"
-      "testdata/task/vision/burger_normalized.bin";
+      JoinPath("./", kTestDataDirectory, "burger_normalized.bin");
 
   std::ifstream golden_image(file_path, std::ios::binary);
-  // Input read success check.
-  is_equal &= golden_image.peek() != std::ifstream::traits_type::eof();
-  std::vector<uint8_t> buffer(std::istreambuf_iterator<char>(golden_image), {});
+  std::vector<uint8> buffer(std::istreambuf_iterator<char>(golden_image), {});
   float *val_ptr = reinterpret_cast<float *>(buffer.data());
 
   for (size_t i = 0; i < buffer.size() / sizeof(float); ++i) {
