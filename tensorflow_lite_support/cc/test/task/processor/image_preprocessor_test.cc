@@ -39,9 +39,7 @@ namespace task {
 namespace processor {
 namespace {
 
-using ::tflite::support::kTfLiteSupportPayload;
 using ::tflite::support::StatusOr;
-using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::JoinPath;
 using ::tflite::task::core::TfLiteEngine;
 using ::tflite::task::vision::DecodeImageFromFile;
@@ -103,8 +101,12 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
 
   bool is_equal = true;
   float epsilon = 0.1f;
+  // std::string file_path =
+  //     JoinPath("./", kTestDataDirectory, "burger_normalized.bin");
+
   std::string file_path =
-      JoinPath("./", kTestDataDirectory, "burger_normalized.bin");
+      "/home/psykik/open_source/tflite-support/tensorflow_lite_support/cc/test/"
+      "testdata/task/vision/burger_normalized.bin";
 
   std::ifstream golden_image(file_path, std::ios::binary);
   // Input read success check.
