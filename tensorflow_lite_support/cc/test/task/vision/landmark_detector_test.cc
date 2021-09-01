@@ -75,8 +75,8 @@ constexpr float GOLDEN_KEY_X[] = {
 // List of expected scores of each keypoint
 constexpr float GOLDEN_SCORE[] = {
     0.700562, 0.880824, 0.753821, 0.569463, 0.43017, 0.753821, 0.802983, 
-	0.925889, 0.942276, 0.700562, 0.802983, 0.802983, 0.905405, 0.635012, 
-	0.905405, 0.700562, 0.905405};
+    0.925889, 0.942276, 0.700562, 0.802983, 0.802983, 0.905405, 0.635012, 
+    0.905405, 0.700562, 0.905405};
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
   return DecodeImageFromFile(
