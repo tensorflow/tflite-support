@@ -39,15 +39,10 @@ namespace task {
 namespace processor {
 namespace {
 
-using ::testing::ElementsAreArray;
-using ::testing::HasSubstr;
-using ::testing::Optional;
 using ::tflite::support::kTfLiteSupportPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::JoinPath;
-using ::tflite::task::core::PopulateTensor;
-using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
 using ::tflite::task::vision::DecodeImageFromFile;
 using ::tflite::task::vision::FrameBuffer;
@@ -71,32 +66,23 @@ class DynamicInputTest : public tflite_shims::testing::Test {
                                          kDilatedConvolutionModelWithMetaData));
     engine_->InitInterpreter();
 
-    SUPPORT_ASSERT_OK_AND_ASSIGN(preprocessor_,
+    SUPPORT_ASSERT_OK_AND_ASSIGN(auto preprocessor,
                                  ImagePreprocessor::Create(engine_.get(), {0}));
+
+    SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
+    std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
+        image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
+
+    preprocessor->Preprocess(*image_frame_buffer);
   }
 
  protected:
-  std::unique_ptr<ImagePreprocessor> preprocessor_ = nullptr;
   std::unique_ptr<TfLiteEngine> engine_ = nullptr;
 };
-
-// See if input tensor dims signature for height and width is -1
-// because it is so in the model.
-TEST_F(DynamicInputTest, InputHeightAndWidthMutable) {
-  const TfLiteIntArray *input_dims_signature =
-      engine_->GetInputs()[0]->dims_signature;
-  EXPECT_EQ(input_dims_signature->data[1], -1);
-  EXPECT_EQ(input_dims_signature->data[2], -1);
-}
 
 // See if output tensor has been re-dimmed as per the input
 // tensor. Expected shape: (1, input_height, input_width, 16).
 TEST_F(DynamicInputTest, OutputDimensionCheck) {
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
-  std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
-      image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
-
-  preprocessor_->Preprocess(*image_frame_buffer);
   absl::Status status = engine_->interpreter_wrapper()->InvokeWithoutFallback();
   EXPECT_TRUE(status.ok());
   EXPECT_EQ(engine_->GetOutputs()[0]->dims->data[0], 1);
@@ -110,12 +96,6 @@ TEST_F(DynamicInputTest, OutputDimensionCheck) {
 // Compare pre-processed input with an already pre-processed
 // golden image.
 TEST_F(DynamicInputTest, GoldenImageComparison) {
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
-  std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
-      image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
-
-  preprocessor_->Preprocess(*image_frame_buffer);
-
   // Check the processed input image.
   float *processed_input_data =
       tflite::task::core::AssertAndReturnTypedTensor<float>(
@@ -129,7 +109,6 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
   std::ifstream golden_image(file_path, std::ios::binary);
   // Input read success check.
   is_equal &= golden_image.peek() != std::ifstream::traits_type::eof();
-
   std::vector<uint8_t> buffer(std::istreambuf_iterator<char>(golden_image), {});
   float *val_ptr = reinterpret_cast<float *>(buffer.data());
 
