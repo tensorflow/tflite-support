@@ -47,8 +47,9 @@ namespace vision {
 //    - `NormalizationOptions` is not required.
 // Output tensor:
 //  (kTfLiteFloat32)
-//    - one output tensor with 4 dimensions `[1 x 1 x num_keypoints x 3]`,
-//      where, `num_keypoints` is required to be 17.
+//    - one output tensor with 4 dimensions `[1 x 1 x 17 x 3]`, the 
+//      last dimension representing keypoint coordinates with predicted
+//      confidence score in the form [y, x, score].
 //
 // The MoveNet model can be found at:
 // https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/int8/4
@@ -110,6 +111,9 @@ class LandmarkDetector : public BaseVisionTaskApi<LandmarkResult> {
 
   // Performs pre-initialization actions.
   virtual absl::Status PreInit();
+    
+  // Performs Sanity check for output_tensors.
+  absl::Status SanityCheckOutputTensors();
 };
 
 }  // namespace vision
