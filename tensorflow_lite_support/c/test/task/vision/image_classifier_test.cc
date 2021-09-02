@@ -13,14 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
+#include "tensorflow_lite_support/c/task/vision/image_classifier.h"
+
+#include "tensorflow_lite_support/c/task/processor/classification_result.h"
+#include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/test/test_utils.h"
-#include "tensorflow_lite_support/c/task/vision/image_classifier.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils_c.h"
-#include "tensorflow_lite_support/c/task/processor/classification_result.h"
-#include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
-
 
 namespace tflite {
 namespace task {
@@ -35,9 +35,9 @@ constexpr char kTestDataDirectory[] =
 constexpr char kMobileNetQuantizedWithMetadata[] =
     "mobilenet_v1_0.25_224_quant.tflite";
 
-ImageData LoadImage(const char* image_name) {
-  return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
-                                      kTestDataDirectory, image_name).data());
+ImageData LoadImage(const char *image_name) {
+  return DecodeImageFromFile(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory, image_name).data());
 }
 
 TEST(CImageClassifierFromFileTest, FailsWithMissingModelPath) {
@@ -45,29 +45,31 @@ TEST(CImageClassifierFromFileTest, FailsWithMissingModelPath) {
   ASSERT_EQ(image_classifier, nullptr);
 }
 
-TEST(CImageClassifierFromFileTest, SucceedsWithModelPath) {  
+TEST(CImageClassifierFromFileTest, SucceedsWithModelPath) {
   TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromFile(
-                                          JoinPath("./" /*test src dir*/, 
-                                          kTestDataDirectory,
-                                          kMobileNetQuantizedWithMetadata)
-                                          .data());
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetQuantizedWithMetadata)
+          .data());
   EXPECT_NE(image_classifier, nullptr);
   TfLiteImageClassifierDelete(image_classifier);
 }
 
 TEST(CImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
   TfLiteImageClassifierOptions *options = TfLiteImageClassifierOptionsCreate();
-  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromOptions(options);
+  TfLiteImageClassifier *image_classifier =
+      TfLiteImageClassifierFromOptions(options);
   ASSERT_EQ(image_classifier, nullptr);
 }
 
 TEST(CImageClassifierFromOptionsTest, SucceedsWithModelPath) {
   TfLiteImageClassifierOptions *options = TfLiteImageClassifierOptionsCreate();
   const char *model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata).data();
-  
+                                    kMobileNetQuantizedWithMetadata)
+                               .data();
+
   TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
-  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromOptions(options);
+  TfLiteImageClassifier *image_classifier =
+      TfLiteImageClassifierFromOptions(options);
   EXPECT_NE(image_classifier, nullptr);
   TfLiteImageClassifierDelete(image_classifier);
 }
@@ -75,11 +77,13 @@ TEST(CImageClassifierFromOptionsTest, SucceedsWithModelPath) {
 TEST(CImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
   TfLiteImageClassifierOptions *options = TfLiteImageClassifierOptionsCreate();
   const char *model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata).data();
-  
+                                    kMobileNetQuantizedWithMetadata)
+                               .data();
+
   TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
   TfLiteImageClassifierOptionsSetNumThreads(options, 3);
-  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromOptions(options);
+  TfLiteImageClassifier *image_classifier =
+      TfLiteImageClassifierFromOptions(options);
   EXPECT_NE(image_classifier, nullptr);
   TfLiteImageClassifierDelete(image_classifier);
 }
@@ -87,44 +91,42 @@ TEST(CImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
 class CImageClassifierClassifyTest : public ::testing::Test {
  protected:
   void SetUp() override {
-     image_classifier = TfLiteImageClassifierFromFile(
-                            JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                            kMobileNetQuantizedWithMetadata).data());
-     ASSERT_NE(image_classifier, nullptr);
+    image_classifier = TfLiteImageClassifierFromFile(
+        JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                 kMobileNetQuantizedWithMetadata)
+            .data());
+    ASSERT_NE(image_classifier, nullptr);
   }
 
-  void TearDown() override {
-     TfLiteImageClassifierDelete(image_classifier);
-  }
+  void TearDown() override { TfLiteImageClassifierDelete(image_classifier); }
 
   TfLiteImageClassifier *image_classifier;
 };
-  
-TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {  
+
+TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
   struct ImageData image_data = LoadImage("burger-224.png");
 
-  TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width, 
-                                     .dimension.height = image_data.height, 
-                                     .buffer = image_data.pixel_data, 
-                                     .format = kRGB};
-  
-  TfLiteClassificationResult *classification_result = 
+  TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width,
+                                    .dimension.height = image_data.height,
+                                    .buffer = image_data.pixel_data,
+                                    .format = kRGB};
+
+  TfLiteClassificationResult *classification_result =
       TfLiteImageClassifierClassify(image_classifier, &frame_buffer);
-  
+
   ImageDataFree(&image_data);
-  
-  ASSERT_NE(classification_result, nullptr) 
-      << "Classification Result is NULL";
-  EXPECT_TRUE(classification_result->size >= 1) 
+
+  ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
+  EXPECT_TRUE(classification_result->size >= 1)
       << "Classification Result size is 0";
-  EXPECT_NE(classification_result->classifications, nullptr) 
+  EXPECT_NE(classification_result->classifications, nullptr)
       << "Classification Result Classifications is NULL";
-  EXPECT_TRUE(classification_result->classifications->size >= 1) 
+  EXPECT_TRUE(classification_result->classifications->size >= 1)
       << "Classification Result Classifications Size is 0";
-  EXPECT_NE(classification_result->classifications->categories, nullptr) 
+  EXPECT_NE(classification_result->classifications->categories, nullptr)
       << "Classification Result Classifications Classes is NULL";
 
-   TfLiteClassificationResultDelete(classification_result);
+  TfLiteClassificationResultDelete(classification_result);
 }
 
 }  // namespace
