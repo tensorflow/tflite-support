@@ -17,6 +17,5 @@ filegroup(
     srcs = glob([
         "*.jpg",
         "*.png",
-        "*.bin"
     ]),
 )
