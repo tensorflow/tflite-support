@@ -64,6 +64,6 @@ tflite_ios_framework(
     bundle_name = "TensorFlowLiteTaskVisionC",
     minimum_os_version = TFL_MINIMUM_OS_VERSION,
     deps = [
-        "//tensorflow_lite_support/c/task/vision:image_classifier_c_api",
+        "//tensorflow_lite_support/c/task/vision:image_classifier",
     ],
 )
