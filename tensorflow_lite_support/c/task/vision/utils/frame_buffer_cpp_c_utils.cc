@@ -14,27 +14,25 @@ limitations under the License.
 ==============================================================================*/
 
 #include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
+
 #include "absl/strings/str_format.h"
 
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 
 std::unique_ptr<FrameBufferCpp> CreateCppFrameBuffer(
     const TfLiteFrameBuffer *frame_buffer) {
-  FrameBufferCpp::Format frame_buffer_format = 
-    FrameBufferCpp::Format((*frame_buffer).format);
+  FrameBufferCpp::Format frame_buffer_format =
+      FrameBufferCpp::Format((*frame_buffer).format);
 
-  auto cpp_frame_buffer = 
-    tflite::task::vision::CreateFromRawBuffer(frame_buffer->buffer, 
-                                              {frame_buffer->dimension.width, 
-                                              frame_buffer->dimension.height}, 
-                                              frame_buffer_format);
-  
+  auto cpp_frame_buffer = tflite::task::vision::CreateFromRawBuffer(
+      frame_buffer->buffer,
+      {frame_buffer->dimension.width, frame_buffer->dimension.height},
+      frame_buffer_format);
+
   if (!cpp_frame_buffer.ok()) {
-       return nullptr;
+    return nullptr;
   }
-  
-  return std::unique_ptr<FrameBufferCpp>(
-                              dynamic_cast<FrameBufferCpp*>(
-                                cpp_frame_buffer.value().release()));
-}
 
+  return std::unique_ptr<FrameBufferCpp>(
+      dynamic_cast<FrameBufferCpp *>(cpp_frame_buffer.value().release()));
+}

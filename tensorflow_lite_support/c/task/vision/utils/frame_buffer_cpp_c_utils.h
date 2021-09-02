@@ -15,7 +15,6 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_FRAME_BUFFER_CPP_C_UTILS_H_
 #define TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_FRAME_BUFFER_CPP_C_UTILS_H_
 
-
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 
@@ -24,7 +23,7 @@ limitations under the License.
 // Meant to be used with vision C apis.
 
 // Creates the C++ FrameBuffer from the C FrameBuffer
-std::unique_ptr<::tflite::task::vision::FrameBuffer> 
-    CreateCppFrameBuffer(const TfLiteFrameBuffer  *frame_buffer);
+std::unique_ptr<::tflite::task::vision::FrameBuffer> CreateCppFrameBuffer(
+    const TfLiteFrameBuffer *frame_buffer);
 
-#endif //TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_FRAME_BUFFER_CPP_C_UTILS_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_FRAME_BUFFER_CPP_C_UTILS_H_
