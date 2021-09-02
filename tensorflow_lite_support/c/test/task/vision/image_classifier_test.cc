@@ -35,18 +35,18 @@ constexpr char kTestDataDirectory[] =
 constexpr char kMobileNetQuantizedWithMetadata[] =
     "mobilenet_v1_0.25_224_quant.tflite";
 
-ImageData LoadImage(const char *image_name) {
+ImageData LoadImage(const char* image_name) {
   return DecodeImageFromFile(
       JoinPath("./" /*test src dir*/, kTestDataDirectory, image_name).data());
 }
 
 TEST(CImageClassifierFromFileTest, FailsWithMissingModelPath) {
-  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromFile("");
+  TfLiteImageClassifier* image_classifier = TfLiteImageClassifierFromFile("");
   ASSERT_EQ(image_classifier, nullptr);
 }
 
 TEST(CImageClassifierFromFileTest, SucceedsWithModelPath) {
-  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromFile(
+  TfLiteImageClassifier* image_classifier = TfLiteImageClassifierFromFile(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata)
           .data());
@@ -55,34 +55,34 @@ TEST(CImageClassifierFromFileTest, SucceedsWithModelPath) {
 }
 
 TEST(CImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
-  TfLiteImageClassifierOptions *options = TfLiteImageClassifierOptionsCreate();
-  TfLiteImageClassifier *image_classifier =
+  TfLiteImageClassifierOptions* options = TfLiteImageClassifierOptionsCreate();
+  TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(options);
   ASSERT_EQ(image_classifier, nullptr);
 }
 
 TEST(CImageClassifierFromOptionsTest, SucceedsWithModelPath) {
-  TfLiteImageClassifierOptions *options = TfLiteImageClassifierOptionsCreate();
-  const char *model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+  TfLiteImageClassifierOptions* options = TfLiteImageClassifierOptionsCreate();
+  const char* model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
                                     kMobileNetQuantizedWithMetadata)
                                .data();
 
   TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
-  TfLiteImageClassifier *image_classifier =
+  TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(options);
   EXPECT_NE(image_classifier, nullptr);
   TfLiteImageClassifierDelete(image_classifier);
 }
 
 TEST(CImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
-  TfLiteImageClassifierOptions *options = TfLiteImageClassifierOptionsCreate();
-  const char *model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+  TfLiteImageClassifierOptions* options = TfLiteImageClassifierOptionsCreate();
+  const char* model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
                                     kMobileNetQuantizedWithMetadata)
                                .data();
 
   TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
   TfLiteImageClassifierOptionsSetNumThreads(options, 3);
-  TfLiteImageClassifier *image_classifier =
+  TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(options);
   EXPECT_NE(image_classifier, nullptr);
   TfLiteImageClassifierDelete(image_classifier);
@@ -100,7 +100,7 @@ class CImageClassifierClassifyTest : public ::testing::Test {
 
   void TearDown() override { TfLiteImageClassifierDelete(image_classifier); }
 
-  TfLiteImageClassifier *image_classifier;
+  TfLiteImageClassifier* image_classifier;
 };
 
 TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
@@ -111,7 +111,7 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
                                     .buffer = image_data.pixel_data,
                                     .format = kRGB};
 
-  TfLiteClassificationResult *classification_result =
+  TfLiteClassificationResult* classification_result =
       TfLiteImageClassifierClassify(image_classifier, &frame_buffer);
 
   ImageDataFree(&image_data);
@@ -139,7 +139,7 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
 
   TfLiteBoundingBox bounding_box = {
       .origin_x = 0, .origin_y = 0, .width = 100, .height = 100};
-  TfLiteClassificationResult *classification_result =
+  TfLiteClassificationResult* classification_result =
       TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
                                            &bounding_box);
 
@@ -168,7 +168,7 @@ TEST_F(CImageClassifierClassifyTest, FailsWithRoiWithinImageBounds) {
 
   TfLiteBoundingBox bounding_box = {
       .origin_x = 0, .origin_y = 0, .width = 250, .height = 250};
-  TfLiteClassificationResult *classification_result =
+  TfLiteClassificationResult* classification_result =
       TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
                                            &bounding_box);
 

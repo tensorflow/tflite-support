@@ -20,7 +20,7 @@ limitations under the License.
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 
 std::unique_ptr<FrameBufferCpp> CreateCppFrameBuffer(
-    const TfLiteFrameBuffer *frame_buffer) {
+    const TfLiteFrameBuffer* frame_buffer) {
   FrameBufferCpp::Format frame_buffer_format =
       FrameBufferCpp::Format((*frame_buffer).format);
 
@@ -34,5 +34,5 @@ std::unique_ptr<FrameBufferCpp> CreateCppFrameBuffer(
   }
 
   return std::unique_ptr<FrameBufferCpp>(
-      dynamic_cast<FrameBufferCpp *>(cpp_frame_buffer.value().release()));
+      dynamic_cast<FrameBufferCpp*>(cpp_frame_buffer.value().release()));
 }
