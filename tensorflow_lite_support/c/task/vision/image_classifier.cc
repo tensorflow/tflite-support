@@ -24,6 +24,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
 
+namespace {
 using ::tflite::support::StatusOr;
 using ClassificationResultCpp = ::tflite::task::vision::ClassificationResult;
 using ClassificationsCpp = ::tflite::task::vision::Classifications;
@@ -33,6 +34,7 @@ using ImageClassifierCpp = ::tflite::task::vision::ImageClassifier;
 using ImageClassifierOptionsCpp =
     ::tflite::task::vision::ImageClassifierOptions;
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
+}
 
 #ifdef __cplusplus
 extern "C" {
