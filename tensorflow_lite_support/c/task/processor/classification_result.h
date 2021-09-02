@@ -38,30 +38,29 @@ typedef struct TfLiteCategory {
   //
   // [1]: https://developers.google.com/knowledge-graph
   char* class_name;
-  
+
 } TfLiteCategory;
 
 // List of predicted classes (aka labels) for a given image classifier head.
 typedef struct TfLiteClassifications {
-
   // The index of the image classifier head these classes refer to. This is
   // useful for multi-head models.
   int head_index;
 
-  // Number of predicted classes which can be used to traverse the array of 
+  // Number of predicted classes which can be used to traverse the array of
   // predicted classes.
   int size;
 
   // The array of predicted classes, usually sorted by descending scores (e.g.
-  // from high to low probability). Since this array is dynamically allocated, 
+  // from high to low probability). Since this array is dynamically allocated,
   // use size to traverse through the array.
-  TfLiteCategory* categories; 
+  TfLiteCategory* categories;
 } TfLiteClassifications;
-  
-// Holds Image Classification results. 
+
+// Holds Image Classification results.
 // Contains one set of results per image classifier head.
 typedef struct TfLiteClassificationResult {
-  // Number of predicted classes which can be used to traverse the array of 
+  // Number of predicted classes which can be used to traverse the array of
   // predicted classes.
   int size;
 

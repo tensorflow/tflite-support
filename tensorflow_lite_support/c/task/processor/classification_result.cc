@@ -21,23 +21,24 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-void TfLiteClassificationResultDelete(TfLiteClassificationResult* classification_result) {
+void TfLiteClassificationResultDelete(
+    TfLiteClassificationResult* classification_result) {
   for (int head = 0; head < classification_result->size; ++head) {
-    TfLiteClassifications classifications = classification_result->classifications[head];
+    TfLiteClassifications classifications =
+        classification_result->classifications[head];
     for (int rank = 0; rank < classifications.size; ++rank) {
       // `strdup` obtains memory using `malloc` and the memory needs to be
       // released using `free`.
-        free(classifications.categories[rank].display_name);
-        free(classifications.categories[rank].class_name);
+      free(classifications.categories[rank].display_name);
+      free(classifications.categories[rank].class_name);
     }
-    
-    if (classifications.size >= 1)
-        delete[] classifications.categories;
+
+    if (classifications.size >= 1) delete[] classifications.categories;
   }
-  
+
   if (classification_result->size >= 1)
-      delete[] classification_result->classifications;
-  
+    delete[] classification_result->classifications;
+
   delete classification_result;
 }
 

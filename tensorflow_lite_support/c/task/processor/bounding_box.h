@@ -45,4 +45,3 @@ typedef struct TfLiteBoundingBox {
 #endif  // __cplusplus
 
 #endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
-
