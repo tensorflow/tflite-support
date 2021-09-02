@@ -12,8 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils_c.h"
-
+#include "tensorflow_lite_support/c/test/task/vision/utils/image_utils.h"
 
 // These need to be defined for stb_image.h and stb_image_write.h to include
 // the actual implementations of image decoding/encoding functions.
@@ -23,10 +22,8 @@ limitations under the License.
 #include "stb_image.h"
 #include "stb_image_write.h"
 
-
-
-struct ImageData DecodeImageFromFile(const char *file_name) {
-  struct ImageData image_data;
+CImageData CDecodeImageFromFile(const char* file_name) {
+  CImageData image_data;
   image_data.pixel_data = stbi_load(file_name, &image_data.width,
                                     &image_data.height, &image_data.channels,
                                     /*desired_channels=*/0);
@@ -36,12 +33,11 @@ struct ImageData DecodeImageFromFile(const char *file_name) {
 
   if (image_data.channels != 1 && image_data.channels != 3 &&
       image_data.channels != 4) {
-      // stbi_image_free(image_data.pixel_data);
-      return image_data;
+    // stbi_image_free(image_data.pixel_data);
+    return image_data;
   }
 
   return image_data;
-
 }
 
-void ImageDataFree(struct ImageData* image) { stbi_image_free(image->pixel_data); }
+void CImageDataFree(CImageData* image) { stbi_image_free(image->pixel_data); }

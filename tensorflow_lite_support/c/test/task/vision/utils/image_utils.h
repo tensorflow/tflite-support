@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_EXAMPLES_TASK_VISION_DESKTOP_UTILS_IMAGE_UTILS_C_H_
-#define TENSORFLOW_LITE_SUPPORT_EXAMPLES_TASK_VISION_DESKTOP_UTILS_IMAGE_UTILS_C_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TEST_TASK_VISION_IMAGE_UTILS_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TEST_TASK_VISION_IMAGE_UTILS_H_
 
 #include <stdint.h>
 
@@ -25,24 +25,24 @@ extern "C" {
 // 1 : grayscale
 // 3 : RGB, interleaved
 // 4 : RGBA, interleaved
-struct ImageData {
+typedef struct CImageData {
   uint8_t* pixel_data;
   int width;
   int height;
   int channels;
-};
+} CImageData;
 
 // Decodes image file and returns the corresponding image if no error
 // occurred. If decoding succeeded, the caller must manage deletion of the
 // underlying pixel data using `ImageDataFree`.
 // Supports a wide range of image formats, listed in `stb_image/stb_image.h`.
-struct ImageData DecodeImageFromFile(const char *file_name);
+CImageData CDecodeImageFromFile(const char* file_name);
 
 // Releases image pixel data memory.
-void ImageDataFree(struct ImageData* image_data);
+void CImageDataFree(CImageData* image_data);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_EXAMPLES_TASK_VISION_DESKTOP_UTILS_IMAGE_UTILS_C_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TEST_TASK_VISION_IMAGE_UTILS_H_

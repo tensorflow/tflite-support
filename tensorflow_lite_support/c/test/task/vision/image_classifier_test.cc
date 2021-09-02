@@ -17,10 +17,10 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/task/processor/classification_result.h"
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
+#include "tensorflow_lite_support/c/test/task/vision/utils/image_utils.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/test/test_utils.h"
-#include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils_c.h"
 
 namespace tflite {
 namespace task {
@@ -35,8 +35,8 @@ constexpr char kTestDataDirectory[] =
 constexpr char kMobileNetQuantizedWithMetadata[] =
     "mobilenet_v1_0.25_224_quant.tflite";
 
-ImageData LoadImage(const char* image_name) {
-  return DecodeImageFromFile(
+CImageData LoadImage(const char* image_name) {
+  return CDecodeImageFromFile(
       JoinPath("./" /*test src dir*/, kTestDataDirectory, image_name).data());
 }
 
@@ -104,7 +104,7 @@ class CImageClassifierClassifyTest : public ::testing::Test {
 };
 
 TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
-  struct ImageData image_data = LoadImage("burger-224.png");
+  CImageData image_data = LoadImage("burger-224.png");
 
   TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width,
                                     .dimension.height = image_data.height,
@@ -114,7 +114,7 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
   TfLiteClassificationResult* classification_result =
       TfLiteImageClassifierClassify(image_classifier, &frame_buffer);
 
-  ImageDataFree(&image_data);
+  CImageDataFree(&image_data);
 
   ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
   EXPECT_TRUE(classification_result->size >= 1)
@@ -130,7 +130,7 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
 }
 
 TEST_F(CImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
-  struct ImageData image_data = LoadImage("burger-224.png");
+  CImageData image_data = LoadImage("burger-224.png");
 
   TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width,
                                     .dimension.height = image_data.height,
@@ -143,7 +143,7 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
       TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
                                            &bounding_box);
 
-  ImageDataFree(&image_data);
+  CImageDataFree(&image_data);
 
   ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
   EXPECT_TRUE(classification_result->size >= 1)
@@ -159,7 +159,7 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
 }
 
 TEST_F(CImageClassifierClassifyTest, FailsWithRoiWithinImageBounds) {
-  struct ImageData image_data = LoadImage("burger-224.png");
+  CImageData image_data = LoadImage("burger-224.png");
 
   TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width,
                                     .dimension.height = image_data.height,
@@ -172,7 +172,7 @@ TEST_F(CImageClassifierClassifyTest, FailsWithRoiWithinImageBounds) {
       TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
                                            &bounding_box);
 
-  ImageDataFree(&image_data);
+  CImageDataFree(&image_data);
 
   ASSERT_EQ(classification_result, nullptr)
       << "Classification Result is not NULL";

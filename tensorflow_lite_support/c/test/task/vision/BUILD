@@ -26,7 +26,7 @@ cc_test_with_tflite(
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:gtest_main",
         "//tensorflow_lite_support/cc/test:test_utils",
-        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils_c",
+        "//tensorflow_lite_support/c/test/task/vision/utils:image_utils",
        
     ],
 )
