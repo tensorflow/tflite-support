@@ -11,7 +11,7 @@ package(
 )
 
 # To test it with Bazel, run the following command from the terminal of your desktop:
-# bazel test tensorflow_lite_support/c/test/task/vision:image_classifier_c_api_test
+# bazel test tensorflow_lite_support/c/test/task/vision:image_classifier_test
 cc_test_with_tflite(
     name = "image_classifier_test",
     srcs = ["image_classifier_test.cc"],
