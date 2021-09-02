@@ -88,12 +88,6 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-typedef struct Opti {
-  char* model_path;
-  char*
-
-}
-
 typedef struct TfLiteImageClassifier TfLiteImageClassifier;
 
 typedef struct TfLiteImageClassifierOptions TfLiteImageClassifierOptions;
