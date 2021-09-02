@@ -17,7 +17,9 @@ limitations under the License.
 
 #include "absl/strings/str_format.h"
 
+namespace {
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
+}
 
 std::unique_ptr<FrameBufferCpp> CreateCppFrameBuffer(
     const TfLiteFrameBuffer* frame_buffer) {
