@@ -129,6 +129,58 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
   TfLiteClassificationResultDelete(classification_result);
 }
 
+TEST_F(CImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
+  struct ImageData image_data = LoadImage("burger-224.png");
+
+  TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width,
+                                    .dimension.height = image_data.height,
+                                    .buffer = image_data.pixel_data,
+                                    .format = kRGB};
+
+  TfLiteBoundingBox bounding_box = {
+      .origin_x = 0, .origin_y = 0, .width = 100, .height = 100};
+  TfLiteClassificationResult *classification_result =
+      TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
+                                           &bounding_box);
+
+  ImageDataFree(&image_data);
+
+  ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
+  EXPECT_TRUE(classification_result->size >= 1)
+      << "Classification Result size is 0";
+  EXPECT_NE(classification_result->classifications, nullptr)
+      << "Classification Result Classifications is NULL";
+  EXPECT_TRUE(classification_result->classifications->size >= 1)
+      << "Classification Result Classifications Size is 0";
+  EXPECT_NE(classification_result->classifications->categories, nullptr)
+      << "Classification Result Classifications Classes is NULL";
+
+  TfLiteClassificationResultDelete(classification_result);
+}
+
+TEST_F(CImageClassifierClassifyTest, FailsWithRoiWithinImageBounds) {
+  struct ImageData image_data = LoadImage("burger-224.png");
+
+  TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width,
+                                    .dimension.height = image_data.height,
+                                    .buffer = image_data.pixel_data,
+                                    .format = kRGB};
+
+  TfLiteBoundingBox bounding_box = {
+      .origin_x = 0, .origin_y = 0, .width = 250, .height = 250};
+  TfLiteClassificationResult *classification_result =
+      TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
+                                           &bounding_box);
+
+  ImageDataFree(&image_data);
+
+  ASSERT_EQ(classification_result, nullptr)
+      << "Classification Result is not NULL";
+
+  if (classification_result != nullptr)
+    TfLiteClassificationResultDelete(classification_result);
+}
+
 }  // namespace
 }  // namespace vision
 }  // namespace task
