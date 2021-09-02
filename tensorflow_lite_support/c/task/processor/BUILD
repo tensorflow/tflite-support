@@ -1,10 +1,10 @@
 package(
-    default_visibility = ["//tensorflow_lite_support:users"],
+    default_visibility = ["//tensorflow_lite_support:__subpackages__"],
     licenses = ["notice"],  # Apache 2.0
 )
 
 cc_library(
-    name = "classification_result_c_api",
+    name = "classification_result",
     srcs = [
         "classification_result.cc",
     ],
@@ -15,4 +15,5 @@ cc_library(
     name = "bounding_box",
     hdrs = ["bounding_box.h"],
 )
+
 

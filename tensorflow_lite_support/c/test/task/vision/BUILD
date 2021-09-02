@@ -5,7 +5,7 @@ load(
 
 package(
     default_visibility = [
-        "//tensorflow_lite_support:users",
+        "//tensorflow_lite_support:__subpackages__",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
@@ -13,14 +13,14 @@ package(
 # To test it with Bazel, run the following command from the terminal of your desktop:
 # bazel test tensorflow_lite_support/c/test/task/vision:image_classifier_c_api_test
 cc_test_with_tflite(
-    name = "image_classifier_c_api_test",
+    name = "image_classifier_test",
     srcs = ["image_classifier_test.cc"],
     data = [
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
     ],
     tflite_deps = [
-        "//tensorflow_lite_support/c/task/vision:image_classifier_c_api",
+        "//tensorflow_lite_support/c/task/vision:image_classifier",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",
@@ -30,4 +30,5 @@ cc_test_with_tflite(
        
     ],
 )
+
 
