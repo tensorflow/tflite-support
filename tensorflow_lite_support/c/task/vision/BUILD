@@ -26,6 +26,3 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/c/task/processor:bounding_box",
     ],
 )
-
-
-
