@@ -24,7 +24,16 @@ extern "C" {
 #endif  // __cplusplus
 
 // Colorspace formats.
-enum TfLiteFrameBufferFormat { kRGBA, kRGB, kNV12, kNV21, kYV12, kYV21, kGRAY, kUNKNOWN};
+enum TfLiteFrameBufferFormat {
+  kRGBA,
+  kRGB,
+  kNV12,
+  kNV21,
+  kYV12,
+  kYV21,
+  kGRAY,
+  kUNKNOWN
+};
 
 // FrameBuffer content orientation follows EXIF specification. The name of
 // each enum value defines the position of the 0th row and the 0th column of
