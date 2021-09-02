@@ -1,2 +1,1 @@
-_ImageClassifier*
-_FrameBuffer*
+_TfLite*
