@@ -25,6 +25,6 @@ limitations under the License.
 
 // Creates the C++ FrameBuffer from the C FrameBuffer
 std::unique_ptr<::tflite::task::vision::FrameBuffer> 
-    CreateCPPFrameBuffer(const struct FrameBuffer  *frame_buffer);
+    CreateCppFrameBuffer(const TfLiteFrameBuffer  *frame_buffer);
 
 #endif //TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_FRAME_BUFFER_CPP_C_UTILS_H_

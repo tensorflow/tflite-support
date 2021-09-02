@@ -22,7 +22,7 @@ extern "C" {
 #endif  // __cplusplus
 
 // A single predicted class.
-struct Class {
+typedef struct TfLiteCategory {
   // The index of the class in the corresponding label map, usually packed in
   // the TFLite Model Metadata [1].
   //
@@ -33,17 +33,17 @@ struct Class {
   float score;
 
   // A human readable name of the class filled from the label map.
-  char *display_name;
+  char* display_name;
   // An ID for the class, not necessarily human-readable (e.g. a Google
   // Knowledge Graph ID [1]), filled from the label map.
   //
   // [1]: https://developers.google.com/knowledge-graph
-  char *class_name;
+  char* class_name;
   
-};
+} TfLiteCategory;
 
 // List of predicted classes (aka labels) for a given image classifier head.
-struct Classifications {
+typedef struct TfLiteClassifications {
 
   // The index of the image classifier head these classes refer to. This is
   // useful for multi-head models.
@@ -56,12 +56,12 @@ struct Classifications {
   // The array of predicted classes, usually sorted by descending scores (e.g.
   // from high to low probability). Since this array is dynamically allocated, 
   // use size to traverse through the array.
-  struct Class *classes; 
-};
+  TfLiteCategory* categories; 
+} TfLiteClassifications;
   
 // Holds Image Classification results. 
 // Contains one set of results per image classifier head.
-struct ClassificationResult {
+typedef struct TfLiteClassificationResult {
   // Number of predicted classes which can be used to traverse the array of 
   // predicted classes.
   int size;
@@ -69,12 +69,12 @@ struct ClassificationResult {
   // Array of image classifier results per image classifier head. This array can
   // have any number of results. size holds the size of this array. size should
   // be used to traverse this array.
-  struct Classifications *classifications;
-};
+  TfLiteClassifications* classifications;
+} TfLiteClassificationResult;
 
 // Frees up the ClassificationResult Structure.
-extern void ImageClassifierClassificationResultDelete(
-    struct ClassificationResult* classification_result);
+void TfLiteClassificationResultDelete(
+    TfLiteClassificationResult* classification_result);
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -26,13 +26,13 @@ extern "C" {
 #endif  // __cplusplus
 
 // Colorspace formats.
-enum Format { kRGBA, kRGB, kNV12, kNV21, kYV12, kYV21, kGRAY, kUNKNOWN};
+enum TfLiteFrameBufferFormat { kRGBA, kRGB, kNV12, kNV21, kYV12, kYV21, kGRAY, kUNKNOWN};
 
 // FrameBuffer content orientation follows EXIF specification. The name of
 // each enum value defines the position of the 0th row and the 0th column of
 // the image content. See http://jpegclub.org/exif_orientation.html for
 // details.
-enum Orientation {
+enum TfLiteFrameBufferOrientation {
   kTopLeft = 1,
   kTopRight = 2,
   kBottomRight = 3,
@@ -44,7 +44,7 @@ enum Orientation {
 };
 
 // Dimension information for the whole frame.
-struct Dimension {
+struct TfLiteFrameBufferDimension {
   // The width dimension in pixel unit.
   int width;
   // The height dimension in pixel unit.
@@ -55,17 +55,17 @@ struct Dimension {
 // frame or still image) with buffer format information. FrameBuffer doesn't
 // take ownership of the provided backing buffer. The caller is responsible to
 // manage the backing buffer lifecycle for the lifetime of the FrameBuffer.
-struct FrameBuffer {
+typedef struct TfLiteFrameBuffer {
   // Colorspace format of the frame buffer.
-  enum Format format;
+  enum TfLiteFrameBufferFormat format;
   // Orientation of the frame buffer.
-  enum Orientation orientation;
+  enum TfLiteFrameBufferOrientation orientation;
   // Dimension information for the whole frame.
-  struct Dimension dimension;
+  struct TfLiteFrameBufferDimension dimension;
   // Holds the backing buffer for the frame buffer. Only single planar images
   // are supported as of now.
   uint8_t* buffer;
-};
+} TfLiteFrameBuffer;
 
 #ifdef __cplusplus
 }  // extern "C"

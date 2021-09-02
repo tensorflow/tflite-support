@@ -10,3 +10,9 @@ cc_library(
     ],
     hdrs = ["classification_result.h"],
 )
+
+cc_library(
+    name = "bounding_box",
+    hdrs = ["bounding_box.h"],
+)
+

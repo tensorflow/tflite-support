@@ -23,7 +23,7 @@ strip_c_api_include_path_prefix(
         "//tensorflow_lite_support/c/task/text:nl_classifier_common.h",
         "//tensorflow_lite_support/c/task/text:bert_question_answerer.h",
         "//tensorflow_lite_support/c/task/vision:image_classifier.h",
-        "//tensorflow_lite_support/c/task/vision:vision_common.h",
+        "//tensorflow_lite_support/c/task/processor:bounding_box.h",
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer.h",
         "//tensorflow_lite_support/c/task/processor:classification_result.h",
     ],
@@ -56,7 +56,7 @@ tflite_ios_framework(
     name = "TensorFlowLiteTaskVisionC_framework",
     hdrs = [
         ":image_classifier.h",
-        ":vision_common.h",
+        ":bounding_box.h",
         ":frame_buffer.h",
         ":classification_result.h"
     ],

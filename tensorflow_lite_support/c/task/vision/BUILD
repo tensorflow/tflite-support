@@ -7,11 +7,6 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-cc_library(
-    name = "vision_common_c_api",
-    hdrs = ["vision_common.h"],
-)
-
 cc_library_with_tflite(
     name = "image_classifier_c_api",
     srcs = [
@@ -20,7 +15,7 @@ cc_library_with_tflite(
     hdrs = [
         "image_classifier.h",
         "//tensorflow_lite_support/c/task/processor:classification_result_c_api",
-        ":vision_common_c_api"
+        "//tensorflow_lite_support/c/task/processor:bounding_box"
     ],
     tflite_deps = [
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
@@ -29,6 +24,7 @@ cc_library_with_tflite(
     deps = [
         "//tensorflow_lite_support/c/task/vision/utils:frame_buffer_cpp_c_utils",
         "//tensorflow_lite_support/c/task/processor:classification_result_c_api",
-        ":vision_common_c_api",
+        "//tensorflow_lite_support/c/task/processor:bounding_box",
     ],
 )
+

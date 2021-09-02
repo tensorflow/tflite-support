@@ -19,7 +19,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/c/task/processor/classification_result.h"
-#include "tensorflow_lite_support/c/task/vision/vision_common.h"
+#include "tensorflow_lite_support/c/task/processor/bounding_box.h"
 
 // --------------------------------------------------------------------------
 /// C API for ImageClassifiier.
@@ -36,10 +36,10 @@ limitations under the License.
 /// ImageClassifier* classifier =
 ///   ImageClassifierFromFile("/path/to/model.tflite");
 ///
-/// struct FrameBuffer frame_buffer = { Initialize }
+/// TfLiteFrameBuffer frame_buffer = { Initialize }
 ///
 /// Create the model
-/// struct ClassificationResult *classification_result = 
+/// TfLiteClassificationResult *classification_result = 
 ///   ImageClassifierClassify(classifier, &frame_buffer,);
 ///
 /// // Dispose of the API object.
@@ -53,12 +53,12 @@ limitations under the License.
 /// ImageClassifierOptionsSetMaxResults(options, 3);
 /// ImageClassifierOptionsSetModelFilePath(options, model_path);
 ///
-/// struct FrameBuffer frame_buffer = { Initialize }
+/// TfLiteFrameBuffer frame_buffer = { Initialize }
 ///
 /// // Create the model
 /// ImageClassifier* classifier =
 ///   ImageClassifierFromOptions(options);
-/// struct ClassificationResult *classification_result = 
+/// struct TfLiteClassificationResult *classification_result = 
 ///   ImageClassifierClassify(classifier, &frame_buffer,);
 ///
 /// // Dispose of the API object.
@@ -71,12 +71,12 @@ limitations under the License.
 /// ImageClassifierOptionsSetMaxResults(options, 3);
 /// ImageClassifierOptionsSetModelFilePath(options, model_path);
 ///
-/// struct FrameBuffer frame_buffer = { Initialize }
+/// TfLiteFrameBuffer frame_buffer = { Initialize }
 ///
 /// // Create the model
 /// ImageClassifier* classifier =
 ///   ImageClassifierFromOptions(options);
-/// struct ClassificationResult *classification_result = 
+/// TfLiteClassificationResult *classification_result = 
 ///   ImageClassifierClassify(classifier, &frame_buffer,);
 ///
 /// // Dispose of the API object.
@@ -86,26 +86,26 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-typedef struct ImageClassifier ImageClassifier;
+typedef struct TfLiteImageClassifier TfLiteImageClassifier;
 
-typedef struct ImageClassifierOptions ImageClassifierOptions;
-
-// Creates and returns the ImageClassifierOptions
-extern ImageClassifierOptions* ImageClassifierOptionsCreate();
+typedef struct TfLiteImageClassifierOptions TfLiteImageClassifierOptions;
 
 // Creates and returns the ImageClassifierOptions
-extern void ImageClassifierOptionsSetModelFilePath(
-    ImageClassifierOptions* options, const char* model_path);
+TfLiteImageClassifierOptions* TfLiteImageClassifierOptionsCreate();
+
+// Creates and returns the ImageClassifierOptions
+void TfLiteImageClassifierOptionsSetModelFilePath(
+    TfLiteImageClassifierOptions* options, const char* model_path);
 
 // Sets the Display names local option in the ImageClassifierOptions
-extern void ImageClassifierOptionsSetDisplayNamesLocal(
-    ImageClassifierOptions* image_classifier_options, 
-    char *display_names_locale);
+void TfLiteImageClassifierOptionsSetDisplayNamesLocal(
+    TfLiteImageClassifierOptions* image_classifier_options, 
+    char* display_names_locale);
 
 // Sets the maximum number of classification results in the encapsulated
 // image classifier options.
-extern void ImageClassifierOptionsSetMaxResults(
-    ImageClassifierOptions* image_classifier_options, int max_results);
+extern void TfLiteImageClassifierOptionsSetMaxResults(
+    TfLiteImageClassifierOptions* image_classifier_options, int max_results);
 
 // Sets the score threshold of classification results to be
 // returned after classification in the ImageClassifierOptions.
@@ -113,13 +113,13 @@ extern void ImageClassifierOptionsSetMaxResults(
 // (if any).Only results predicted with a confidence threshold of greater than
 // the score threshold are returned. The value of score threshold
 // should be between 0 and 1.
-extern void ImageClassifierOptionsSetScoreThreshold(
-    ImageClassifierOptions* image_classifier_options, float score_threshold);
+void TfLiteImageClassifierOptionsSetScoreThreshold(
+    TfLiteImageClassifierOptions* image_classifier_options, float score_threshold);
 
 // Sets the number of threads used for classification in the encapsulated 
 // ImageClassifierOptions
-extern void ImageClassifierOptionsSetNumThreads(
-    ImageClassifierOptions* image_classifier_options, int num_threads);
+void TfLiteImageClassifierOptionsSetNumThreads(
+    TfLiteImageClassifierOptions* image_classifier_options, int num_threads);
 
 // Adds a class name to the list of class names to be whitelisted. If you have
 // more than one class names to be whitelisted, consider calling this method
@@ -129,8 +129,8 @@ extern void ImageClassifierOptionsSetNumThreads(
 // class names are ignored. Mutually exclusive with blacklisted class names set
 // using void ImageClassifierOptionsAddClassNameBlackList(
 // ImageClassifierOptions* image_classifier_options, char* class_name);
-extern void ImageClassifierOptionsAddClassNameWhiteList(
-    ImageClassifierOptions* image_classifier_options, char* class_name);
+void TfLiteImageClassifierOptionsAddClassNameWhiteList(
+    TfLiteImageClassifierOptions* image_classifier_options, char* class_name);
 
 // Adds a class name to the list of class names to be black listed. If you have
 // more than one class names to be black listed, consider calling this method
@@ -139,14 +139,11 @@ extern void ImageClassifierOptionsAddClassNameWhiteList(
 // Mutually exclusive with white listed class names set
 // using void ImageClassifierOptionsAddClassNameWhiteList(
 // ImageClassifierOptions* image_classifier_options, char* class_name);
-extern void ImageClassifierOptionsAddClassNameBlackList(
-    ImageClassifierOptions* image_classifier_options, char* class_name);
+void TfLiteImageClassifierOptionsAddClassNameBlackList(
+    TfLiteImageClassifierOptions* image_classifier_options, char* class_name);
 
 //Disposes off the ImageClassifierOptions.
-void ImageClassifierOptionsDelete(ImageClassifierOptions* options);
-
-
-extern const struct ImageClassifierOptions ImageClassifierOptions_default;
+void TfLiteImageClassifierOptionsDelete(TfLiteImageClassifierOptions* options);
 
 // Creates ImageClassifier from options. When using this function to instantiate
 // Image Classifer, the model path should be set using
@@ -154,8 +151,8 @@ extern const struct ImageClassifierOptions ImageClassifierOptions_default;
 //                                          const char* model_path)
 // returns nullptr if the file doesn't exist or is not a well formatted 
 // TFLite model path.
-extern ImageClassifier* ImageClassifierFromOptions(
-    const ImageClassifierOptions* options);
+TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
+    const TfLiteImageClassifierOptions* options);
 
 // Creates ImaegeClassifier from model path and default options, returns nullptr
 // if the file doesn't exist or is not a well formatted TFLite model path.
@@ -163,24 +160,24 @@ extern ImageClassifier* ImageClassifierFromOptions(
 // threshold of 0, max_results of 5. In order to override these, use:
 // ImageClassifier* ImageClassifierFromOptions(
 //   const ImageClassifierOptions* options) instead.
-extern ImageClassifier* ImageClassifierFromFile(const char* model_path);
+TfLiteImageClassifier* TfLiteImageClassifierFromFile(const char* model_path);
 
 // Invokes the encapsulated TFLite model and classifies the frame_buffer.
-extern struct ClassificationResult* ImageClassifierClassify(
-    const ImageClassifier* classifier, const struct FrameBuffer* frame_buffer);
+TfLiteClassificationResult* TfLiteImageClassifierClassify(
+    const TfLiteImageClassifier* classifier, const TfLiteFrameBuffer* frame_buffer);
 
 // Invokes the encapsulated TFLite model and classifies the
 // region of the frame_buffer specified by the bounding box.
 // Same as above, except that the classification is performed based on the
 // input region of interest. Cropping according to this region of interest is
 // prepended to the pre-processing operations.
-extern struct ClassificationResult* ImageClassifierClassifyWithBoundingBox(
-    const ImageClassifier* classifier, 
-    const struct FrameBuffer* frame_buffer, 
-    const struct BoundingBox* roi);
+TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
+    const TfLiteImageClassifier* classifier, 
+    const TfLiteFrameBuffer* frame_buffer, 
+    const TfLiteBoundingBox* roi);
 
 // Disposes off the image classifier
-extern void ImageClassifierDelete(ImageClassifier* classifier);
+void  TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier);
 
 #ifdef __cplusplus
 }  // extern "C"

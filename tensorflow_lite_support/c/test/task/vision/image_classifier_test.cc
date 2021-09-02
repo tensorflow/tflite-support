@@ -41,75 +41,75 @@ ImageData LoadImage(const char* image_name) {
 }
 
 TEST(CImageClassifierFromFileTest, FailsWithMissingModelPath) {
-  ImageClassifier *image_classifier = ImageClassifierFromFile("");
+  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromFile("");
   ASSERT_EQ(image_classifier, nullptr);
 }
 
 TEST(CImageClassifierFromFileTest, SucceedsWithModelPath) {  
-  ImageClassifier *image_classifier = ImageClassifierFromFile(
+  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromFile(
                                           JoinPath("./" /*test src dir*/, 
                                           kTestDataDirectory,
                                           kMobileNetQuantizedWithMetadata)
                                           .data());
   EXPECT_NE(image_classifier, nullptr);
-  ImageClassifierDelete(image_classifier);
+  TfLiteImageClassifierDelete(image_classifier);
 }
 
 TEST(CImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
-  ImageClassifierOptions *options = ImageClassifierOptionsCreate();
-  ImageClassifier *image_classifier = ImageClassifierFromOptions(options);
+  TfLiteImageClassifierOptions *options = TfLiteImageClassifierOptionsCreate();
+  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromOptions(options);
   ASSERT_EQ(image_classifier, nullptr);
 }
 
 TEST(CImageClassifierFromOptionsTest, SucceedsWithModelPath) {
-  ImageClassifierOptions *options = ImageClassifierOptionsCreate();
+  TfLiteImageClassifierOptions *options = TfLiteImageClassifierOptionsCreate();
   const char *model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata).data();
   
-  ImageClassifierOptionsSetModelFilePath(options, model_path);
-  ImageClassifier *image_classifier = ImageClassifierFromOptions(options);
+  TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
+  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromOptions(options);
   EXPECT_NE(image_classifier, nullptr);
-  ImageClassifierDelete(image_classifier);
+  TfLiteImageClassifierDelete(image_classifier);
 }
 
 TEST(CImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
-  ImageClassifierOptions *options = ImageClassifierOptionsCreate();
+  TfLiteImageClassifierOptions *options = TfLiteImageClassifierOptionsCreate();
   const char *model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata).data();
   
-  ImageClassifierOptionsSetModelFilePath(options, model_path);
-  ImageClassifierOptionsSetNumThreads(options, 3);
-  ImageClassifier *image_classifier = ImageClassifierFromOptions(options);
+  TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
+  TfLiteImageClassifierOptionsSetNumThreads(options, 3);
+  TfLiteImageClassifier *image_classifier = TfLiteImageClassifierFromOptions(options);
   EXPECT_NE(image_classifier, nullptr);
-  ImageClassifierDelete(image_classifier);
+  TfLiteImageClassifierDelete(image_classifier);
 }
 
 class CImageClassifierClassifyTest : public ::testing::Test {
  protected:
   void SetUp() override {
-     image_classifier = ImageClassifierFromFile(
+     image_classifier = TfLiteImageClassifierFromFile(
                             JoinPath("./" /*test src dir*/, kTestDataDirectory,
                             kMobileNetQuantizedWithMetadata).data());
      ASSERT_NE(image_classifier, nullptr);
   }
 
   void TearDown() override {
-     ImageClassifierDelete(image_classifier);
+     TfLiteImageClassifierDelete(image_classifier);
   }
 
-  ImageClassifier *image_classifier;
+  TfLiteImageClassifier *image_classifier;
 };
   
 TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {  
   struct ImageData image_data = LoadImage("burger-224.png");
 
-  struct FrameBuffer frame_buffer = {.dimension.width = image_data.width, 
+  TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width, 
                                      .dimension.height = image_data.height, 
                                      .buffer = image_data.pixel_data, 
                                      .format = kRGB};
   
-  struct ClassificationResult *classification_result = 
-      ImageClassifierClassify(image_classifier, &frame_buffer);
+  TfLiteClassificationResult *classification_result = 
+      TfLiteImageClassifierClassify(image_classifier, &frame_buffer);
   
   ImageDataFree(&image_data);
   
@@ -121,10 +121,10 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
       << "Classification Result Classifications is NULL";
   EXPECT_TRUE(classification_result->classifications->size >= 1) 
       << "Classification Result Classifications Size is 0";
-  EXPECT_NE(classification_result->classifications->classes, nullptr) 
+  EXPECT_NE(classification_result->classifications->categories, nullptr) 
       << "Classification Result Classifications Classes is NULL";
 
-   ImageClassifierClassificationResultDelete(classification_result);
+   TfLiteClassificationResultDelete(classification_result);
 }
 
 }  // namespace

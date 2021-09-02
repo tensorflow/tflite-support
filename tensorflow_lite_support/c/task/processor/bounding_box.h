@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_VISION_COMMON_H_
-#define TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_VISION_COMMON_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
 
 #include <stdint.h>
 
@@ -26,22 +26,23 @@ extern "C" {
 #endif  // __cplusplus
 
 // Holds the region of interest used for image classification.
-struct BoundingBox {
+typedef struct TfLiteBoundingBox {
   // The X coordinate of the top-left corner, in pixels.
-  int32_t origin_x;
+  int origin_x;
 
   // The Y coordinate of the top-left corner, in pixels.
-  int32_t origin_y;
+  int origin_y;
 
   // The width of the bounding box, in pixels.
-  int32_t width;
+  int width;
 
   // The height of the bounding box, in pixels.
-  int32_t height;
-};
+  int height;
+} TfLiteBoundingBox;
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_VISION_COMMON_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
+
