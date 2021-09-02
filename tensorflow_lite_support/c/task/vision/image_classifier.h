@@ -17,9 +17,9 @@ limitations under the License.
 
 #include <stdint.h>
 
-#include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
-#include "tensorflow_lite_support/c/task/processor/classification_result.h"
 #include "tensorflow_lite_support/c/task/processor/bounding_box.h"
+#include "tensorflow_lite_support/c/task/processor/classification_result.h"
+#include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 
 // --------------------------------------------------------------------------
 /// C API for ImageClassifiier.
@@ -39,12 +39,12 @@ limitations under the License.
 /// TfLiteFrameBuffer frame_buffer = { Initialize }
 ///
 /// Create the model
-/// TfLiteClassificationResult *classification_result = 
+/// TfLiteClassificationResult *classification_result =
 ///   ImageClassifierClassify(classifier, &frame_buffer,);
 ///
 /// // Dispose of the API object.
 /// ImageClassifierDelete(classifier);
-/// 
+///
 /// Advanced Usage with Options:
 /// <pre><code>
 /// // Create the interpreter options
@@ -58,7 +58,7 @@ limitations under the License.
 /// // Create the model
 /// ImageClassifier* classifier =
 ///   ImageClassifierFromOptions(options);
-/// struct TfLiteClassificationResult *classification_result = 
+/// struct TfLiteClassificationResult *classification_result =
 ///   ImageClassifierClassify(classifier, &frame_buffer,);
 ///
 /// // Dispose of the API object.
@@ -76,7 +76,7 @@ limitations under the License.
 /// // Create the model
 /// ImageClassifier* classifier =
 ///   ImageClassifierFromOptions(options);
-/// TfLiteClassificationResult *classification_result = 
+/// TfLiteClassificationResult *classification_result =
 ///   ImageClassifierClassify(classifier, &frame_buffer,);
 ///
 /// // Dispose of the API object.
@@ -99,7 +99,7 @@ void TfLiteImageClassifierOptionsSetModelFilePath(
 
 // Sets the Display names local option in the ImageClassifierOptions
 void TfLiteImageClassifierOptionsSetDisplayNamesLocal(
-    TfLiteImageClassifierOptions* image_classifier_options, 
+    TfLiteImageClassifierOptions* image_classifier_options,
     char* display_names_locale);
 
 // Sets the maximum number of classification results in the encapsulated
@@ -114,17 +114,18 @@ extern void TfLiteImageClassifierOptionsSetMaxResults(
 // the score threshold are returned. The value of score threshold
 // should be between 0 and 1.
 void TfLiteImageClassifierOptionsSetScoreThreshold(
-    TfLiteImageClassifierOptions* image_classifier_options, float score_threshold);
+    TfLiteImageClassifierOptions* image_classifier_options,
+    float score_threshold);
 
-// Sets the number of threads used for classification in the encapsulated 
+// Sets the number of threads used for classification in the encapsulated
 // ImageClassifierOptions
 void TfLiteImageClassifierOptionsSetNumThreads(
     TfLiteImageClassifierOptions* image_classifier_options, int num_threads);
 
 // Adds a class name to the list of class names to be whitelisted. If you have
 // more than one class names to be whitelisted, consider calling this method
-// repeatedly in a loop. If you set atleast one class name into the whitelist 
-// using this option, classifications whose class names which are not added 
+// repeatedly in a loop. If you set atleast one class name into the whitelist
+// using this option, classifications whose class names which are not added
 // into the white list will be filtered out. Duplicate or unknown
 // class names are ignored. Mutually exclusive with blacklisted class names set
 // using void ImageClassifierOptionsAddClassNameBlackList(
@@ -134,29 +135,29 @@ void TfLiteImageClassifierOptionsAddClassNameWhiteList(
 
 // Adds a class name to the list of class names to be black listed. If you have
 // more than one class names to be black listed, consider calling this method
-// repeatedly in a loop. Classifications whose class are added into the black 
-// list will be filtered out. Duplicate or unknown class names are ignored. 
+// repeatedly in a loop. Classifications whose class are added into the black
+// list will be filtered out. Duplicate or unknown class names are ignored.
 // Mutually exclusive with white listed class names set
 // using void ImageClassifierOptionsAddClassNameWhiteList(
 // ImageClassifierOptions* image_classifier_options, char* class_name);
 void TfLiteImageClassifierOptionsAddClassNameBlackList(
     TfLiteImageClassifierOptions* image_classifier_options, char* class_name);
 
-//Disposes off the ImageClassifierOptions.
+// Disposes off the ImageClassifierOptions.
 void TfLiteImageClassifierOptionsDelete(TfLiteImageClassifierOptions* options);
 
 // Creates ImageClassifier from options. When using this function to instantiate
 // Image Classifer, the model path should be set using
-// ImageClassifierOptionsSetModelFilePath(ImageClassifierOptions* options, 
+// ImageClassifierOptionsSetModelFilePath(ImageClassifierOptions* options,
 //                                          const char* model_path)
-// returns nullptr if the file doesn't exist or is not a well formatted 
+// returns nullptr if the file doesn't exist or is not a well formatted
 // TFLite model path.
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     const TfLiteImageClassifierOptions* options);
 
 // Creates ImaegeClassifier from model path and default options, returns nullptr
 // if the file doesn't exist or is not a well formatted TFLite model path.
-// This image classifier created using this function defaults to s score 
+// This image classifier created using this function defaults to s score
 // threshold of 0, max_results of 5. In order to override these, use:
 // ImageClassifier* ImageClassifierFromOptions(
 //   const ImageClassifierOptions* options) instead.
@@ -164,7 +165,8 @@ TfLiteImageClassifier* TfLiteImageClassifierFromFile(const char* model_path);
 
 // Invokes the encapsulated TFLite model and classifies the frame_buffer.
 TfLiteClassificationResult* TfLiteImageClassifierClassify(
-    const TfLiteImageClassifier* classifier, const TfLiteFrameBuffer* frame_buffer);
+    const TfLiteImageClassifier* classifier,
+    const TfLiteFrameBuffer* frame_buffer);
 
 // Invokes the encapsulated TFLite model and classifies the
 // region of the frame_buffer specified by the bounding box.
@@ -172,12 +174,11 @@ TfLiteClassificationResult* TfLiteImageClassifierClassify(
 // input region of interest. Cropping according to this region of interest is
 // prepended to the pre-processing operations.
 TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
-    const TfLiteImageClassifier* classifier, 
-    const TfLiteFrameBuffer* frame_buffer, 
-    const TfLiteBoundingBox* roi);
+    const TfLiteImageClassifier* classifier,
+    const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi);
 
 // Disposes off the image classifier
-void  TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier);
+void TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier);
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -17,12 +17,12 @@ limitations under the License.
 
 #include <memory>
 
-#include "absl/strings/string_view.h"
 #include "absl/strings/str_format.h"
-#include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
+#include "absl/strings/string_view.h"
 #include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
 
 using ::tflite::support::StatusOr;
 using ClassificationResultCpp = ::tflite::task::vision::ClassificationResult;
@@ -30,7 +30,8 @@ using ClassificationsCpp = ::tflite::task::vision::Classifications;
 using ClassCpp = ::tflite::task::vision::Class;
 using BoundingBoxCpp = ::tflite::task::vision::BoundingBox;
 using ImageClassifierCpp = ::tflite::task::vision::ImageClassifier;
-using ImageClassifierOptionsCpp = ::tflite::task::vision::ImageClassifierOptions;
+using ImageClassifierOptionsCpp =
+    ::tflite::task::vision::ImageClassifierOptions;
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 
 #ifdef __cplusplus
@@ -46,35 +47,37 @@ struct TfLiteImageClassifierOptions {
 };
 
 TfLiteImageClassifierOptions* TfLiteImageClassifierOptionsCreate() {
-  return new TfLiteImageClassifierOptions{.impl = 
-                                    std::unique_ptr<ImageClassifierOptionsCpp> 
-                                    (new ImageClassifierOptionsCpp)};
+  return new TfLiteImageClassifierOptions{
+      .impl = std::unique_ptr<ImageClassifierOptionsCpp>(
+          new ImageClassifierOptionsCpp)};
 }
 
-void TfLiteImageClassifierOptionsSetModelFilePath(TfLiteImageClassifierOptions* options,
-    const char* model_path) {
-  options->impl->mutable_base_options()->mutable_model_file()
-      ->set_file_name(model_path);
+void TfLiteImageClassifierOptionsSetModelFilePath(
+    TfLiteImageClassifierOptions* options, const char* model_path) {
+  options->impl->mutable_base_options()->mutable_model_file()->set_file_name(
+      model_path);
 }
 void TfLiteImageClassifierOptionsSetDisplayNamesLocal(
     TfLiteImageClassifierOptions* options, char* display_names_locale) {
   options->impl->set_display_names_locale(display_names_locale);
 }
 
-void TfLiteImageClassifierOptionsSetMaxResults(TfLiteImageClassifierOptions* options, 
-    int max_results) {
+void TfLiteImageClassifierOptionsSetMaxResults(
+    TfLiteImageClassifierOptions* options, int max_results) {
   options->impl->set_max_results(max_results);
 }
 
-void TfLiteImageClassifierOptionsSetScoreThreshold(TfLiteImageClassifierOptions* options, 
-    float score_threshold) {
+void TfLiteImageClassifierOptionsSetScoreThreshold(
+    TfLiteImageClassifierOptions* options, float score_threshold) {
   options->impl->set_score_threshold(score_threshold);
 }
 
-void TfLiteImageClassifierOptionsSetNumThreads(TfLiteImageClassifierOptions* options, 
-    int num_threads) {
-  options->impl->mutable_base_options()->mutable_compute_settings()
-      ->mutable_tflite_settings()->mutable_cpu_settings()
+void TfLiteImageClassifierOptionsSetNumThreads(
+    TfLiteImageClassifierOptions* options, int num_threads) {
+  options->impl->mutable_base_options()
+      ->mutable_compute_settings()
+      ->mutable_tflite_settings()
+      ->mutable_cpu_settings()
       ->set_num_threads(num_threads);
 }
 
@@ -84,54 +87,57 @@ void TfLiteImageClassifierOptionsAddClassNameWhiteList(
 }
 
 void TfLiteImageClassifierOptionsAddClassNameBlackList(
-  TfLiteImageClassifierOptions* options, char* class_name) {
+    TfLiteImageClassifierOptions* options, char* class_name) {
   options->impl->add_class_name_blacklist(class_name);
 }
 
-void TfLiteImageClassifierOptionsDelete(
-    TfLiteImageClassifierOptions* options) { delete options; }
-
+void TfLiteImageClassifierOptionsDelete(TfLiteImageClassifierOptions* options) {
+  delete options;
+}
 
 TfLiteImageClassifierOptions* TfLiteImageClassifierOptionsDefault() {
-  TfLiteImageClassifierOptions* image_classifier_options = 
+  TfLiteImageClassifierOptions* image_classifier_options =
       TfLiteImageClassifierOptionsCreate();
   TfLiteImageClassifierOptionsSetMaxResults(image_classifier_options, 5);
   TfLiteImageClassifierOptionsSetScoreThreshold(image_classifier_options, 0);
-  
+
   return image_classifier_options;
 }
 
-
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     const TfLiteImageClassifierOptions* options) {
-  auto classifier_status = 
+  auto classifier_status =
       ImageClassifierCpp::CreateFromOptions(*(options->impl));
 
   if (classifier_status.ok()) {
-    return new TfLiteImageClassifier{.impl = std::unique_ptr<ImageClassifierCpp>(
-                                    dynamic_cast<ImageClassifierCpp*>(
-                                        classifier_status.value().release()))};
+    return new TfLiteImageClassifier{
+        .impl = std::unique_ptr<ImageClassifierCpp>(
+            dynamic_cast<ImageClassifierCpp*>(
+                classifier_status.value().release()))};
   } else {
-    return nullptr; 
+    return nullptr;
   }
 }
 
 TfLiteImageClassifier* TfLiteImageClassifierFromFile(const char* model_path) {
-  TfLiteImageClassifierOptions* default_options = TfLiteImageClassifierOptionsDefault();
+  TfLiteImageClassifierOptions* default_options =
+      TfLiteImageClassifierOptionsDefault();
   TfLiteImageClassifierOptionsSetModelFilePath(default_options, model_path);
   return TfLiteImageClassifierFromOptions(default_options);
 }
 
 TfLiteClassificationResult* GetClassificationResultCStruct(
     const ClassificationResultCpp classification_result_cpp) {
-  auto* c_classifications = 
-      new TfLiteClassifications[classification_result_cpp.classifications_size()];
+  auto* c_classifications =
+      new TfLiteClassifications[classification_result_cpp
+                                    .classifications_size()];
 
-  for(int head = 0; head < classification_result_cpp.classifications_size(); ++head) {
-    const ClassificationsCpp& classifications = 
+  for (int head = 0; head < classification_result_cpp.classifications_size();
+       ++head) {
+    const ClassificationsCpp& classifications =
         classification_result_cpp.classifications(head);
     c_classifications[head].head_index = head;
-    
+
     auto* c_categories = new TfLiteCategory[classifications.classes_size()];
     c_classifications->size = classifications.classes_size();
 
@@ -139,45 +145,45 @@ TfLiteClassificationResult* GetClassificationResultCStruct(
       const ClassCpp& classification = classifications.classes(rank);
       c_categories[rank].index = classification.index();
       c_categories[rank].score = classification.score();
-      
+
       if (classification.has_class_name())
-        c_categories[rank].class_name = 
+        c_categories[rank].class_name =
             strdup(classification.class_name().c_str());
       else
         c_categories[rank].class_name = nullptr;
-      
+
       if (classification.has_display_name())
-        c_categories[rank].display_name = 
+        c_categories[rank].display_name =
             strdup(classification.display_name().c_str());
       else
         c_categories[rank].display_name = nullptr;
     }
     c_classifications[head].categories = c_categories;
   }
-  
-  TfLiteClassificationResult* c_classification_result = new TfLiteClassificationResult;
+
+  TfLiteClassificationResult* c_classification_result =
+      new TfLiteClassificationResult;
   c_classification_result->classifications = c_classifications;
-  c_classification_result->size = 
+  c_classification_result->size =
       classification_result_cpp.classifications_size();
-  
+
   return c_classification_result;
 }
 
 TfLiteClassificationResult* TfLiteImageClassifierClassify(
     const TfLiteImageClassifier* classifier,
     const TfLiteFrameBuffer* frame_buffer) {
-  std::unique_ptr<FrameBufferCpp> cpp_frame_buffer = CreateCppFrameBuffer(frame_buffer);
+  std::unique_ptr<FrameBufferCpp> cpp_frame_buffer =
+      CreateCppFrameBuffer(frame_buffer);
 
-  if (cpp_frame_buffer == nullptr)
-    return nullptr;
-    
-  StatusOr<ClassificationResultCpp> classification_result_cpp = 
+  if (cpp_frame_buffer == nullptr) return nullptr;
+
+  StatusOr<ClassificationResultCpp> classification_result_cpp =
       classifier->impl->Classify(*cpp_frame_buffer);
-  
-  if (!classification_result_cpp.ok())
-    return nullptr;
 
-  TfLiteClassificationResult* c_classification_result = 
+  if (!classification_result_cpp.ok()) return nullptr;
+
+  TfLiteClassificationResult* c_classification_result =
       GetClassificationResultCStruct(
           ClassificationResultCpp(classification_result_cpp.value()));
 
@@ -185,32 +191,31 @@ TfLiteClassificationResult* TfLiteImageClassifierClassify(
 }
 
 TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
-    const TfLiteImageClassifier* classifier, const TfLiteFrameBuffer* frame_buffer,
-    const TfLiteBoundingBox* roi) {
-    
-    BoundingBoxCpp cc_roi;
-    cc_roi.set_origin_x(roi->origin_x);
-    cc_roi.set_origin_y(roi->origin_y);
-    cc_roi.set_width(roi->width);
-    cc_roi.set_height(roi->height);
-  
-    std::unique_ptr<FrameBufferCpp> cpp_frame_buffer = 
-        CreateCppFrameBuffer(frame_buffer);
-    StatusOr<ClassificationResultCpp> classification_result_cpp = 
-        classifier->impl->Classify(*cpp_frame_buffer, cc_roi);
-    
-    if (!classification_result_cpp.ok())
-      return nullptr;
+    const TfLiteImageClassifier* classifier,
+    const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi) {
+  BoundingBoxCpp cc_roi;
+  cc_roi.set_origin_x(roi->origin_x);
+  cc_roi.set_origin_y(roi->origin_y);
+  cc_roi.set_width(roi->width);
+  cc_roi.set_height(roi->height);
 
-    TfLiteClassificationResult* c_classification_result = 
-        GetClassificationResultCStruct(
-            ClassificationResultCpp(classification_result_cpp.value()));
+  std::unique_ptr<FrameBufferCpp> cpp_frame_buffer =
+      CreateCppFrameBuffer(frame_buffer);
+  StatusOr<ClassificationResultCpp> classification_result_cpp =
+      classifier->impl->Classify(*cpp_frame_buffer, cc_roi);
 
-    return c_classification_result;
+  if (!classification_result_cpp.ok()) return nullptr;
+
+  TfLiteClassificationResult* c_classification_result =
+      GetClassificationResultCStruct(
+          ClassificationResultCpp(classification_result_cpp.value()));
+
+  return c_classification_result;
 }
 
-void TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier) { delete classifier; }
-
+void TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier) {
+  delete classifier;
+}
 
 #ifdef __cplusplus
 }  // extern "C"
