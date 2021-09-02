@@ -30,7 +30,7 @@ void TfLiteClassificationResultDelete(
       // `strdup` obtains memory using `malloc` and the memory needs to be
       // released using `free`.
       free(classifications.categories[rank].display_name);
-      free(classifications.categories[rank].class_name);
+      free(classifications.categories[rank].label);
     }
 
     if (classifications.size >= 1) delete[] classifications.categories;

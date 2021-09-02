@@ -37,7 +37,7 @@ typedef struct TfLiteCategory {
   // Knowledge Graph ID [1]), filled from the label map.
   //
   // [1]: https://developers.google.com/knowledge-graph
-  char* class_name;
+  char* label;
 
 } TfLiteCategory;
 
