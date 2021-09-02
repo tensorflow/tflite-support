@@ -23,12 +23,10 @@ extern "C" {
 
 void TfLiteClassificationResultDelete(TfLiteClassificationResult* classification_result) {
   for (int head = 0; head < classification_result->size; ++head) {
-    
     TfLiteClassifications classifications = classification_result->classifications[head];
     for (int rank = 0; rank < classifications.size; ++rank) {
       // `strdup` obtains memory using `malloc` and the memory needs to be
       // released using `free`.
-        
         free(classifications.categories[rank].display_name);
         free(classifications.categories[rank].class_name);
     }

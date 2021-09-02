@@ -15,7 +15,6 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_RESULT_H_
 #define TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_RESULT_H_
 
-// --------------------------------------------------------------------------
 // Defines C structure for Classification Results and associated helper methods
 #ifdef __cplusplus
 extern "C" {
