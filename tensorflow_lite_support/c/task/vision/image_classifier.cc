@@ -25,15 +25,15 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
 
 namespace {
-using ::tflite::support::StatusOr;
-using ClassificationResultCpp = ::tflite::task::vision::ClassificationResult;
-using ClassificationsCpp = ::tflite::task::vision::Classifications;
-using ClassCpp = ::tflite::task::vision::Class;
-using BoundingBoxCpp = ::tflite::task::vision::BoundingBox;
-using ImageClassifierCpp = ::tflite::task::vision::ImageClassifier;
-using ImageClassifierOptionsCpp =
+  using ::tflite::support::StatusOr;
+  using ClassificationResultCpp = ::tflite::task::vision::ClassificationResult;
+  using ClassificationsCpp = ::tflite::task::vision::Classifications;
+  using ClassCpp = ::tflite::task::vision::Class;
+  using BoundingBoxCpp = ::tflite::task::vision::BoundingBox;
+  using ImageClassifierCpp = ::tflite::task::vision::ImageClassifier;
+  using ImageClassifierOptionsCpp =
     ::tflite::task::vision::ImageClassifierOptions;
-using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
+  using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 }
 
 #ifdef __cplusplus
