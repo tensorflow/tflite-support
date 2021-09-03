@@ -33,12 +33,10 @@ void TfLiteClassificationResultDelete(
       free(classifications.categories[rank].label);
     }
 
-    if (classifications.size >= 1) delete[] classifications.categories;
+    delete[] classifications.categories;
   }
 
-  if (classification_result->size >= 1)
-    delete[] classification_result->classifications;
-
+  delete[] classification_result->classifications;
   delete classification_result;
 }
 
