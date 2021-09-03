@@ -15,3 +15,8 @@ cc_library(
     name = "bounding_box",
     hdrs = ["bounding_box.h"],
 )
+
+cc_library(
+    name = "base_options",
+    hdrs = ["base_options.h"],
+)
