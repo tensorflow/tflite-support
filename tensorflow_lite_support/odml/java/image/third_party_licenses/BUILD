@@ -61,6 +61,7 @@ third_party_licenses(
         "JSpecify": "third_party/java/jspecify_annotations/LICENSE",
         "JsInterop Annotations": "third_party/java_src/jsinterop_annotations/java/jsinterop/annotations/LICENSE",
         "TensorFlow Lite Support": "third_party/tensorflow_lite_support/LICENSE",
+        "Kotlin": "third_party/kotlin/kotlin/LICENSE",
     },
     platform = "android",
     target = "//tensorflow_lite_support/odml/java/image",
