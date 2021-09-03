@@ -33,6 +33,7 @@ namespace task {
 namespace processor {
 namespace {
 
+using ::testing::HasSubstr;
 using ::tflite::support::StatusOr;
 using ::tflite::task::JoinPath;
 using ::tflite::task::core::TfLiteEngine;
@@ -90,15 +91,16 @@ TEST_F(DynamicInputTest, OutputDimensionCheck) {
 // golden image.
 TEST_F(DynamicInputTest, GoldenImageComparison) {
   // Get the processed input image.
-  float *processed_input_data =
+  float* processed_input_data =
       tflite::task::core::AssertAndReturnTypedTensor<float>(
           engine_->GetInputs()[0]);
 
   bool is_equal = true;
 
   const uint8* image_data = frame_buffer_->plane(0).buffer;
-  const size_t input_byte_size = frame_buffer_->plane(0).stride.row_stride_bytes *
-                           frame_buffer_->dimension().height;
+  const size_t input_byte_size =
+      frame_buffer_->plane(0).stride.row_stride_bytes *
+      frame_buffer_->dimension().height;
 
   for (size_t i = 0; i < input_byte_size / sizeof(uint8);
        ++i, ++image_data, ++processed_input_data)
@@ -108,6 +110,21 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
 
   EXPECT_TRUE(is_equal);
 }
+
+// Modifying batch/depth to invalid size after Init()
+// call should throw error.
+TEST_F(DynamicInputTest, InvalidBatchOrDepthResize) {
+  // Resized input tensor to invalid batch and depth size.
+  engine_->interpreter()->ResizeInputTensor(
+      0, {50, frame_buffer_->dimension().height,
+          frame_buffer_->dimension().width, 100});
+  auto process_status = preprocessor_->Preprocess(*frame_buffer_);
+  EXPECT_EQ(process_status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_THAT(process_status.message(),
+              HasSubstr("The input tensor should have dimensions 1 x height x "
+                        "width x 3. Got"));
+}
+
 }  // namespace
 }  // namespace processor
 }  // namespace task
