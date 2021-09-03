@@ -58,18 +58,20 @@ class DynamicInputTest : public tflite_shims::testing::Test {
                                          kDilatedConvolutionModelWithMetaData));
     engine_->InitInterpreter();
 
-    SUPPORT_ASSERT_OK_AND_ASSIGN(auto preprocessor,
+    SUPPORT_ASSERT_OK_AND_ASSIGN(preprocessor_,
                                  ImagePreprocessor::Create(engine_.get(), {0}));
 
     SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
-    std::unique_ptr<FrameBuffer> image_frame_buffer = CreateFromRgbRawBuffer(
+    frame_buffer_ = CreateFromRgbRawBuffer(
         image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
 
-    preprocessor->Preprocess(*image_frame_buffer);
+    preprocessor_->Preprocess(*frame_buffer_);
   }
 
  protected:
   std::unique_ptr<TfLiteEngine> engine_ = nullptr;
+  std::unique_ptr<FrameBuffer> frame_buffer_ = nullptr;
+  std::unique_ptr<ImagePreprocessor> preprocessor_ = nullptr;
 };
 
 // See if output tensor has been re-dimmed as per the input
@@ -87,26 +89,22 @@ TEST_F(DynamicInputTest, OutputDimensionCheck) {
 // Compare pre-processed input with an already pre-processed
 // golden image.
 TEST_F(DynamicInputTest, GoldenImageComparison) {
-  // Check the processed input image.
+  // Get the processed input image.
   float *processed_input_data =
       tflite::task::core::AssertAndReturnTypedTensor<float>(
           engine_->GetInputs()[0]);
 
   bool is_equal = true;
-  float epsilon = 0.1f;
 
-  std::string file_path =
-      JoinPath("./", kTestDataDirectory, "burger_normalized.bin");
+  const uint8* image_data = frame_buffer_->plane(0).buffer;
+  const size_t input_byte_size = frame_buffer_->plane(0).stride.row_stride_bytes *
+                           frame_buffer_->dimension().height;
 
-  std::ifstream golden_image(file_path, std::ios::binary);
-  std::vector<uint8> buffer(std::istreambuf_iterator<char>(golden_image), {});
-  float *val_ptr = reinterpret_cast<float *>(buffer.data());
-
-  for (size_t i = 0; i < buffer.size() / sizeof(float); ++i) {
-    is_equal &= std::fabs(*val_ptr - *processed_input_data) <= epsilon;
-    ++val_ptr;
-    ++processed_input_data;
-  }
+  for (size_t i = 0; i < input_byte_size / sizeof(uint8);
+       ++i, ++image_data, ++processed_input_data)
+    is_equal &=
+        std::fabs(static_cast<float>(*image_data) - *processed_input_data) <=
+        std::numeric_limits<float>::epsilon();
 
   EXPECT_TRUE(is_equal);
 }

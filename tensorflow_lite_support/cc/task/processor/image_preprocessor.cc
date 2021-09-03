@@ -101,13 +101,13 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
 
   if (Tensor()->dims->data[0] != 1 || Tensor()->dims->data[3] != 3) {
     return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
+        absl::StatusCode::kInvalidArgument,
         absl::StrCat("The input tensor should have dimensions 1 x height x "
                      "width x 3. Got ",
                      Tensor()->dims->data[0], " x ", Tensor()->dims->data[1],
                      " x ", Tensor()->dims->data[2], " x ",
                      Tensor()->dims->data[3], "."),
-        TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
+        tflite::support::TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
   }
 
   if (IsImagePreprocessingNeeded(frame_buffer, roi)) {
