@@ -95,8 +95,6 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
       tflite::task::core::AssertAndReturnTypedTensor<float>(
           engine_->GetInputs()[0]);
 
-  bool is_equal = true;
-
   const uint8* image_data = frame_buffer_->plane(0).buffer;
   const size_t input_byte_size =
       frame_buffer_->plane(0).stride.row_stride_bytes *
@@ -104,11 +102,8 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
 
   for (size_t i = 0; i < input_byte_size / sizeof(uint8);
        ++i, ++image_data, ++processed_input_data)
-    is_equal &=
-        std::fabs(static_cast<float>(*image_data) - *processed_input_data) <=
-        std::numeric_limits<float>::epsilon();
-
-  EXPECT_TRUE(is_equal);
+    EXPECT_NEAR(static_cast<float>(*image_data), *processed_input_data,
+                std::numeric_limits<float>::epsilon());
 }
 
 // Modifying batch/depth to invalid size after Init()
