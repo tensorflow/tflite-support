@@ -110,9 +110,9 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
 // call should throw error.
 TEST_F(DynamicInputTest, InvalidBatchOrDepthResize) {
   // Resized input tensor to invalid batch and depth size.
-  engine_->interpreter()->ResizeInputTensor(
+  engine_->interpreter()->ResizeInputTensorStrict(
       0, {50, frame_buffer_->dimension().height,
-          frame_buffer_->dimension().width, 100});
+          frame_buffer_->dimension().width, 3});
   auto process_status = preprocessor_->Preprocess(*frame_buffer_);
   EXPECT_EQ(process_status.code(), absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(process_status.message(),
