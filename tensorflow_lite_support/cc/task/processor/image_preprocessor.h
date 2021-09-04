@@ -64,6 +64,9 @@ class ImagePreprocessor : public Preprocessor {
   //   only supported colorspace for now),
   // - rotate it according to its `Orientation` so that inference is performed
   //   on an "upright" image.
+  //
+  // NOTE: In case the model has dynamic input shape, the method would re-dim
+  // the entire graph based on the dimensions of the image.
   absl::Status Preprocess(const vision::FrameBuffer& frame_buffer);
 
   // Same as above, except based on the input region of interest.
