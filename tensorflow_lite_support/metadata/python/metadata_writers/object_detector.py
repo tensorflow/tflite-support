@@ -18,6 +18,7 @@ from typing import List, Optional
 
 import flatbuffers
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
+from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 from tensorflow_lite_support.metadata.python import metadata as _metadata
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_writer
@@ -77,6 +78,12 @@ def _create_metadata_with_value_range(
   return tensor_metadata
 
 
+def _get_tflite_outputs(model_buffer: bytearray):
+  model = _schema_fb.Model.GetRootAsModel(model_buffer, 0)
+  tflite_outputs = model.Subgraphs(0).OutputsAsNumpy()
+  return tflite_outputs
+
+
 class MetadataWriter(metadata_writer.MetadataWriter):
   """Writes metadata into an object detector."""
 
@@ -112,7 +119,6 @@ class MetadataWriter(metadata_writer.MetadataWriter):
     Returns:
       A MetadataWriter object.
     """
-
     if general_md is None:
       general_md = metadata_info.GeneralMd(
           name=_MODEL_NAME, description=_MODEL_DESCRIPTION)
@@ -149,15 +155,25 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         output_location_md.name, output_category_md.name, output_score_md.name
     ]
 
-    # Create subgraph info.
-    subgraph_metadata = _metadata_fb.SubGraphMetadataT()
-    subgraph_metadata.inputTensorMetadata = [input_md.create_metadata()]
-    subgraph_metadata.outputTensorMetadata = [
+    # Gets the tflite outputs and get the indices that would sort the outputs.
+    outputs = _get_tflite_outputs(model_buffer)
+    output_indices = sorted(range(4), key=lambda i: outputs[i])
+    sorted_metadata = [
         _create_location_metadata(output_location_md),
         _create_metadata_with_value_range(output_category_md),
         _create_metadata_with_value_range(output_score_md),
         output_number_md.create_metadata()
     ]
+    # Creates output tensors metadata by mapping the sorting output index and
+    # sorted metadata.
+    output_metadata = [None] * 4
+    for i, output_index in enumerate(output_indices):
+      output_metadata[output_index] = sorted_metadata[i]
+
+    # Create subgraph info.
+    subgraph_metadata = _metadata_fb.SubGraphMetadataT()
+    subgraph_metadata.inputTensorMetadata = [input_md.create_metadata()]
+    subgraph_metadata.outputTensorMetadata = output_metadata
     subgraph_metadata.outputTensorGroups = [group]
 
     # Create model metadata

@@ -92,6 +92,8 @@ constexpr char kExpectResults[] =
            classes { index: 17 score: 0.51171875 class_name: "dog" }
          }
     )pb";
+constexpr char kEfficientDetWithMetadata[] =
+    "coco_efficientdet_lite0_v1_1.0_quant_2021_09_06.tflite";
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
   return DecodeImageFromFile(JoinPath("./" /*test src dir*/,

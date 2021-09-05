@@ -178,6 +178,11 @@ class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
   // discarded. If none is provided via metadata or options, -FLT_MAX is set as
   // default value.
   float score_threshold_;
+
+  // Indices of the output tensors to match the output tensors to the correct
+  // index order of the output tensors: (bounding_boxes, classes, scores,
+  // num_detections).
+  std::vector<std::size_t> output_indices_ = {0, 1, 2, 3};
 };
 
 }  // namespace vision

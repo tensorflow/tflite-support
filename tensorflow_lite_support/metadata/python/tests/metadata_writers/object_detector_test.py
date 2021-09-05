@@ -14,6 +14,8 @@
 # ==============================================================================
 """Tests for ObjectDetector.MetadataWriter."""
 
+import os
+
 from absl.testing import parameterized
 
 import tensorflow as tf
@@ -21,32 +23,44 @@ import tensorflow as tf
 from tensorflow_lite_support.metadata.python.metadata_writers import object_detector
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
-_MODEL = "../testdata/object_detector/ssd_mobilenet_v1.tflite"
-_LABEL_FILE = "../testdata/object_detector/labelmap.txt"
+_PATH = '../testdata/object_detector/'
+_LABEL_FILE = '../testdata/object_detector/labelmap.txt'
 _NORM_MEAN = 127.5
 _NORM_STD = 127.5
-_JSON_FOR_INFERENCE = "../testdata/object_detector/ssd_mobilenet_v1.json"
-_JSON_DEFAULT = "../testdata/object_detector/ssd_mobilenet_v1_default.json"
 
 
 class MetadataWriterTest(tf.test.TestCase, parameterized.TestCase):
 
-  def test_create_for_inference_should_succeed(self):
+  @parameterized.parameters(
+      ('ssd_mobilenet_v1'),
+      ('efficientdet_lite0_v1'),
+  )
+  def test_create_for_inference_should_succeed(self, model_name: str):
+    model_path = os.path.join(_PATH, model_name + '.tflite')
     writer = object_detector.MetadataWriter.create_for_inference(
-        test_utils.load_file(_MODEL), [_NORM_MEAN], [_NORM_STD], [_LABEL_FILE])
+        test_utils.load_file(model_path), [_NORM_MEAN], [_NORM_STD],
+        [_LABEL_FILE])
 
+    json_path = os.path.join(_PATH, model_name + '.json')
     metadata_json = writer.get_metadata_json()
-    expected_json = test_utils.load_file(_JSON_FOR_INFERENCE, "r")
+    expected_json = test_utils.load_file(json_path, 'r')
     self.assertEqual(metadata_json, expected_json)
 
-  def test_create_from_metadata_info_by_default_should_succeed(self):
+  @parameterized.parameters(
+      ('ssd_mobilenet_v1'),
+      ('efficientdet_lite0_v1'),
+  )
+  def test_create_from_metadata_info_by_default_should_succeed(
+      self, model_name: str):
+    model_path = os.path.join(_PATH, model_name + '.tflite')
     writer = object_detector.MetadataWriter.create_from_metadata_info(
-        test_utils.load_file(_MODEL))
+        test_utils.load_file(model_path))
 
+    json_path = os.path.join(_PATH, model_name + '_default.json')
     metadata_json = writer.get_metadata_json()
-    expected_json = test_utils.load_file(_JSON_DEFAULT, "r")
+    expected_json = test_utils.load_file(json_path, 'r')
     self.assertEqual(metadata_json, expected_json)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   tf.test.main()

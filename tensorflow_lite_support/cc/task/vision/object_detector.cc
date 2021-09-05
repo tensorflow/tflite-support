@@ -16,6 +16,8 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/object_detector.h"
 
 #include <algorithm>
+#include <cstddef>
+#include <iterator>
 #include <limits>
 #include <vector>
 
@@ -323,15 +325,23 @@ absl::Status ObjectDetector::CheckAndSetOutputs() {
                         TfLiteEngine::OutputCount(interpreter)),
         TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
+
+  // Sorts output indices by the output tensor index in the TFLite subgraph.
+  std::sort(output_indices_.begin(), output_indices_.end(),
+            [&](const std::size_t& a, const std::size_t& b) -> bool {
+              return interpreter->outputs()[a] < interpreter->outputs()[b];
+            });
+
   // Check tensor dimensions and batch size.
   for (int i = 0; i < 4; ++i) {
-    const TfLiteTensor* tensor = TfLiteEngine::GetOutput(interpreter, i);
+    std::size_t j = output_indices_[i];
+    const TfLiteTensor* tensor = TfLiteEngine::GetOutput(interpreter, j);
     if (tensor->dims->size != kOutputTensorsExpectedDims[i]) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
           absl::StrFormat("Output tensor at index %d is expected to "
                           "have %d dimensions, found %d.",
-                          i, kOutputTensorsExpectedDims[i], tensor->dims->size),
+                          j, kOutputTensorsExpectedDims[i], tensor->dims->size),
           TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
     }
     if (tensor->dims->data[0] != 1) {
@@ -372,7 +382,8 @@ absl::Status ObjectDetector::CheckAndSetOutputs() {
   // Extract mandatory BoundingBoxProperties for easier access at
   // post-processing time, performing sanity checks on the fly.
   ASSIGN_OR_RETURN(const BoundingBoxProperties* bounding_box_properties,
-                   GetBoundingBoxProperties(*output_tensors_metadata->Get(0)));
+                   GetBoundingBoxProperties(
+                       *output_tensors_metadata->Get(output_indices_[0])));
   if (bounding_box_properties->index() == nullptr) {
     bounding_box_corners_order_ = {0, 1, 2, 3};
   } else {
@@ -388,16 +399,18 @@ absl::Status ObjectDetector::CheckAndSetOutputs() {
   // Build label map (if available) from metadata.
   ASSIGN_OR_RETURN(
       label_map_,
-      GetLabelMapIfAny(*metadata_extractor, *output_tensors_metadata->Get(1),
+      GetLabelMapIfAny(*metadata_extractor,
+                       *output_tensors_metadata->Get(output_indices_[1]),
                        options_->display_names_locale()));
 
   // Set score threshold.
   if (options_->has_score_threshold()) {
     score_threshold_ = options_->score_threshold();
   } else {
-    ASSIGN_OR_RETURN(score_threshold_,
-                     GetScoreThreshold(*metadata_extractor,
-                                       *output_tensors_metadata->Get(2)));
+    ASSIGN_OR_RETURN(
+        score_threshold_,
+        GetScoreThreshold(*metadata_extractor,
+                          *output_tensors_metadata->Get(output_indices_[2])));
   }
 
   return absl::OkStatus();
@@ -462,14 +475,18 @@ StatusOr<DetectionResult> ObjectDetector::Detect(
 StatusOr<DetectionResult> ObjectDetector::Postprocess(
     const std::vector<const TfLiteTensor*>& output_tensors,
     const FrameBuffer& frame_buffer, const BoundingBox& /*roi*/) {
+  std::vector<const TfLiteTensor*> sorted_output_tensors;
+  for (auto i : output_indices_) {
+    sorted_output_tensors.push_back(output_tensors[i]);
+  }
   // Most of the checks here should never happen, as outputs have been validated
   // at construction time. Checking nonetheless and returning internal errors if
   // something bad happens.
-  RETURN_IF_ERROR(SanityCheckOutputTensors(output_tensors));
+  RETURN_IF_ERROR(SanityCheckOutputTensors(sorted_output_tensors));
 
   // Get number of available results.
-  const int num_results =
-      static_cast<int>(AssertAndReturnTypedTensor<float>(output_tensors[3])[0]);
+  const int num_results = static_cast<int>(
+      AssertAndReturnTypedTensor<float>(sorted_output_tensors[3])[0]);
   // Compute number of max results to return.
   const int max_results = options_->max_results() > 0
                               ? std::min(options_->max_results(), num_results)
@@ -483,9 +500,12 @@ StatusOr<DetectionResult> ObjectDetector::Postprocess(
     upright_input_frame_dimensions.Swap();
   }
 
-  const float* locations = AssertAndReturnTypedTensor<float>(output_tensors[0]);
-  const float* classes = AssertAndReturnTypedTensor<float>(output_tensors[1]);
-  const float* scores = AssertAndReturnTypedTensor<float>(output_tensors[2]);
+  const float* locations =
+      AssertAndReturnTypedTensor<float>(sorted_output_tensors[0]);
+  const float* classes =
+      AssertAndReturnTypedTensor<float>(sorted_output_tensors[1]);
+  const float* scores =
+      AssertAndReturnTypedTensor<float>(sorted_output_tensors[2]);
   DetectionResult results;
   for (int i = 0; i < num_results; ++i) {
     const int class_index = static_cast<int>(classes[i]);
