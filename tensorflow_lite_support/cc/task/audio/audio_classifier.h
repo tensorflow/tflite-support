@@ -33,8 +33,7 @@ namespace audio {
 
 // Performs classification on audio clips.
 //
-// The API expects a TFLite model with optional, but strongly recommended,
-// TFLite Model Metadata.
+// This API expects a TFLite model with metadata.
 //
 // Input tensor:
 //   (kTfLiteFloat32)
@@ -52,8 +51,6 @@ namespace audio {
 //      `ImageClassifierOptions` used at creation time ("en" by default, i.e.
 //      English). If none of these are available, only the `index` field of the
 //      results will be filled.
-//
-// TODO(b/182535933): Add a model example and demo comments here.
 class AudioClassifier
     : public tflite::task::core::BaseTaskApi<ClassificationResult,
                                              const AudioBuffer&> {
