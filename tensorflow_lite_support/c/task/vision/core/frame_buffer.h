@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <stdint.h>
 
-// Defines C structs for Holding the frame buffer.
+// Defines C structs for holding the frame buffer.
 
 #ifdef __cplusplus
 extern "C" {
