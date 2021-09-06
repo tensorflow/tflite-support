@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
-#define TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_OPTIONS_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_OPTIONS_H_
 
 #include <stdint.h>
 
@@ -28,21 +28,21 @@ extern "C" {
 
 typedef struct TfLiteStringArrayOption {
 int length;
-char** list;
+const char** list;
 } TfLiteStringArrayOption;
 
 // Holds the region of interest used for image classification.
-typedef struct ClassificationOptions {
+typedef struct TfLiteClassificationOptions {
   // The X coordinate of the top-left corner, in pixels.
-  TfLiteStringArrayOption class_name_blacklist;
-  TfLiteStringArrayOption class_name_whitelist;
-  char* display_names_local;
+  const TfLiteStringArrayOption class_name_blacklist;
+  const TfLiteStringArrayOption class_name_whitelist;
+  const char* display_names_local;
   int max_results;
   float score_threshold;
-} TfLiteBaseOptions;
+} TfLiteClassificationOptions;
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_OPTIONS_H_
