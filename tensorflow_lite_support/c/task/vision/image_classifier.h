@@ -17,7 +17,9 @@ limitations under the License.
 
 #include <stdint.h>
 
+#include "tensorflow_lite_support/c/task/processor/base_options.h"
 #include "tensorflow_lite_support/c/task/processor/bounding_box.h"
+#include "tensorflow_lite_support/c/task/processor/classification_options.h"
 #include "tensorflow_lite_support/c/task/processor/classification_result.h"
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 
@@ -90,63 +92,11 @@ extern "C" {
 
 typedef struct TfLiteImageClassifier TfLiteImageClassifier;
 
-typedef struct TfLiteImageClassifierOptions TfLiteImageClassifierOptions;
+typedef struct TfLiteImageClassifierOptions {
+  TfLiteClassificationOptions classifier_options;
+  TfLiteBaseOptions base_options;
 
-// Creates and returns the TfLiteImageClassifierOptions
-TfLiteImageClassifierOptions* TfLiteImageClassifierOptionsCreate();
-
-// Creates and returns the TfLiteImageClassifierOptions
-void TfLiteImageClassifierOptionsSetModelFilePath(
-    TfLiteImageClassifierOptions* options, const char* model_path);
-
-// Sets the Display names local option in the TfLiteImageClassifierOptions
-void TfLiteImageClassifierOptionsSetDisplayNamesLocal(
-    TfLiteImageClassifierOptions* image_classifier_options,
-    char* display_names_locale);
-
-// Sets the maximum number of classification results in the encapsulated
-// image classifier options.
-extern void TfLiteImageClassifierOptionsSetMaxResults(
-    TfLiteImageClassifierOptions* image_classifier_options, int max_results);
-
-// Sets the score threshold of classification results to be
-// returned after classification in the TfLiteImageClassifierOptions.
-// Score threshold, overrides the ones provided in the model metadata
-// (if any).Only results predicted with a confidence threshold of greater than
-// the score threshold are returned. The value of score threshold
-// should be between 0 and 1.
-void TfLiteImageClassifierOptionsSetScoreThreshold(
-    TfLiteImageClassifierOptions* image_classifier_options,
-    float score_threshold);
-
-// Sets the number of threads used for classification in the encapsulated
-// TfLiteImageClassifierOptions
-void TfLiteImageClassifierOptionsSetNumThreads(
-    TfLiteImageClassifierOptions* image_classifier_options, int num_threads);
-
-// Adds a class name to the list of class names to be whitelisted. If you have
-// more than one class names to be whitelisted, consider calling this method
-// repeatedly in a loop. If you set atleast one class name into the whitelist
-// using this option, classifications whose class names which are not added
-// into the white list will be filtered out. Duplicate or unknown
-// class names are ignored. Mutually exclusive with blacklisted class names set
-// using void TfLiteImageClassifierOptionsAddClassNameBlackList(
-// TfLiteImageClassifierOptions* image_classifier_options, char* class_name);
-void TfLiteImageClassifierOptionsAddClassNameWhiteList(
-    TfLiteImageClassifierOptions* image_classifier_options, char* class_name);
-
-// Adds a class name to the list of class names to be black listed. If you have
-// more than one class names to be black listed, consider calling this method
-// repeatedly in a loop. Classifications whose class are added into the black
-// list will be filtered out. Duplicate or unknown class names are ignored.
-// Mutually exclusive with white listed class names set
-// using void TfLiteImageClassifierOptionsAddClassNameWhiteList(
-// TfLiteImageClassifierOptions* image_classifier_options, char* class_name);
-void TfLiteImageClassifierOptionsAddClassNameBlackList(
-    TfLiteImageClassifierOptions* image_classifier_options, char* class_name);
-
-// Disposes off the TfLiteImageClassifierOptions.
-void TfLiteImageClassifierOptionsDelete(TfLiteImageClassifierOptions* options);
+} TfLiteImageClassifierOptions;
 
 // Creates TfLiteImageClassifier from options. When using this function to
 // instantiate Image Classifer, the model path should be set using
@@ -158,13 +108,6 @@ void TfLiteImageClassifierOptionsDelete(TfLiteImageClassifierOptions* options);
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     const TfLiteImageClassifierOptions* options);
 
-// Creates ImaegeClassifier from model path and default options, returns nullptr
-// if the file doesn't exist or is not a well formatted TFLite model path.
-// This image classifier created using this function defaults to s score
-// threshold of 0, max_results of 5. In order to override these, use:
-// TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
-//   const TfLiteImageClassifierOptions* options) instead.
-TfLiteImageClassifier* TfLiteImageClassifierFromFile(const char* model_path);
 
 // Invokes the encapsulated TFLite model and classifies the frame_buffer.
 TfLiteClassificationResult* TfLiteImageClassifierClassify(

@@ -14,8 +14,6 @@ cc_library_with_tflite(
     ],
     hdrs = [
         "image_classifier.h",
-        # "//tensorflow_lite_support/c/task/processor:classification_result",
-        # "//tensorflow_lite_support/c/task/processor:bounding_box"
     ],
     tflite_deps = [
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
@@ -24,5 +22,8 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/c/task/vision/utils:frame_buffer_cpp_c_utils",
         "//tensorflow_lite_support/c/task/processor:classification_result",
         "//tensorflow_lite_support/c/task/processor:bounding_box",
+        "//tensorflow_lite_support/c/task/processor:base_options",
+        "//tensorflow_lite_support/c/task/processor:classification_options",
+
     ],
 )

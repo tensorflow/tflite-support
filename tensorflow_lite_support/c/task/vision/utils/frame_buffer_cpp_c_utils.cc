@@ -17,24 +17,32 @@ limitations under the License.
 
 #include "absl/strings/str_format.h"
 
+namespace tflite {
+namespace task {
+namespace vision {
+
 namespace {
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
+using ::tflite::support::StatusOr;
 }
 
-std::unique_ptr<FrameBufferCpp> CreateCppFrameBuffer(
-    const TfLiteFrameBuffer* frame_buffer) {
+StatusOr<std::unique_ptr<FrameBufferCpp>> CreateCppFrameBuffer(
+    const TfLiteFrameBuffer& frame_buffer) {
   FrameBufferCpp::Format frame_buffer_format =
-      FrameBufferCpp::Format((*frame_buffer).format);
+      FrameBufferCpp::Format(frame_buffer.format);
 
-  auto cpp_frame_buffer = tflite::task::vision::CreateFromRawBuffer(
-      frame_buffer->buffer,
-      {frame_buffer->dimension.width, frame_buffer->dimension.height},
+//   StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer = CreateFromRawBuffer(
+//       frame_buffer.buffer,
+//       {frame_buffer.dimension.width, frame_buffer.dimension.height},
+//       frame_buffer_format);
+
+  return CreateFromRawBuffer(
+      frame_buffer.buffer,
+      {frame_buffer.dimension.width, frame_buffer.dimension.height},
       frame_buffer_format);
-
-  if (!cpp_frame_buffer.ok()) {
-    return nullptr;
-  }
-
-  return std::unique_ptr<FrameBufferCpp>(
-      dynamic_cast<FrameBufferCpp*>(cpp_frame_buffer.value().release()));
 }
+
+}  // namespace vision
+}  // namespace task
+}  // namespace tflite
+
