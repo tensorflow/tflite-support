@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
-#define TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BASE_OPTIONS_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BASE_OPTIONS_H_
 
 #include <stdint.h>
 
@@ -31,7 +31,7 @@ int num_threads;
 } TfLiteCpuSettings;
 
 typedef struct TfLiteTflSettings {
-TfLiteCpuSettings cpuSettings;
+TfLiteCpuSettings cpu_settings;
 } TfLiteTflSettings;
 
 typedef struct TfLiteComputeSettings {
@@ -39,11 +39,15 @@ typedef struct TfLiteComputeSettings {
 TfLiteTflSettings tflite_settings;
 } TfLiteComputeSettings;
 
+typedef struct TfLiteExternalFile {
+    const char* file_path;
+    //Additional option for byte data when it's supported.
+} TfLiteExternalFile;
+
 // Holds the region of interest used for image classification.
 typedef struct TfLiteBaseOptions {
   // The X coordinate of the top-left corner, in pixels.
-  char* model_path;
-
+  TfLiteExternalFile model_file;
   TfLiteComputeSettings compute_settings;
 
 } TfLiteBaseOptions;
@@ -52,4 +56,4 @@ typedef struct TfLiteBaseOptions {
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BOUNDING_BOX_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BASE_OPTIONS_H_
