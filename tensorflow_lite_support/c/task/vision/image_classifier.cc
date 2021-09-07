@@ -57,9 +57,7 @@ CreateImageClassifierCppOptionsFromCOptions(
   else
     return nullptr;
 
-  int num_threads =
-      c_options->base_options.compute_settings.tflite_settings.cpu_settings
-          .num_threads if (c_options->base_options.compute_settings
+  if (c_options->base_options.compute_settings
                                .tflite_settings.cpu_settings.num_threads > 0)
               cpp_options->mutable_base_options()
           ->mutable_compute_settings()
