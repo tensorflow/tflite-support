@@ -48,7 +48,8 @@ TEST(CImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
 }
 
 TEST(CImageClassifierFromOptionsTest, SucceedsWithModelPath) {
-//   TfLiteImageClassifierOptions* options = TfLiteImageClassifierOptionsCreate();
+  //   TfLiteImageClassifierOptions* options =
+  //   TfLiteImageClassifierOptionsCreate();
   const char* model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
                                     kMobileNetQuantizedWithMetadata)
                                .data();
@@ -67,23 +68,48 @@ TEST(CImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
 
   TfLiteImageClassifierOptions options = {0};
   options.base_options.model_file.file_path = model_path;
-  options.base_options.compute_settings.tflite_settings.cpu_settings.num_threads = 3;
+  options.base_options.compute_settings.tflite_settings.cpu_settings
+      .num_threads = 3;
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options);
   EXPECT_NE(image_classifier, nullptr);
   TfLiteImageClassifierDelete(image_classifier);
 }
 
+TEST(CImageClassifierFromOptionsTest,
+     FailsWithClassNameBlackListAndClassNameWhiteList) {
+  const char* model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileNetQuantizedWithMetadata)
+                               .data();
+
+  TfLiteImageClassifierOptions options = {0};
+  options.base_options.model_file.file_path = model_path;
+
+  char* class_name_blacklist[] = {"brambling"};
+  options.classification_options.class_name_blacklist.list =
+      class_name_blacklist;
+  options.classification_options.class_name_blacklist.length = 1;
+
+  char* class_name_whitelist[] = {"cheeseburger"};
+  options.classification_options.class_name_whitelist.list =
+      class_name_whitelist;
+  options.classification_options.class_name_whitelist.length = 1;
+
+  TfLiteImageClassifier* image_classifier =
+      TfLiteImageClassifierFromOptions(&options);
+  EXPECT_EQ(image_classifier, nullptr);
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
+}
+
 class CImageClassifierClassifyTest : public ::testing::Test {
  protected:
   void SetUp() override {
-
- TfLiteImageClassifierOptions options = {0};
-  options.base_options.model_file.file_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+    TfLiteImageClassifierOptions options = {0};
+    options.base_options.model_file.file_path =
+        JoinPath("./" /*test src dir*/, kTestDataDirectory,
                  kMobileNetQuantizedWithMetadata)
             .data();
-  image_classifier =
-      TfLiteImageClassifierFromOptions(&options);
+    image_classifier = TfLiteImageClassifierFromOptions(&options);
 
     ASSERT_NE(image_classifier, nullptr);
   }
