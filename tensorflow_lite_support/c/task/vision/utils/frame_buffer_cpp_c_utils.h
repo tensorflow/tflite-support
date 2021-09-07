@@ -23,7 +23,14 @@ limitations under the License.
 // Meant to be used with vision C apis.
 
 // Creates the C++ FrameBuffer from the C FrameBuffer
-std::unique_ptr<::tflite::task::vision::FrameBuffer> CreateCppFrameBuffer(
-    const TfLiteFrameBuffer* frame_buffer);
+namespace tflite {
+namespace task {
+namespace vision {
 
+tflite::support::StatusOr<std::unique_ptr<tflite::task::vision::FrameBuffer>>
+CreateCppFrameBuffer(const TfLiteFrameBuffer& frame_buffer);
+
+}  // namespace vision
+}  // namespace task
+}  // namespace tflite
 #endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_VISION_FRAME_BUFFER_CPP_C_UTILS_H_

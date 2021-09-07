@@ -15,3 +15,14 @@ cc_library(
     name = "bounding_box",
     hdrs = ["bounding_box.h"],
 )
+
+cc_library(
+    name = "base_options",
+    hdrs = ["base_options.h"],
+)
+
+cc_library(
+    name = "classification_options",
+    hdrs = ["classification_options.h"],
+)
+

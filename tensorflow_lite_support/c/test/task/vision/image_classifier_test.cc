@@ -15,6 +15,8 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/task/vision/image_classifier.h"
 
+#include <string.h>
+
 #include "tensorflow_lite_support/c/task/processor/classification_result.h"
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/c/test/task/vision/utils/image_utils.h"
@@ -40,66 +42,81 @@ CImageData LoadImage(const char* image_name) {
       JoinPath("./" /*test src dir*/, kTestDataDirectory, image_name).data());
 }
 
-TEST(CImageClassifierFromFileTest, FailsWithMissingModelPath) {
-  TfLiteImageClassifier* image_classifier = TfLiteImageClassifierFromFile("");
-  ASSERT_EQ(image_classifier, nullptr);
-}
-
-TEST(CImageClassifierFromFileTest, SucceedsWithModelPath) {
-  TfLiteImageClassifier* image_classifier = TfLiteImageClassifierFromFile(
-      JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata)
-          .data());
-  EXPECT_NE(image_classifier, nullptr);
-  TfLiteImageClassifierDelete(image_classifier);
-}
-
 TEST(CImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
-  TfLiteImageClassifierOptions* options = TfLiteImageClassifierOptionsCreate();
+  TfLiteImageClassifierOptions options = {0};
   TfLiteImageClassifier* image_classifier =
-      TfLiteImageClassifierFromOptions(options);
+      TfLiteImageClassifierFromOptions(&options);
   ASSERT_EQ(image_classifier, nullptr);
 }
 
 TEST(CImageClassifierFromOptionsTest, SucceedsWithModelPath) {
-  TfLiteImageClassifierOptions* options = TfLiteImageClassifierOptionsCreate();
+  //   TfLiteImageClassifierOptions* options =
+  //   TfLiteImageClassifierOptionsCreate();
   const char* model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
                                     kMobileNetQuantizedWithMetadata)
                                .data();
-
-  TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
+  TfLiteImageClassifierOptions options = {0};
+  options.base_options.model_file.file_path = model_path;
   TfLiteImageClassifier* image_classifier =
-      TfLiteImageClassifierFromOptions(options);
+      TfLiteImageClassifierFromOptions(&options);
   EXPECT_NE(image_classifier, nullptr);
   TfLiteImageClassifierDelete(image_classifier);
 }
 
 TEST(CImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
-  TfLiteImageClassifierOptions* options = TfLiteImageClassifierOptionsCreate();
   const char* model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
                                     kMobileNetQuantizedWithMetadata)
                                .data();
 
-  TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
-  TfLiteImageClassifierOptionsSetNumThreads(options, 3);
+  TfLiteImageClassifierOptions options = {0};
+  options.base_options.model_file.file_path = model_path;
+  options.base_options.compute_settings.tflite_settings.cpu_settings
+      .num_threads = 3;
   TfLiteImageClassifier* image_classifier =
-      TfLiteImageClassifierFromOptions(options);
+      TfLiteImageClassifierFromOptions(&options);
   EXPECT_NE(image_classifier, nullptr);
   TfLiteImageClassifierDelete(image_classifier);
+}
+
+TEST(CImageClassifierFromOptionsTest,
+     FailsWithClassNameBlackListAndClassNameWhiteList) {
+  const char* model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileNetQuantizedWithMetadata)
+                               .data();
+
+  TfLiteImageClassifierOptions options = {0};
+  options.base_options.model_file.file_path = model_path;
+
+  char* class_name_blacklist[] = {"brambling"};
+  options.classification_options.class_name_blacklist.list =
+      class_name_blacklist;
+  options.classification_options.class_name_blacklist.length = 1;
+
+  char* class_name_whitelist[] = {"cheeseburger"};
+  options.classification_options.class_name_whitelist.list =
+      class_name_whitelist;
+  options.classification_options.class_name_whitelist.length = 1;
+
+  TfLiteImageClassifier* image_classifier =
+      TfLiteImageClassifierFromOptions(&options);
+  EXPECT_EQ(image_classifier, nullptr);
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
 }
 
 class CImageClassifierClassifyTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    image_classifier = TfLiteImageClassifierFromFile(
+    TfLiteImageClassifierOptions options = {0};
+    options.base_options.model_file.file_path =
         JoinPath("./" /*test src dir*/, kTestDataDirectory,
                  kMobileNetQuantizedWithMetadata)
-            .data());
+            .data();
+    image_classifier = TfLiteImageClassifierFromOptions(&options);
+
     ASSERT_NE(image_classifier, nullptr);
   }
 
   void TearDown() override { TfLiteImageClassifierDelete(image_classifier); }
-
   TfLiteImageClassifier* image_classifier;
 };
 
@@ -158,7 +175,7 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
   TfLiteClassificationResultDelete(classification_result);
 }
 
-TEST_F(CImageClassifierClassifyTest, FailsWithRoiWithinImageBounds) {
+TEST_F(CImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
   CImageData image_data = LoadImage("burger-224.png");
 
   TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width,
@@ -179,6 +196,105 @@ TEST_F(CImageClassifierClassifyTest, FailsWithRoiWithinImageBounds) {
 
   if (classification_result != nullptr)
     TfLiteClassificationResultDelete(classification_result);
+}
+
+TEST(CImageClassifierWithUserDefinedOptionsClassifyTest,
+     SucceedsWithClassNameBlackList) {
+  char* blacklisted_label_name = "cheeseburger";
+  const char* model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileNetQuantizedWithMetadata)
+                               .data();
+
+  TfLiteImageClassifierOptions options = {0};
+  options.base_options.model_file.file_path = model_path;
+
+  char* class_name_blacklist[] = {blacklisted_label_name};
+  options.classification_options.class_name_blacklist.list =
+      class_name_blacklist;
+  options.classification_options.class_name_blacklist.length = 1;
+
+  TfLiteImageClassifier* image_classifier =
+      TfLiteImageClassifierFromOptions(&options);
+  ASSERT_NE(image_classifier, nullptr);
+
+  CImageData image_data = LoadImage("burger-224.png");
+
+  TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width,
+                                    .dimension.height = image_data.height,
+                                    .buffer = image_data.pixel_data,
+                                    .format = kRGB};
+
+  TfLiteClassificationResult* classification_result =
+      TfLiteImageClassifierClassify(image_classifier, &frame_buffer);
+
+  CImageDataFree(&image_data);
+
+  ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
+  EXPECT_TRUE(classification_result->size >= 1)
+      << "Classification Result size is 0";
+  EXPECT_NE(classification_result->classifications, nullptr)
+      << "Classification Result Classifications is NULL";
+  EXPECT_TRUE(classification_result->classifications->size >= 1)
+      << "Classification Result Classifications Size is 0";
+  EXPECT_NE(classification_result->classifications->categories, nullptr)
+      << "Classification Result Classifications Categories is NULL";
+  EXPECT_TRUE(
+      strcmp(classification_result->classifications->categories[0].label,
+             blacklisted_label_name) != 0)
+      << "Black listed class is present in classification results ";
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
+
+  TfLiteClassificationResultDelete(classification_result);
+}
+
+TEST(CImageClassifierWithUserDefinedOptionsClassifyTest,
+     SucceedsWithClassNameWhiteList) {
+  char* whitelisted_label_name = "cheeseburger";
+  const char* model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileNetQuantizedWithMetadata)
+                               .data();
+
+  TfLiteImageClassifierOptions options = {0};
+  options.base_options.model_file.file_path = model_path;
+
+  char* class_name_whitelist[] = {"cheeseburger"};
+  options.classification_options.class_name_whitelist.list =
+      class_name_whitelist;
+  options.classification_options.class_name_whitelist.length = 1;
+
+  TfLiteImageClassifier* image_classifier =
+      TfLiteImageClassifierFromOptions(&options);
+  ASSERT_NE(image_classifier, nullptr);
+
+  CImageData image_data = LoadImage("burger-224.png");
+
+  TfLiteFrameBuffer frame_buffer = {.dimension.width = image_data.width,
+                                    .dimension.height = image_data.height,
+                                    .buffer = image_data.pixel_data,
+                                    .format = kRGB};
+
+  TfLiteClassificationResult* classification_result =
+      TfLiteImageClassifierClassify(image_classifier, &frame_buffer);
+
+  CImageDataFree(&image_data);
+
+  ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
+  EXPECT_TRUE(classification_result->size >= 1)
+      << "Classification Result size is 0";
+  EXPECT_NE(classification_result->classifications, nullptr)
+      << "Classification Result Classifications is NULL";
+  EXPECT_TRUE(classification_result->classifications->size == 1)
+      << "Classification Result Classifications Size is 0";
+  EXPECT_NE(classification_result->classifications->categories, nullptr)
+      << "Classification Result Classifications Categories is NULL";
+  EXPECT_TRUE(
+      strcmp(classification_result->classifications->categories[0].label,
+             whitelisted_label_name) == 0)
+      << "White listed class is not present in classification results.";
+
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
+
+  TfLiteClassificationResultDelete(classification_result);
 }
 
 }  // namespace
