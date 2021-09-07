@@ -35,56 +35,19 @@ limitations under the License.
 /// Usage with Model File Path:
 /// <pre><code>
 /// // Create the model
-/// TfLiteImageClassifier* classifier =
-///   TfLiteImageClassifierFromFile("/path/to/model.tflite");
+/// TfLiteImageClassifierOptions options = {0};
+///   options.base_options.model_file.file_path = "/path/to/model.tflite";
+///   TfLiteImageClassifier* image_classifier =
+///       TfLiteImageClassifierFromOptions(&options);
 ///
-/// TfLiteFrameBuffer frame_buffer = { Initialize }
+/// Classify an image
+/// TfLiteFrameBuffer frame_buffer = { Initialize with image data }
 ///
-/// Create the model
 /// TfLiteClassificationResult* classification_result =
-///   TfLiteImageClassifierClassify(classifier, &frame_buffer,);
+///       TfLiteImageClassifierClassify(image_classifier, &frame_buffer);
 ///
 /// // Dispose of the API object.
-/// TfLiteImageClassifierDelete(classifier);
-///
-/// Advanced Usage with Options:
-/// <pre><code>
-/// // Create the interpreter options
-/// TfLiteImageClassifierOptions* options =
-/// TfLiteImageClassifierOptionsCreate();
-/// TfLiteImageClassifierOptionsSetScoreThreshold(options, 0.5);
-/// TfLiteImageClassifierOptionsSetMaxResults(options, 3);
-/// TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
-///
-/// TfLiteFrameBuffer frame_buffer = { Initialize }
-///
-/// // Create the model
-/// TfLiteImageClassifier* classifier =
-///   TfLiteImageClassifierFromOptions(options);
-/// TfLiteClassificationResult* classification_result =
-///   TfLiteImageClassifierClassify(classifier, &frame_buffer,);
-///
-/// // Dispose of the API object.
-/// TfLiteImageClassifierDelete(classifier);
-/// Advanced Usage with Options:
-/// <pre><code>
-/// // Create the interpreter options
-/// TfLiteImageClassifierOptions* options =
-/// TfLiteImageClassifierOptionsCreate();
-/// TfLiteImageClassifierOptionsSetScoreThreshold(options, 0.5);
-/// TfLiteImageClassifierOptionsSetMaxResults(options, 3);
-/// TfLiteImageClassifierOptionsSetModelFilePath(options, model_path);
-///
-/// TfLiteFrameBuffer frame_buffer = { Initialize }
-///
-/// // Create the model
-/// TfLiteImageClassifier* classifier =
-///   TfLiteImageClassifierFromOptions(options);
-/// TfLiteTfLiteClassificationResult* classification_result =
-///   TfLiteImageClassifierClassify(classifier, &frame_buffer,);
-///
-/// // Dispose of the API object.
-/// TfLiteImageClassifierDelete(classifier);
+/// TfLiteImageClassifierDelete(image_classifier);
 
 #ifdef __cplusplus
 extern "C" {
