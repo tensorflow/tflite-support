@@ -17,9 +17,7 @@ limitations under the License.
 
 #include <stdint.h>
 
-// --------------------------------------------------------------------------
-/// Common  C APIs and Structs for Vision Tasks.
-//
+// Defines C Struct for Bounding Box Shared by Vision Tasks.
 
 #ifdef __cplusplus
 extern "C" {

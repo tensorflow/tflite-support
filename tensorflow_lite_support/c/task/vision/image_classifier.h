@@ -65,8 +65,17 @@ typedef struct TfLiteImageClassifierOptions {
 
 // Creates TfLiteImageClassifier from options. base_options.model_file.file_path
 // TfLiteImageClassifierOptions should be set to the path of the tflite model
-// you wish to create the TfLiteImageClassifier with. Returns nullptr if the
-// file doesn't exist or is not a well formatted.
+// you wish to create the TfLiteImageClassifier with.
+// Returns nullptr under the followingg circumstances:
+// 1. file doesn't exist or is not a well formatted.
+// 2. options is nullptr
+// 2. Both options.classification_options.class_name_blacklist and
+// options.classification_options.class_name_blacklist are non empty.
+//    These fields are mutually exclusive.
+// If
+// options->base_options.compute_settings.tflite_settings.cpu_settings.num_threads
+// <= 0, it will be set to a default of -1 which indicates the TFLite runtime to
+// choose the value.
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     const TfLiteImageClassifierOptions* options);
 

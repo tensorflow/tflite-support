@@ -17,23 +17,30 @@ limitations under the License.
 
 #include <stdint.h>
 
-// --------------------------------------------------------------------------
-/// Common  C APIs and Structs for Vision Tasks.
-//
+// Defines C Struct for Classification Options Shared by All Classification
+// Tasks.
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
+// Holds pointer to array of C strings and length for looping through the array.
 typedef struct TfLiteStringArrayOption {
+  // Length of list. length can be used to loop through list.
   int length;
+  // Array of C strings.
   char** list;
 } TfLiteStringArrayOption;
 
-// Holds the region of interest used for image classification.
+// Holds settings for any single classification task.
 typedef struct TfLiteClassificationOptions {
-  // The X coordinate of the top-left corner, in pixels.
+  // Optional blacklist of class names. If non NULL, classifications whose
+  // class name is in this set will be filtered out. Duplicate or unknown
+  // class names are ignored. Mutually exclusive with class_name_whitelist.
   TfLiteStringArrayOption class_name_blacklist;
+  // Optional whitelist of class names. If non-empty, classifications whose
+  // class name is not in this set will be filtered out. Duplicate or unknown
+  // class names are ignored. Mutually exclusive with class_name_blacklist.
   TfLiteStringArrayOption class_name_whitelist;
   char* display_names_local;
   int max_results;

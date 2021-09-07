@@ -17,9 +17,7 @@ limitations under the License.
 
 #include <stdint.h>
 
-// --------------------------------------------------------------------------
-/// Base Option C Structs shared by all tasks.
-//
+// Defines C Structs for Base Options Shared by all tasks.
 
 #ifdef __cplusplus
 extern "C" {
