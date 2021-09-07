@@ -31,12 +31,6 @@ StatusOr<std::unique_ptr<FrameBufferCpp>> CreateCppFrameBuffer(
   FrameBufferCpp::Format frame_buffer_format =
       FrameBufferCpp::Format(frame_buffer.format);
 
-  //   StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer =
-  //   CreateFromRawBuffer(
-  //       frame_buffer.buffer,
-  //       {frame_buffer.dimension.width, frame_buffer.dimension.height},
-  //       frame_buffer_format);
-
   return CreateFromRawBuffer(
       frame_buffer.buffer,
       {frame_buffer.dimension.width, frame_buffer.dimension.height},
