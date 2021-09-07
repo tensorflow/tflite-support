@@ -57,19 +57,31 @@ CreateImageClassifierCppOptionsFromCOptions(
   else
     return nullptr;
 
-  if (c_options->base_options.compute_settings.tflite_settings.cpu_settings
-          .num_threads > 0)
+  int num_threads =
+      c_options->base_options.compute_settings.tflite_settings.cpu_settings
+          .num_threads if (c_options->base_options.compute_settings
+                               .tflite_settings.cpu_settings.num_threads > 0)
+              cpp_options->mutable_base_options()
+          ->mutable_compute_settings()
+          ->mutable_tflite_settings()
+          ->mutable_cpu_settings()
+          ->set_num_threads(c_options->base_options.compute_settings
+                                .tflite_settings.cpu_settings.num_threads);
+  else {
     cpp_options->mutable_base_options()
         ->mutable_compute_settings()
         ->mutable_tflite_settings()
         ->mutable_cpu_settings()
-        ->set_num_threads(c_options->base_options.compute_settings
-                              .tflite_settings.cpu_settings.num_threads);
+        ->set_num_threads(-1);
+  }
 
   if (c_options->classification_options.class_name_blacklist.length > 0 &&
       c_options->classification_options.class_name_whitelist.length > 0)
     return nullptr;
 
+  if (c_options->classification_options.class_name_blacklist.length > 0 &&
+      c_options->classification_options.class_name_whitelist.length)
+    return nullptr;
   if (c_options->classification_options.class_name_blacklist.length > 0) {
     for (int i = 0;
          i < c_options->classification_options.class_name_blacklist.length; i++)
