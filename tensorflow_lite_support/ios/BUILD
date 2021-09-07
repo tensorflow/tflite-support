@@ -26,6 +26,8 @@ strip_c_api_include_path_prefix(
         "//tensorflow_lite_support/c/task/processor:bounding_box.h",
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer.h",
         "//tensorflow_lite_support/c/task/processor:classification_result.h",
+        "//tensorflow_lite_support/c/task/processor:classification_options.h",
+        "//tensorflow_lite_support/c/task/processor:base_options.h",
     ],
 )
 
@@ -58,7 +60,9 @@ tflite_ios_framework(
         ":image_classifier.h",
         ":bounding_box.h",
         ":frame_buffer.h",
-        ":classification_result.h"
+        ":classification_result.h",
+        ":base_options.h",
+        ":classification_options.h"
     ],
     allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
     bundle_name = "TensorFlowLiteTaskVisionC",
