@@ -82,12 +82,15 @@ CreateImageClassifierCppOptionsFromCOptions(
   if (c_options->classification_options.class_name_blacklist.length > 0 &&
       c_options->classification_options.class_name_whitelist.length)
     return nullptr;
+  
   if (c_options->classification_options.class_name_blacklist.length > 0) {
     for (int i = 0;
          i < c_options->classification_options.class_name_blacklist.length; i++)
       cpp_options->add_class_name_blacklist(
           c_options->classification_options.class_name_blacklist.list[i]);
-  } else if (c_options->classification_options.class_name_whitelist.length >
+  }
+  
+  if (c_options->classification_options.class_name_whitelist.length >
              0) {
     for (int i = 0;
          i < c_options->classification_options.class_name_whitelist.length; i++)
