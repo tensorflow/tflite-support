@@ -25,18 +25,17 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-
 typedef struct TfLiteStringArrayOption {
-int length;
-const char** list;
+  int length;
+  char** list;
 } TfLiteStringArrayOption;
 
 // Holds the region of interest used for image classification.
 typedef struct TfLiteClassificationOptions {
   // The X coordinate of the top-left corner, in pixels.
-  const TfLiteStringArrayOption class_name_blacklist;
-  const TfLiteStringArrayOption class_name_whitelist;
-  const char* display_names_local;
+  TfLiteStringArrayOption class_name_blacklist;
+  TfLiteStringArrayOption class_name_whitelist;
+  char* display_names_local;
   int max_results;
   float score_threshold;
 } TfLiteClassificationOptions;

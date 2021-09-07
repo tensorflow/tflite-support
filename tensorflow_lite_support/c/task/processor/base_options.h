@@ -25,23 +25,21 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-
 typedef struct TfLiteCpuSettings {
-int num_threads;
+  int num_threads;
 } TfLiteCpuSettings;
 
 typedef struct TfLiteTflSettings {
-TfLiteCpuSettings cpu_settings;
+  TfLiteCpuSettings cpu_settings;
 } TfLiteTflSettings;
 
 typedef struct TfLiteComputeSettings {
-
-TfLiteTflSettings tflite_settings;
+  TfLiteTflSettings tflite_settings;
 } TfLiteComputeSettings;
 
 typedef struct TfLiteExternalFile {
-    const char* file_path;
-    //Additional option for byte data when it's supported.
+  const char* file_path;
+  // Additional option for byte data when it's supported.
 } TfLiteExternalFile;
 
 // Holds the region of interest used for image classification.

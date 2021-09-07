@@ -93,7 +93,7 @@ extern "C" {
 typedef struct TfLiteImageClassifier TfLiteImageClassifier;
 
 typedef struct TfLiteImageClassifierOptions {
-  TfLiteClassificationOptions classifier_options;
+  TfLiteClassificationOptions classification_options;
   TfLiteBaseOptions base_options;
 
 } TfLiteImageClassifierOptions;
@@ -107,7 +107,6 @@ typedef struct TfLiteImageClassifierOptions {
 // TFLite model path.
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     const TfLiteImageClassifierOptions* options);
-
 
 // Invokes the encapsulated TFLite model and classifies the frame_buffer.
 TfLiteClassificationResult* TfLiteImageClassifierClassify(

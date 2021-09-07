@@ -24,17 +24,18 @@ namespace vision {
 namespace {
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 using ::tflite::support::StatusOr;
-}
+}  // namespace
 
 StatusOr<std::unique_ptr<FrameBufferCpp>> CreateCppFrameBuffer(
     const TfLiteFrameBuffer& frame_buffer) {
   FrameBufferCpp::Format frame_buffer_format =
       FrameBufferCpp::Format(frame_buffer.format);
 
-//   StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer = CreateFromRawBuffer(
-//       frame_buffer.buffer,
-//       {frame_buffer.dimension.width, frame_buffer.dimension.height},
-//       frame_buffer_format);
+  //   StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer =
+  //   CreateFromRawBuffer(
+  //       frame_buffer.buffer,
+  //       {frame_buffer.dimension.width, frame_buffer.dimension.height},
+  //       frame_buffer_format);
 
   return CreateFromRawBuffer(
       frame_buffer.buffer,
@@ -45,4 +46,3 @@ StatusOr<std::unique_ptr<FrameBufferCpp>> CreateCppFrameBuffer(
 }  // namespace vision
 }  // namespace task
 }  // namespace tflite
-

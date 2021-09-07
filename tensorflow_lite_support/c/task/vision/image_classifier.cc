@@ -66,34 +66,35 @@ CreateImageClassifierCppOptionsFromCOptions(
         ->set_num_threads(c_options->base_options.compute_settings
                               .tflite_settings.cpu_settings.num_threads);
 
-  if (c_options->classifier_options.class_name_blacklist.length > 0 &&
-      c_options->classifier_options.class_name_whitelist.length > 0)
+  if (c_options->classification_options.class_name_blacklist.length > 0 &&
+      c_options->classification_options.class_name_whitelist.length > 0)
     return nullptr;
 
-  if (c_options->classifier_options.class_name_blacklist.length > 0) {
+  if (c_options->classification_options.class_name_blacklist.length > 0) {
     for (int i = 0;
-         i < c_options->classifier_options.class_name_blacklist.length; i++)
+         i < c_options->classification_options.class_name_blacklist.length; i++)
       cpp_options->add_class_name_blacklist(
-          c_options->classifier_options.class_name_blacklist.list[i]);
-  } else if (c_options->classifier_options.class_name_whitelist.length > 0) {
+          c_options->classification_options.class_name_blacklist.list[i]);
+  } else if (c_options->classification_options.class_name_whitelist.length >
+             0) {
     for (int i = 0;
-         i < c_options->classifier_options.class_name_whitelist.length; i++)
+         i < c_options->classification_options.class_name_whitelist.length; i++)
       cpp_options->add_class_name_whitelist(
-          c_options->classifier_options.class_name_whitelist.list[i]);
+          c_options->classification_options.class_name_whitelist.list[i]);
   }
 
-  if (c_options->classifier_options.display_names_local) {
+  if (c_options->classification_options.display_names_local) {
     cpp_options->set_display_names_locale(
-        c_options->classifier_options.display_names_local);
+        c_options->classification_options.display_names_local);
   }
 
-  if (c_options->classifier_options.max_results > 0) {
-    cpp_options->set_max_results(c_options->classifier_options.max_results);
+  if (c_options->classification_options.max_results > 0) {
+    cpp_options->set_max_results(c_options->classification_options.max_results);
   }
 
-  if (c_options->classifier_options.score_threshold >= 0) {
+  if (c_options->classification_options.score_threshold >= 0) {
     cpp_options->set_score_threshold(
-        c_options->classifier_options.score_threshold);
+        c_options->classification_options.score_threshold);
   }
 
   return cpp_options;
@@ -111,8 +112,8 @@ TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
   auto classifier_status = ImageClassifierCpp::CreateFromOptions(*cpp_options);
 
   if (classifier_status.ok()) {
-    return new TfLiteImageClassifier{
-        .impl = std::move(classifier_status.value())};
+    return new TfLiteImageClassifier{.impl =
+                                         std::move(classifier_status.value())};
   } else {
     return nullptr;
   }
@@ -180,20 +181,17 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
     cc_roi.set_height(roi->height);
   }
 
-
-StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer_status =
+  StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer_status =
       ::tflite::task::vision::CreateCppFrameBuffer(*frame_buffer);
 
-  if (!cpp_frame_buffer_status.ok())
-    return nullptr;
+  if (!cpp_frame_buffer_status.ok()) return nullptr;
 
   // fnc_sample(cpp_frame_buffer_status);
   StatusOr<ClassificationResultCpp> classification_result_cpp =
-      classifier->impl->Classify(*std::move(cpp_frame_buffer_status.value()), cc_roi);
-
+      classifier->impl->Classify(*std::move(cpp_frame_buffer_status.value()),
+                                 cc_roi);
 
   if (!classification_result_cpp.ok()) return nullptr;
-
 
   return GetClassificationResultCStruct(classification_result_cpp.value());
 }
