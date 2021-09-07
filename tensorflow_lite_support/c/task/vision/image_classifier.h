@@ -35,6 +35,8 @@ limitations under the License.
 /// Usage with Model File Path:
 /// <pre><code>
 /// // Create the model
+/// Zero initialize options to avoid undefined behaviour due to garbage values
+/// for members
 /// TfLiteImageClassifierOptions options = {0};
 ///   options.base_options.model_file.file_path = "/path/to/model.tflite";
 ///   TfLiteImageClassifier* image_classifier =
@@ -61,13 +63,10 @@ typedef struct TfLiteImageClassifierOptions {
 
 } TfLiteImageClassifierOptions;
 
-// Creates TfLiteImageClassifier from options. When using this function to
-// instantiate Image Classifer, the model path should be set using
-// TfLiteImageClassifierOptionsSetModelFilePath(TfLiteImageClassifierOptions*
-// options,
-//                                          const char* model_path)
-// returns nullptr if the file doesn't exist or is not a well formatted
-// TFLite model path.
+// Creates TfLiteImageClassifier from options. base_options.model_file.file_path
+// TfLiteImageClassifierOptions should be set to the path of the tflite model
+// you wish to create the TfLiteImageClassifier with. Returns nullptr if the
+// file doesn't exist or is not a well formatted.
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     const TfLiteImageClassifierOptions* options);
 
