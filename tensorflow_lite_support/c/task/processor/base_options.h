@@ -18,34 +18,56 @@ limitations under the License.
 #include <stdint.h>
 
 // --------------------------------------------------------------------------
-/// Common  C APIs and Structs for Vision Tasks.
+/// Base Option C Structs shared by all tasks.
 //
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
+// Holds settings to configure cpu execution.
 typedef struct TfLiteCpuSettings {
+  // Specifies the number of threads to be used for TFLite
+  // ops that support multi-threading when running inference with CPU.
+  // num_threads should be greater than 0 or equal to -1. Setting num_threads to
+  // -1 has the effect to let TFLite runtime set the value.
   int num_threads;
 } TfLiteCpuSettings;
 
+// Holds settings to configure TFLite runtime.
 typedef struct TfLiteTflSettings {
+  // Specifies how to configure cpu execution.
   TfLiteCpuSettings cpu_settings;
 } TfLiteTflSettings;
 
+// Holds settings for one possible acceleration configuration.
 typedef struct TfLiteComputeSettings {
+  // Holds settings to configure TFLite runtime.
   TfLiteTflSettings tflite_settings;
 } TfLiteComputeSettings;
 
+// Represents external files used by the Task APIs (e.g. TF Lite Model File).
+// For now you can only specify the path of the file using file_path:
+// In future other sources may be supported.
 typedef struct TfLiteExternalFile {
+  // The path to the file to open.
   const char* file_path;
   // Additional option for byte data when it's supported.
 } TfLiteExternalFile;
 
-// Holds the region of interest used for image classification.
+// Holds the base options that is used for creation of any type of task. It has
+// fields withh important information acceleration configuration, tflite model
+// source etc.
 typedef struct TfLiteBaseOptions {
-  // The X coordinate of the top-left corner, in pixels.
+  // The external model file, as a single standalone TFLite file. It could be
+  // packed with TFLite Model Metadata[1] and associated files if exist. Fail to
+  // provide the necessary metadata and associated files might result in errors.
+  // Check the documentation for each task about the specific requirement.
+  // [1]: https://www.tensorflow.org/lite/convert/metadata
   TfLiteExternalFile model_file;
+  // Holds settings for one possible acceleration configuration
+  // including.cpu/gpu settings. Please see documentation of
+  // TfLiteComputeSettings and its members for more details.
   TfLiteComputeSettings compute_settings;
 
 } TfLiteBaseOptions;
