@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_OPTIONS_H_
-#define TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_OPTIONS_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_CORE_CLASSIFICATION_OPTIONS_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TASK_CORE_CLASSIFICATION_OPTIONS_H_
 
 #include <stdint.h>
 
@@ -51,4 +51,4 @@ typedef struct TfLiteClassificationOptions {
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_OPTIONS_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_CORE_CLASSIFICATION_OPTIONS_H_

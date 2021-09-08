@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BASE_OPTIONS_H_
-#define TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BASE_OPTIONS_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_CORE_BASE_OPTIONS_H_
+#define TENSORFLOW_LITE_SUPPORT_C_TASK_CORE_BASE_OPTIONS_H_
 
 #include <stdint.h>
 
@@ -23,25 +23,13 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-// Holds settings to configure cpu execution.
-typedef struct TfLiteCpuSettings {
+// Holds settings for one possible acceleration configuration.
+typedef struct TfLiteComputeSettings {
   // Specifies the number of threads to be used for TFLite
   // ops that support multi-threading when running inference with CPU.
   // num_threads should be greater than 0 or equal to -1. Setting num_threads to
   // -1 has the effect to let TFLite runtime set the value.
   int num_threads;
-} TfLiteCpuSettings;
-
-// Holds settings to configure TFLite runtime.
-typedef struct TfLiteTflSettings {
-  // Specifies how to configure cpu execution.
-  TfLiteCpuSettings cpu_settings;
-} TfLiteTflSettings;
-
-// Holds settings for one possible acceleration configuration.
-typedef struct TfLiteComputeSettings {
-  // Holds settings to configure TFLite runtime.
-  TfLiteTflSettings tflite_settings;
 } TfLiteComputeSettings;
 
 // Represents external files used by the Task APIs (e.g. TF Lite Model File).
@@ -56,6 +44,8 @@ typedef struct TfLiteExternalFile {
 // Holds the base options that is used for creation of any type of task. It has
 // fields withh important information acceleration configuration, tflite model
 // source etc.
+// This struct must be zero initialized before setting any options as this
+// will result in seg faults.
 typedef struct TfLiteBaseOptions {
   // The external model file, as a single standalone TFLite file. It could be
   // packed with TFLite Model Metadata[1] and associated files if exist. Fail to
@@ -74,4 +64,4 @@ typedef struct TfLiteBaseOptions {
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_BASE_OPTIONS_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_CORE_BASE_OPTIONS_H_
