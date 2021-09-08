@@ -57,58 +57,45 @@ CreateImageClassifierCppOptionsFromCOptions(
   else
     return nullptr;
 
-  if (c_options->base_options.compute_settings
-                               .tflite_settings.cpu_settings.num_threads > 0)
-              cpp_options->mutable_base_options()
-          ->mutable_compute_settings()
-          ->mutable_tflite_settings()
-          ->mutable_cpu_settings()
-          ->set_num_threads(c_options->base_options.compute_settings
-                                .tflite_settings.cpu_settings.num_threads);
-  else {
+  // Without this check, in zero initialized TfLiteImageClassifierOptions (must
+  // be done to prevent undefined behaviour)
+  // c_options->base_options.compute_settings.num_threads should be explicitly
+  // set to value > 0 or -1. Otherwise invoking
+  // ImageClassifierCpp::CreateFromOptions() results in a not ok status.
+  if (c_options->base_options.compute_settings.num_threads > 0)
     cpp_options->mutable_base_options()
         ->mutable_compute_settings()
         ->mutable_tflite_settings()
         ->mutable_cpu_settings()
-        ->set_num_threads(-1);
-  }
+        ->set_num_threads(c_options->base_options.compute_settings.num_threads);
 
-  if (c_options->classification_options.class_name_blacklist.length > 0 &&
-      c_options->classification_options.class_name_whitelist.length > 0)
-    return nullptr;
+  for (int i = 0;
+       i < c_options->classification_options.class_name_blacklist.length; i++)
+    cpp_options->add_class_name_blacklist(
+        c_options->classification_options.class_name_blacklist.list[i]);
 
-  if (c_options->classification_options.class_name_blacklist.length > 0 &&
-      c_options->classification_options.class_name_whitelist.length)
-    return nullptr;
-  
-  if (c_options->classification_options.class_name_blacklist.length > 0) {
-    for (int i = 0;
-         i < c_options->classification_options.class_name_blacklist.length; i++)
-      cpp_options->add_class_name_blacklist(
-          c_options->classification_options.class_name_blacklist.list[i]);
-  }
-  
-  if (c_options->classification_options.class_name_whitelist.length >
-             0) {
-    for (int i = 0;
-         i < c_options->classification_options.class_name_whitelist.length; i++)
-      cpp_options->add_class_name_whitelist(
-          c_options->classification_options.class_name_whitelist.list[i]);
-  }
+  for (int i = 0;
+       i < c_options->classification_options.class_name_whitelist.length; i++)
+    cpp_options->add_class_name_whitelist(
+        c_options->classification_options.class_name_whitelist.list[i]);
 
+  // Check needed since setting a nullptr for this field results in a segfault
+  // on invocation of ImageClassifierCpp::CreateFromOptions().
   if (c_options->classification_options.display_names_local) {
     cpp_options->set_display_names_locale(
         c_options->classification_options.display_names_local);
   }
 
-  if (c_options->classification_options.max_results > 0) {
+  // Without this check, in zero initialized TfLiteImageClassifierOptions (must
+  // be done to prevent undefined behaviour)
+  // c_options->classification_options.max_results should be explicitly set to
+  // value > 0. Otherwise invocation of ImageClassifierCpp::CreateFromOptions()
+  // will return a not ok status.
+  if (c_options->classification_options.max_results > 0)
     cpp_options->set_max_results(c_options->classification_options.max_results);
-  }
 
-  if (c_options->classification_options.score_threshold >= 0) {
-    cpp_options->set_score_threshold(
-        c_options->classification_options.score_threshold);
-  }
+  cpp_options->set_score_threshold(
+      c_options->classification_options.score_threshold);
 
   return cpp_options;
 }
@@ -196,7 +183,6 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
 
   StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer_status =
       ::tflite::task::vision::CreateCppFrameBuffer(*frame_buffer);
-
   if (!cpp_frame_buffer_status.ok()) return nullptr;
 
   // fnc_sample(cpp_frame_buffer_status);

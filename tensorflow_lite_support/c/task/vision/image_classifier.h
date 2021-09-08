@@ -17,9 +17,9 @@ limitations under the License.
 
 #include <stdint.h>
 
-#include "tensorflow_lite_support/c/task/processor/base_options.h"
+#include "tensorflow_lite_support/c/task/core/base_options.h"
+#include "tensorflow_lite_support/c/task/core/classification_options.h"
 #include "tensorflow_lite_support/c/task/processor/bounding_box.h"
-#include "tensorflow_lite_support/c/task/processor/classification_options.h"
 #include "tensorflow_lite_support/c/task/processor/classification_result.h"
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 
@@ -60,7 +60,6 @@ typedef struct TfLiteImageClassifier TfLiteImageClassifier;
 typedef struct TfLiteImageClassifierOptions {
   TfLiteClassificationOptions classification_options;
   TfLiteBaseOptions base_options;
-
 } TfLiteImageClassifierOptions;
 
 // Creates TfLiteImageClassifier from options. base_options.model_file.file_path
@@ -76,6 +75,7 @@ typedef struct TfLiteImageClassifierOptions {
 // options->base_options.compute_settings.tflite_settings.cpu_settings.num_threads
 // <= 0, it will be set to a default of -1 which indicates the TFLite runtime to
 // choose the value.
+// TfLiteImageClassifierOptions must be zero initialized to avoid seg faults.
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     const TfLiteImageClassifierOptions* options);
 
