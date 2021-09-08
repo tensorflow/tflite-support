@@ -70,8 +70,7 @@ TEST(CImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
 
   TfLiteImageClassifierOptions options = {0};
   options.base_options.model_file.file_path = model_path;
-  options.base_options.compute_settings.tflite_settings.cpu_settings
-      .num_threads = 3;
+  options.base_options.compute_settings.num_threads = 3;
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options);
   EXPECT_NE(image_classifier, nullptr);
