@@ -30,7 +30,7 @@ public abstract class BaseOptions {
      * Sets the advanced accelerator options.
      *
      * <p>Note: this method will override those highlevel API to choose an delegate, such as {@link
-     * useGpu} and {@link useNnapi}.
+     * #useGpu} and {@link #useNnapi}.
      */
     public abstract Builder setComputeSettings(ComputeSettings computeSettings);
 
