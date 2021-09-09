@@ -26,6 +26,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/core/base_task_api.h"
 #include "tensorflow_lite_support/cc/task/core/classification_head.h"
+#include "tensorflow_lite_support/cc/task/processor/audio_preprocessor.h"
 
 namespace tflite {
 namespace task {
@@ -77,10 +78,14 @@ class AudioClassifier
   // kMetadataNotFoundError.
   // TODO(b/182625132): Add unit test after the format is populated from model
   // metadata.
-  tflite::support::StatusOr<AudioBuffer::AudioFormat> GetRequiredAudioFormat();
+  tflite::support::StatusOr<AudioBuffer::AudioFormat> GetRequiredAudioFormat() {
+    return preprocessor_->GetRequiredAudioFormat();
+  }
 
   // Returns the required input buffer size in number of float elements.
-  int GetRequiredInputBufferSize() { return input_buffer_size_; }
+  int GetRequiredInputBufferSize() {
+    return preprocessor_->GetRequiredInputBufferSize();
+  }
 
  private:
   // Performs sanity checks on the provided AudioClassifierOptions.
@@ -90,19 +95,14 @@ class AudioClassifier
   // whose ownership is transferred to this object.
   absl::Status Init(std::unique_ptr<AudioClassifierOptions> options);
 
-  // Sets up input audio format from the model metadata;
-  absl::Status SetAudioFormatFromMetadata();
-
-  // Performs sanity checks on the model input dimension and sets the input
-  // buffer size accordingly.
-  absl::Status CheckAndSetInputs();
-
   // Performs sanity checks on the model outputs and extracts their metadata.
   absl::Status CheckAndSetOutputs();
 
   // Passes through the input audio buffer into model's input tensor.
   absl::Status Preprocess(const std::vector<TfLiteTensor*>& input_tensors,
-                          const AudioBuffer& audio_buffer) override;
+                          const AudioBuffer& audio_buffer) override {
+    return preprocessor_->Preprocess(audio_buffer);
+  }
 
   // Post-processing to transform the raw model outputs into classification
   // results.
@@ -139,11 +139,8 @@ class AudioClassifier
   // post-processing.
   ClassNameSet class_name_set_;
 
-  // Expected input audio format by the model.
-  AudioBuffer::AudioFormat audio_format_;
-
-  // Expected input audio buffer size in number of float elements.
-  int input_buffer_size_;
+  std::unique_ptr<tflite::task::processor::AudioPreprocessor> preprocessor_ =
+      nullptr;
 };
 
 }  // namespace audio

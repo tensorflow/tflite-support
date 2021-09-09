@@ -16,6 +16,7 @@ cc_library_with_tflite(
     hdrs = ["audio_classifier.h"],
     tflite_deps = [
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "//tensorflow_lite_support/cc/task/processor:audio_preprocessor",
         "//tensorflow_lite_support/cc/task/core:base_task_api",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
     ],
