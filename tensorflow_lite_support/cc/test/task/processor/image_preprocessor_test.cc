@@ -59,20 +59,19 @@ class DynamicInputTest : public tflite_shims::testing::Test {
                                          kDilatedConvolutionModelWithMetaData));
     engine_->InitInterpreter();
 
-    SUPPORT_ASSERT_OK_AND_ASSIGN(preprocessor_,
+    SUPPORT_ASSERT_OK_AND_ASSIGN(auto preprocessor,
                                  ImagePreprocessor::Create(engine_.get(), {0}));
 
     SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
     frame_buffer_ = CreateFromRgbRawBuffer(
         image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
 
-    preprocessor_->Preprocess(*frame_buffer_);
+    preprocessor->Preprocess(*frame_buffer_);
   }
 
  protected:
   std::unique_ptr<TfLiteEngine> engine_ = nullptr;
   std::unique_ptr<FrameBuffer> frame_buffer_ = nullptr;
-  std::unique_ptr<ImagePreprocessor> preprocessor_ = nullptr;
 };
 
 // See if output tensor has been re-dimmed as per the input
@@ -104,20 +103,6 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
        ++i, ++image_data, ++processed_input_data)
     EXPECT_NEAR(static_cast<float>(*image_data), *processed_input_data,
                 std::numeric_limits<float>::epsilon());
-}
-
-// Modifying batch/depth to invalid size after Init()
-// call should throw error.
-TEST_F(DynamicInputTest, InvalidBatchOrDepthResize) {
-  // Resized input tensor to invalid batch and depth size.
-  engine_->interpreter()->ResizeInputTensorStrict(
-      0, {50, frame_buffer_->dimension().height,
-          frame_buffer_->dimension().width, 3});
-  auto process_status = preprocessor_->Preprocess(*frame_buffer_);
-  EXPECT_EQ(process_status.code(), absl::StatusCode::kInvalidArgument);
-  EXPECT_THAT(process_status.message(),
-              HasSubstr("The input tensor should have dimensions 1 x height x "
-                        "width x 3. Got"));
 }
 
 }  // namespace
