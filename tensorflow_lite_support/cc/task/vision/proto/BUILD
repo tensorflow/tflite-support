@@ -242,3 +242,31 @@ cc_library(
     hdrs = ["embeddings_proto_inc.h"],
     deps = [":embeddings_cc_proto"],
 )
+
+# ImageTransformer protos.
+
+proto_library(
+    name = "image_transformer_options_proto",
+    srcs = ["image_transformer_options.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
+        "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "image_transformer_options_cc_proto",
+    deps = [
+        ":image_transformer_options_proto",
+    ],
+)
+
+cc_library(
+    name = "image_transformer_options_proto_inc",
+    hdrs = ["image_transformer_options_proto_inc.h"],
+    deps = [
+        ":image_transformer_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",
+    ],
+)
