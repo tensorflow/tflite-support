@@ -26,7 +26,7 @@ strip_c_api_include_path_prefix(
         "//tensorflow_lite_support/c/task/processor:bounding_box.h",
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer.h",
         "//tensorflow_lite_support/c/task/processor:classification_result.h",
-        "//tensorflow_lite_support/c/task/core:classification_options.h",
+        "//tensorflow_lite_support/c/task/processor:classification_options.h",
         "//tensorflow_lite_support/c/task/core:base_options.h",
     ],
 )

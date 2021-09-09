@@ -18,7 +18,7 @@ limitations under the License.
 #include <stdint.h>
 
 #include "tensorflow_lite_support/c/task/core/base_options.h"
-#include "tensorflow_lite_support/c/task/core/classification_options.h"
+#include "tensorflow_lite_support/c/task/processor/classification_options.h"
 #include "tensorflow_lite_support/c/task/processor/bounding_box.h"
 #include "tensorflow_lite_support/c/task/processor/classification_result.h"
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"

@@ -8,8 +8,4 @@ cc_library(
     hdrs = ["base_options.h"],
 )
 
-cc_library(
-    name = "classification_options",
-    hdrs = ["classification_options.h"],
-)
 

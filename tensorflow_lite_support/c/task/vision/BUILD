@@ -23,7 +23,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/c/task/processor:classification_result",
         "//tensorflow_lite_support/c/task/processor:bounding_box",
         "//tensorflow_lite_support/c/task/core:base_options",
-        "//tensorflow_lite_support/c/task/core:classification_options",
+        "//tensorflow_lite_support/c/task/processor:classification_options",
 
     ],
 )
