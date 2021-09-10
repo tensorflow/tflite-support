@@ -28,7 +28,6 @@ _INPUT_NAME = "audio_clip"
 _INPUT_DESCRIPTION = "Input audio clip to be classified."
 _OUTPUT_NAME = "probability"
 _OUTPUT_DESCRIPTION = "Scores of the labels respectively."
-_AUDIO_TENSOR_INDEX = 0
 
 
 class MetadataWriter(metadata_writer.MetadataWriter):

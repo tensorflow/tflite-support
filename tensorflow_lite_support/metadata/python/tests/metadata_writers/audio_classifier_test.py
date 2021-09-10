@@ -40,7 +40,7 @@ _CHANNELS = 1
 
 class MetadataWriterTest(tf.test.TestCase):
 
-  def test_create_for_inference_should_succeed_dynaamic_input_shape_model(self):
+  def test_create_for_inference_should_succeed_dynamic_input_shape_model(self):
     writer = audio_classifier.MetadataWriter.create_for_inference(
         test_utils.load_file(_DYNAMIC_INPUT_SIZE_MODEL), _SAMPLE_RATE,
         _CHANNELS, [_LABEL_FILE],
