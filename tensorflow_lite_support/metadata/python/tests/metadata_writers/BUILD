@@ -97,6 +97,8 @@ py_test(
     deps = [
         ":test_utils",
         # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/metadata:metadata_schema_py",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "//tensorflow_lite_support/metadata/python/metadata_writers:object_detector",
         "@absl_py//absl/testing:parameterized",
         "@flatbuffers//:runtime_py",
