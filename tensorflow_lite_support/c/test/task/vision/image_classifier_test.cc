@@ -135,12 +135,12 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
   ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
   EXPECT_TRUE(classification_result->size >= 1)
       << "Classification Result size is 0";
-  EXPECT_NE(classification_result->classifications, nullptr)
-      << "Classification Result Classifications is NULL";
-  EXPECT_TRUE(classification_result->classifications->size >= 1)
-      << "Classification Result Classifications Size is 0";
-  EXPECT_NE(classification_result->classifications->categories, nullptr)
-      << "Classification Result Classifications Classes is NULL";
+  ASSERT_NE(classification_result, nullptr);
+  EXPECT_TRUE(classification_result->size >= 1);
+  EXPECT_NE(classification_result->classifications, nullptr);
+  EXPECT_TRUE(classification_result->classifications->size >= 1);
+  EXPECT_NE(classification_result->classifications->categories, nullptr);
+  // TODO(prianka): check score and labels`
 
   TfLiteClassificationResultDelete(classification_result);
 }
@@ -161,15 +161,12 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
 
   CImageDataFree(&image_data);
 
-  ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
-  EXPECT_TRUE(classification_result->size >= 1)
-      << "Classification Result size is 0";
-  EXPECT_NE(classification_result->classifications, nullptr)
-      << "Classification Result Classifications is NULL";
-  EXPECT_TRUE(classification_result->classifications->size >= 1)
-      << "Classification Result Classifications Size is 0";
-  EXPECT_NE(classification_result->classifications->categories, nullptr)
-      << "Classification Result Classifications Classes is NULL";
+  ASSERT_NE(classification_result, nullptr);
+  EXPECT_TRUE(classification_result->size >= 1);
+  EXPECT_NE(classification_result->classifications, nullptr);
+  EXPECT_TRUE(classification_result->classifications->size >= 1);
+  EXPECT_NE(classification_result->classifications->categories, nullptr);
+  // TODO(prianka): check score and labels`
 
   TfLiteClassificationResultDelete(classification_result);
 }
@@ -190,8 +187,7 @@ TEST_F(CImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
 
   CImageDataFree(&image_data);
 
-  ASSERT_EQ(classification_result, nullptr)
-      << "Classification Result is not NULL";
+  ASSERT_EQ(classification_result, nullptr);
 
   if (classification_result != nullptr)
     TfLiteClassificationResultDelete(classification_result);
@@ -228,19 +224,15 @@ TEST(CImageClassifierWithUserDefinedOptionsClassifyTest,
 
   CImageDataFree(&image_data);
 
-  ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
-  EXPECT_TRUE(classification_result->size >= 1)
-      << "Classification Result size is 0";
-  EXPECT_NE(classification_result->classifications, nullptr)
-      << "Classification Result Classifications is NULL";
-  EXPECT_TRUE(classification_result->classifications->size >= 1)
-      << "Classification Result Classifications Size is 0";
-  EXPECT_NE(classification_result->classifications->categories, nullptr)
-      << "Classification Result Classifications Categories is NULL";
+  ASSERT_NE(classification_result, nullptr);
+  EXPECT_TRUE(classification_result->size >= 1);
+  EXPECT_NE(classification_result->classifications, nullptr);
+  EXPECT_TRUE(classification_result->classifications->size >= 1);
+  EXPECT_NE(classification_result->classifications->categories, nullptr);
   EXPECT_TRUE(
       strcmp(classification_result->classifications->categories[0].label,
-             blacklisted_label_name) != 0)
-      << "Black listed class is present in classification results ";
+             blacklisted_label_name) != 0);
+
   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
 
   TfLiteClassificationResultDelete(classification_result);
@@ -277,19 +269,14 @@ TEST(CImageClassifierWithUserDefinedOptionsClassifyTest,
 
   CImageDataFree(&image_data);
 
-  ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
-  EXPECT_TRUE(classification_result->size >= 1)
-      << "Classification Result size is 0";
-  EXPECT_NE(classification_result->classifications, nullptr)
-      << "Classification Result Classifications is NULL";
-  EXPECT_TRUE(classification_result->classifications->size == 1)
-      << "Classification Result Classifications Size is 0";
-  EXPECT_NE(classification_result->classifications->categories, nullptr)
-      << "Classification Result Classifications Categories is NULL";
+  ASSERT_NE(classification_result, nullptr);
+  EXPECT_TRUE(classification_result->size >= 1);
+  EXPECT_NE(classification_result->classifications, nullptr);
+  EXPECT_TRUE(classification_result->classifications->size == 1);
+  EXPECT_NE(classification_result->classifications->categories, nullptr);
   EXPECT_TRUE(
       strcmp(classification_result->classifications->categories[0].label,
-             whitelisted_label_name) == 0)
-      << "White listed class is not present in classification results.";
+             whitelisted_label_name) == 0);
 
   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
 
