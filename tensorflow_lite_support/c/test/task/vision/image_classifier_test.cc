@@ -132,9 +132,6 @@ TEST_F(CImageClassifierClassifyTest, SucceedsWithImageData) {
 
   CImageDataFree(&image_data);
 
-  ASSERT_NE(classification_result, nullptr) << "Classification Result is NULL";
-  EXPECT_TRUE(classification_result->size >= 1)
-      << "Classification Result size is 0";
   ASSERT_NE(classification_result, nullptr);
   EXPECT_TRUE(classification_result->size >= 1);
   EXPECT_NE(classification_result->classifications, nullptr);
