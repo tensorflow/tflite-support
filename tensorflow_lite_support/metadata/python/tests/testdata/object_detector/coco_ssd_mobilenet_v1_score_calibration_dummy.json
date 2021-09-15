@@ -97,7 +97,7 @@
             {
               "options_type": "ScoreCalibrationOptions",
               "options": {
-                "default_score": 0.2
+                "score_transformation": "INVERSE_LOGISTIC"
               }
             }
           ],
@@ -105,7 +105,7 @@
           },
           "associated_files": [
             {
-              "name": "score_calibration.csv",
+              "name": "score_calibration_dummy.csv",
               "description": "Contains sigmoid-based score calibration parameters. The main purposes of score calibration is to make scores across classes comparable, so that a common threshold can be used for all output classes.",
               "type": "TENSOR_AXIS_SCORE_CALIBRATION"
             }
