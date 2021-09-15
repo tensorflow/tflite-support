@@ -40,15 +40,7 @@ class AudioPreprocessor : public Preprocessor {
  public:
   static tflite::support::StatusOr<std::unique_ptr<AudioPreprocessor>> Create(
       tflite::task::core::TfLiteEngine* engine,
-      const std::initializer_list<int> input_indices) {
-    RETURN_IF_ERROR(Preprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                              engine, input_indices,
-                                              /* requires_metadata = */ true));
-    auto processor =
-        ::absl::WrapUnique(new AudioPreprocessor(engine, input_indices));
-    RETURN_IF_ERROR(processor->Init());
-    return processor;
-  }
+      const std::initializer_list<int> input_indices);
 
   // Processes the provided AudioBuffer and populates tensor values.
   //

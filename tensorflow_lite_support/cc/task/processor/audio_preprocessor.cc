@@ -70,6 +70,19 @@ tflite::support::StatusOr<const AudioProperties*> GetAudioPropertiesSafe(
 }
 }  // namespace
 
+/* static */
+tflite::support::StatusOr<std::unique_ptr<AudioPreprocessor>>
+AudioPreprocessor::Create(tflite::task::core::TfLiteEngine* engine,
+                          const std::initializer_list<int> input_indices) {
+  RETURN_IF_ERROR(Preprocessor::SanityCheck(/* num_expected_tensors = */ 1,
+                                            engine, input_indices,
+                                            /* requires_metadata = */ true));
+  auto processor =
+      ::absl::WrapUnique(new AudioPreprocessor(engine, input_indices));
+  RETURN_IF_ERROR(processor->Init());
+  return processor;
+}
+
 absl::Status AudioPreprocessor::Init() {
   RETURN_IF_ERROR(SetAudioFormatFromMetadata());
   RETURN_IF_ERROR(CheckAndSetInputs());

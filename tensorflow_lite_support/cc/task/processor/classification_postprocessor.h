@@ -49,16 +49,7 @@ class ClassificationPostprocessor : public Postprocessor {
   static absl::StatusOr<std::unique_ptr<ClassificationPostprocessor>> Create(
       core::TfLiteEngine* engine,
       const std::initializer_list<int> output_indices,
-      std::unique_ptr<ClassificationOptions> options) {
-    RETURN_IF_ERROR(Postprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                               engine, output_indices));
-
-    auto processor = absl::WrapUnique(
-        new ClassificationPostprocessor(engine, output_indices));
-
-    RETURN_IF_ERROR(processor->Init(std::move(options)));
-    return processor;
-  }
+      std::unique_ptr<ClassificationOptions> options);
 
   template <typename T>
   absl::Status Postprocess(T* classifications);
