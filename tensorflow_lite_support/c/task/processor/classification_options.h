@@ -33,6 +33,7 @@ typedef struct TfLiteStringArrayOption {
 } TfLiteStringArrayOption;
 
 // Holds settings for any single classification task.
+// TODO(prianka): change `white/blacklist` to `allow/denylist`
 typedef struct TfLiteClassificationOptions {
   // Optional blacklist of class names. If non NULL, classifications whose
   // class name is in this set will be filtered out. Duplicate or unknown
