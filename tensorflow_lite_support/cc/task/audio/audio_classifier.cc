@@ -26,6 +26,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/label_map_item.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
+#include "tensorflow_lite_support/cc/task/processor/audio_preprocessor.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
@@ -48,57 +49,6 @@ using ::tflite::task::core::AssertAndReturnTypedTensor;
 using ::tflite::task::core::LabelMapItem;
 using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
-
-StatusOr<const TensorMetadata*> GetInputTensorMetadata(
-    const ModelMetadataExtractor& metadata_extractor) {
-  if (metadata_extractor.GetModelMetadata() == nullptr ||
-      metadata_extractor.GetModelMetadata()->subgraph_metadata() == nullptr) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        "Models are assumed to have the ModelMetadata and SubGraphMetadata.",
-        TfLiteSupportStatus::kMetadataNotFoundError);
-  } else if (metadata_extractor.GetInputTensorCount() != 1) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        "Models are assumed to have a single input TensorMetadata.",
-        TfLiteSupportStatus::kInvalidNumInputTensorsError);
-  }
-
-  const TensorMetadata* metadata = metadata_extractor.GetInputTensorMetadata(0);
-
-  if (metadata == nullptr) {
-    // Should never happen.
-    return CreateStatusWithPayload(StatusCode::kInternal,
-                                   "Input TensorMetadata is null.");
-  }
-
-  return metadata;
-}
-
-StatusOr<const AudioProperties*> GetAudioProperties(
-    const TensorMetadata& tensor_metadata) {
-  if (tensor_metadata.content() == nullptr ||
-      tensor_metadata.content()->content_properties() == nullptr) {
-    return CreateStatusWithPayload(
-        StatusCode::kInternal,
-        "Missing audio format metadata in the model metadata.",
-        TfLiteSupportStatus::kMetadataNotFoundError);
-  }
-
-  ContentProperties type = tensor_metadata.content()->content_properties_type();
-
-  if (type != ContentProperties_AudioProperties) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrCat(
-            "Expected AudioProperties for tensor ",
-            tensor_metadata.name() ? tensor_metadata.name()->str() : "#0",
-            ", got ", EnumNameContentProperties(type), "."),
-        TfLiteSupportStatus::kMetadataInvalidContentPropertiesError);
-  }
-
-  return tensor_metadata.content()->content_properties_as_AudioProperties();
-}
 
 }  // namespace
 
@@ -149,66 +99,14 @@ absl::Status AudioClassifier::Init(
     std::unique_ptr<AudioClassifierOptions> options) {
   // Set options.
   options_ = std::move(options);
-  RETURN_IF_ERROR(SetAudioFormatFromMetadata());
-  RETURN_IF_ERROR(CheckAndSetInputs());
+
+  // Create preprocessor, assuming having only 1 input tensor.
+  ASSIGN_OR_RETURN(
+      preprocessor_,
+      ::tflite::task::processor::AudioPreprocessor::Create(engine_.get(), {0}));
+
   RETURN_IF_ERROR(CheckAndSetOutputs());
 
-  return absl::OkStatus();
-}
-
-absl::Status AudioClassifier::SetAudioFormatFromMetadata() {
-  const ModelMetadataExtractor* metadata_extractor =
-      engine_->metadata_extractor();
-  ASSIGN_OR_RETURN(const TensorMetadata* metadata,
-                   GetInputTensorMetadata(*metadata_extractor));
-  ASSIGN_OR_RETURN(const AudioProperties* props, GetAudioProperties(*metadata));
-  if (props == nullptr) {
-    return CreateStatusWithPayload(
-        StatusCode::kInternal,
-        "Missing audio format metadata in the model metadata.",
-        TfLiteSupportStatus::kMetadataNotFoundError);
-  }
-  audio_format_.channels = props->channels();
-  audio_format_.sample_rate = props->sample_rate();
-  return absl::OkStatus();
-}
-
-tflite::support::StatusOr<AudioBuffer::AudioFormat>
-AudioClassifier::GetRequiredAudioFormat() {
-  if (audio_format_.channels <= 0 || audio_format_.sample_rate <= 0) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        "Missing audio format metadata in the model.",
-        TfLiteSupportStatus::kMetadataNotFoundError);
-  }
-  return audio_format_;
-}
-
-absl::Status AudioClassifier::CheckAndSetInputs() {
-  const std::vector<TfLiteTensor*> input_tensors = GetInputTensors();
-  input_buffer_size_ = 1;
-  TfLiteIntArray* dims = input_tensors[0]->dims;
-  for (int i = 0; i < dims->size; ++i) {
-    if (dims->data[i] < 1) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          absl::StrFormat("Invalid size: %d for input tensor dimension: %d.",
-                          dims->data[i], i),
-          TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
-    }
-    input_buffer_size_ *= input_tensors[0]->dims->data[i];
-  }
-
-  // Check if the input buffer size is divisible by the required audio channels.
-  // This needs to be done after loading metadata and input.
-  if (input_buffer_size_ % audio_format_.channels != 0) {
-    return CreateStatusWithPayload(
-        StatusCode::kInternal,
-        absl::StrFormat("Model input tensor size (%d) should be a "
-                        "multiplier of the number of channels (%d).",
-                        input_buffer_size_, audio_format_.channels),
-        TfLiteSupportStatus::kMetadataInconsistencyError);
-  }
   return absl::OkStatus();
 }
 
@@ -343,45 +241,6 @@ absl::Status AudioClassifier::CheckAndSetOutputs() {
 tflite::support::StatusOr<ClassificationResult> AudioClassifier::Classify(
     const AudioBuffer& audio_buffer) {
   return InferWithFallback(audio_buffer);
-}
-
-// TODO(b/182537114): Extract into a common library to share between audio and
-// vision tasks.
-absl::Status AudioClassifier::Preprocess(
-    const std::vector<TfLiteTensor*>& input_tensors,
-    const AudioBuffer& audio_buffer) {
-  if (input_tensors.size() != 1) {
-    return tflite::support::CreateStatusWithPayload(
-        absl::StatusCode::kInternal, "A single input tensor is expected.");
-  }
-  if (audio_buffer.GetAudioFormat().channels != audio_format_.channels) {
-    return tflite::support::CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Input audio buffer channel number %d does not match "
-                        "the model required audio channel number %d.",
-                        audio_buffer.GetAudioFormat().channels,
-                        audio_format_.channels));
-  }
-  if (audio_buffer.GetAudioFormat().sample_rate != audio_format_.sample_rate) {
-    return tflite::support::CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Input audio sample rate %d does not match "
-                        "the model required audio sample rate %d.",
-                        audio_buffer.GetAudioFormat().sample_rate,
-                        audio_format_.sample_rate));
-  }
-  if (audio_buffer.GetBufferSize() != input_buffer_size_) {
-    return tflite::support::CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
-            "Input audio buffer size %d does not match the model required "
-            "input size %d.",
-            audio_buffer.GetBufferSize(), input_buffer_size_),
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
-  tflite::task::core::PopulateTensor(audio_buffer.GetFloatBuffer(),
-                                     input_buffer_size_, input_tensors[0]);
-  return absl::OkStatus();
 }
 
 tflite::support::StatusOr<audio::ClassificationResult>

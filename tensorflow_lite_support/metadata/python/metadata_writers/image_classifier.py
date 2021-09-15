@@ -103,7 +103,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       input_norm_std: the std value used in the input tensor normalizarion [1].
       label_file_paths: paths to the label files [2] in the classification
         tensor. Pass in an empty list if the model does not have any label file.
-        score_calibration_md: information of the score calibration operation [3]
+      score_calibration_md: information of the score calibration operation [3]
         in the classification tensor. Optional if the model does not use score
         calibration.
       [1]:

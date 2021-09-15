@@ -89,7 +89,8 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       output_location_md: Optional[metadata_info.TensorMd] = None,
       output_category_md: Optional[metadata_info.CategoryTensorMd] = None,
       output_score_md: Optional[metadata_info.TensorMd] = None,
-      output_number_md: Optional[metadata_info.TensorMd] = None):
+      output_number_md: Optional[metadata_info.TensorMd] = None,
+      score_calibration_md: Optional[metadata_info.ScoreCalibrationMd] = None):
     """Creates MetadataWriter based on general/input/outputs information.
 
     Args:
@@ -108,6 +109,8 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         probability that a class was detected.
       output_number_md: output number of dections tensor information. This
         tensor is an integer value of N.
+      score_calibration_md: ScoreCalibration metadata (optional), calibrate
+        scores of classification head if it is provided.
 
     Returns:
       A MetadataWriter object.
@@ -132,8 +135,18 @@ class MetadataWriter(metadata_writer.MetadataWriter):
           name=_OUTPUT_CATRGORY_NAME, description=_OUTPUT_CATEGORY_DESCRIPTION)
 
     if output_score_md is None:
-      output_score_md = metadata_info.TensorMd(
-          name=_OUTPUT_SCORE_NAME, description=_OUTPUT_SCORE_DESCRIPTION)
+      output_score_md = metadata_info.ClassificationTensorMd(
+          name=_OUTPUT_SCORE_NAME,
+          description=_OUTPUT_SCORE_DESCRIPTION,
+          score_calibration_md=score_calibration_md,
+      )
+    output_score_metadata = _create_metadata_with_value_range(output_score_md)
+
+    if score_calibration_md:
+      # Add process units for score calibration.
+      output_score_metadata.processUnits = [
+          score_calibration_md.create_metadata()
+      ]
 
     if output_number_md is None:
       output_number_md = metadata_info.TensorMd(
@@ -155,7 +168,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
     subgraph_metadata.outputTensorMetadata = [
         _create_location_metadata(output_location_md),
         _create_metadata_with_value_range(output_category_md),
-        _create_metadata_with_value_range(output_score_md),
+        output_score_metadata,
         output_number_md.create_metadata()
     ]
     subgraph_metadata.outputTensorGroups = [group]
@@ -177,10 +190,13 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         ])
 
   @classmethod
-  def create_for_inference(cls, model_buffer: bytearray,
-                           input_norm_mean: List[float],
-                           input_norm_std: List[float],
-                           label_file_paths: List[str]):
+  def create_for_inference(
+      cls,
+      model_buffer: bytearray,
+      input_norm_mean: List[float],
+      input_norm_std: List[float],
+      label_file_paths: List[str],
+      score_calibration_md: Optional[metadata_info.ScoreCalibrationMd] = None):
     """Creates mandatory metadata for TFLite Support inference.
 
     The parameters required in this method are mandatory when using TFLite
@@ -195,10 +211,15 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       input_norm_std: the std value used in the input tensor normalizarion [1].
       label_file_paths: paths to the label files [2] in the category tensor.
         Pass in an empty list, If the model does not have any label file.
+      score_calibration_md: information of the score calibration operation [3]
+        in the classification tensor. Optional if the model does not use score
+        calibration.
       [1]:
         https://www.tensorflow.org/lite/convert/metadata#normalization_and_quantization_parameters
       [2]:
         https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L108
+      [3]:
+        https://github.com/tensorflow/tflite-support/blob/5e0cdf5460788c481f5cd18aab8728ec36cf9733/tensorflow_lite_support/metadata/metadata_schema.fbs#L434
 
     Returns:
       A MetadataWriter object.
@@ -220,4 +241,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         ])
 
     return cls.create_from_metadata_info(
-        model_buffer, input_md=input_md, output_category_md=output_category_md)
+        model_buffer,
+        input_md=input_md,
+        output_category_md=output_category_md,
+        score_calibration_md=score_calibration_md)

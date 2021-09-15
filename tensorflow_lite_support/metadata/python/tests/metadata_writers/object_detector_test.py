@@ -18,6 +18,8 @@ from absl.testing import parameterized
 
 import tensorflow as tf
 
+from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
+from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.metadata_writers import object_detector
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
@@ -27,6 +29,9 @@ _NORM_MEAN = 127.5
 _NORM_STD = 127.5
 _JSON_FOR_INFERENCE = "../testdata/object_detector/ssd_mobilenet_v1.json"
 _JSON_DEFAULT = "../testdata/object_detector/ssd_mobilenet_v1_default.json"
+_SCORE_CALIBRATION = "../testdata/object_detector/score_calibration.csv"
+_SCORE_CALIBRATION_DEFAULT_SCORE = 0.2
+_JSON_FOR_SCORE_CALIBRATION = "../testdata/object_detector/ssd_mobilenet_v1_score_calibration.json"
 
 
 class MetadataWriterTest(tf.test.TestCase, parameterized.TestCase):
@@ -45,6 +50,20 @@ class MetadataWriterTest(tf.test.TestCase, parameterized.TestCase):
 
     metadata_json = writer.get_metadata_json()
     expected_json = test_utils.load_file(_JSON_DEFAULT, "r")
+    self.assertEqual(metadata_json, expected_json)
+
+  def test_create_for_inference_score_calibration_should_succeed(self):
+    score_calibration_md = metadata_info.ScoreCalibrationMd(
+        _metadata_fb.ScoreTransformationType.IDENTITY,
+        _SCORE_CALIBRATION_DEFAULT_SCORE,
+        _SCORE_CALIBRATION,
+    )
+    writer = object_detector.MetadataWriter.create_for_inference(
+        test_utils.load_file(_MODEL), [_NORM_MEAN], [_NORM_STD], [_LABEL_FILE],
+        score_calibration_md)
+
+    metadata_json = writer.get_metadata_json()
+    expected_json = test_utils.load_file(_JSON_FOR_SCORE_CALIBRATION, "r")
     self.assertEqual(metadata_json, expected_json)
 
 

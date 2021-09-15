@@ -38,16 +38,7 @@ class EmbeddingPostprocessor : public Postprocessor {
   static absl::StatusOr<std::unique_ptr<EmbeddingPostprocessor>> Create(
       core::TfLiteEngine* engine,
       const std::initializer_list<int> output_indices,
-      std::unique_ptr<EmbeddingOptions> options) {
-    RETURN_IF_ERROR(Postprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                               engine, output_indices));
-
-    auto processor =
-        absl::WrapUnique(new EmbeddingPostprocessor(engine, output_indices));
-
-    RETURN_IF_ERROR(processor->Init(std::move(options)));
-    return processor;
-  }
+      std::unique_ptr<EmbeddingOptions> options);
 
   template <typename T>
   absl::Status Postprocess(T* embedding);

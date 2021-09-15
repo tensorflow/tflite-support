@@ -9,5 +9,6 @@ filegroup(
         "*.json",
         "*.tflite",
         "*.txt",
+        "*.csv",
     ]),
 )

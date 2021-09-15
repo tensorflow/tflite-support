@@ -33,6 +33,22 @@ using ::tflite::task::vision::BoundingBox;
 using ::tflite::task::vision::FrameBuffer;
 }  // namespace
 
+/* static */
+tflite::support::StatusOr<std::unique_ptr<ImagePreprocessor>>
+ImagePreprocessor::Create(
+    core::TfLiteEngine* engine, const std::initializer_list<int> input_indices,
+    const vision::FrameBufferUtils::ProcessEngine& process_engine) {
+  RETURN_IF_ERROR(Preprocessor::SanityCheck(/* num_expected_tensors = */ 1,
+                                            engine, input_indices,
+                                            /* requires_metadata = */ false));
+
+  auto processor =
+      absl::WrapUnique(new ImagePreprocessor(engine, input_indices));
+
+  RETURN_IF_ERROR(processor->Init(process_engine));
+  return processor;
+}
+
 // Returns false if image preprocessing could be skipped, true otherwise.
 bool ImagePreprocessor::IsImagePreprocessingNeeded(
     const FrameBuffer& frame_buffer, const BoundingBox& roi) {
