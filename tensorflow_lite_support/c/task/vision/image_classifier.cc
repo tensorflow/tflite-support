@@ -62,12 +62,13 @@ CreateImageClassifierCppOptionsFromCOptions(
   // c_options->base_options.compute_settings.num_threads should be explicitly
   // set to value > 0 or -1. Otherwise invoking
   // ImageClassifierCpp::CreateFromOptions() results in a not ok status.
-  if (c_options->base_options.compute_settings.num_threads > 0)
+  if (c_options->base_options.compute_settings.cpu_settings.num_threads > 0)
     cpp_options->mutable_base_options()
         ->mutable_compute_settings()
         ->mutable_tflite_settings()
         ->mutable_cpu_settings()
-        ->set_num_threads(c_options->base_options.compute_settings.num_threads);
+        ->set_num_threads(
+            c_options->base_options.compute_settings.cpu_settings.num_threads);
 
   for (int i = 0;
        i < c_options->classification_options.class_name_blacklist.length; i++)

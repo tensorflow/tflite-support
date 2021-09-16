@@ -23,13 +23,19 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-// Holds settings for one possible acceleration configuration.
-typedef struct TfLiteComputeSettings {
+// Holds cpu settings.
+typedef struct TfLiteCpuSettings {
   // Specifies the number of threads to be used for TFLite
   // ops that support multi-threading when running inference with CPU.
   // num_threads should be greater than 0 or equal to -1. Setting num_threads to
   // -1 has the effect to let TFLite runtime set the value.
   int num_threads;
+} TfLiteCpuSettings;
+
+// Holds settings for one possible acceleration configuration.
+typedef struct TfLiteComputeSettings {
+  // Holds cpu settings
+  TfLiteCpuSettings cpu_settings;
 } TfLiteComputeSettings;
 
 // Represents external files used by the Task APIs (e.g. TF Lite Model File).
