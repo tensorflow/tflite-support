@@ -15,9 +15,9 @@ limitations under the License.
 
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"
 
-#include "absl/status/status.h"
-#include "absl/strings/str_replace.h"
-#include "src/sentencepiece_model.pb.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/strings/str_replace.h"
+#include "external/com_google_sentencepiece/src/sentencepiece_model.pb.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/decoder_config_generated.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"

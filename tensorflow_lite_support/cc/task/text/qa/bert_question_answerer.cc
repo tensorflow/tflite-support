@@ -15,10 +15,10 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/task/text/qa/bert_question_answerer.h"
 
-#include "absl/status/status.h"
-#include "absl/strings/str_join.h"
-#include "absl/strings/str_split.h"
-#include "tensorflow/lite/core/shims/cc/kernels/register.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/strings/str_join.h"
+#include "external/com_google_absl/absl/strings/str_split.h"
+#include "external/org_tensorflow/tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"

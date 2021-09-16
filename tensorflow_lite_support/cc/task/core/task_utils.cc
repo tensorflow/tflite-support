@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <fstream>
 
-#include "absl/strings/str_cat.h"
+#include "external/com_google_absl/absl/strings/str_cat.h"
 
 namespace tflite {
 namespace task {

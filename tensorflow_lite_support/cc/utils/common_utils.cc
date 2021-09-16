@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <fstream>
 
-#include "absl/strings/str_split.h"
+#include "external/com_google_absl/absl/strings/str_split.h"
 
 namespace tflite {
 namespace support {

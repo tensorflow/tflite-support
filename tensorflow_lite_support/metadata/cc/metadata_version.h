@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <string>
 
-#include "tensorflow/lite/c/common.h"
+#include "external/org_tensorflow/tensorflow/lite/c/common.h"
 
 namespace tflite {
 namespace metadata {

@@ -15,10 +15,10 @@ limitations under the License.
 #include <iostream>
 #include <limits>
 
-#include "absl/flags/flag.h"
-#include "absl/flags/parse.h"
-#include "absl/status/status.h"
-#include "absl/strings/str_format.h"
+#include "external/com_google_absl/absl/flags/flag.h"
+#include "external/com_google_absl/absl/flags/parse.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/strings/str_format.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"

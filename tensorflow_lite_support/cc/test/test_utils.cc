@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/test/test_utils.h"
 
-#include "absl/strings/str_cat.h"
+#include "external/com_google_absl/absl/strings/str_cat.h"
 
 namespace tflite {
 namespace task {

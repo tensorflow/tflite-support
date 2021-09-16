@@ -17,7 +17,7 @@ limitations under the License.
 #define TENSORFLOW_LITE_SUPPORT_CC_TASK_PROCESSOR_EMBEDDING_POSTPROCESSOR_H_
 #include <initializer_list>
 
-#include "absl/status/status.h"
+#include "external/com_google_absl/absl/status/status.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"

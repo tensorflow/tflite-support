@@ -17,14 +17,14 @@ limitations under the License.
 #include <memory>
 
 #include "flatbuffers/flexbuffers.h"  // from @flatbuffers
-#include "tensorflow/core/util/ragged_to_dense_util_common.h"
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/context.h"
-#include "tensorflow/lite/kernels/internal/tensor.h"
-#include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
-#include "tensorflow/lite/kernels/internal/types.h"
-#include "tensorflow/lite/kernels/kernel_util.h"
-#include "tensorflow/lite/model.h"
+#include "external/org_tensorflow/tensorflow/core/util/ragged_to_dense_util_common.h"
+#include "external/org_tensorflow/tensorflow/lite/c/common.h"
+#include "external/org_tensorflow/tensorflow/lite/context.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/internal/tensor.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/internal/tensor_ctypes.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/internal/types.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/kernel_util.h"
+#include "external/org_tensorflow/tensorflow/lite/model.h"
 
 namespace tflite {
 namespace ops {

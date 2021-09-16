@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/text/nlclassifier/Sources/TFLNLClassifier.h"
-#import "GTMDefines.h"
+#import "external/google_toolbox_for_mac/GTMDefines.h"
 #include "tensorflow_lite_support/c/task/text/nl_classifier.h"
 #include "tensorflow_lite_support/c/task/text/nl_classifier_common.h"
 

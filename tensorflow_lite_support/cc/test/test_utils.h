@@ -16,7 +16,7 @@ limitations under the License.
 #ifndef THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TEST_UTILS_TEST_UTILS_H_
 #define THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TEST_UTILS_TEST_UTILS_H_
 
-#include "absl/strings/string_view.h"
+#include "external/com_google_absl/absl/strings/string_view.h"
 
 namespace tflite {
 namespace task {

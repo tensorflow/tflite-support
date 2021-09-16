@@ -17,8 +17,8 @@ limitations under the License.
 
 #include <iostream>
 
-#include "absl/strings/str_cat.h"
-#include "absl/strings/substitute.h"
+#include "external/com_google_absl/absl/strings/str_cat.h"
+#include "external/com_google_absl/absl/strings/substitute.h"
 #include "tensorflow_lite_support/cc/utils/common_utils.h"
 namespace tflite {
 namespace support {

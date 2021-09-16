@@ -15,12 +15,12 @@ limitations under the License.
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/configuration_generated.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
-#include "tensorflow/lite/interpreter.h"
-#include "tensorflow/lite/kernels/register.h"
-#include "tensorflow/lite/model.h"
+#include "external/org_tensorflow/tensorflow/lite/c/common.h"
+#include "external/org_tensorflow/tensorflow/lite/experimental/acceleration/configuration/configuration_generated.h"
+#include "external/org_tensorflow/tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
+#include "external/org_tensorflow/tensorflow/lite/interpreter.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/register.h"
+#include "external/org_tensorflow/tensorflow/lite/model.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 
 namespace tflite {

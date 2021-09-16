@@ -20,8 +20,8 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "absl/memory/memory.h"
-#include "absl/strings/str_split.h"
+#include "external/com_google_absl/absl/memory/memory.h"
+#include "external/com_google_absl/absl/strings/str_split.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/sentencepiece_tokenizer.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/tokenizer_jni_lib.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"

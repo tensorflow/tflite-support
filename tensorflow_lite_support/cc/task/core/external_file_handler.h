@@ -18,8 +18,8 @@ limitations under the License.
 
 #include <memory>
 
-#include "absl/status/status.h"
-#include "absl/strings/string_view.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/strings/string_view.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"

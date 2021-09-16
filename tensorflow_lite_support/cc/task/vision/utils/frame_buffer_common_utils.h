@@ -17,9 +17,9 @@ limitations under the License.
 
 #include <memory>
 
-#include "absl/status/status.h"
-#include "absl/time/clock.h"
-#include "absl/time/time.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/time/clock.h"
+#include "external/com_google_absl/absl/time/time.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"

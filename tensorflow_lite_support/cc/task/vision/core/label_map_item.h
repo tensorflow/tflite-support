@@ -18,10 +18,10 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
-#include "absl/status/status.h"
-#include "absl/strings/string_view.h"
+#include "external/com_google_absl/absl/container/flat_hash_map.h"
+#include "external/com_google_absl/absl/container/flat_hash_set.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/strings/string_view.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 
 namespace tflite {

@@ -24,11 +24,11 @@ limitations under the License.
 #include <type_traits>
 #include <utility>
 
-#include "absl/base/optimization.h"
-#include "absl/meta/type_traits.h"
-#include "absl/status/status.h"
-#include "absl/types/variant.h"
-#include "absl/utility/utility.h"
+#include "external/com_google_absl/absl/base/optimization.h"
+#include "external/com_google_absl/absl/meta/type_traits.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/types/variant.h"
+#include "external/com_google_absl/absl/utility/utility.h"
 #include "tensorflow_lite_support/cc/port/default/statusor_internals.h"
 
 namespace tflite {

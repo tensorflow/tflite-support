@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/codegen/utils.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
-#include "tensorflow/lite/schema/schema_generated.h"
+#include "external/org_tensorflow/tensorflow/lite/schema/schema_generated.h"
 
 namespace tflite {
 namespace support {

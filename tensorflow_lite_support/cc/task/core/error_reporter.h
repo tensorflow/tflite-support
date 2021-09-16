@@ -19,7 +19,7 @@ limitations under the License.
 #include <cstdarg>
 #include <string>
 
-#include "tensorflow/lite/stateful_error_reporter.h"
+#include "external/org_tensorflow/tensorflow/lite/stateful_error_reporter.h"
 
 namespace tflite {
 namespace task {

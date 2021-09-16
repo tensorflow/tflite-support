@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/text/qa/Sources/TFLBertQuestionAnswerer.h"
-#import "GTMDefines.h"
+#import "external/google_toolbox_for_mac/GTMDefines.h"
 #include "tensorflow_lite_support/c/task/text/bert_question_answerer.h"
 
 NS_ASSUME_NONNULL_BEGIN

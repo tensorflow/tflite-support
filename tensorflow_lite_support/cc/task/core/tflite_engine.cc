@@ -19,12 +19,12 @@ limitations under the License.
 
 #include <memory>
 
-#include "absl/strings/match.h"
-#include "absl/strings/str_cat.h"
-#include "tensorflow/lite/builtin_ops.h"
-#include "tensorflow/lite/core/shims/cc/kernels/register.h"
-#include "tensorflow/lite/core/shims/cc/tools/verifier.h"
-#include "tensorflow/lite/stderr_reporter.h"
+#include "external/com_google_absl/absl/strings/match.h"
+#include "external/com_google_absl/absl/strings/str_cat.h"
+#include "external/org_tensorflow/tensorflow/lite/builtin_ops.h"
+#include "external/org_tensorflow/tensorflow/lite/core/shims/cc/kernels/register.h"
+#include "external/org_tensorflow/tensorflow/lite/core/shims/cc/tools/verifier.h"
+#include "external/org_tensorflow/tensorflow/lite/stderr_reporter.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"

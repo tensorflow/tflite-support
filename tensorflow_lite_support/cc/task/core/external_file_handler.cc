@@ -24,8 +24,8 @@ limitations under the License.
 #include <memory>
 #include <string>
 
-#include "absl/memory/memory.h"
-#include "absl/strings/str_format.h"
+#include "external/com_google_absl/absl/memory/memory.h"
+#include "external/com_google_absl/absl/strings/str_format.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"

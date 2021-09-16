@@ -19,10 +19,10 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "tensorflow/lite/context.h"
-#include "tensorflow/lite/kernels/kernel_util.h"
-#include "tensorflow/lite/string_util.h"
-#include "libutf/utf.h"
+#include "external/org_tensorflow/tensorflow/lite/context.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/kernel_util.h"
+#include "external/org_tensorflow/tensorflow/lite/string_util.h"
+#include "external/utf_archive/libutf/utf.h"
 
 constexpr int kInput = 0;
 constexpr int kOutputValues = 0;

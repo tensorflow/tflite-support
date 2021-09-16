@@ -21,14 +21,14 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "absl/algorithm/container.h"
-#include "absl/status/status.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/string_view.h"
+#include "external/com_google_absl/absl/algorithm/container.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/strings/str_cat.h"
+#include "external/com_google_absl/absl/strings/string_view.h"
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/core/api/op_resolver.h"
-#include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
+#include "external/org_tensorflow/tensorflow/lite/c/common.h"
+#include "external/org_tensorflow/tensorflow/lite/core/api/op_resolver.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/internal/tensor_ctypes.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"

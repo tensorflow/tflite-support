@@ -15,10 +15,10 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_METADATA_CC_METADATA_EXTRACTOR_H_
 #define TENSORFLOW_LITE_SUPPORT_METADATA_CC_METADATA_EXTRACTOR_H_
 
-#include "absl/container/flat_hash_map.h"
-#include "absl/status/status.h"
-#include "absl/strings/string_view.h"
-#include "tensorflow/lite/schema/schema_generated.h"
+#include "external/com_google_absl/absl/container/flat_hash_map.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/strings/string_view.h"
+#include "external/org_tensorflow/tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 

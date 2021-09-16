@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
-#include "absl/strings/str_cat.h"
+#include "external/com_google_absl/absl/strings/str_cat.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"

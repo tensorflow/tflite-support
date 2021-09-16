@@ -17,9 +17,9 @@ limitations under the License.
 
 #include <memory>
 
-#include "absl/status/status.h"
-#include "tensorflow/lite/core/api/op_resolver.h"
-#include "tensorflow/lite/core/shims/cc/kernels/register.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/org_tensorflow/tensorflow/lite/core/api/op_resolver.h"
+#include "external/org_tensorflow/tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/audio_classifier_options.pb.h"

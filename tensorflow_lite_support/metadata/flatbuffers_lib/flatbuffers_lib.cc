@@ -15,9 +15,9 @@ limitations under the License.
 
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "flatbuffers/idl.h"  // from @flatbuffers
-#include "pybind11/pybind11.h"
-#include "pybind11/pytypes.h"
-#include "pybind11/stl.h"
+#include "external/pybind11/include/pybind11/pybind11.h"
+#include "external/pybind11/include/pybind11/pytypes.h"
+#include "external/pybind11/include/pybind11/stl.h"
 
 namespace tflite {
 namespace support {

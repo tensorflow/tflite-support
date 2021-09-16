@@ -18,8 +18,8 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_format.h"
+#include "external/com_google_absl/absl/strings/str_cat.h"
+#include "external/com_google_absl/absl/strings/str_format.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
 namespace tflite {

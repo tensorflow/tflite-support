@@ -15,7 +15,7 @@ limitations under the License.
 
 #ifndef TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_PY_TFLITE_REGISTERER_H_
 #define TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_SENTENCEPIECE_PY_TFLITE_REGISTERER_H_
-#include "tensorflow/lite/mutable_op_resolver.h"
+#include "external/org_tensorflow/tensorflow/lite/mutable_op_resolver.h"
 
 // C-function that is called from the Python Wrapper.
 

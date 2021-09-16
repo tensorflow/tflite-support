@@ -22,12 +22,12 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "absl/base/macros.h"
-#include "absl/status/status.h"
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/core/api/op_resolver.h"
-#include "tensorflow/lite/core/shims/cc/kernels/register.h"
-#include "tensorflow/lite/string_type.h"
+#include "external/com_google_absl/absl/base/macros.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/org_tensorflow/tensorflow/lite/c/common.h"
+#include "external/org_tensorflow/tensorflow/lite/core/api/op_resolver.h"
+#include "external/org_tensorflow/tensorflow/lite/core/shims/cc/kernels/register.h"
+#include "external/org_tensorflow/tensorflow/lite/string_type.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_nl_classifier_options_proto_inc.h"

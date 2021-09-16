@@ -18,10 +18,10 @@ limitations under the License.
 
 #include <memory>
 
-#include "absl/container/flat_hash_set.h"
-#include "absl/status/status.h"
-#include "tensorflow/lite/core/api/op_resolver.h"
-#include "tensorflow/lite/core/shims/cc/kernels/register.h"
+#include "external/com_google_absl/absl/container/flat_hash_set.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/org_tensorflow/tensorflow/lite/core/api/op_resolver.h"
+#include "external/org_tensorflow/tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/vision/core/base_vision_task_api.h"

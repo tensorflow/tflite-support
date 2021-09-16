@@ -16,13 +16,13 @@ limitations under the License.
 #include <unordered_map>
 
 #include <glog/logging.h>
-#include "absl/container/node_hash_map.h"
-#include "absl/memory/memory.h"
-#include "absl/strings/match.h"
-#include "absl/strings/numbers.h"
-#include "tflite/public/edgetpu_c.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/configuration_generated.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
+#include "external/com_google_absl/absl/container/node_hash_map.h"
+#include "external/com_google_absl/absl/memory/memory.h"
+#include "external/com_google_absl/absl/strings/match.h"
+#include "external/com_google_absl/absl/strings/numbers.h"
+#include "external/libedgetpu/tflite/public/edgetpu_c.h"
+#include "external/org_tensorflow/tensorflow/lite/experimental/acceleration/configuration/configuration_generated.h"
+#include "external/org_tensorflow/tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
 
 namespace tflite {
 namespace delegates {

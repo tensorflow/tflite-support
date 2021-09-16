@@ -16,8 +16,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_TEXT_TOKENIZERS_REGEX_TOKENIZER_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_TEXT_TOKENIZERS_REGEX_TOKENIZER_H_
 
-#include "absl/container/node_hash_map.h"
-#include "re2/re2.h"
+#include "external/com_google_absl/absl/container/node_hash_map.h"
+#include "external/com_googlesource_code_re2/re2/re2.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
 
 namespace tflite {

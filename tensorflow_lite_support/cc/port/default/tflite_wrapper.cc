@@ -15,13 +15,13 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/port/default/tflite_wrapper.h"
 
-#include "absl/status/status.h"
-#include "absl/strings/str_format.h"
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/delegates/interpreter_utils.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/flatbuffer_to_proto.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/proto_to_flatbuffer.h"
-#include "tensorflow/lite/minimal_logging.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/strings/str_format.h"
+#include "external/org_tensorflow/tensorflow/lite/c/common.h"
+#include "external/org_tensorflow/tensorflow/lite/delegates/interpreter_utils.h"
+#include "external/org_tensorflow/tensorflow/lite/experimental/acceleration/configuration/flatbuffer_to_proto.h"
+#include "external/org_tensorflow/tensorflow/lite/experimental/acceleration/configuration/proto_to_flatbuffer.h"
+#include "external/org_tensorflow/tensorflow/lite/minimal_logging.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
 namespace tflite {

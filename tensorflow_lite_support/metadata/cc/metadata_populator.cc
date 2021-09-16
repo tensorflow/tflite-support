@@ -20,9 +20,9 @@ limitations under the License.
 #include <functional>
 
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
-#include "contrib/minizip/ioapi.h"
-#include "contrib/minizip/zip.h"
-#include "tensorflow/lite/schema/schema_generated.h"
+#include "external/org_libzip/contrib/minizip/ioapi.h"
+#include "external/org_libzip/contrib/minizip/zip.h"
+#include "external/org_tensorflow/tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"

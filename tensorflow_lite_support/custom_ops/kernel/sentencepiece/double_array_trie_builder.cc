@@ -18,7 +18,7 @@ limitations under the License.
 #include <algorithm>
 #include <memory>
 
-#include "include/darts.h"
+#include "external/darts_clone/include/darts.h"
 
 namespace tflite {
 namespace ops {

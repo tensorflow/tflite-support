@@ -20,12 +20,12 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "absl/container/flat_hash_map.h"
-#include "re2/re2.h"
+#include "external/com_google_absl/absl/container/flat_hash_map.h"
+#include "external/com_googlesource_code_re2/re2/re2.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
 #include "tensorflow_lite_support/cc/utils/common_utils.h"
-#include "tensorflow_text/core/kernels/regex_split.h"
-#include "tensorflow_text/core/kernels/wordpiece_tokenizer.h"
+#include "external/org_tensorflow_text/tensorflow_text/core/kernels/regex_split.h"
+#include "external/org_tensorflow_text/tensorflow_text/core/kernels/wordpiece_tokenizer.h"
 
 namespace tflite {
 namespace support {

@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "pybind11/pybind11.h"
-#include "pybind11/pytypes.h"
+#include "external/pybind11/include/pybind11/pybind11.h"
+#include "external/pybind11/include/pybind11/pytypes.h"
 #include "tensorflow_lite_support/custom_ops/kernel/ragged/py_tflite_registerer.h"
 
 PYBIND11_MODULE(pywrap_tflite_registerer, m) {

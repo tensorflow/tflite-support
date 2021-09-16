@@ -20,10 +20,10 @@ limitations under the License.
 #include <memory>
 #include <string>
 
-#include "absl/status/status.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_format.h"
-#include "include/libyuv.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/strings/str_cat.h"
+#include "external/com_google_absl/absl/strings/str_format.h"
+#include "external/libyuv/include/libyuv.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"

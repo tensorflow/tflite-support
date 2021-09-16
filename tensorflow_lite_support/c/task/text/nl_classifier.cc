@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <memory>
 
-#include "absl/strings/string_view.h"
+#include "external/com_google_absl/absl/strings/string_view.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
 

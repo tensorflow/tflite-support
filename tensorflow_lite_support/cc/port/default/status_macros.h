@@ -17,8 +17,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_PORT_DEFAULT_STATUS_MACROS_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_PORT_DEFAULT_STATUS_MACROS_H_
 
-#include "absl/base/optimization.h"
-#include "absl/status/status.h"
+#include "external/com_google_absl/absl/base/optimization.h"
+#include "external/com_google_absl/absl/status/status.h"
 
 // Evaluates an expression that produces a `absl::Status`. If the status is not
 // ok, returns it from the current function.

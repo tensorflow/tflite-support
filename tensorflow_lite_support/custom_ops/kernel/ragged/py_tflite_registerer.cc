@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 #include "tensorflow_lite_support/custom_ops/kernel/ragged/py_tflite_registerer.h"
 
-#include "tensorflow/lite/mutable_op_resolver.h"
+#include "external/org_tensorflow/tensorflow/lite/mutable_op_resolver.h"
 
 namespace tflite {
 namespace ops {

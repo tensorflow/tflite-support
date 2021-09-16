@@ -19,9 +19,9 @@ limitations under the License.
 #include <memory>
 #include <vector>
 
-#include "absl/status/status.h"
-#include "absl/types/optional.h"
-#include "absl/types/variant.h"
+#include "external/com_google_absl/absl/status/status.h"
+#include "external/com_google_absl/absl/types/optional.h"
+#include "external/com_google_absl/absl/types/variant.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"

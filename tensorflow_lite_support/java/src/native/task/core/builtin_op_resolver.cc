@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow/lite/core/shims/cc/kernels/register.h"
+#include "external/org_tensorflow/tensorflow/lite/core/shims/cc/kernels/register.h"
 
 namespace tflite {
 namespace task {

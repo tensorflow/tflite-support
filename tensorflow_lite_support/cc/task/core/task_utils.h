@@ -21,13 +21,13 @@ limitations under the License.
 #include <numeric>
 #include <vector>
 
-#include "absl/memory/memory.h"
-#include "absl/strings/str_cat.h"
+#include "external/com_google_absl/absl/memory/memory.h"
+#include "external/com_google_absl/absl/strings/str_cat.h"
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
-#include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
-#include "tensorflow/lite/kernels/op_macros.h"
-#include "tensorflow/lite/string_util.h"
-#include "tensorflow/lite/type_to_tflitetype.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/internal/tensor_ctypes.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/op_macros.h"
+#include "external/org_tensorflow/tensorflow/lite/string_util.h"
+#include "external/org_tensorflow/tensorflow/lite/type_to_tflitetype.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {

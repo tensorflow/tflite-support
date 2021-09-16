@@ -15,8 +15,8 @@ limitations under the License.
 
 #include <jni.h>
 
-#include "tensorflow/lite/kernels/kernel_util.h"
-#include "tensorflow/lite/op_resolver.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/kernel_util.h"
+#include "external/org_tensorflow/tensorflow/lite/op_resolver.h"
 #include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"

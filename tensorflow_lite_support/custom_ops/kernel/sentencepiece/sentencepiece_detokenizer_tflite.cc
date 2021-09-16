@@ -18,12 +18,12 @@
 #include <iterator>
 
 #include "flatbuffers/flexbuffers.h"  // from @flatbuffers
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/context.h"
-#include "tensorflow/lite/kernels/internal/tensor.h"
-#include "tensorflow/lite/kernels/kernel_util.h"
-#include "tensorflow/lite/model.h"
-#include "tensorflow/lite/string_util.h"
+#include "external/org_tensorflow/tensorflow/lite/c/common.h"
+#include "external/org_tensorflow/tensorflow/lite/context.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/internal/tensor.h"
+#include "external/org_tensorflow/tensorflow/lite/kernels/kernel_util.h"
+#include "external/org_tensorflow/tensorflow/lite/model.h"
+#include "external/org_tensorflow/tensorflow/lite/string_util.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/optimized_decoder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/sentencepiece_detokenizer.h"
 

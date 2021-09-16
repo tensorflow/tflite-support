@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <initializer_list>
 
-#include "absl/memory/memory.h"
+#include "external/com_google_absl/absl/memory/memory.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"

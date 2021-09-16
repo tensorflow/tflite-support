@@ -13,10 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "pybind11/detail/common.h"
-#include "pybind11/pybind11.h"
-#include "pybind11/pytypes.h"
-#include "pybind11/stl.h"
+#include "external/pybind11/include/pybind11/detail/common.h"
+#include "external/pybind11/include/pybind11/pybind11.h"
+#include "external/pybind11/include/pybind11/pytypes.h"
+#include "external/pybind11/include/pybind11/stl.h"
 #include "tensorflow_lite_support/codegen/android_java_generator.h"
 #include "tensorflow_lite_support/codegen/code_generator.h"
 
