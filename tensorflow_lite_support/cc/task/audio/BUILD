@@ -39,3 +39,25 @@ cc_library_with_tflite(
     ],
     alwayslink = 1,
 )
+
+cc_library_with_tflite(
+    name = "audio_embedder",
+    srcs = ["audio_embedder.cc"],
+    hdrs = ["audio_embedder.h"],
+    tflite_deps = [
+        "//tensorflow_lite_support/cc/task/processor:embedding_postprocessor",
+        "//tensorflow_lite_support/cc/task/processor:audio_preprocessor",
+        "//tensorflow_lite_support/cc/task/core:task_api_factory",
+        "//tensorflow_lite_support/cc/task/core:base_task_api",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/audio/proto:audio_embedder_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_cc_proto",
+        "@com_google_absl//absl/status",
+        "@org_tensorflow//tensorflow/lite/c:common",
+    ],
+)

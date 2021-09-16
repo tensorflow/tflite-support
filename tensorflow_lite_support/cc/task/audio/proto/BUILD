@@ -37,3 +37,17 @@ cc_library(
         "//tensorflow_lite_support/cc/task/core/proto:class_cc_proto",
     ],
 )
+
+proto_library(
+    name = "audio_embedder_options_proto",
+    srcs = ["audio_embedder_options.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "audio_embedder_options_cc_proto",
+    deps = [":audio_embedder_options_proto"],
+)
