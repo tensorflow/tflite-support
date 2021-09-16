@@ -35,7 +35,10 @@ py_test(
 py_test(
     name = "metadata_writer_for_task_test",
     srcs = ["metadata_writer_for_task_test.py"],
-    data = ["//tensorflow_lite_support/metadata/python/tests/testdata/audio_classifier:test_files"],
+    data = [
+        "//tensorflow_lite_support/metadata/python/tests/testdata/audio_classifier:test_files",
+        "//tensorflow_lite_support/metadata/python/tests/testdata/audio_embedder:test_files",
+    ],
     python_version = "PY3",
     srcs_version = "PY3",
     deps = [

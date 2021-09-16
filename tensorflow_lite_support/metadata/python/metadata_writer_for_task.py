@@ -99,3 +99,40 @@ class Writer:
         f.write(metadata_json_content)
 
     return (tflite_content, metadata_json_content)
+
+  _INPUT_AUDIO_NAME = 'audio'
+  _INPUT_AUDIO_DESCRIPTION = 'Input audio clip to be processed.'
+
+  def add_audio_input(self,
+                      sample_rate: int,
+                      channels: int,
+                      name: str = _INPUT_AUDIO_NAME,
+                      description: str = _INPUT_AUDIO_DESCRIPTION):
+    """Marks the next input tensor as an audio input."""
+    # To make Task Library working properly, sample_rate, channels need to be
+    # positive.
+    if sample_rate <= 0:
+      raise ValueError(
+          'sample_rate should be positive, but got {}.'.format(sample_rate))
+    if channels <= 0:
+      raise ValueError(
+          'channels should be positive, but got {}.'.format(channels))
+
+    input_md = metadata_info.InputAudioTensorMd(
+        name=name,
+        description=description,
+        sample_rate=sample_rate,
+        channels=channels)
+    self._input_mds.append(input_md)
+    return self
+
+  _OUTPUT_EMBEDDING_NAME = 'embedding'
+  _OUTPUT_EMBEDDING_DESCRIPTION = 'Embedding vector of the input.'
+
+  def add_embedding_output(self,
+                           name: str = _OUTPUT_EMBEDDING_NAME,
+                           description: str = _OUTPUT_EMBEDDING_DESCRIPTION):
+    """Marks the next output tensor as embedding."""
+    output_md = metadata_info.TensorMd(name=name, description=description)
+    self._output_mds.append(output_md)
+    return self

@@ -19,14 +19,15 @@ import tensorflow as tf
 from tensorflow_lite_support.metadata.python import metadata_writer_for_task as mt
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
-_AUDIO_MODEL = '../testdata/audio_classifier/yamnet_wavin_quantized_mel_relu6.tflite'
+_AUDIO_CLASSIFICATION_MODEL = '../testdata/audio_classifier/yamnet_wavin_quantized_mel_relu6.tflite'
+_AUDIO_EMBEDDING_MODEL = '../testdata/audio_embedder/yamnet_embedding.tflite'
 
 
 class MetadataWriterForTaskTest(tf.test.TestCase):
 
   def test_initialize_and_populate(self):
     with mt.Writer(
-        test_utils.load_file(_AUDIO_MODEL),
+        test_utils.load_file(_AUDIO_CLASSIFICATION_MODEL),
         model_name='my_audio_model',
         model_description='my_description') as writer:
       out_dir = self.create_tempdir()
@@ -52,6 +53,58 @@ class MetadataWriterForTaskTest(tf.test.TestCase):
     }
   ],
   "min_parser_version": "1.0.0"
+}
+""")
+
+  def test_audio_embedder(self):
+    with mt.Writer(
+        test_utils.load_file(_AUDIO_EMBEDDING_MODEL),
+        model_name='audio_embedder',
+        model_description='Generate embedding for the input audio clip'
+    ) as writer:
+      out_dir = self.create_tempdir()
+      writer.add_audio_input(sample_rate=16000, channels=1)
+      writer.add_embedding_output()
+      _, metadata_json = writer.populate(
+          os.path.join(out_dir, 'model.tflite'),
+          os.path.join(out_dir, 'metadata.json'))
+      self.assertEqual(
+          metadata_json, """{
+  "name": "audio_embedder",
+  "description": "Generate embedding for the input audio clip",
+  "subgraph_metadata": [
+    {
+      "input_tensor_metadata": [
+        {
+          "name": "audio",
+          "description": "Input audio clip to be processed.",
+          "content": {
+            "content_properties_type": "AudioProperties",
+            "content_properties": {
+              "sample_rate": 16000,
+              "channels": 1
+            }
+          },
+          "stats": {
+          }
+        }
+      ],
+      "output_tensor_metadata": [
+        {
+          "name": "embedding",
+          "description": "Embedding vector of the input.",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {
+            }
+          },
+          "stats": {
+          }
+        }
+      ]
+    }
+  ],
+  "min_parser_version": "1.3.0"
 }
 """)
 
