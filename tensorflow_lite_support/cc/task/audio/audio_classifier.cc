@@ -17,7 +17,7 @@ limitations under the License.
 
 #include "external/com_google_absl/absl/status/status.h"
 #include "external/com_google_absl/absl/strings/str_format.h"
-#include "external/org_tensorflow/tensorflow/lite/c/c_api_types.h"
+#include "tensorflow/lite/c/c_api_types.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/class_proto_inc.h"

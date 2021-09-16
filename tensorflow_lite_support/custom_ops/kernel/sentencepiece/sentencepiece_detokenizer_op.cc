@@ -13,11 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "external/org_tensorflow/tensorflow/core/framework/op.h"
-#include "external/org_tensorflow/tensorflow/core/framework/op_kernel.h"
-#include "external/org_tensorflow/tensorflow/core/framework/shape_inference.h"
-#include "external/org_tensorflow/tensorflow/core/framework/tensor.h"
-#include "external/org_tensorflow/tensorflow/core/protobuf/error_codes.pb.h"
+#include "tensorflow/core/framework/op.h"
+#include "tensorflow/core/framework/op_kernel.h"
+#include "tensorflow/core/framework/shape_inference.h"
+#include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/protobuf/error_codes.pb.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/optimized_decoder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/sentencepiece_detokenizer.h"
 

@@ -16,9 +16,9 @@ limitations under the License.
 #include "tensorflow_lite_support/custom_ops/kernel/ngrams.h"
 
 #include "flatbuffers/flexbuffers.h"  // from @flatbuffers
-#include "external/org_tensorflow/tensorflow/lite/context.h"
-#include "external/org_tensorflow/tensorflow/lite/kernels/kernel_util.h"
-#include "external/org_tensorflow/tensorflow/lite/string_util.h"
+#include "tensorflow/lite/context.h"
+#include "tensorflow/lite/kernels/kernel_util.h"
+#include "tensorflow/lite/string_util.h"
 
 namespace tflite {
 namespace ops {

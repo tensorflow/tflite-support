@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 #include "external/pybind11/include/pybind11/pybind11.h"
-#include "external/org_tensorflow/tensorflow/lite/mutable_op_resolver.h"
+#include "tensorflow/lite/mutable_op_resolver.h"
 #include "tensorflow_lite_support/custom_ops/kernel/ngrams_op_resolver.h"
 
 PYBIND11_MODULE(_pywrap_ngrams_op_resolver, m) {

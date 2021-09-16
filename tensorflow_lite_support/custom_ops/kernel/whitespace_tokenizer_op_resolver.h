@@ -16,7 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_WHITESPACE_TOKENIZER_OP_RESOLVER_H_
 #define TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_WHITESPACE_TOKENIZER_OP_RESOLVER_H_
 
-#include "external/org_tensorflow/tensorflow/lite/mutable_op_resolver.h"
+#include "tensorflow/lite/mutable_op_resolver.h"
 
 namespace tflite {
 namespace ops {

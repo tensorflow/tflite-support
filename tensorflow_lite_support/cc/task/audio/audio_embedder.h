@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <memory>
 
-#include "external/org_tensorflow/tensorflow/lite/c/common.h"
+#include "tensorflow/lite/c/common.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/audio_embedder_options.proto.h"
 #include "tensorflow_lite_support/cc/task/core/base_task_api.h"

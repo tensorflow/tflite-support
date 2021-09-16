@@ -20,8 +20,8 @@ limitations under the License.
 
 #include "external/com_google_absl/absl/base/macros.h"
 #include "external/com_google_absl/absl/status/status.h"
-#include "external/org_tensorflow/tensorflow/lite/core/api/op_resolver.h"
-#include "external/org_tensorflow/tensorflow/lite/kernels/op_macros.h"
+#include "tensorflow/lite/core/api/op_resolver.h"
+#include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"

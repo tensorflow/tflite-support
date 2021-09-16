@@ -16,7 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_WHITESPACE_TOKENIZER_H_
 #define TENSORFLOW_LITE_SUPPORT_CUSTOM_OPS_KERNEL_WHITESPACE_TOKENIZER_H_
 
-#include "external/org_tensorflow/tensorflow/lite/context.h"
+#include "tensorflow/lite/context.h"
 
 namespace tflite {
 namespace ops {

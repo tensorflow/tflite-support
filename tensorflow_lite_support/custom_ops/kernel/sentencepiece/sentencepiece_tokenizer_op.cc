@@ -18,11 +18,11 @@ limitations under the License.
 
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/optimized_encoder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/sentencepiece_tokenizer.h"
-#include "external/org_tensorflow/tensorflow/core/framework/op.h"
-#include "external/org_tensorflow/tensorflow/core/framework/op_kernel.h"
-#include "external/org_tensorflow/tensorflow/core/framework/shape_inference.h"
-#include "external/org_tensorflow/tensorflow/core/framework/tensor.h"
-#include "external/org_tensorflow/tensorflow/core/protobuf/error_codes.pb.h"
+#include "tensorflow/core/framework/op.h"
+#include "tensorflow/core/framework/op_kernel.h"
+#include "tensorflow/core/framework/shape_inference.h"
+#include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/protobuf/error_codes.pb.h"
 
 namespace tensorflow {
 namespace ops{

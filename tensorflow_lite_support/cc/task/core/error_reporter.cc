@@ -19,7 +19,7 @@ limitations under the License.
 #include <cstdio>
 #include <cstring>
 
-#include "external/org_tensorflow/tensorflow/lite/minimal_logging.h"
+#include "tensorflow/lite/minimal_logging.h"
 
 namespace tflite {
 namespace task {

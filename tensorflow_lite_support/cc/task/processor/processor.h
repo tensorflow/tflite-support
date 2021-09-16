@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "external/com_google_absl/absl/status/status.h"
 #include "external/com_google_absl/absl/strings/str_format.h"
-#include "external/org_tensorflow/tensorflow/lite/core/shims/c/common.h"
+#include "tensorflow/lite/core/shims/c/common.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"

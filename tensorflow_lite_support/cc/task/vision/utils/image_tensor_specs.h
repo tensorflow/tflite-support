@@ -18,7 +18,7 @@ limitations under the License.
 #include <array>
 
 #include "external/com_google_absl/absl/types/optional.h"
-#include "external/org_tensorflow/tensorflow/lite/c/common.h"
+#include "tensorflow/lite/c/common.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"

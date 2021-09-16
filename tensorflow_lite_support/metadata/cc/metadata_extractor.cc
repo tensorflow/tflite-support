@@ -22,7 +22,7 @@ limitations under the License.
 #include "external/com_google_absl/absl/strings/str_format.h"
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "lib/zip.h"  // from @org_libzip
-#include "external/org_tensorflow/tensorflow/lite/schema/schema_generated.h"
+#include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"

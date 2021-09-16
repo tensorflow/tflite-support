@@ -24,7 +24,7 @@ limitations under the License.
 #include "external/com_google_absl/absl/strings/str_format.h"
 #include "external/com_google_sentencepiece/src/sentencepiece.pb.h"
 #include "external/com_google_sentencepiece/src/sentencepiece_processor.h"
-#include "external/org_tensorflow/tensorflow/core/platform/env.h"
+#include "tensorflow/core/platform/env.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/double_array_trie_builder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/encoder_config_generated.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"

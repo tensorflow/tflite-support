@@ -21,12 +21,12 @@ limitations under the License.
 
 #include "external/com_google_absl/absl/status/status.h"
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
-#include "external/org_tensorflow/tensorflow/lite/c/common.h"
-#include "external/org_tensorflow/tensorflow/lite/experimental/acceleration/configuration/configuration.pb.h"
-#include "external/org_tensorflow/tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
-#include "external/org_tensorflow/tensorflow/lite/experimental/acceleration/mini_benchmark/mini_benchmark.h"
-#include "external/org_tensorflow/tensorflow/lite/interpreter.h"
-#include "external/org_tensorflow/tensorflow/lite/interpreter_builder.h"
+#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/configuration.pb.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
+#include "tensorflow/lite/experimental/acceleration/mini_benchmark/mini_benchmark.h"
+#include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/interpreter_builder.h"
 
 namespace tflite {
 namespace support {

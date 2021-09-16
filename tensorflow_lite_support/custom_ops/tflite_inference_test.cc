@@ -20,13 +20,13 @@ limitations under the License.
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "external/org_tensorflow/tensorflow/core/platform/logging.h"
-#include "external/org_tensorflow/tensorflow/lite/c/common.h"
-#include "external/org_tensorflow/tensorflow/lite/interpreter.h"
-#include "external/org_tensorflow/tensorflow/lite/kernels/register.h"
-#include "external/org_tensorflow/tensorflow/lite/model.h"
-#include "external/org_tensorflow/tensorflow/lite/model_builder.h"
-#include "external/org_tensorflow/tensorflow/lite/string_util.h"
+#include "tensorflow/core/platform/logging.h"
+#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/model.h"
+#include "tensorflow/lite/model_builder.h"
+#include "tensorflow/lite/string_util.h"
 
 void FillRandomString(tflite::DynamicBuffer* buffer,
                       const TfLiteIntArray* dim_array,
