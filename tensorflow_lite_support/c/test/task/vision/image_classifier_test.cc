@@ -46,7 +46,7 @@ TEST(CImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
   TfLiteImageClassifierOptions options = {0};
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options);
-  ASSERT_EQ(image_classifier, nullptr);
+  EXPECT_EQ(image_classifier, nullptr);
 }
 
 TEST(CImageClassifierFromOptionsTest, SucceedsWithModelPath) {
@@ -184,7 +184,7 @@ TEST_F(CImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
 
   CImageDataFree(&image_data);
 
-  ASSERT_EQ(classification_result, nullptr);
+  EXPECT_EQ(classification_result, nullptr);
 
   if (classification_result != nullptr)
     TfLiteClassificationResultDelete(classification_result);
