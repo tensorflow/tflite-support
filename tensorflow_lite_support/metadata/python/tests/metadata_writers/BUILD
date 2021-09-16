@@ -2,9 +2,7 @@
 # Placeholder for internal Python strict library compatibility macro.
 
 package(
-    default_visibility = [
-        "//visibility:public",
-    ],
+    default_visibility = ["//tensorflow_lite_support:users"],
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -148,5 +146,19 @@ py_test(
         "//tensorflow_lite_support/metadata/python/metadata_writers:audio_classifier",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "@absl_py//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "metadata_writer_for_qa_test",
+    srcs = ["metadata_writer_for_qa_test.py"],
+    data = [
+        "//tensorflow_lite_support/metadata/python/tests/testdata/universal_sentence_encoder_qa:test_metadata",
+        "//tensorflow_lite_support/metadata/python/tests/testdata/universal_sentence_encoder_qa:test_model",
+    ],
+    python_version = "PY3",
+    deps = [
+        # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_writer_for_qa_lib",
     ],
 )

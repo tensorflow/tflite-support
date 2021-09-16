@@ -1,0 +1,59 @@
+{
+  "name": "USE-QA TFLite model",
+  "version": "v1",
+  "description": "Greater-than-word length text encoder for question answer retrieval.",
+  "author": "Google LLC",
+  "subgraph_metadata": [
+    {
+      "input_tensor_metadata": [
+        {
+          "name": "inp_text",
+          "description": "Input query text",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {}
+          },
+          "stats": {}
+        },
+        {
+          "name": "res_context",
+          "description": "Response context",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {}
+          },
+          "stats": {}
+        },
+        {
+          "name": "res_text",
+          "description": "Response text",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {}
+          },
+          "stats": {}
+        }
+      ],
+      "output_tensor_metadata": [
+        {
+          "name": "query_encoding",
+          "description": "Query encoding for the dot-product similarity",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {}
+          },
+          "stats": {}
+        },
+        {
+          "name": "response_encoding",
+          "description": "Response encoding for the dot-product similarity",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {}
+          },
+          "stats": {}
+        }
+      ]
+    }
+  ]
+}

@@ -1,10 +1,8 @@
 # Placeholder for internal Python strict library compatibility macro.
 
 package(
-    default_visibility = [
-        "//visibility:public",
-    ],
-    licenses = ["notice"],
+    default_visibility = ["//visibility:public"],
+    licenses = ["notice"],  # Apache 2.0
 )
 
 py_library(
@@ -122,5 +120,28 @@ py_library(
         ":metadata_info",
         ":metadata_writer",
         ":writer_utils",
+    ],
+)
+
+py_library(
+    name = "metadata_writer_for_qa_lib",
+    srcs = ["metadata_writer_for_qa.py"],
+    srcs_version = "PY3",
+    deps = [
+        # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_writer",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:writer_utils",
+        "@absl_py//absl:app",
+        "@absl_py//absl/flags",
+    ],
+)
+
+py_binary(
+    name = "metadata_writer_for_qa",
+    srcs = ["metadata_writer_for_qa.py"],
+    python_version = "PY3",
+    deps = [
+        ":metadata_writer_for_qa_lib",
     ],
 )
