@@ -56,21 +56,16 @@ confidence score.
 `NLClassifier` API is able to load any TFLite models for natural language
 classaification task such as language detection or sentiment detection.
 
-The API expects a TFLite model with the following input/output tensor:
-Input tensor0:
-  (kTfLiteString) - input of the model, accepts a string.
-Output tensor0:
-  (kTfLiteUInt8/kTfLiteInt8/kTfLiteInt16/kTfLiteFloat32/kTfLiteFloat64)
-  - output scores for each class, if type is one of the Int types,
-    dequantize it to double
-Output tensor1: optional
-  (kTfLiteString)
-  - output classname for each class, should be of the same length with
-    scores. If this tensor is not present, the API uses score indices as
-    classnames.
-By default the API tries to find the input/output tensors with default
-configurations in NLClassifierOptions, with tensor name prioritized over
-tensor index. The option is configurable for different TFLite models.
+The API expects a TFLite model with the following input/output tensor: Input
+tensor0: (kTfLiteString) - input of the model, accepts a string. Output tensor0:
+(kTfLiteUInt8/kTfLiteInt8/kTfLiteInt16/kTfLiteFloat32/kTfLiteFloat64) - output
+scores for each class, if type is one of the Int types, dequantize it to double
+Output tensor1: optional (kTfLiteString) - output classname for each class,
+should be of the same length with scores. If this tensor is not present, the API
+uses score indices as classnames. By default the API tries to find the
+input/output tensors with default configurations in NLClassifierOptions, with
+tensor name prioritized over tensor index. The option is configurable for
+different TFLite models.
 
 Use the C++ API to perform language ID classification as follows:
 
@@ -109,24 +104,24 @@ spec:
 
 Input tensor (type: `kTfLiteUInt8` / `kTfLiteFloat32`):
 
-   - image input of size `[batch x height x width x channels]`.
-   - batch inference is not supported (`batch` is required to be 1).
-   - only RGB inputs are supported (`channels` is required to be 3).
-   - if type is `kTfLiteFloat32`, `NormalizationOptions` are required to be
-     attached to the metadata for input normalization.
+-   image input of size `[batch x height x width x channels]`.
+-   batch inference is not supported (`batch` is required to be 1).
+-   only RGB inputs are supported (`channels` is required to be 3).
+-   if type is `kTfLiteFloat32`, `NormalizationOptions` are required to be
+    attached to the metadata for input normalization.
 
 At least one output tensor (type: `kTfLiteUInt8` / `kTfLiteFloat32`) with:
 
-   -  `N` classes and either 2 or 4 dimensions, i.e. `[1 x N]` or
-      `[1 x 1 x 1 x N]`
-   - optional (but recommended) label map(s) as AssociatedFile-s with type
-     TENSOR_AXIS_LABELS, containing one label per line. The first such
-     AssociatedFile (if any) is used to fill the `class_name` field of the
-     results. The `display_name` field is filled from the AssociatedFile (if
-     any) whose locale matches the `display_names_locale` field of the
-     `ImageClassifierOptions` used at creation time ("en" by default, i.e.
-     English). If none of these are available, only the `index` field of the
-     results will be filled.
+-   `N` classes and either 2 or 4 dimensions, i.e. `[1 x N]` or `[1 x 1 x 1 x
+    N]`
+-   optional (but recommended) label map(s) as AssociatedFile-s with type
+    TENSOR_AXIS_LABELS, containing one label per line. The first such
+    AssociatedFile (if any) is used to fill the `class_name` field of the
+    results. The `display_name` field is filled from the AssociatedFile (if any)
+    whose locale matches the `display_names_locale` field of the
+    `ImageClassifierOptions` used at creation time ("en" by default, i.e.
+    English). If none of these are available, only the `index` field of the
+    results will be filled.
 
 An example of such model can be found at:
 https://tfhub.dev/bohemian-visual-recognition-alliance/lite-model/models/mushroom-identification_v1/1
@@ -187,43 +182,43 @@ Detectors):
 
 Input tensor (type: `kTfLiteUInt8` / `kTfLiteFloat32`):
 
-   - image input of size `[batch x height x width x channels]`.
-   - batch inference is not supported (`batch` is required to be 1).
-   - only RGB inputs are supported (`channels` is required to be 3).
-   - if type is kTfLiteFloat32, `NormalizationOptions` are required to be
-     attached to the metadata for input normalization.
+-   image input of size `[batch x height x width x channels]`.
+-   batch inference is not supported (`batch` is required to be 1).
+-   only RGB inputs are supported (`channels` is required to be 3).
+-   if type is kTfLiteFloat32, `NormalizationOptions` are required to be
+    attached to the metadata for input normalization.
 
 Output tensors must be the 4 outputs (type: `kTfLiteFloat32`) of a
 [`DetectionPostProcess`][2] op, i.e:
 
-* Locations:
+*   Locations:
 
-  - of size `[num_results x 4]`, the inner array
-    representing bounding boxes in the form [top, left, right, bottom].
-  - BoundingBoxProperties are required to be attached to the metadata
-    and must specify type=BOUNDARIES and coordinate_type=RATIO.
+    -   of size `[num_results x 4]`, the inner array representing bounding boxes
+        in the form [top, left, right, bottom].
+    -   BoundingBoxProperties are required to be attached to the metadata and
+        must specify type=BOUNDARIES and coordinate_type=RATIO.
 
-* Classes:
+*   Classes:
 
-  - of size `[num_results]`, each value representing the
-    integer index of a class.
-  - optional (but recommended) label map(s) can be attached as
-    AssociatedFile-s with type TENSOR_VALUE_LABELS, containing one label per
-    line. The first such AssociatedFile (if any) is used to fill the
-    `class_name` field of the results. The `display_name` field is filled
-    from the AssociatedFile (if any) whose locale matches the
-    `display_names_locale` field of the `ObjectDetectorOptions` used at
-    creation time ("en" by default, i.e. English). If none of these are
-    available, only the `index` field of the results will be filled.
+    -   of size `[num_results]`, each value representing the integer index of a
+        class.
+    -   optional (but recommended) label map(s) can be attached as
+        AssociatedFile-s with type TENSOR_VALUE_LABELS, containing one label per
+        line. The first such AssociatedFile (if any) is used to fill the
+        `class_name` field of the results. The `display_name` field is filled
+        from the AssociatedFile (if any) whose locale matches the
+        `display_names_locale` field of the `ObjectDetectorOptions` used at
+        creation time ("en" by default, i.e. English). If none of these are
+        available, only the `index` field of the results will be filled.
 
-* Scores:
+*   Scores:
 
-  - of size `[num_results]`, each value representing the score
-    of the detected object.
+    -   of size `[num_results]`, each value representing the score of the
+        detected object.
 
-* Number of results:
+*   Number of results:
 
-  - integer `num_results` as a tensor of size `[1]`
+    -   integer `num_results` as a tensor of size `[1]`
 
 An example of such model can be found at:
 https://tfhub.dev/google/lite-model/object_detection/mobile_object_localizer_v1/1/metadata/1
@@ -294,26 +289,26 @@ recommended, TFLite Model Metadata) that conforms to the following spec:
 
 Input tensor (type: `kTfLiteUInt8` / `kTfLiteFloat32`):
 
-   - image input of size `[batch x height x width x channels]`.
-   - batch inference is not supported (`batch` is required to be 1).
-   - only RGB inputs are supported (`channels` is required to be 3).
-   - if type is kTfLiteFloat32, `NormalizationOptions` are required to be
-     attached to the metadata for input normalization.
+-   image input of size `[batch x height x width x channels]`.
+-   batch inference is not supported (`batch` is required to be 1).
+-   only RGB inputs are supported (`channels` is required to be 3).
+-   if type is kTfLiteFloat32, `NormalizationOptions` are required to be
+    attached to the metadata for input normalization.
 
 Output tensor (type: `kTfLiteUInt8` / `kTfLiteFloat32`):
 
-   - tensor of size `[batch x mask_height x mask_width x num_classes]`, where
-     `batch` is required to be 1, `mask_width` and `mask_height` are the
-     dimensions of the segmentation masks produced by the model, and
-     `num_classes` is the number of classes supported by the model.
-   - optional (but recommended) label map(s) can be attached as
-     AssociatedFile-s with type TENSOR_AXIS_LABELS, containing one label per
-     line. The first such AssociatedFile (if any) is used to fill the
-     `class_name` field of the results. The `display_name` field is filled
-     from the AssociatedFile (if any) whose locale matches the
-     `display_names_locale` field of the `ImageSegmenterOptions` used at
-     creation time ("en" by default, i.e. English). If none of these are
-     available, only the `index` field of the results will be filled.
+-   tensor of size `[batch x mask_height x mask_width x num_classes]`, where
+    `batch` is required to be 1, `mask_width` and `mask_height` are the
+    dimensions of the segmentation masks produced by the model, and
+    `num_classes` is the number of classes supported by the model.
+-   optional (but recommended) label map(s) can be attached as AssociatedFile-s
+    with type TENSOR_AXIS_LABELS, containing one label per line. The first such
+    AssociatedFile (if any) is used to fill the `class_name` field of the
+    results. The `display_name` field is filled from the AssociatedFile (if any)
+    whose locale matches the `display_names_locale` field of the
+    `ImageSegmenterOptions` used at creation time ("en" by default, i.e.
+    English). If none of these are available, only the `index` field of the
+    results will be filled.
 
 An example of such model can be found at:
 https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/1
@@ -377,6 +372,63 @@ SegmentationResult result = result_or.value();
 ```
 
 A CLI demo tool is available [here][4] for easily trying out this API.
+
+### Landmark Detector
+
+`LandmarkDetector` accepts
+[MoveNet](https://tfhub.dev/google/movenet/singlepose/lightning/4) model (with
+optional TFLite Model Metadata) that conforms to the following spec:
+
+Input tensor (type: `kTfLiteUInt8`):
+
+-   image input of size `[batch x height x width x channels]`.
+-   batch inference is not supported (`batch` is required to be 1).
+-   only RGB inputs are supported (`channels` is required to be 3).
+
+Output tensor (type: `kTfLiteFloat32`):
+
+-   one output tensor with 4 dimensions `[1 x 1 x num_keypoints x 3]`, the last
+    dimension representing keypoint coordinates with predicted confidence score
+    in the form [y, x, score].
+
+Example usage:
+
+```cc
+LandmarkDetectorOptions options;
+options.mutable_base_options()->mutable_model_file()->set_file_name(
+    "/path/to/model.tflite");
+// Create an LandmarkDetector instance from the options.
+StatusOr<std::unique_ptr<LandmarkDetector>> landmark_detector_or =
+    LandmarkDetector::CreateFromOptions(options);
+// Check if an error occurred.
+if (!landmark_detector_or.ok()) {
+  std::cerr << "An error occurred during LandmarkDetector creation: "
+            << landmark_detector_or.status().message();
+  return;
+}
+std::unique_ptr<LandmarkDetector> landmark_detector =
+    std::move(landmark_detector_or.value());
+// Prepare FrameBuffer input from e.g. image RGBA data, width and height:
+std::unique_ptr<FrameBuffer> frame_buffer =
+    CreateFromRgbaRawBuffer(image_rgba_data, {image_width, image_height});
+// Run inference:
+StatusOr<LandmarkResult> result_or = landmark_detector->Detect(*frame_buffer);
+// Check if an error occurred.
+if (!result_or.ok()) {
+  std::cerr << "An error occurred during detection: "
+            << result_or.status().message();
+  return;
+}
+LandmarkResult result = result_or.value();
+// Example value for 'result':
+//
+// landmarks {key_y : 0.31545776 key_x : 0.4260728 score : 0.70056206}
+// landmarks {key_y : 0.29907033 key_x : 0.44246024 score : 0.6350124}
+// landmarks {key_y : 0.3031672 key_x : 0.44655707 score : 0.24581124}
+// ....
+// landmarks {key_y : 0.27858606 key_x : 0.8685331 score : 0.6350124}
+// landmarks {key_y : 0.9299859 key_x : 0.7128526 score : 0.9422764}
+```
 
 [1]: https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/examples/task/vision/desktop/image_classifier_demo.cc
 [2]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/kernels/detection_postprocess.cc
