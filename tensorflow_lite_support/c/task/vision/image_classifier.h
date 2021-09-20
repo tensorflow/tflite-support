@@ -69,8 +69,8 @@ typedef struct TfLiteImageClassifierOptions {
 // Returns nullptr under the following circumstances:
 // 1. file doesn't exist or is not a well formatted.
 // 2. options is nullptr.
-// 3. Both options.classification_options.class_name_blacklist and
-// options.classification_options.class_name_blacklist are non empty. These
+// 3. Both options.classification_options.label_blacklist and
+// options.classification_options.label_whitelist are non empty. These
 // fields are mutually exclusive.
 //
 // If

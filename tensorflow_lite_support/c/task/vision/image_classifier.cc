@@ -69,14 +69,14 @@ CreateImageClassifierCppOptionsFromCOptions(
             c_options->base_options.compute_settings.cpu_settings.num_threads);
 
   for (int i = 0;
-       i < c_options->classification_options.class_name_blacklist.length; i++)
+       i < c_options->classification_options.label_denylist.length; i++)
     cpp_options->add_class_name_blacklist(
-        c_options->classification_options.class_name_blacklist.list[i]);
+        c_options->classification_options.label_denylist.list[i]);
 
   for (int i = 0;
-       i < c_options->classification_options.class_name_whitelist.length; i++)
+       i < c_options->classification_options.label_allowlist.length; i++)
     cpp_options->add_class_name_whitelist(
-        c_options->classification_options.class_name_whitelist.list[i]);
+        c_options->classification_options.label_allowlist.list[i]);
 
   // Check needed since setting a nullptr for this field results in a segfault
   // on invocation of ImageClassifierCpp::CreateFromOptions().
