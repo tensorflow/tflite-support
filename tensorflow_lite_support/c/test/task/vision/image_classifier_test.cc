@@ -233,7 +233,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
   EXPECT_GE(classification_result->classifications->size, 1);
   EXPECT_NE(classification_result->classifications->categories, nullptr);
   EXPECT_NE(strcmp(classification_result->classifications->categories[0].label,
-                   blacklisted_label_name),
+                   blacklisted_label),
             0);
 
   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
@@ -279,7 +279,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
   EXPECT_GE(classification_result->classifications->size, 1);
   EXPECT_NE(classification_result->classifications->categories, nullptr);
   EXPECT_EQ(strcmp(classification_result->classifications->categories[0].label,
-                   whitelisted_label_name),
+                   whitelisted_label),
             0);
 
   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
