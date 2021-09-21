@@ -173,26 +173,3 @@ cc_test_with_tflite(
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ],
 )
-
-cc_test_with_tflite(
-    name = "landmark_detector_test",
-    srcs = ["landmark_detector_test.cc"],
-    data = [
-        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
-        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
-    ],
-    tflite_deps = [
-        "@org_tensorflow//tensorflow/lite/core/shims:cc_shims_test_util",
-        "//tensorflow_lite_support/cc/task/vision:landmark_detector",
-    ],
-    deps = [
-        "//tensorflow_lite_support/cc/port:gtest_main",
-        "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
-        "//tensorflow_lite_support/cc/task/vision/proto:landmark_detector_options_proto_inc",
-        "//tensorflow_lite_support/cc/task/vision/proto:landmarks_proto_inc",
-        "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
-        "//tensorflow_lite_support/cc/test:test_utils",
-        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
-        "@com_google_absl//absl/flags:flag",
-    ],
-)
