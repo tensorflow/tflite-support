@@ -23,12 +23,13 @@ import android.provider.MediaStore;
 import java.io.IOException;
 
 /**
- * Builds {@link MlImage} from {@link Bitmap}.
+ * Builds {@link MlImage} from {@link android.graphics.Bitmap}.
  *
- * <p>You can pass in either mutable or immutable {@link Bitmap}. However once {@link Bitmap} is
- * passed in, to keep data integrity you shouldn't modify content in it.
+ * <p>You can pass in either mutable or immutable {@link android.graphics.Bitmap}. However once
+ * {@link android.graphics.Bitmap} is passed in, to keep data integrity you shouldn't modify content
+ * in it.
  *
- * <p>Use {@link BitmapExtractor} to get {@link Bitmap} you passed in.
+ * <p>Use {@link BitmapExtractor} to get {@link android.graphics.Bitmap} you passed in.
  */
 public class BitmapMlImageBuilder {
 
@@ -41,7 +42,7 @@ public class BitmapMlImageBuilder {
   private long timestamp;
 
   /**
-   * Creates the builder with a mandatory {@link Bitmap}.
+   * Creates the builder with a mandatory {@link android.graphics.Bitmap}.
    *
    * <p>Also calls {@link #setRotation(int)} to set the optional properties. If not set, the values
    * will be set with default:
