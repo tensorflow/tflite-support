@@ -18,7 +18,7 @@ package com.google.android.odml.image;
 import android.graphics.Bitmap;
 
 /**
- * Utility for extracting {@link Bitmap} from {@link MlImage}.
+ * Utility for extracting {@link android.graphics.Bitmap} from {@link MlImage}.
  *
  * <p>Currently it only supports {@link MlImage} with {@link MlImage#STORAGE_TYPE_BITMAP}, otherwise
  * {@link IllegalArgumentException} will be thrown.
@@ -26,12 +26,12 @@ import android.graphics.Bitmap;
 public final class BitmapExtractor {
 
   /**
-   * Extracts a {@link Bitmap} from an {@link MlImage}.
+   * Extracts a {@link android.graphics.Bitmap} from an {@link MlImage}.
    *
    * <p>Notice: Properties of the {@code image} like rotation will not take effects.
    *
-   * @param image the image to extract {@link Bitmap} from.
-   * @return the {@link Bitmap} stored in {@link MlImage}
+   * @param image the image to extract {@link android.graphics.Bitmap} from.
+   * @return the {@link android.graphics.Bitmap} stored in {@link MlImage}
    * @throws IllegalArgumentException when the extraction requires unsupported format or data type
    *     conversions.
    */

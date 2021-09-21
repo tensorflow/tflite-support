@@ -21,11 +21,12 @@ import android.os.Build.VERSION_CODES;
 import androidx.annotation.RequiresApi;
 
 /**
- * Builds {@link MlImage} from {@link Image}.
+ * Builds {@link MlImage} from {@link android.media.Image}.
  *
- * <p>Once {@link Image} is passed in, to keep data integrity you shouldn't modify content in it.
+ * <p>Once {@link android.media.Image} is passed in, to keep data integrity you shouldn't modify
+ * content in it.
  *
- * <p>Use {@link MediaImageExtractor} to get {@link Image} you passed in.
+ * <p>Use {@link MediaImageExtractor} to get {@link android.media.Image} you passed in.
  */
 @RequiresApi(VERSION_CODES.KITKAT)
 public class MediaMlImageBuilder {
@@ -39,7 +40,7 @@ public class MediaMlImageBuilder {
   private long timestamp;
 
   /**
-   * Creates the builder with a mandatory {@link Image}.
+   * Creates the builder with a mandatory {@link android.media.Image}.
    *
    * <p>Also calls {@link #setRotation(int)} to set the optional properties. If not set, the values
    * will be set with default:

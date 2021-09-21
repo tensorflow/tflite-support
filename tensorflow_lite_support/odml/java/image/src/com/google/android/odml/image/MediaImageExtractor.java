@@ -20,7 +20,7 @@ import android.os.Build.VERSION_CODES;
 import androidx.annotation.RequiresApi;
 
 /**
- * Utility for extracting {@link Image} from {@link MlImage}.
+ * Utility for extracting {@link android.media.Image} from {@link MlImage}.
  *
  * <p>Currently it only supports {@link MlImage} with {@link MlImage#STORAGE_TYPE_MEDIA_IMAGE},
  * otherwise {@link IllegalArgumentException} will be thrown.
@@ -31,13 +31,13 @@ public class MediaImageExtractor {
   private MediaImageExtractor() {}
 
   /**
-   * Extracts a {@link Image} from an {@link MlImage}. Currently it only works for {@link MlImage}
-   * that built from {@link MediaMlImageBuilder}.
+   * Extracts a {@link android.media.Image} from an {@link MlImage}. Currently it only works for
+   * {@link MlImage} that built from {@link MediaMlImageBuilder}.
    *
    * <p>Notice: Properties of the {@code image} like rotation will not take effects.
    *
-   * @param image the image to extract {@link Image} from.
-   * @return {@link Image} that stored in {@link MlImage}.
+   * @param image the image to extract {@link android.media.Image} from.
+   * @return {@link android.media.Image} that stored in {@link MlImage}.
    * @throws IllegalArgumentException if the extraction failed.
    */
   public static Image extract(MlImage image) {

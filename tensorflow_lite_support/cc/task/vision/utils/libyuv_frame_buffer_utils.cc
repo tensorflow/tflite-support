@@ -1385,10 +1385,8 @@ absl::Status UniformCropResizePlane(const FrameBuffer& buffer,
   // adjusted_output_buffer is not used in the Resize* methods.
   FrameBuffer::Dimension adjusted_dimension =
       GetScaledDimension(input_dimension, output_buffer->dimension());
-  FrameBuffer::Plane output_plane = {
-      /*buffer=*/output_buffer->plane(0).buffer,
-      /*stride=*/{output_buffer->plane(0).stride.row_stride_bytes,
-                  output_buffer->plane(0).stride.pixel_stride_bytes}};
+  FrameBuffer::Plane output_plane = {/*buffer=*/output_buffer->plane(0).buffer,
+                                     /*stride=*/output_buffer->plane(0).stride};
   auto adjusted_output_buffer = FrameBuffer::Create(
       {output_plane}, adjusted_dimension, output_buffer->format(),
       output_buffer->orientation(), output_buffer->timestamp());
@@ -1406,6 +1404,126 @@ absl::Status UniformCropResizePlane(const FrameBuffer& buffer,
           absl::StrFormat("Format %i is not supported.", buffer.format()),
           TfLiteSupportStatus::kImageProcessingError);
   }
+}
+
+absl::Status UniformCropResizeYuv(const FrameBuffer& buffer,
+                                  std::vector<int> crop_coordinates,
+                                  FrameBuffer* output_buffer) {
+  int x0 = 0, y0 = 0;
+  FrameBuffer::Dimension input_dimension = buffer.dimension();
+  if (!crop_coordinates.empty()) {
+    x0 = crop_coordinates[0];
+    y0 = crop_coordinates[1];
+    input_dimension =
+        GetCropDimension(x0, crop_coordinates[2], y0, crop_coordinates[3]);
+  }
+  if (input_dimension == output_buffer->dimension()) {
+    // Cropping only case.
+    int x1 = crop_coordinates[2];
+    int y1 = crop_coordinates[3];
+    switch (buffer.format()) {
+      case FrameBuffer::Format::kNV12:
+      case FrameBuffer::Format::kNV21:
+        return CropNv(buffer, x0, y0, x1, y1, output_buffer);
+      case FrameBuffer::Format::kYV12:
+      case FrameBuffer::Format::kYV21:
+        return CropYv(buffer, x0, y0, x1, y1, output_buffer);
+      default:
+        return CreateStatusWithPayload(
+            StatusCode::kInternal,
+            absl::StrFormat("Format %i is not supported.", buffer.format()),
+            TfLiteSupportStatus::kImageProcessingError);
+    }
+  }
+
+  // Cropping is achieved by adjusting origin to (x0, y0).
+  ASSIGN_OR_RETURN(FrameBuffer::YuvData input_data,
+                   FrameBuffer::GetYuvDataFromFrameBuffer(buffer));
+  // Cropping YUV planes by offsetting the origins of each plane.
+  // TODO(b/152629712): Investigate the impact of color shifting caused by the
+  // bounding box with odd X or Y starting positions.
+  const int plane_y_offset = input_data.y_row_stride * y0 + x0;
+  const int plane_uv_offset = input_data.uv_row_stride * (y0 / 2) +
+                              input_data.uv_pixel_stride * (x0 / 2);
+  FrameBuffer::Plane adjusted_plane_y = {
+      /*buffer=*/input_data.y_buffer + plane_y_offset,
+      /*stride=*/{input_data.y_row_stride, /*pixel_stride_bytes=*/1}};
+  FrameBuffer::Plane adjusted_plane_u = {
+      /*buffer=*/input_data.u_buffer + plane_uv_offset,
+      /*stride=*/{input_data.uv_row_stride, input_data.uv_pixel_stride}};
+  FrameBuffer::Plane adjusted_plane_v = {
+      /*buffer=*/input_data.v_buffer + plane_uv_offset,
+      /*stride=*/{input_data.uv_row_stride, input_data.uv_pixel_stride}};
+
+  // Uniform resize is achieved by adjusting the resize dimension to fit the
+  // output_buffer and respect the input aspect ratio at the same time. For
+  // YUV formats, we need access to the actual output dimension to get the
+  // correct address of each plane. For this, we are not calling ResizeNv or
+  // ResizeYv but the libyuv scale methods directly.
+  FrameBuffer::Dimension adjusted_dimension =
+      GetScaledDimension(input_dimension, output_buffer->dimension());
+  ASSIGN_OR_RETURN(FrameBuffer::YuvData output_data,
+                   FrameBuffer::GetYuvDataFromFrameBuffer(*output_buffer));
+
+  switch (buffer.format()) {
+    case FrameBuffer::Format::kNV12: {
+      int ret = libyuv::NV12Scale(
+          adjusted_plane_y.buffer, adjusted_plane_y.stride.row_stride_bytes,
+          adjusted_plane_u.buffer, adjusted_plane_u.stride.row_stride_bytes,
+          input_dimension.width, input_dimension.height,
+          const_cast<uint8_t*>(output_data.y_buffer), output_data.y_row_stride,
+          const_cast<uint8_t*>(output_data.u_buffer), output_data.uv_row_stride,
+          adjusted_dimension.width, adjusted_dimension.height,
+          libyuv::FilterMode::kFilterBilinear);
+      if (ret != 0) {
+        return CreateStatusWithPayload(
+            StatusCode::kUnknown, "Libyuv NV12Scale operation failed.",
+            TfLiteSupportStatus::kImageProcessingBackendError);
+      }
+      return absl::OkStatus();
+    }
+    case FrameBuffer::Format::kNV21: {
+      int ret = libyuv::NV12Scale(
+          adjusted_plane_y.buffer, adjusted_plane_y.stride.row_stride_bytes,
+          adjusted_plane_v.buffer, adjusted_plane_v.stride.row_stride_bytes,
+          input_dimension.width, input_dimension.height,
+          const_cast<uint8_t*>(output_data.y_buffer), output_data.y_row_stride,
+          const_cast<uint8_t*>(output_data.v_buffer), output_data.uv_row_stride,
+          adjusted_dimension.width, adjusted_dimension.height,
+          libyuv::FilterMode::kFilterBilinear);
+      if (ret != 0) {
+        return CreateStatusWithPayload(
+            StatusCode::kUnknown, "Libyuv NV12Scale operation failed.",
+            TfLiteSupportStatus::kImageProcessingBackendError);
+      }
+      return absl::OkStatus();
+    }
+    case FrameBuffer::Format::kYV12:
+    case FrameBuffer::Format::kYV21: {
+      int ret = libyuv::I420Scale(
+          adjusted_plane_y.buffer, adjusted_plane_y.stride.row_stride_bytes,
+          adjusted_plane_u.buffer, adjusted_plane_u.stride.row_stride_bytes,
+          adjusted_plane_v.buffer, adjusted_plane_v.stride.row_stride_bytes,
+          input_dimension.width, input_dimension.height,
+          const_cast<uint8_t*>(output_data.y_buffer), output_data.y_row_stride,
+          const_cast<uint8_t*>(output_data.u_buffer), output_data.uv_row_stride,
+          const_cast<uint8_t*>(output_data.v_buffer), output_data.uv_row_stride,
+          adjusted_dimension.width, adjusted_dimension.height,
+          libyuv::FilterMode::kFilterBilinear);
+      if (ret != 0) {
+        return CreateStatusWithPayload(
+            StatusCode::kUnknown, "Libyuv I420Scale operation failed.",
+            TfLiteSupportStatus::kImageProcessingBackendError);
+      }
+      return absl::OkStatus();
+    }
+    default:
+      return CreateStatusWithPayload(
+          StatusCode::kInternal,
+          absl::StrFormat("Format %i is not supported.", buffer.format()),
+          TfLiteSupportStatus::kImageProcessingError);
+  }
+  return absl::OkStatus();
 }
 }  // namespace
 
