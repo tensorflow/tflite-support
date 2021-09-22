@@ -61,7 +61,7 @@ CreateImageClassifierCppOptionsFromCOptions(
   else
     return nullptr;
 
-  // c_options->base_options.compute_settings.num_threads iis expected to be
+  // c_options->base_options.compute_settings.num_threads is expected to be
   // set to value > 0 or -1. Otherwise invoking
   // ImageClassifierCpp::CreateFromOptions() results in a not ok status.
   cpp_options->mutable_base_options()
