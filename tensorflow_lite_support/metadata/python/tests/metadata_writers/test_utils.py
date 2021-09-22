@@ -20,6 +20,11 @@ from tensorflow.python.platform import resource_loader
 
 def load_file(file_name: str, mode: str = "rb") -> Union[str, bytes]:
   """Loads files from resources."""
-  file_path = resource_loader.get_path_to_datafile(file_name)
+  file_path = get_resource_path(file_name)
   with open(file_path, mode) as file:
     return file.read()
+
+
+def get_resource_path(file_name: str) -> str:
+  """Gets resource path from the loader."""
+  return resource_loader.get_path_to_datafile(file_name)

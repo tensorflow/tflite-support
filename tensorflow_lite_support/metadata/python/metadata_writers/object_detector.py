@@ -14,7 +14,7 @@
 # ==============================================================================
 """Writes metadata and label file to the object detector models."""
 
-from typing import List, Optional
+from typing import List, Optional, Type, Union
 
 import flatbuffers
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
@@ -77,6 +77,18 @@ def _create_metadata_with_value_range(
   return tensor_metadata
 
 
+def _extend_new_files(
+    file_list: List[str],
+    associated_files: Optional[List[Type[metadata_info.AssociatedFileMd]]]):
+  """Extends new associated files to the file list."""
+  if not associated_files:
+    return
+
+  for file in associated_files:
+    if file.file_path not in file_list:
+      file_list.append(file.file_path)
+
+
 class MetadataWriter(metadata_writer.MetadataWriter):
   """Writes metadata into an object detector."""
 
@@ -88,9 +100,9 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       input_md: Optional[metadata_info.InputImageTensorMd] = None,
       output_location_md: Optional[metadata_info.TensorMd] = None,
       output_category_md: Optional[metadata_info.CategoryTensorMd] = None,
-      output_score_md: Optional[metadata_info.TensorMd] = None,
-      output_number_md: Optional[metadata_info.TensorMd] = None,
-      score_calibration_md: Optional[metadata_info.ScoreCalibrationMd] = None):
+      output_score_md: Union[None, metadata_info.TensorMd,
+                             metadata_info.ClassificationTensorMd] = None,
+      output_number_md: Optional[metadata_info.TensorMd] = None):
     """Creates MetadataWriter based on general/input/outputs information.
 
     Args:
@@ -106,11 +118,10 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         indicating the index of a class label from the labels file.
       output_score_md: output score tensor information. The score tensor is an
         array of N floating point values between 0 and 1 representing
-        probability that a class was detected.
+        probability that a class was detected. Use ClassificationTensorMd to
+        calibrate score.
       output_number_md: output number of dections tensor information. This
         tensor is an integer value of N.
-      score_calibration_md: ScoreCalibration metadata (optional), calibrate
-        scores of classification head if it is provided.
 
     Returns:
       A MetadataWriter object.
@@ -138,22 +149,11 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       output_score_md = metadata_info.ClassificationTensorMd(
           name=_OUTPUT_SCORE_NAME,
           description=_OUTPUT_SCORE_DESCRIPTION,
-          score_calibration_md=score_calibration_md,
       )
-    output_score_metadata = _create_metadata_with_value_range(output_score_md)
-
-    if score_calibration_md:
-      # Add process units for score calibration.
-      output_score_metadata.processUnits = [
-          score_calibration_md.create_metadata()
-      ]
 
     if output_number_md is None:
       output_number_md = metadata_info.TensorMd(
           name=_OUTPUT_NUMBER_NAME, description=_OUTPUT_NUMBER_DESCRIPTION)
-
-    if output_category_md.associated_files is None:
-      output_category_md.associated_files = []
 
     # Create output tensor group info.
     group = _metadata_fb.TensorGroupT()
@@ -168,7 +168,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
     subgraph_metadata.outputTensorMetadata = [
         _create_location_metadata(output_location_md),
         _create_metadata_with_value_range(output_category_md),
-        output_score_metadata,
+        _create_metadata_with_value_range(output_score_md),
         output_number_md.create_metadata()
     ]
     subgraph_metadata.outputTensorGroups = [group]
@@ -182,12 +182,10 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         model_metadata.Pack(b),
         _metadata.MetadataPopulator.METADATA_FILE_IDENTIFIER)
 
-    return cls(
-        model_buffer,
-        b.Output(),
-        associated_files=[
-            file.file_path for file in output_category_md.associated_files
-        ])
+    associated_files = []
+    _extend_new_files(associated_files, output_category_md.associated_files)
+    _extend_new_files(associated_files, output_score_md.associated_files)
+    return cls(model_buffer, b.Output(), associated_files=associated_files)
 
   @classmethod
   def create_for_inference(
@@ -240,8 +238,14 @@ class MetadataWriter(metadata_writer.MetadataWriter):
             for file_path in label_file_paths
         ])
 
+    output_score_md = metadata_info.ClassificationTensorMd(
+        name=_OUTPUT_SCORE_NAME,
+        description=_OUTPUT_SCORE_DESCRIPTION,
+        score_calibration_md=score_calibration_md
+    )
+
     return cls.create_from_metadata_info(
         model_buffer,
         input_md=input_md,
         output_category_md=output_category_md,
-        score_calibration_md=score_calibration_md)
+        output_score_md=output_score_md)
