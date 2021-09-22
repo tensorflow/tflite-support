@@ -43,10 +43,9 @@ struct TfLiteImageClassifier {
 };
 
 TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate() {
-  TfLiteImageClassifierOptions options = {
+  return {
       .classification_options.max_results = -1,
       .base_options.compute_settings.cpu_settings.num_threads = -1};
-  return options;
 }
 
 std::unique_ptr<ImageClassifierOptionsCpp>
