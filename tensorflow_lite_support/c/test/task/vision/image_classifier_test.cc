@@ -48,7 +48,7 @@ StatusOr<ImageData> LoadImage(const char* image_name) {
 class ImageClassifierFromOptionsTest : public tflite_shims::testing::Test {};
 
 TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
-  TfLiteImageClassifierOptions options = {{{0}}};
+  TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options);
   EXPECT_EQ(image_classifier, nullptr);
@@ -58,7 +58,7 @@ TEST_F(ImageClassifierFromOptionsTest, SucceedsWithModelPath) {
   std::string model_path =
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata);
-  TfLiteImageClassifierOptions options = {{{0}}};
+  TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options);
@@ -71,7 +71,7 @@ TEST_F(ImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
   std::string model_path =
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata);
-  TfLiteImageClassifierOptions options = {{{0}}};
+  TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
   options.base_options.compute_settings.cpu_settings.num_threads = 3;
   TfLiteImageClassifier* image_classifier =
@@ -82,23 +82,21 @@ TEST_F(ImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
 }
 
 TEST_F(ImageClassifierFromOptionsTest,
-       FailsWithClassNameBlackListAndClassNameWhiteList) {
+       FailsWithClassNameDenyListAndClassNameAllowList) {
   std::string model_path =
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata);
 
-  TfLiteImageClassifierOptions options = {{{0}}};
+  TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
 
-  const char* class_name_blacklist[] = {"brambling"};
-  options.classification_options.class_name_blacklist.list =
-      class_name_blacklist;
-  options.classification_options.class_name_blacklist.length = 1;
+  const char* label_denylist[] = {"brambling"};
+  options.classification_options.label_denylist.list = label_denylist;
+  options.classification_options.label_denylist.length = 1;
 
-  const char* class_name_whitelist[] = {"cheeseburger"};
-  options.classification_options.class_name_whitelist.list =
-      class_name_whitelist;
-  options.classification_options.class_name_whitelist.length = 1;
+  const char* label_allowlist[] = {"cheeseburger"};
+  options.classification_options.label_allowlist.list = label_allowlist;
+  options.classification_options.label_allowlist.length = 1;
 
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options);
@@ -114,7 +112,7 @@ class ImageClassifierClassifyTest : public tflite_shims::testing::Test {
         JoinPath("./" /*test src dir*/, kTestDataDirectory,
                  kMobileNetQuantizedWithMetadata);
 
-    TfLiteImageClassifierOptions options = {{{0}}};
+    TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
     options.base_options.model_file.file_path = model_path.data();
     image_classifier = TfLiteImageClassifierFromOptions(&options);
 
@@ -197,19 +195,18 @@ TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
 }
 
 TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
-     SucceedsWithClassNameBlackList) {
-  const char* blacklisted_label_name = "cheeseburger";
+     SucceedsWithClassNameDenyList) {
+  const char* denylisted_label_name = "cheeseburger";
   std::string model_path =
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata);
 
-  TfLiteImageClassifierOptions options = {{{0}}};
+  TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
 
-  const char* class_name_blacklist[] = {blacklisted_label_name};
-  options.classification_options.class_name_blacklist.list =
-      class_name_blacklist;
-  options.classification_options.class_name_blacklist.length = 1;
+  const char* label_denylist[] = {denylisted_label_name};
+  options.classification_options.label_denylist.list = label_denylist;
+  options.classification_options.label_denylist.length = 1;
 
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options);
@@ -233,7 +230,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
   EXPECT_GE(classification_result->classifications->size, 1);
   EXPECT_NE(classification_result->classifications->categories, nullptr);
   EXPECT_NE(strcmp(classification_result->classifications->categories[0].label,
-                   blacklisted_label_name),
+                   denylisted_label_name),
             0);
 
   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
@@ -242,20 +239,19 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
 }
 
 TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
-     SucceedsWithClassNameWhiteList) {
-  const char* whitelisted_label_name = "cheeseburger";
+     SucceedsWithClassNameAllowList) {
+  const char* allowlisted_label_name = "cheeseburger";
   std::string model_path =
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata)
           .data();
 
-  TfLiteImageClassifierOptions options = {{{0}}};
+  TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
 
-  const char* class_name_whitelist[] = {whitelisted_label_name};
-  options.classification_options.class_name_whitelist.list =
-      class_name_whitelist;
-  options.classification_options.class_name_whitelist.length = 1;
+  const char* label_allowlist[] = {allowlisted_label_name};
+  options.classification_options.label_allowlist.list = label_allowlist;
+  options.classification_options.label_allowlist.length = 1;
 
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options);
@@ -279,7 +275,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
   EXPECT_GE(classification_result->classifications->size, 1);
   EXPECT_NE(classification_result->classifications->categories, nullptr);
   EXPECT_EQ(strcmp(classification_result->classifications->categories[0].label,
-                   whitelisted_label_name),
+                   allowlisted_label_name),
             0);
 
   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
