@@ -313,7 +313,8 @@ absl::Status ObjectDetector::PreInit() {
 
 absl::Status ObjectDetector::CheckAndSetOutputs() {
   // First, sanity checks on the model itself.
-  const TfLiteEngine::Interpreter* interpreter = engine_->interpreter();
+  const TfLiteEngine::Interpreter* interpreter =
+      GetTfLiteEngine()->interpreter();
   // Check the number of output tensors.
   if (TfLiteEngine::OutputCount(interpreter) != 4) {
     return CreateStatusWithPayload(
@@ -345,7 +346,7 @@ absl::Status ObjectDetector::CheckAndSetOutputs() {
 
   // Now, perform sanity checks and extract metadata.
   const ModelMetadataExtractor* metadata_extractor =
-      engine_->metadata_extractor();
+      GetTfLiteEngine()->metadata_extractor();
   // Check that metadata is available.
   if (metadata_extractor->GetModelMetadata() == nullptr ||
       metadata_extractor->GetModelMetadata()->subgraph_metadata() == nullptr) {

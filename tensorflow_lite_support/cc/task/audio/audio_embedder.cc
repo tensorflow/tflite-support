@@ -59,13 +59,14 @@ absl::Status AudioEmbedder::Init(
   options_ = std::move(options);
 
   // Create preprocessor, assuming having only 1 input tensor.
-  ASSIGN_OR_RETURN(
-      preprocessor_,
-      tflite::task::processor::AudioPreprocessor::Create(engine_.get(), {0}));
+  ASSIGN_OR_RETURN(preprocessor_,
+                   tflite::task::processor::AudioPreprocessor::Create(
+                       GetTfLiteEngine(), {0}));
 
   // Create postprocessors, assuming that all output tensors are embedding
   // outputs.
-  int post_processors_count = engine_->OutputCount(engine_->interpreter());
+  int post_processors_count =
+      GetTfLiteEngine()->OutputCount(GetTfLiteEngine()->interpreter());
   postprocessors_.reserve(post_processors_count);
 
   for (int i = 0; i < post_processors_count; i++) {
@@ -90,7 +91,7 @@ absl::Status AudioEmbedder::Init(
     }
     ASSIGN_OR_RETURN(auto processor,
                      processor::EmbeddingPostprocessor::Create(
-                         engine_.get(), {i}, std::move(option)));
+                         GetTfLiteEngine(), {i}, std::move(option)));
     postprocessors_.emplace_back(std::move(processor));
   }
   return absl::OkStatus();

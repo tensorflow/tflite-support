@@ -169,11 +169,11 @@ absl::Status ImageClassifier::PreInit() {
 absl::Status ImageClassifier::PostInit() { return InitScoreCalibrations(); }
 
 absl::Status ImageClassifier::CheckAndSetOutputs() {
-  num_outputs_ = TfLiteEngine::OutputCount(engine_->interpreter());
+  num_outputs_ = TfLiteEngine::OutputCount(GetTfLiteEngine()->interpreter());
 
   // Perform sanity checks and extract metadata.
   const ModelMetadataExtractor* metadata_extractor =
-      engine_->metadata_extractor();
+      GetTfLiteEngine()->metadata_extractor();
 
   const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
       output_tensor_metadata = metadata_extractor->GetOutputTensorMetadata();
@@ -228,7 +228,7 @@ absl::Status ImageClassifier::CheckAndSetOutputs() {
   int num_quantized_outputs = 0;
   for (int i = 0; i < num_outputs_; ++i) {
     const TfLiteTensor* output_tensor =
-        TfLiteEngine::GetOutput(engine_->interpreter(), i);
+        TfLiteEngine::GetOutput(GetTfLiteEngine()->interpreter(), i);
     const int num_dimensions = output_tensor->dims->size;
     if (num_dimensions == 4) {
       if (output_tensor->dims->data[1] != 1 ||

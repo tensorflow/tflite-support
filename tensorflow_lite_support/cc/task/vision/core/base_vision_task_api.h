@@ -66,9 +66,6 @@ class BaseVisionTaskApi
  protected:
   FrameBufferUtils::ProcessEngine process_engine_;
 
-  using tflite::task::core::BaseTaskApi<OutputType, const FrameBuffer&,
-                                        const BoundingBox&>::engine_;
-
   // Checks input tensor and metadata (if any) are valid, or return an error
   // otherwise. This must be called once at initialization time, before running
   // inference, as it is a prerequisite for `Preprocess`.
@@ -78,7 +75,7 @@ class BaseVisionTaskApi
     // BaseTaskApi always assume having a single input.
     ASSIGN_OR_RETURN(preprocessor_,
                      ::tflite::task::processor::ImagePreprocessor::Create(
-                         engine_.get(), {0}, process_engine_));
+                         this->GetTfLiteEngine(), {0}, process_engine_));
     return absl::OkStatus();
   }
 
