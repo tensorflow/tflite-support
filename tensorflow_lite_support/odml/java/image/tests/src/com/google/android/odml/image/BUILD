@@ -95,21 +95,6 @@ android_local_test(
 )
 
 android_local_test(
-    name = "TextureMlImageBuilderTest",
-    srcs = ["TextureMlImageBuilderTest.java"],
-    manifest = "AndroidManifest.xml",
-    test_class = "com.google.android.odml.image.TextureMlImageBuilderTest",
-    deps = [
-        "//tensorflow_lite_support/odml/java/image",
-        "//third_party/java/mockito:mockito-android",
-        "@maven//:androidx_test_core",
-        "@maven//:com_google_truth_truth",  # android
-        "@maven//:org_robolectric_robolectric",
-        "@robolectric//bazel:android-all",
-    ],
-)
-
-android_local_test(
     name = "TextureImageExtractorTest",
     srcs = ["TextureImageExtractorTest.java"],
     manifest = "AndroidManifest.xml",
