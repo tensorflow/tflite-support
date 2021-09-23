@@ -17,6 +17,7 @@ limitations under the License.
 
 #include <memory>
 
+#include "tensorflow_lite_support/c/task/common_error_utils.h"
 #include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
 #include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
@@ -52,8 +53,6 @@ CreateImageClassifierCppOptionsFromCOptions(
   if (c_options->base_options.model_file.file_path)
     cpp_options->mutable_base_options()->mutable_model_file()->set_file_name(
         c_options->base_options.model_file.file_path);
-  else
-    return nullptr;
 
   // Without this check, in zero initialized TfLiteImageClassifierOptions (must
   // be done to prevent undefined behaviour)
@@ -100,7 +99,7 @@ CreateImageClassifierCppOptionsFromCOptions(
 }
 
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
-    const TfLiteImageClassifierOptions* options) {
+    const TfLiteImageClassifierOptions* options, TfLiteError** error) {
   std::unique_ptr<ImageClassifierOptionsCpp> cpp_options =
       CreateImageClassifierCppOptionsFromCOptions(options);
 
@@ -114,13 +113,15 @@ TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     return new TfLiteImageClassifier{.impl =
                                          std::move(classifier_status.value())};
   } else {
+    ::tflite::task::CreateTfLiteErrorWithStatus(classifier_status.status(),
+                                                error);
     return nullptr;
   }
 }
 
 TfLiteClassificationResult* GetClassificationResultCStruct(
     const ClassificationResultCpp& classification_result_cpp) {
-  TfLiteClassifications* c_classifications =
+  auto c_classifications =
       new TfLiteClassifications[classification_result_cpp
                                     .classifications_size()];
 
@@ -130,8 +131,7 @@ TfLiteClassificationResult* GetClassificationResultCStruct(
         classification_result_cpp.classifications(head);
     c_classifications[head].head_index = head;
 
-    TfLiteCategory* c_categories =
-        new TfLiteCategory[classifications.classes_size()];
+    auto c_categories = new TfLiteCategory[classifications.classes_size()];
     c_classifications->size = classifications.classes_size();
 
     for (int rank = 0; rank < classifications.classes_size(); ++rank) {
@@ -153,8 +153,7 @@ TfLiteClassificationResult* GetClassificationResultCStruct(
     c_classifications[head].categories = c_categories;
   }
 
-  TfLiteClassificationResult* c_classification_result =
-      new TfLiteClassificationResult;
+  auto c_classification_result = new TfLiteClassificationResult;
   c_classification_result->classifications = c_classifications;
   c_classification_result->size =
       classification_result_cpp.classifications_size();
@@ -164,7 +163,8 @@ TfLiteClassificationResult* GetClassificationResultCStruct(
 
 TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
     const TfLiteImageClassifier* classifier,
-    const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi) {
+    const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi,
+    TfLiteError** error) {
   if (classifier == nullptr || frame_buffer == nullptr) {
     return nullptr;
   }
@@ -189,16 +189,20 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
       classifier->impl->Classify(*std::move(cpp_frame_buffer_status.value()),
                                  cc_roi);
 
-  if (!classification_result_cpp.ok()) return nullptr;
+  if (!classification_result_cpp.ok()) {
+    ::tflite::task::CreateTfLiteErrorWithStatus(
+        classification_result_cpp.status(), error);
+    return nullptr;
+  }
 
   return GetClassificationResultCStruct(classification_result_cpp.value());
 }
 
 TfLiteClassificationResult* TfLiteImageClassifierClassify(
     const TfLiteImageClassifier* classifier,
-    const TfLiteFrameBuffer* frame_buffer) {
-  return TfLiteImageClassifierClassifyWithRoi(classifier, frame_buffer,
-                                              nullptr);
+    const TfLiteFrameBuffer* frame_buffer, TfLiteError** error) {
+  return TfLiteImageClassifierClassifyWithRoi(classifier, frame_buffer, nullptr,
+                                              error);
 }
 
 void TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier) {
