@@ -120,7 +120,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         array of N floating point values between 0 and 1 representing
         probability that a class was detected. Use ClassificationTensorMd to
         calibrate score.
-      output_number_md: output number of dections tensor information. This
+      output_number_md: output number of detections tensor information. This
         tensor is an integer value of N.
 
     Returns:
