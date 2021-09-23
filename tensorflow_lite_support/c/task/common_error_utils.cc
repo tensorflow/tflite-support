@@ -68,6 +68,7 @@ void CreateTfLiteErrorWithStatus(const absl::Status& status,
   // from the value 1(kError) and hence will be correctly initialized if
   // directly cast from the integer code derived from TfLiteSupportStatus stored
   // in payload. TfLiteErrorCode omits kOk = 0 of TfLiteSupportStatus.
+  //
   // TODO(prianka): Investigate if switching between error code cast to
   // TfLiteSupportStatus and assigning appropriate value to TfLiteErrorCode is
   // necessary (If 'TfLiteSupportStatus' or other edge cases).
