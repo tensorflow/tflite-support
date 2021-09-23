@@ -1,0 +1,86 @@
+/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
+
+#include "tensorflow_lite_support/c/task/common_error_utils.h"
+
+#include <string>
+
+#include "external/com_google_absl/absl/strings/cord.h"
+#include "tensorflow_lite_support/cc/common.h"
+#define GTEST_COUT std::cerr << "[          ] [ INFO ]"
+
+namespace tflite {
+namespace task {
+
+namespace {
+using ::tflite::support::kTfLiteSupportPayload;
+}  // namespace
+
+void CreateTfLiteErrorWithStatus(const absl::Status& status,
+                                 TfLiteError** error) {
+  if (status.ok() or error == nullptr) return;
+
+  // Payload of absl::Status created by the tflite task library stores an
+  // appropriate value of the enum TfLiteSupportStatus. The integer value
+  // corresponding to the TfLiteSupportStatus enum stored in the payload is
+  // extracted here to later map to the appropriate error code to be returned.
+  // In cases where the enum is not stored in (payload is NULL or the payload
+  // string cannot be converted to an integer), we set the error code value to
+  // be 1 (kError of TfLiteErrorCode used in the C library to signify any errors
+  // not falling into other categories.) Since payload is of type absl::Cord
+  // that can be type cast into an absl::optional<std::string>, we use the
+  // std::stoi function to convert it into an integer code if possible.
+  int generic_error_code = static_cast<int>(kError);
+  int error_code;
+  try {
+    // Try converting payload to integer if not payload is not empty. Otherwise
+    // convert a string signifying generic error code kError to integer.
+    error_code = std::stoi(static_cast<absl::optional<std::string>>(
+                               status.GetPayload(kTfLiteSupportPayload))
+                               .value_or(std::to_string(generic_error_code)));
+  } catch (std::invalid_argument& e) {
+    // If non empty payload string cannot be converted to an integer. Set error
+    // code to 1(kError).
+    error_code = generic_error_code;
+  }
+
+  // If generated error code is outside the range of enum values possible, set
+  // the error code to 1(kError). Assumes that enums will have an underlying
+  // integer value and kErrorCodeLast and kErrorCodeFirst will always hold the
+  // bounds of this range.
+  if (error_code > static_cast<int>(kErrorCodeLast) ||
+      error_code < static_cast<int>(kErrorCodeFirst))
+    error_code = generic_error_code;
+
+  *error = new TfLiteError;
+  // TfLiteErrorCode has a one to one mapping with TfLiteSupportStatus starting
+  // from the value 1(kError) and hence will be correctly initialized if
+  // directly cast from the integer code derived from TfLiteSupportStatus stored
+  // in payload. TfLiteErrorCode omits kOk = 0 of TfLiteSupportStatus.
+  // TODO(prianka): Investigate if switching between error code cast to
+  // TfLiteSupportStatus and assigning appropriate value to TfLiteErrorCode is
+  // necessary (If 'TfLiteSupportStatus' or other edge cases).
+  (*error)->code = static_cast<TfLiteErrorCode>(error_code);
+  // Stores a string including absl status code and message(if non empty) as the
+  // error message See
+  // https://github.com/abseil/abseil-cpp/blob/master/absl/status/status.h#L514
+  // for explanation. absl::Status::message() can also be used but not always
+  // guaranteed to be non empty.
+  (*error)->message = strdup(
+      status.ToString(absl::StatusToStringMode::kWithNoExtraData).c_str());
+}
+
+}  // namespace task
+}  // namespace tflite
