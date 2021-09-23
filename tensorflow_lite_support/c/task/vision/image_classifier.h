@@ -35,11 +35,19 @@ limitations under the License.
 /// Usage with Model File Path:
 /// <pre><code>
 /// // Create the model
-/// Zero initialize options to avoid undefined behaviour due to garbage values
-/// for members
-/// TfLiteImageClassifierOptions options = {0};
+/// Using the options initialized with default values returned by
+/// TfLiteImageClassifierOptionsCreate() makes sure that there will be no
+/// undefined behaviour due to garbage values in unitialized members.
+/// TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
+///
+/// Set the model file path in options
 ///   options.base_options.model_file.file_path = "/path/to/model.tflite";
-///   TfLiteImageClassifier* image_classifier =
+///
+/// If need be, set values for any options to customize behaviour.
+/// options.base_options.compute_settings.cpu_settings.num_threads = 3
+///
+/// Create TfLiteImageClassifier using the options.
+/// TfLiteImageClassifier* image_classifier =
 ///       TfLiteImageClassifierFromOptions(&options);
 ///
 /// Classify an image
@@ -62,26 +70,37 @@ typedef struct TfLiteImageClassifierOptions {
   TfLiteBaseOptions base_options;
 } TfLiteImageClassifierOptions;
 
+// Creates and returns TfLiteImageClassifierOptions initialized with default
+// values. Default values are as follows:
+// 1. .classification_options.max_results = -1, which returns all classification
+// categories by default.
+// 2. .base_options.compute_settings.tflite_settings.cpu_settings.num_threads =
+// -1, which makes the TFLite runtime choose the value.
+// 3. .classification_options.score_threshold = 0
+// 4. All pointers like .base_options.model_file.file_path,
+// .base_options.classification_options.display_names_local,
+// .classification_options.label_allowlist.list,
+// options.classification_options.label_denylist.list are NULL.
+// 5. All other integer values are initialized to 0.
+TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate();
+
 // Creates TfLiteImageClassifier from options.
-// base_options.model_file.file_path in TfLiteImageClassifierOptions should be
+// .base_options.model_file.file_path in TfLiteImageClassifierOptions should be
 // set to the path of the tflite model you wish to create the
 // TfLiteImageClassifier with.
 // Returns nullptr under the following circumstances:
 // 1. file doesn't exist or is not a well formatted.
 // 2. options is nullptr.
-// 3. Both options.classification_options.class_name_blacklist and
-// options.classification_options.class_name_blacklist are non empty. These
+// 3. Both options.classification_options.label_denylist and
+// options.classification_options.label_allowlist are non empty. These
 // fields are mutually exclusive.
 //
-// If
-// options->base_options.compute_settings.tflite_settings.cpu_settings.num_threads
-// <= 0, it will be set to a default of -1 which indicates the TFLite runtime to
-// choose the value.
-//
-// TfLiteImageClassifierOptions must be zero initialized to avoid seg faults.
-//
-// TODO(prianka): create default TfLiteImageClassifierOptions with default
-// values.
+// Create TfLiteImageClassifierOptions using
+// TfLiteImageClassifierOptionsCreate(). If need be, you can change the default
+// values of options for customizing classification, If options are not created
+// in the aforementioned way, you have to make sure that all members are
+// initialized to respective default values and all pointer members are zero
+// initialized to avoid any undefined behaviour.
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     const TfLiteImageClassifierOptions* options);
 

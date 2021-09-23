@@ -101,9 +101,9 @@ absl::Status AudioClassifier::Init(
   options_ = std::move(options);
 
   // Create preprocessor, assuming having only 1 input tensor.
-  ASSIGN_OR_RETURN(
-      preprocessor_,
-      ::tflite::task::processor::AudioPreprocessor::Create(engine_.get(), {0}));
+  ASSIGN_OR_RETURN(preprocessor_,
+                   ::tflite::task::processor::AudioPreprocessor::Create(
+                       GetTfLiteEngine(), {0}));
 
   RETURN_IF_ERROR(CheckAndSetOutputs());
 
@@ -113,11 +113,11 @@ absl::Status AudioClassifier::Init(
 // TODO(b/182537114): Extract into a common library to share between audio and
 // vision tasks.
 absl::Status AudioClassifier::CheckAndSetOutputs() {
-  num_outputs_ = TfLiteEngine::OutputCount(engine_->interpreter());
+  num_outputs_ = TfLiteEngine::OutputCount(GetTfLiteEngine()->interpreter());
 
   // Perform sanity checks and extract metadata.
   const ModelMetadataExtractor* metadata_extractor =
-      engine_->metadata_extractor();
+      GetTfLiteEngine()->metadata_extractor();
 
   const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
       output_tensor_metadata = metadata_extractor->GetOutputTensorMetadata();
@@ -172,7 +172,7 @@ absl::Status AudioClassifier::CheckAndSetOutputs() {
   int num_quantized_outputs = 0;
   for (int i = 0; i < num_outputs_; ++i) {
     const TfLiteTensor* output_tensor =
-        TfLiteEngine::GetOutput(engine_->interpreter(), i);
+        TfLiteEngine::GetOutput(GetTfLiteEngine()->interpreter(), i);
     const int num_dimensions = output_tensor->dims->size;
     if (num_dimensions != 2) {
       return CreateStatusWithPayload(

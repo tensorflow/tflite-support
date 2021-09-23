@@ -22,12 +22,12 @@ from tensorflow_lite_support.metadata.python.metadata_writers import metadata_wr
 from tensorflow_lite_support.metadata.python.metadata_writers import writer_utils
 
 _MODEL_NAME = "ImageClassifier"
-_MODEL_DESCRIPTION = ("Identify the most prominent object in the image from a "
-                      "known set of categories.")
-_INPUT_NAME = "image"
-_INPUT_DESCRIPTION = "Input image to be classified."
-_OUTPUT_NAME = "probability"
-_OUTPUT_DESCRIPTION = "Probabilities of the labels respectively."
+MODEL_DESCRIPTION = ("Identify the most prominent object in the image from a "
+                     "known set of categories.")
+INPUT_NAME = "image"
+INPUT_DESCRIPTION = "Input image to be classified."
+OUTPUT_NAME = "probability"
+OUTPUT_DESCRIPTION = "Probabilities of the labels respectively."
 
 
 class MetadataWriter(metadata_writer.MetadataWriter):
@@ -57,17 +57,17 @@ class MetadataWriter(metadata_writer.MetadataWriter):
 
     if general_md is None:
       general_md = metadata_info.GeneralMd(
-          name=_MODEL_NAME, description=_MODEL_DESCRIPTION)
+          name=_MODEL_NAME, description=MODEL_DESCRIPTION)
 
     if input_md is None:
       input_md = metadata_info.InputImageTensorMd(
-          name=_INPUT_NAME,
-          description=_INPUT_DESCRIPTION,
+          name=INPUT_NAME,
+          description=INPUT_DESCRIPTION,
           color_space_type=_metadata_fb.ColorSpaceType.RGB)
 
     if output_md is None:
       output_md = metadata_info.ClassificationTensorMd(
-          name=_OUTPUT_NAME, description=_OUTPUT_DESCRIPTION)
+          name=OUTPUT_NAME, description=OUTPUT_DESCRIPTION)
 
     if output_md.associated_files is None:
       output_md.associated_files = []
@@ -117,16 +117,16 @@ class MetadataWriter(metadata_writer.MetadataWriter):
       A MetadataWriter object.
     """
     input_md = metadata_info.InputImageTensorMd(
-        name=_INPUT_NAME,
-        description=_INPUT_DESCRIPTION,
+        name=INPUT_NAME,
+        description=INPUT_DESCRIPTION,
         norm_mean=input_norm_mean,
         norm_std=input_norm_std,
         color_space_type=_metadata_fb.ColorSpaceType.RGB,
         tensor_type=writer_utils.get_input_tensor_types(model_buffer)[0])
 
     output_md = metadata_info.ClassificationTensorMd(
-        name=_OUTPUT_NAME,
-        description=_OUTPUT_DESCRIPTION,
+        name=OUTPUT_NAME,
+        description=OUTPUT_DESCRIPTION,
         label_files=[
             metadata_info.LabelFileMd(file_path=file_path)
             for file_path in label_file_paths

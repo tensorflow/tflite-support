@@ -163,14 +163,14 @@ absl::Status ImageEmbedder::Init(
 
 absl::Status ImageEmbedder::CheckAndSetOutputs() {
   // First, sanity checks on the model itself.
-  num_output_layers_ = engine_->interpreter()->outputs().size();
+  num_output_layers_ = GetTfLiteEngine()->interpreter()->outputs().size();
   embedding_dimensions_.resize(num_output_layers_);
 
   int num_quantized_outputs = 0;
   for (int i = 0; i < num_output_layers_; ++i) {
-    int output_tensor_index = engine_->interpreter()->outputs()[i];
+    int output_tensor_index = GetTfLiteEngine()->interpreter()->outputs()[i];
     const TfLiteTensor* output_tensor =
-        engine_->interpreter()->tensor(output_tensor_index);
+        GetTfLiteEngine()->interpreter()->tensor(output_tensor_index);
     int num_dimensions = output_tensor->dims->size;
     if (num_dimensions == 4) {
       if (output_tensor->dims->data[1] != 1 ||
@@ -254,11 +254,12 @@ tflite::support::StatusOr<EmbeddingResult> ImageEmbedder::Postprocess(
     FeatureVector* feature_vector = embedding->mutable_feature_vector();
     if (has_uint8_outputs_) {
       const uint8* output_data =
-          engine_->interpreter()->typed_output_tensor<uint8>(i);
+          GetTfLiteEngine()->interpreter()->typed_output_tensor<uint8>(i);
       // Get the zero_point and scale parameters from the tensor metadata.
-      const int output_tensor_index = engine_->interpreter()->outputs()[i];
+      const int output_tensor_index =
+          GetTfLiteEngine()->interpreter()->outputs()[i];
       const TfLiteTensor* output_tensor =
-          engine_->interpreter()->tensor(output_tensor_index);
+          GetTfLiteEngine()->interpreter()->tensor(output_tensor_index);
       for (int j = 0; j < embedding_dimensions_[i]; ++j) {
         feature_vector->add_value_float(output_tensor->params.scale *
                                         (static_cast<int>(output_data[j]) -
@@ -266,7 +267,7 @@ tflite::support::StatusOr<EmbeddingResult> ImageEmbedder::Postprocess(
       }
     } else {
       const float* output_data =
-          engine_->interpreter()->typed_output_tensor<float>(i);
+          GetTfLiteEngine()->interpreter()->typed_output_tensor<float>(i);
       for (int j = 0; j < embedding_dimensions_[i]; ++j) {
         feature_vector->add_value_float(output_data[j]);
       }

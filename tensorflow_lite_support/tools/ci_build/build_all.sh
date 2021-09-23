@@ -19,38 +19,50 @@ set -ex
 
 bash tensorflow_lite_support/custom_ops/tf_configure.sh
 
+# TODO(b/200756963): Make it possible to build flatbuffer schema libraries with
+# more jobs.
 bazel build -c opt --config=monolithic \
-    //tensorflow_lite_support/java:tensorflowlite_support \
-    //tensorflow_lite_support/codegen/python:codegen \
     //tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata_lib \
-    //tensorflow_lite_support/metadata/cc:metadata_extractor \
+    //tensorflow_lite_support/metadata/cc:metadata_extractor
+
+export BAZEL_PARALLEL="-j 32"
+
+# General targets.
+bazel build -c opt ${BAZEL_PARALLEL} --config=monolithic \
+    //tensorflow_lite_support/codegen/python:codegen \
     //tensorflow_lite_support/custom_ops/kernel:all \
     //tensorflow_lite_support/custom_ops/python:tflite_text_api \
-    //tensorflow_lite_support/cc/task/audio:audio_classifier \
-    //tensorflow_lite_support/cc/task/vision:image_embedder
+    //tensorflow_lite_support/examples/task/audio/desktop:audio_classifier_demo
 
-# Build ODML.
-bazel build -c opt --config=monolithic --config=android_arm64 \
-    //tensorflow_lite_support/odml/java/image
-
-# Build Task libraries.
-bazel build -c opt --config=monolithic \
+# Android targets.
+bazel build -c opt ${BAZEL_PARALLEL} --config=monolithic \
     --config=android_arm64 --fat_apk_cpu=x86,x86_64,arm64-v8a,armeabi-v7a \
+    //tensorflow_lite_support/java:tensorflowlite_support \
+    //tensorflow_lite_support/cc/task/vision:image_embedder \
+    //tensorflow_lite_support/odml/java/image \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base-task-api.aar \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text:task-library-text \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision:task-library-vision \
-    //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/audio:task-library-audio
-
-# Build A@S delegate plugin libraries.
-bazel build -c opt \
-    --config=android_arm64 --fat_apk_cpu=x86,x86_64,arm64-v8a,armeabi-v7a \
+    //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/audio:task-library-audio \
     //tensorflow_lite_support/acceleration/configuration:gpu-delegate-plugin
 
-# Build desktop demos.
-bazel build -c opt --config=monolithic \
-    //tensorflow_lite_support/examples/task/audio/desktop:audio_classifier_demo
-
-bazel clean --expunge
-# Build Coral plugin.
-bazel build --sandbox_debug --subcommands --define=darwinn_portable=1 \
+bazel clean
+# Coral plugin.
+bazel build -c opt ${BAZEL_PARALLEL} --define=darwinn_portable=1 \
     //tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin
+
+# Tests.
+
+bazel clean
+
+bazel test $BAZEL_PARALLEL --test_output=all \
+    //tensorflow_lite_support/cc/test/task/vision:all \
+    //tensorflow_lite_support/custom_ops/kernel/sentencepiece:all \
+    //tensorflow_lite_support/metadata/python/tests:metadata_test \
+    //tensorflow_lite_support/metadata/python/tests/metadata_writers:all \
+
+bazel test $BAZEL_PARALLEL --test_output=all --build_tests_only \
+    --build_tag_filters=-tflite_emulator_test_android \
+    --test_tag_filters=-tflite_emulator_test_android \
+    //tensorflow_lite_support/java/src/javatests/org/tensorflow/lite/support/...
+
