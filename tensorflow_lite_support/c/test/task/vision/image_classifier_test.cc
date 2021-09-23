@@ -35,7 +35,8 @@ using ::tflite::support::StatusOr;
 using ::tflite::task::JoinPath;
 
 constexpr char kTestDataDirectory[] =
-    "tensorflow_lite_support/cc/test/testdata/task/vision/";
+    "/tensorflow_lite_support/cc/test/testdata/task/"
+    "vision/";
 // Quantized model.
 constexpr char kMobileNetQuantizedWithMetadata[] =
     "mobilenet_v1_0.25_224_quant.tflite";

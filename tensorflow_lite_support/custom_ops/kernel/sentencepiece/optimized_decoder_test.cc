@@ -24,6 +24,7 @@ limitations under the License.
 #include "external/com_google_sentencepiece/src/sentencepiece.pb.h"
 #include "external/com_google_sentencepiece/src/sentencepiece_processor.h"
 #include "tensorflow/core/platform/env.h"
+#include "tensorflow_lite_support/cc/test/test_utils.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"
 
 namespace tflite {
@@ -35,9 +36,8 @@ namespace internal {
 
 tensorflow::Status TFReadFileToString(const std::string& filepath,
                                       std::string* data) {
-  return tensorflow::ReadFileToString(
-      tensorflow::Env::Default(), /*test_path*/ filepath,
-      data);
+  return tensorflow::ReadFileToString(tensorflow::Env::Default(), filepath,
+                                      data);
 }
 
 absl::Status StdReadFileToString(const std::string& filepath,
@@ -57,14 +57,17 @@ absl::Status StdReadFileToString(const std::string& filepath,
 }  // namespace internal
 
 namespace {
+using ::tflite::task::JoinPath;
+
 static char kConfigFilePath[] =
-    "tensorflow_lite_support/custom_ops/kernel/"
+    "/tensorflow_lite_support/custom_ops/kernel/"
     "sentencepiece/testdata/sentencepiece.model";
 
 TEST(OptimizedEncoder, ConfigConverter) {
   std::string config;
-  auto status = internal::StdReadFileToString(kConfigFilePath, &config);
 
+  auto status = internal::StdReadFileToString(
+      JoinPath("./" /*test src dir*/, kConfigFilePath), &config);
   ASSERT_TRUE(status.ok());
 
   ::sentencepiece::SentencePieceProcessor processor;
