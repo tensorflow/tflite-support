@@ -19,7 +19,6 @@ limitations under the License.
 
 #include "external/com_google_absl/absl/strings/cord.h"
 #include "tensorflow_lite_support/cc/common.h"
-#define GTEST_COUT std::cerr << "[          ] [ INFO ]"
 
 namespace tflite {
 namespace task {
