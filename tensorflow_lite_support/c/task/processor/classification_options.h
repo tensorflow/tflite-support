@@ -34,17 +34,16 @@ typedef struct TfLiteStringArrayOption {
 } TfLiteStringArrayOption;
 
 // Holds settings for any single classification task.
-// TODO(prianka): change `white/blacklist` to `allow/denylist`
 typedef struct TfLiteClassificationOptions {
-  // Optional blacklist of class names. If non NULL, classifications whose
-  // class name is in this set will be filtered out. Duplicate or unknown
-  // class names are ignored. Mutually exclusive with class_name_whitelist.
-  TfLiteStringArrayOption class_name_blacklist;
+  // Optional denylist of class labels. If non NULL, classifications whose
+  // class label is in this set will be filtered out. Duplicate or unknown
+  // class labels are ignored. Mutually exclusive with label_allowlist.
+  TfLiteStringArrayOption label_denylist;
 
-  // Optional whitelist of class names. If non-empty, classifications whose
-  // class name is not in this set will be filtered out. Duplicate or unknown
-  // class names are ignored. Mutually exclusive with class_name_blacklist.
-  TfLiteStringArrayOption class_name_whitelist;
+  // Optional allowlist of class labels. If non-empty, classifications whose
+  // class label is not in this set will be filtered out. Duplicate or unknown
+  // class labels are ignored. Mutually exclusive with label_denylist.
+  TfLiteStringArrayOption label_allowlist;
 
   const char* display_names_local;
   int max_results;

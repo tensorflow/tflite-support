@@ -220,7 +220,8 @@ absl::Status ImageSegmenter::PreInit() {
 
 absl::Status ImageSegmenter::CheckAndSetOutputs() {
   // First, sanity checks on the model itself.
-  const TfLiteEngine::Interpreter* interpreter = engine_->interpreter();
+  const TfLiteEngine::Interpreter* interpreter =
+      GetTfLiteEngine()->interpreter();
 
   // Check the number of output tensors.
   if (TfLiteEngine::OutputCount(interpreter) != 1) {
@@ -274,7 +275,7 @@ absl::Status ImageSegmenter::CheckAndSetOutputs() {
 
   // Build label map from metadata, if available.
   const ModelMetadataExtractor* metadata_extractor =
-      engine_->metadata_extractor();
+      GetTfLiteEngine()->metadata_extractor();
   const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
       output_tensor_metadata = metadata_extractor->GetOutputTensorMetadata();
   if (output_tensor_metadata != nullptr) {
