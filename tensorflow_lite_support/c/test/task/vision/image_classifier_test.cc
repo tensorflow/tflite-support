@@ -50,14 +50,14 @@ class ImageClassifierFromOptionsTest : public tflite_shims::testing::Test {};
 TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
 
-  TfLiteError *error = nullptr;
+  TfLiteSupportError *error = nullptr;
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options, &error);
   EXPECT_EQ(image_classifier, nullptr);
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  TfLiteErrorDelete(error);
+  TfLiteSupportErrorDelete(error);
 }
 
 TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPathAndNullError) {
@@ -88,14 +88,14 @@ TEST_F(ImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
   options.base_options.model_file.file_path = model_path.data();
   options.base_options.compute_settings.cpu_settings.num_threads = 3;
 
-  TfLiteError *error = nullptr;
+  TfLiteSupportError *error = nullptr;
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options, &error);
 
   EXPECT_NE(image_classifier, nullptr);
   EXPECT_EQ(error, nullptr);
   TfLiteImageClassifierDelete(image_classifier);
-  if (error) TfLiteErrorDelete(error);
+  if (error) TfLiteSupportErrorDelete(error);
 }
 
 TEST_F(ImageClassifierFromOptionsTest,
@@ -115,7 +115,7 @@ TEST_F(ImageClassifierFromOptionsTest,
   options.classification_options.label_allowlist.list = label_allowlist;
   options.classification_options.label_allowlist.length = 1;
 
-  TfLiteError* error = nullptr;
+  TfLiteSupportError* error = nullptr;
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options, &error);
 
@@ -125,7 +125,7 @@ TEST_F(ImageClassifierFromOptionsTest,
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  TfLiteErrorDelete(error);
+  TfLiteSupportErrorDelete(error);
 }
 
 class ImageClassifierClassifyTest : public tflite_shims::testing::Test {
@@ -153,14 +153,14 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithImageData) {
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
-  TfLiteError* error = nullptr;
+  TfLiteSupportError* error = nullptr;
   TfLiteClassificationResult* classification_result =
       TfLiteImageClassifierClassify(image_classifier, &frame_buffer, &error);
 
   ImageDataFree(&image_data);
 
   EXPECT_EQ(error, nullptr);
-  if (error) TfLiteErrorDelete(error);
+  if (error) TfLiteSupportErrorDelete(error);
 
   ASSERT_NE(classification_result, nullptr);
   EXPECT_GE(classification_result->size, 1);
@@ -184,7 +184,7 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
 
   TfLiteBoundingBox bounding_box = {
       .origin_x = 0, .origin_y = 0, .width = 100, .height = 100};
-  TfLiteError* error = nullptr;
+  TfLiteSupportError* error = nullptr;
   TfLiteClassificationResult* classification_result =
       TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
                                            &bounding_box, &error);
@@ -192,7 +192,7 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
   ImageDataFree(&image_data);
 
   EXPECT_EQ(error, nullptr);
-  if (error) TfLiteErrorDelete(error);
+  if (error) TfLiteSupportErrorDelete(error);
 
   ASSERT_NE(classification_result, nullptr);
   EXPECT_GE(classification_result->size, 1);
@@ -215,7 +215,7 @@ TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
 
   TfLiteBoundingBox bounding_box = {
       .origin_x = 0, .origin_y = 0, .width = 250, .height = 250};
-  TfLiteError* error = nullptr;
+  TfLiteSupportError* error = nullptr;
   TfLiteClassificationResult* classification_result =
       TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
                                            &bounding_box, &error);
@@ -223,9 +223,9 @@ TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
   ImageDataFree(&image_data);
 
   EXPECT_NE(error, nullptr);
-  EXPECT_EQ(error->code, kError);
+  EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  TfLiteErrorDelete(error);
+  TfLiteSupportErrorDelete(error);
 
   EXPECT_EQ(classification_result, nullptr);
   if (classification_result)

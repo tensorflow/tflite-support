@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <stdint.h>
 
-#include "tensorflow_lite_support/c/task/common_error.h"
+#include "tensorflow_lite_support/c/common.h"
 #include "tensorflow_lite_support/c/task/core/base_options.h"
 #include "tensorflow_lite_support/c/task/processor/bounding_box.h"
 #include "tensorflow_lite_support/c/task/processor/classification_options.h"
@@ -103,12 +103,12 @@ TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate();
 // initialized to respective default values and all pointer members are zero
 // initialized to avoid any undefined behaviour.
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
-    const TfLiteImageClassifierOptions* options, TfLiteError** error);
+    const TfLiteImageClassifierOptions* options, TfLiteSupportError** error);
 
 // Invokes the encapsulated TFLite model and classifies the frame_buffer.
 TfLiteClassificationResult* TfLiteImageClassifierClassify(
     const TfLiteImageClassifier* classifier,
-    const TfLiteFrameBuffer* frame_buffer, TfLiteError** error);
+    const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error);
 
 // Invokes the encapsulated TFLite model and classifies the region of the
 // frame_buffer specified by the bounding box. Same as above, except that the
@@ -118,7 +118,7 @@ TfLiteClassificationResult* TfLiteImageClassifierClassify(
 TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
     const TfLiteImageClassifier* classifier,
     const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi,
-    TfLiteError** error);
+    TfLiteSupportError** error);
 
 // Disposes off the image classifier.
 void TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier);
