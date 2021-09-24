@@ -13,22 +13,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/c/task/common_error_utils.h"
+#include "tensorflow_lite_support/c/common_utils.h"
 
 #include <string>
 
+#include "external/com_google_absl/absl/status/status.h"
 #include "external/com_google_absl/absl/strings/cord.h"
 #include "tensorflow_lite_support/cc/common.h"
 
 namespace tflite {
-namespace task {
+namespace support {
 
-namespace {
-using ::tflite::support::kTfLiteSupportPayload;
-}  // namespace
-
-void CreateTfLiteErrorWithStatus(const absl::Status& status,
-                                 TfLiteError** error) {
+void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
+                                        TfLiteSupportError** error) {
   if (status.ok() or error == nullptr) return;
 
   // Payload of absl::Status created by the tflite task library stores an
@@ -44,7 +41,7 @@ void CreateTfLiteErrorWithStatus(const absl::Status& status,
   int generic_error_code = static_cast<int>(kError);
   int error_code;
   try {
-    // Try converting payload to integer if not payload is not empty. Otherwise
+    // Try converting payload to integer if payload is not empty. Otherwise
     // convert a string signifying generic error code kError to integer.
     error_code = std::stoi(static_cast<absl::optional<std::string>>(
                                status.GetPayload(kTfLiteSupportPayload))
@@ -55,15 +52,32 @@ void CreateTfLiteErrorWithStatus(const absl::Status& status,
     error_code = generic_error_code;
   }
 
-  // If generated error code is outside the range of enum values possible, set
-  // the error code to 1(kError). Assumes that enums will have an underlying
-  // integer value and kErrorCodeLast and kErrorCodeFirst will always hold the
-  // bounds of this range.
+  // If error_code is outside the range of enum values possible or is kError, we
+  // try to map the absl::Status::code() to assign appropriate
+  // TfLiteSupportErrorCode or kError in default cases. Note: The mapping to
+  // absl::Status::code() is done to generate a more specific error code than
+  // kError in cases when the payload can't be mapped to TfLiteSupportStatus.
+  // This can happen when absl::Status returned by TfLite are in turn returned
+  // without moodification by TfLite Support Methods.
   if (error_code > static_cast<int>(kErrorCodeLast) ||
-      error_code < static_cast<int>(kErrorCodeFirst))
-    error_code = generic_error_code;
+      error_code <= static_cast<int>(kErrorCodeFirst)) {
+    switch (status.code()) {
+      case absl::StatusCode::kInternal:
+        error_code = kInternal;
+        break;
+      case absl::StatusCode::kInvalidArgument:
+        error_code = kInvalidArgumentError;
+        break;
+      case absl::StatusCode::kNotFound:
+        error_code = kNotFound;
+        break;
+      default:
+        error_code = kError;
+        break;
+    }
+  }
 
-  *error = new TfLiteError;
+  *error = new TfLiteSupportError;
   // TfLiteErrorCode has a one to one mapping with TfLiteSupportStatus starting
   // from the value 1(kError) and hence will be correctly initialized if
   // directly cast from the integer code derived from TfLiteSupportStatus stored
@@ -72,7 +86,7 @@ void CreateTfLiteErrorWithStatus(const absl::Status& status,
   // TODO(prianka): Investigate if switching between error code cast to
   // TfLiteSupportStatus and assigning appropriate value to TfLiteErrorCode is
   // necessary (If 'TfLiteSupportStatus' or other edge cases).
-  (*error)->code = static_cast<TfLiteErrorCode>(error_code);
+  (*error)->code = static_cast<TfLiteSupportErrorCode>(error_code);
   // Stores a string including absl status code and message(if non empty) as the
   // error message See
   // https://github.com/abseil/abseil-cpp/blob/master/absl/status/status.h#L514
@@ -82,5 +96,5 @@ void CreateTfLiteErrorWithStatus(const absl::Status& status,
       status.ToString(absl::StatusToStringMode::kWithNoExtraData).c_str());
 }
 
-}  // namespace task
+}  // namespace support
 }  // namespace tflite

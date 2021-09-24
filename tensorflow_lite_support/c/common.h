@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_COMMON_ERROR_H_
-#define TENSORFLOW_LITE_SUPPORT_C_TASK_COMMON_ERROR_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_COMMON_H_
+#define TENSORFLOW_LITE_SUPPORT_C_COMMON_H_
 
 // Defines C struct and error codes for describing any error returned from the C
 // Task Library.
@@ -24,17 +24,23 @@ extern "C" {
 
 // Error codes for TensorFlow Lite Task Library C APIs.
 //
-// One to one mapping with `TfLiteSupportStatus` code starting from kError = 1.
-// Omits `kOk` since `TfLiteErrorCode` is only to be used in the event of an
-// error and does not account for success unlike `TfLiteSupportStatus`. In case
-// of success, TensorFlow Lite Task Library C APIs return the appropriate return
-// value and a null error. One to one mapping makes it easier to convert between
-// `TfLiteSupportStatus` and `TfLiteErrorCode` without long switch statements.
-// kErrorCodeFirst and kErrorCodeLast are also provided for safety checks during
-// conversion. In case of modifications in error codes, ensure that
-// kErrorCodeFirst is set to the least enum value and kErrorCodeLast is set to
-// the greatest enum value.
-enum TfLiteErrorCode {
+// Holds one to one mapping with `TfLiteSupportStatus` code starting from kError
+// = 1. Omits `kOk` since `TfLiteErrorCode` is only to be used in the event of
+// an error and does not account for success unlike `TfLiteSupportStatus`. In
+// case of success, TensorFlow Lite Task Library C APIs return the appropriate
+// return value and a null error. One to one mapping makes it easier to convert
+// between `TfLiteSupportStatus` and `TfLiteSupportErrorCode` without long
+// switch statements.
+//
+// Also holds error codes mapping to absl::Status::code() starting from
+// kNotFound = 900 in cases where the absl::Status payload can't
+// be mapped to a `TfLiteSupportStatus` code. kErrorCodeFirst and kErrorCodeLast
+// are also provided for safety checks during conversion between
+// `TfLiteSupportStatus` and `TfLiteSupportErrorCode`. In case of modifications
+// in error codes, ensure that kErrorCodeFirst and kErrorCodeLast is
+// respectively, set to the least and greatest enum value amongst the error
+// codes mapping to TfLiteSupportStatus.
+enum TfLiteSupportErrorCode {
   // Unspecified error.
   kError = 1,
   // Invalid argument specified.
@@ -144,28 +150,54 @@ enum TfLiteErrorCode {
   kImageProcessingBackendError,
 
   // Convenience error codes for condition checks during type casting.
+  //
+  // Codes mapping to absl status codes should not be considered for these
+  // ranges.
+  // They must be used exclsively for checking if error codes fall in valid
+  // ranges when converting between TfLiteSupportStatus and
+  // TfLiteSupportErrorCodee.
 
-  // Ensure it holds the least enum value.
+  // Ensure it holds the least enum value amongst error codes mapping to
+  // TfLiteSupportStatus.
   kErrorCodeFirst = kError,
-  // Ensure it holds the greatest enum value.
+  // Ensure it holds the greatest enum value amongst error codes mapping to
+  // TfLiteSupportStatus.
   kErrorCodeLast = kImageProcessingBackendError,
+
+  // Absl Status Codes Mapping
+  //
+  // Codes starting from 900 will be used to map absl::Status created by TfLite
+  // and are used as is by TfLite Support C++ layer. Such absl status objects
+  // don't have a TfLiteSupportStatus in the payload that can be mapped to other
+  // error codes in this struct. You must use the absl::Status::code() and map
+  // them to the following error codes in such cases.
+  // For more info on respective absl status codes, please see:
+  // https://github.com/abseil/abseil-cpp/blob/master/absl/status/status.h#L91
+
+  // kNotFound indicates some requested entity (such as a file or directory)
+  // was not found.
+  kNotFound = 900,
+  // kInternal indicates an internal error has occurred
+  // and some invariants expected by the underlying system have not been
+  // satisfied. This error code is reserved for serious errors.
+  kInternal,
 
 };
 
-// A `TfLiteError` encapsulates an error code and a descriptive message to
-// return in the event of an error being encountered in any TensorFlow Lite Task
-// Library C API.
-typedef struct TfLiteError {
+// A `TfLiteSupportError` encapsulates an error code and a descriptive message
+// to return in the event of an error being encountered in any TensorFlow Lite
+// Task Library C API.
+typedef struct TfLiteSupportError {
   // Holds the error code.
-  enum TfLiteErrorCode code;
+  enum TfLiteSupportErrorCode code;
   // Detailed description of the error.
   char *message;
-} TfLiteError;
+} TfLiteSupportError;
 
-void TfLiteErrorDelete(TfLiteError *error);
+void TfLiteErrorDelete(TfLiteSupportError *error);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
 
-#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_COMMON_ERROR_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_COMMON_H_

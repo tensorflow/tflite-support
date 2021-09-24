@@ -13,9 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/c/task/common_error.h"
+#include "tensorflow_lite_support/c/common.h"
 
-void TfLiteErrorDelete(TfLiteError *error) {
+void TfLiteErrorDelete(TfLiteSupportError *error) {
   delete error->message;
   delete error;
 }

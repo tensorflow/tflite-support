@@ -12,36 +12,39 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_COMMON_ERROR_UTILS_H_
-#define TENSORFLOW_LITE_SUPPORT_C_TASK_COMMON_ERROR_UTILS_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_C_COMMON_UTILS_H_
+#define TENSORFLOW_LITE_SUPPORT_C_COMMON_UTILS_H_
 
 #include "external/com_google_absl/absl/status/status.h"
-#include "tensorflow_lite_support/c/task/common_error.h"
+#include "tensorflow_lite_support/c/common.h"
 
 // Utils for Conversion of absl::Status to TfLiteError
 // -----------------------------------------------------------------
 // Meant to be used with task C apis.
 
 namespace tflite {
-namespace task {
+namespace support {
 
-// Creates a TfLiteError from absl::Status and passes it back as a parameter
-// which is a pointer to the error pointer. Example Usage With Image Classifier
+// Creates a TfLiteSupportError from absl::Status and passes it back as a
+// parameter which is a pointer to the error pointer.
+//
+// Example Usage With Image Classifier
+//
 // APIs: TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
 //     const TfLiteImageClassifierOptions* options,
-//     TfLiteError **error) {
+//     TfLiteSupportError **error) {
 // // Necessary checks
 // tflite::support::StatusOr<std::unique_ptr<ImageClassifier>> classifier_status
 // = // Call to create Cpp Image Classifier. if (classifier_status.ok()) {
 //   Code to return classifier
 // } else {
-//     ::tflite::task::vision::CreateTfLiteErrorWithStatus(classifier_status.status(),
+//     ::tflite::support::CreateTfLiteSupportErrorWithStatus(classifier_status.status(),
 //     error); return nullptr;
 //  }
 //}
-void CreateTfLiteErrorWithStatus(const absl::Status& status,
-                                 TfLiteError** error);
+void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
+                                        TfLiteSupportError** error);
 
-}  // namespace task
+}  // namespace support
 }  // namespace tflite
-#endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_COMMON_ERROR_UTILS_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_C_COMMON_UTILS_H_
