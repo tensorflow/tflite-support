@@ -63,13 +63,13 @@ void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
       error_code <= static_cast<int>(kErrorCodeFirst)) {
     switch (status.code()) {
       case absl::StatusCode::kInternal:
-        error_code = kInternal;
+        error_code = kInternalError;
         break;
       case absl::StatusCode::kInvalidArgument:
         error_code = kInvalidArgumentError;
         break;
       case absl::StatusCode::kNotFound:
-        error_code = kNotFound;
+        error_code = kNotFoundError;
         break;
       default:
         error_code = kError;
