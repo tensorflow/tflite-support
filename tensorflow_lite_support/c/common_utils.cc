@@ -17,6 +17,7 @@ limitations under the License.
 
 #include <string>
 
+#include "external/com_google_absl/absl/status/status.h"
 #include "external/com_google_absl/absl/strings/cord.h"
 #include "tensorflow_lite_support/cc/common.h"
 
@@ -40,7 +41,7 @@ void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
   int generic_error_code = static_cast<int>(kError);
   int error_code;
   try {
-    // Try converting payload to integer if not payload is not empty. Otherwise
+    // Try converting payload to integer if payload is not empty. Otherwise
     // convert a string signifying generic error code kError to integer.
     error_code = std::stoi(static_cast<absl::optional<std::string>>(
                                status.GetPayload(kTfLiteSupportPayload))
@@ -51,13 +52,30 @@ void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
     error_code = generic_error_code;
   }
 
-  // If generated error code is outside the range of enum values possible, set
-  // the error code to 1(kError). Assumes that enums will have an underlying
-  // integer value and kErrorCodeLast and kErrorCodeFirst will always hold the
-  // bounds of this range.
+  // If error_code is outside the range of enum values possible or is kError, we
+  // try to map the absl::Status::code() to assign appropriate
+  // TfLiteSupportErrorCode or kError in default cases. Note: The mapping to
+  // absl::Status::code() is done to generate a more specific error code than
+  // kError in cases when the payload can't be mapped to TfLiteSupportStatus.
+  // This can happen when absl::Status returned by TfLite are in turn returned
+  // without moodification by TfLite Support Methods.
   if (error_code > static_cast<int>(kErrorCodeLast) ||
-      error_code < static_cast<int>(kErrorCodeFirst))
-    error_code = generic_error_code;
+      error_code <= static_cast<int>(kErrorCodeFirst)) {
+    switch (status.code()) {
+      case absl::StatusCode::kInternal:
+        error_code = kInternal;
+        break;
+      case absl::StatusCode::kInvalidArgument:
+        error_code = kInvalidArgumentError;
+        break;
+      case absl::StatusCode::kNotFound:
+        error_code = kNotFound;
+        break;
+      default:
+        error_code = kError;
+        break;
+    }
+  }
 
   *error = new TfLiteSupportError;
   // TfLiteErrorCode has a one to one mapping with TfLiteSupportStatus starting
