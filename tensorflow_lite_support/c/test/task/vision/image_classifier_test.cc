@@ -129,6 +129,7 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithImageData) {
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
@@ -152,6 +153,7 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
@@ -178,6 +180,7 @@ TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
@@ -217,6 +220,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
@@ -262,6 +266,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
