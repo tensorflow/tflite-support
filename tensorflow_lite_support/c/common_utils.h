@@ -26,7 +26,10 @@ namespace tflite {
 namespace support {
 
 // Creates a TfLiteSupportError from absl::Status and passes it back as a parameter
-// which is a pointer to the error pointer. Example Usage With Image Classifier
+// which is a pointer to the error pointer. 
+//
+// Example Usage With Image Classifier
+//
 // APIs: TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
 //     const TfLiteImageClassifierOptions* options,
 //     TfLiteSupportError **error) {
