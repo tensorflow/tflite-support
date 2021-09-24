@@ -113,7 +113,7 @@ TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     return new TfLiteImageClassifier{.impl =
                                          std::move(classifier_status.value())};
   } else {
-    ::tflite::task::CreateTfLiteSupportErrorWithStatus(classifier_status.status(),
+    ::tflite::support::CreateTfLiteSupportErrorWithStatus(classifier_status.status(),
                                                 error);
     return nullptr;
   }
@@ -190,7 +190,7 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
                                  cc_roi);
 
   if (!classification_result_cpp.ok()) {
-    ::tflite::task::CreateTfLiteSupportErrorWithStatus(
+    ::tflite::support::CreateTfLiteSupportErrorWithStatus(
         classification_result_cpp.status(), error);
     return nullptr;
   }
