@@ -176,11 +176,11 @@ enum TfLiteSupportErrorCode {
 
   // kNotFound indicates some requested entity (such as a file or directory)
   // was not found.
-  kNotFound = 900,
+  kNotFoundError = 900,
   // kInternal indicates an internal error has occurred
   // and some invariants expected by the underlying system have not been
   // satisfied. This error code is reserved for serious errors.
-  kInternal,
+  kInternalError,
 
 };
 
