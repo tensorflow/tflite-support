@@ -25,8 +25,8 @@ limitations under the License.
 namespace tflite {
 namespace support {
 
-// Creates a TfLiteSupportError from absl::Status and passes it back as a parameter
-// which is a pointer to the error pointer. 
+// Creates a TfLiteSupportError from absl::Status and passes it back as a
+// parameter which is a pointer to the error pointer.
 //
 // Example Usage With Image Classifier
 //
@@ -43,7 +43,7 @@ namespace support {
 //  }
 //}
 void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
-                                 TfLiteSupportError** error);
+                                        TfLiteSupportError** error);
 
 }  // namespace support
 }  // namespace tflite

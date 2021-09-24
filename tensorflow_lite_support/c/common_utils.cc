@@ -24,7 +24,7 @@ namespace tflite {
 namespace support {
 
 void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
-                                 TfLiteSupportError** error) {
+                                        TfLiteSupportError** error) {
   if (status.ok() or error == nullptr) return;
 
   // Payload of absl::Status created by the tflite task library stores an
