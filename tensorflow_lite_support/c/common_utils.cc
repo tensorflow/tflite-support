@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/c/task/common_error_utils.h"
+#include "tensorflow_lite_support/c/common_utils.h"
 
 #include <string>
 
@@ -21,14 +21,10 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/common.h"
 
 namespace tflite {
-namespace task {
+namespace support {
 
-namespace {
-using ::tflite::support::kTfLiteSupportPayload;
-}  // namespace
-
-void CreateTfLiteErrorWithStatus(const absl::Status& status,
-                                 TfLiteError** error) {
+void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
+                                 TfLiteSupportError** error) {
   if (status.ok() or error == nullptr) return;
 
   // Payload of absl::Status created by the tflite task library stores an
@@ -63,7 +59,7 @@ void CreateTfLiteErrorWithStatus(const absl::Status& status,
       error_code < static_cast<int>(kErrorCodeFirst))
     error_code = generic_error_code;
 
-  *error = new TfLiteError;
+  *error = new TfLiteSupportError;
   // TfLiteErrorCode has a one to one mapping with TfLiteSupportStatus starting
   // from the value 1(kError) and hence will be correctly initialized if
   // directly cast from the integer code derived from TfLiteSupportStatus stored
@@ -72,7 +68,7 @@ void CreateTfLiteErrorWithStatus(const absl::Status& status,
   // TODO(prianka): Investigate if switching between error code cast to
   // TfLiteSupportStatus and assigning appropriate value to TfLiteErrorCode is
   // necessary (If 'TfLiteSupportStatus' or other edge cases).
-  (*error)->code = static_cast<TfLiteErrorCode>(error_code);
+  (*error)->code = static_cast<TfLiteSupportErrorCode>(error_code);
   // Stores a string including absl status code and message(if non empty) as the
   // error message See
   // https://github.com/abseil/abseil-cpp/blob/master/absl/status/status.h#L514
@@ -82,5 +78,5 @@ void CreateTfLiteErrorWithStatus(const absl::Status& status,
       status.ToString(absl::StatusToStringMode::kWithNoExtraData).c_str());
 }
 
-}  // namespace task
+}  // namespace support
 }  // namespace tflite

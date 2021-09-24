@@ -4,17 +4,17 @@ package(
 )
 
 cc_library(
-    name = "common_error",
-    srcs = ["common_error.cc"],
-    hdrs = ["common_error.h"],
+    name = "common",
+    srcs = ["common.cc"],
+    hdrs = ["common.h"],
 )
 
 cc_library(
-    name = "common_error_utils",
-    srcs = ["common_error_utils.cc"],
-    hdrs = ["common_error_utils.h"],
+    name = "common_utils",
+    srcs = ["common_utils.cc"],
+    hdrs = ["common_utils.h"],
     deps = [
-        ":common_error",
+        ":common",
         "//tensorflow_lite_support/cc:common",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
