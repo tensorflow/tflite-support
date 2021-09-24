@@ -194,7 +194,7 @@ typedef struct TfLiteSupportError {
   char *message;
 } TfLiteSupportError;
 
-void TfLiteErrorDelete(TfLiteSupportError *error);
+void TfLiteSupportErrorDelete(TfLiteSupportError *error);
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/common.h"
 
-void TfLiteErrorDelete(TfLiteSupportError *error) {
+void TfLiteSupportErrorDelete(TfLiteSupportError *error) {
   delete error->message;
   delete error;
 }
