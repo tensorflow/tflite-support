@@ -56,6 +56,7 @@ bazel build -c opt ${BAZEL_PARALLEL} --define=darwinn_portable=1 \
 bazel clean
 
 bazel test $BAZEL_PARALLEL --test_output=all \
+    //tensorflow_lite_support/c/test/... \
     //tensorflow_lite_support/cc/test/task/vision:all \
     //tensorflow_lite_support/custom_ops/kernel/sentencepiece:all \
     //tensorflow_lite_support/metadata/python/tests:metadata_test \
