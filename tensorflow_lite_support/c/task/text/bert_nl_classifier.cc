@@ -19,13 +19,12 @@ limitations under the License.
 
 #include "external/com_google_absl/absl/strings/string_view.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/bert_nl_classifier.h"
+#include "tensorflow_lite_support/cc/task/text/bert_nl_classifier.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_nl_classifier_options_proto_inc.h"
 
 namespace {
 using CategoryCpp = ::tflite::task::core::Category;
-using BertNLClassifierCpp =
-    ::tflite::task::text::nlclassifier::BertNLClassifier;
+using BertNLClassifierCpp = ::tflite::task::text::BertNLClassifier;
 using BertNLClassifierOptionsCpp =
     ::tflite::task::text::BertNLClassifierOptions;
 

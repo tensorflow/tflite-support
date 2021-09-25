@@ -47,7 +47,7 @@ cc_binary(
         "@com_google_absl//absl/strings:str_format",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:category",
-        "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier",
+        "//tensorflow_lite_support/cc/task/text:bert_nl_classifier",
     ] + select({
         "//tensorflow_lite_support/examples/task:darwinn_portable": [
             "//tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin",

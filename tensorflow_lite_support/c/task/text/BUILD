@@ -44,7 +44,7 @@ cc_library_with_tflite(
         "nl_classifier_common.h",
     ],
     tflite_deps = [
-        "//tensorflow_lite_support/cc/task/text/nlclassifier:bert_nl_classifier",
+        "//tensorflow_lite_support/cc/task/text:bert_nl_classifier",
     ],
     deps = [
         ":nl_classifier_common",

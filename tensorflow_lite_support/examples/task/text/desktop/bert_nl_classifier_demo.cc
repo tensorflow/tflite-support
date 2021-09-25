@@ -21,7 +21,7 @@ limitations under the License.
 #include "external/com_google_absl/absl/strings/str_format.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/bert_nl_classifier.h"
+#include "tensorflow_lite_support/cc/task/text/bert_nl_classifier.h"
 
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' bert classification model.");
@@ -33,7 +33,6 @@ ABSL_FLAG(bool, use_coral, false,
 namespace tflite {
 namespace task {
 namespace text {
-namespace nlclassifier {
 
 namespace {
 using std::chrono::microseconds;
@@ -75,7 +74,6 @@ absl::Status Classify() {
   return absl::OkStatus();
 }
 
-}  // namespace nlclassifier
 }  // namespace text
 }  // namespace task
 }  // namespace tflite
@@ -93,7 +91,7 @@ int main(int argc, char** argv) {
   }
 
   // Run classification.
-  absl::Status status = tflite::task::text::nlclassifier::Classify();
+  absl::Status status = tflite::task::text::Classify();
   if (status.ok()) {
     return 0;
   } else {

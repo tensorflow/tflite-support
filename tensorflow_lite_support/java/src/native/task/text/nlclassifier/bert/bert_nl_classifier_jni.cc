@@ -15,7 +15,7 @@ limitations under the License.
 
 #include <jni.h>
 
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/bert_nl_classifier.h"
+#include "tensorflow_lite_support/cc/task/text/bert_nl_classifier.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_nl_classifier_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 #include "tensorflow_lite_support/java/src/native/task/text/nlclassifier/nl_classifier_jni_utils.h"
@@ -25,8 +25,8 @@ namespace {
 using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
+using ::tflite::task::text::BertNLClassifier;
 using ::tflite::task::text::BertNLClassifierOptions;
-using ::tflite::task::text::nlclassifier::BertNLClassifier;
 using ::tflite::task::text::nlclassifier::RunClassifier;
 
 BertNLClassifierOptions ConvertJavaBertNLClassifierOptions(
