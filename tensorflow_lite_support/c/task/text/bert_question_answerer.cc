@@ -17,12 +17,12 @@ limitations under the License.
 
 #include <memory>
 
-#include "tensorflow_lite_support/cc/task/text/qa/bert_question_answerer.h"
-#include "tensorflow_lite_support/cc/task/text/qa/question_answerer.h"
+#include "tensorflow_lite_support/cc/task/text/bert_question_answerer.h"
+#include "tensorflow_lite_support/cc/task/text/question_answerer.h"
 
 namespace {
-using BertQuestionAnswererCpp = ::tflite::task::text::qa::BertQuestionAnswerer;
-using QaAnswerCpp = ::tflite::task::text::qa::QaAnswer;
+using BertQuestionAnswererCpp = ::tflite::task::text::BertQuestionAnswerer;
+using QaAnswerCpp = ::tflite::task::text::QaAnswer;
 }  // namespace
 
 #ifdef __cplusplus

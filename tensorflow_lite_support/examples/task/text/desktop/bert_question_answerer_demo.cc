@@ -20,7 +20,7 @@ limitations under the License.
 #include "external/com_google_absl/absl/status/status.h"
 #include "external/com_google_absl/absl/strings/str_format.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
-#include "tensorflow_lite_support/cc/task/text/qa/bert_question_answerer.h"
+#include "tensorflow_lite_support/cc/task/text/bert_question_answerer.h"
 
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' bert question answerer model.");
@@ -34,7 +34,6 @@ ABSL_FLAG(bool, use_coral, false,
 namespace tflite {
 namespace task {
 namespace text {
-namespace qa {
 
 namespace {
 using std::chrono::microseconds;
@@ -77,7 +76,6 @@ absl::Status Answer() {
   return absl::OkStatus();
 }
 
-}  // namespace qa
 }  // namespace text
 }  // namespace task
 }  // namespace tflite
@@ -98,7 +96,7 @@ int main(int argc, char** argv) {
     return 1;
   }
   // Run the answerer.
-  absl::Status status = tflite::task::text::qa::Answer();
+  absl::Status status = tflite::task::text::Answer();
   if (status.ok()) {
     return 0;
   } else {

@@ -15,7 +15,7 @@ limitations under the License.
 
 #include <jni.h>
 
-#include "tensorflow_lite_support/cc/task/text/qa/bert_question_answerer.h"
+#include "tensorflow_lite_support/cc/task/text/bert_question_answerer.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
 namespace {
@@ -23,9 +23,9 @@ namespace {
 using ::tflite::support::utils::ConvertVectorToArrayList;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::JStringToString;
-using ::tflite::task::text::qa::BertQuestionAnswerer;
-using ::tflite::task::text::qa::QaAnswer;
-using ::tflite::task::text::qa::QuestionAnswerer;
+using ::tflite::task::text::BertQuestionAnswerer;
+using ::tflite::task::text::QaAnswer;
+using ::tflite::task::text::QuestionAnswerer;
 
 constexpr int kInvalidPointer = 0;
 

@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_QA_BERT_QUESTION_ANSWERER_H_
-#define TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_QA_BERT_QUESTION_ANSWERER_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_QA_BERT_QUESTION_ANSWERER_H_
+#define TENSORFLOW_LITE_SUPPORT_CC_TASK_QA_BERT_QUESTION_ANSWERER_H_
 
 #include "external/com_google_absl/absl/base/macros.h"
 #include "external/com_google_absl/absl/container/flat_hash_map.h"
@@ -24,14 +24,13 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_question_answerer_options_proto_inc.h"
-#include "tensorflow_lite_support/cc/task/text/qa/question_answerer.h"
+#include "tensorflow_lite_support/cc/task/text/question_answerer.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/bert_tokenizer.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/sentencepiece_tokenizer.h"
 
 namespace tflite {
 namespace task {
 namespace text {
-namespace qa {
 
 // BertQA task API, performs tokenization for models (BERT, Albert, etc.) in
 // preprocess and returns most possible answers.
@@ -153,9 +152,8 @@ class BertQuestionAnswerer : public QuestionAnswerer {
   std::unique_ptr<BertQuestionAnswererOptions> options_;
 };
 
-}  // namespace qa
 }  // namespace text
 }  // namespace task
 }  // namespace tflite
 
-#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_QA_BERT_QUESTION_ANSWERER_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_QA_BERT_QUESTION_ANSWERER_H_

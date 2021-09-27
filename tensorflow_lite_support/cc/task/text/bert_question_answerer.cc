@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/text/qa/bert_question_answerer.h"
+#include "tensorflow_lite_support/cc/task/text/bert_question_answerer.h"
 
 #include "external/com_google_absl/absl/status/status.h"
 #include "external/com_google_absl/absl/strings/str_join.h"
@@ -28,7 +28,6 @@ limitations under the License.
 namespace tflite {
 namespace task {
 namespace text {
-namespace qa {
 
 constexpr char kIdsTensorName[] = "ids";
 constexpr char kMaskTensorName[] = "mask";
@@ -409,7 +408,6 @@ void BertQuestionAnswerer::InitializeSentencepieceTokenizerFromBinary(
                                                          spmodel_buffer_size);
 }
 
-}  // namespace qa
 }  // namespace text
 }  // namespace task
 }  // namespace tflite
