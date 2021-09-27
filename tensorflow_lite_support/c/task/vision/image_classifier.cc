@@ -33,21 +33,6 @@ using ImageClassifierCpp = ::tflite::task::vision::ImageClassifier;
 using ImageClassifierOptionsCpp =
     ::tflite::task::vision::ImageClassifierOptions;
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
-}  // namespace
-
-#ifdef __cplusplus
-extern "C" {
-#endif  // __cplusplus
-
-struct TfLiteImageClassifier {
-  std::unique_ptr<ImageClassifierCpp> impl;
-};
-
-TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate() {
-  return {.classification_options = {.max_results = -1},
-          .base_options = {
-              .compute_settings = {.cpu_settings = {.num_threads = -1}}}};
-}
 
 std::unique_ptr<ImageClassifierOptionsCpp>
 CreateImageClassifierCppOptionsFromCOptions(
@@ -96,6 +81,24 @@ CreateImageClassifierCppOptionsFromCOptions(
       c_options->classification_options.score_threshold);
 
   return cpp_options;
+}
+}  // namespace
+
+#ifdef __cplusplus
+extern "C" {
+#endif  // __cplusplus
+
+struct TfLiteImageClassifier {
+  std::unique_ptr<ImageClassifierCpp> impl;
+};
+
+TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate() {
+  // Use brace-enclosed initializer list will break the Kokoro test.
+  TfLiteImageClassifierOptions options = {{{0}}};
+  options.classification_options.max_results = -1;
+  options.classification_options.score_threshold = 0.0;
+  options.base_options.compute_settings.cpu_settings.num_threads = -1;
+  return options;
 }
 
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(

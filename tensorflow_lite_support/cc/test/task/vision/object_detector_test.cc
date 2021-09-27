@@ -70,7 +70,8 @@ using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
 
 constexpr char kTestDataDirectory[] =
-    "tensorflow_lite_support/cc/test/testdata/task/vision/";
+    "/tensorflow_lite_support/cc/test/testdata/task/"
+    "vision/";
 constexpr char kMobileSsdWithMetadata[] =
     "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.tflite";
 constexpr char kExpectResults[] =

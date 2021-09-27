@@ -45,8 +45,17 @@ typedef struct TfLiteClassificationOptions {
   // class labels are ignored. Mutually exclusive with label_denylist.
   TfLiteStringArrayOption label_allowlist;
 
+  // The locale to use for display names specified through the TFLite Model
+  // Metadata, if any. Defaults to English.
   const char* display_names_local;
+
+  // The maximum number of top-scored classification results to return. If < 0,
+  // all available results will be returned. If 0, an invalid argument error is
+  // returned. Defaults to -1.
   int max_results;
+
+  // Score threshold, overrides the ones provided in the model metadata
+  // (if any). Results below this value are rejected.
   float score_threshold;
 } TfLiteClassificationOptions;
 

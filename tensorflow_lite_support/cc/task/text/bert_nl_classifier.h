@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_BERT_NL_CLASSIFIER_H_
-#define TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_BERT_NL_CLASSIFIER_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_NLCLASSIFIER_BERT_NL_CLASSIFIER_H_
+#define TENSORFLOW_LITE_SUPPORT_CC_TASK_NLCLASSIFIER_BERT_NL_CLASSIFIER_H_
 
 #include <stddef.h>
 
@@ -36,7 +36,6 @@ limitations under the License.
 namespace tflite {
 namespace task {
 namespace text {
-namespace nlclassifier {
 
 // Classifier API for NLClassification tasks with Bert models, categorizes
 // string into different classes.
@@ -50,9 +49,9 @@ namespace nlclassifier {
 //     with one label per line, the number of labels should match the number of
 //     categories the model outputs.
 
-class BertNLClassifier : public NLClassifier {
+class BertNLClassifier : public tflite::task::text::nlclassifier::NLClassifier {
  public:
-  using NLClassifier::NLClassifier;
+  using tflite::task::text::nlclassifier::NLClassifier::NLClassifier;
 
   // Factory function to create a BertNLClassifier from BertNLClassifierOptions.
   static tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>>
@@ -127,9 +126,8 @@ class BertNLClassifier : public NLClassifier {
   std::unique_ptr<BertNLClassifierOptions> options_;
 };
 
-}  // namespace nlclassifier
 }  // namespace text
 }  // namespace task
 }  // namespace tflite
 
-#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_NLCLASSIFIER_BERT_NL_CLASSIFIER_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_NLCLASSIFIER_BERT_NL_CLASSIFIER_H_

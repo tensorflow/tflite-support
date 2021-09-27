@@ -50,7 +50,8 @@ using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::JoinPath;
 
 constexpr char kTestDataDirectory[] =
-    "tensorflow_lite_support/cc/test/testdata/task/vision/";
+    "/tensorflow_lite_support/cc/test/testdata/task/"
+    "vision/";
 // Test model. Float inputs, produces feature vectors that are not
 // L2-normalized as this model doesn't include a L2_NORMALIZATION TFLite Op.
 constexpr char kMobileNetV3[] = "mobilenet_v3_small_100_224_embedder.tflite";

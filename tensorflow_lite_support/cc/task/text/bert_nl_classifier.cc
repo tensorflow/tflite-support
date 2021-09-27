@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/text/nlclassifier/bert_nl_classifier.h"
+#include "tensorflow_lite_support/cc/task/text/bert_nl_classifier.h"
 
 #include <stddef.h>
 
@@ -41,7 +41,6 @@ limitations under the License.
 namespace tflite {
 namespace task {
 namespace text {
-namespace nlclassifier {
 
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::StatusOr;
@@ -182,7 +181,6 @@ absl::Status BertNLClassifier::Initialize(
   return absl::OkStatus();
 }
 
-}  // namespace nlclassifier
 }  // namespace text
 }  // namespace task
 }  // namespace tflite

@@ -56,7 +56,8 @@ using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
 
 constexpr char kTestDataDirectory[] =
-    "tensorflow_lite_support/cc/test/testdata/task/vision/";
+    "/tensorflow_lite_support/cc/test/testdata/task/"
+    "vision/";
 constexpr char kDeepLabV3[] = "deeplabv3.tflite";
 
 // All results returned by DeepLabV3 are expected to contain these in addition

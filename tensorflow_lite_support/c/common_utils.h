@@ -35,11 +35,13 @@ namespace support {
 //     TfLiteSupportError **error) {
 // // Necessary checks
 // tflite::support::StatusOr<std::unique_ptr<ImageClassifier>> classifier_status
-// = // Call to create Cpp Image Classifier. if (classifier_status.ok()) {
-//   Code to return classifier
+// = // Call to create Cpp Image Classifier. 
+// if (classifier_status.ok()) {
+//     Code to return classifier
 // } else {
 //     ::tflite::support::CreateTfLiteSupportErrorWithStatus(classifier_status.status(),
-//     error); return nullptr;
+//     error); 
+//     return nullptr;
 //  }
 //}
 void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,

@@ -58,7 +58,8 @@ using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
 
 constexpr char kTestDataDirectory[] =
-    "tensorflow_lite_support/cc/test/testdata/task/vision/";
+    "/tensorflow_lite_support/cc/test/testdata/task/"
+    "vision/";
 // Float model.
 constexpr char kMobileNetFloatWithMetadata[] = "mobilenet_v2_1.0_224.tflite";
 // Quantized model.

@@ -35,7 +35,8 @@ using ::tflite::support::StatusOr;
 using ::tflite::task::JoinPath;
 
 constexpr char kTestDataDirectory[] =
-    "tensorflow_lite_support/cc/test/testdata/task/vision/";
+    "/tensorflow_lite_support/cc/test/testdata/task/"
+    "vision/";
 // Quantized model.
 constexpr char kMobileNetQuantizedWithMetadata[] =
     "mobilenet_v1_0.25_224_quant.tflite";
@@ -150,6 +151,7 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithImageData) {
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
@@ -179,6 +181,7 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
@@ -210,6 +213,7 @@ TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
@@ -255,6 +259,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
@@ -301,6 +306,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
+      .orientation = kTopLeft,
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
