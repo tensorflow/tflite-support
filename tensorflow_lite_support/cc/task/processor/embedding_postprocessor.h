@@ -35,10 +35,10 @@ namespace processor {
 //    - Either 2 or 4 dimensions, i.e. `[1 x N]` or `[1 x 1 x 1 x N]`.
 class EmbeddingPostprocessor : public Postprocessor {
  public:
-  static absl::StatusOr<std::unique_ptr<EmbeddingPostprocessor>> Create(
-      core::TfLiteEngine* engine,
-      const std::initializer_list<int> output_indices,
-      std::unique_ptr<EmbeddingOptions> options);
+  static tflite::support::StatusOr<std::unique_ptr<EmbeddingPostprocessor>>
+  Create(core::TfLiteEngine* engine,
+         const std::initializer_list<int> output_indices,
+         std::unique_ptr<EmbeddingOptions> options);
 
   template <typename T>
   absl::Status Postprocess(T* embedding);

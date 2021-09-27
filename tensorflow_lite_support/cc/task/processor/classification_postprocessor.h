@@ -19,6 +19,7 @@ limitations under the License.
 #include <initializer_list>
 
 #include "tensorflow_lite_support/cc/port/status_macros.h"
+#include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/classification_head.h"
 #include "tensorflow_lite_support/cc/task/core/label_map_item.h"
 #include "tensorflow_lite_support/cc/task/core/score_calibration.h"
@@ -46,10 +47,10 @@ namespace processor {
 //      results will be filled.
 class ClassificationPostprocessor : public Postprocessor {
  public:
-  static absl::StatusOr<std::unique_ptr<ClassificationPostprocessor>> Create(
-      core::TfLiteEngine* engine,
-      const std::initializer_list<int> output_indices,
-      std::unique_ptr<ClassificationOptions> options);
+  static tflite::support::StatusOr<std::unique_ptr<ClassificationPostprocessor>>
+  Create(core::TfLiteEngine* engine,
+         const std::initializer_list<int> output_indices,
+         std::unique_ptr<ClassificationOptions> options);
 
   template <typename T>
   absl::Status Postprocess(T* classifications);
