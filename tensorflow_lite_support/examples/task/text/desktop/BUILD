@@ -21,7 +21,7 @@ cc_binary(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings:str_format",
         "//tensorflow_lite_support/cc/port:statusor",
-        "//tensorflow_lite_support/cc/task/text/qa:bert_question_answerer",
+        "//tensorflow_lite_support/cc/task/text:bert_question_answerer",
     ] + select({
         "//tensorflow_lite_support/examples/task:darwinn_portable": [
             "//tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin",

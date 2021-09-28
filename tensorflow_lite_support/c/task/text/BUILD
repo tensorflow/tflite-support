@@ -73,7 +73,7 @@ cc_library_with_tflite(
         "bert_question_answerer.h",
     ],
     tflite_deps = [
-        "//tensorflow_lite_support/cc/task/text/qa:bert_question_answerer",
-        "//tensorflow_lite_support/cc/task/text/qa:question_answerer",
+        "//tensorflow_lite_support/cc/task/text:bert_question_answerer",
+        "//tensorflow_lite_support/cc/task/text:question_answerer",
     ],
 )

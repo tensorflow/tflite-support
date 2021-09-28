@@ -50,6 +50,7 @@ cc_library_with_tflite(
     ],
     deps = [
         "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core:classification_head",
         "//tensorflow_lite_support/cc/task/core:label_map_item",
         "//tensorflow_lite_support/cc/task/core:score_calibration",

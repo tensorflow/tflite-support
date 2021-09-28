@@ -40,7 +40,7 @@ using ::tflite::task::core::ScoreCalibration;
 }  // namespace
 
 /* static */
-absl::StatusOr<std::unique_ptr<ClassificationPostprocessor>>
+tflite::support::StatusOr<std::unique_ptr<ClassificationPostprocessor>>
 ClassificationPostprocessor::Create(
     core::TfLiteEngine* engine, const std::initializer_list<int> output_indices,
     std::unique_ptr<ClassificationOptions> options) {

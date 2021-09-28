@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_QA_QUESTION_ANSWERER_H_
-#define TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_QA_QUESTION_ANSWERER_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_QA_QUESTION_ANSWERER_H_
+#define TENSORFLOW_LITE_SUPPORT_CC_TASK_QA_QUESTION_ANSWERER_H_
 
 #include <string>
 #include <utility>
@@ -26,7 +26,6 @@ limitations under the License.
 namespace tflite {
 namespace task {
 namespace text {
-namespace qa {
 
 // Struct for the Answer to QuestionAnswerer.
 struct QaAnswer {
@@ -57,9 +56,8 @@ class QuestionAnswerer
                                        const std::string& question) = 0;
 };
 
-}  // namespace qa
 }  // namespace text
 }  // namespace task
 }  // namespace tflite
 
-#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_QA_QUESTION_ANSWERER_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_QA_QUESTION_ANSWERER_H_

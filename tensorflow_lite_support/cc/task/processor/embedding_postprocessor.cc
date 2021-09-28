@@ -20,7 +20,7 @@ namespace task {
 namespace processor {
 
 /* static */
-absl::StatusOr<std::unique_ptr<EmbeddingPostprocessor>>
+tflite::support::StatusOr<std::unique_ptr<EmbeddingPostprocessor>>
 EmbeddingPostprocessor::Create(core::TfLiteEngine* engine,
                                const std::initializer_list<int> output_indices,
                                std::unique_ptr<EmbeddingOptions> options) {
