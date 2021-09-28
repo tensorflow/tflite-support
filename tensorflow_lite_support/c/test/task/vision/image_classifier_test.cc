@@ -212,7 +212,10 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithImageData) {
   EXPECT_NE(classification_result->classifications, nullptr);
   EXPECT_GE(classification_result->classifications->size, 1);
   EXPECT_NE(classification_result->classifications->categories, nullptr);
-  // TODO(prianka): check score and labels`
+  EXPECT_EQ(strcmp(classification_result->classifications->categories[0].label,
+                   "cheeseburger"),
+            0);
+  EXPECT_GE(classification_result->classifications->categories[0].score, 0.90);
 
   TfLiteClassificationResultDelete(classification_result);
 }
@@ -287,7 +290,10 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
   EXPECT_NE(classification_result->classifications, nullptr);
   EXPECT_GE(classification_result->classifications->size, 1);
   EXPECT_NE(classification_result->classifications->categories, nullptr);
-  // TODO(prianka): check score and labels`
+  EXPECT_EQ(strcmp(classification_result->classifications->categories[0].label,
+                   "bagel"),
+            0);
+  EXPECT_GE(classification_result->classifications->categories[0].score, 0.30);
 
   TfLiteClassificationResultDelete(classification_result);
 }
