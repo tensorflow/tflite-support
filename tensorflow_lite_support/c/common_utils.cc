@@ -24,6 +24,15 @@ limitations under the License.
 namespace tflite {
 namespace support {
 
+void CreateTfLiteSupportError(enum TfLiteSupportErrorCode code,
+                              const char* message, TfLiteSupportError** error) {
+  if (error == nullptr) return;
+
+  *error = new TfLiteSupportError;
+  (*error)->code = code;
+  (*error)->message = strdup(message);
+}
+
 void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
                                         TfLiteSupportError** error) {
   if (status.ok() or error == nullptr) return;
@@ -77,23 +86,41 @@ void CreateTfLiteSupportErrorWithStatus(const absl::Status& status,
     }
   }
 
-  *error = new TfLiteSupportError;
-  // TfLiteErrorCode has a one to one mapping with TfLiteSupportStatus starting
-  // from the value 1(kError) and hence will be correctly initialized if
-  // directly cast from the integer code derived from TfLiteSupportStatus stored
-  // in payload. TfLiteErrorCode omits kOk = 0 of TfLiteSupportStatus.
+  // *error = new TfLiteSupportError;
+  // // TfLiteErrorCode has a one to one mapping with TfLiteSupportStatus
+  // starting
+  // // from the value 1(kError) and hence will be correctly initialized if
+  // // directly cast from the integer code derived from TfLiteSupportStatus
+  // stored
+  // // in payload. TfLiteErrorCode omits kOk = 0 of TfLiteSupportStatus.
+  // //
+  // (*error)->code = static_cast<TfLiteSupportErrorCode>(error_code);
+  // // Stores a string including absl status code and message(if non empty) as
+  // the
+  // // error message See
+  // //
+  // https://github.com/abseil/abseil-cpp/blob/master/absl/status/status.h#L514
+  // // for explanation. absl::Status::message() can also be used but not always
+  // // guaranteed to be non empty.
+  // (*error)->message = strdup(
+  //     status.ToString(absl::StatusToStringMode::kWithNoExtraData).c_str());
+
+  // Creates the TfLiteSupportError with the appropriate error
+  // TfLiteSupportErrorCode and message. TfLiteErrorCode has a one to one
+  // mapping with TfLiteSupportStatus starting from the value 1(kError) and
+  // hence will be correctly initialized if directly cast from the integer code
+  // derived from TfLiteSupportStatus stored in payload. TfLiteErrorCode omits
+  // kOk = 0 of TfLiteSupportStatus.
   //
-  // TODO(prianka): Investigate if switching between error code cast to
-  // TfLiteSupportStatus and assigning appropriate value to TfLiteErrorCode is
-  // necessary (If 'TfLiteSupportStatus' or other edge cases).
-  (*error)->code = static_cast<TfLiteSupportErrorCode>(error_code);
   // Stores a string including absl status code and message(if non empty) as the
   // error message See
   // https://github.com/abseil/abseil-cpp/blob/master/absl/status/status.h#L514
   // for explanation. absl::Status::message() can also be used but not always
   // guaranteed to be non empty.
-  (*error)->message = strdup(
-      status.ToString(absl::StatusToStringMode::kWithNoExtraData).c_str());
+  CreateTfLiteSupportError(
+      static_cast<TfLiteSupportErrorCode>(error_code),
+      status.ToString(absl::StatusToStringMode::kWithNoExtraData).c_str(),
+      error);
 }
 
 }  // namespace support
