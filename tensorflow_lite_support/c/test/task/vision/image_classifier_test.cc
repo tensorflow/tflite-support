@@ -48,30 +48,51 @@ StatusOr<ImageData> LoadImage(const char* image_name) {
 
 class ImageClassifierFromOptionsTest : public tflite_shims::testing::Test {};
 
-TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
-  TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
-
-  TfLiteSupportError *error = nullptr;
+TEST_F(ImageClassifierFromOptionsTest, FailsWithNullOptionsAndError) {
+  TfLiteSupportError* error = nullptr;
   TfLiteImageClassifier* image_classifier =
-      TfLiteImageClassifierFromOptions(&options, &error);
+      TfLiteImageClassifierFromOptions(nullptr, &error);
+
   EXPECT_EQ(image_classifier, nullptr);
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
+
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
+  EXPECT_NE(strstr(error->message, "Expected non null options"), nullptr);
+
   TfLiteSupportErrorDelete(error);
 }
 
-TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPathAndNullError) {
-  TfLiteImageClassifierOptions options = {{{0}}};
+TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
+  TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options, nullptr);
   EXPECT_EQ(image_classifier, nullptr);
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
+}
+
+TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPathAndError) {
+  TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
+
+  TfLiteSupportError* error = nullptr;
+  TfLiteImageClassifier* image_classifier =
+      TfLiteImageClassifierFromOptions(&options, &error);
+
+  EXPECT_EQ(image_classifier, nullptr);
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
+
+  ASSERT_NE(error, nullptr);
+  EXPECT_EQ(error->code, kInvalidArgumentError);
+  EXPECT_NE(error->message, nullptr);
+  EXPECT_NE(strstr(error->message, "`base_options.model_file`"), nullptr);
+
+  TfLiteSupportErrorDelete(error);
 }
 
 TEST_F(ImageClassifierFromOptionsTest, SucceedsWithModelPath) {
-  std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata);
+  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileNetQuantizedWithMetadata);
   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
   TfLiteImageClassifier* image_classifier =
@@ -81,29 +102,28 @@ TEST_F(ImageClassifierFromOptionsTest, SucceedsWithModelPath) {
   TfLiteImageClassifierDelete(image_classifier);
 }
 
-TEST_F(ImageClassifierFromOptionsTest, SucceedsWithNumberOfThreads) {
-  std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata);
+TEST_F(ImageClassifierFromOptionsTest, SucceedsWithNumberOfThreadsAndError) {
+  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileNetQuantizedWithMetadata);
   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
   options.base_options.compute_settings.cpu_settings.num_threads = 3;
 
-  TfLiteSupportError *error = nullptr;
+  TfLiteSupportError* error = nullptr;
   TfLiteImageClassifier* image_classifier =
       TfLiteImageClassifierFromOptions(&options, &error);
 
   EXPECT_NE(image_classifier, nullptr);
   EXPECT_EQ(error, nullptr);
-  TfLiteImageClassifierDelete(image_classifier);
+
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
   if (error) TfLiteSupportErrorDelete(error);
 }
 
 TEST_F(ImageClassifierFromOptionsTest,
-       FailsWithClassNameDenyListAndClassNameAllowList) {
-  std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata);
+       FailsWithClassNameDenyListAndClassNameAllowListAndError) {
+  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileNetQuantizedWithMetadata);
 
   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
@@ -126,6 +146,32 @@ TEST_F(ImageClassifierFromOptionsTest,
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
+  EXPECT_NE(strstr(error->message, "mutually exclusive options"), nullptr);
+
+  TfLiteSupportErrorDelete(error);
+}
+
+TEST(ImageClassifierNullClassifierClassifyTest,
+     FailsWithNullImageClassifierAndError) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
+                               LoadImage("burger-224.png"));
+
+  TfLiteSupportError* error = nullptr;
+  TfLiteClassificationResult* classification_result =
+      TfLiteImageClassifierClassify(nullptr, nullptr, &error);
+
+  ImageDataFree(&image_data);
+
+  EXPECT_EQ(classification_result, nullptr);
+  if (classification_result)
+    TfLiteClassificationResultDelete(classification_result);
+
+  ASSERT_NE(error, nullptr);
+  EXPECT_EQ(error->code, kInvalidArgumentError);
+  EXPECT_NE(error->message, nullptr);
+  EXPECT_NE(strstr(error->message, "Expected non null image classifier"),
+            nullptr);
+
   TfLiteSupportErrorDelete(error);
 }
 
@@ -157,22 +203,64 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithImageData) {
 
   TfLiteSupportError* error = nullptr;
   TfLiteClassificationResult* classification_result =
-      TfLiteImageClassifierClassify(image_classifier, &frame_buffer, &error);
+      TfLiteImageClassifierClassify(image_classifier, &frame_buffer, nullptr);
 
   ImageDataFree(&image_data);
-
-  EXPECT_EQ(error, nullptr);
-  if (error) TfLiteSupportErrorDelete(error);
 
   ASSERT_NE(classification_result, nullptr);
   EXPECT_GE(classification_result->size, 1);
   EXPECT_NE(classification_result->classifications, nullptr);
   EXPECT_GE(classification_result->classifications->size, 1);
   EXPECT_NE(classification_result->classifications->categories, nullptr);
-
   // TODO(prianka): check score and labels`
 
   TfLiteClassificationResultDelete(classification_result);
+}
+
+TEST_F(ImageClassifierClassifyTest, FailsWithNullFrameBufferAndError) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
+                               LoadImage("burger-224.png"));
+
+  TfLiteSupportError* error = nullptr;
+  TfLiteClassificationResult* classification_result =
+      TfLiteImageClassifierClassify(image_classifier, nullptr, &error);
+
+  ImageDataFree(&image_data);
+
+  EXPECT_EQ(classification_result, nullptr);
+  if (classification_result)
+    TfLiteClassificationResultDelete(classification_result);
+
+  ASSERT_NE(error, nullptr);
+  EXPECT_EQ(error->code, kInvalidArgumentError);
+  EXPECT_NE(error->message, nullptr);
+  EXPECT_NE(strstr(error->message, "Expected non null frame buffer"), nullptr);
+
+  TfLiteSupportErrorDelete(error);
+}
+
+TEST_F(ImageClassifierClassifyTest, FailsWithNullImageDataAndError) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
+                               LoadImage("burger-224.png"));
+
+  TfLiteFrameBuffer frame_buffer = {.format = kRGB, .orientation = kTopLeft};
+
+  TfLiteSupportError* error = nullptr;
+  TfLiteClassificationResult* classification_result =
+      TfLiteImageClassifierClassify(image_classifier, &frame_buffer, &error);
+
+  ImageDataFree(&image_data);
+
+  EXPECT_EQ(classification_result, nullptr);
+  if (classification_result)
+    TfLiteClassificationResultDelete(classification_result);
+
+  ASSERT_NE(error, nullptr);
+  EXPECT_EQ(error->code, kInvalidArgumentError);
+  EXPECT_NE(error->message, nullptr);
+  EXPECT_NE(strstr(error->message, "Invalid stride information"), nullptr);
+
+  TfLiteSupportErrorDelete(error);
 }
 
 TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
@@ -194,9 +282,6 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
 
   ImageDataFree(&image_data);
 
-  EXPECT_EQ(error, nullptr);
-  if (error) TfLiteSupportErrorDelete(error);
-
   ASSERT_NE(classification_result, nullptr);
   EXPECT_GE(classification_result->size, 1);
   EXPECT_NE(classification_result->classifications, nullptr);
@@ -207,7 +292,7 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
   TfLiteClassificationResultDelete(classification_result);
 }
 
-TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
+TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBoundsAndError) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
                                LoadImage("burger-224.png"));
 
@@ -226,22 +311,23 @@ TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBounds) {
 
   ImageDataFree(&image_data);
 
-  EXPECT_NE(error, nullptr);
-  EXPECT_EQ(error->code, kInvalidArgumentError);
-  EXPECT_NE(error->message, nullptr);
-  TfLiteSupportErrorDelete(error);
-
   EXPECT_EQ(classification_result, nullptr);
   if (classification_result)
     TfLiteClassificationResultDelete(classification_result);
+
+  ASSERT_NE(error, nullptr);
+  EXPECT_EQ(error->code, kInvalidArgumentError);
+  EXPECT_NE(error->message, nullptr);
+  EXPECT_NE(strstr(error->message, "Invalid crop coordinates"), nullptr);
+
+  TfLiteSupportErrorDelete(error);
 }
 
 TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
      SucceedsWithClassNameDenyList) {
   const char* denylisted_label_name = "cheeseburger";
-  std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata);
+  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileNetQuantizedWithMetadata);
 
   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
@@ -267,6 +353,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
       TfLiteImageClassifierClassify(image_classifier, &frame_buffer, nullptr);
 
   ImageDataFree(&image_data);
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
 
   ASSERT_NE(classification_result, nullptr);
   EXPECT_GE(classification_result->size, 1);
@@ -277,18 +364,15 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
                    denylisted_label_name),
             0);
 
-  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
-
   TfLiteClassificationResultDelete(classification_result);
 }
 
 TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
      SucceedsWithClassNameAllowList) {
   const char* allowlisted_label_name = "cheeseburger";
-  std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kMobileNetQuantizedWithMetadata)
-          .data();
+  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileNetQuantizedWithMetadata)
+                               .data();
 
   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
@@ -314,6 +398,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
       TfLiteImageClassifierClassify(image_classifier, &frame_buffer, nullptr);
 
   ImageDataFree(&image_data);
+  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
 
   ASSERT_NE(classification_result, nullptr);
   EXPECT_GE(classification_result->size, 1);
@@ -323,8 +408,6 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
   EXPECT_EQ(strcmp(classification_result->classifications->categories[0].label,
                    allowlisted_label_name),
             0);
-
-  if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
 
   TfLiteClassificationResultDelete(classification_result);
 }
