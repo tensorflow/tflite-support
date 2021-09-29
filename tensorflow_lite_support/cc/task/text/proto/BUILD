@@ -76,3 +76,29 @@ cc_library(
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
     ],
 )
+
+proto_library(
+    name = "retrieval_proto",
+    srcs = ["retrieval.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "retrieval_cc_proto",
+    deps = [
+        ":retrieval_proto",
+    ],
+)
+
+cc_library(
+    name = "retrieval_proto_inc",
+    hdrs = ["retrieval_proto_inc.h"],
+    deps = [
+        ":retrieval_cc_proto",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/proto:embeddings_proto_inc",
+    ],
+)
