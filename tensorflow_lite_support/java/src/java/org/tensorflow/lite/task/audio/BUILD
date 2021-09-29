@@ -25,7 +25,7 @@ android_library(
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "//tensorflow_lite_support/java/src/native/task/audio:task_audio_native",
         "@com_google_auto_value",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java_stable",
     ],
     # LINT.ThenChange(<INTERNAL>/release/build_task_pom.sh:dep)
 )

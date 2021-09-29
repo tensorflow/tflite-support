@@ -24,7 +24,7 @@ filegroup(
 # Lite runtime (tensorflow/lite/java:tensorflowlite). If you don't want to
 # introduce the native library into dependencies, use
 # "tensorflowlite_support_java" instead, which depends on
-# tensorflow/lite/java:tensorflowlite_java.
+# tensorflow/lite/java:tensorflowlite_java_stable.
 android_library(
     name = "tensorflowlite_support",
     srcs = [],
@@ -50,7 +50,7 @@ android_library(
         "@maven//:androidx_annotation_annotation",
         "@maven//:com_google_android_odml_image",
         "@org_checkerframework_qual",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java",  # TODO(b/198734357): Use api when TF dep catches up.
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_java_stable",  # TODO(b/198734357): Use api when TF dep catches up.
     ],
     # LINT.ThenChange(<INTERNAL>/release/build_support_api_pom.sh:dep)
 )
