@@ -15,7 +15,6 @@
 """Tests for metadata info classes."""
 
 from absl.testing import parameterized
-
 import tensorflow as tf
 
 import flatbuffers
@@ -24,6 +23,9 @@ from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 from tensorflow_lite_support.metadata.python import metadata as _metadata
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
+
+_SCORE_CALIBRATION_FILE = test_utils.get_resource_path(
+    "../testdata/image_classifier/score_calibration.txt")
 
 
 class GeneralMdTest(tf.test.TestCase):
@@ -280,7 +282,6 @@ class ClassificationTensorMdTest(tf.test.TestCase, parameterized.TestCase):
   _DESCRIPTION = "The classification result tensor."
   _LABEL_FILE_EN = "labels.txt"
   _LABEL_FILE_CN = "labels_cn.txt"  # Locale label file in Chinese.
-  _SCORE_CALIBRATION_FILE = "score_calibration.txt"
   _CALIBRATION_DEFAULT_SCORE = 0.2
   _EXPECTED_FLOAT_TENSOR_JSON = "../testdata/classification_tensor_float_meta.json"
   _EXPECTED_UINT8_TENSOR_JSON = "../testdata/classification_tensor_uint8_meta.json"
@@ -307,7 +308,7 @@ class ClassificationTensorMdTest(tf.test.TestCase, parameterized.TestCase):
         file_path=self._LABEL_FILE_CN, locale="cn")
     score_calibration_md = metadata_info.ScoreCalibrationMd(
         _metadata_fb.ScoreTransformationType.IDENTITY,
-        self._CALIBRATION_DEFAULT_SCORE, self._SCORE_CALIBRATION_FILE)
+        self._CALIBRATION_DEFAULT_SCORE, _SCORE_CALIBRATION_FILE)
 
     tesnor_md = metadata_info.ClassificationTensorMd(
         name=self._NAME,
@@ -397,16 +398,15 @@ class SentencePieceTokenizerMdTest(tf.test.TestCase):
     self.assertEqual(metadata_json, expected_json)
 
 
-class ScoreClalibrationMdTest(tf.test.TestCase):
+class ScoreCalibrationMdTest(tf.test.TestCase):
   _DEFAULT_VALUE = 0.2
-  _SCORE_CALIBRATION_FILE = "score_calibration.txt"
   _EXPECTED_TENSOR_JSON = "../testdata/score_calibration_tensor_meta.json"
   _EXPECTED_MODEL_META_JSON = "../testdata/score_calibration_file_meta.json"
 
   def test_create_metadata_should_succeed(self):
     score_calibration_md = metadata_info.ScoreCalibrationMd(
         _metadata_fb.ScoreTransformationType.LOG, self._DEFAULT_VALUE,
-        self._SCORE_CALIBRATION_FILE)
+        _SCORE_CALIBRATION_FILE)
     score_calibration_metadata = score_calibration_md.create_metadata()
 
     metadata_json = _metadata.convert_to_json(
@@ -418,7 +418,7 @@ class ScoreClalibrationMdTest(tf.test.TestCase):
   def test_create_score_calibration_file_md_should_succeed(self):
     score_calibration_md = metadata_info.ScoreCalibrationMd(
         _metadata_fb.ScoreTransformationType.LOG, self._DEFAULT_VALUE,
-        self._SCORE_CALIBRATION_FILE)
+        _SCORE_CALIBRATION_FILE)
     score_calibration_file_md = (
         score_calibration_md.create_score_calibration_file_md())
     file_metadata = score_calibration_file_md.create_metadata()
@@ -434,6 +434,28 @@ class ScoreClalibrationMdTest(tf.test.TestCase):
 
     expected_json = test_utils.load_file(self._EXPECTED_MODEL_META_JSON, "r")
     self.assertEqual(metadata_json, expected_json)
+
+  def test_create_score_calibration_file_fails_with_less_colunms(self):
+    malformed_calibration_file = test_utils.create_calibration_file(
+        self.get_temp_dir(), content="1.0,0.2")
+
+    with self.assertRaisesRegex(
+        ValueError,
+        "Expected empty lines or 3 or 4 parameters per line in score" +
+        " calibration file, but got 2."):
+      metadata_info.ScoreCalibrationMd(_metadata_fb.ScoreTransformationType.LOG,
+                                       self._DEFAULT_VALUE,
+                                       malformed_calibration_file)
+
+  def test_create_score_calibration_file_fails_with_negative_scale(self):
+    malformed_calibration_file = test_utils.create_calibration_file(
+        self.get_temp_dir(), content="-1.0,0.2,0.1")
+
+    with self.assertRaisesRegex(
+        ValueError, "Expected scale to be a non-negative value, but got -1.0."):
+      metadata_info.ScoreCalibrationMd(_metadata_fb.ScoreTransformationType.LOG,
+                                       self._DEFAULT_VALUE,
+                                       malformed_calibration_file)
 
 
 def _create_dummy_model_metadata_with_tensor(

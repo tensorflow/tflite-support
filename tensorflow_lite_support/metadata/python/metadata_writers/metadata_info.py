@@ -14,6 +14,7 @@
 # ==============================================================================
 """Helper classes for common model metadata information."""
 
+import csv
 import os
 from typing import Optional, List, Type
 
@@ -273,10 +274,27 @@ class ScoreCalibrationMd:
       file_path: file_path of the score calibration file [1].
       [1]:
         https://github.com/tensorflow/tflite-support/blob/5e0cdf5460788c481f5cd18aab8728ec36cf9733/tensorflow_lite_support/metadata/metadata_schema.fbs#L122
+
+    Raises:
+      ValueError: if the score_calibration file is malformed.
     """
     self._score_transformation_type = score_transformation_type
     self._default_score = default_score
     self._file_path = file_path
+
+    # Sanity check the score calibration file.
+    with open(self._file_path) as calibration_file:
+      csv_reader = csv.reader(calibration_file, delimiter=",")
+      for row in csv_reader:
+        if row and len(row) != 3 and len(row) != 4:
+          raise ValueError(
+              "Expected empty lines or 3 or 4 parameters per line in score" +
+              " calibration file, but got {}.".format(len(row)))
+
+        if row and float(row[0]) < 0:
+          raise ValueError(
+              "Expected scale to be a non-negative value, but got {}.".format(
+                  float(row[0])))
 
   def create_metadata(self) -> _metadata_fb.ProcessUnitT:
     """Creates the score calibration metadata based on the information.

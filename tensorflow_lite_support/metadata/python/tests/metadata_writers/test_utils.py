@@ -14,8 +14,19 @@
 # ==============================================================================
 """Test utils for MetadataWriter."""
 
+import os
 from typing import Union
 from tensorflow.python.platform import resource_loader
+
+
+def create_calibration_file(file_dir: str,
+                            file_name: str = "score_calibration.txt",
+                            content: str = "1.0,2.0,3.0,4.0") -> str:
+  """Creates the calibration file."""
+  calibration_file = os.path.join(file_dir, file_name)
+  with open(calibration_file, mode="w") as file:
+    file.write(content)
+  return calibration_file
 
 
 def load_file(file_name: str, mode: str = "rb") -> Union[str, bytes]:
