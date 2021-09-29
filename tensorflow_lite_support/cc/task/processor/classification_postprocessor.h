@@ -25,9 +25,9 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/score_calibration.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
 #include "tensorflow_lite_support/cc/task/processor/processor.h"
-#include "tensorflow_lite_support/cc/task/processor/proto/class.proto.h"
-#include "tensorflow_lite_support/cc/task/processor/proto/classification_options.proto.h"
-#include "tensorflow_lite_support/cc/task/processor/proto/classifications.proto.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/class.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/classification_options.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/classifications.pb.h"
 
 namespace tflite {
 namespace task {

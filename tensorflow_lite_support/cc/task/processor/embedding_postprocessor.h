@@ -22,7 +22,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/cc/task/processor/processor.h"
-#include "tensorflow_lite_support/cc/task/processor/proto/embedding_options.proto.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/embedding_options.pb.h"
 
 namespace tflite {
 namespace task {

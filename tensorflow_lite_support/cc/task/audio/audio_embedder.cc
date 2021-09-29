@@ -17,11 +17,11 @@ limitations under the License.
 #include "external/com_google_absl/absl/status/status.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
-#include "tensorflow_lite_support/cc/task/audio/proto/audio_embedder_options.proto.h"
+#include "tensorflow_lite_support/cc/task/audio/proto/audio_embedder_options.pb.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/processor/audio_preprocessor.h"
 #include "tensorflow_lite_support/cc/task/processor/embedding_postprocessor.h"
-#include "tensorflow_lite_support/cc/task/processor/proto/embedding_options.proto.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/embedding_options.pb.h"
 
 namespace tflite {
 namespace task {
