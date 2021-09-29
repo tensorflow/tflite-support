@@ -39,6 +39,7 @@ bazel build -c opt ${BAZEL_PARALLEL} --config=monolithic \
     --config=android_arm64 --fat_apk_cpu=x86,x86_64,arm64-v8a,armeabi-v7a \
     //tensorflow_lite_support/java:tensorflowlite_support \
     //tensorflow_lite_support/cc/task/vision:image_embedder \
+    //tensorflow_lite_support/cc/task/audio:audio_embedder \
     //tensorflow_lite_support/odml/java/image \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base-task-api.aar \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/text:task-library-text \
