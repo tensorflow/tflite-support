@@ -20,6 +20,7 @@ limitations under the License.
 #include <vector>
 
 #include "external/com_google_absl/absl/memory/memory.h"
+#include "external/com_google_absl/absl/status/status.h"
 #include "external/com_google_absl/absl/strings/str_format.h"
 #include "external/com_google_absl/absl/strings/string_view.h"
 #include "tensorflow/lite/c/common.h"
@@ -32,6 +33,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/class_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/utils/score_calibration.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
@@ -60,6 +62,12 @@ using ::tflite::task::core::TfLiteEngine;
 // The expected number of dimensions of the 4 output tensors, representing in
 // that order: locations, classes, scores, num_results.
 static constexpr int kOutputTensorsExpectedDims[4] = {3, 2, 2, 1};
+constexpr int kDefaultLocationsIndex = 0;
+constexpr int kDefaultClassesIndex = 1;
+constexpr int kDefaultScoresIndex = 2;
+constexpr int kDefaultNumResultsIndex = 3;
+
+constexpr float kDefaultScoreThreshold = std::numeric_limits<float>::lowest();
 
 StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
     const TensorMetadata& tensor_metadata) {
@@ -136,7 +144,7 @@ StatusOr<std::vector<LabelMapItem>> GetLabelMapIfAny(
       ModelMetadataExtractor::FindFirstAssociatedFileName(
           tensor_metadata, tflite::AssociatedFileType_TENSOR_VALUE_LABELS,
           locale);
-  absl::string_view display_names_file = nullptr;
+  absl::string_view display_names_file;
   if (!display_names_filename.empty()) {
     ASSIGN_OR_RETURN(display_names_file, metadata_extractor.GetAssociatedFile(
                                              display_names_filename));
@@ -152,7 +160,7 @@ StatusOr<float> GetScoreThreshold(
       metadata_extractor.FindFirstProcessUnit(
           tensor_metadata, ProcessUnitOptions_ScoreThresholdingOptions));
   if (score_thresholding_process_unit == nullptr) {
-    return std::numeric_limits<float>::lowest();
+    return kDefaultScoreThreshold;
   }
   return score_thresholding_process_unit->options_as_ScoreThresholdingOptions()
       ->global_score_threshold();
@@ -168,48 +176,51 @@ absl::Status SanityCheckOutputTensors(
   }
 
   // Get number of results.
-  if (output_tensors[3]->dims->data[0] != 1) {
+  if (output_tensors[kDefaultNumResultsIndex]->dims->data[0] != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
             "Expected tensor with dimensions [1] at index 3, found [%d]",
-            output_tensors[3]->dims->data[0]));
+            output_tensors[kDefaultNumResultsIndex]->dims->data[0]));
   }
-  int num_results =
-      static_cast<int>(AssertAndReturnTypedTensor<float>(output_tensors[3])[0]);
+  int num_results = static_cast<int>(AssertAndReturnTypedTensor<float>(
+      output_tensors[kDefaultNumResultsIndex])[0]);
 
   // Check dimensions for the other tensors are correct.
-  if (output_tensors[0]->dims->data[0] != 1 ||
-      output_tensors[0]->dims->data[1] < num_results ||
-      output_tensors[0]->dims->data[2] != 4) {
+  if (output_tensors[kDefaultLocationsIndex]->dims->data[0] != 1 ||
+      output_tensors[kDefaultLocationsIndex]->dims->data[1] < num_results ||
+      output_tensors[kDefaultLocationsIndex]->dims->data[2] != 4) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
             "Expected locations tensor with dimensions [1, num_detected_boxes, "
-            "4] at index 0, num_detected_boxes >= %d, found [%d,%d,%d].",
-            num_results, output_tensors[0]->dims->data[0],
-            output_tensors[0]->dims->data[1],
-            output_tensors[0]->dims->data[2]));
+            "4] at index %d, num_detected_boxes >= %d, found [%d,%d,%d].",
+            kDefaultLocationsIndex, num_results,
+            output_tensors[kDefaultLocationsIndex]->dims->data[0],
+            output_tensors[kDefaultLocationsIndex]->dims->data[1],
+            output_tensors[kDefaultLocationsIndex]->dims->data[2]));
   }
-  if (output_tensors[1]->dims->data[0] != 1 ||
-      output_tensors[1]->dims->data[1] < num_results) {
+  if (output_tensors[kDefaultClassesIndex]->dims->data[0] != 1 ||
+      output_tensors[kDefaultClassesIndex]->dims->data[1] < num_results) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
             "Expected classes tensor with dimensions [1, num_detected_boxes] "
-            "at index 1, num_detected_boxes >= %d, found [%d,%d].",
-            num_results, output_tensors[1]->dims->data[0],
-            output_tensors[1]->dims->data[1]));
+            "at index %d, num_detected_boxes >= %d, found [%d,%d].",
+            kDefaultClassesIndex, num_results,
+            output_tensors[kDefaultClassesIndex]->dims->data[0],
+            output_tensors[kDefaultClassesIndex]->dims->data[1]));
   }
-  if (output_tensors[2]->dims->data[0] != 1 ||
-      output_tensors[2]->dims->data[1] < num_results) {
+  if (output_tensors[kDefaultScoresIndex]->dims->data[0] != 1 ||
+      output_tensors[kDefaultScoresIndex]->dims->data[1] < num_results) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
             "Expected scores tensor with dimensions [1, num_detected_boxes] "
-            "at index 2, num_detected_boxes >= %d, found [%d,%d].",
-            num_results, output_tensors[2]->dims->data[0],
-            output_tensors[2]->dims->data[1]));
+            "at index %d, num_detected_boxes >= %d, found [%d,%d].",
+            kDefaultScoresIndex, num_results,
+            output_tensors[kDefaultScoresIndex]->dims->data[0],
+            output_tensors[kDefaultScoresIndex]->dims->data[1]));
   }
 
   return absl::OkStatus();
@@ -303,11 +314,85 @@ absl::Status ObjectDetector::Init(
   // Initialize class whitelisting/blacklisting, if any.
   RETURN_IF_ERROR(CheckAndSetClassIndexSet());
 
+  // Perform final initialization (by default, initialize score calibration
+  // parameters, if any).
+  RETURN_IF_ERROR(PostInit());
+
   return absl::OkStatus();
 }
 
 absl::Status ObjectDetector::PreInit() {
   SetProcessEngine(FrameBufferUtils::ProcessEngine::kLibyuv);
+  return absl::OkStatus();
+}
+
+absl::Status ObjectDetector::PostInit() { return InitScoreCalibrations(); }
+
+StatusOr<SigmoidCalibrationParameters> BuildCalibrationParametersIfAny(
+    const tflite::metadata::ModelMetadataExtractor& metadata_extractor,
+    const tflite::TensorMetadata& output_tensor_metadata,
+    const std::vector<LabelMapItem>& label_map_items,
+    bool* has_score_calibration) {
+  SigmoidCalibrationParameters sigmoid_params;
+  *has_score_calibration = false;
+
+  // Build score calibration parameters, if present.
+  //
+  // TODO(tianlin): This code is similar to the block of classification_head.cc
+  // that does sanity checks and builds sigmoid calibration params in:
+  //   https://github.com/tensorflow/tflite-support/blob/64e044408f3d3654de7fc10bca401ed900649ca3/tensorflow_lite_support/cc/task/vision/core/classification_head.cc#L75-L107
+  // Consider to refactor it and reuse the same function.
+  ASSIGN_OR_RETURN(const tflite::ProcessUnit* score_calibration_process_unit,
+                   ModelMetadataExtractor::FindFirstProcessUnit(
+                       output_tensor_metadata,
+                       tflite::ProcessUnitOptions_ScoreCalibrationOptions));
+  if (score_calibration_process_unit != nullptr) {
+    const std::string score_calibration_filename =
+        ModelMetadataExtractor::FindFirstAssociatedFileName(
+            output_tensor_metadata,
+            tflite::AssociatedFileType_TENSOR_AXIS_SCORE_CALIBRATION);
+    ASSIGN_OR_RETURN(
+        absl::string_view score_calibration_file,
+        metadata_extractor.GetAssociatedFile(score_calibration_filename));
+
+    // Set has_score_calibration to true, only if sigmoid_params is built.
+    ASSIGN_OR_RETURN(sigmoid_params,
+                     BuildSigmoidCalibrationParams(
+                         *score_calibration_process_unit
+                              ->options_as_ScoreCalibrationOptions(),
+                         score_calibration_file, label_map_items));
+    *has_score_calibration = true;
+  }
+  return sigmoid_params;
+}
+
+absl::Status ObjectDetector::InitScoreCalibrations() {
+  StatusOr<SigmoidCalibrationParameters> calibration_params_status;
+  bool has_score_calibration = false;
+
+  // Search the output tensor metadata, can try to get calibration_params.
+  const ModelMetadataExtractor* metadata_extractor =
+      GetTfLiteEngine()->metadata_extractor();
+  const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
+      output_tensor_metadata = metadata_extractor->GetOutputTensorMetadata();
+  const tflite::TensorMetadata* output_tensor =
+      output_tensor_metadata->Get(kDefaultScoresIndex);
+  ASSIGN_OR_RETURN(auto calibration_params,
+      BuildCalibrationParametersIfAny(*metadata_extractor, *output_tensor,
+                                      label_map_, &has_score_calibration));
+
+  // If no calibration_params is found, just skip score calibration.
+  if (!has_score_calibration) {
+    return absl::OkStatus();
+  }
+
+  score_calibration_ = absl::make_unique<ScoreCalibration>();
+  if (score_calibration_ == nullptr) {
+    return CreateStatusWithPayload(
+        StatusCode::kInternal, "Could not create score calibration object.");
+  }
+  RETURN_IF_ERROR(
+      score_calibration_->InitializeFromParameters(calibration_params));
   return absl::OkStatus();
 }
 
@@ -469,8 +554,8 @@ StatusOr<DetectionResult> ObjectDetector::Postprocess(
   RETURN_IF_ERROR(SanityCheckOutputTensors(output_tensors));
 
   // Get number of available results.
-  const int num_results =
-      static_cast<int>(AssertAndReturnTypedTensor<float>(output_tensors[3])[0]);
+  const int num_results = static_cast<int>(AssertAndReturnTypedTensor<float>(
+      output_tensors[kDefaultNumResultsIndex])[0]);
   // Compute number of max results to return.
   const int max_results = options_->max_results() > 0
                               ? std::min(options_->max_results(), num_results)
@@ -483,17 +568,29 @@ StatusOr<DetectionResult> ObjectDetector::Postprocess(
                            FrameBuffer::Orientation::kTopLeft)) {
     upright_input_frame_dimensions.Swap();
   }
-
-  const float* locations = AssertAndReturnTypedTensor<float>(output_tensors[0]);
-  const float* classes = AssertAndReturnTypedTensor<float>(output_tensors[1]);
-  const float* scores = AssertAndReturnTypedTensor<float>(output_tensors[2]);
+  const float* locations =
+      AssertAndReturnTypedTensor<float>(output_tensors[kDefaultLocationsIndex]);
+  const float* classes =
+      AssertAndReturnTypedTensor<float>(output_tensors[kDefaultClassesIndex]);
+  const float* scores =
+      AssertAndReturnTypedTensor<float>(output_tensors[kDefaultScoresIndex]);
   DetectionResult results;
   for (int i = 0; i < num_results; ++i) {
     const int class_index = static_cast<int>(classes[i]);
-    const float score = scores[i];
-    if (!IsClassIndexAllowed(class_index) || score < score_threshold_) {
+    if (!IsClassIndexAllowed(class_index)) {
       continue;
     }
+
+    float score = scores[i];
+    // Calibrate score only if score_calibration_ is presented.
+    if (score_calibration_ != nullptr) {
+      const std::string& class_name = label_map_[class_index].name;
+      score = score_calibration_->ComputeCalibratedScore(class_name, score);
+    }
+    if (score <= score_threshold_) {
+      continue;
+    }
+
     Detection* detection = results.add_detections();
     // Denormalize the bounding box cooordinates in the upright frame
     // coordinates system, then rotate back from frame_buffer.orientation() to
