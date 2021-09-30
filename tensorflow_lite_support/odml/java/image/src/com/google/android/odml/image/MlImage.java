@@ -17,12 +17,16 @@ package com.google.android.odml.image;
 
 import android.graphics.Rect;
 import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
 import com.google.android.odml.image.annotation.KeepForSdk;
 import java.io.Closeable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Wraps image data for on-device machine learning (ODML) usages.
@@ -157,7 +161,9 @@ public class MlImage implements Closeable {
   public synchronized void close() {
     referenceCount -= 1;
     if (referenceCount == 0) {
-      getContainer().close();
+      for (ImageContainer imageContainer : containerMap.values()) {
+        imageContainer.close();
+      }
     }
   }
 
@@ -200,7 +206,7 @@ public class MlImage implements Closeable {
     return new Internal(this);
   }
 
-  private final ImageContainer container;
+  private final Map<ImageProperties, ImageContainer> containerMap;
   private final int rotation;
   private final Rect roi;
   private final long timestamp;
@@ -212,7 +218,8 @@ public class MlImage implements Closeable {
   /** Constructs an {@link MlImage} with a built container. */
   @KeepForSdk
   MlImage(ImageContainer container, int rotation, Rect roi, long timestamp, int width, int height) {
-    this.container = container;
+    this.containerMap = new HashMap<>();
+    containerMap.put(container.getImageProperties(), container);
     this.rotation = rotation;
     this.roi = new Rect();
     this.roi.set(roi);
@@ -232,7 +239,40 @@ public class MlImage implements Closeable {
     // According to the design, in the future we will support multiple containers in one image.
     // Currently just return the original container.
     // TODO(b/182443927): Cache multiple containers in MlImage.
-    return container;
+    return containerMap.values().iterator().next();
+  }
+
+  /**
+   * Gets container from required {@code storageType}. Returns {@code null} if not existed.
+   *
+   * <p>If there are multiple containers with required {@code storageType}, returns the first one.
+   */
+  @Nullable
+  @KeepForSdk
+  ImageContainer getContainer(@StorageType int storageType) {
+    for (Entry<ImageProperties, ImageContainer> entry : containerMap.entrySet()) {
+      if (entry.getKey().getStorageType() == storageType) {
+        return entry.getValue();
+      }
+    }
+    return null;
+  }
+
+  /** Gets container from required {@code imageProperties}. Returns {@code null} if non existed. */
+  @Nullable
+  @KeepForSdk
+  ImageContainer getContainer(ImageProperties imageProperties) {
+    return containerMap.get(imageProperties);
+  }
+
+  /** Adds a new container if it doesn't exist. Returns {@code true} if it succeeds. */
+  boolean addContainer(ImageContainer container) {
+    ImageProperties imageProperties = container.getImageProperties();
+    if (containerMap.containsKey(imageProperties)) {
+      return false;
+    }
+    containerMap.put(imageProperties, container);
+    return true;
   }
 
   /**

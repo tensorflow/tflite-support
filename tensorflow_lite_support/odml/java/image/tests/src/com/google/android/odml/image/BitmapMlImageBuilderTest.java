@@ -34,7 +34,7 @@ public final class BitmapMlImageBuilderTest {
     Bitmap bitmap = Bitmap.createBitmap(20, 25, Config.ARGB_8888);
 
     MlImage image = new BitmapMlImageBuilder(bitmap).build();
-    ImageContainer container = image.getContainer();
+    ImageContainer container = image.getContainer(MlImage.STORAGE_TYPE_BITMAP);
 
     assertThat(image.getWidth()).isEqualTo(20);
     assertThat(image.getHeight()).isEqualTo(25);

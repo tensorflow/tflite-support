@@ -36,18 +36,14 @@ public final class BitmapExtractor {
    *     conversions.
    */
   public static Bitmap extract(MlImage image) {
-    ImageContainer container = image.getContainer();
-    switch (container.getImageProperties().getStorageType()) {
-      case MlImage.STORAGE_TYPE_BITMAP:
-        BitmapImageContainer bitmapImageContainer = (BitmapImageContainer) container;
-        return bitmapImageContainer.getBitmap();
-      case MlImage.STORAGE_TYPE_BYTEBUFFER:
-      case MlImage.STORAGE_TYPE_MEDIA_IMAGE:
-        // TODO(b/180504869): Support ByteBuffer -> Bitmap conversion.
-      default:
-        throw new IllegalArgumentException(
-            "Extracting Bitmap from an MlImage created by objects other than Bitmap is not"
-                + " supported");
+    ImageContainer imageContainer = image.getContainer(MlImage.STORAGE_TYPE_BITMAP);
+    if (imageContainer != null) {
+      return ((BitmapImageContainer) imageContainer).getBitmap();
+    } else {
+      // TODO(b/180504869): Support ByteBuffer -> Bitmap conversion.
+      throw new IllegalArgumentException(
+          "Extracting Bitmap from an MlImage created by objects other than Bitmap is not"
+              + " supported");
     }
   }
 

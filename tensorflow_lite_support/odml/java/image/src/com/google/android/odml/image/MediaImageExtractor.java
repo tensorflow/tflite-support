@@ -41,15 +41,12 @@ public class MediaImageExtractor {
    * @throws IllegalArgumentException if the extraction failed.
    */
   public static Image extract(MlImage image) {
-    ImageContainer container = image.getContainer();
-    switch (container.getImageProperties().getStorageType()) {
-      case MlImage.STORAGE_TYPE_MEDIA_IMAGE:
-        MediaImageContainer mediaImageContainer = (MediaImageContainer) container;
-        return mediaImageContainer.getImage();
-      default:
-        throw new IllegalArgumentException(
-            "Extract Media Image from an MlImage created by objects other than Media Image"
-                + " is not supported");
+    ImageContainer container;
+    if ((container = image.getContainer(MlImage.STORAGE_TYPE_MEDIA_IMAGE)) != null) {
+      return ((MediaImageContainer) container).getImage();
     }
+    throw new IllegalArgumentException(
+        "Extract Media Image from an MlImage created by objects other than Media Image"
+            + " is not supported");
   }
 }

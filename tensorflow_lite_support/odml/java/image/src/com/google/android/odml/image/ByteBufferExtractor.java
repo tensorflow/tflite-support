@@ -75,25 +75,31 @@ public class ByteBufferExtractor {
    *     conversions.
    */
   static ByteBuffer extract(MlImage image, @ImageFormat int targetFormat) {
-    ImageContainer container = image.getContainer();
-    switch (container.getImageProperties().getStorageType()) {
-      case MlImage.STORAGE_TYPE_BITMAP:
-        BitmapImageContainer bitmapImageContainer = (BitmapImageContainer) container;
-        return extractByteBufferFromBitmap(bitmapImageContainer.getBitmap(), targetFormat)
-            .asReadOnlyBuffer();
-      case MlImage.STORAGE_TYPE_BYTEBUFFER:
-        ByteBufferImageContainer byteBufferImageContainer = (ByteBufferImageContainer) container;
-        @ImageFormat int sourceFormat = byteBufferImageContainer.getImageFormat();
-        if (sourceFormat == targetFormat) {
-          return byteBufferImageContainer.getByteBuffer().asReadOnlyBuffer();
-        }
-        return convertByteBuffer(
-                byteBufferImageContainer.getByteBuffer(), sourceFormat, targetFormat)
-            .asReadOnlyBuffer();
-      default:
-        throw new IllegalArgumentException(
-            "Extracting ByteBuffer from an MlImage created by objects other than Bitmap or"
-                + " Bytebuffer is not supported");
+    ImageContainer container;
+    ImageProperties byteBufferProperties =
+        ImageProperties.builder()
+            .setStorageType(MlImage.STORAGE_TYPE_BYTEBUFFER)
+            .setImageFormat(targetFormat)
+            .build();
+    if ((container = image.getContainer(byteBufferProperties)) != null) {
+      ByteBufferImageContainer byteBufferImageContainer = (ByteBufferImageContainer) container;
+      return byteBufferImageContainer.getByteBuffer().asReadOnlyBuffer();
+    } else if ((container = image.getContainer(MlImage.STORAGE_TYPE_BYTEBUFFER)) != null) {
+      ByteBufferImageContainer byteBufferImageContainer = (ByteBufferImageContainer) container;
+      @ImageFormat int sourceFormat = byteBufferImageContainer.getImageFormat();
+      return convertByteBuffer(byteBufferImageContainer.getByteBuffer(), sourceFormat, targetFormat)
+          .asReadOnlyBuffer();
+    } else if ((container = image.getContainer(MlImage.STORAGE_TYPE_BITMAP)) != null) {
+      BitmapImageContainer bitmapImageContainer = (BitmapImageContainer) container;
+      ByteBuffer byteBuffer =
+          extractByteBufferFromBitmap(bitmapImageContainer.getBitmap(), targetFormat)
+              .asReadOnlyBuffer();
+      image.addContainer(new ByteBufferImageContainer(byteBuffer, targetFormat));
+      return byteBuffer;
+    } else {
+      throw new IllegalArgumentException(
+          "Extracting ByteBuffer from an MlImage created by objects other than Bitmap or"
+              + " Bytebuffer is not supported");
     }
   }
 
@@ -128,23 +134,24 @@ public class ByteBufferExtractor {
    *     given {@code imageFormat}
    */
   static Result extractInRecommendedFormat(MlImage image) {
-    ImageContainer container = image.getContainer();
-    switch (container.getImageProperties().getStorageType()) {
-      case MlImage.STORAGE_TYPE_BITMAP:
-        BitmapImageContainer bitmapImageContainer = (BitmapImageContainer) container;
-        Bitmap bitmap = bitmapImageContainer.getBitmap();
-        @ImageFormat int format = adviseImageFormat(bitmap);
-        return Result.create(
-            extractByteBufferFromBitmap(bitmap, format).asReadOnlyBuffer(), format);
-      case MlImage.STORAGE_TYPE_BYTEBUFFER:
-        ByteBufferImageContainer byteBufferImageContainer = (ByteBufferImageContainer) container;
-        return Result.create(
-            byteBufferImageContainer.getByteBuffer().asReadOnlyBuffer(),
-            byteBufferImageContainer.getImageFormat());
-      default:
-        throw new IllegalArgumentException(
-            "Extract ByteBuffer from an MlImage created by objects other than Bitmap or Bytebuffer"
-                + " is not supported");
+    ImageContainer container;
+    if ((container = image.getContainer(MlImage.STORAGE_TYPE_BITMAP)) != null) {
+      Bitmap bitmap = ((BitmapImageContainer) container).getBitmap();
+      @ImageFormat int format = adviseImageFormat(bitmap);
+      Result result =
+          Result.create(extractByteBufferFromBitmap(bitmap, format).asReadOnlyBuffer(), format);
+
+      image.addContainer(new ByteBufferImageContainer(result.buffer(), result.format()));
+      return result;
+    } else if ((container = image.getContainer(MlImage.STORAGE_TYPE_BYTEBUFFER)) != null) {
+      ByteBufferImageContainer byteBufferImageContainer = (ByteBufferImageContainer) container;
+      return Result.create(
+          byteBufferImageContainer.getByteBuffer().asReadOnlyBuffer(),
+          byteBufferImageContainer.getImageFormat());
+    } else {
+      throw new IllegalArgumentException(
+          "Extract ByteBuffer from an MlImage created by objects other than Bitmap or Bytebuffer"
+              + " is not supported");
     }
   }
 

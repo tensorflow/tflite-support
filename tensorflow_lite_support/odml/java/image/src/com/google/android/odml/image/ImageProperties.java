@@ -19,6 +19,7 @@ import com.google.android.odml.image.MlImage.ImageFormat;
 import com.google.android.odml.image.MlImage.StorageType;
 import com.google.android.odml.image.annotation.KeepForSdk;
 import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
 
 /** Groups a set of properties to describe how an image is stored. */
 @AutoValue
@@ -39,6 +40,10 @@ public abstract class ImageProperties {
    */
   @StorageType
   public abstract int getStorageType();
+
+  @Memoized
+  @Override
+  public abstract int hashCode();
 
   /**
    * Creates a builder of {@link ImageProperties}.
