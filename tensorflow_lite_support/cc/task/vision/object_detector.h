@@ -190,6 +190,11 @@ class ObjectDetector : public BaseVisionTaskApi<DetectionResult> {
   // List of score calibration parameters, if any. Built from TFLite Model
   // Metadata.
   std::unique_ptr<ScoreCalibration> score_calibration_;
+
+  // Indices of the output tensors to match the output tensors to the correct
+  // index order of the output tensors: [location, categories, scores,
+  // num_detections].
+  std::vector<int> output_indices_;
 };
 
 }  // namespace vision

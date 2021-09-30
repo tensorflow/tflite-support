@@ -95,6 +95,9 @@ constexpr char kExpectResults[] =
     )pb";
 constexpr char kMobileSsdWithMetadataDummyScoreCalibration[] =
     "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29_score_calibration.tflite";
+// The model has different output tensor order.
+constexpr char kEfficientDetWithMetadata[] =
+    "coco_efficientdet_lite0_v1_1.0_quant_2021_09_06.tflite";
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
   return DecodeImageFromFile(JoinPath("./" /*test src dir*/,

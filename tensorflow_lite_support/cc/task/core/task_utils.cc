@@ -61,6 +61,22 @@ std::string LoadBinaryContent(const char* filename) {
   return buffer;
 }
 
+int FindIndexByMetadataTensorName(
+    const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
+        tensor_metadatas,
+    const std::string& name) {
+  if (tensor_metadatas == nullptr) {
+    return -1;
+  }
+  for (int i = 0; i < tensor_metadatas->size(); i++) {
+    if (strcmp(name.data(), tensor_metadatas->Get(i)->name()->c_str()) == 0) {
+      return i;
+    }
+  }
+  // Returns -1 if not found.
+  return -1;
+}
+
 }  // namespace core
 }  // namespace task
 }  // namespace tflite

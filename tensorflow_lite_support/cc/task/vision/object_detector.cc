@@ -19,6 +19,7 @@ limitations under the License.
 #include <limits>
 #include <vector>
 
+#include <glog/logging.h>
 #include "external/com_google_absl/absl/memory/memory.h"
 #include "external/com_google_absl/absl/status/status.h"
 #include "external/com_google_absl/absl/strings/str_format.h"
@@ -56,11 +57,15 @@ using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::core::AssertAndReturnTypedTensor;
+using ::tflite::task::core::FindIndexByMetadataTensorName;
 using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
 
 // The expected number of dimensions of the 4 output tensors, representing in
-// that order: locations, classes, scores, num_results.
+// that order: locations, categories, scores, num_results. The order is
+// coming from the TFLite custom NMS op for object detection post-processing
+// shown in
+// https://github.com/tensorflow/tensorflow/blob/1c419b231b622bd9e9685682545e9064f0fbb42a/tensorflow/lite/kernels/detection_postprocess.cc#L47.
 static constexpr int kOutputTensorsExpectedDims[4] = {3, 2, 2, 1};
 constexpr int kDefaultLocationsIndex = 0;
 constexpr int kDefaultClassesIndex = 1;
@@ -68,6 +73,11 @@ constexpr int kDefaultScoresIndex = 2;
 constexpr int kDefaultNumResultsIndex = 3;
 
 constexpr float kDefaultScoreThreshold = std::numeric_limits<float>::lowest();
+
+constexpr char kLocationTensorName[] = "location";
+constexpr char kCategoryTensorName[] = "category";
+constexpr char kScoreTensorName[] = "score";
+constexpr char kNumberOfDetectionsTensorName[] = "number of detections";
 
 StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
     const TensorMetadata& tensor_metadata) {
@@ -166,8 +176,38 @@ StatusOr<float> GetScoreThreshold(
       ->global_score_threshold();
 }
 
+// Use tensor names in metadata to get the output order.
+std::vector<int> GetOutputIndices(
+    const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
+        tensor_metadatas) {
+  std::vector<int> output_indices = {
+      FindIndexByMetadataTensorName(tensor_metadatas, kLocationTensorName),
+      FindIndexByMetadataTensorName(tensor_metadatas, kCategoryTensorName),
+      FindIndexByMetadataTensorName(tensor_metadatas, kScoreTensorName),
+      FindIndexByMetadataTensorName(tensor_metadatas,
+                                    kNumberOfDetectionsTensorName)};
+
+  for (int i = 0; i < 4; i++) {
+    int output_index = output_indices[i];
+    // If tensor name is not found, set the default output indices.
+    if (output_index == -1) {
+      LOG(WARNING) << absl::StrFormat(
+          "You don't seem to be matching tensor names in metadata list. The "
+          "tensor name \"%s\" at index %d in the model metadata doesn't match "
+          "the available output names: [\"%s\", \"%s\", \"%s\", \"%s\"].",
+          tensor_metadatas->Get(i)->name()->c_str(), i, kLocationTensorName,
+          kCategoryTensorName, kScoreTensorName, kNumberOfDetectionsTensorName);
+      output_indices = {kDefaultLocationsIndex, kDefaultClassesIndex,
+                        kDefaultScoresIndex, kDefaultNumResultsIndex};
+      return output_indices;
+    }
+  }
+  return output_indices;
+}
+
 absl::Status SanityCheckOutputTensors(
-    const std::vector<const TfLiteTensor*>& output_tensors) {
+    const std::vector<const TfLiteTensor*>& output_tensors,
+    const std::vector<int>& output_indices) {
   if (output_tensors.size() != 4) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
@@ -176,51 +216,53 @@ absl::Status SanityCheckOutputTensors(
   }
 
   // Get number of results.
-  if (output_tensors[kDefaultNumResultsIndex]->dims->data[0] != 1) {
+  const TfLiteTensor* num_results_tensor = output_tensors[output_indices[3]];
+  if (num_results_tensor->dims->data[0] != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
             "Expected tensor with dimensions [1] at index 3, found [%d]",
-            output_tensors[kDefaultNumResultsIndex]->dims->data[0]));
+            num_results_tensor->dims->data[0]));
   }
-  int num_results = static_cast<int>(AssertAndReturnTypedTensor<float>(
-      output_tensors[kDefaultNumResultsIndex])[0]);
+  int num_results = static_cast<int>(
+      AssertAndReturnTypedTensor<float>(num_results_tensor)[0]);
 
+  const TfLiteTensor* location_tensor = output_tensors[output_indices[0]];
   // Check dimensions for the other tensors are correct.
-  if (output_tensors[kDefaultLocationsIndex]->dims->data[0] != 1 ||
-      output_tensors[kDefaultLocationsIndex]->dims->data[1] < num_results ||
-      output_tensors[kDefaultLocationsIndex]->dims->data[2] != 4) {
+  if (location_tensor->dims->data[0] != 1 ||
+      location_tensor->dims->data[1] < num_results ||
+      location_tensor->dims->data[2] != 4) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
             "Expected locations tensor with dimensions [1, num_detected_boxes, "
-            "4] at index %d, num_detected_boxes >= %d, found [%d,%d,%d].",
-            kDefaultLocationsIndex, num_results,
-            output_tensors[kDefaultLocationsIndex]->dims->data[0],
-            output_tensors[kDefaultLocationsIndex]->dims->data[1],
-            output_tensors[kDefaultLocationsIndex]->dims->data[2]));
+            "4] at index 0, num_detected_boxes >= %d, found [%d,%d,%d].",
+            num_results, location_tensor->dims->data[0],
+            location_tensor->dims->data[1], location_tensor->dims->data[2]));
   }
-  if (output_tensors[kDefaultClassesIndex]->dims->data[0] != 1 ||
-      output_tensors[kDefaultClassesIndex]->dims->data[1] < num_results) {
+
+  const TfLiteTensor* class_tensor = output_tensors[output_indices[1]];
+  if (class_tensor->dims->data[0] != 1 ||
+      class_tensor->dims->data[1] < num_results) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
             "Expected classes tensor with dimensions [1, num_detected_boxes] "
-            "at index %d, num_detected_boxes >= %d, found [%d,%d].",
-            kDefaultClassesIndex, num_results,
-            output_tensors[kDefaultClassesIndex]->dims->data[0],
-            output_tensors[kDefaultClassesIndex]->dims->data[1]));
+            "at index 1, num_detected_boxes >= %d, found [%d,%d].",
+            num_results, class_tensor->dims->data[0],
+            class_tensor->dims->data[1]));
   }
-  if (output_tensors[kDefaultScoresIndex]->dims->data[0] != 1 ||
-      output_tensors[kDefaultScoresIndex]->dims->data[1] < num_results) {
+
+  const TfLiteTensor* scores_tensor = output_tensors[output_indices[2]];
+  if (scores_tensor->dims->data[0] != 1 ||
+      scores_tensor->dims->data[1] < num_results) {
     return CreateStatusWithPayload(
         StatusCode::kInternal,
         absl::StrFormat(
             "Expected scores tensor with dimensions [1, num_detected_boxes] "
-            "at index %d, num_detected_boxes >= %d, found [%d,%d].",
-            kDefaultScoresIndex, num_results,
-            output_tensors[kDefaultScoresIndex]->dims->data[0],
-            output_tensors[kDefaultScoresIndex]->dims->data[1]));
+            "at index 2, num_detected_boxes >= %d, found [%d,%d].",
+            num_results, scores_tensor->dims->data[0],
+            scores_tensor->dims->data[1]));
   }
 
   return absl::OkStatus();
@@ -409,25 +451,6 @@ absl::Status ObjectDetector::CheckAndSetOutputs() {
                         TfLiteEngine::OutputCount(interpreter)),
         TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
-  // Check tensor dimensions and batch size.
-  for (int i = 0; i < 4; ++i) {
-    const TfLiteTensor* tensor = TfLiteEngine::GetOutput(interpreter, i);
-    if (tensor->dims->size != kOutputTensorsExpectedDims[i]) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          absl::StrFormat("Output tensor at index %d is expected to "
-                          "have %d dimensions, found %d.",
-                          i, kOutputTensorsExpectedDims[i], tensor->dims->size),
-          TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
-    }
-    if (tensor->dims->data[0] != 1) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          absl::StrFormat("Expected batch size of 1, found %d.",
-                          tensor->dims->data[0]),
-          TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
-    }
-  }
 
   // Now, perform sanity checks and extract metadata.
   const ModelMetadataExtractor* metadata_extractor =
@@ -455,10 +478,13 @@ absl::Status ObjectDetector::CheckAndSetOutputs() {
         TfLiteSupportStatus::kMetadataInconsistencyError);
   }
 
+  output_indices_ = GetOutputIndices(output_tensors_metadata);
+
   // Extract mandatory BoundingBoxProperties for easier access at
   // post-processing time, performing sanity checks on the fly.
   ASSIGN_OR_RETURN(const BoundingBoxProperties* bounding_box_properties,
-                   GetBoundingBoxProperties(*output_tensors_metadata->Get(0)));
+                   GetBoundingBoxProperties(
+                       *output_tensors_metadata->Get(output_indices_[0])));
   if (bounding_box_properties->index() == nullptr) {
     bounding_box_corners_order_ = {0, 1, 2, 3};
   } else {
@@ -474,16 +500,39 @@ absl::Status ObjectDetector::CheckAndSetOutputs() {
   // Build label map (if available) from metadata.
   ASSIGN_OR_RETURN(
       label_map_,
-      GetLabelMapIfAny(*metadata_extractor, *output_tensors_metadata->Get(1),
+      GetLabelMapIfAny(*metadata_extractor,
+                       *output_tensors_metadata->Get(output_indices_[1]),
                        options_->display_names_locale()));
 
   // Set score threshold.
   if (options_->has_score_threshold()) {
     score_threshold_ = options_->score_threshold();
   } else {
-    ASSIGN_OR_RETURN(score_threshold_,
-                     GetScoreThreshold(*metadata_extractor,
-                                       *output_tensors_metadata->Get(2)));
+    ASSIGN_OR_RETURN(
+        score_threshold_,
+        GetScoreThreshold(*metadata_extractor,
+                          *output_tensors_metadata->Get(output_indices_[2])));
+  }
+
+  // Check tensor dimensions and batch size.
+  for (int i = 0; i < 4; ++i) {
+    std::size_t j = output_indices_[i];
+    const TfLiteTensor* tensor = TfLiteEngine::GetOutput(interpreter, j);
+    if (tensor->dims->size != kOutputTensorsExpectedDims[i]) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrFormat("Output tensor at index %d is expected to "
+                          "have %d dimensions, found %d.",
+                          j, kOutputTensorsExpectedDims[i], tensor->dims->size),
+          TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
+    }
+    if (tensor->dims->data[0] != 1) {
+      return CreateStatusWithPayload(
+          StatusCode::kInvalidArgument,
+          absl::StrFormat("Expected batch size of 1, found %d.",
+                          tensor->dims->data[0]),
+          TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
+    }
   }
 
   return absl::OkStatus();
@@ -551,11 +600,11 @@ StatusOr<DetectionResult> ObjectDetector::Postprocess(
   // Most of the checks here should never happen, as outputs have been validated
   // at construction time. Checking nonetheless and returning internal errors if
   // something bad happens.
-  RETURN_IF_ERROR(SanityCheckOutputTensors(output_tensors));
+  RETURN_IF_ERROR(SanityCheckOutputTensors(output_tensors, output_indices_));
 
   // Get number of available results.
-  const int num_results = static_cast<int>(AssertAndReturnTypedTensor<float>(
-      output_tensors[kDefaultNumResultsIndex])[0]);
+  const int num_results = static_cast<int>(
+      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[3]])[0]);
   // Compute number of max results to return.
   const int max_results = options_->max_results() > 0
                               ? std::min(options_->max_results(), num_results)
@@ -569,11 +618,11 @@ StatusOr<DetectionResult> ObjectDetector::Postprocess(
     upright_input_frame_dimensions.Swap();
   }
   const float* locations =
-      AssertAndReturnTypedTensor<float>(output_tensors[kDefaultLocationsIndex]);
+      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[0]]);
   const float* classes =
-      AssertAndReturnTypedTensor<float>(output_tensors[kDefaultClassesIndex]);
+      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[1]]);
   const float* scores =
-      AssertAndReturnTypedTensor<float>(output_tensors[kDefaultScoresIndex]);
+      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[2]]);
   DetectionResult results;
   for (int i = 0; i < num_results; ++i) {
     const int class_index = static_cast<int>(classes[i]);
