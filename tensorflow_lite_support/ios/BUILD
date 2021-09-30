@@ -28,6 +28,7 @@ strip_c_api_include_path_prefix(
         "//tensorflow_lite_support/c/task/processor:classification_result.h",
         "//tensorflow_lite_support/c/task/processor:classification_options.h",
         "//tensorflow_lite_support/c/task/core:base_options.h",
+        "//tensorflow_lite_support/c:common.h",
     ],
 )
 
@@ -66,9 +67,11 @@ tflite_ios_framework(
         ":base_options.h",
         ":bounding_box.h",
         ":classification_options.h",
+        ":common.h",
         ":classification_result.h",
         ":frame_buffer.h",
         ":image_classifier.h",
+        
     ],
     allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
     bundle_name = "TensorFlowLiteTaskVisionC",
