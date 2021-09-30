@@ -105,7 +105,6 @@ py_test(
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "//tensorflow_lite_support/metadata/python/metadata_writers:object_detector",
         "@absl_py//absl/testing:parameterized",
-        "@flatbuffers//:runtime_py",
     ],
 )
 
