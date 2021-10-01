@@ -28,6 +28,7 @@ import java.util.List;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.image.MlImageAdapter;
 import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.task.core.BaseOptions;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
@@ -151,7 +152,12 @@ public final class ObjectDetector extends BaseVisionTaskApi {
                   long fileDescriptorOffset,
                   ObjectDetectorOptions options) {
                 return initJniWithModelFdAndOptions(
-                    fileDescriptor, fileDescriptorLength, fileDescriptorOffset, options);
+                    fileDescriptor,
+                    fileDescriptorLength,
+                    fileDescriptorOffset,
+                    options,
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             OBJECT_DETECTOR_NATIVE_LIB,
@@ -180,7 +186,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
                       descriptor.getFd(),
                       /*fileDescriptorLength=*/ OPTIONAL_FD_LENGTH,
                       /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET,
-                      options);
+                      options,
+                      TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                          options.getBaseOptions(), options.getNumThreads()));
                 }
               },
               OBJECT_DETECTOR_NATIVE_LIB));
@@ -209,7 +217,11 @@ public final class ObjectDetector extends BaseVisionTaskApi {
             new EmptyHandleProvider() {
               @Override
               public long createHandle() {
-                return initJniWithByteBuffer(modelBuffer, options);
+                return initJniWithByteBuffer(
+                    modelBuffer,
+                    options,
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             OBJECT_DETECTOR_NATIVE_LIB));
@@ -233,6 +245,7 @@ public final class ObjectDetector extends BaseVisionTaskApi {
     // 1. java.util.Optional require Java 8 while we need to support Java 7.
     // 2. The Guava library (com.google.common.base.Optional) is avoided in this project. See the
     // comments for labelAllowList.
+    private final BaseOptions baseOptions;
     private final String displayNamesLocale;
     private final int maxResults;
     private final float scoreThreshold;
@@ -252,6 +265,7 @@ public final class ObjectDetector extends BaseVisionTaskApi {
 
     /** A builder that helps to configure an instance of ObjectDetectorOptions. */
     public static class Builder {
+      private BaseOptions baseOptions = BaseOptions.builder().build();
       private String displayNamesLocale = "en";
       private int maxResults = -1;
       private float scoreThreshold;
@@ -261,6 +275,12 @@ public final class ObjectDetector extends BaseVisionTaskApi {
       private int numThreads = -1;
 
       private Builder() {}
+
+      /** Sets the general options to configure Task APIs, such as accelerators. */
+      public Builder setBaseOptions(BaseOptions baseOptions) {
+        this.baseOptions = baseOptions;
+        return this;
+      }
 
       /**
        * Sets the locale to use for display names specified through the TFLite Model Metadata, if
@@ -335,7 +355,11 @@ public final class ObjectDetector extends BaseVisionTaskApi {
        *
        * <p>numThreads should be greater than 0 or equal to -1. Setting numThreads to -1 has the
        * effect to let TFLite runtime set the value.
+       *
+       * @deprecated use {@link BaseOptions} to configure number of threads instead. This method
+       *     will override the number of threads configured from {@link BaseOptions}.
        */
+      @Deprecated
       public Builder setNumThreads(int numThreads) {
         this.numThreads = numThreads;
         return this;
@@ -381,6 +405,10 @@ public final class ObjectDetector extends BaseVisionTaskApi {
       return numThreads;
     }
 
+    public BaseOptions getBaseOptions() {
+      return baseOptions;
+    }
+
     private ObjectDetectorOptions(Builder builder) {
       displayNamesLocale = builder.displayNamesLocale;
       maxResults = builder.maxResults;
@@ -389,6 +417,7 @@ public final class ObjectDetector extends BaseVisionTaskApi {
       labelAllowList = builder.labelAllowList;
       labelDenyList = builder.labelDenyList;
       numThreads = builder.numThreads;
+      baseOptions = builder.baseOptions;
     }
   }
 
@@ -463,8 +492,7 @@ public final class ObjectDetector extends BaseVisionTaskApi {
   }
 
   /**
-   * Performs actual detection on the provided {@code MlImage} with {@link
-   * ImageProcessingOptions}.
+   * Performs actual detection on the provided {@code MlImage} with {@link ImageProcessingOptions}.
    *
    * <p>{@link ObjectDetector} supports the following options:
    *
@@ -497,10 +525,11 @@ public final class ObjectDetector extends BaseVisionTaskApi {
       int fileDescriptor,
       long fileDescriptorLength,
       long fileDescriptorOffset,
-      ObjectDetectorOptions options);
+      ObjectDetectorOptions options,
+      long baseOptionsHandle);
 
   private static native long initJniWithByteBuffer(
-      ByteBuffer modelBuffer, ObjectDetectorOptions options);
+      ByteBuffer modelBuffer, ObjectDetectorOptions options, long baseOptionsHandle);
 
   private static native List<Detection> detectNative(long nativeHandle, long frameBufferHandle);
 

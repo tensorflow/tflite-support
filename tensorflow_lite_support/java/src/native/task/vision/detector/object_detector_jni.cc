@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "external/com_google_absl/absl/strings/string_view.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/object_detector.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"
@@ -36,16 +37,26 @@ using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::StringListToVector;
 using ::tflite::support::utils::ThrowException;
+using ::tflite::task::core::BaseOptions;
 using ::tflite::task::vision::BoundingBox;
 using ::tflite::task::vision::ConvertToCategory;
 using ::tflite::task::vision::DetectionResult;
 using ::tflite::task::vision::FrameBuffer;
+
 using ::tflite::task::vision::ObjectDetector;
 using ::tflite::task::vision::ObjectDetectorOptions;
 
 // Creates an ObjectDetectorOptions proto based on the Java class.
-ObjectDetectorOptions ConvertToProtoOptions(JNIEnv* env, jobject java_options) {
+ObjectDetectorOptions ConvertToProtoOptions(JNIEnv* env, jobject java_options,
+                                            jlong base_options_handle) {
   ObjectDetectorOptions proto_options;
+
+  if (base_options_handle != kInvalidPointer) {
+    // proto_options will free the previous base_options and set the new one.
+    proto_options.set_allocated_base_options(
+        reinterpret_cast<BaseOptions*>(base_options_handle));
+  }
+
   jclass java_options_class = env->FindClass(
       "org/tensorflow/lite/task/vision/detector/"
       "ObjectDetector$ObjectDetectorOptions");
@@ -91,12 +102,6 @@ ObjectDetectorOptions ConvertToProtoOptions(JNIEnv* env, jobject java_options) {
   for (const auto& class_name : deny_list_vector) {
     proto_options.add_class_name_blacklist(class_name);
   }
-
-  jmethodID num_threads_id =
-      env->GetMethodID(java_options_class, "getNumThreads", "()I");
-  jint num_threads = env->CallIntMethod(java_options, num_threads_id);
-  proto_options.set_num_threads(num_threads);
-
   return proto_options;
 }
 
@@ -177,10 +182,11 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_initJniWithModelFdAndOptions(
     JNIEnv* env, jclass thiz, jint file_descriptor,
     jlong file_descriptor_length, jlong file_descriptor_offset,
-    jobject java_options) {
+    jobject java_options, jlong base_options_handle) {
   ObjectDetectorOptions proto_options =
-      ConvertToProtoOptions(env, java_options);
-  auto file_descriptor_meta = proto_options.mutable_model_file_with_metadata()
+      ConvertToProtoOptions(env, java_options, base_options_handle);
+  auto file_descriptor_meta = proto_options.mutable_base_options()
+                                  ->mutable_model_file()
                                   ->mutable_file_descriptor_meta();
   file_descriptor_meta->set_fd(file_descriptor);
   if (file_descriptor_length > 0) {
@@ -194,10 +200,11 @@ Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_initJniWithModelFdA
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_initJniWithByteBuffer(
-    JNIEnv* env, jclass thiz, jobject model_buffer, jobject java_options) {
+    JNIEnv* env, jclass thiz, jobject model_buffer, jobject java_options,
+    jlong base_options_handle) {
   ObjectDetectorOptions proto_options =
-      ConvertToProtoOptions(env, java_options);
-  proto_options.mutable_model_file_with_metadata()->set_file_content(
+      ConvertToProtoOptions(env, java_options, base_options_handle);
+  proto_options.mutable_base_options()->mutable_model_file()->set_file_content(
       static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
       static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
   return CreateObjectDetectorFromOptions(env, proto_options);
