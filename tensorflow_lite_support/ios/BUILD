@@ -71,7 +71,6 @@ tflite_ios_framework(
         ":classification_result.h",
         ":frame_buffer.h",
         ":image_classifier.h",
-        
     ],
     allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
     bundle_name = "TensorFlowLiteTaskVisionC",
