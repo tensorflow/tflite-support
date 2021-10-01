@@ -33,6 +33,7 @@ namespace {
 
 using ::tflite::support::StatusOr;
 using ::tflite::task::JoinPath;
+using ::testing::HasSubstr;
 
 constexpr char kTestDataDirectory[] =
     "/tensorflow_lite_support/cc/test/testdata/task/"
@@ -59,7 +60,7 @@ TEST_F(ImageClassifierFromOptionsTest, FailsWithNullOptionsAndError) {
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  EXPECT_NE(strstr(error->message, "Expected non null options"), nullptr);
+  EXPECT_THAT(error->message, HasSubstr("Expected non null options"));
 
   TfLiteSupportErrorDelete(error);
 }
@@ -85,7 +86,7 @@ TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPathAndError) {
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  EXPECT_NE(strstr(error->message, "`base_options.model_file`"), nullptr);
+  EXPECT_THAT(error->message, HasSubstr("`base_options.model_file`"));
 
   TfLiteSupportErrorDelete(error);
 }
@@ -146,7 +147,7 @@ TEST_F(ImageClassifierFromOptionsTest,
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  EXPECT_NE(strstr(error->message, "mutually exclusive options"), nullptr);
+  EXPECT_THAT(error->message, HasSubstr("mutually exclusive options"));
 
   TfLiteSupportErrorDelete(error);
 }
@@ -169,8 +170,7 @@ TEST(ImageClassifierNullClassifierClassifyTest,
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  EXPECT_NE(strstr(error->message, "Expected non null image classifier"),
-            nullptr);
+  EXPECT_THAT(error->message, HasSubstr("Expected non null image classifier"));
 
   TfLiteSupportErrorDelete(error);
 }
@@ -237,7 +237,7 @@ TEST_F(ImageClassifierClassifyTest, FailsWithNullFrameBufferAndError) {
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  EXPECT_NE(strstr(error->message, "Expected non null frame buffer"), nullptr);
+  EXPECT_THAT(error->message, HasSubstr("Expected non null frame buffer"));
 
   TfLiteSupportErrorDelete(error);
 }
@@ -261,7 +261,7 @@ TEST_F(ImageClassifierClassifyTest, FailsWithNullImageDataAndError) {
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  EXPECT_NE(strstr(error->message, "Invalid stride information"), nullptr);
+  EXPECT_THAT(error->message, HasSubstr("Invalid stride information"));
 
   TfLiteSupportErrorDelete(error);
 }
@@ -324,7 +324,7 @@ TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBoundsAndError) {
   ASSERT_NE(error, nullptr);
   EXPECT_EQ(error->code, kInvalidArgumentError);
   EXPECT_NE(error->message, nullptr);
-  EXPECT_NE(strstr(error->message, "Invalid crop coordinates"), nullptr);
+  EXPECT_THAT(error->message, HasSubstr("Invalid crop coordinates"));
 
   TfLiteSupportErrorDelete(error);
 }
