@@ -144,7 +144,8 @@ public final class ImageClassifier extends BaseVisionTaskApi {
                     fileDescriptorLength,
                     fileDescriptorOffset,
                     options,
-                    TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             IMAGE_CLASSIFIER_NATIVE_LIB,
@@ -175,7 +176,8 @@ public final class ImageClassifier extends BaseVisionTaskApi {
                       /*fileDescriptorLength=*/ OPTIONAL_FD_LENGTH,
                       /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET,
                       options,
-                      TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
+                      TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                          options.getBaseOptions(), options.getNumThreads()));
                 }
               },
               IMAGE_CLASSIFIER_NATIVE_LIB));
@@ -209,7 +211,8 @@ public final class ImageClassifier extends BaseVisionTaskApi {
                 return initJniWithByteBuffer(
                     modelBuffer,
                     options,
-                    TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             IMAGE_CLASSIFIER_NATIVE_LIB));

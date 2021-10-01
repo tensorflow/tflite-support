@@ -147,7 +147,7 @@ public class TaskJniUtils {
   }
 
   /**
-   * Try load a native library, if it's already loaded return directly.
+   * Try loading a native library, if it's already loaded return directly.
    *
    * @param libName name of the lib
    */
@@ -162,8 +162,17 @@ public class TaskJniUtils {
   }
 
   public static long createProtoBaseOptionsHandle(BaseOptions baseOptions) {
+    return createProtoBaseOptionsHandleWithLegacyNumThreads(baseOptions, /*legacyNumThreads =*/ -1);
+  }
+
+  public static long createProtoBaseOptionsHandleWithLegacyNumThreads(
+      BaseOptions baseOptions, int legacyNumThreads) {
+    // NumThreads should be configured through BaseOptions. However, if NumThreads is configured
+    // through the legacy API of the Task Java API (then it will not equal to -1, the default
+    // value), use it to overide the one in baseOptions.
     return createProtoBaseOptions(
-        baseOptions.getComputeSettings().getDelegate().getValue(), baseOptions.getNumThreads());
+        baseOptions.getComputeSettings().getDelegate().getValue(),
+        legacyNumThreads == -1 ? baseOptions.getNumThreads() : legacyNumThreads);
   }
 
   private TaskJniUtils() {}
