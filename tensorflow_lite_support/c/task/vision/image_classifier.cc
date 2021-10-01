@@ -104,7 +104,7 @@ TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate() {
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     const TfLiteImageClassifierOptions* options, TfLiteSupportError** error) {
   if (options == nullptr) {
-     ::tflite::support::CreateTfLiteSupportError(
+     tflite::support::CreateTfLiteSupportError(
         kInvalidArgumentError, "Expected non null options.", error);
      return nullptr;
   }
@@ -113,7 +113,7 @@ TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
       CreateImageClassifierCppOptionsFromCOptions(options);
 
   if (cpp_options == nullptr) {
-    ::tflite::support::CreateTfLiteSupportError(
+    tflite::support::CreateTfLiteSupportError(
         kError, "Some error occured.", error);
     return nullptr;
   }
@@ -177,7 +177,7 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
     const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi,
     TfLiteSupportError** error) {
   if (classifier == nullptr) {
-    ::tflite::support::CreateTfLiteSupportError(
+    tflite::support::CreateTfLiteSupportError(
         kInvalidArgumentError, "Expected non null image classifier.", error);
     return nullptr;
   }
@@ -187,6 +187,14 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
         kInvalidArgumentError, "Expected non null frame buffer.", error);
     return nullptr;
   }
+
+  StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer_status =
+      ::tflite::task::vision::CreateCppFrameBuffer(*frame_buffer);
+  if (!cpp_frame_buffer_status.ok()) {
+    tflite::support::CreateTfLiteSupportErrorWithStatus(
+        cpp_frame_buffer_status.status(), error);
+    return nullptr;
+  } 
 
   BoundingBoxCpp cc_roi;
   if (roi == nullptr) {
@@ -198,14 +206,6 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
     cc_roi.set_width(roi->width);
     cc_roi.set_height(roi->height);
   }
-
-  StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer_status =
-      ::tflite::task::vision::CreateCppFrameBuffer(*frame_buffer);
-  if (!cpp_frame_buffer_status.ok()) {
-    ::tflite::support::CreateTfLiteSupportErrorWithStatus(
-        cpp_frame_buffer_status.status(), error);
-    return nullptr;
-  } 
   
   // fnc_sample(cpp_frame_buffer_status);
   StatusOr<ClassificationResultCpp> cpp_classification_result_status =
@@ -213,7 +213,7 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
                                  cc_roi);
 
   if (!cpp_classification_result_status.ok()) {
-    ::tflite::support::CreateTfLiteSupportErrorWithStatus(
+    tflite::support::CreateTfLiteSupportErrorWithStatus(
         cpp_classification_result_status.status(), error);
     return nullptr;
   }
