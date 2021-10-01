@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.tensorflow.lite.support.image.MlImageAdapter;
 import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.task.core.BaseOptions;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
@@ -186,7 +187,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
                     modelBuffer,
                     options.getDisplayNamesLocale(),
                     options.getOutputType().getValue(),
-                    options.getNumThreads());
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             IMAGE_SEGMENTER_NATIVE_LIB),
@@ -210,6 +212,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
     private static final OutputType DEFAULT_OUTPUT_TYPE = OutputType.CATEGORY_MASK;
     private static final int NUM_THREADS = -1;
 
+    public abstract BaseOptions getBaseOptions();
+
     public abstract String getDisplayNamesLocale();
 
     public abstract OutputType getOutputType();
@@ -220,12 +224,16 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
       return new AutoValue_ImageSegmenter_ImageSegmenterOptions.Builder()
           .setDisplayNamesLocale(DEFAULT_DISPLAY_NAME_LOCALE)
           .setOutputType(DEFAULT_OUTPUT_TYPE)
-          .setNumThreads(NUM_THREADS);
+          .setNumThreads(NUM_THREADS)
+          .setBaseOptions(BaseOptions.builder().build());
     }
 
     /** Builder for {@link ImageSegmenterOptions}. */
     @AutoValue.Builder
     public abstract static class Builder {
+
+      /** Sets the general options to configure Task APIs, such as accelerators. */
+      public abstract Builder setBaseOptions(BaseOptions baseOptions);
 
       /**
        * Sets the locale to use for display names specified through the TFLite Model Metadata, if
@@ -245,7 +253,11 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
        *
        * <p>numThreads should be greater than 0 or equal to -1. Setting numThreads to -1 has the
        * effect to let TFLite runtime set the value.
+       *
+       * @deprecated use {@link BaseOptions} to configure number of threads instead. This method
+       *     will override the number of threads configured from {@link BaseOptions}.
        */
+      @Deprecated
       public abstract Builder setNumThreads(int numThreads);
 
       public abstract ImageSegmenterOptions build();
@@ -402,7 +414,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
                     fileDescriptorOffset,
                     options.getDisplayNamesLocale(),
                     options.getOutputType().getValue(),
-                    options.getNumThreads());
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             IMAGE_SEGMENTER_NATIVE_LIB);
@@ -415,10 +428,10 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
       long fileDescriptorOffset,
       String displayNamesLocale,
       int outputType,
-      int numThreads);
+      long baseOptionsHandle);
 
   private static native long initJniWithByteBuffer(
-      ByteBuffer modelBuffer, String displayNamesLocale, int outputType, int numThreads);
+      ByteBuffer modelBuffer, String displayNamesLocale, int outputType, long baseOptionsHandle);
 
   /**
    * The native method to segment the image.
