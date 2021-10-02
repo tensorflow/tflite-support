@@ -33,7 +33,7 @@ limitations under the License.
 namespace {
 
 using ::tflite::support::StatusOr;
-using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::StringListToVector;
 using ::tflite::support::utils::ThrowException;
@@ -42,7 +42,6 @@ using ::tflite::task::vision::BoundingBox;
 using ::tflite::task::vision::ConvertToCategory;
 using ::tflite::task::vision::DetectionResult;
 using ::tflite::task::vision::FrameBuffer;
-
 using ::tflite::task::vision::ObjectDetector;
 using ::tflite::task::vision::ObjectDetectorOptions;
 
@@ -162,12 +161,16 @@ jlong CreateObjectDetectorFromOptions(JNIEnv* env,
   if (object_detector_or.ok()) {
     return reinterpret_cast<jlong>(object_detector_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing ObjectDetector: %s",
-                   object_detector_or.status().message().data());
+    ThrowException(
+        env,
+        GetExceptionClassNameForStatusCode(object_detector_or.status().code()),
+        "Error occurred when initializing ObjectDetector: %s",
+        object_detector_or.status().message().data());
     return kInvalidPointer;
   }
 }
+
+}  // namespace
 
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_deinitJni(
@@ -221,10 +224,10 @@ Java_org_tensorflow_lite_task_vision_detector_ObjectDetector_detectNative(
   if (results_or.ok()) {
     return ConvertToDetectionResults(env, results_or.value());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when detecting the image: %s",
-                   results_or.status().message().data());
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(results_or.status().code()),
+        "Error occurred when detecting the image: %s",
+        results_or.status().message().data());
     return nullptr;
   }
 }
-}  // namespace

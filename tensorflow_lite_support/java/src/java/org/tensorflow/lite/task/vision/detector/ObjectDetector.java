@@ -96,8 +96,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelPath path to the detection model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromFile(Context context, String modelPath)
       throws IOException {
@@ -109,8 +110,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelFile the detection model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromFile(File modelFile) throws IOException {
     return createFromFileAndOptions(modelFile, ObjectDetectorOptions.builder().build());
@@ -122,10 +124,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the detection
    *     model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
-   *     {@link MappedByteBuffer}
+   *     {@link MappedByteBuffer} * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromBuffer(final ByteBuffer modelBuffer) {
     return createFromBufferAndOptions(modelBuffer, ObjectDetectorOptions.builder().build());
@@ -136,8 +137,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelPath path to the detection model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromFileAndOptions(
       Context context, String modelPath, ObjectDetectorOptions options) throws IOException {
@@ -170,8 +172,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelFile the detection model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromFileAndOptions(
       File modelFile, final ObjectDetectorOptions options) throws IOException {
@@ -201,10 +204,10 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the detection
    *     model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromBufferAndOptions(
       final ByteBuffer modelBuffer, final ObjectDetectorOptions options) {
@@ -328,8 +331,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
        *
        * <p>If non-empty, detection results whose label is not in this set will be filtered out.
        * Duplicate or unknown labels are ignored. Mutually exclusive with {@code labelDenyList}. It
-       * will cause {@link AssertionError} when calling {@link #createFromFileAndOptions}, if both
-       * {@code labelDenyList} and {@code labelAllowList} are set.
+       * will cause {@link IllegalStateException} when calling {@link #createFromFileAndOptions}, if
+       * both {@code labelDenyList} and {@code labelAllowList} are set.
        */
       public Builder setLabelAllowList(List<String> labelAllowList) {
         this.labelAllowList = Collections.unmodifiableList(new ArrayList<>(labelAllowList));
@@ -341,8 +344,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
        *
        * <p>If non-empty, detection results whose label is in this set will be filtered out.
        * Duplicate or unknown labels are ignored. Mutually exclusive with {@code labelAllowList}. It
-       * will cause {@link AssertionError} when calling {@link #createFromFileAndOptions}, if both
-       * {@code labelDenyList} and {@code labelAllowList} are set.
+       * will cause {@link IllegalStateException} when calling {@link #createFromFileAndOptions}, if
+       * both {@code labelDenyList} and {@code labelAllowList} are set.
        */
       public Builder setLabelDenyList(List<String> labelDenyList) {
         this.labelDenyList = Collections.unmodifiableList(new ArrayList<>(labelDenyList));
@@ -435,7 +438,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
-   * @throws AssertionError if error occurs when processing the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Detection> detect(TensorImage image) {
@@ -464,7 +468,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @param options the options to configure how to preprocess the image
-   * @throws AssertionError if error occurs when processing the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Detection> detect(TensorImage image, ImageProcessingOptions options) {
@@ -484,7 +489,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    * Performs actual detection on the provided {@code MlImage}.
    *
    * @param image an {@code MlImage} object that represents an image
-   * @throws AssertionError if error occurs when processing the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the storage type or format of the image is unsupported
    */
   public List<Detection> detect(MlImage image) {
@@ -504,7 +510,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param image an {@code MlImage} object that represents an image
    * @param options the options to configure how to preprocess the image
-   * @throws AssertionError if error occurs when classifying the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the storage type or format of the image is unsupported
    */
   public List<Detection> detect(MlImage image, ImageProcessingOptions options) {
