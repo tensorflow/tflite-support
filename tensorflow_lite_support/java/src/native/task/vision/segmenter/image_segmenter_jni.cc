@@ -33,8 +33,9 @@ namespace {
 
 using ::tflite::support::StatusOr;
 using ::tflite::support::utils::CreateByteArray;
-using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::kIllegalArgumentException;
+using ::tflite::support::utils::kIllegalStateException;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::core::BaseOptions;
@@ -97,7 +98,7 @@ void ConvertFromSegmentationResults(JNIEnv* env,
   if (results.segmentation_size() != 1) {
     // Should never happen.
     ThrowException(
-        env, kAssertionError,
+        env, kIllegalStateException,
         "ImageSegmenter only supports one segmentation result, getting %d",
         results.segmentation_size());
   }
@@ -171,12 +172,16 @@ jlong CreateImageSegmenterFromOptions(JNIEnv* env,
   if (image_segmenter_or.ok()) {
     return reinterpret_cast<jlong>(image_segmenter_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing ImageSegmenter: %s",
-                   image_segmenter_or.status().message().data());
+    ThrowException(
+        env,
+        GetExceptionClassNameForStatusCode(image_segmenter_or.status().code()),
+        "Error occurred when initializing ImageSegmenter: %s",
+        image_segmenter_or.status().message().data());
     return kInvalidPointer;
   }
 }
+
+}  // namespace
 
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_deinitJni(
@@ -233,10 +238,9 @@ Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_segmentNative(
     ConvertFromSegmentationResults(env, results_or.value(), jmask_buffers,
                                    jmask_shape, jcolored_labels);
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when segmenting the image: %s",
-                   results_or.status().message().data());
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(results_or.status().code()),
+        "Error occurred when segmenting the image: %s",
+        results_or.status().message().data());
   }
 }
-
-}  // namespace

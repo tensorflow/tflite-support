@@ -87,8 +87,9 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelPath path of the segmentation model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageSegmenter createFromFile(Context context, String modelPath)
       throws IOException {
@@ -100,8 +101,9 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelFile the segmentation model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageSegmenter createFromFile(File modelFile) throws IOException {
     return createFromFileAndOptions(modelFile, ImageSegmenterOptions.builder().build());
@@ -113,8 +115,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
    *     segmentation model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
    */
@@ -127,8 +129,9 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelPath path of the segmentation model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageSegmenter createFromFileAndOptions(
       Context context, String modelPath, final ImageSegmenterOptions options) throws IOException {
@@ -146,8 +149,9 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelFile the segmentation model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageSegmenter createFromFileAndOptions(
       File modelFile, final ImageSegmenterOptions options) throws IOException {
@@ -167,8 +171,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
    *     segmentation model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
    */
@@ -282,7 +286,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
-   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Segmentation> segment(TensorImage image) {
@@ -315,7 +320,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
-   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Segmentation> segment(TensorImage image, ImageProcessingOptions options) {
@@ -339,7 +345,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
-   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the storage type or format of the image is unsupported
    */
   public List<Segmentation> segment(MlImage image) {
@@ -364,7 +371,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
-   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Segmentation> segment(MlImage image, ImageProcessingOptions options) {
