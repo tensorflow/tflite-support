@@ -25,6 +25,7 @@ import java.nio.MappedByteBuffer;
 import java.util.List;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.label.Category;
+import org.tensorflow.lite.task.core.BaseOptions;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
@@ -54,14 +55,21 @@ public class BertNLClassifier extends BaseTaskApi {
     @UsedByReflection("bert_nl_classifier_jni.cc")
     abstract int getMaxSeqLen();
 
-    public static BertNLClassifierOptions.Builder builder() {
+    abstract BaseOptions getBaseOptions();
+
+    public static Builder builder() {
       return new AutoValue_BertNLClassifier_BertNLClassifierOptions.Builder()
-          .setMaxSeqLen(DEFAULT_MAX_SEQ_LEN);
+          .setMaxSeqLen(DEFAULT_MAX_SEQ_LEN)
+          .setBaseOptions(BaseOptions.builder().build());
     }
 
     /** Builder for {@link BertNLClassifierOptions}. */
     @AutoValue.Builder
     public abstract static class Builder {
+
+      /** Sets the general options to configure Task APIs, such as accelerators. */
+      public abstract Builder setBaseOptions(BaseOptions baseOptions);
+
       public abstract BertNLClassifierOptions.Builder setMaxSeqLen(int value);
 
       public abstract BertNLClassifierOptions build();
@@ -139,7 +147,10 @@ public class BertNLClassifier extends BaseTaskApi {
               new EmptyHandleProvider() {
                 @Override
                 public long createHandle() {
-                  return initJniWithFileDescriptor(descriptor.getFd(), options);
+                  return initJniWithFileDescriptor(
+                      descriptor.getFd(),
+                      options,
+                      TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
                 }
               },
               BERT_NL_CLASSIFIER_NATIVE_LIBNAME));
@@ -179,7 +190,10 @@ public class BertNLClassifier extends BaseTaskApi {
             new EmptyHandleProvider() {
               @Override
               public long createHandle() {
-                return initJniWithByteBuffer(modelBuffer, options);
+                return initJniWithByteBuffer(
+                    modelBuffer,
+                    options,
+                    TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
               }
             },
             BERT_NL_CLASSIFIER_NATIVE_LIBNAME));
@@ -196,9 +210,10 @@ public class BertNLClassifier extends BaseTaskApi {
   }
 
   private static native long initJniWithByteBuffer(
-      ByteBuffer modelBuffer, BertNLClassifierOptions options);
+      ByteBuffer modelBuffer, BertNLClassifierOptions options, long baseOptionsHandle);
 
-  private static native long initJniWithFileDescriptor(int fd, BertNLClassifierOptions options);
+  private static native long initJniWithFileDescriptor(
+      int fd, BertNLClassifierOptions options, long baseOptionsHandle);
 
   private static native List<Category> classifyNative(long nativeHandle, String text);
 
