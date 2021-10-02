@@ -20,14 +20,20 @@ limitations under the License.
 
 namespace {
 
+using ::tflite::support::StatusOr;
 using ::tflite::support::utils::ConvertVectorToArrayList;
+using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::JStringToString;
+using ::tflite::support::utils::ThrowException;
 using ::tflite::task::text::BertQuestionAnswerer;
+using ::tflite::task::text::BertQuestionAnswererOptions;
 using ::tflite::task::text::QaAnswer;
 using ::tflite::task::text::QuestionAnswerer;
 
 constexpr int kInvalidPointer = 0;
+
+}  // namespace
 
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_deinitJni(
@@ -41,24 +47,44 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithModelWithM
   absl::string_view model_with_metadata =
       GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 0));
 
-  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
-      BertQuestionAnswerer::CreateFromBuffer(
-          model_with_metadata.data(), model_with_metadata.size());
-  if (status.ok()) {
-    return reinterpret_cast<jlong>(status->release());
+  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> qa_status =
+      BertQuestionAnswerer::CreateFromBuffer(model_with_metadata.data(),
+                                             model_with_metadata.size());
+  if (qa_status.ok()) {
+    return reinterpret_cast<jlong>(qa_status->release());
   } else {
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(qa_status.status().code()),
+        "Error occurred when initializing BertQuestionAnswerer: %s",
+        qa_status.status().message().data());
     return kInvalidPointer;
   }
 }
-
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithFileDescriptor(
-    JNIEnv* env, jclass thiz, jint fd) {
-  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
-      BertQuestionAnswerer::CreateFromFd(fd);
-  if (status.ok()) {
-    return reinterpret_cast<jlong>(status->release());
+    JNIEnv* env, jclass thiz, jint file_descriptor,
+    jlong file_descriptor_length, jlong file_descriptor_offset) {
+  BertQuestionAnswererOptions proto_options;
+  auto file_descriptor_meta = proto_options.mutable_base_options()
+                                  ->mutable_model_file()
+                                  ->mutable_file_descriptor_meta();
+  file_descriptor_meta->set_fd(file_descriptor);
+  if (file_descriptor_length > 0) {
+    file_descriptor_meta->set_length(file_descriptor_length);
+  }
+  if (file_descriptor_offset > 0) {
+    file_descriptor_meta->set_offset(file_descriptor_offset);
+  }
+
+  StatusOr<std::unique_ptr<QuestionAnswerer>> qa_status =
+      BertQuestionAnswerer::CreateFromOptions(proto_options);
+  if (qa_status.ok()) {
+    return reinterpret_cast<jlong>(qa_status->release());
   } else {
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(qa_status.status().code()),
+        "Error occurred when initializing BertQuestionAnswerer: %s",
+        qa_status.status().message().data());
     return kInvalidPointer;
   }
 }
@@ -71,12 +97,16 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithBertByteBu
   absl::string_view vocab =
       GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 1));
 
-  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
+  StatusOr<std::unique_ptr<QuestionAnswerer>> qa_status =
       BertQuestionAnswerer::CreateBertQuestionAnswererFromBuffer(
           model.data(), model.size(), vocab.data(), vocab.size());
-  if (status.ok()) {
-    return reinterpret_cast<jlong>(status->release());
+  if (qa_status.ok()) {
+    return reinterpret_cast<jlong>(qa_status->release());
   } else {
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(qa_status.status().code()),
+        "Error occurred when initializing BertQuestionAnswerer: %s",
+        qa_status.status().message().data());
     return kInvalidPointer;
   }
 }
@@ -89,12 +119,16 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithAlbertByte
   absl::string_view sp_model =
       GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 1));
 
-  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
+  StatusOr<std::unique_ptr<QuestionAnswerer>> qa_status =
       BertQuestionAnswerer::CreateAlbertQuestionAnswererFromBuffer(
           model.data(), model.size(), sp_model.data(), sp_model.size());
-  if (status.ok()) {
-    return reinterpret_cast<jlong>(status->release());
+  if (qa_status.ok()) {
+    return reinterpret_cast<jlong>(qa_status->release());
   } else {
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(qa_status.status().code()),
+        "Error occurred when initializing BertQuestionAnswerer: %s",
+        qa_status.status().message().data());
     return kInvalidPointer;
   }
 }
@@ -123,5 +157,3 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_answerNative(
         return qa_answer;
       });
 }
-
-}  // namespace
