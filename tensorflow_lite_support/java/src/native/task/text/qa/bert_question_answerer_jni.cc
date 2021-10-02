@@ -15,6 +15,7 @@ limitations under the License.
 
 #include <jni.h>
 
+#include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/text/bert_question_answerer.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
@@ -26,12 +27,26 @@ using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::JStringToString;
 using ::tflite::support::utils::ThrowException;
+using ::tflite::task::core::BaseOptions;
 using ::tflite::task::text::BertQuestionAnswerer;
 using ::tflite::task::text::BertQuestionAnswererOptions;
 using ::tflite::task::text::QaAnswer;
 using ::tflite::task::text::QuestionAnswerer;
 
 constexpr int kInvalidPointer = 0;
+
+// Creates a BertQuestionAnswererOptions proto based on the Java class.
+BertQuestionAnswererOptions ConvertToProtoOptions(jlong base_options_handle) {
+  BertQuestionAnswererOptions proto_options;
+
+  if (base_options_handle != kInvalidPointer) {
+    // proto_options will free the previous base_options and set the new one.
+    proto_options.set_allocated_base_options(
+        reinterpret_cast<BaseOptions*>(base_options_handle));
+  }
+
+  return proto_options;
+}
 
 }  // namespace
 
@@ -42,29 +57,12 @@ Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_deinitJni(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithModelWithMetadataByteBuffers(
-    JNIEnv* env, jclass thiz, jobjectArray model_buffers) {
-  absl::string_view model_with_metadata =
-      GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 0));
-
-  tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>> qa_status =
-      BertQuestionAnswerer::CreateFromBuffer(model_with_metadata.data(),
-                                             model_with_metadata.size());
-  if (qa_status.ok()) {
-    return reinterpret_cast<jlong>(qa_status->release());
-  } else {
-    ThrowException(
-        env, GetExceptionClassNameForStatusCode(qa_status.status().code()),
-        "Error occurred when initializing BertQuestionAnswerer: %s",
-        qa_status.status().message().data());
-    return kInvalidPointer;
-  }
-}
-extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithFileDescriptor(
     JNIEnv* env, jclass thiz, jint file_descriptor,
-    jlong file_descriptor_length, jlong file_descriptor_offset) {
-  BertQuestionAnswererOptions proto_options;
+    jlong file_descriptor_length, jlong file_descriptor_offset,
+    jlong base_options_handle) {
+  BertQuestionAnswererOptions proto_options =
+      ConvertToProtoOptions(base_options_handle);
   auto file_descriptor_meta = proto_options.mutable_base_options()
                                   ->mutable_model_file()
                                   ->mutable_file_descriptor_meta();

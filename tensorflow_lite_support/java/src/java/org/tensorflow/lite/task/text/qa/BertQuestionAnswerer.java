@@ -17,13 +17,16 @@ package org.tensorflow.lite.task.text.qa;
 
 import android.content.Context;
 import android.os.ParcelFileDescriptor;
+import com.google.auto.value.AutoValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
+import org.tensorflow.lite.task.core.BaseOptions;
 import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
+import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.MultipleBuffersHandleProvider;
 
 /**
@@ -60,17 +63,8 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
    */
   public static BertQuestionAnswerer createFromFile(Context context, String modelPath)
       throws IOException {
-    return new BertQuestionAnswerer(
-        TaskJniUtils.createHandleWithMultipleAssetFilesFromLibrary(
-            context,
-            new MultipleBuffersHandleProvider() {
-              @Override
-              public long createHandle(ByteBuffer... buffers) {
-                return BertQuestionAnswerer.initJniWithModelWithMetadataByteBuffers(buffers);
-              }
-            },
-            BERT_QUESTION_ANSWERER_NATIVE_LIBNAME,
-            modelPath));
+    return createFromFileAndOptions(
+        context, modelPath, BertQuestionAnswererOptions.builder().build());
   }
 
   /**
@@ -85,6 +79,56 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
    * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static BertQuestionAnswerer createFromFile(File modelFile) throws IOException {
+    return createFromFileAndOptions(modelFile, BertQuestionAnswererOptions.builder().build());
+  }
+
+  /**
+   * Creates a {@link BertQuestionAnswerer} instance from {@link BertQuestionAnswererOptions}.
+   *
+   * @param context android context
+   * @param modelPath file path to the model with metadata. Note: The model should not be compressed
+   * @return a {@link BertQuestionAnswerer} instance
+   * @throws IOException if model file fails to load
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
+   */
+  public static BertQuestionAnswerer createFromFileAndOptions(
+      Context context, String modelPath, BertQuestionAnswererOptions options) throws IOException {
+    return new BertQuestionAnswerer(
+        TaskJniUtils.createHandleFromFdAndOptions(
+            context,
+            new FdAndOptionsHandleProvider<BertQuestionAnswererOptions>() {
+              @Override
+              public long createHandle(
+                  int fileDescriptor,
+                  long fileDescriptorLength,
+                  long fileDescriptorOffset,
+                  BertQuestionAnswererOptions options) {
+                return initJniWithFileDescriptor(
+                    fileDescriptor,
+                    fileDescriptorLength,
+                    fileDescriptorOffset,
+                    TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
+              }
+            },
+            BERT_QUESTION_ANSWERER_NATIVE_LIBNAME,
+            modelPath,
+            options));
+  }
+
+  /**
+   * Creates a {@link BertQuestionAnswerer} instance from {@link BertQuestionAnswererOptions}.
+   *
+   * @param modelFile a {@link File} object of the model
+   * @return a {@link BertQuestionAnswerer} instance
+   * @throws IOException if model file fails to load
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
+   */
+  public static BertQuestionAnswerer createFromFileAndOptions(
+      File modelFile, final BertQuestionAnswererOptions options) throws IOException {
     try (ParcelFileDescriptor descriptor =
         ParcelFileDescriptor.open(modelFile, ParcelFileDescriptor.MODE_READ_ONLY)) {
       return new BertQuestionAnswerer(
@@ -95,7 +139,8 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
                   return initJniWithFileDescriptor(
                       /*fileDescriptor=*/ descriptor.getFd(),
                       /*fileDescriptorLength=*/ OPTIONAL_FD_LENGTH,
-                      /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET);
+                      /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET,
+                      TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()));
                 }
               },
               BERT_QUESTION_ANSWERER_NATIVE_LIBNAME));
@@ -164,6 +209,26 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
             sentencePieceModelPath));
   }
 
+  /** Options for setting up a {@link BertQuestionAnswerer}. */
+  @AutoValue
+  public abstract static class BertQuestionAnswererOptions {
+    abstract BaseOptions getBaseOptions();
+
+    public static Builder builder() {
+      return new AutoValue_BertQuestionAnswerer_BertQuestionAnswererOptions.Builder()
+          .setBaseOptions(BaseOptions.builder().build());
+    }
+
+    /** Builder for {@link BertQuestionAnswererOptions}. */
+    @AutoValue.Builder
+    public abstract static class Builder {
+      /** Sets the general options to configure Task APIs, such as accelerators. */
+      public abstract Builder setBaseOptions(BaseOptions baseOptions);
+
+      public abstract BertQuestionAnswererOptions build();
+    }
+  }
+
   @Override
   public List<QaAnswer> answer(String context, String question) {
     checkNotClosed();
@@ -181,11 +246,11 @@ public class BertQuestionAnswerer extends BaseTaskApi implements QuestionAnswere
   // buffer.
   private static native long initJniWithAlbertByteBuffers(ByteBuffer... modelBuffers);
 
-  // modelBuffers[0] is tflite model file buffer with metadata to specify which tokenizer to use.
-  private static native long initJniWithModelWithMetadataByteBuffers(ByteBuffer... modelBuffers);
-
   private static native long initJniWithFileDescriptor(
-      int fileDescriptor, long fileDescriptorLength, long fileDescriptorOffset);
+      int fileDescriptor,
+      long fileDescriptorLength,
+      long fileDescriptorOffset,
+      long baseOptionsHandle);
 
   private static native List<QaAnswer> answerNative(
       long nativeHandle, String context, String question);
