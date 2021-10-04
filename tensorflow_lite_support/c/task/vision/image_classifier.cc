@@ -183,14 +183,8 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
     return nullptr;
   }
 
-  if (frame_buffer == nullptr) {
-    ::tflite::support::CreateTfLiteSupportError(
-        kInvalidArgumentError, "Expected non null frame buffer.", error);
-    return nullptr;
-  }
-
   StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer_status =
-      ::tflite::task::vision::CreateCppFrameBuffer(*frame_buffer);
+      ::tflite::task::vision::CreateCppFrameBuffer(frame_buffer);
   if (!cpp_frame_buffer_status.ok()) {
     tflite::support::CreateTfLiteSupportErrorWithStatus(
         cpp_frame_buffer_status.status(), error);

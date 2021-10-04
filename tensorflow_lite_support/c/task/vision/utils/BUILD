@@ -16,5 +16,6 @@ cc_library(
     deps = [
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
+        "//tensorflow_lite_support/cc:common",
     ],
 )
