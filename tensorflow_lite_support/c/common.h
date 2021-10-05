@@ -181,7 +181,6 @@ enum TfLiteSupportErrorCode {
   // and some invariants expected by the underlying system have not been
   // satisfied. This error code is reserved for serious errors.
   kInternalError,
-
 };
 
 // A `TfLiteSupportError` encapsulates an error code and a descriptive message

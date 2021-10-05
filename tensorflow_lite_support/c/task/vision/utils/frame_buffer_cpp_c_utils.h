@@ -28,7 +28,7 @@ namespace task {
 namespace vision {
 
 tflite::support::StatusOr<std::unique_ptr<tflite::task::vision::FrameBuffer>>
-CreateCppFrameBuffer(const TfLiteFrameBuffer& frame_buffer);
+CreateCppFrameBuffer(const TfLiteFrameBuffer* frame_buffer);
 
 }  // namespace vision
 }  // namespace task

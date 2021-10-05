@@ -17,6 +17,7 @@ limitations under the License.
 
 #include <stdint.h>
 
+#include "tensorflow_lite_support/c/common.h"
 #include "tensorflow_lite_support/c/task/core/base_options.h"
 #include "tensorflow_lite_support/c/task/processor/bounding_box.h"
 #include "tensorflow_lite_support/c/task/processor/classification_options.h"
@@ -32,7 +33,7 @@ limitations under the License.
 /// `ImageClassifier` API, but is useful for shared libraries where having
 /// a stable ABI boundary is important.
 ///
-/// Usage with Model File Path:
+/// Usage:
 /// <pre><code>
 /// // Create the model
 /// Using the options initialized with default values returned by
@@ -46,17 +47,46 @@ limitations under the License.
 /// If need be, set values for any options to customize behaviour.
 /// options.base_options.compute_settings.cpu_settings.num_threads = 3
 ///
-/// Create TfLiteImageClassifier using the options.
+/// Create TfLiteImageClassifier using the options:
+/// If error information is not nedded in case of failure:
 /// TfLiteImageClassifier* image_classifier =
-///       TfLiteImageClassifierFromOptions(&options);
+///       TfLiteImageClassifierFromOptions(&options, NULL);
+///
+/// If error information is nedded in case of failure:
+/// TfLiteSupportError* create_error = NULL;
+/// TfLiteImageClassifier* image_classifier =
+///       TfLiteImageClassifierFromOptions(&options, &create_error);
+///
+/// if (!image_classifier) {
+///   Handle failure.
+///   Do something with `create_error`, if requested as illustrated above.
+/// }
+///
+/// Dispose of the create_error object.
+/// TfLiteSupportErrorDelete(create_error);
 ///
 /// Classify an image
 /// TfLiteFrameBuffer frame_buffer = { Initialize with image data }
 ///
+/// If error information is not nedded in case of failure:
 /// TfLiteClassificationResult* classification_result =
-///       TfLiteImageClassifierClassify(image_classifier, &frame_buffer);
+///       TfLiteImageClassifierClassify(image_classifier, &frame_buffer, NULL);
 ///
-/// // Dispose of the API object.
+/// If error information is nedded in case of failure:
+/// TfLiteSupportError* classify_error = NULL;
+/// TfLiteClassificationResult* classification_result =
+///       TfLiteImageClassifierClassify(image_classifier, &frame_buffer,
+///       &classify_error);
+///
+/// if (!classification_result) {
+///   Handle failure.
+///   Do something with `classify_error`, if requested as illustrated above.
+/// }
+///
+/// Dispose of the classify_error object.
+/// TfLiteSupportErrorDelete(classify_error);
+///
+/// Dispose of the API object.
 /// TfLiteImageClassifierDelete(image_classifier);
 
 #ifdef __cplusplus
@@ -88,35 +118,88 @@ TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate();
 // .base_options.model_file.file_path in TfLiteImageClassifierOptions should be
 // set to the path of the tflite model you wish to create the
 // TfLiteImageClassifier with.
-// Returns nullptr under the following circumstances:
-// 1. file doesn't exist or is not a well formatted.
-// 2. options is nullptr.
-// 3. Both options.classification_options.label_denylist and
-// options.classification_options.label_allowlist are non empty. These
-// fields are mutually exclusive.
-//
 // Create TfLiteImageClassifierOptions using
 // TfLiteImageClassifierOptionsCreate(). If need be, you can change the default
 // values of options for customizing classification, If options are not created
 // in the aforementioned way, you have to make sure that all members are
 // initialized to respective default values and all pointer members are zero
 // initialized to avoid any undefined behaviour.
+//
+// Returns the created image classifier in case of success.
+// Returns nullptr on failure which happens commonly due to one of the following
+// issues:
+// 1. file doesn't exist or is not a well formatted.
+// 2. options is nullptr.
+// 3. Both options.classification_options.label_denylist and
+// options.classification_options.label_allowlist are non empty. These
+// fields are mutually exclusive.
+//
+// The caller can check if an error was encountered by testing if the returned
+// value of the function is null. If the caller doesn't want the reason for
+// failure, they can simply pass a NULL for the address of the error pointer as
+// shown below:
+//
+// TfLiteImageClassifier* classifier = TfLiteImageClassifierFromOptions(options,
+// NULL);
+//
+// If the caller wants to be informed of the reason for failure, they must pass
+// the adress of a pointer of type TfLiteSupportError to the `error` param as
+// shown below:
+//
+// TfLiteSupport *error = NULL:
+// TfLiteImageClassifier* classifier = TfLiteImageClassifierFromOptions(options,
+// &error);
+//
+// In case of unsuccessful execution, Once the function returns, the error
+// pointer will point to a struct containing the error information. If error
+// info is passed back to the caller, it is the responsibility of the caller to
+// free the error struct by calling the following method defined in common.h:
+//
+// TfLiteSupportErrorDelete(error)
+//
 TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
-    const TfLiteImageClassifierOptions* options);
+    const TfLiteImageClassifierOptions* options, TfLiteSupportError** error);
 
 // Invokes the encapsulated TFLite model and classifies the frame_buffer.
+// Returns a pointer to the created classification result in case of success or
+// NULL in case of failure. The caller must test the return value to identify
+// success or failure. If the caller doesn't want the reason for failure, they
+// can simply pass a NULL for the address of the error pointer as shown below:
+//
+// TfLiteClassificationResult* classification_result =
+// TfLiteImageClassifierClassify(&options, NULL);
+//
+// If the caller wants to be informed of the reason for failure, they must pass
+// the adress of a pointer of type TfLiteSupportError to the `error` param as
+// shown below:
+//
+// TfLiteSupport *error = NULL:
+// TfLiteImageClassifier* classifier = TfLiteImageClassifierFromOptions(options,
+// &error);
+//
+// In case of unsuccessful execution, Once the function returns, the error
+// pointer will point to a struct containing the error information. If error
+// info is passed back to the caller, it is the responsibility of the caller to
+// free the error struct by calling the following method defined in common.h:
+//
+// TfLiteSupportErrorDelete(error)
+//
 TfLiteClassificationResult* TfLiteImageClassifierClassify(
     const TfLiteImageClassifier* classifier,
-    const TfLiteFrameBuffer* frame_buffer);
+    const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error);
 
 // Invokes the encapsulated TFLite model and classifies the region of the
-// frame_buffer specified by the bounding box. Same as above, except that the
+// frame_buffer specified by the bounding box. Same as TfLiteImageClassifier*
+// TfLiteImageClassifierFromOptions(
+//    const TfLiteImageClassifierOptions* options, TfLiteSupportError** error),
+//    except that the
 // classification is performed based on the input region of interest. Cropping
 // according to this region of interest is prepended to the pre-processing
 // operations.
 TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
     const TfLiteImageClassifier* classifier,
-    const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi);
+    const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi,
+    TfLiteSupportError** error);
 
 // Disposes off the image classifier.
 void TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier);

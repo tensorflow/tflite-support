@@ -15,6 +15,9 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
 
+#include "external/com_google_absl/absl/strings/str_format.h"
+#include "tensorflow_lite_support/cc/common.h"
+
 namespace tflite {
 namespace task {
 namespace vision {
@@ -22,16 +25,23 @@ namespace vision {
 namespace {
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 using ::tflite::support::StatusOr;
+using ::tflite::support::TfLiteSupportStatus;
 }  // namespace
 
 StatusOr<std::unique_ptr<FrameBufferCpp>> CreateCppFrameBuffer(
-    const TfLiteFrameBuffer& frame_buffer) {
+    const TfLiteFrameBuffer* frame_buffer) {
+  if (frame_buffer == nullptr)
+    return CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        absl::StrFormat("Expected non null frame buffer."),
+        TfLiteSupportStatus::kInvalidArgumentError);
+
   FrameBufferCpp::Format frame_buffer_format =
-      FrameBufferCpp::Format(frame_buffer.format);
+      FrameBufferCpp::Format(frame_buffer->format);
 
   return CreateFromRawBuffer(
-      frame_buffer.buffer,
-      {frame_buffer.dimension.width, frame_buffer.dimension.height},
+      frame_buffer->buffer,
+      {frame_buffer->dimension.width, frame_buffer->dimension.height},
       frame_buffer_format);
 }
 

@@ -25,6 +25,10 @@ limitations under the License.
 namespace tflite {
 namespace support {
 
+// Creates a TfLiteSupportError with a TfLiteSupportErrorCode and message.
+void CreateTfLiteSupportError(enum TfLiteSupportErrorCode code,
+                              const char* message, TfLiteSupportError** error);
+
 // Creates a TfLiteSupportError from absl::Status and passes it back as a
 // parameter which is a pointer to the error pointer.
 //
@@ -35,12 +39,12 @@ namespace support {
 //     TfLiteSupportError **error) {
 // // Necessary checks
 // tflite::support::StatusOr<std::unique_ptr<ImageClassifier>> classifier_status
-// = // Call to create Cpp Image Classifier. 
+// = // Call to create Cpp Image Classifier.
 // if (classifier_status.ok()) {
 //     Code to return classifier
 // } else {
 //     ::tflite::support::CreateTfLiteSupportErrorWithStatus(classifier_status.status(),
-//     error); 
+//     error);
 //     return nullptr;
 //  }
 //}

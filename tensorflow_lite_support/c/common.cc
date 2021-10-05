@@ -15,7 +15,11 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/common.h"
 
+#include <cstdlib>
+
 void TfLiteSupportErrorDelete(TfLiteSupportError *error) {
-  delete error->message;
+  // `strdup` obtains memory using `malloc` and the memory needs to be
+  // released using `free`.
+  free(error->message);
   delete error;
 }
