@@ -52,6 +52,13 @@ namespace audio {
 //      `ImageClassifierOptions` used at creation time ("en" by default, i.e.
 //      English). If none of these are available, only the `index` field of the
 //      results will be filled.
+//
+// An example of such model can be found at:
+// https://tfhub.dev/google/lite-model/yamnet/classification/tflite/1
+
+// A CLI demo tool is available for easily trying out this API, and provides
+// example usage. See:
+// https://github.com/tensorflow/tflite-support/tree/master/tensorflow_lite_support/examples/task/audio/desktop
 class AudioClassifier
     : public tflite::task::core::BaseTaskApi<ClassificationResult,
                                              const AudioBuffer&> {

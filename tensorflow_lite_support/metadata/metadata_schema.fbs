@@ -119,7 +119,8 @@ enum AssociatedFileType : byte {
   // Contains sigmoid-based score calibration parameters, formatted as CSV.
   // Lines contain for each index of an output tensor the scale, slope, offset
   // and (optional) min_score parameters to be used for sigmoid fitting (in this
-  // order and in `strtof`-compatible [1] format).
+  // order and in `strtof`-compatible [1] format). Scale should be a
+  // non-negative value.
   // A line may be left empty to default calibrated scores for this index to
   // default_score.
   // In summary, each line should thus contain 0, 3 or 4 comma-separated values.

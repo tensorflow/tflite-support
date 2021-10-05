@@ -27,6 +27,7 @@ from tensorflow_lite_support.metadata.python.metadata_writers import metadata_in
 from tensorflow_lite_support.metadata.python.metadata_writers import object_detector
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
+_PATH = "../testdata/object_detector/"
 _MODEL = "../testdata/object_detector/ssd_mobilenet_v1.tflite"
 _LABEL_FILE = "../testdata/object_detector/labelmap.txt"
 _NORM_MEAN = 127.5
@@ -54,17 +55,31 @@ class MetadataWriterTest(tf.test.TestCase, parameterized.TestCase):
     self._dummy_score_file = test_utils.get_resource_path(
         _DUMMY_SCORE_CALIBRATION_FILE)
 
-  def test_create_for_inference_should_succeed(self):
+  @parameterized.parameters(
+      ("ssd_mobilenet_v1"),
+      ("efficientdet_lite0_v1"),
+  )
+  def test_create_for_inference_should_succeed(self, model_name):
+    model_path = os.path.join(_PATH, model_name + ".tflite")
     writer = object_detector.MetadataWriter.create_for_inference(
-        test_utils.load_file(_MODEL), [_NORM_MEAN], [_NORM_STD],
+        test_utils.load_file(model_path), [_NORM_MEAN], [_NORM_STD],
         [self._label_file])
-    self._validate_metadata(writer, _JSON_FOR_INFERENCE)
+
+    json_path = os.path.join(_PATH, model_name + ".json")
+    self._validate_metadata(writer, json_path)
     self._validate_populated_model(writer)
 
-  def test_create_from_metadata_info_by_default_should_succeed(self):
+  @parameterized.parameters(
+      ("ssd_mobilenet_v1"),
+      ("efficientdet_lite0_v1"),
+  )
+  def test_create_from_metadata_info_by_default_should_succeed(
+      self, model_name: str):
+    model_path = os.path.join(_PATH, model_name + ".tflite")
     writer = object_detector.MetadataWriter.create_from_metadata_info(
-        test_utils.load_file(_MODEL))
-    self._validate_metadata(writer, _JSON_DEFAULT)
+        test_utils.load_file(model_path))
+    json_path = os.path.join(_PATH, model_name + "_default.json")
+    self._validate_metadata(writer, json_path)
     self._validate_populated_model(writer)
 
   def test_create_for_inference_score_calibration_should_succeed(self):

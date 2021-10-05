@@ -121,6 +121,16 @@ public final class ByteBufferExtractorTest {
 
     assertThat(result.isReadOnly()).isTrue();
     assertThat(result).isEquivalentAccordingToCompareTo(TestImageCreator.createRgbBuffer());
+
+    // Verifies ByteBuffer is cached inside MlImage.
+    ByteBufferImageContainer byteBufferImageContainer =
+        (ByteBufferImageContainer) image.getContainer(MlImage.STORAGE_TYPE_BYTEBUFFER);
+    assertThat(byteBufferImageContainer.getByteBuffer()).isEqualTo(result);
+    assertThat(byteBufferImageContainer.getImageFormat()).isEqualTo(MlImage.IMAGE_FORMAT_RGB);
+
+    // Verifies that extracted ByteBuffer is the cached one.
+    ByteBuffer result2 = ByteBufferExtractor.extract(image, MlImage.IMAGE_FORMAT_RGB);
+    assertThat(result2).isEqualTo(result);
   }
 
   @Test
@@ -154,5 +164,16 @@ public final class ByteBufferExtractorTest {
 
     assertThat(result.buffer().isReadOnly()).isTrue();
     assertThat(result.format()).isEqualTo(MlImage.IMAGE_FORMAT_RGB);
+
+    // Verifies ByteBuffer is cached inside MlImage.
+    ByteBufferImageContainer byteBufferImageContainer =
+        (ByteBufferImageContainer) image.getContainer(MlImage.STORAGE_TYPE_BYTEBUFFER);
+    assertThat(byteBufferImageContainer.getByteBuffer()).isEqualTo(result.buffer());
+    assertThat(byteBufferImageContainer.getImageFormat()).isEqualTo(MlImage.IMAGE_FORMAT_RGB);
+
+    // Verifies that extracted ByteBuffer is the cached one.
+    ByteBufferExtractor.Result result2 = ByteBufferExtractor.extractInRecommendedFormat(image);
+    assertThat(result2.buffer()).isEqualTo(result.buffer());
+    assertThat(result2.format()).isEqualTo(result.format());
   }
 }

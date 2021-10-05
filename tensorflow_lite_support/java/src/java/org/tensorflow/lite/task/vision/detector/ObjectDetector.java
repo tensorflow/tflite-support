@@ -28,6 +28,7 @@ import java.util.List;
 import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.image.MlImageAdapter;
 import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.task.core.BaseOptions;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
@@ -95,8 +96,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelPath path to the detection model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromFile(Context context, String modelPath)
       throws IOException {
@@ -108,8 +110,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelFile the detection model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromFile(File modelFile) throws IOException {
     return createFromFileAndOptions(modelFile, ObjectDetectorOptions.builder().build());
@@ -121,10 +124,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the detection
    *     model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
-   *     {@link MappedByteBuffer}
+   *     {@link MappedByteBuffer} * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromBuffer(final ByteBuffer modelBuffer) {
     return createFromBufferAndOptions(modelBuffer, ObjectDetectorOptions.builder().build());
@@ -135,8 +137,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelPath path to the detection model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromFileAndOptions(
       Context context, String modelPath, ObjectDetectorOptions options) throws IOException {
@@ -151,7 +154,12 @@ public final class ObjectDetector extends BaseVisionTaskApi {
                   long fileDescriptorOffset,
                   ObjectDetectorOptions options) {
                 return initJniWithModelFdAndOptions(
-                    fileDescriptor, fileDescriptorLength, fileDescriptorOffset, options);
+                    fileDescriptor,
+                    fileDescriptorLength,
+                    fileDescriptorOffset,
+                    options,
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             OBJECT_DETECTOR_NATIVE_LIB,
@@ -164,8 +172,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelFile the detection model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromFileAndOptions(
       File modelFile, final ObjectDetectorOptions options) throws IOException {
@@ -180,7 +189,9 @@ public final class ObjectDetector extends BaseVisionTaskApi {
                       descriptor.getFd(),
                       /*fileDescriptorLength=*/ OPTIONAL_FD_LENGTH,
                       /*fileDescriptorOffset=*/ OPTIONAL_FD_OFFSET,
-                      options);
+                      options,
+                      TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                          options.getBaseOptions(), options.getNumThreads()));
                 }
               },
               OBJECT_DETECTOR_NATIVE_LIB));
@@ -193,10 +204,10 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the detection
    *     model
-   * @throws AssertionError if error occurs when creating {@link ObjectDetector} from the native
-   *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ObjectDetector createFromBufferAndOptions(
       final ByteBuffer modelBuffer, final ObjectDetectorOptions options) {
@@ -209,7 +220,11 @@ public final class ObjectDetector extends BaseVisionTaskApi {
             new EmptyHandleProvider() {
               @Override
               public long createHandle() {
-                return initJniWithByteBuffer(modelBuffer, options);
+                return initJniWithByteBuffer(
+                    modelBuffer,
+                    options,
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             OBJECT_DETECTOR_NATIVE_LIB));
@@ -233,6 +248,7 @@ public final class ObjectDetector extends BaseVisionTaskApi {
     // 1. java.util.Optional require Java 8 while we need to support Java 7.
     // 2. The Guava library (com.google.common.base.Optional) is avoided in this project. See the
     // comments for labelAllowList.
+    private final BaseOptions baseOptions;
     private final String displayNamesLocale;
     private final int maxResults;
     private final float scoreThreshold;
@@ -252,6 +268,7 @@ public final class ObjectDetector extends BaseVisionTaskApi {
 
     /** A builder that helps to configure an instance of ObjectDetectorOptions. */
     public static class Builder {
+      private BaseOptions baseOptions = BaseOptions.builder().build();
       private String displayNamesLocale = "en";
       private int maxResults = -1;
       private float scoreThreshold;
@@ -261,6 +278,12 @@ public final class ObjectDetector extends BaseVisionTaskApi {
       private int numThreads = -1;
 
       private Builder() {}
+
+      /** Sets the general options to configure Task APIs, such as accelerators. */
+      public Builder setBaseOptions(BaseOptions baseOptions) {
+        this.baseOptions = baseOptions;
+        return this;
+      }
 
       /**
        * Sets the locale to use for display names specified through the TFLite Model Metadata, if
@@ -308,8 +331,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
        *
        * <p>If non-empty, detection results whose label is not in this set will be filtered out.
        * Duplicate or unknown labels are ignored. Mutually exclusive with {@code labelDenyList}. It
-       * will cause {@link AssertionError} when calling {@link #createFromFileAndOptions}, if both
-       * {@code labelDenyList} and {@code labelAllowList} are set.
+       * will cause {@link IllegalStateException} when calling {@link #createFromFileAndOptions}, if
+       * both {@code labelDenyList} and {@code labelAllowList} are set.
        */
       public Builder setLabelAllowList(List<String> labelAllowList) {
         this.labelAllowList = Collections.unmodifiableList(new ArrayList<>(labelAllowList));
@@ -321,8 +344,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
        *
        * <p>If non-empty, detection results whose label is in this set will be filtered out.
        * Duplicate or unknown labels are ignored. Mutually exclusive with {@code labelAllowList}. It
-       * will cause {@link AssertionError} when calling {@link #createFromFileAndOptions}, if both
-       * {@code labelDenyList} and {@code labelAllowList} are set.
+       * will cause {@link IllegalStateException} when calling {@link #createFromFileAndOptions}, if
+       * both {@code labelDenyList} and {@code labelAllowList} are set.
        */
       public Builder setLabelDenyList(List<String> labelDenyList) {
         this.labelDenyList = Collections.unmodifiableList(new ArrayList<>(labelDenyList));
@@ -335,7 +358,11 @@ public final class ObjectDetector extends BaseVisionTaskApi {
        *
        * <p>numThreads should be greater than 0 or equal to -1. Setting numThreads to -1 has the
        * effect to let TFLite runtime set the value.
+       *
+       * @deprecated use {@link BaseOptions} to configure number of threads instead. This method
+       *     will override the number of threads configured from {@link BaseOptions}.
        */
+      @Deprecated
       public Builder setNumThreads(int numThreads) {
         this.numThreads = numThreads;
         return this;
@@ -381,6 +408,10 @@ public final class ObjectDetector extends BaseVisionTaskApi {
       return numThreads;
     }
 
+    public BaseOptions getBaseOptions() {
+      return baseOptions;
+    }
+
     private ObjectDetectorOptions(Builder builder) {
       displayNamesLocale = builder.displayNamesLocale;
       maxResults = builder.maxResults;
@@ -389,6 +420,7 @@ public final class ObjectDetector extends BaseVisionTaskApi {
       labelAllowList = builder.labelAllowList;
       labelDenyList = builder.labelDenyList;
       numThreads = builder.numThreads;
+      baseOptions = builder.baseOptions;
     }
   }
 
@@ -406,7 +438,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
-   * @throws AssertionError if error occurs when processing the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Detection> detect(TensorImage image) {
@@ -435,7 +468,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
    * @param options the options to configure how to preprocess the image
-   * @throws AssertionError if error occurs when processing the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Detection> detect(TensorImage image, ImageProcessingOptions options) {
@@ -455,7 +489,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    * Performs actual detection on the provided {@code MlImage}.
    *
    * @param image an {@code MlImage} object that represents an image
-   * @throws AssertionError if error occurs when processing the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the storage type or format of the image is unsupported
    */
   public List<Detection> detect(MlImage image) {
@@ -463,8 +498,7 @@ public final class ObjectDetector extends BaseVisionTaskApi {
   }
 
   /**
-   * Performs actual detection on the provided {@code MlImage} with {@link
-   * ImageProcessingOptions}.
+   * Performs actual detection on the provided {@code MlImage} with {@link ImageProcessingOptions}.
    *
    * <p>{@link ObjectDetector} supports the following options:
    *
@@ -476,7 +510,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
    *
    * @param image an {@code MlImage} object that represents an image
    * @param options the options to configure how to preprocess the image
-   * @throws AssertionError if error occurs when classifying the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the storage type or format of the image is unsupported
    */
   public List<Detection> detect(MlImage image, ImageProcessingOptions options) {
@@ -497,10 +532,11 @@ public final class ObjectDetector extends BaseVisionTaskApi {
       int fileDescriptor,
       long fileDescriptorLength,
       long fileDescriptorOffset,
-      ObjectDetectorOptions options);
+      ObjectDetectorOptions options,
+      long baseOptionsHandle);
 
   private static native long initJniWithByteBuffer(
-      ByteBuffer modelBuffer, ObjectDetectorOptions options);
+      ByteBuffer modelBuffer, ObjectDetectorOptions options, long baseOptionsHandle);
 
   private static native List<Detection> detectNative(long nativeHandle, long frameBufferHandle);
 

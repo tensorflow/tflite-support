@@ -33,7 +33,7 @@ public final class ByteBufferMlImageBuilderTest {
     ByteBuffer buffer = ByteBuffer.allocate(500);
 
     MlImage image = new ByteBufferMlImageBuilder(buffer, 20, 25, MlImage.IMAGE_FORMAT_RGB).build();
-    ImageContainer container = image.getContainer();
+    ImageContainer container = image.getContainer(MlImage.STORAGE_TYPE_BYTEBUFFER);
 
     assertThat(image.getWidth()).isEqualTo(20);
     assertThat(image.getHeight()).isEqualTo(25);

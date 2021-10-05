@@ -27,7 +27,6 @@ _DYNAMIC_INPUT_SIZE_MODEL = "../testdata/audio_classifier/yamnet_tfhub.tflite"
 _MULTIHEAD_MODEL = "../testdata/audio_classifier/two_heads.tflite"
 _YAMNET_LABEL_FILE = "../testdata/audio_classifier/yamnet_521_labels.txt"
 _LABEL_FILE = "../testdata/audio_classifier/labelmap.txt"
-_SCORE_CALIBRATION_FILE = "../testdata/audio_classifier/score_calibration.txt"
 _DEFAULT_SCORE_CALIBRATION_VALUE = 0.2
 _JSON_FOR_INFERENCE_DYNAMIC = "../testdata/audio_classifier/yamnet_tfhub.json"
 _JSON_FOR_INFERENCE_FIXED = "../testdata/audio_classifier/yamnet_wavin_quantized_mel_relu6.json"
@@ -46,7 +45,8 @@ class MetadataWriterTest(tf.test.TestCase):
         _CHANNELS, [_LABEL_FILE],
         metadata_info.ScoreCalibrationMd(
             _metadata_fb.ScoreTransformationType.LOG,
-            _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
+            _DEFAULT_SCORE_CALIBRATION_VALUE,
+            test_utils.create_calibration_file(self.get_temp_dir())))
 
     metadata_json = writer.get_metadata_json()
     expected_json = test_utils.load_file(_JSON_FOR_INFERENCE_DYNAMIC, "r")
@@ -59,7 +59,8 @@ class MetadataWriterTest(tf.test.TestCase):
         [_YAMNET_LABEL_FILE],
         metadata_info.ScoreCalibrationMd(
             _metadata_fb.ScoreTransformationType.LOG,
-            _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
+            _DEFAULT_SCORE_CALIBRATION_VALUE,
+            test_utils.create_calibration_file(self.get_temp_dir())))
 
     metadata_json = writer.get_metadata_json()
     expected_json = test_utils.load_file(_JSON_FOR_INFERENCE_FIXED, "r")
@@ -83,6 +84,11 @@ class MetadataWriterTest(tf.test.TestCase):
     self.assertEqual(metadata_json, expected_json)
 
   def test_create_from_metadata_info_succeeds_for_multihead(self):
+    calibration_file1 = test_utils.create_calibration_file(
+        self.get_temp_dir(), "score_cali_1.txt")
+    calibration_file2 = test_utils.create_calibration_file(
+        self.get_temp_dir(), "score_cali_2.txt")
+
     general_md = metadata_info.GeneralMd(name="AudioClassifier")
     input_md = metadata_info.InputAudioTensorMd(
         name="audio_clip", sample_rate=_SAMPLE_RATE, channels=_CHANNELS)
@@ -97,7 +103,7 @@ class MetadataWriterTest(tf.test.TestCase):
         ],
         score_calibration_md=metadata_info.ScoreCalibrationMd(
             _metadata_fb.ScoreTransformationType.LOG,
-            _DEFAULT_SCORE_CALIBRATION_VALUE, "score_cali_1.txt"),
+            _DEFAULT_SCORE_CALIBRATION_VALUE, calibration_file1),
         tensor_name="Identity_1")
     output_head_md_2 = metadata_info.ClassificationTensorMd(
         name="head2",
@@ -107,7 +113,7 @@ class MetadataWriterTest(tf.test.TestCase):
         ],
         score_calibration_md=metadata_info.ScoreCalibrationMd(
             _metadata_fb.ScoreTransformationType.LOG,
-            _DEFAULT_SCORE_CALIBRATION_VALUE, "score_cali_2.txt"),
+            _DEFAULT_SCORE_CALIBRATION_VALUE, calibration_file2),
         tensor_name="Identity")
 
     writer = (
@@ -139,7 +145,8 @@ class MetadataWriterSampleRateTest(tf.test.TestCase, parameterized.TestCase):
           _CHANNELS, [_LABEL_FILE],
           metadata_info.ScoreCalibrationMd(
               _metadata_fb.ScoreTransformationType.LOG,
-              _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
+              _DEFAULT_SCORE_CALIBRATION_VALUE,
+              test_utils.create_calibration_file(self.get_temp_dir())))
 
     self.assertEqual(
         "sample_rate should be positive, but got {}.".format(wrong_sample_rate),
@@ -164,7 +171,8 @@ class MetadataWriterChannelsTest(tf.test.TestCase, parameterized.TestCase):
           wrong_channels, [_LABEL_FILE],
           metadata_info.ScoreCalibrationMd(
               _metadata_fb.ScoreTransformationType.LOG,
-              _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
+              _DEFAULT_SCORE_CALIBRATION_VALUE,
+              test_utils.create_calibration_file(self.get_temp_dir())))
 
     self.assertEqual(
         "channels should be positive, but got {}.".format(wrong_channels),

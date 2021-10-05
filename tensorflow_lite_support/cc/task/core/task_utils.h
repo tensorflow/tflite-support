@@ -156,6 +156,14 @@ std::string GetStringAtIndex(const TfLiteTensor* labels, int index);
 // Loads binary content of a file into a string.
 std::string LoadBinaryContent(const char* filename);
 
+// Gets the index from a vector of tensors with name specified inside metadata.
+// The range of the return value should be [0, output_tensor_size). If not
+// found, returns -1.
+int FindIndexByMetadataTensorName(
+    const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
+        tensor_metadatas,
+    const std::string& name);
+
 // Gets the tensor from a vector of tensors with name specified inside metadata.
 template <typename TensorType>
 static TensorType* FindTensorByName(
@@ -167,12 +175,8 @@ static TensorType* FindTensorByName(
       tensor_metadatas->size() != tensors.size()) {
     return nullptr;
   }
-  for (flatbuffers::uoffset_t i = 0; i < tensor_metadatas->size(); i++) {
-    if (strcmp(name.data(), tensor_metadatas->Get(i)->name()->c_str()) == 0) {
-      return tensors[i];
-    }
-  }
-  return nullptr;
+  int i = FindIndexByMetadataTensorName(tensor_metadatas, name);
+  return i == -1 ? nullptr : tensors[i];
 }
 
 }  // namespace core

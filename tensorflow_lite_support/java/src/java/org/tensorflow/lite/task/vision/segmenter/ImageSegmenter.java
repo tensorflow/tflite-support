@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.tensorflow.lite.support.image.MlImageAdapter;
 import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.task.core.BaseOptions;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
@@ -86,8 +87,9 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelPath path of the segmentation model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageSegmenter createFromFile(Context context, String modelPath)
       throws IOException {
@@ -99,8 +101,9 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelFile the segmentation model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageSegmenter createFromFile(File modelFile) throws IOException {
     return createFromFileAndOptions(modelFile, ImageSegmenterOptions.builder().build());
@@ -112,8 +115,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
    *     segmentation model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
    */
@@ -126,8 +129,9 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelPath path of the segmentation model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageSegmenter createFromFileAndOptions(
       Context context, String modelPath, final ImageSegmenterOptions options) throws IOException {
@@ -145,8 +149,9 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelFile the segmentation model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static ImageSegmenter createFromFileAndOptions(
       File modelFile, final ImageSegmenterOptions options) throws IOException {
@@ -166,8 +171,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
    *     segmentation model
-   * @throws AssertionError if error occurs when creating {@link ImageSegmenter} from the native
-   *     code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
    */
@@ -186,7 +191,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
                     modelBuffer,
                     options.getDisplayNamesLocale(),
                     options.getOutputType().getValue(),
-                    options.getNumThreads());
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             IMAGE_SEGMENTER_NATIVE_LIB),
@@ -210,6 +216,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
     private static final OutputType DEFAULT_OUTPUT_TYPE = OutputType.CATEGORY_MASK;
     private static final int NUM_THREADS = -1;
 
+    public abstract BaseOptions getBaseOptions();
+
     public abstract String getDisplayNamesLocale();
 
     public abstract OutputType getOutputType();
@@ -220,12 +228,16 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
       return new AutoValue_ImageSegmenter_ImageSegmenterOptions.Builder()
           .setDisplayNamesLocale(DEFAULT_DISPLAY_NAME_LOCALE)
           .setOutputType(DEFAULT_OUTPUT_TYPE)
-          .setNumThreads(NUM_THREADS);
+          .setNumThreads(NUM_THREADS)
+          .setBaseOptions(BaseOptions.builder().build());
     }
 
     /** Builder for {@link ImageSegmenterOptions}. */
     @AutoValue.Builder
     public abstract static class Builder {
+
+      /** Sets the general options to configure Task APIs, such as accelerators. */
+      public abstract Builder setBaseOptions(BaseOptions baseOptions);
 
       /**
        * Sets the locale to use for display names specified through the TFLite Model Metadata, if
@@ -245,7 +257,11 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
        *
        * <p>numThreads should be greater than 0 or equal to -1. Setting numThreads to -1 has the
        * effect to let TFLite runtime set the value.
+       *
+       * @deprecated use {@link BaseOptions} to configure number of threads instead. This method
+       *     will override the number of threads configured from {@link BaseOptions}.
        */
+      @Deprecated
       public abstract Builder setNumThreads(int numThreads);
 
       public abstract ImageSegmenterOptions build();
@@ -270,7 +286,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
-   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Segmentation> segment(TensorImage image) {
@@ -303,7 +320,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
-   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Segmentation> segment(TensorImage image, ImageProcessingOptions options) {
@@ -327,7 +345,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
-   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the storage type or format of the image is unsupported
    */
   public List<Segmentation> segment(MlImage image) {
@@ -352,7 +371,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
    *     Segmentation} element is expected to be returned. The result is stored in a {@link List}
    *     for later extension to e.g. instance segmentation models, which may return one segmentation
    *     per object.
-   * @throws AssertionError if error occurs when segmenting the image from the native code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Segmentation> segment(MlImage image, ImageProcessingOptions options) {
@@ -402,7 +422,8 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
                     fileDescriptorOffset,
                     options.getDisplayNamesLocale(),
                     options.getOutputType().getValue(),
-                    options.getNumThreads());
+                    TaskJniUtils.createProtoBaseOptionsHandleWithLegacyNumThreads(
+                        options.getBaseOptions(), options.getNumThreads()));
               }
             },
             IMAGE_SEGMENTER_NATIVE_LIB);
@@ -415,10 +436,10 @@ public final class ImageSegmenter extends BaseVisionTaskApi {
       long fileDescriptorOffset,
       String displayNamesLocale,
       int outputType,
-      int numThreads);
+      long baseOptionsHandle);
 
   private static native long initJniWithByteBuffer(
-      ByteBuffer modelBuffer, String displayNamesLocale, int outputType, int numThreads);
+      ByteBuffer modelBuffer, String displayNamesLocale, int outputType, long baseOptionsHandle);
 
   /**
    * The native method to segment the image.

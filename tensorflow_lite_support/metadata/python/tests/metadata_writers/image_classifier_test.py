@@ -54,7 +54,8 @@ class MetadataWriterTest(tf.test.TestCase, parameterized.TestCase):
         [_LABEL_FILE],
         metadata_info.ScoreCalibrationMd(
             _metadata_fb.ScoreTransformationType.LOG,
-            _DEFAULT_SCORE_CALIBRATION_VALUE, _SCORE_CALIBRATION_FILE))
+            _DEFAULT_SCORE_CALIBRATION_VALUE,
+            test_utils.get_resource_path(_SCORE_CALIBRATION_FILE)))
 
     metadata_json = writer.get_metadata_json()
     expected_json = test_utils.load_file(golden_json, "r")

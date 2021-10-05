@@ -16,6 +16,7 @@ tflite_jni_binary(
     name = "libtask_audio_jni.so",
     srcs = [
         "//tensorflow_lite_support/java/src/native/task/audio/classifier:audio_classifier_jni.cc",
+        "//tensorflow_lite_support/java/src/native/task/core:task_jni_utils.cc",
     ],
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     deps = [
@@ -25,6 +26,7 @@ tflite_jni_binary(
         "//tensorflow_lite_support/cc/task/audio/proto:audio_classifier_options_cc_proto",
         "//tensorflow_lite_support/cc/task/audio/proto:class_proto_inc",
         "//tensorflow_lite_support/cc/task/audio/proto:classifications_proto_inc",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
         "//tensorflow_lite_support/cc/utils:jni_utils",
         "//tensorflow_lite_support/java/jni",
     ],

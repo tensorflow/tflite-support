@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "external/com_google_absl/absl/strings/str_cat.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/image_segmenter.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/image_segmenter_options_proto_inc.h"
@@ -32,10 +33,12 @@ namespace {
 
 using ::tflite::support::StatusOr;
 using ::tflite::support::utils::CreateByteArray;
-using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::kIllegalArgumentException;
+using ::tflite::support::utils::kIllegalStateException;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
+using ::tflite::task::core::BaseOptions;
 using ::tflite::task::vision::FrameBuffer;
 using ::tflite::task::vision::ImageSegmenter;
 using ::tflite::task::vision::ImageSegmenterOptions;
@@ -58,8 +61,14 @@ constexpr int kOutputTypeConfidenceMask = 1;
 ImageSegmenterOptions ConvertToProtoOptions(JNIEnv* env,
                                             jstring display_names_locale,
                                             jint output_type,
-                                            jint num_threads) {
+                                            jlong base_options_handle) {
   ImageSegmenterOptions proto_options;
+
+  if (base_options_handle != kInvalidPointer) {
+    // proto_options will free the previous base_options and set the new one.
+    proto_options.set_allocated_base_options(
+        reinterpret_cast<BaseOptions*>(base_options_handle));
+  }
 
   const char* pchars = env->GetStringUTFChars(display_names_locale, nullptr);
   proto_options.set_display_names_locale(pchars);
@@ -78,8 +87,6 @@ ImageSegmenterOptions ConvertToProtoOptions(JNIEnv* env,
                      "Unsupported output type: %d", output_type);
   }
 
-  proto_options.set_num_threads(num_threads);
-
   return proto_options;
 }
 
@@ -91,7 +98,7 @@ void ConvertFromSegmentationResults(JNIEnv* env,
   if (results.segmentation_size() != 1) {
     // Should never happen.
     ThrowException(
-        env, kAssertionError,
+        env, kIllegalStateException,
         "ImageSegmenter only supports one segmentation result, getting %d",
         results.segmentation_size());
   }
@@ -165,12 +172,16 @@ jlong CreateImageSegmenterFromOptions(JNIEnv* env,
   if (image_segmenter_or.ok()) {
     return reinterpret_cast<jlong>(image_segmenter_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing ImageSegmenter: %s",
-                   image_segmenter_or.status().message().data());
+    ThrowException(
+        env,
+        GetExceptionClassNameForStatusCode(image_segmenter_or.status().code()),
+        "Error occurred when initializing ImageSegmenter: %s",
+        image_segmenter_or.status().message().data());
     return kInvalidPointer;
   }
 }
+
+}  // namespace
 
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_deinitJni(
@@ -185,10 +196,11 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_initJniWithModelFdAndOptions(
     JNIEnv* env, jclass thiz, jint file_descriptor,
     jlong file_descriptor_length, jlong file_descriptor_offset,
-    jstring display_names_locale, jint output_type, jint num_threads) {
+    jstring display_names_locale, jint output_type, jlong base_options_handle) {
   ImageSegmenterOptions proto_options = ConvertToProtoOptions(
-      env, display_names_locale, output_type, num_threads);
-  auto file_descriptor_meta = proto_options.mutable_model_file_with_metadata()
+      env, display_names_locale, output_type, base_options_handle);
+  auto file_descriptor_meta = proto_options.mutable_base_options()
+                                  ->mutable_model_file()
                                   ->mutable_file_descriptor_meta();
   file_descriptor_meta->set_fd(file_descriptor);
   if (file_descriptor_length > 0) {
@@ -203,10 +215,10 @@ Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_initJniWithModelFd
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_initJniWithByteBuffer(
     JNIEnv* env, jclass thiz, jobject model_buffer,
-    jstring display_names_locale, jint output_type, jint num_threads) {
+    jstring display_names_locale, jint output_type, jlong base_options_handle) {
   ImageSegmenterOptions proto_options = ConvertToProtoOptions(
-      env, display_names_locale, output_type, num_threads);
-  proto_options.mutable_model_file_with_metadata()->set_file_content(
+      env, display_names_locale, output_type, base_options_handle);
+  proto_options.mutable_base_options()->mutable_model_file()->set_file_content(
       static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
       static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
   return CreateImageSegmenterFromOptions(env, proto_options);
@@ -226,10 +238,9 @@ Java_org_tensorflow_lite_task_vision_segmenter_ImageSegmenter_segmentNative(
     ConvertFromSegmentationResults(env, results_or.value(), jmask_buffers,
                                    jmask_shape, jcolored_labels);
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when segmenting the image: %s",
-                   results_or.status().message().data());
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(results_or.status().code()),
+        "Error occurred when segmenting the image: %s",
+        results_or.status().message().data());
   }
 }
-
-}  // namespace

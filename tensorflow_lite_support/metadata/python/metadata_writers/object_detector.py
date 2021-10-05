@@ -14,10 +14,12 @@
 # ==============================================================================
 """Writes metadata and label file to the object detector models."""
 
+import logging
 from typing import List, Optional, Type, Union
 
 import flatbuffers
 from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
+from tensorflow_lite_support.metadata import schema_py_generated as _schema_fb
 from tensorflow_lite_support.metadata.python import metadata as _metadata
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_writer
@@ -30,6 +32,9 @@ _MODEL_DESCRIPTION = (
     "stream.")
 _INPUT_NAME = "image"
 _INPUT_DESCRIPTION = "Input image to be detected."
+# The output tensor names shouldn't be changed since these name will be used
+# to handle the order of output in TFLite Task Library when doing inference
+# in on-device application.
 _OUTPUT_LOCATION_NAME = "location"
 _OUTPUT_LOCATION_DESCRIPTION = "The locations of the detected boxes."
 _OUTPUT_CATRGORY_NAME = "category"
@@ -77,6 +82,12 @@ def _create_metadata_with_value_range(
   return tensor_metadata
 
 
+def _get_tflite_outputs(model_buffer: bytearray) -> List[int]:
+  """Gets the tensor indices of output in the TFLite Subgraph."""
+  model = _schema_fb.Model.GetRootAsModel(model_buffer, 0)
+  return model.Subgraphs(0).OutputsAsNumpy()
+
+
 def _extend_new_files(
     file_list: List[str],
     associated_files: Optional[List[Type[metadata_info.AssociatedFileMd]]]):
@@ -120,13 +131,12 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         array of N floating point values between 0 and 1 representing
         probability that a class was detected. Use ClassificationTensorMd to
         calibrate score.
-      output_number_md: output number of dections tensor information. This
+      output_number_md: output number of detections tensor information. This
         tensor is an integer value of N.
 
     Returns:
       A MetadataWriter object.
     """
-
     if general_md is None:
       general_md = metadata_info.GeneralMd(
           name=_MODEL_NAME, description=_MODEL_DESCRIPTION)
@@ -137,23 +147,35 @@ class MetadataWriter(metadata_writer.MetadataWriter):
           description=_INPUT_DESCRIPTION,
           color_space_type=_metadata_fb.ColorSpaceType.RGB)
 
+    warn_message_format = (
+        "The output name isn't the default string \"%s\". This may cause the "
+        "model not work in the TFLite Task Library since the tensor name will "
+        "be used to handle the output order in the TFLite Task Library.")
     if output_location_md is None:
       output_location_md = metadata_info.TensorMd(
           name=_OUTPUT_LOCATION_NAME, description=_OUTPUT_LOCATION_DESCRIPTION)
+    elif output_location_md.name != _OUTPUT_LOCATION_NAME:
+      logging.warning(warn_message_format, _OUTPUT_LOCATION_NAME)
 
     if output_category_md is None:
       output_category_md = metadata_info.CategoryTensorMd(
           name=_OUTPUT_CATRGORY_NAME, description=_OUTPUT_CATEGORY_DESCRIPTION)
+    elif output_category_md.name != _OUTPUT_CATRGORY_NAME:
+      logging.warning(warn_message_format, _OUTPUT_CATRGORY_NAME)
 
     if output_score_md is None:
       output_score_md = metadata_info.ClassificationTensorMd(
           name=_OUTPUT_SCORE_NAME,
           description=_OUTPUT_SCORE_DESCRIPTION,
       )
+    elif output_score_md.name != _OUTPUT_SCORE_NAME:
+      logging.warning(warn_message_format, _OUTPUT_SCORE_NAME)
 
     if output_number_md is None:
       output_number_md = metadata_info.TensorMd(
           name=_OUTPUT_NUMBER_NAME, description=_OUTPUT_NUMBER_DESCRIPTION)
+    elif output_number_md.name != _OUTPUT_NUMBER_NAME:
+      logging.warning(warn_message_format, _OUTPUT_NUMBER_NAME)
 
     # Create output tensor group info.
     group = _metadata_fb.TensorGroupT()
@@ -162,15 +184,37 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         output_location_md.name, output_category_md.name, output_score_md.name
     ]
 
-    # Create subgraph info.
-    subgraph_metadata = _metadata_fb.SubGraphMetadataT()
-    subgraph_metadata.inputTensorMetadata = [input_md.create_metadata()]
-    subgraph_metadata.outputTensorMetadata = [
+    # Gets the tensor inidces of tflite outputs and then gets the order of the
+    # output metadata by the value of tensor indices. For instance, if the
+    # output indices are [601, 599, 598, 600], tensor names and indices aligned
+    # are:
+    #   - location: 598
+    #   - category: 599
+    #   - score: 600
+    #   - number of detections: 601
+    # because of the op's ports of TFLITE_DETECTION_POST_PROCESS
+    # (https://github.com/tensorflow/tensorflow/blob/a4fe268ea084e7d323133ed7b986e0ae259a2bc7/tensorflow/lite/kernels/detection_postprocess.cc#L47-L50).
+    # Thus, the metadata of tensors are sorted in this way, according to
+    # output_tensor_indicies correctly.
+    output_tensor_indices = _get_tflite_outputs(model_buffer)
+    metadata_list = [
         _create_location_metadata(output_location_md),
         _create_metadata_with_value_range(output_category_md),
         _create_metadata_with_value_range(output_score_md),
         output_number_md.create_metadata()
     ]
+
+    # Align indices with tensors.
+    sorted_indices = sorted(output_tensor_indices)
+    indices_to_tensors = dict(zip(sorted_indices, metadata_list))
+
+    # Output metadata according to output_tensor_indices.
+    output_metadata = [indices_to_tensors[i] for i in output_tensor_indices]
+
+    # Create subgraph info.
+    subgraph_metadata = _metadata_fb.SubGraphMetadataT()
+    subgraph_metadata.inputTensorMetadata = [input_md.create_metadata()]
+    subgraph_metadata.outputTensorMetadata = output_metadata
     subgraph_metadata.outputTensorGroups = [group]
 
     # Create model metadata

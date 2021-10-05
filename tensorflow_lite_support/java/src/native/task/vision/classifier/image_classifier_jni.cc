@@ -100,20 +100,6 @@ ImageClassifierOptions ConvertToProtoOptions(JNIEnv* env, jobject java_options,
   for (const auto& class_name : deny_list_vector) {
     proto_options.add_class_name_blacklist(class_name);
   }
-
-  jmethodID num_threads_id =
-      env->GetMethodID(java_options_class, "getNumThreads", "()I");
-  jint num_threads = env->CallIntMethod(java_options, num_threads_id);
-  // Use base_options to configure num_threads, because image_classifier is
-  // created using base_options in initJniWithModelFdAndOptions and
-  // initJniWithByteBuffer.
-  if (num_threads != -1) {
-    proto_options.mutable_base_options()
-        ->mutable_compute_settings()
-        ->mutable_tflite_settings()
-        ->mutable_cpu_settings()
-        ->set_num_threads(num_threads);
-  }
   return proto_options;
 }
 

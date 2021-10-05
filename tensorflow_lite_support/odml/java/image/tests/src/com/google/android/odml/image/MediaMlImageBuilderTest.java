@@ -49,7 +49,7 @@ public final class MediaMlImageBuilderTest {
   @Test
   public void build_fromMediaImage_succeeds() {
     MlImage image = new MediaMlImageBuilder(mediaImage).build();
-    ImageContainer container = image.getContainer();
+    ImageContainer container = image.getContainer(MlImage.STORAGE_TYPE_MEDIA_IMAGE);
 
     assertThat(image.getWidth()).isEqualTo(WIDTH);
     assertThat(image.getHeight()).isEqualTo(HEIGHT);

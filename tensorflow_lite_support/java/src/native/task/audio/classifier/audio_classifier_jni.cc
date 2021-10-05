@@ -24,6 +24,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/audio/proto/audio_classifier_options.pb.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/class_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
 namespace {
@@ -38,6 +39,7 @@ using ::tflite::task::audio::AudioClassifier;
 using ::tflite::task::audio::AudioClassifierOptions;
 using ::tflite::task::audio::Class;
 using ::tflite::task::audio::ClassificationResult;
+using ::tflite::task::core::BaseOptions;
 
 // TODO(b/183343074): Share the code below with ImageClassifier.
 
@@ -123,9 +125,16 @@ jobject ConvertToClassificationResults(JNIEnv* env,
 }
 
 // Creates an AudioClassifierOptions proto based on the Java class.
-AudioClassifierOptions ConvertToProtoOptions(JNIEnv* env,
-                                             jobject java_options) {
+AudioClassifierOptions ConvertToProtoOptions(JNIEnv* env, jobject java_options,
+                                             jlong base_options_handle) {
   AudioClassifierOptions proto_options;
+
+  if (base_options_handle != kInvalidPointer) {
+    // proto_options will free the previous base_options and set the new one.
+    proto_options.set_allocated_base_options(
+        reinterpret_cast<BaseOptions*>(base_options_handle));
+  }
+
   jclass java_options_class = env->FindClass(
       "org/tensorflow/lite/task/audio/classifier/"
       "AudioClassifier$AudioClassifierOptions");
@@ -202,9 +211,9 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_initJniWithModelFdAndOptions(
     JNIEnv* env, jclass thiz, jint file_descriptor,
     jlong file_descriptor_length, jlong file_descriptor_offset,
-    jobject java_options) {
+    jobject java_options, jlong base_options_handle) {
   AudioClassifierOptions proto_options =
-      ConvertToProtoOptions(env, java_options);
+      ConvertToProtoOptions(env, java_options, base_options_handle);
   auto file_descriptor_meta = proto_options.mutable_base_options()
                                   ->mutable_model_file()
                                   ->mutable_file_descriptor_meta();
@@ -220,9 +229,10 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_initJniWithModelF
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_initJniWithByteBuffer(
-    JNIEnv* env, jclass thiz, jobject model_buffer, jobject java_options) {
+    JNIEnv* env, jclass thiz, jobject model_buffer, jobject java_options,
+    jlong base_options_handle) {
   AudioClassifierOptions proto_options =
-      ConvertToProtoOptions(env, java_options);
+      ConvertToProtoOptions(env, java_options, base_options_handle);
   // External proto generated header does not overload `set_file_content` with
   // string_view, therefore GetMappedFileBuffer does not apply here.
   // Creating a std::string will cause one extra copying of data. Thus, the
