@@ -209,59 +209,61 @@ public class NLClassifier extends BaseTaskApi {
   private static final String NL_CLASSIFIER_NATIVE_LIBNAME = "task_text_jni";
 
   /**
-   * Constructor to initialize the JNI with a pointer from C++.
+   * Creates {@link NLClassifier} from default {@link NLClassifierOptions}.
    *
-   * @param nativeHandle a pointer referencing memory allocated in C++.
+   * @param context Android context
+   * @param modelPath path to the classification model relative to asset dir
+   * @return an {@link NLClassifier} instance
+   * @throws IOException if model file fails to load
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
-  protected NLClassifier(long nativeHandle) {
-    super(nativeHandle);
+  public static NLClassifier createFromFile(Context context, String modelPath) throws IOException {
+    return createFromFileAndOptions(context, modelPath, NLClassifierOptions.builder().build());
   }
 
   /**
-   * Create {@link NLClassifier} from default {@link NLClassifierOptions}.
+   * Creates {@link NLClassifier} from default {@link NLClassifierOptions}.
    *
-   * @param context Android context.
-   * @param pathToModel Path to the classification model relative to asset dir.
-   * @return {@link NLClassifier} instance.
-   * @throws IOException If model file fails to load.
-   */
-  public static NLClassifier createFromFile(Context context, String pathToModel)
-      throws IOException {
-    return createFromFileAndOptions(context, pathToModel, NLClassifierOptions.builder().build());
-  }
-
-  /**
-   * Create {@link NLClassifier} from default {@link NLClassifierOptions}.
-   *
-   * @param modelFile The classification model {@link File} instance.
-   * @return {@link NLClassifier} instance.
-   * @throws IOException If model file fails to load.
+   * @param modelFile the classification model {@link File} instance
+   * @return an {@link NLClassifier} instance
+   * @throws IOException if model file fails to load
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static NLClassifier createFromFile(File modelFile) throws IOException {
     return createFromFileAndOptions(modelFile, NLClassifierOptions.builder().build());
   }
 
   /**
-   * Create {@link NLClassifier} from {@link NLClassifierOptions}.
+   * Creates {@link NLClassifier} from {@link NLClassifierOptions}.
    *
    * @param context Android context
-   * @param pathToModel Path to the classification model relative to asset dir.
-   * @param options Configurations for the model.
-   * @return {@link NLClassifier} instance.
-   * @throws IOException If model file fails to load.
+   * @param modelPath path to the classification model relative to asset dir
+   * @param options configurations for the model.
+   * @return an {@link NLClassifier} instance
+   * @throws IOException if model file fails to load
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static NLClassifier createFromFileAndOptions(
-      Context context, String pathToModel, NLClassifierOptions options) throws IOException {
-    return createFromBufferAndOptions(TaskJniUtils.loadMappedFile(context, pathToModel), options);
+      Context context, String modelPath, NLClassifierOptions options) throws IOException {
+    return createFromBufferAndOptions(TaskJniUtils.loadMappedFile(context, modelPath), options);
   }
 
   /**
-   * Create {@link NLClassifier} from {@link NLClassifierOptions}.
+   * Creates {@link NLClassifier} from {@link NLClassifierOptions}.
    *
-   * @param modelFile The classification model {@link File} instance.
-   * @param options Configurations for the model.
-   * @return {@link NLClassifier} instance.
-   * @throws IOException If model file fails to load.
+   * @param modelFile the classification model {@link File} instance
+   * @param options configurations for the model
+   * @return an {@link NLClassifier} instance
+   * @throws IOException if model file fails to load
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static NLClassifier createFromFileAndOptions(
       File modelFile, final NLClassifierOptions options) throws IOException {
@@ -284,12 +286,14 @@ public class NLClassifier extends BaseTaskApi {
   }
 
   /**
-   * Create {@link NLClassifier} with a model {@link ByteBuffer} and {@link NLClassifierOptions}.
+   * Creates {@link NLClassifier} with a model {@link ByteBuffer} and {@link NLClassifierOptions}.
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
    *     classification model
-   * @param options Configurations for the model
+   * @param options configurations for the model
    * @return {@link NLClassifier} instance
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
    */
@@ -316,13 +320,27 @@ public class NLClassifier extends BaseTaskApi {
   }
 
   /**
-   * Perform classification on a string input, returns classified {@link Category}s.
+   * Performs classification on a string input, returns classified {@link Category}s.
    *
-   * @param text input text to the model.
-   * @return A list of Category results.
+   * @param text input text to the model
+   * @return a list of Category results
    */
   public List<Category> classify(String text) {
     return classifyNative(getNativeHandle(), text);
+  }
+
+  /**
+   * Constructor to initialize the JNI with a pointer from C++.
+   *
+   * @param nativeHandle a pointer referencing memory allocated in C++.
+   */
+  protected NLClassifier(long nativeHandle) {
+    super(nativeHandle);
+  }
+
+  @Override
+  protected void deinit(long nativeHandle) {
+    deinitJni(nativeHandle);
   }
 
   private static native long initJniWithByteBuffer(
@@ -332,11 +350,6 @@ public class NLClassifier extends BaseTaskApi {
       NLClassifierOptions options, int fd, long baseOptionsHandle);
 
   private static native List<Category> classifyNative(long nativeHandle, String text);
-
-  @Override
-  protected void deinit(long nativeHandle) {
-    deinitJni(nativeHandle);
-  }
 
   /**
    * Native implementation to release memory pointed by the pointer.

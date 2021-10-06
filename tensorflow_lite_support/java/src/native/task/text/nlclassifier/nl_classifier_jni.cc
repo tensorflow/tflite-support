@@ -32,9 +32,9 @@ extern std::unique_ptr<OpResolver> CreateOpResolver();
 
 namespace {
 
+using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::GetMappedFileBuffer;
 using ::tflite::support::utils::JStringToString;
-using ::tflite::support::utils::kAssertionError;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::core::BaseOptions;
@@ -90,6 +90,8 @@ NLClassifierOptions ConvertToProtoOptions(JNIEnv* env,
   return proto_options;
 }
 
+}  // namespace
+
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_deinitJni(
     JNIEnv* env, jobject thiz, jlong native_handle) {
@@ -113,9 +115,10 @@ Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_initJniWithByteBuff
   if (classifier_or.ok()) {
     return reinterpret_cast<jlong>(classifier_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing NLClassifier: %s",
-                   classifier_or.status().message().data());
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(classifier_or.status().code()),
+        "Error occurred when initializing NLClassifier: %s",
+        classifier_or.status().message().data());
     return kInvalidPointer;
   }
 }
@@ -138,9 +141,10 @@ Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_initJniWithFileDesc
   if (classifier_or.ok()) {
     return reinterpret_cast<jlong>(classifier_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing NLClassifier: %s",
-                   classifier_or.status().message().data());
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(classifier_or.status().code()),
+        "Error occurred when initializing NLClassifier: %s",
+        classifier_or.status().message().data());
     return kInvalidPointer;
   }
 }
@@ -150,5 +154,3 @@ Java_org_tensorflow_lite_task_text_nlclassifier_NLClassifier_classifyNative(
     JNIEnv* env, jclass thiz, jlong native_handle, jstring text) {
   return RunClassifier(env, native_handle, text);
 }
-
-}  // namespace
