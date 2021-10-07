@@ -17,12 +17,15 @@ syntax = "proto2";
 
 package tflite.task.vision;
 
+message TransformationResult {
+  repeated Transformation transformation = 1;
+}
+
 // A single transformed image.
 message Transformation {
-
   // Output image height.
-  optional int32 out_height = 1;
+  optional int32 height = 1;
   // Output image width.
-  optional int32 out_width = 2;
+  optional int32 width = 2;
 }
 
