@@ -1,4 +1,4 @@
-/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ StatusOr<std::unique_ptr<ImageTransformer>> ImageTransformer::CreateFromOptions(
 
   std::unique_ptr<ImageTransformer> image_transformer;
   //TODO: Should be model_file_with_metadata?
-  if (options_copy->base_options().has_model_file()) {
+  if (options_copy->model_file_with_metadata()) {
     ASSIGN_OR_RETURN(
         image_classifier,
         TaskAPIFactory::CreateFromExternalFileProto<ImageTransformer>(
