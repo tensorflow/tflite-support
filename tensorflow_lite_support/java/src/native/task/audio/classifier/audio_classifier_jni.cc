@@ -296,7 +296,7 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_classifyNative(
   jbyte* native_array = env->GetByteArrayElements(java_array, nullptr);
   if (native_array == nullptr) {
     ThrowException(env, kAssertionError,
-                   "Error occured when converting the java audio input array "
+                   "Error occurred when converting the java audio input array "
                    "to native array.");
     return nullptr;
   }
@@ -325,7 +325,7 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_classifyNative(
     }
   } else {
     ThrowException(env, kAssertionError,
-                   "Error occured when creating the AudioBuffer: %s",
+                   "Error occurred when creating the AudioBuffer: %s",
                    audio_buffer_or.status().message().data());
   }
 

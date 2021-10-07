@@ -221,7 +221,7 @@ public class Model {
   }
 
   /**
-   * Gets the Tensor associated with the provdied input index.
+   * Gets the Tensor associated with the provided input index.
    *
    * @throws IllegalStateException if the interpreter is closed.
    */
@@ -230,7 +230,7 @@ public class Model {
   }
 
   /**
-   * Gets the Tensor associated with the provdied output index.
+   * Gets the Tensor associated with the provided output index.
    *
    * @throws IllegalStateException if the interpreter is closed.
    */

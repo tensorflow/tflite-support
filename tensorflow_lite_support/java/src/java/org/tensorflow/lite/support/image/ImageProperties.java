@@ -43,7 +43,7 @@ public abstract class ImageProperties {
   }
 
   /**
-   * Builder for {@link ImageProperties}. Different image objects may reqiure different properties.
+   * Builder for {@link ImageProperties}. Different image objects may require different properties.
    * See the detais below:
    *
    * <ul>

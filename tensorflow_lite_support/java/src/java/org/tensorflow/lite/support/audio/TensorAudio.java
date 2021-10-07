@@ -96,7 +96,7 @@ public class TensorAudio {
   public abstract static class TensorAudioFormat {
     private static final int DEFAULT_CHANNELS = 1;
 
-    /** Creates a {@link TensorAudioFormat} instance from Android AudioForamt class. */
+    /** Creates a {@link TensorAudioFormat} instance from Android AudioFormat class. */
     @RequiresApi(Build.VERSION_CODES.M)
     public static TensorAudioFormat create(AudioFormat format) {
       return TensorAudioFormat.builder()
@@ -202,7 +202,7 @@ public class TensorAudio {
    *
    * @param record an instance of {@link android.media.AudioRecord}
    * @return number of captured audio values whose size is {@code channelCount * sampleCount}. If
-   *     there was no new data in the AudioRecord or an error occured, this method will return 0.
+   *     there was no new data in the AudioRecord or an error occurred, this method will return 0.
    * @throws IllegalArgumentException for unsupported audio encoding format
    * @throws IllegalStateException if reading from AudioRecord failed
    */
@@ -287,7 +287,7 @@ public class TensorAudio {
 
     /**
      * Loads the entire float array to the ring buffer. If the float array is longer than ring
-     * buffer's capacity, samples with lower indicies in the array will be ignored.
+     * buffer's capacity, samples with lower indices in the array will be ignored.
      */
     public void load(float[] newData) {
       load(newData, 0, newData.length);
@@ -295,7 +295,7 @@ public class TensorAudio {
 
     /**
      * Loads a slice of the float array to the ring buffer. If the float array is longer than ring
-     * buffer's capacity, samples with lower indicies in the array will be ignored.
+     * buffer's capacity, samples with lower indices in the array will be ignored.
      */
     public void load(float[] newData, int offset, int size) {
       checkArgument(
