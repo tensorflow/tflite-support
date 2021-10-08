@@ -30,7 +30,8 @@ limitations under the License.
 namespace {
 
 using ::tflite::support::StatusOr;
-using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
+using ::tflite::support::utils::kIllegalArgumentException;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::StringListToVector;
 using ::tflite::support::utils::ThrowException;
@@ -191,12 +192,16 @@ jlong CreateAudioClassifierFromOptions(JNIEnv* env,
     // Deletion is handled at deinitJni time.
     return reinterpret_cast<jlong>(audio_classifier_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing AudioClassifier: %s",
-                   audio_classifier_or.status().message().data());
+    ThrowException(
+        env,
+        GetExceptionClassNameForStatusCode(audio_classifier_or.status().code()),
+        "Error occurred when initializing AudioClassifier: %s",
+        audio_classifier_or.status().message().data());
   }
   return kInvalidPointer;
 }
+
+}  // namespace
 
 extern "C" JNIEXPORT void JNICALL
 Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_deinitJni(
@@ -256,7 +261,7 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_getRequiredSample
     return format_or->sample_rate;
   } else {
     ThrowException(
-        env, kAssertionError,
+        env, GetExceptionClassNameForStatusCode(format_or.status().code()),
         "Error occurred when getting sample rate from AudioClassifier: %s",
         format_or.status().message());
     return kInvalidPointer;
@@ -273,7 +278,7 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_getRequiredChanne
     return format_or->channels;
   } else {
     ThrowException(
-        env, kAssertionError,
+        env, GetExceptionClassNameForStatusCode(format_or.status().code()),
         "Error occurred when gettng channels from AudioClassifier: %s",
         format_or.status().message());
     return kInvalidPointer;
@@ -295,7 +300,7 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_classifyNative(
   // array might be a copy of the JAVA array (or not).
   jbyte* native_array = env->GetByteArrayElements(java_array, nullptr);
   if (native_array == nullptr) {
-    ThrowException(env, kAssertionError,
+    ThrowException(env, kIllegalArgumentException,
                    "Error occurred when converting the java audio input array "
                    "to native array.");
     return nullptr;
@@ -319,14 +324,17 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_classifyNative(
       classification_results =
           ConvertToClassificationResults(env, results_or.value());
     } else {
-      ThrowException(env, kAssertionError,
-                     "Error occurred when classifying the audio clip: %s",
-                     results_or.status().message().data());
+      ThrowException(
+          env, GetExceptionClassNameForStatusCode(results_or.status().code()),
+          "Error occurred when classifying the audio clip: %s",
+          results_or.status().message().data());
     }
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when creating the AudioBuffer: %s",
-                   audio_buffer_or.status().message().data());
+    ThrowException(
+        env,
+        GetExceptionClassNameForStatusCode(audio_buffer_or.status().code()),
+        "Error occurred when creating the AudioBuffer: %s",
+        audio_buffer_or.status().message().data());
   }
 
   // Mark native_array as no longer needed.
@@ -334,5 +342,3 @@ Java_org_tensorflow_lite_task_audio_classifier_AudioClassifier_classifyNative(
   env->ReleaseByteArrayElements(java_array, native_array, /*mode=*/0);
   return classification_results;
 }
-
-}  // namespace
