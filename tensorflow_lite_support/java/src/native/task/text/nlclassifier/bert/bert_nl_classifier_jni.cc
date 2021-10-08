@@ -23,7 +23,7 @@ limitations under the License.
 
 namespace {
 
-using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::core::BaseOptions;
@@ -50,6 +50,7 @@ BertNLClassifierOptions ConvertJavaBertNLClassifierOptions(
       env->CallIntMethod(java_options, max_seq_len_id));
   return proto_options;
 }
+
 }  // namespace
 
 extern "C" JNIEXPORT void JNICALL
@@ -68,14 +69,15 @@ Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_initJniWithByte
       static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
       static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
 
-  tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>> status =
+  tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>> classifier_or =
       BertNLClassifier::CreateFromOptions(proto_options);
-  if (status.ok()) {
-    return reinterpret_cast<jlong>(status->release());
+  if (classifier_or.ok()) {
+    return reinterpret_cast<jlong>(classifier_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing Bert NLClassifier: %s",
-                   status.status().message().data());
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(classifier_or.status().code()),
+        "Error occurred when initializing Bert NLClassifier: %s",
+        classifier_or.status().message().data());
     return kInvalidPointer;
   }
 }
@@ -91,14 +93,15 @@ Java_org_tensorflow_lite_task_text_nlclassifier_BertNLClassifier_initJniWithFile
       ->mutable_file_descriptor_meta()
       ->set_fd(fd);
 
-  tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>> status =
+  tflite::support::StatusOr<std::unique_ptr<BertNLClassifier>> classifier_or =
       BertNLClassifier::CreateFromOptions(proto_options);
-  if (status.ok()) {
-    return reinterpret_cast<jlong>(status->release());
+  if (classifier_or.ok()) {
+    return reinterpret_cast<jlong>(classifier_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when initializing Bert NLClassifier: %s",
-                   status.status().message().data());
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(classifier_or.status().code()),
+        "Error occurred when initializing Bert NLClassifier: %s",
+        classifier_or.status().message().data());
     return kInvalidPointer;
   }
 }
