@@ -169,10 +169,9 @@ class InputImageTensorMdTest(tf.test.TestCase, parameterized.TestCase):
     norm_std = [1, 2]
     with self.assertRaises(ValueError) as error:
       metadata_info.InputImageTensorMd(norm_mean=norm_mean, norm_std=norm_std)
-    # TODO(b/175843689): Python version cannot be specified in Kokoro bazel test
     self.assertEqual(
-        "norm_mean and norm_std are expected to be the same dim. But got " +
-        "{} and {}".format(len(norm_mean), len(norm_std)), str(error.exception))
+        f"norm_mean and norm_std are expected to be the same dim. But got "
+        f"{len(norm_mean)} and {len(norm_std)}", str(error.exception))
 
 
 class InputTextTensorMdTest(tf.test.TestCase):
@@ -216,11 +215,9 @@ class InputTextTensorMdTest(tf.test.TestCase):
           tokenizer_md=invalid_tokenzier)
       tensor_md.create_metadata()
 
-    # TODO(b/175843689): f string cannot be used. Python version cannot be
-    # specified in Kokoro bazel test.
     self.assertEqual(
-        "The type of tokenizer_options, {}, is unsupported".format(
-            type(invalid_tokenzier)), str(error.exception))
+        f"The type of tokenizer_options, {type(invalid_tokenzier)}, is "
+        f"unsupported", str(error.exception))
 
 
 class InputAudioTensorMd(tf.test.TestCase):
@@ -262,8 +259,8 @@ class InputAudioTensorMd(tf.test.TestCase):
       tensor_md.create_metadata()
 
     self.assertEqual(
-        "sample_rate should be non-negative, but got {}.".format(
-            negative_sample_rate), str(error.exception))
+        f"sample_rate should be non-negative, but got {negative_sample_rate}.",
+        str(error.exception))
 
   def test_create_metadata_fail_with_negative_channels(self):
     negative_channels = -1
@@ -272,8 +269,8 @@ class InputAudioTensorMd(tf.test.TestCase):
       tensor_md.create_metadata()
 
     self.assertEqual(
-        "channels should be non-negative, but got {}.".format(
-            negative_channels), str(error.exception))
+        f"channels should be non-negative, but got {negative_channels}.",
+        str(error.exception))
 
 
 class ClassificationTensorMdTest(tf.test.TestCase, parameterized.TestCase):
