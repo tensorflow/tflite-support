@@ -79,3 +79,14 @@ tflite_ios_framework(
         "//tensorflow_lite_support/c/task/vision:image_classifier",
     ],
 )
+
+objc_library(
+    name = "TFLCommon",
+    hdrs = [
+        "Sources/TFLCommon.h",
+    ],
+    module_name = "TFLCommon",
+    visibility = [
+        "//tensorflow_lite_support:__subpackages__",
+    ],
+)
