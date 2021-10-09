@@ -84,6 +84,15 @@ absl::Status ImagePreprocessor::Init(
         "ImagePreprocessor only supports RGB color space for now.");
   }
 
+  // Determine if the input shape is resizable.
+  const TfLiteIntArray* dims_signature = Tensor()->dims_signature;
+
+  // Some fixed-shape models do not have dims_signature.
+  if (dims_signature != nullptr && dims_signature->size > 2) {
+    // Only the HxW dimensions support mutability.
+    is_height_mutable_ = dims_signature->data[1] == -1;
+    is_width_mutable_ = dims_signature->data[2] == -1;
+  }
   return absl::OkStatus();
 }
 
@@ -111,6 +120,11 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
     // Preprocess input image to fit model requirements.
     // For now RGB is the only color space supported, which is ensured by
     // `InitInternal`.
+    input_specs_.image_width =
+        is_width_mutable_ ? roi.width() : input_specs_.image_width;
+    input_specs_.image_height =
+        is_height_mutable_ ? roi.height() : input_specs_.image_height;
+
     FrameBuffer::Dimension to_buffer_dimension = {input_specs_.image_width,
                                                   input_specs_.image_height};
     input_data_byte_size =
@@ -135,6 +149,14 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
                            frame_buffer.dimension().height;
   }
 
+  // If dynamic, it will re-dim the entire graph as per the input.
+  if (is_height_mutable_ || is_width_mutable_) {
+    engine_->interpreter()->ResizeInputTensorStrict(
+        0, {Tensor()->dims->data[0], input_specs_.image_height,
+            input_specs_.image_width, Tensor()->dims->data[3]});
+
+    engine_->interpreter()->AllocateTensors();
+  }
   // Then normalize pixel data (if needed) and populate the input tensor.
   switch (input_specs_.tensor_type) {
     case kTfLiteUInt8:
