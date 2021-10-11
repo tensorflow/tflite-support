@@ -120,7 +120,7 @@ BertQuestionAnswerer::CreateBertQuestionAnswererFromFile(
           absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
   api_to_init->InitializeBertTokenizer(path_to_vocab);
-  return api_to_init;
+  return std::move(api_to_init);
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
@@ -136,7 +136,7 @@ BertQuestionAnswerer::CreateBertQuestionAnswererFromBuffer(
           kNumLiteThreads));
   api_to_init->InitializeBertTokenizerFromBinary(vocab_buffer_data,
                                                  vocab_buffer_size);
-  return api_to_init;
+  return std::move(api_to_init);
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
@@ -150,7 +150,7 @@ BertQuestionAnswerer::CreateAlbertQuestionAnswererFromFile(
           absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
           kNumLiteThreads));
   api_to_init->InitializeSentencepieceTokenizer(path_to_spmodel);
-  return api_to_init;
+  return std::move(api_to_init);
 }
 
 StatusOr<std::unique_ptr<QuestionAnswerer>>
@@ -166,7 +166,7 @@ BertQuestionAnswerer::CreateAlbertQuestionAnswererFromBuffer(
           kNumLiteThreads));
   api_to_init->InitializeSentencepieceTokenizerFromBinary(spmodel_buffer_data,
                                                           spmodel_buffer_size);
-  return api_to_init;
+  return std::move(api_to_init);
 }
 
 std::vector<QaAnswer> BertQuestionAnswerer::Answer(

@@ -24,7 +24,7 @@ swift_library(
     testonly = 1,
     srcs = ["Tests/TFLBertNLClassifierTest.swift"],
     data = [
-        "//tensorflow_lite_support/cc/test/testdata/task/text:nl_classifier_models",
+        "//tensorflow_lite_support/cc/test/testdata/task/text:bert_nl_classifier_models",
     ],
     tags = TFL_DEFAULT_TAGS,
     deps = [
@@ -48,7 +48,7 @@ objc_library(
     testonly = 1,
     srcs = ["Tests/TFLBertNLClassifierTest.m"],
     data = [
-        "//tensorflow_lite_support/cc/test/testdata/task/text:nl_classifier_models",
+        "//tensorflow_lite_support/cc/test/testdata/task/text:bert_nl_classifier_models",
     ],
     tags = TFL_DEFAULT_TAGS,
     deps = [

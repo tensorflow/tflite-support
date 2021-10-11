@@ -29,31 +29,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setUp {
   [super setUp];
   NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-  self.bertModelPath = [bundle pathForResource:@"test_model_nl_classifier_bert"
-                                        ofType:@"tflite"];
+  self.bertModelPath = [bundle pathForResource:@"bert_nl_classifier" ofType:@"tflite"];
 }
 
 - (void)testClassifyPositiveResult {
-  TFLBertNLClassifier* bertNLClassifier =
-    [TFLBertNLClassifier bertNLClassifierWithModelPath:self.bertModelPath];
+  TFLBertNLClassifier *bertNLClassifier =
+      [TFLBertNLClassifier bertNLClassifierWithModelPath:self.bertModelPath];
 
   XCTAssertNotNil(bertNLClassifier);
 
-  NSDictionary<NSString *, NSNumber *> * categories =
-    [bertNLClassifier classifyWithText:@"it's a charming and often affecting journey"];
+  NSDictionary<NSString *, NSNumber *> *categories =
+      [bertNLClassifier classifyWithText:@"it's a charming and often affecting journey"];
 
   XCTAssertGreaterThan([categories[@"positive"] doubleValue],
                        [categories[@"negative"] doubleValue]);
 }
 
 - (void)testClassifyNegativeResult {
-  TFLBertNLClassifier* bertNLClassifier =
-    [TFLBertNLClassifier bertNLClassifierWithModelPath:self.bertModelPath];
+  TFLBertNLClassifier *bertNLClassifier =
+      [TFLBertNLClassifier bertNLClassifierWithModelPath:self.bertModelPath];
 
   XCTAssertNotNil(bertNLClassifier);
 
-  NSDictionary<NSString *, NSNumber *> * categories =
-    [bertNLClassifier classifyWithText:@"unflinchingly bleak and desperate"];
+  NSDictionary<NSString *, NSNumber *> *categories =
+      [bertNLClassifier classifyWithText:@"unflinchingly bleak and desperate"];
 
   XCTAssertGreaterThan([categories[@"negative"] doubleValue],
                        [categories[@"positive"] doubleValue]);
@@ -61,16 +60,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testCreateFromOptionsClassifyPositiveResult {
   self.modelOptions = [[TFLBertNLClassifierOptions alloc] init];
-  [self.modelOptions setMaxSeqLen: 128];
+  [self.modelOptions setMaxSeqLen:128];
 
-  TFLBertNLClassifier* bertNLClassifier =
-    [TFLBertNLClassifier bertNLClassifierWithModelPath:self.bertModelPath
-                                               options:self.modelOptions];
+  TFLBertNLClassifier *bertNLClassifier =
+      [TFLBertNLClassifier bertNLClassifierWithModelPath:self.bertModelPath
+                                                 options:self.modelOptions];
 
   XCTAssertNotNil(bertNLClassifier);
 
-  NSDictionary<NSString *, NSNumber *> * categories =
-    [bertNLClassifier classifyWithText:@"it's a charming and often affecting journey"];
+  NSDictionary<NSString *, NSNumber *> *categories =
+      [bertNLClassifier classifyWithText:@"it's a charming and often affecting journey"];
 
   XCTAssertGreaterThan([categories[@"positive"] doubleValue],
                        [categories[@"negative"] doubleValue]);
@@ -78,17 +77,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testCreateFromOptionsClassifyNegativeResult {
   self.modelOptions = [[TFLBertNLClassifierOptions alloc] init];
-  [self.modelOptions setMaxSeqLen: 128];
+  [self.modelOptions setMaxSeqLen:128];
 
-  TFLBertNLClassifier* bertNLClassifier =
-    [TFLBertNLClassifier bertNLClassifierWithModelPath:self.bertModelPath
-                                               options:self.modelOptions];
-
+  TFLBertNLClassifier *bertNLClassifier =
+      [TFLBertNLClassifier bertNLClassifierWithModelPath:self.bertModelPath
+                                                 options:self.modelOptions];
 
   XCTAssertNotNil(bertNLClassifier);
 
-  NSDictionary<NSString *, NSNumber *> * categories =
-    [bertNLClassifier classifyWithText:@"unflinchingly bleak and desperate"];
+  NSDictionary<NSString *, NSNumber *> *categories =
+      [bertNLClassifier classifyWithText:@"unflinchingly bleak and desperate"];
 
   XCTAssertGreaterThan([categories[@"negative"] doubleValue],
                        [categories[@"positive"] doubleValue]);

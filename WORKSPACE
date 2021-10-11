@@ -10,6 +10,42 @@ http_file(
     urls = ["https://tfhub.dev/tensorflow/lite-model/mobilebert/1/default/1?lite-format=tflite"],
 )
 
+http_file(
+    name = "mobilebert_with_metadata",
+    sha256 = "e79d3c70108bbdee02da657b679349cab46dbb859a05b599c76b53d98e82f272",
+    urls = ["https://tfhub.dev/tensorflow/lite-model/mobilebert/1/metadata/1?lite-format=tflite"],
+)
+
+http_file(
+    name = "30k-clean",
+    sha256 = "fefb02b667a6c5c2fe27602d28e5fb3428f66ab89c7d6f388e7c8d44a02d0336",
+    urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_qa/30k-clean.model"],
+)
+
+http_file(
+    name = "mobilebert_vocab",
+    sha256 = "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+    urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_qa/mobilebert_vocab.txt"],
+)
+
+
+http_file(
+    name = "albert",
+    sha256 = "4a29c7063c518925960229f49dd03e8da5d6682001cf73037815dcd98afd728a",
+    urls = ["https://tfhub.dev/tensorflow/lite-model/albert_lite_base/squadv1/1?lite-format=tflite"],
+)
+
+http_file(
+    name = "albert_with_metadata",
+    sha256 = "8a8a91856b94b945e4a9f22f0332bbf105c3b6b878bb23abfc97eb89d3e8436a",
+    urls = ["https://tfhub.dev/tensorflow/lite-model/albert_lite_base/squadv1/metadata/1?lite-format=tflite"],
+)
+
+http_file(
+    name = "bert_nl_classifier",
+    sha256 = "1e5a550c09bff0a13e61858bcfac7654d7fcc6d42106b4f15e11117695069600",
+    urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_nl_classifier/bert_nl_classifier.tflite"],
+)
 
 http_archive(
     name = "io_bazel_rules_closure",

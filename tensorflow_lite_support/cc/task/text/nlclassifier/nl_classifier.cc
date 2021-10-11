@@ -146,7 +146,7 @@ StatusOr<std::unique_ptr<Tokenizer>> CreateRegexTokenizerFromProcessUnit(
         "RegexTokenizer doesn't have <PAD> token.",
         TfLiteSupportStatus::kMetadataInvalidTokenizerError);
   }
-  return regex_tokenizer;
+  return std::move(regex_tokenizer);
 }
 
 }  // namespace
