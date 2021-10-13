@@ -5,10 +5,17 @@ package(
 
 cc_library(
     name = "test_utils",
+    testonly = 1,
     srcs = ["test_utils.cc"],
-    hdrs = ["test_utils.h"],
+    hdrs = [
+        "message_matchers.h",
+        "test_utils.h",
+    ],
     deps = [
+        "//tensorflow_lite_support/cc/port:gtest_main",
+        "//tensorflow_lite_support/cc/port:proto2",
         "@com_google_absl//absl/strings",
+        "@com_google_glog//:glog",
     ],
 )
 

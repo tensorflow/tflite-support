@@ -13,10 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TEST_UTILS_TEST_UTILS_H_
-#define THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TEST_UTILS_TEST_UTILS_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_CC_TEST_UTILS_TEST_UTILS_H_
+#define TENSORFLOW_LITE_SUPPORT_CC_TEST_UTILS_TEST_UTILS_H_
 
+#include <glog/logging.h>
 #include "external/com_google_absl/absl/strings/string_view.h"
+#include "tensorflow_lite_support/cc/port/proto2.h"
 
 namespace tflite {
 namespace task {
@@ -36,7 +38,14 @@ inline std::string JoinPath(absl::string_view path1, absl::string_view path2,
   return internal::JoinPathImpl(false, {path1, path2, path3, args...});
 }
 
+template <typename T>
+T ParseTextProtoOrDie(const std::string& input) {
+  T result;
+  CHECK(tflite::support::proto::TextFormat::ParseFromString(input, &result));
+  return result;
+}
+
 }  // namespace task
 }  // namespace tflite
 
-#endif  // THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TEST_UTILS_TEST_UTILS_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_CC_TEST_UTILS_TEST_UTILS_H_

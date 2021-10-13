@@ -56,3 +56,13 @@ cc_library(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "proto2",
+    hdrs = [
+        "proto2.h",
+    ],
+    deps = [
+        "@com_google_protobuf//:protobuf",
+    ],
+)

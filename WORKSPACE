@@ -57,11 +57,12 @@ http_archive(
     ],
 )
 
+# GoogleTest/GoogleMock framework. Used by most unit-tests.
 http_archive(
     name = "com_google_googletest",
-    urls = ["https://github.com/google/googletest/archive/aee0f9d9b5b87796ee8a0ab26b7587ec30e8858e.zip"],
-    strip_prefix = "googletest-aee0f9d9b5b87796ee8a0ab26b7587ec30e8858e",
-    sha256 = "04a1751f94244307cebe695a69cc945f9387a80b0ef1af21394a490697c5c895",
+    urls = ["https://github.com/google/googletest/archive/4ec4cd23f486bf70efcc5d2caa40f24368f752e3.zip"],
+    strip_prefix = "googletest-4ec4cd23f486bf70efcc5d2caa40f24368f752e3",
+    sha256 = "de682ea824bfffba05b4e33b67431c247397d6175962534305136aa06f92e049",
 )
 
 # Apple and Swift rules.
