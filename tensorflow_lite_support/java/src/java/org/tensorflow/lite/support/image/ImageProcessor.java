@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.ListIterator;
 import org.tensorflow.lite.support.common.Operator;
 import org.tensorflow.lite.support.common.SequentialProcessor;
-import org.tensorflow.lite.support.common.SupportPreconditions;
 import org.tensorflow.lite.support.common.TensorOperator;
+import org.tensorflow.lite.support.common.internal.SupportPreconditions;
 import org.tensorflow.lite.support.image.ops.Rot90Op;
 import org.tensorflow.lite.support.image.ops.TensorOperatorWrapper;
 

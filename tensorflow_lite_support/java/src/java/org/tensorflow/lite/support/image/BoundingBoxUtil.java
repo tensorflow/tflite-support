@@ -15,7 +15,7 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkArgument;
 
 import android.graphics.RectF;
 import java.nio.ByteBuffer;

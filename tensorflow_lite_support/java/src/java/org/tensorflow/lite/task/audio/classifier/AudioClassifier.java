@@ -15,7 +15,7 @@ limitations under the License.
 
 package org.tensorflow.lite.task.audio.classifier;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkState;
 
 import android.content.Context;
 import android.media.AudioFormat;

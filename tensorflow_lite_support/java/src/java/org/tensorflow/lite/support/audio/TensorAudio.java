@@ -16,7 +16,7 @@ limitations under the License.
 package org.tensorflow.lite.support.audio;
 
 import static java.lang.System.arraycopy;
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkArgument;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;

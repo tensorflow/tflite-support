@@ -25,7 +25,7 @@ import org.tensorflow.lite.InterpreterApi;
 import org.tensorflow.lite.InterpreterFactory;
 import org.tensorflow.lite.Tensor;
 import org.tensorflow.lite.support.common.FileUtil;
-import org.tensorflow.lite.support.common.SupportPreconditions;
+import org.tensorflow.lite.support.common.internal.SupportPreconditions;
 
 /**
  * The wrapper class for a TFLite model and a TFLite interpreter.

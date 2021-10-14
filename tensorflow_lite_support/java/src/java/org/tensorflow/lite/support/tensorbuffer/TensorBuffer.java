@@ -15,9 +15,9 @@ limitations under the License.
 
 package org.tensorflow.lite.support.tensorbuffer;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkNotNull;
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkArgument;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkNotNull;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkState;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.tensorflow.lite.support.common.internal.SupportPreconditions;
 
 /**
  * A processor base class that chains a serial of {@code Operator<T>} and executes them.
