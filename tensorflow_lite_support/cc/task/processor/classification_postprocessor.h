@@ -52,8 +52,13 @@ class ClassificationPostprocessor : public Postprocessor {
          const std::initializer_list<int> output_indices,
          std::unique_ptr<ClassificationOptions> options);
 
+  // Convert the tensor output to classification class.
+  // Note that this method doesn't add head_name for backward compatibility.
+  // Head name can be retrieved by `GetHeadName` method.
   template <typename T>
   absl::Status Postprocess(T* classifications);
+
+  const std::string GetHeadName() const { return classification_head_.name; }
 
  private:
   using Postprocessor::Postprocessor;
@@ -115,9 +120,10 @@ class ClassificationPostprocessor : public Postprocessor {
 
 template <typename T>
 absl::Status ClassificationPostprocessor::Postprocess(T* classifications) {
-  classifications->set_head_index(output_indices_.at(0));
-  std::vector<std::pair<int, float>> score_pairs;
   const auto& head = classification_head_;
+  classifications->set_head_index(output_indices_.at(0));
+
+  std::vector<std::pair<int, float>> score_pairs;
   score_pairs.reserve(head.label_map_items.size());
 
   const TfLiteTensor* output_tensor = Tensor();
