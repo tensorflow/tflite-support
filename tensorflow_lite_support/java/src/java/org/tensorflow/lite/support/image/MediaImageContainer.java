@@ -15,8 +15,8 @@ limitations under the License.
 
 package org.tensorflow.lite.support.image;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkNotNull;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkArgument;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkNotNull;
 
 import android.graphics.Bitmap;
 import android.graphics.ImageFormat;

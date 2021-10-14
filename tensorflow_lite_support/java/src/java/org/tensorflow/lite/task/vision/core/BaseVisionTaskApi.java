@@ -15,8 +15,8 @@ limitations under the License.
 
 package org.tensorflow.lite.task.vision.core;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkNotNull;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkArgument;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkNotNull;
 
 import android.graphics.ImageFormat;
 import android.media.Image;
@@ -145,7 +145,7 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
           /*byteArrayHandle=*/ 0,
           /*byteArray=*/ new byte[0]);
     } else {
-      // If the the byte array is copied in jni (during GetByteArrayElements), need to free
+      // If the byte array is copied in jni (during GetByteArrayElements), need to free
       // the copied array once inference is done.
       long[] byteArrayHandle = new long[1];
       byte[] byteArray = getBytesFromByteBuffer(byteBuffer);
@@ -189,7 +189,7 @@ public abstract class BaseVisionTaskApi extends BaseTaskApi {
 
     abstract long getByteArrayHandle();
 
-    // Package private method for transfering data.
+    // Package private method for transferring data.
     @SuppressWarnings("mutable")
     abstract byte[] getByteArray();
   }

@@ -15,7 +15,7 @@ limitations under the License.
 
 package org.tensorflow.lite.task.audio.classifier;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkState;
 
 import android.content.Context;
 import android.media.AudioFormat;
@@ -82,8 +82,9 @@ public final class AudioClassifier extends BaseTaskApi {
    *
    * @param modelPath path of the classification model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link AudioClassifier} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static AudioClassifier createFromFile(Context context, String modelPath)
       throws IOException {
@@ -95,8 +96,9 @@ public final class AudioClassifier extends BaseTaskApi {
    *
    * @param modelFile the classification model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link AudioClassifier} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static AudioClassifier createFromFile(File modelFile) throws IOException {
     return createFromFileAndOptions(modelFile, AudioClassifierOptions.builder().build());
@@ -108,8 +110,8 @@ public final class AudioClassifier extends BaseTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
    *     classification model
-   * @throws AssertionError if error occurs when creating {@link AudioClassifier} from the native
-   *     code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
    */
@@ -122,8 +124,9 @@ public final class AudioClassifier extends BaseTaskApi {
    *
    * @param modelPath path of the classification model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link AudioClassifier} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static AudioClassifier createFromFileAndOptions(
       Context context, String modelPath, AudioClassifierOptions options) throws IOException {
@@ -155,8 +158,9 @@ public final class AudioClassifier extends BaseTaskApi {
    *
    * @param modelFile the classification model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model
-   * @throws AssertionError if error occurs when creating {@link AudioClassifier} from the native
-   *     code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    */
   public static AudioClassifier createFromFileAndOptions(
       File modelFile, final AudioClassifierOptions options) throws IOException {
@@ -185,8 +189,8 @@ public final class AudioClassifier extends BaseTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
    *     classification model
-   * @throws AssertionError if error occurs when creating {@link AudioClassifier} from the native
-   *     code
+   * @throws IllegalStateException if there is an internal error
+   * @throws RuntimeException if there is an otherwise unspecified error
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
    */
@@ -382,7 +386,9 @@ public final class AudioClassifier extends BaseTaskApi {
    *     between [-1, 1). The {@code tensor} argument should have the same flat size as the TFLite
    *     model's input tensor. It's recommended to create {@code tensor} using {@code
    *     createInputTensorAudio} method.
-   * @throws AssertionError if error occurs when classifying the audio clip from the native code
+   * @throws IllegalArgumentException if an argument is invalid
+   * @throws IllegalStateException if error occurs when classifying the audio clip from the native
+   *     code
    */
   public List<Classifications> classify(TensorAudio tensor) {
     TensorBuffer buffer = tensor.getTensorBuffer();
@@ -476,11 +482,7 @@ public final class AudioClassifier extends BaseTaskApi {
     return audioRecord;
   }
 
-  /**
-   * Returns the {@link TensorAudioFormat} required by the model.
-   *
-   * @throws AssertionError if error occurs when invoking the native code
-   */
+  /** Returns the {@link TensorAudioFormat} required by the model. */
   public TensorAudioFormat getRequiredTensorAudioFormat() {
     return TensorAudioFormat.builder()
         .setChannels(getRequiredChannels())

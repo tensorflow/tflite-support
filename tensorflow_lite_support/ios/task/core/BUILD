@@ -10,4 +10,3 @@ objc_library(
     ],
     module_name = "TFLBaseOptions",
 )
-

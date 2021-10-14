@@ -27,6 +27,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/base_task_api.h"
 #include "tensorflow_lite_support/cc/task/core/classification_head.h"
 #include "tensorflow_lite_support/cc/task/processor/audio_preprocessor.h"
+#include "tensorflow_lite_support/cc/task/processor/classification_postprocessor.h"
 
 namespace tflite {
 namespace task {
@@ -102,9 +103,6 @@ class AudioClassifier
   // whose ownership is transferred to this object.
   absl::Status Init(std::unique_ptr<AudioClassifierOptions> options);
 
-  // Performs sanity checks on the model outputs and extracts their metadata.
-  absl::Status CheckAndSetOutputs();
-
   // Passes through the input audio buffer into model's input tensor.
   absl::Status Preprocess(const std::vector<TfLiteTensor*>& input_tensors,
                           const AudioBuffer& audio_buffer) override {
@@ -117,37 +115,15 @@ class AudioClassifier
       const std::vector<const TfLiteTensor*>& output_tensors,
       const AudioBuffer& audio_buffer) override;
 
-  // Given a ClassificationResult object containing class indices, fills the
-  // name and display name from the label map(s).
-  absl::Status FillResultsFromLabelMaps(ClassificationResult* result);
-
   // The options used to build this AudioClassifier.
   std::unique_ptr<AudioClassifierOptions> options_;
 
-  // The list of classification heads associated with the corresponding output
-  // tensors. Built from TFLite Model Metadata.
-  std::vector<tflite::task::core::ClassificationHead> classification_heads_;
-
-  // The number of output tensors. This corresponds to the number of
-  // classification heads.
-  int num_outputs_;
-  // Whether the model features quantized inference type (QUANTIZED_UINT8). This
-  // is currently detected by checking if all output tensors data type is uint8.
-  bool has_uint8_outputs_;
-
-  // Set of allowlisted or denylisted class names.
-  struct ClassNameSet {
-    absl::flat_hash_set<std::string> values;
-    bool is_allowlist;
-  };
-
-  // Allowlisted or denylisted class names based on provided options at
-  // construction time. These are used to filter out results during
-  // post-processing.
-  ClassNameSet class_name_set_;
-
   std::unique_ptr<tflite::task::processor::AudioPreprocessor> preprocessor_ =
       nullptr;
+
+  std::vector<
+      std::unique_ptr<tflite::task::processor::ClassificationPostprocessor>>
+      postprocessors_;
 };
 
 }  // namespace audio

@@ -85,10 +85,10 @@ objc_library(
     hdrs = [
         "Sources/TFLCommon.h",
     ],
-   visibility = [
-       "//tensorflow_lite_support:__subpackages__"
-    ],
     module_name = "TFLCommon",
+    visibility = [
+        "//tensorflow_lite_support:__subpackages__",
+    ],
 )
 
 objc_library(

@@ -46,13 +46,14 @@ namespace task {
 namespace vision {
 namespace {
 
+using ::testing::ElementsAreArray;
 using ::testing::HasSubstr;
 using ::testing::Optional;
-using ::testing::ElementsAreArray;
 using ::tflite::support::kTfLiteSupportPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::JoinPath;
+using ::tflite::task::ParseTextProtoOrDie;
 using ::tflite::task::core::PopulateTensor;
 using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
@@ -71,6 +72,25 @@ constexpr char kAutoMLModelWithMetadata[] = "automl_labeler_model.tflite";
 StatusOr<ImageData> LoadImage(std::string image_name) {
   return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
                                       kTestDataDirectory, image_name));
+}
+
+// If the proto definition changes, please also change this function.
+void ExpectApproximatelyEqual(const ClassificationResult& actual,
+                              const ClassificationResult& expected) {
+  const float kPrecision = 1e-6;
+  EXPECT_EQ(actual.classifications_size(), expected.classifications_size());
+  for (int i = 0; i < actual.classifications_size(); ++i) {
+    const Classifications& a = actual.classifications(i);
+    const Classifications& b = expected.classifications(i);
+    EXPECT_EQ(a.head_index(), b.head_index());
+    EXPECT_EQ(a.classes_size(), b.classes_size());
+    for (int j = 0; j < a.classes_size(); ++j) {
+      EXPECT_EQ(a.classes(j).index(), b.classes(j).index());
+      EXPECT_EQ(a.classes(j).class_name(), b.classes(j).class_name());
+      EXPECT_EQ(a.classes(j).display_name(), b.classes(j).display_name());
+      EXPECT_NEAR(a.classes(j).score(), b.classes(j).score(), kPrecision);
+    }
+  }
 }
 
 class MobileNetQuantizedOpResolver : public ::tflite::MutableOpResolver {
@@ -243,6 +263,402 @@ TEST_P(NumThreadsTest, FailsWithInvalidNumberOfThreads) {
   EXPECT_THAT(image_classifier_or.status().GetPayload(kTfLiteSupportPayload),
               Optional(absl::Cord(
                   absl::StrCat(TfLiteSupportStatus::kInvalidArgumentError))));
+}
+
+TEST(ClassifyTest, SucceedsWithFloatModel) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData rgb_image, LoadImage("burger.jpg"));
+  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
+      rgb_image.pixel_data,
+      FrameBuffer::Dimension{rgb_image.width, rgb_image.height});
+
+  ImageClassifierOptions options;
+  options.set_max_results(3);
+  options.mutable_model_file_with_metadata()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetFloatWithMetadata));
+
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
+                       ImageClassifier::CreateFromOptions(options));
+
+  StatusOr<ClassificationResult> result_or =
+      image_classifier->Classify(*frame_buffer);
+  ImageDataFree(&rgb_image);
+  SUPPORT_ASSERT_OK(result_or);
+
+  const ClassificationResult& result = result_or.value();
+  ExpectApproximatelyEqual(
+      result,
+      ParseTextProtoOrDie<ClassificationResult>(
+          R"pb(classifications {
+                 classes {
+                   index: 934
+                   score: 0.7399742
+                   class_name: "cheeseburger"
+                 }
+                 classes {
+                   index: 925
+                   score: 0.026928535
+                   class_name: "guacamole"
+                 }
+                 classes { index: 932 score: 0.025737215 class_name: "bagel" }
+                 head_index: 0
+               }
+          )pb"));
+}
+
+TEST(ClassifyTest, SucceedsWithRegionOfInterest) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData rgb_image, LoadImage("multi_objects.jpg"));
+  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
+      rgb_image.pixel_data,
+      FrameBuffer::Dimension{rgb_image.width, rgb_image.height});
+
+  ImageClassifierOptions options;
+  options.set_max_results(1);
+  options.mutable_model_file_with_metadata()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetFloatWithMetadata));
+
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
+                       ImageClassifier::CreateFromOptions(options));
+
+  // Crop around the soccer ball.
+  BoundingBox roi;
+  roi.set_origin_x(406);
+  roi.set_origin_y(110);
+  roi.set_width(148);
+  roi.set_height(153);
+
+  StatusOr<ClassificationResult> result_or =
+      image_classifier->Classify(*frame_buffer, roi);
+  ImageDataFree(&rgb_image);
+  SUPPORT_ASSERT_OK(result_or);
+
+  const ClassificationResult& result = result_or.value();
+  ExpectApproximatelyEqual(result, ParseTextProtoOrDie<ClassificationResult>(
+                                       R"pb(classifications {
+                                              classes {
+                                                index: 806
+                                                score: 0.99673367
+                                                class_name: "soccer ball"
+                                              }
+                                              head_index: 0
+                                            }
+                                       )pb"));
+}
+
+TEST(ClassifyTest, SucceedsWithQuantizedModel) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData rgb_image, LoadImage("burger.jpg"));
+  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
+      rgb_image.pixel_data,
+      FrameBuffer::Dimension{rgb_image.width, rgb_image.height});
+
+  ImageClassifierOptions options;
+  options.set_max_results(3);
+  options.mutable_model_file_with_metadata()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetQuantizedWithMetadata));
+
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
+                       ImageClassifier::CreateFromOptions(options));
+
+  StatusOr<ClassificationResult> result_or =
+      image_classifier->Classify(*frame_buffer);
+  ImageDataFree(&rgb_image);
+  SUPPORT_ASSERT_OK(result_or);
+
+  const ClassificationResult& result = result_or.value();
+  ExpectApproximatelyEqual(
+      result,
+      ParseTextProtoOrDie<ClassificationResult>(
+          R"pb(classifications {
+                 classes {
+                   index: 934
+                   score: 0.96484375
+                   class_name: "cheeseburger"
+                 }
+                 classes { index: 948 score: 0.0078125 class_name: "mushroom" }
+                 classes { index: 924 score: 0.00390625 class_name: "plate" }
+                 head_index: 0
+               }
+          )pb"));
+}
+
+TEST(ClassifyTest, SucceedsWithBaseOptions) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData rgb_image, LoadImage("burger.jpg"));
+  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
+      rgb_image.pixel_data,
+      FrameBuffer::Dimension{rgb_image.width, rgb_image.height});
+
+  ImageClassifierOptions options;
+  options.set_max_results(3);
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetFloatWithMetadata));
+
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
+                       ImageClassifier::CreateFromOptions(options));
+
+  StatusOr<ClassificationResult> result_or =
+      image_classifier->Classify(*frame_buffer);
+  ImageDataFree(&rgb_image);
+  SUPPORT_ASSERT_OK(result_or);
+
+  const ClassificationResult& result = result_or.value();
+  ExpectApproximatelyEqual(
+      result,
+      ParseTextProtoOrDie<ClassificationResult>(
+          R"pb(classifications {
+                 classes {
+                   index: 934
+                   score: 0.7399742
+                   class_name: "cheeseburger"
+                 }
+                 classes {
+                   index: 925
+                   score: 0.026928535
+                   class_name: "guacamole"
+                 }
+                 classes { index: 932 score: 0.025737215 class_name: "bagel" }
+                 head_index: 0
+               }
+          )pb"));
+}
+
+TEST(ClassifyTest, GetInputCountSucceeds) {
+  ImageClassifierOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetFloatWithMetadata));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
+                       ImageClassifier::CreateFromOptions(options));
+
+  int32_t input_count = image_classifier->GetInputCount();
+  EXPECT_THAT(input_count, 1);
+}
+
+TEST(ClassifyTest, GetInputShapeSucceeds) {
+  ImageClassifierOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetFloatWithMetadata));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
+                       ImageClassifier::CreateFromOptions(options));
+
+  // Verify the shape array size.
+  const TfLiteIntArray* input_shape_0 = image_classifier->GetInputShape(0);
+  EXPECT_THAT(input_shape_0->size, 4);
+
+  // Verify the shape array data.
+  auto shape_data = input_shape_0->data;
+  std::vector<int> shape_vector(shape_data, shape_data + input_shape_0->size);
+  EXPECT_THAT(shape_vector, ElementsAreArray({1, 224, 224, 3}));
+}
+
+TEST(ClassifyTest, GetOutputCountSucceeds) {
+  ImageClassifierOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetFloatWithMetadata));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
+                       ImageClassifier::CreateFromOptions(options));
+
+  int32_t output_count = image_classifier->GetOutputCount();
+  EXPECT_THAT(output_count, 1);
+}
+
+TEST(ClassifyTest, GetOutputShapeSucceeds) {
+  ImageClassifierOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetFloatWithMetadata));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
+                       ImageClassifier::CreateFromOptions(options));
+
+  // Verify the shape array size.
+  const TfLiteIntArray* output_shape_0 = image_classifier->GetOutputShape(0);
+  EXPECT_THAT(output_shape_0->size, 2);
+
+  // Verify the shape array data.
+  auto shape_data = output_shape_0->data;
+  std::vector<int> shape_vector(shape_data, shape_data + output_shape_0->size);
+  EXPECT_THAT(shape_vector, ElementsAreArray({1, 1001}));
+}
+
+class PostprocessTest : public tflite_shims::testing::Test {
+ public:
+  class TestImageClassifier : public ImageClassifier {
+   public:
+    using ImageClassifier::ImageClassifier;
+    using ImageClassifier::Postprocess;
+
+    static StatusOr<std::unique_ptr<TestImageClassifier>> CreateFromOptions(
+        const ImageClassifierOptions& options) {
+      RETURN_IF_ERROR(SanityCheckOptions(options));
+
+      auto options_copy = absl::make_unique<ImageClassifierOptions>(options);
+
+      ASSIGN_OR_RETURN(
+          auto image_classifier,
+          TaskAPIFactory::CreateFromExternalFileProto<TestImageClassifier>(
+              &options_copy->model_file_with_metadata()));
+
+      RETURN_IF_ERROR(image_classifier->Init(std::move(options_copy)));
+
+      return image_classifier;
+    }
+
+    TfLiteTensor* GetOutputTensor() {
+      if (TfLiteEngine::OutputCount(GetTfLiteEngine()->interpreter()) != 1) {
+        return nullptr;
+      }
+      return TfLiteEngine::GetOutput(GetTfLiteEngine()->interpreter(), 0);
+    }
+  };
+
+ protected:
+  void SetUp() override { tflite_shims::testing::Test::SetUp(); }
+  void SetUp(const ImageClassifierOptions& options) {
+    StatusOr<std::unique_ptr<TestImageClassifier>> test_image_classifier_or =
+        TestImageClassifier::CreateFromOptions(options);
+
+    init_status_ = test_image_classifier_or.status();
+
+    if (init_status_.ok()) {
+      test_image_classifier_ = std::move(test_image_classifier_or).value();
+    }
+
+    dummy_frame_buffer_ = CreateFromRgbRawBuffer(/*input=*/nullptr, {});
+  }
+
+  std::unique_ptr<TestImageClassifier> test_image_classifier_;
+  std::unique_ptr<FrameBuffer> dummy_frame_buffer_;
+  absl::Status init_status_;
+};
+
+TEST_F(PostprocessTest, SucceedsWithMaxResultsOption) {
+  ImageClassifierOptions options;
+  options.mutable_model_file_with_metadata()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kAutoMLModelWithMetadata));
+  options.set_max_results(3);
+
+  SetUp(options);
+  ASSERT_TRUE(test_image_classifier_ != nullptr) << init_status_;
+
+  TfLiteTensor* output_tensor = test_image_classifier_->GetOutputTensor();
+  ASSERT_NE(output_tensor, nullptr);
+
+  std::vector<uint8_t> scores = {/*daisy*/ 0, /*dandelion*/ 64, /*roses*/ 255,
+                                 /*sunflowers*/ 32, /*tulips*/ 128};
+  PopulateTensor(scores, output_tensor);
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ClassificationResult result,
+                       test_image_classifier_->Postprocess(
+                           {output_tensor}, *dummy_frame_buffer_, /*roi=*/{}));
+  ExpectApproximatelyEqual(
+      result,
+      ParseTextProtoOrDie<ClassificationResult>(
+          R"pb(classifications {
+                 classes { index: 2 score: 0.99609375 class_name: "roses" }
+                 classes { index: 4 score: 0.5 class_name: "tulips" }
+                 classes { index: 1 score: 0.25 class_name: "dandelion" }
+                 head_index: 0
+               }
+          )pb"));
+}
+
+TEST_F(PostprocessTest, SucceedsWithScoreThresholdOption) {
+  ImageClassifierOptions options;
+  options.mutable_model_file_with_metadata()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kAutoMLModelWithMetadata));
+  options.set_score_threshold(0.4);
+
+  SetUp(options);
+  ASSERT_TRUE(test_image_classifier_ != nullptr) << init_status_;
+
+  TfLiteTensor* output_tensor = test_image_classifier_->GetOutputTensor();
+  ASSERT_NE(output_tensor, nullptr);
+
+  std::vector<uint8_t> scores = {/*daisy*/ 0, /*dandelion*/ 64, /*roses*/ 255,
+                                 /*sunflowers*/ 32, /*tulips*/ 128};
+  PopulateTensor(scores, output_tensor);
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ClassificationResult result,
+                       test_image_classifier_->Postprocess(
+                           {output_tensor}, *dummy_frame_buffer_, /*roi=*/{}));
+
+  ExpectApproximatelyEqual(
+      result,
+      ParseTextProtoOrDie<ClassificationResult>(
+          R"pb(classifications {
+                 classes { index: 2 score: 0.99609375 class_name: "roses" }
+                 classes { index: 4 score: 0.5 class_name: "tulips" }
+                 head_index: 0
+               }
+          )pb"));
+}
+
+TEST_F(PostprocessTest, SucceedsWithWhitelistOption) {
+  ImageClassifierOptions options;
+  options.mutable_model_file_with_metadata()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kAutoMLModelWithMetadata));
+  options.add_class_name_whitelist("dandelion");
+  options.add_class_name_whitelist("daisy");
+
+  SetUp(options);
+  ASSERT_TRUE(test_image_classifier_ != nullptr) << init_status_;
+
+  TfLiteTensor* output_tensor = test_image_classifier_->GetOutputTensor();
+  ASSERT_NE(output_tensor, nullptr);
+
+  std::vector<uint8_t> scores = {/*daisy*/ 0, /*dandelion*/ 64, /*roses*/ 255,
+                                 /*sunflowers*/ 32, /*tulips*/ 128};
+  PopulateTensor(scores, output_tensor);
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ClassificationResult result,
+                       test_image_classifier_->Postprocess(
+                           {output_tensor}, *dummy_frame_buffer_, /*roi=*/{}));
+  ExpectApproximatelyEqual(
+      result,
+      ParseTextProtoOrDie<ClassificationResult>(
+          R"pb(classifications {
+                 classes { index: 1 score: 0.25 class_name: "dandelion" }
+                 classes { index: 0 score: 0 class_name: "daisy" }
+                 head_index: 0
+               }
+          )pb"));
+}
+
+TEST_F(PostprocessTest, SucceedsWithBlacklistOption) {
+  ImageClassifierOptions options;
+  options.mutable_model_file_with_metadata()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kAutoMLModelWithMetadata));
+  options.add_class_name_blacklist("dandelion");
+  options.add_class_name_blacklist("daisy");
+
+  SetUp(options);
+  ASSERT_TRUE(test_image_classifier_ != nullptr) << init_status_;
+
+  TfLiteTensor* output_tensor = test_image_classifier_->GetOutputTensor();
+  ASSERT_NE(output_tensor, nullptr);
+
+  std::vector<uint8_t> scores = {/*daisy*/ 0, /*dandelion*/ 64, /*roses*/ 255,
+                                 /*sunflowers*/ 32, /*tulips*/ 128};
+  PopulateTensor(scores, output_tensor);
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ClassificationResult result,
+                       test_image_classifier_->Postprocess(
+                           {output_tensor}, *dummy_frame_buffer_, /*roi=*/{}));
+
+  ExpectApproximatelyEqual(
+      result,
+      ParseTextProtoOrDie<ClassificationResult>(
+          R"pb(classifications {
+                 classes { index: 2 score: 0.99609375 class_name: "roses" }
+                 classes { index: 4 score: 0.5 class_name: "tulips" }
+                 classes { index: 3 score: 0.125 class_name: "sunflowers" }
+                 head_index: 0
+               }
+          )pb"));
 }
 
 }  // namespace

@@ -19,8 +19,7 @@ import XCTest
 class TFLBertNLClassifierTest: XCTestCase {
 
   static let bundle = Bundle(for: TFLBertNLClassifierTest.self)
-  static let bertModelPath = bundle.path(forResource: "test_model_nl_classifier_bert", ofType: "tflite")!
-
+  static let bertModelPath = bundle.path(forResource: "bert_nl_classifier", ofType: "tflite")!
 
   func testClassifyPositiveResult() {
     let bertNLClassifier = TFLBertNLClassifier.bertNLClassifier(
@@ -46,7 +45,7 @@ class TFLBertNLClassifierTest: XCTestCase {
 
   func testCreateFromOptionsClassifyPositiveResult() {
     let modelOptions = TFLBertNLClassifierOptions()
-    modelOptions.maxSeqLen = 128;
+    modelOptions.maxSeqLen = 128
     let bertNLClassifier = TFLBertNLClassifier.bertNLClassifier(
       modelPath: TFLBertNLClassifierTest.bertModelPath,
       options: modelOptions)
@@ -60,7 +59,7 @@ class TFLBertNLClassifierTest: XCTestCase {
 
   func testCreateFromOptionsClassifyNegativeResult() {
     let modelOptions = TFLBertNLClassifierOptions()
-    modelOptions.maxSeqLen = 128;
+    modelOptions.maxSeqLen = 128
     let bertNLClassifier = TFLBertNLClassifier.bertNLClassifier(
       modelPath: TFLBertNLClassifierTest.bertModelPath,
       options: modelOptions)

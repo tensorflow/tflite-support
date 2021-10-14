@@ -27,7 +27,7 @@ namespace vision {
 
 using ::tflite::support::StatusOr;
 using ::tflite::support::utils::GetMappedFileBuffer;
-using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::kIllegalStateException;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::vision::CreateFromRawBuffer;
 
@@ -81,7 +81,7 @@ FrameBuffer::Format ConvertToFrameBufferFormat(JNIEnv* env,
       break;
   }
   // Should never happen.
-  ThrowException(env, kAssertionError,
+  ThrowException(env, kIllegalStateException,
                  "The color space type is unsupported: %d", jcolor_space_type);
   return FrameBuffer::Format::kRGB;
 }
@@ -107,7 +107,7 @@ FrameBuffer::Orientation ConvertToFrameBufferOrientation(JNIEnv* env,
       return FrameBuffer::Orientation::kLeftBottom;
   }
   // Should never happen.
-  ThrowException(env, kAssertionError,
+  ThrowException(env, kIllegalStateException,
                  "The FrameBuffer Orientation type is unsupported: %d",
                  jorientation);
   return FrameBuffer::Orientation::kTopLeft;
@@ -155,7 +155,7 @@ StatusOr<std::unique_ptr<FrameBuffer>> CreateFrameBufferFromBytes(
   env->SetLongArrayRegion(jbyte_array_handle, 0, 1, &jimage_ptr_handle);
 
   if (jimage_ptr == NULL) {
-    ThrowException(env, kAssertionError,
+    ThrowException(env, kIllegalStateException,
                    "Error occurred when reading image data from byte array.");
     return nullptr;
   }

@@ -16,6 +16,7 @@ cc_library_with_tflite(
     hdrs = ["audio_classifier.h"],
     tflite_deps = [
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "//tensorflow_lite_support/cc/task/processor:classification_postprocessor",
         "//tensorflow_lite_support/cc/task/processor:audio_preprocessor",
         "//tensorflow_lite_support/cc/task/core:base_task_api",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
@@ -31,6 +32,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/core:classification_head",
         "//tensorflow_lite_support/cc/task/core:label_map_item",
         "//tensorflow_lite_support/cc/task/core:task_utils",
+        "//tensorflow_lite_support/cc/task/processor/proto:classification_options_cc_proto",
         "//tensorflow_lite_support/metadata:metadata_schema_cc",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings:str_format",

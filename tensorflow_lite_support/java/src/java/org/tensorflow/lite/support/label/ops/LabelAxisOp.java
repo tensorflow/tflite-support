@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.tensorflow.lite.support.common.FileUtil;
-import org.tensorflow.lite.support.common.SupportPreconditions;
+import org.tensorflow.lite.support.common.internal.SupportPreconditions;
 import org.tensorflow.lite.support.label.TensorLabel;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 

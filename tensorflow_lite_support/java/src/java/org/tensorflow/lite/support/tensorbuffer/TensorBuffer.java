@@ -15,9 +15,9 @@ limitations under the License.
 
 package org.tensorflow.lite.support.tensorbuffer;
 
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkArgument;
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkNotNull;
-import static org.tensorflow.lite.support.common.SupportPreconditions.checkState;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkArgument;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkNotNull;
+import static org.tensorflow.lite.support.common.internal.SupportPreconditions.checkState;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -163,7 +163,7 @@ public abstract class TensorBuffer {
    * @throws IllegalStateException if the underlying data is corrupted
    */
   public int getFlatSize() {
-    assertShapeIsCorect();
+    assertShapeIsCorrect();
     return flatSize;
   }
 
@@ -174,7 +174,7 @@ public abstract class TensorBuffer {
    */
   @NonNull
   public int[] getShape() {
-    assertShapeIsCorect();
+    assertShapeIsCorrect();
     return Arrays.copyOf(shape, shape.length);
   }
 
@@ -199,7 +199,7 @@ public abstract class TensorBuffer {
    * For example, a TensorBuffer with shape {2, 3} that represents the following array,
    * [[0.0f, 1.0f, 2.0f], [3.0f, 4.0f, 5.0f]].
    *
-   * The fourth element (whose value is 3.0f) in the TensorBuffer can be retrived by:
+   * The fourth element (whose value is 3.0f) in the TensorBuffer can be retrieved by:
    * float v = tensorBuffer.getFloatValue(3);
    * </pre>
    *
@@ -226,7 +226,7 @@ public abstract class TensorBuffer {
    * For example, a TensorBuffer with shape {2, 3} that represents the following array,
    * [[0.0f, 1.0f, 2.0f], [3.0f, 4.0f, 5.0f]].
    *
-   * The fourth element (whose value is 3.0f) in the TensorBuffer can be retrived by:
+   * The fourth element (whose value is 3.0f) in the TensorBuffer can be retrieved by:
    * int v = tensorBuffer.getIntValue(3);
    * Note that v is converted from 3.0f to 3 as a result of type conversion.
    * </pre>
@@ -459,7 +459,7 @@ public abstract class TensorBuffer {
    * Verifies if the shape of the {@link TensorBuffer} matched the size of the underlying {@link
    * ByteBuffer}.
    */
-  private void assertShapeIsCorect() {
+  private void assertShapeIsCorrect() {
     int flatSize = computeFlatSize(shape);
     checkState(
         (buffer.limit() == getTypeSize() * flatSize),

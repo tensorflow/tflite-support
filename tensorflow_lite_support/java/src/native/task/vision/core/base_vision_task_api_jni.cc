@@ -21,7 +21,7 @@ limitations under the License.
 
 namespace {
 
-using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::vision::CreateFrameBufferFromByteBuffer;
@@ -38,9 +38,11 @@ Java_org_tensorflow_lite_task_vision_core_BaseVisionTaskApi_createFrameBufferFro
   if (frame_buffer_or.ok()) {
     return reinterpret_cast<jlong>(frame_buffer_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when creating FrameBuffer: %s",
-                   frame_buffer_or.status().message().data());
+    ThrowException(
+        env,
+        GetExceptionClassNameForStatusCode(frame_buffer_or.status().code()),
+        "Error occurred when creating FrameBuffer: %s",
+        frame_buffer_or.status().message().data());
     return kInvalidPointer;
   }
 }
@@ -55,9 +57,11 @@ Java_org_tensorflow_lite_task_vision_core_BaseVisionTaskApi_createFrameBufferFro
   if (frame_buffer_or.ok()) {
     return reinterpret_cast<jlong>(frame_buffer_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when creating FrameBuffer: %s",
-                   frame_buffer_or.status().message().data());
+    ThrowException(
+        env,
+        GetExceptionClassNameForStatusCode(frame_buffer_or.status().code()),
+        "Error occurred when creating FrameBuffer: %s",
+        frame_buffer_or.status().message().data());
     return kInvalidPointer;
   }
 }
@@ -73,9 +77,11 @@ Java_org_tensorflow_lite_task_vision_core_BaseVisionTaskApi_createFrameBufferFro
   if (frame_buffer_or.ok()) {
     return reinterpret_cast<jlong>(frame_buffer_or->release());
   } else {
-    ThrowException(env, kAssertionError,
-                   "Error occurred when creating FrameBuffer: %s",
-                   frame_buffer_or.status().message().data());
+    ThrowException(
+        env,
+        GetExceptionClassNameForStatusCode(frame_buffer_or.status().code()),
+        "Error occurred when creating FrameBuffer: %s",
+        frame_buffer_or.status().message().data());
     return kInvalidPointer;
   }
 }

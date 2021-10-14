@@ -16,8 +16,8 @@ limitations under the License.
 package org.tensorflow.lite.support.common.ops;
 
 import org.tensorflow.lite.DataType;
-import org.tensorflow.lite.support.common.SupportPreconditions;
 import org.tensorflow.lite.support.common.TensorOperator;
+import org.tensorflow.lite.support.common.internal.SupportPreconditions;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 /** Casts a {@link TensorBuffer} to a specified data type. */

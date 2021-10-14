@@ -28,7 +28,6 @@ namespace support {
 namespace text {
 namespace tokenizer {
 
-
 using ::tflite::ProcessUnit;
 using ::tflite::SentencePieceTokenizerOptions;
 using ::tflite::support::CreateStatusWithPayload;
@@ -118,7 +117,7 @@ StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromProcessUnit(
             TfLiteSupportStatus::kMetadataInvalidTokenizerError);
       }
 
-      return regex_tokenizer;
+      return std::move(regex_tokenizer);
     }
     default:
       return CreateStatusWithPayload(
@@ -133,4 +132,3 @@ StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromProcessUnit(
 }  // namespace text
 }  // namespace support
 }  // namespace tflite
-

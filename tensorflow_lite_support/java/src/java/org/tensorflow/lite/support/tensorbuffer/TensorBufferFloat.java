@@ -18,7 +18,7 @@ package org.tensorflow.lite.support.tensorbuffer;
 import java.nio.FloatBuffer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.tensorflow.lite.DataType;
-import org.tensorflow.lite.support.common.SupportPreconditions;
+import org.tensorflow.lite.support.common.internal.SupportPreconditions;
 
 /** Represents data buffer with float values. */
 public final class TensorBufferFloat extends TensorBuffer {

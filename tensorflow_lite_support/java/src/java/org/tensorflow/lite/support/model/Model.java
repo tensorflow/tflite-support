@@ -25,7 +25,7 @@ import org.tensorflow.lite.InterpreterApi;
 import org.tensorflow.lite.InterpreterFactory;
 import org.tensorflow.lite.Tensor;
 import org.tensorflow.lite.support.common.FileUtil;
-import org.tensorflow.lite.support.common.SupportPreconditions;
+import org.tensorflow.lite.support.common.internal.SupportPreconditions;
 
 /**
  * The wrapper class for a TFLite model and a TFLite interpreter.
@@ -221,7 +221,7 @@ public class Model {
   }
 
   /**
-   * Gets the Tensor associated with the provdied input index.
+   * Gets the Tensor associated with the provided input index.
    *
    * @throws IllegalStateException if the interpreter is closed.
    */
@@ -230,7 +230,7 @@ public class Model {
   }
 
   /**
-   * Gets the Tensor associated with the provdied output index.
+   * Gets the Tensor associated with the provided output index.
    *
    * @throws IllegalStateException if the interpreter is closed.
    */

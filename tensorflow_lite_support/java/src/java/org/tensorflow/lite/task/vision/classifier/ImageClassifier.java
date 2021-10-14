@@ -190,8 +190,6 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the
    *     classification model
-   * @throws AssertionError if error occurs when creating {@link ImageClassifier} from the native
-   *     code
    * @throws IllegalArgumentException if the model buffer is not a direct {@link ByteBuffer} or a
    *     {@link MappedByteBuffer}
    * @throws IllegalStateException if there is an internal error
@@ -422,7 +420,6 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
-   * @throws AssertionError if error occurs when classifying the image from the native code
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Classifications> classify(TensorImage image) {
@@ -453,7 +450,6 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    * </ul>
    *
    * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
-   * @throws AssertionError if error occurs when classifying the image from the native code
    * @throws IllegalArgumentException if the color space type of image is unsupported
    */
   public List<Classifications> classify(TensorImage image, ImageProcessingOptions options) {
@@ -473,7 +469,6 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    * Performs actual classification on the provided {@code MlImage}.
    *
    * @param image an {@code MlImage} object that represents an image
-   * @throws AssertionError if error occurs when classifying the image from the native code
    * @throws IllegalArgumentException if the storage type or format of the image is unsupported
    */
   public List<Classifications> classify(MlImage image) {
@@ -496,7 +491,6 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *
    * @param image a {@code MlImage} object that represents an image
    * @param options configures options including ROI and rotation
-   * @throws AssertionError if error occurs when classifying the image from the native code
    * @throws IllegalArgumentException if the storage type or format of the image is unsupported
    */
   public List<Classifications> classify(MlImage image, ImageProcessingOptions options) {

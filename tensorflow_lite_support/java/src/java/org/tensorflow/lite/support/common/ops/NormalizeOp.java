@@ -17,8 +17,8 @@ package org.tensorflow.lite.support.common.ops;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.tensorflow.lite.DataType;
-import org.tensorflow.lite.support.common.SupportPreconditions;
 import org.tensorflow.lite.support.common.TensorOperator;
+import org.tensorflow.lite.support.common.internal.SupportPreconditions;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import org.tensorflow.lite.support.tensorbuffer.TensorBufferFloat;
 

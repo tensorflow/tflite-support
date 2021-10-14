@@ -23,7 +23,7 @@ namespace {
 using ::tflite::proto::Delegate;
 using ::tflite::support::StatusOr;
 using ::tflite::support::utils::ConvertToProtoDelegate;
-using ::tflite::support::utils::kAssertionError;
+using ::tflite::support::utils::kIllegalStateException;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::core::BaseOptions;
@@ -33,7 +33,7 @@ Java_org_tensorflow_lite_task_core_TaskJniUtils_createProtoBaseOptions(
     JNIEnv* env, jclass thiz, jint delegate, jint num_threads) {
   StatusOr<Delegate> delegate_proto_or = ConvertToProtoDelegate(delegate);
   if (!delegate_proto_or.ok()) {
-    ThrowException(env, kAssertionError,
+    ThrowException(env, kIllegalStateException,
                    "Error occurred when converting to the proto delegate: %s",
                    delegate_proto_or.status().message().data());
     return kInvalidPointer;
