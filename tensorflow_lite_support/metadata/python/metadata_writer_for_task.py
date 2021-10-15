@@ -14,13 +14,68 @@
 # ==============================================================================
 """Object oriented generic metadata writer for modular task API."""
 
+import collections
+import os
 import tempfile
-from typing import Optional
+from typing import Optional, List
 
 from tensorflow_lite_support.metadata.python import metadata as _metadata
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_writer
 from tensorflow_lite_support.metadata.python.metadata_writers import writer_utils
+
+LabelItem = collections.namedtuple('LabelItem', ['locale', 'filename', 'names'])
+
+
+class Labels:
+  """Simple container holding classification labels of a particular tensor."""
+
+  def __init__(self):
+    self._labels = []  # [LabelItem]
+
+  def add(self,
+          labels: List[str],
+          locale: Optional[str] = None,
+          use_as_category_name=False,
+          exported_filename: Optional[str] = None):
+    """Adds labels in the container."""
+    if not labels:
+      raise ValueError('The list of labels is empty')
+
+    # Prepare the new item to be inserted
+    if not exported_filename:
+      exported_filename = 'labels'
+      if locale:
+        exported_filename += f'_{locale}'
+      exported_filename += '.txt'
+    item = LabelItem(locale, exported_filename, labels)
+
+    if self._labels and use_as_category_name:
+      # Category names should be the first one in the list
+      pos = 0
+
+      # Double check if we need to replace exising category name or insert one.
+      if self._labels[pos].locale:
+        # No category names available, insert one
+        self._labels.insert(pos, item)
+      else:
+        # Update the category name
+        self._labels[pos] = item
+
+    else:
+      # insert the new element at the end of the list
+      self._labels.append(item)
+    return self
+
+  def add_from_file(self,
+                    label_filepath: str,
+                    locale: Optional[str] = None,
+                    use_as_category_name=False,
+                    exported_filename: Optional[str] = None):
+    """Adds a label file in the container."""
+    with open(label_filepath, 'r') as f:
+      labels = f.read().split('\n')
+      return self.add(labels, locale, use_as_category_name, exported_filename)
 
 
 class Writer:
@@ -40,8 +95,8 @@ class Writer:
       writer
         .add_audio_input(sample_rate=16000, channels=1)
         .add_image_input()
-        .add_classification_head(class_names=['apple', 'banana'])
-        .add_embedding_head()
+        .add_classification_output(Labels().add(['A', 'B']))
+        .add_embedding_output()
         .populate('model.tflite', 'model.json')
   """
 
@@ -100,6 +155,16 @@ class Writer:
 
     return (tflite_content, metadata_json_content)
 
+  def _export_labels(self, filename: str, index_to_label: List[str]):
+    filepath = os.path.join(self._temp_folder.name, filename)
+    with open(filepath, 'w') as f:
+      f.write('\n'.join(index_to_label))
+    self._associate_files.append(filepath)
+    return filepath
+
+  def _output_tensor_type(self, idx):
+    return writer_utils.get_output_tensor_types(self._model_buffer)[idx]
+
   _INPUT_AUDIO_NAME = 'audio'
   _INPUT_AUDIO_DESCRIPTION = 'Input audio clip to be processed.'
 
@@ -134,5 +199,48 @@ class Writer:
                            description: str = _OUTPUT_EMBEDDING_DESCRIPTION):
     """Marks the next output tensor as embedding."""
     output_md = metadata_info.TensorMd(name=name, description=description)
+    self._output_mds.append(output_md)
+    return self
+
+  _OUTPUT_CLASSIFICATION_NAME = 'score'
+  _OUTPUT_CLASSIFICATION_DESCRIPTION = 'Score of the labels respectively'
+
+  def add_classification_output(self,
+                                labels: Labels,
+                                name=_OUTPUT_CLASSIFICATION_NAME,
+                                description=_OUTPUT_CLASSIFICATION_DESCRIPTION):
+    """Marks model's next output tensor as a classification head.
+
+    Example usage:
+    writer.add_classification_output(
+      Labels()
+        .add(['cat', 'dog], 'en')
+        .add(['chat', 'chien], 'fr')
+        .add(['/m/011l78', '/m/031d23'], use_as_category_name=True))
+
+    Args:
+      labels: a instance of Labels helper class.
+      name: Metadata name of the tensor. Note that this is different from tensor
+        name in the flatbuffer.
+      description: human readable description of what the tensor does.
+
+    Returns:
+      The current Writer instance to allow chained operation.
+    """
+    idx = len(self._output_mds)
+
+    label_files = []
+    for item in labels._labels:  # pylint: disable=protected-access
+      label_files.append(
+          metadata_info.LabelFileMd(
+              self._export_labels(item.filename, item.names),
+              locale=item.locale))
+
+    output_md = metadata_info.ClassificationTensorMd(
+        name=name,
+        description=description,
+        label_files=label_files,
+        tensor_type=self._output_tensor_type(idx),
+    )
     self._output_mds.append(output_md)
     return self
