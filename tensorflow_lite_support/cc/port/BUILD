@@ -11,7 +11,7 @@ cc_library(
         "statusor.h",
     ],
     deps = [
-        "//tensorflow_lite_support/cc/port/default:statusor",
+        "@com_google_absl//absl/status:statusor",
     ],
 )
 
