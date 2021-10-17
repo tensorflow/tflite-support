@@ -95,13 +95,7 @@ absl::Status ImageTransformer::SanityCheckOptions(
                         num_input_models),
         TfLiteSupportStatus::kInvalidArgumentError);
   }
-  if (options.base_options().compute_settings().tflite_settings().cpu_settings().num_threads() == 0 ||
-      options.base_options().compute_settings().tflite_settings().cpu_settings().num_threads() < -1) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        "`num_threads` must be greater than 0 or equal to -1.",
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
+
   return absl::OkStatus();
 }
 
