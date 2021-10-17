@@ -161,8 +161,6 @@ absl::Status ImageTransformer::CheckAndSetOutputs() {
                         output_tensor->dims->data[0]),
         TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
   }
-  // TODO: Will the output be float and should be converted or directly available?
-  // The example had float and it had to be converted. Anyway, we're guaranteed to have uint8 as output.
   has_uint8_outputs_ = (output_tensor->type == kTfLiteUInt8);
   return absl::OkStatus();
 }
