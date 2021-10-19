@@ -318,6 +318,10 @@ FrameBuffer::Dimension FrameBufferUtils::GetSize(
   } else if (absl::holds_alternative<CropResizeOperation>(operation)) {
     const auto& crop_resize = absl::get<CropResizeOperation>(operation);
     dimension = crop_resize.resize_dimension;
+  } else if (absl::holds_alternative<UniformCropResizeOperation>(operation)) {
+    const auto& uniform_crop_resize =
+        absl::get<UniformCropResizeOperation>(operation);
+    dimension = uniform_crop_resize.output_dimension;
   }
   return dimension;
 }
@@ -394,6 +398,13 @@ absl::Status FrameBufferUtils::Execute(const FrameBuffer& buffer,
                                        FrameBuffer* output_buffer) {
   if (absl::holds_alternative<CropResizeOperation>(operation)) {
     const auto& params = absl::get<CropResizeOperation>(operation);
+    RETURN_IF_ERROR(
+        Crop(buffer, params.crop_origin_x, params.crop_origin_y,
+             (params.crop_dimension.width + params.crop_origin_x - 1),
+             (params.crop_dimension.height + params.crop_origin_y - 1),
+             output_buffer));
+  } else if (absl::holds_alternative<UniformCropResizeOperation>(operation)) {
+    const auto& params = absl::get<UniformCropResizeOperation>(operation);
     RETURN_IF_ERROR(
         Crop(buffer, params.crop_origin_x, params.crop_origin_y,
              (params.crop_dimension.width + params.crop_origin_x - 1),
@@ -568,7 +579,7 @@ absl::Status FrameBufferUtils::Execute(
 
 absl::Status FrameBufferUtils::Preprocess(
     const FrameBuffer& buffer, absl::optional<BoundingBox> bounding_box,
-    FrameBuffer* output_buffer) {
+    FrameBuffer* output_buffer, bool uniform_resizing) {
   std::vector<FrameBufferOperation> frame_buffer_operations;
   // Handle cropping and resizing.
   bool needs_dimension_swap =
@@ -580,15 +591,26 @@ absl::Status FrameBufferUtils::Preprocess(
     pre_orient_dimension.Swap();
   }
 
-  if (bounding_box.has_value()) {
-    // Cropping case.
+  if (uniform_resizing && bounding_box.has_value()) {
+    // Crop and uniform resize.
+    frame_buffer_operations.push_back(UniformCropResizeOperation(
+        bounding_box.value().origin_x(), bounding_box.value().origin_y(),
+        FrameBuffer::Dimension{bounding_box.value().width(),
+                               bounding_box.value().height()},
+        pre_orient_dimension));
+  } else if (uniform_resizing) {
+    // Uniform resize only.
+    frame_buffer_operations.push_back(UniformCropResizeOperation(
+        0, 0, buffer.dimension(), pre_orient_dimension));
+  } else if (bounding_box.has_value()) {
+    // Crop and non-uniform resize.
     frame_buffer_operations.push_back(CropResizeOperation(
         bounding_box.value().origin_x(), bounding_box.value().origin_y(),
         FrameBuffer::Dimension{bounding_box.value().width(),
                                bounding_box.value().height()},
         pre_orient_dimension));
   } else if (pre_orient_dimension != buffer.dimension()) {
-    // Resizing case.
+    // non-uniform resize.
     frame_buffer_operations.push_back(
         CropResizeOperation(0, 0, buffer.dimension(), pre_orient_dimension));
   }
