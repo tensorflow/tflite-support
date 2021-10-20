@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
  * is encountered because of invalid memSize. If failure is due to any other reason, method
  * terminates program execution.
  */
-+ (void *)mallocOrErrorWithSize:(size_t)memSize error:(NSError **)error;
++ (void *)mallocWithSize:(size_t)memSize error:(NSError **)error;
 @end
 
 NS_ASSUME_NONNULL_END
