@@ -12,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -66,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** Encapsulates results of any classification task. */
 @interface TFLClassificationResult : NSObject
 
-@property(nonatomic, strong) NSArray<TFLClassifications *> *classifications;
+@property(nonatomic, copy) NSArray<TFLClassifications *> *classifications;
 
 /**
  * Initializes an instance of TFLClassifications for an image classifier head with given index and list of
