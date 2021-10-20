@@ -15,6 +15,7 @@
 """Tests for tensorflow_lite_support.metadata.metadata_writer_for_task."""
 
 import os
+import sys
 import tensorflow as tf
 from tensorflow_lite_support.metadata.python import metadata_writer_for_task as mt
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
@@ -23,7 +24,62 @@ _AUDIO_CLASSIFICATION_MODEL = '../testdata/audio_classifier/yamnet_wavin_quantiz
 _AUDIO_EMBEDDING_MODEL = '../testdata/audio_embedder/yamnet_embedding.tflite'
 
 
+class LabelsTest(tf.test.TestCase):
+
+  def test_category_name(self):
+    labels = mt.Labels()
+    self.assertEqual(
+        labels.add(['a', 'b'], use_as_category_name=True)._labels,
+        [(None, 'labels.txt', ['a', 'b'])])
+    # Overwrite categories
+    self.assertEqual(
+        labels.add(['new_a', 'new_b'], use_as_category_name=True)._labels,
+        [(None, 'labels.txt', ['new_a', 'new_b'])])
+
+  def test_locale(self):
+    labels = mt.Labels()
+
+    # Add from file.
+    en_filepath = self.create_tempfile().full_path
+    with open(en_filepath, 'w') as f:
+      f.write('a\nb')
+    labels.add_from_file(en_filepath, 'en')
+
+    # Customized file name
+    labels.add(['A', 'B'], 'fr', exported_filename='my_file.txt')
+    self.assertEqual(labels._labels, [
+        ('en', 'labels_en.txt', ['a', 'b']),
+        ('fr', 'my_file.txt', ['A', 'B']),
+    ])
+
+    # Add category name, which should be the first file in the list.
+    labels.add(['aa', 'bb'], 'cn', use_as_category_name=True)
+    self.assertEqual(labels._labels, [
+        ('cn', 'labels_cn.txt', ['aa', 'bb']),
+        ('en', 'labels_en.txt', ['a', 'b']),
+        ('fr', 'my_file.txt', ['A', 'B']),
+    ])
+
+
 class MetadataWriterForTaskTest(tf.test.TestCase):
+
+  def test_initialize_without_with_block(self):
+    writer = mt.Writer(
+        test_utils.load_file(_AUDIO_CLASSIFICATION_MODEL),
+        model_name='test_model',
+        model_description='test_description')
+
+    # Calling `add_classification_output` outside the `with` block fails.
+    with self.assertRaisesRegex(AttributeError, '_temp_folder'):
+      writer.add_classification_output(mt.Labels().add(['cat', 'dog']))
+
+    writer.__enter__()
+    writer.add_classification_output(mt.Labels().add(['cat', 'dog']))
+    writer.__exit__(*sys.exc_info())
+
+    # Calling `add_classification_output` after `with` block closes also fails.
+    with self.assertRaisesRegex(AttributeError, '_temp_folder'):
+      writer.add_classification_output(mt.Labels().add(['cat', 'dog']))
 
   def test_initialize_and_populate(self):
     with mt.Writer(
@@ -53,6 +109,152 @@ class MetadataWriterForTaskTest(tf.test.TestCase):
     }
   ],
   "min_parser_version": "1.0.0"
+}
+""")
+
+  def test_audio_classifier(self):
+    with mt.Writer(
+        test_utils.load_file(_AUDIO_CLASSIFICATION_MODEL),
+        model_name='audio_classifier',
+        model_description='Classify the input audio clip') as writer:
+      out_dir = self.create_tempdir()
+      writer.add_audio_input(sample_rate=16000, channels=1)
+      writer.add_classification_output(mt.Labels().add(
+          ['sound1', 'sound2'], 'en', use_as_category_name=True))
+      writer.populate(
+          os.path.join(out_dir, 'model.tflite'),
+          os.path.join(out_dir, 'metadata.tflite'))
+      self.assertEqual(
+          test_utils.load_file(os.path.join(out_dir, 'metadata.tflite'), 'r'),
+          """{
+  "name": "audio_classifier",
+  "description": "Classify the input audio clip",
+  "subgraph_metadata": [
+    {
+      "input_tensor_metadata": [
+        {
+          "name": "audio",
+          "description": "Input audio clip to be processed.",
+          "content": {
+            "content_properties_type": "AudioProperties",
+            "content_properties": {
+              "sample_rate": 16000,
+              "channels": 1
+            }
+          },
+          "stats": {
+          }
+        }
+      ],
+      "output_tensor_metadata": [
+        {
+          "name": "score",
+          "description": "Score of the labels respectively",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {
+            }
+          },
+          "stats": {
+            "max": [
+              1.0
+            ],
+            "min": [
+              0.0
+            ]
+          },
+          "associated_files": [
+            {
+              "name": "labels_en.txt",
+              "description": "Labels for categories that the model can recognize.",
+              "type": "TENSOR_AXIS_LABELS",
+              "locale": "en"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "min_parser_version": "1.3.0"
+}
+""")
+
+  def test_audio_classifier_with_locale(self):
+    with mt.Writer(
+        test_utils.load_file(_AUDIO_CLASSIFICATION_MODEL),
+        model_name='audio_classifier',
+        model_description='Classify the input audio clip') as writer:
+      out_dir = self.create_tempdir()
+      writer.add_audio_input(sample_rate=16000, channels=1)
+      writer.add_classification_output(mt.Labels().add(
+          ['/id1', '/id2'],
+          use_as_category_name=True).add(['sound1', 'sound2'],
+                                         'en').add(['son1', 'son2'], 'fr'))
+      _, metadata_json = writer.populate(
+          os.path.join(out_dir, 'model.tflite'),
+          os.path.join(out_dir, 'metadata.tflite'))
+      self.assertEqual(
+          metadata_json, """{
+  "name": "audio_classifier",
+  "description": "Classify the input audio clip",
+  "subgraph_metadata": [
+    {
+      "input_tensor_metadata": [
+        {
+          "name": "audio",
+          "description": "Input audio clip to be processed.",
+          "content": {
+            "content_properties_type": "AudioProperties",
+            "content_properties": {
+              "sample_rate": 16000,
+              "channels": 1
+            }
+          },
+          "stats": {
+          }
+        }
+      ],
+      "output_tensor_metadata": [
+        {
+          "name": "score",
+          "description": "Score of the labels respectively",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {
+            }
+          },
+          "stats": {
+            "max": [
+              1.0
+            ],
+            "min": [
+              0.0
+            ]
+          },
+          "associated_files": [
+            {
+              "name": "labels.txt",
+              "description": "Labels for categories that the model can recognize.",
+              "type": "TENSOR_AXIS_LABELS"
+            },
+            {
+              "name": "labels_en.txt",
+              "description": "Labels for categories that the model can recognize.",
+              "type": "TENSOR_AXIS_LABELS",
+              "locale": "en"
+            },
+            {
+              "name": "labels_fr.txt",
+              "description": "Labels for categories that the model can recognize.",
+              "type": "TENSOR_AXIS_LABELS",
+              "locale": "fr"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "min_parser_version": "1.3.0"
 }
 """)
 

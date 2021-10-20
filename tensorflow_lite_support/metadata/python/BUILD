@@ -49,7 +49,6 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         ":metadata",
-        "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_writer",
         "//tensorflow_lite_support/metadata/python/metadata_writers:writer_utils",
