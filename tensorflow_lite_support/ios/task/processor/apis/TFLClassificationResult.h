@@ -21,10 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLCategory : NSObject
 
 /** Display name of the class. */
-@property(nonatomic, strong) NSString *displayName;
+@property(nonatomic, copy) NSString *displayName;
 
 /** Class name of the class . */
-@property(nonatomic, strong) NSString *label;
+@property(nonatomic, copy) NSString *label;
 
  /** Confidence score for this class . */
 @property(nonatomic, assign) float score;
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign) int headIndex;
 
 /** The array of predicted classes, usually sorted by descending scores (e.g.from high to low probability). */
-@property(nonatomic, strong) NSArray<TFLCategory *> *categories;
+@property(nonatomic, copy) NSArray<TFLCategory *> *categories;
 
 /**
  * Initializes an instance of TFLClassifications for an image classifier head with given index and list of
