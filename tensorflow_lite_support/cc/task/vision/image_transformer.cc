@@ -56,46 +56,19 @@ StatusOr<std::unique_ptr<ImageTransformer>> ImageTransformer::CreateFromOptions(
   auto options_copy = absl::make_unique<ImageTransformerOptions>(options);
 
   std::unique_ptr<ImageTransformer> image_transformer;
-  //TODO: Should be model_file_with_metadata?
-  if (options_copy->model_file_with_metadata()) {
-    ASSIGN_OR_RETURN(
-        image_classifier,
-        TaskAPIFactory::CreateFromExternalFileProto<ImageTransformer>(
-            &options_copy->model_file_with_metadata(), std::move(resolver),
-            options_copy->num_threads(), options_copy->compute_settings()));
-  } else if (options_copy->base_options().has_model_file()) {
-    ASSIGN_OR_RETURN(image_classifier,
-                     TaskAPIFactory::CreateFromBaseOptions<ImageTransformer>(
-                         &options_copy->base_options(), std::move(resolver)));
-  } else {
-    // Should never happen because of SanityCheckOptions.
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat("Expected exactly one of `base_options.model_file` or "
-                        "`model_file_with_metadata` to be provided, found 0."),
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
+
+  ASSIGN_OR_RETURN(image_transformer,
+                   TaskAPIFactory::CreateFromBaseOptions<ImageTransformer>(
+                   &options_copy->base_options(), std::move(resolver)));
 
   RETURN_IF_ERROR(image_transformer->Init(std::move(options_copy)));
-
   return image_transformer;
 }
 
 /* static */
 absl::Status ImageTransformer::SanityCheckOptions(
     const ImageTransformerOptions& options) {
-  int num_input_models = (options.base_options().has_model_file() ? 1 : 0) +
-                         (options.has_model_file_with_metadata() ? 1 : 0);
-
-  if (num_input_models != 1) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat("Expected exactly one of `base_options.model_file` or "
-                        "`model_file_with_metadata` to be provided, found %d.",
-                        num_input_models),
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
-
+  // Nothing to do.
   return absl::OkStatus();
 }
 
@@ -165,7 +138,7 @@ absl::Status ImageTransformer::CheckAndSetOutputs() {
   return absl::OkStatus();
 }
 
-StatusOr<TransformationResult> ImageTransformer::Transform(
+StatusOr<FrameBuffer> ImageTransformer::Transform(
     const FrameBuffer& frame_buffer) {
   BoundingBox roi;
   roi.set_width(frame_buffer.dimension().width);
@@ -173,14 +146,18 @@ StatusOr<TransformationResult> ImageTransformer::Transform(
   return Transform(frame_buffer, roi);
 }
 
-StatusOr<TransformationResult> ImageTransformer::Transform(
+StatusOr<FrameBuffer> ImageTransformer::Transform(
     const FrameBuffer& frame_buffer, const BoundingBox& roi) {
   return InferWithFallback(frame_buffer, roi);
 }
 
-StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess(
-    const std::vector<const TfLiteTensor*>& output_tensors,
-    const FrameBuffer& /*frame_buffer*/, const BoundingBox& /*roi*/) {
+StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
+
+    auto output_buffer = std::make_unique<FrameBuffer>();
+
+
+    return output_buffer;
+
 }
 }  // namespace vision
 }  // namespace task
