@@ -16,8 +16,9 @@ limitations under the License.
 // Functions to write audio in WAV format.
 // This file is forked from `tensorflow/core/lib/wav/wav_io.h`.
 
-#ifndef TENSORFLOW_LITE_SUPPORT_EXAMPLES_TASK_AUDIO_DESKTOP_WAV_WAV_IO_H_
-#define TENSORFLOW_LITE_SUPPORT_EXAMPLES_TASK_AUDIO_DESKTOP_WAV_WAV_IO_H_
+#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_AUDIO_UTILS_WAV_IO_H_
+
+#define TENSORFLOW_LITE_SUPPORT_CC_TASK_AUDIO_UTILS_WAV_IO_H_
 
 #include <string>
 #include <vector>
@@ -96,4 +97,4 @@ std::string ReadFile(const std::string filepath);
 }  // namespace task
 }  // namespace tflite
 
-#endif  // TENSORFLOW_LITE_SUPPORT_EXAMPLES_TASK_AUDIO_DESKTOP_WAV_WAV_IO_H_
+#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_AUDIO_UTILS_WAV_IO_H_

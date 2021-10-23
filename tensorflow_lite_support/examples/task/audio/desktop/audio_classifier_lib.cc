@@ -26,8 +26,8 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/audio/audio_classifier.h"
 #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/audio/utils/wav_io.h"
 #include "tensorflow_lite_support/cc/task/core/category.h"
-#include "tensorflow_lite_support/examples/task/audio/desktop/wav/wav_io.h"
 
 namespace tflite {
 namespace task {
