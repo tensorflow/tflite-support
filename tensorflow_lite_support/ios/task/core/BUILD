@@ -6,7 +6,7 @@ package(
 objc_library(
     name = "TFLBaseOptions",
     hdrs = [
-        "Sources/TFLBaseOptions.h",
+        "apis/TFLBaseOptions.h",
     ],
     module_name = "TFLBaseOptions",
 )
