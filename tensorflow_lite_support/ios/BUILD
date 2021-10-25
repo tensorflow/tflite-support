@@ -83,7 +83,7 @@ tflite_ios_framework(
 objc_library(
     name = "TFLCommon",
     hdrs = [
-        "Sources/TFLCommon.h",
+        "sources/TFLCommon.h",
     ],
     module_name = "TFLCommon",
     visibility = [
@@ -95,6 +95,9 @@ objc_library(
     name = "TFLCommonUtils",
     hdrs = [
         "sources/TFLCommonUtils.h",
+    ],
+    deps = [
+        "//tensorflow_lite_support/c:common",
     ],
    visibility = [
        "//tensorflow_lite_support:__subpackages__"
