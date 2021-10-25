@@ -22,6 +22,7 @@ from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_
 
 _AUDIO_CLASSIFICATION_MODEL = '../testdata/audio_classifier/yamnet_wavin_quantized_mel_relu6.tflite'
 _AUDIO_EMBEDDING_MODEL = '../testdata/audio_embedder/yamnet_embedding.tflite'
+_IMAGE_CLASSIFIER_MODEL = '../testdata/image_classifier/mobilenet_v2_1.0_224.tflite'
 
 
 class LabelsTest(tf.test.TestCase):
@@ -258,6 +259,104 @@ class MetadataWriterForTaskTest(tf.test.TestCase):
 }
 """)
 
+  def test_audio_classifier_with_locale_and_score_calibration(self):
+    with mt.Writer(
+        test_utils.load_file(_AUDIO_CLASSIFICATION_MODEL),
+        model_name='audio_classifier',
+        model_description='Classify the input audio clip') as writer:
+      out_dir = self.create_tempdir()
+      writer.add_audio_input(sample_rate=16000, channels=1)
+      writer.add_classification_output(
+          mt.Labels().add(['/id1', '/id2'], use_as_category_name=True).add(
+              ['sound1', 'sound2'], 'en').add(['son1', 'son2'], 'fr'),
+          score_calibration=mt.ScoreCalibration(
+              mt.ScoreCalibration.transformation_types.INVERSE_LOGISTIC, [
+                  mt.CalibrationParameter(1., 2., 3., None),
+                  mt.CalibrationParameter(1., 2., 3., 4.),
+              ],
+              default_score=0.5))
+      _, metadata_json = writer.populate(
+          os.path.join(out_dir, 'model.tflite'),
+          os.path.join(out_dir, 'metadata.tflite'))
+      self.assertEqual(
+          metadata_json, """{
+  "name": "audio_classifier",
+  "description": "Classify the input audio clip",
+  "subgraph_metadata": [
+    {
+      "input_tensor_metadata": [
+        {
+          "name": "audio",
+          "description": "Input audio clip to be processed.",
+          "content": {
+            "content_properties_type": "AudioProperties",
+            "content_properties": {
+              "sample_rate": 16000,
+              "channels": 1
+            }
+          },
+          "stats": {
+          }
+        }
+      ],
+      "output_tensor_metadata": [
+        {
+          "name": "score",
+          "description": "Score of the labels respectively",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {
+            }
+          },
+          "process_units": [
+            {
+              "options_type": "ScoreCalibrationOptions",
+              "options": {
+                "score_transformation": "INVERSE_LOGISTIC",
+                "default_score": 0.5
+              }
+            }
+          ],
+          "stats": {
+            "max": [
+              1.0
+            ],
+            "min": [
+              0.0
+            ]
+          },
+          "associated_files": [
+            {
+              "name": "labels.txt",
+              "description": "Labels for categories that the model can recognize.",
+              "type": "TENSOR_AXIS_LABELS"
+            },
+            {
+              "name": "labels_en.txt",
+              "description": "Labels for categories that the model can recognize.",
+              "type": "TENSOR_AXIS_LABELS",
+              "locale": "en"
+            },
+            {
+              "name": "labels_fr.txt",
+              "description": "Labels for categories that the model can recognize.",
+              "type": "TENSOR_AXIS_LABELS",
+              "locale": "fr"
+            },
+            {
+              "name": "score_calibration.txt",
+              "description": "Contains sigmoid-based score calibration parameters. The main purposes of score calibration is to make scores across classes comparable, so that a common threshold can be used for all output classes.",
+              "type": "TENSOR_AXIS_SCORE_CALIBRATION"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "min_parser_version": "1.3.0"
+}
+""")
+
   def test_audio_embedder(self):
     with mt.Writer(
         test_utils.load_file(_AUDIO_EMBEDDING_MODEL),
@@ -307,6 +406,99 @@ class MetadataWriterForTaskTest(tf.test.TestCase):
     }
   ],
   "min_parser_version": "1.3.0"
+}
+""")
+
+  def test_image_classifier(self):
+    with mt.Writer(
+        test_utils.load_file(_IMAGE_CLASSIFIER_MODEL),
+        model_name='image_classifier',
+        model_description='Imagenet classification model') as writer:
+      out_dir = self.create_tempdir()
+      writer.add_image_input(
+          norm_mean=[127.5, 127.5, 127.5],
+          norm_std=[127.5, 127.5, 127.5],
+          color_space_type=mt.Writer.color_space_types.RGB)
+      writer.add_classification_output(mt.Labels().add(['a', 'b', 'c']))
+      _, metadata_json = writer.populate(
+          os.path.join(out_dir, 'model.tflite'),
+          os.path.join(out_dir, 'metadat.json'))
+      self.assertEqual(
+          metadata_json, """{
+  "name": "image_classifier",
+  "description": "Imagenet classification model",
+  "subgraph_metadata": [
+    {
+      "input_tensor_metadata": [
+        {
+          "name": "image",
+          "description": "Input image to be processed.",
+          "content": {
+            "content_properties_type": "ImageProperties",
+            "content_properties": {
+              "color_space": "RGB"
+            }
+          },
+          "process_units": [
+            {
+              "options_type": "NormalizationOptions",
+              "options": {
+                "mean": [
+                  127.5,
+                  127.5,
+                  127.5
+                ],
+                "std": [
+                  127.5,
+                  127.5,
+                  127.5
+                ]
+              }
+            }
+          ],
+          "stats": {
+            "max": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "min": [
+              -1.0,
+              -1.0,
+              -1.0
+            ]
+          }
+        }
+      ],
+      "output_tensor_metadata": [
+        {
+          "name": "score",
+          "description": "Score of the labels respectively",
+          "content": {
+            "content_properties_type": "FeatureProperties",
+            "content_properties": {
+            }
+          },
+          "stats": {
+            "max": [
+              1.0
+            ],
+            "min": [
+              0.0
+            ]
+          },
+          "associated_files": [
+            {
+              "name": "labels.txt",
+              "description": "Labels for categories that the model can recognize.",
+              "type": "TENSOR_AXIS_LABELS"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "min_parser_version": "1.0.0"
 }
 """)
 

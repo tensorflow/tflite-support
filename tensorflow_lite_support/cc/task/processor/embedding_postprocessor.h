@@ -53,6 +53,8 @@ class EmbeddingPostprocessor : public Postprocessor {
   static tflite::support::StatusOr<double> CosineSimilarity(const T& u,
                                                             const T& v);
 
+  int GetEmbeddingDimension() const { return embedding_dimension_; }
+
  private:
   using Postprocessor::Postprocessor;
 

@@ -1,5 +1,4 @@
-# Description:
-# wav_io targets.
+# Description: some utilitiy function for audio processing.
 
 package(
     default_visibility = [
