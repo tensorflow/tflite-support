@@ -16,7 +16,7 @@ limitations under the License.
 // Functions to write audio in WAV format.
 // This file is forked from `tensorflow/core/lib/wav/wav_io.cc`.
 
-#include "tensorflow_lite_support/examples/task/audio/desktop/wav/wav_io.h"
+#include "tensorflow_lite_support/cc/task/audio/utils/wav_io.h"
 
 #include <math.h>
 #include <string.h>

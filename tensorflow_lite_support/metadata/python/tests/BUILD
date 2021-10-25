@@ -38,6 +38,7 @@ py_test(
     data = [
         "//tensorflow_lite_support/metadata/python/tests/testdata/audio_classifier:test_files",
         "//tensorflow_lite_support/metadata/python/tests/testdata/audio_embedder:test_files",
+        "//tensorflow_lite_support/metadata/python/tests/testdata/image_classifier:test_files",
     ],
     python_version = "PY3",
     srcs_version = "PY3",

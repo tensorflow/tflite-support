@@ -19,10 +19,14 @@ import os
 import tempfile
 from typing import Optional, List
 
+from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
 from tensorflow_lite_support.metadata.python import metadata as _metadata
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_writer
 from tensorflow_lite_support.metadata.python.metadata_writers import writer_utils
+
+CalibrationParameter = collections.namedtuple(
+    'CalibrationParameter', ['scale', 'slope', 'offset', 'min_score'])
 
 LabelItem = collections.namedtuple('LabelItem', ['locale', 'filename', 'names'])
 
@@ -76,6 +80,21 @@ class Labels:
     with open(label_filepath, 'r') as f:
       labels = f.read().split('\n')
       return self.add(labels, locale, use_as_category_name, exported_filename)
+
+
+class ScoreCalibration:
+  """Simple container holding score calibration related parameters."""
+
+  # A shortcut to avoid client side code importing _metadata_fb
+  transformation_types = _metadata_fb.ScoreTransformationType
+
+  def __init__(self,
+               transformation_type: _metadata_fb.ScoreTransformationType,
+               parameters: List[CalibrationParameter],
+               default_score: int = 0):
+    self.transformation_type = transformation_type
+    self.parameters = parameters
+    self.default_score = default_score
 
 
 class Writer:
@@ -162,6 +181,9 @@ class Writer:
     self._associate_files.append(filepath)
     return filepath
 
+  def _input_tensor_type(self, idx):
+    return writer_utils.get_input_tensor_types(self._model_buffer)[idx]
+
   def _output_tensor_type(self, idx):
     return writer_utils.get_output_tensor_types(self._model_buffer)[idx]
 
@@ -191,6 +213,51 @@ class Writer:
     self._input_mds.append(input_md)
     return self
 
+  _INPUT_IMAGE_NAME = 'image'
+  _INPUT_IMAGE_DESCRIPTION = 'Input image to be processed.'
+  color_space_types = _metadata_fb.ColorSpaceType
+
+  def add_image_input(
+      self,
+      norm_mean: List[float],
+      norm_std: List[float],
+      color_space_type: Optional[
+          _metadata_fb.ColorSpaceType] = _metadata_fb.ColorSpaceType.RGB,
+      name: str = _INPUT_IMAGE_NAME,
+      description: str = _INPUT_IMAGE_DESCRIPTION):
+    """Marks the next input tensor as an image input.
+
+    Args:
+      norm_mean: The mean value used to normalize each input channel. If there
+        is only one element in the list, its value will be broadcasted to all
+        channels. Also note that norm_mean and norm_std should have the same
+        number of elements. [1]
+      norm_std: The std value used to normalize each input channel. If there is
+        only one element in the list, its value will be broadcasted to all
+        channels. [1]
+      color_space_type: The color space type of the input image. [2]
+      name: Name of the input tensor.
+      description: Description of the input tensor.
+
+    Returns:
+      The Writer instance, can be used for chained operation.
+
+    [1]:
+    https://www.tensorflow.org/lite/convert/metadata#normalization_and_quantization_parameters
+    [2]:
+    https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L172
+    """
+    input_md = metadata_info.InputImageTensorMd(
+        name=name,
+        description=description,
+        norm_mean=norm_mean,
+        norm_std=norm_std,
+        color_space_type=color_space_type,
+        tensor_type=self._input_tensor_type(len(self._input_mds)))
+
+    self._input_mds.append(input_md)
+    return self
+
   _OUTPUT_EMBEDDING_NAME = 'embedding'
   _OUTPUT_EMBEDDING_DESCRIPTION = 'Embedding vector of the input.'
 
@@ -202,13 +269,35 @@ class Writer:
     self._output_mds.append(output_md)
     return self
 
+  def _export_calibration_file(self, filename: str,
+                               calibrations: List[CalibrationParameter]):
+    """Store calibration parameters in a csv file."""
+    filepath = os.path.join(self._temp_folder.name, filename)
+    with open(filepath, 'w') as f:
+      for idx, item in enumerate(calibrations):
+        if idx != 0:
+          f.write('\n')
+        if item:
+          scale, slope, offset, min_score = item
+          if all(x is not None for x in item):
+            f.write(f'{scale},{slope},{offset},{min_score}')
+          elif all(x is not None for x in item[:3]):
+            f.write(f'{scale},{slope},{offset}')
+          else:
+            raise ValueError('scale, slope and offset values can not be set to '
+                             'None.')
+          self._associate_files.append(filepath)
+    return filepath
+
   _OUTPUT_CLASSIFICATION_NAME = 'score'
   _OUTPUT_CLASSIFICATION_DESCRIPTION = 'Score of the labels respectively'
 
-  def add_classification_output(self,
-                                labels: Labels,
-                                name=_OUTPUT_CLASSIFICATION_NAME,
-                                description=_OUTPUT_CLASSIFICATION_DESCRIPTION):
+  def add_classification_output(
+      self,
+      labels: Labels,
+      score_calibration: Optional[ScoreCalibration] = None,
+      name=_OUTPUT_CLASSIFICATION_NAME,
+      description=_OUTPUT_CLASSIFICATION_DESCRIPTION):
     """Marks model's next output tensor as a classification head.
 
     Example usage:
@@ -219,7 +308,8 @@ class Writer:
         .add(['/m/011l78', '/m/031d23'], use_as_category_name=True))
 
     Args:
-      labels: a instance of Labels helper class.
+      labels: an instance of Labels helper class.
+      score_calibration: an instance of ScoreCalibration helper class.
       name: Metadata name of the tensor. Note that this is different from tensor
         name in the flatbuffer.
       description: human readable description of what the tensor does.
@@ -227,6 +317,14 @@ class Writer:
     Returns:
       The current Writer instance to allow chained operation.
     """
+    calibration_md = None
+    if score_calibration:
+      calibration_md = metadata_info.ScoreCalibrationMd(
+          score_transformation_type=score_calibration.transformation_type,
+          default_score=score_calibration.default_score,
+          file_path=self._export_calibration_file('score_calibration.txt',
+                                                  score_calibration.parameters))
+
     idx = len(self._output_mds)
 
     label_files = []
@@ -241,6 +339,7 @@ class Writer:
         description=description,
         label_files=label_files,
         tensor_type=self._output_tensor_type(idx),
+        score_calibration_md=calibration_md,
     )
     self._output_mds.append(output_md)
     return self

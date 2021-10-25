@@ -25,7 +25,8 @@ EmbeddingPostprocessor::Create(core::TfLiteEngine* engine,
                                const std::initializer_list<int> output_indices,
                                std::unique_ptr<EmbeddingOptions> options) {
   RETURN_IF_ERROR(Postprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                             engine, output_indices));
+                                             engine, output_indices,
+                                             /* requires_metadata = */ false));
 
   auto processor =
       absl::WrapUnique(new EmbeddingPostprocessor(engine, output_indices));

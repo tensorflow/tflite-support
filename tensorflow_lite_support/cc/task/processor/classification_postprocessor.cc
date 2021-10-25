@@ -195,12 +195,6 @@ absl::Status ClassificationPostprocessor::Init(
 
   // Set score calibration
   if (classification_head_.calibration_params.has_value()) {
-    // Use a specific default score instead of the one specified by default in
-    // cc/task/vision/utils/score_calibration.h. See `kDefaultCalibratedScore`
-    // documentation for more details.
-    classification_head_.calibration_params->default_score =
-        kDefaultCalibratedScore;
-
     score_calibration_ = absl::make_unique<ScoreCalibration>();
     if (score_calibration_ == nullptr) {
       return CreateStatusWithPayload(
