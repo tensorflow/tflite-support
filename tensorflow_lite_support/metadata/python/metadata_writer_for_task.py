@@ -181,6 +181,9 @@ class Writer:
     self._associate_files.append(filepath)
     return filepath
 
+  def _input_tensor_type(self, idx):
+    return writer_utils.get_input_tensor_types(self._model_buffer)[idx]
+
   def _output_tensor_type(self, idx):
     return writer_utils.get_output_tensor_types(self._model_buffer)[idx]
 
@@ -207,6 +210,51 @@ class Writer:
         description=description,
         sample_rate=sample_rate,
         channels=channels)
+    self._input_mds.append(input_md)
+    return self
+
+  _INPUT_IMAGE_NAME = 'image'
+  _INPUT_IMAGE_DESCRIPTION = 'Input image to be processed.'
+  color_space_types = _metadata_fb.ColorSpaceType
+
+  def add_image_input(
+      self,
+      norm_mean: List[float],
+      norm_std: List[float],
+      color_space_type: Optional[
+          _metadata_fb.ColorSpaceType] = _metadata_fb.ColorSpaceType.RGB,
+      name: str = _INPUT_IMAGE_NAME,
+      description: str = _INPUT_IMAGE_DESCRIPTION):
+    """Marks the next input tensor as an image input.
+
+    Args:
+      norm_mean: The mean value used to normalize each input channel. If there
+        is only one element in the list, its value will be broadcasted to all
+        channels. Also note that norm_mean and norm_std should have the same
+        number of elements. [1]
+      norm_std: The std value used to normalize each input channel. If there is
+        only one element in the list, its value will be broadcasted to all
+        channels. [1]
+      color_space_type: The color space type of the input image. [2]
+      name: Name of the input tensor.
+      description: Description of the input tensor.
+
+    Returns:
+      The Writer instance, can be used for chained operation.
+
+    [1]:
+    https://www.tensorflow.org/lite/convert/metadata#normalization_and_quantization_parameters
+    [2]:
+    https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L172
+    """
+    input_md = metadata_info.InputImageTensorMd(
+        name=name,
+        description=description,
+        norm_mean=norm_mean,
+        norm_std=norm_std,
+        color_space_type=color_space_type,
+        tensor_type=self._input_tensor_type(len(self._input_mds)))
+
     self._input_mds.append(input_md)
     return self
 
