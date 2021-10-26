@@ -43,7 +43,7 @@ using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::core::AssertAndReturnTypedTensor;
 using ::tflite::task::core::TaskAPIFactory;
 using ::tflite::task::core::TfLiteEngine;
-
+using ::tflite::task::vision::FrameBuffer;
 }  // namespace
 
 /* static */
@@ -59,7 +59,7 @@ StatusOr<std::unique_ptr<ImageTransformer>> ImageTransformer::CreateFromOptions(
 
   ASSIGN_OR_RETURN(image_transformer,
                    TaskAPIFactory::CreateFromBaseOptions<ImageTransformer>(
-                   &options_copy->base_options(), std::move(resolver)));
+                       &options_copy->base_options(), std::move(resolver)));
 
   RETURN_IF_ERROR(image_transformer->Init(std::move(options_copy)));
   return image_transformer;
@@ -134,6 +134,7 @@ absl::Status ImageTransformer::CheckAndSetOutputs() {
                         output_tensor->dims->data[0]),
         TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
   }
+
   has_uint8_outputs_ = (output_tensor->type == kTfLiteUInt8);
   return absl::OkStatus();
 }
@@ -152,12 +153,70 @@ StatusOr<FrameBuffer> ImageTransformer::Transform(
 }
 
 StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
+  std::unique_ptr<FrameBuffer> postprocessed_frame_buffer;
+  const TfLiteTensor* output_tensor =
+      TfLiteEngine::GetOutput(GetTfLiteEngine()->interpreter(), 0);
 
-    auto output_buffer = std::make_unique<FrameBuffer>();
+  FrameBuffer::Dimension to_buffer_dimension = {output_tensor->dims->data[2],
+                                                output_tensor->dims->data[1]};
+  size_t output_data_size =
+      GetBufferByteSize(to_buffer_dimension, FrameBuffer::Format::kRGB);
+  std::vector<uint8> postprocessed_data(output_data_size / sizeof(uint8), 0);
 
+  if (has_uint8_outputs_) {  // No normalization required. Directly copy to vector.
+    if (output_tensor->bytes != output_data_byte_size) {
+      return tflite::support::CreateStatusWithPayload(
+          absl::StatusCode::kInternal,
+          "Size mismatch or unsupported padding bytes between pixel data "
+          "and output tensor.");
+    }
 
-    return output_buffer;
+    postprocessed_data.insert(
+        postprocessed_data.end(), &output_tensor[0],
+        &output_tensor[output_data_byte_size / sizeof(uint8)]);
+  } else {  // Denormalize to [0, 255] range.
+    if (output_tensor->bytes / sizeof(float) !=
+        output_data_byte_size / sizeof(uint8)) {
+      return tflite::support::CreateStatusWithPayload(
+          absl::StatusCode::kInternal,
+          "Size mismatch or unsupported padding bytes between pixel data "
+          "and output tensor.");
+    }
 
+    uint8* denormalized_output_data = postprocessed_data.data();
+    const float* output_data = AssertAndReturnTypedTensor<float>(output_tensor);
+    const tflite::task::vision::NormalizationOptions& normalization_options =
+        GetInputSpecs().normalization_options.value();
+
+    if (normalization_options.size() == 1) {
+      float mean_value = normalization_options.mean_values[0];
+      float std_value = normalization_options.std_values[0];
+
+      for (size_t i = 0; i < output_data_byte_size / sizeof(uint8);
+           ++i, ++denormalized_output_data, ++output_data) {
+        denormalized_output_data = static_cast<uint8>(std::round(std::min(
+            255.f, std::max(0.f, (*output_data) * std_value + mean_value))));
+      }
+    } else {
+      for (size_t i = 0; i < output_data_byte_size / sizeof(uint8);
+           ++i, ++denormalized_output_data, ++output_data) {
+        denormalized_output_data = static_cast<uint8>(std::round(std::min(
+            255.f,
+            std::max(0.f,
+                     (*output_data) * normalization_options.std_values[i % 3] +
+                         normalization_options.mean_values[i % 3]))));
+      }
+    }
+  }
+
+  FrameBuffer::Plane postprocessed_plane = {
+      /*buffer=*/postprocessed_data.data(),
+      /*stride=*/{input_specs_.image_width * kRgbPixelBytes, kRgbPixelBytes}};
+  postprocessed_frame_buffer = FrameBuffer::Create(
+      {postprocessed_plane}, to_buffer_dimension, FrameBuffer::Format::kRGB,
+      FrameBuffer::Orientation::kTopLeft);
+
+  return postprocessed_frame_buffer;
 }
 }  // namespace vision
 }  // namespace task
