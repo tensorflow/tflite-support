@@ -26,8 +26,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils.h"
-#include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
-#include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
 namespace task {
@@ -36,7 +34,6 @@ namespace vision {
 namespace {
 
 using ::absl::StatusCode;
-using ::tflite::metadata::ModelMetadataExtractor;
 using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
@@ -135,6 +132,15 @@ absl::Status ImageTransformer::CheckAndSetOutputs() {
         TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
   }
 
+  // RGB check.
+  if (output_tensor->dims->data[3] != 3) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        absl::StrFormat("Expected depth size of 3, found %d.",
+                        output_tensor->dims->data[3]),
+        TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
+  }
+
   has_uint8_outputs_ = (output_tensor->type == kTfLiteUInt8);
   return absl::OkStatus();
 }
@@ -163,7 +169,7 @@ StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
       GetBufferByteSize(to_buffer_dimension, FrameBuffer::Format::kRGB);
   std::vector<uint8> postprocessed_data(output_data_size / sizeof(uint8), 0);
 
-  if (has_uint8_outputs_) {  // No normalization required. Directly copy to vector.
+  if (has_uint8_outputs_) {  // No normalization required.
     if (output_tensor->bytes != output_data_byte_size) {
       return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kInternal,
@@ -211,7 +217,8 @@ StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
 
   FrameBuffer::Plane postprocessed_plane = {
       /*buffer=*/postprocessed_data.data(),
-      /*stride=*/{input_specs_.image_width * kRgbPixelBytes, kRgbPixelBytes}};
+      /*stride=*/{output_tensor->dims->data[1] * kRgbPixelBytes,
+                  kRgbPixelBytes}};
   postprocessed_frame_buffer = FrameBuffer::Create(
       {postprocessed_plane}, to_buffer_dimension, FrameBuffer::Format::kRGB,
       FrameBuffer::Orientation::kTopLeft);
