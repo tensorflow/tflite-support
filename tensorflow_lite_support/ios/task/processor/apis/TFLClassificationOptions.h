@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -23,19 +22,19 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLClassificationOptions : NSObject
 
 /** If set, all classes  in this list will be filtered out from the results . */
-@property(nonatomic, strong) NSArray *labelDenyList;
+@property(nonatomic, copy) NSArray *labelDenyList;
 
 /** If set, all classes not in this list will be filtered out from the results . */
-@property(nonatomic, strong) NSArray *labelAllowList;
+@property(nonatomic, copy) NSArray *labelAllowList;
 
 /** Display names local for display names*/
-@property(nonatomic, strong) NSString *displayNamesLocal;
+@property(nonatomic, copy) NSString *displayNamesLocal;
 
 /** Results with score threshold greater than this value are returned . */
-@property(nonatomic) float scoreThreshold;
+@property(nonatomic, assign) float scoreThreshold;
 
 /** Limit to the number of classes that can be returned in results. */
-@property(nonatomic) NSInteger maxResults;
+@property(nonatomic, assign) NSInteger maxResults;
 
 @end
 

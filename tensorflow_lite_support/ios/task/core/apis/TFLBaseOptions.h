@@ -1,18 +1,14 @@
 /* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
-
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -39,7 +35,7 @@ NS_SWIFT_NAME(ComputeSettings)
 @interface TFLComputeSettings : NSObject
 
 /** Holds cpu settings. */
-@property(nonatomic, strong) TFLCpuSettings *cpuSettings;
+@property(nonatomic, copy) TFLCpuSettings *cpuSettings;
 
 @end
 
@@ -50,7 +46,7 @@ NS_SWIFT_NAME(ExternalFile)
 @interface TFLExternalFile : NSObject
 
 /** Path to the file in bundle. */
-@property(nonatomic, strong) NSString *filePath;
+@property(nonatomic, copy) NSString *filePath;
 /// Add provision for other sources in future.
 
 @end
@@ -67,13 +63,13 @@ NS_SWIFT_NAME(BaseOptions)
  * Metadata[1] and associated files if exist. Fail to provide the necessary metadata and associated
  * files might result in errors.
  */
-@property(nonatomic, strong) TFLExternalFile *modelFile;
+@property(nonatomic, copy) TFLExternalFile *modelFile;
 
 /**
  * Holds settings for one possible acceleration configuration including.cpu/gpu settings.
  * Please see documentation of TfLiteComputeSettings and its members for more details.
  */
-@property(nonatomic, strong) TFLComputeSettings *computeSettings;
+@property(nonatomic, copy) TFLComputeSettings *computeSettings;
 
 @end
 

@@ -6,7 +6,15 @@ package(
 objc_library(
     name = "TFLClassificationOptions",
     hdrs = [
-        "Sources/TFLClassificationOptions.h",
+        "apis/TFLClassificationOptions.h",
     ],
     module_name = "TFLClassificationOptions",
+)
+
+objc_library(
+    name = "TFLClassificationResult",
+    hdrs = [
+        "apis/TFLClassificationResult.h",
+    ],
+    module_name = "TFLClassificationResult",
 )
