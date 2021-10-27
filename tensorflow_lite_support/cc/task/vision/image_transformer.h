@@ -61,7 +61,7 @@ namespace vision {
 // A CLI demo tool is available for easily trying out this API, and provides
 // example usage. See:
 // examples/task/vision/desktop/image_classifier_demo.cc
-class ImageTransformer : public BaseVisionTaskApi<::tflite::task::vision::FrameBuffer> {
+class ImageTransformer : public BaseVisionTaskApi<FrameBuffer> {
  public:
   using BaseVisionTaskApi::BaseVisionTaskApi;
 
@@ -85,7 +85,7 @@ class ImageTransformer : public BaseVisionTaskApi<::tflite::task::vision::FrameB
   //   only supported colorspace for now),
   // - rotate it according to its `Orientation` so that inference is performed
   //   on an "upright" image.
-  tflite::support::StatusOr<::tflite::task::vision::FrameBuffer> Transform(
+  tflite::support::StatusOr<FrameBuffer> Transform(
       const FrameBuffer& frame_buffer);
 
   // Same as above, except that the transformation is performed based on the
@@ -99,7 +99,7 @@ class ImageTransformer : public BaseVisionTaskApi<::tflite::task::vision::FrameB
   // `frame_buffer` data before any `Orientation` flag gets applied. Also, the
   // region of interest is not clamped, so this method will return a non-ok
   // status if the region is out of these bounds.
-  tflite::support::StatusOr<::tflite::task::vision::FrameBuffer> Transform(
+  tflite::support::StatusOr<FrameBuffer> Transform(
       const FrameBuffer& frame_buffer, const BoundingBox& roi);
 
  protected:
@@ -107,7 +107,9 @@ class ImageTransformer : public BaseVisionTaskApi<::tflite::task::vision::FrameB
   std::unique_ptr<ImageTransformerOptions> options_;
 
   // Post-processing to transform the raw model outputs into image results.
-  tflite::support::StatusOr<std::unique_ptr<::tflite::task::vision::FrameBuffer>> Postprocess();
+  tflite::support::StatusOr<FrameBuffer> Postprocess(
+      const std::vector<const TfLiteTensor*>& output_tensors,
+      const FrameBuffer& frame_buffer, const BoundingBox& roi) override;
 
   // Performs sanity checks on the provided ImageTransformerOptions.
   static absl::Status SanityCheckOptions(const ImageTransformerOptions& options);

@@ -152,8 +152,9 @@ StatusOr<FrameBuffer> ImageTransformer::Transform(
   return InferWithFallback(frame_buffer, roi);
 }
 
-StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
-  std::unique_ptr<FrameBuffer> postprocessed_frame_buffer;
+StatusOr<FrameBuffer> ImageTransformer::Postprocess(
+    const std::vector<const TfLiteTensor*>& /*output_tensors*/,
+    const FrameBuffer& /*frame_buffer*/, const BoundingBox& /*roi*/) {
   const int kRgbPixelBytes = 3;
   const TfLiteTensor* output_tensor =
       TfLiteEngine::GetOutput(GetTfLiteEngine()->interpreter(), 0);
@@ -171,9 +172,9 @@ StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
           "Size mismatch or unsupported padding bytes between pixel data "
           "and output tensor.");
     }
-
-    postprocessed_data.insert(postprocessed_data.end(), &output_tensor[0],
-                              &output_tensor[output_byte_size / sizeof(uint8)]);
+    const uint8* output_data = AssertAndReturnTypedTensor<uint8>(output_tensor);
+    postprocessed_data.insert(postprocessed_data.end(), &output_data[0],
+                              &output_data[output_byte_size / sizeof(uint8)]);
   } else {  // Denormalize to [0, 255] range.
     if (output_tensor->bytes / sizeof(float) !=
         output_byte_size / sizeof(uint8)) {
@@ -213,11 +214,12 @@ StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
       /*buffer=*/postprocessed_data.data(),
       /*stride=*/{output_tensor->dims->data[2] * kRgbPixelBytes,
                   kRgbPixelBytes}};
-  postprocessed_frame_buffer = FrameBuffer::Create(
+  auto postprocessed_frame_buffer = FrameBuffer::Create(
       {postprocessed_plane}, to_buffer_dimension, FrameBuffer::Format::kRGB,
       FrameBuffer::Orientation::kTopLeft);
 
-  return postprocessed_frame_buffer;
+  FrameBuffer postprocessed_result = *postprocessed_frame_buffer.get();
+  return postprocessed_result;
 }
 }  // namespace vision
 }  // namespace task
