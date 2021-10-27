@@ -185,6 +185,7 @@ cc_library_with_tflite(
     srcs = ["image_transformer.cc"],
     hdrs = ["image_transformer.h"],
     tflite_deps = [
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
     ],

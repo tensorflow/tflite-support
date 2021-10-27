@@ -17,9 +17,7 @@ syntax = "proto2";
 
 package tflite.task.vision;
 
-import "tensorflow/lite/experimental/acceleration/configuration/configuration.proto";
 import "tensorflow_lite_support/cc/task/core/proto/base_options.proto";
-import "tensorflow_lite_support/cc/task/core/proto/external_file.proto";
 
 // Options for setting up an ImageTransformer.
 // Next Id: 10.
