@@ -19,17 +19,12 @@ limitations under the License.
 #include <memory>
 #include <vector>
 
-#include "external/com_google_absl/absl/container/flat_hash_set.h"
-#include "external/com_google_absl/absl/status/status.h"
-#include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/core/shims/cc/kernels/register.h"
-#include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/vision/core/base_vision_task_api.h"
-#include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/bounding_box_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/image_transformer_options.proto"
 
 namespace tflite {
 namespace task {
@@ -66,7 +61,7 @@ namespace vision {
 // A CLI demo tool is available for easily trying out this API, and provides
 // example usage. See:
 // examples/task/vision/desktop/image_classifier_demo.cc
-class ImageTransformer : public BaseVisionTaskApi<TransformationResult> {
+class ImageTransformer : public BaseVisionTaskApi<tflite::task::vision::FrameBuffer> {
  public:
   using BaseVisionTaskApi::BaseVisionTaskApi;
 
@@ -90,7 +85,7 @@ class ImageTransformer : public BaseVisionTaskApi<TransformationResult> {
   //   only supported colorspace for now),
   // - rotate it according to its `Orientation` so that inference is performed
   //   on an "upright" image.
-  tflite::support::StatusOr<TransformationResult> Transform(
+  tflite::support::StatusOr<tflite::task::vision::FrameBuffer> Transform(
       const FrameBuffer& frame_buffer);
 
   // Same as above, except that the transformation is performed based on the
@@ -104,18 +99,15 @@ class ImageTransformer : public BaseVisionTaskApi<TransformationResult> {
   // `frame_buffer` data before any `Orientation` flag gets applied. Also, the
   // region of interest is not clamped, so this method will return a non-ok
   // status if the region is out of these bounds.
-  tflite::support::StatusOr<TransformationResult> Transform(
+  tflite::support::StatusOr<tflite::task::vision::FrameBuffer> Transform(
       const FrameBuffer& frame_buffer, const BoundingBox& roi);
 
  protected:
   // The options used to build this ImageTransformer.
   std::unique_ptr<ImageTransformerOptions> options_;
 
-  // Post-processing to transform the raw model outputs into classification
-  // results.
-  tflite::support::StatusOr<TransformationResult> Postprocess(
-      const std::vector<const TfLiteTensor*>& output_tensors,
-      const FrameBuffer& frame_buffer, const BoundingBox& roi) override;
+  // Post-processing to transform the raw model outputs into image results.
+  tflite::support::StatusOr<std::unique_ptr<tflite::task::vision::FrameBuffer>> Postprocess();
 
   // Performs sanity checks on the provided ImageTransformerOptions.
   static absl::Status SanityCheckOptions(const ImageTransformerOptions& options);
@@ -133,9 +125,6 @@ class ImageTransformer : public BaseVisionTaskApi<TransformationResult> {
   // Performs sanity checks on the model outputs and extracts their metadata.
   absl::Status CheckAndSetOutputs();
 
-  // The number of output tensors. This corresponds to the number of
-  // classification heads.
-  int num_outputs_;
   // Whether the model features quantized inference type (QUANTIZED_UINT8). This
   // is currently detected by checking if all output tensors data type is uint8.
   bool has_uint8_outputs_;

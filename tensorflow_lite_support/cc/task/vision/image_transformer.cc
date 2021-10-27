@@ -15,17 +15,11 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/task/vision/image_transformer.h"
 
-#include "external/com_google_absl/absl/algorithm/container.h"
 #include "external/com_google_absl/absl/strings/str_format.h"
 #include "external/com_google_absl/absl/strings/string_view.h"
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
-#include "tensorflow_lite_support/cc/common.h"
-#include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
-#include "tensorflow_lite_support/cc/task/core/task_utils.h"
-#include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
-#include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_utils.h"
 
 namespace tflite {
 namespace task {
@@ -165,24 +159,23 @@ StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
 
   FrameBuffer::Dimension to_buffer_dimension = {output_tensor->dims->data[2],
                                                 output_tensor->dims->data[1]};
-  size_t output_data_size =
+  size_t output_byte_size =
       GetBufferByteSize(to_buffer_dimension, FrameBuffer::Format::kRGB);
-  std::vector<uint8> postprocessed_data(output_data_size / sizeof(uint8), 0);
+  std::vector<uint8> postprocessed_data(output_byte_size / sizeof(uint8), 0);
 
   if (has_uint8_outputs_) {  // No normalization required.
-    if (output_tensor->bytes != output_data_byte_size) {
+    if (output_tensor->bytes != output_byte_size) {
       return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kInternal,
           "Size mismatch or unsupported padding bytes between pixel data "
           "and output tensor.");
     }
 
-    postprocessed_data.insert(
-        postprocessed_data.end(), &output_tensor[0],
-        &output_tensor[output_data_byte_size / sizeof(uint8)]);
+    postprocessed_data.insert(postprocessed_data.end(), &output_tensor[0],
+                              &output_tensor[output_byte_size / sizeof(uint8)]);
   } else {  // Denormalize to [0, 255] range.
     if (output_tensor->bytes / sizeof(float) !=
-        output_data_byte_size / sizeof(uint8)) {
+        output_byte_size / sizeof(uint8)) {
       return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kInternal,
           "Size mismatch or unsupported padding bytes between pixel data "
@@ -198,13 +191,13 @@ StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
       float mean_value = normalization_options.mean_values[0];
       float std_value = normalization_options.std_values[0];
 
-      for (size_t i = 0; i < output_data_byte_size / sizeof(uint8);
+      for (size_t i = 0; i < output_byte_size / sizeof(uint8);
            ++i, ++denormalized_output_data, ++output_data) {
         denormalized_output_data = static_cast<uint8>(std::round(std::min(
             255.f, std::max(0.f, (*output_data) * std_value + mean_value))));
       }
     } else {
-      for (size_t i = 0; i < output_data_byte_size / sizeof(uint8);
+      for (size_t i = 0; i < output_byte_size / sizeof(uint8);
            ++i, ++denormalized_output_data, ++output_data) {
         denormalized_output_data = static_cast<uint8>(std::round(std::min(
             255.f,
