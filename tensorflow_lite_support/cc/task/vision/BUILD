@@ -173,3 +173,29 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
     ],
 )
+
+# IMPORTANT: in order to use hardware acceleration delegates, configurable through the
+# `compute_settings` field of the ImageClassifierOptions, you must additionally link to
+# the appropriate delegate plugin target (e.g. `gpu_plugin` for GPU) from:
+# https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/experimental/acceleration/configuration/BUILD
+# To use EDGETPU_CORAL, link to `edgetpu_coral_plugin` from:
+# https://github.com/tensorflow/tflite-support/blob/a58a4f9225c411fa9ba29f821523e6e283988d23/tensorflow_lite_support/acceleration/configuration/BUILD#L11
+cc_library_with_tflite(
+    name = "image_transformer",
+    srcs = ["image_transformer.cc"],
+    hdrs = ["image_transformer.h"],
+    tflite_deps = [
+        "//tensorflow_lite_support/cc/task/core:task_api_factory",
+        "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc/port:integral_types",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core:external_file_handler",
+        "//tensorflow_lite_support/cc/task/vision/proto:image_transformer_options_proto_inc",
+        "@com_google_absl//absl/strings:str_format",
+        "@flatbuffers",
+        "@org_tensorflow//tensorflow/lite/core/api",
+    ],
+)
