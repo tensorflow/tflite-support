@@ -154,6 +154,7 @@ StatusOr<FrameBuffer> ImageTransformer::Transform(
 
 StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
   std::unique_ptr<FrameBuffer> postprocessed_frame_buffer;
+  const int kRgbPixelBytes = 3;
   const TfLiteTensor* output_tensor =
       TfLiteEngine::GetOutput(GetTfLiteEngine()->interpreter(), 0);
 
@@ -187,19 +188,19 @@ StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
     const tflite::task::vision::NormalizationOptions& normalization_options =
         GetInputSpecs().normalization_options.value();
 
-    if (normalization_options.size() == 1) {
+    if (normalization_options.num_values == 1) {
       float mean_value = normalization_options.mean_values[0];
       float std_value = normalization_options.std_values[0];
 
       for (size_t i = 0; i < output_byte_size / sizeof(uint8);
            ++i, ++denormalized_output_data, ++output_data) {
-        denormalized_output_data = static_cast<uint8>(std::round(std::min(
+        *denormalized_output_data = static_cast<uint8>(std::round(std::min(
             255.f, std::max(0.f, (*output_data) * std_value + mean_value))));
       }
     } else {
       for (size_t i = 0; i < output_byte_size / sizeof(uint8);
            ++i, ++denormalized_output_data, ++output_data) {
-        denormalized_output_data = static_cast<uint8>(std::round(std::min(
+        *denormalized_output_data = static_cast<uint8>(std::round(std::min(
             255.f,
             std::max(0.f,
                      (*output_data) * normalization_options.std_values[i % 3] +
@@ -210,7 +211,7 @@ StatusOr<std::unique_ptr<FrameBuffer>> ImageTransformer::Postprocess() {
 
   FrameBuffer::Plane postprocessed_plane = {
       /*buffer=*/postprocessed_data.data(),
-      /*stride=*/{output_tensor->dims->data[1] * kRgbPixelBytes,
+      /*stride=*/{output_tensor->dims->data[2] * kRgbPixelBytes,
                   kRgbPixelBytes}};
   postprocessed_frame_buffer = FrameBuffer::Create(
       {postprocessed_plane}, to_buffer_dimension, FrameBuffer::Format::kRGB,
