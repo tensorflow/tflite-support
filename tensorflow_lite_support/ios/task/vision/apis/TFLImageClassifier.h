@@ -30,13 +30,13 @@ NS_ASSUME_NONNULL_BEGIN
  * Base options that is used for creation of any type of task.
  * @seealso TFLBaseOptions
  */
-@property(nonatomic, strong) TFLBaseOptions *baseOptions;
+@property(nonatomic, copy) TFLBaseOptions *baseOptions;
 
 /**
  * Options that configure the display and filtering of results.
  * @seealso TFLClassificationOptions
  */
-@property(nonatomic, strong) TFLClassificationOptions *classificationOptions;
+@property(nonatomic, copy) TFLClassificationOptions *classificationOptions;
 
 /**
  * Initializes TFLImageClassifierOptions with the model path set to the specified path to a model file.
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return An instance of TFLImageClassifierOptions set to the specified 
  * modelPath.
  */
-- (nullable instancetype)initWithModelPath:(nonnull id)modelPath;
+- (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath;
 
 @end
 
