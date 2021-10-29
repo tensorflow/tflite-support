@@ -188,6 +188,7 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
+        "//tensorflow_lite_support/cc/task/processor:image_postprocessor",
     ],
     deps = [
         "//tensorflow_lite_support/cc/port:integral_types",

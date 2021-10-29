@@ -25,6 +25,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/vision/core/base_vision_task_api.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/image_transformer_options_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/processor/image_postprocessor.h"
 
 namespace tflite {
 namespace task {
@@ -127,9 +128,7 @@ class ImageTransformer : public BaseVisionTaskApi<FrameBuffer> {
   // Performs sanity checks on the model outputs and extracts their metadata.
   absl::Status CheckAndSetOutputs();
 
-  // Whether the model features quantized inference type (QUANTIZED_UINT8). This
-  // is currently detected by checking if all output tensors data type is uint8.
-  bool has_uint8_outputs_;
+  std::unique_ptr<processor::ImagePostprocessor> postprocessor_;
 };
 
 }  // namespace vision

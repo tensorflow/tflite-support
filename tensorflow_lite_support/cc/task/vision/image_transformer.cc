@@ -78,6 +78,12 @@ absl::Status ImageTransformer::Init(
 
   RETURN_IF_ERROR(PostInit());
 
+  auto norm_options = std::make_unique<NormalizationOptions>(
+      GetInputSpecs().normalization_options.value());
+  ASSIGN_OR_RETURN(postprocessor_,
+                   processor::ImagePostprocessor::Create(
+                       GetTfLiteEngine(), {0}, std::move(norm_options)));
+
   return absl::OkStatus();
 }
 
@@ -105,37 +111,6 @@ absl::Status ImageTransformer::CheckAndSetOutputs() {
                         TfLiteEngine::OutputCount(interpreter)),
         TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
-
-  const TfLiteTensor* output_tensor = TfLiteEngine::GetOutput(interpreter, 0);
-
-  // Check tensor dimensions.
-  if (output_tensor->dims->size != 4) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat(
-            "Output tensor is expected to have 4 dimensions, found %d.",
-            output_tensor->dims->size),
-        TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
-  }
-
-  if (output_tensor->dims->data[0] != 1) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat("Expected batch size of 1, found %d.",
-                        output_tensor->dims->data[0]),
-        TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
-  }
-
-  // RGB check.
-  if (output_tensor->dims->data[3] != 3) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat("Expected depth size of 3, found %d.",
-                        output_tensor->dims->data[3]),
-        TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
-  }
-
-  has_uint8_outputs_ = (output_tensor->type == kTfLiteUInt8);
   return absl::OkStatus();
 }
 
@@ -155,71 +130,8 @@ StatusOr<FrameBuffer> ImageTransformer::Transform(
 StatusOr<FrameBuffer> ImageTransformer::Postprocess(
     const std::vector<const TfLiteTensor*>& /*output_tensors*/,
     const FrameBuffer& /*frame_buffer*/, const BoundingBox& /*roi*/) {
-  const int kRgbPixelBytes = 3;
-  const TfLiteTensor* output_tensor =
-      TfLiteEngine::GetOutput(GetTfLiteEngine()->interpreter(), 0);
-
-  FrameBuffer::Dimension to_buffer_dimension = {output_tensor->dims->data[2],
-                                                output_tensor->dims->data[1]};
-  size_t output_byte_size =
-      GetBufferByteSize(to_buffer_dimension, FrameBuffer::Format::kRGB);
-  std::vector<uint8> postprocessed_data(output_byte_size / sizeof(uint8), 0);
-
-  if (has_uint8_outputs_) {  // No normalization required.
-    if (output_tensor->bytes != output_byte_size) {
-      return tflite::support::CreateStatusWithPayload(
-          absl::StatusCode::kInternal,
-          "Size mismatch or unsupported padding bytes between pixel data "
-          "and output tensor.");
-    }
-    const uint8* output_data = AssertAndReturnTypedTensor<uint8>(output_tensor);
-    postprocessed_data.insert(postprocessed_data.end(), &output_data[0],
-                              &output_data[output_byte_size / sizeof(uint8)]);
-  } else {  // Denormalize to [0, 255] range.
-    if (output_tensor->bytes / sizeof(float) !=
-        output_byte_size / sizeof(uint8)) {
-      return tflite::support::CreateStatusWithPayload(
-          absl::StatusCode::kInternal,
-          "Size mismatch or unsupported padding bytes between pixel data "
-          "and output tensor.");
-    }
-
-    uint8* denormalized_output_data = postprocessed_data.data();
-    const float* output_data = AssertAndReturnTypedTensor<float>(output_tensor);
-    const tflite::task::vision::NormalizationOptions& normalization_options =
-        GetInputSpecs().normalization_options.value();
-
-    if (normalization_options.num_values == 1) {
-      float mean_value = normalization_options.mean_values[0];
-      float std_value = normalization_options.std_values[0];
-
-      for (size_t i = 0; i < output_byte_size / sizeof(uint8);
-           ++i, ++denormalized_output_data, ++output_data) {
-        *denormalized_output_data = static_cast<uint8>(std::round(std::min(
-            255.f, std::max(0.f, (*output_data) * std_value + mean_value))));
-      }
-    } else {
-      for (size_t i = 0; i < output_byte_size / sizeof(uint8);
-           ++i, ++denormalized_output_data, ++output_data) {
-        *denormalized_output_data = static_cast<uint8>(std::round(std::min(
-            255.f,
-            std::max(0.f,
-                     (*output_data) * normalization_options.std_values[i % 3] +
-                         normalization_options.mean_values[i % 3]))));
-      }
-    }
-  }
-
-  FrameBuffer::Plane postprocessed_plane = {
-      /*buffer=*/postprocessed_data.data(),
-      /*stride=*/{output_tensor->dims->data[2] * kRgbPixelBytes,
-                  kRgbPixelBytes}};
-  auto postprocessed_frame_buffer = FrameBuffer::Create(
-      {postprocessed_plane}, to_buffer_dimension, FrameBuffer::Format::kRGB,
-      FrameBuffer::Orientation::kTopLeft);
-
-  FrameBuffer postprocessed_result = *postprocessed_frame_buffer.get();
-  return postprocessed_result;
+  ASSIGN_OR_RETURN(auto postprocessed_output, postprocessor_->Postprocess());
+  return postprocessed_output;
 }
 }  // namespace vision
 }  // namespace task
