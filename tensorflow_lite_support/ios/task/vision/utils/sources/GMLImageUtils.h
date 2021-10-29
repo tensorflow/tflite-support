@@ -24,9 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface GMLImageUtils : NSObject
 /**
- * Creates and retrurns a TfLiteFrameBuffer from a GMLImage. TfLiteFrameBuffer 
+ * Creates and returns a TfLiteFrameBuffer from a GMLImage. TfLiteFrameBuffer 
  * is used by the TFLite Task Vision C library to hold the backing buffer of 
- * any image. Image inputs to theTF Lite Task Vision C library is of type 
+ * any image. Image inputs to the TFLite Task Vision C library is of type 
  * TfLiteFrameBuffer.
  *
  * @param gmlImage Image of type GMLImage which is to be converted into a 
