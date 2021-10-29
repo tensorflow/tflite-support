@@ -27,6 +27,14 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
+namespace tflite {
+namespace task {
+// To be provided by a link-time library
+extern std::unique_ptr<OpResolver> CreateOpResolver();
+
+}  // namespace task
+}  // namespace tflite
+
 namespace {
 
 using ::tflite::support::StatusOr;
@@ -187,7 +195,8 @@ AudioClassifierOptions ConvertToProtoOptions(JNIEnv* env, jobject java_options,
 jlong CreateAudioClassifierFromOptions(JNIEnv* env,
                                        const AudioClassifierOptions& options) {
   StatusOr<std::unique_ptr<AudioClassifier>> audio_classifier_or =
-      AudioClassifier::CreateFromOptions(options);
+      AudioClassifier::CreateFromOptions(options,
+                                         tflite::task::CreateOpResolver());
   if (audio_classifier_or.ok()) {
     // Deletion is handled at deinitJni time.
     return reinterpret_cast<jlong>(audio_classifier_or->release());
