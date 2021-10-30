@@ -55,6 +55,10 @@ class ImagePostprocessor : public Postprocessor {
   //   on an "upright" image.
   absl::StatusOr<vision::FrameBuffer> Postprocess();
 
+  const vision::NormalizationOptions& GetNormalizationOptions() {
+    return *options_.get();
+  };
+
  private:
   using Postprocessor::Postprocessor;
 
@@ -97,10 +101,11 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
 
     uint8* denormalized_output_data = postprocessed_data.data();
     const float* output_data = core::AssertAndReturnTypedTensor<float>(Tensor());
+    const auto norm_options = GetNormalizationOptions();
 
-    if (options_->num_values == 1) {
-      float mean_value = options_->mean_values[0];
-      float std_value = options_->std_values[0];
+    if (norm_options.num_values == 1) {
+      float mean_value = norm_options.mean_values[0];
+      float std_value = norm_options.std_values[0];
 
       for (size_t i = 0; i < output_byte_size / sizeof(uint8);
            ++i, ++denormalized_output_data, ++output_data) {
@@ -111,8 +116,8 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
       for (size_t i = 0; i < output_byte_size / sizeof(uint8);
            ++i, ++denormalized_output_data, ++output_data) {
         *denormalized_output_data = static_cast<uint8>(std::round(std::min(
-            255.f, std::max(0.f, (*output_data) * options_->std_values[i % 3] +
-                                     options_->mean_values[i % 3]))));
+            255.f, std::max(0.f, (*output_data) * norm_options.std_values[i % 3] +
+                                     norm_options.mean_values[i % 3]))));
       }
     }
   }
