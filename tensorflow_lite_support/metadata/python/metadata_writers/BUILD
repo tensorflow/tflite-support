@@ -32,6 +32,7 @@ py_library(
     srcs_version = "PY3",
     visibility = ["//visibility:public"],
     deps = [
+        ":writer_utils",
         "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata:schema_py",
     ],
@@ -123,5 +124,22 @@ py_library(
         ":metadata_info",
         ":metadata_writer",
         ":writer_utils",
+    ],
+)
+
+py_library(
+    name = "bert_nl_classifier",
+    srcs = [
+        "bert_nl_classifier.py",
+    ],
+    srcs_version = "PY3",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":metadata_info",
+        ":metadata_writer",
+        ":writer_utils",
+        "//tensorflow_lite_support/metadata:metadata_schema_py",
+        "//tensorflow_lite_support/metadata/python:metadata",
+        "@flatbuffers//:runtime_py",
     ],
 )

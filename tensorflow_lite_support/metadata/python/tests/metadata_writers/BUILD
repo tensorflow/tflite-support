@@ -43,6 +43,7 @@ py_test(
     srcs = ["metadata_info_test.py"],
     data = [
         "//tensorflow_lite_support/metadata/python/tests/testdata:test_files",
+        "//tensorflow_lite_support/metadata/python/tests/testdata/bert_nl_classifier:test_files",
         "//tensorflow_lite_support/metadata/python/tests/testdata/image_classifier:test_files",
     ],
     python_version = "PY3",
@@ -151,5 +152,20 @@ py_test(
         "//tensorflow_lite_support/metadata/python/metadata_writers:audio_classifier",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
         "@absl_py//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "bert_nl_classifier_test",
+    srcs = ["bert_nl_classifier_test.py"],
+    data = ["//tensorflow_lite_support/metadata/python/tests/testdata/bert_nl_classifier:test_files"],
+    python_version = "PY3",
+    srcs_version = "PY3",
+    deps = [
+        ":test_utils",
+        # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/metadata/python:metadata",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:bert_nl_classifier",
+        "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
     ],
 )
