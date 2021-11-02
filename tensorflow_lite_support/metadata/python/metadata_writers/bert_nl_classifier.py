@@ -16,9 +16,6 @@
 
 from typing import List, Optional, Union
 
-import flatbuffers
-from tensorflow_lite_support.metadata import metadata_schema_py_generated as _metadata_fb
-from tensorflow_lite_support.metadata.python import metadata as _metadata
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_info
 from tensorflow_lite_support.metadata.python.metadata_writers import metadata_writer
 from tensorflow_lite_support.metadata.python.metadata_writers import writer_utils
