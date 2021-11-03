@@ -86,6 +86,13 @@ class FrameBuffer {
     // pixels in bytes. It may be larger than the size of a single pixel to
     // account for interleaved image data or padded formats.
     int pixel_stride_bytes;
+
+    bool operator==(const Stride& other) const {
+      return row_stride_bytes == other.row_stride_bytes &&
+             pixel_stride_bytes == other.pixel_stride_bytes;
+    }
+
+    bool operator!=(const Stride& other) const { return !operator==(other); }
   };
 
   // YUV data structure.
