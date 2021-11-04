@@ -29,6 +29,14 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 #include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
+namespace tflite {
+namespace task {
+// To be provided by a link-time library
+extern std::unique_ptr<OpResolver> CreateOpResolver();
+
+}  // namespace task
+}  // namespace tflite
+
 namespace {
 
 using ::tflite::support::StatusOr;
@@ -148,7 +156,8 @@ jobject ConvertToClassificationResults(JNIEnv* env,
 jlong CreateImageClassifierFromOptions(JNIEnv* env,
                                        const ImageClassifierOptions& options) {
   StatusOr<std::unique_ptr<ImageClassifier>> image_classifier_or =
-      ImageClassifier::CreateFromOptions(options);
+      ImageClassifier::CreateFromOptions(options,
+                                         tflite::task::CreateOpResolver());
   if (image_classifier_or.ok()) {
     // Deletion is handled at deinitJni time.
     return reinterpret_cast<jlong>(image_classifier_or->release());
