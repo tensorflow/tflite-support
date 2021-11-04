@@ -44,7 +44,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
 
     Args:
       model_buffer: valid buffer of the model file.
-      general_md: general infromation about the model. If not specified, default
+      general_md: general information about the model. If not specified, default
         general metadata will be generated.
       input_md: input image tensor informaton, if not specified, default input
         metadata will be generated.

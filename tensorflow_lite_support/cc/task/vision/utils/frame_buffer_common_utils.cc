@@ -315,10 +315,14 @@ absl::Status ValidateConvertFormats(FrameBuffer::Format from_format,
 // Creates a FrameBuffer from raw RGBA buffer and passing arguments.
 std::unique_ptr<FrameBuffer> CreateFromRgbaRawBuffer(
     const uint8* input, FrameBuffer::Dimension dimension,
-    FrameBuffer::Orientation orientation, const absl::Time timestamp) {
-  FrameBuffer::Plane input_plane = {
-      /*buffer=*/input,
-      /*stride=*/{dimension.width * kRgbaChannels, kRgbaChannels}};
+    FrameBuffer::Orientation orientation, const absl::Time timestamp,
+    FrameBuffer::Stride stride) {
+  if (stride == kDefaultStride) {
+    stride.row_stride_bytes = dimension.width * kRgbaChannels;
+    stride.pixel_stride_bytes = kRgbaChannels;
+  }
+  FrameBuffer::Plane input_plane = {/*buffer=*/input,
+                                    /*stride=*/stride};
   return FrameBuffer::Create({input_plane}, dimension,
                              FrameBuffer::Format::kRGBA, orientation,
                              timestamp);
@@ -327,10 +331,14 @@ std::unique_ptr<FrameBuffer> CreateFromRgbaRawBuffer(
 // Creates a FrameBuffer from raw RGB buffer and passing arguments.
 std::unique_ptr<FrameBuffer> CreateFromRgbRawBuffer(
     const uint8* input, FrameBuffer::Dimension dimension,
-    FrameBuffer::Orientation orientation, const absl::Time timestamp) {
-  FrameBuffer::Plane input_plane = {
-      /*buffer=*/input,
-      /*stride=*/{dimension.width * kRgbChannels, kRgbChannels}};
+    FrameBuffer::Orientation orientation, const absl::Time timestamp,
+    FrameBuffer::Stride stride) {
+  if (stride == kDefaultStride) {
+    stride.row_stride_bytes = dimension.width * kRgbChannels;
+    stride.pixel_stride_bytes = kRgbChannels;
+  }
+  FrameBuffer::Plane input_plane = {/*buffer=*/input,
+                                    /*stride=*/stride};
   return FrameBuffer::Create({input_plane}, dimension,
                              FrameBuffer::Format::kRGB, orientation, timestamp);
 }
@@ -338,9 +346,14 @@ std::unique_ptr<FrameBuffer> CreateFromRgbRawBuffer(
 // Creates a FrameBuffer from raw grayscale buffer and passing arguments.
 std::unique_ptr<FrameBuffer> CreateFromGrayRawBuffer(
     const uint8* input, FrameBuffer::Dimension dimension,
-    FrameBuffer::Orientation orientation, const absl::Time timestamp) {
+    FrameBuffer::Orientation orientation, const absl::Time timestamp,
+    FrameBuffer::Stride stride) {
+  if (stride == kDefaultStride) {
+    stride.row_stride_bytes = dimension.width * kGrayChannel;
+    stride.pixel_stride_bytes = kGrayChannel;
+  }
   FrameBuffer::Plane input_plane = {/*buffer=*/input,
-                                    /*stride=*/{dimension.width, kGrayChannel}};
+                                    /*stride=*/stride};
   return FrameBuffer::Create({input_plane}, dimension,
                              FrameBuffer::Format::kGRAY, orientation,
                              timestamp);

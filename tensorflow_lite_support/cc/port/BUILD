@@ -10,6 +10,10 @@ cc_library(
     hdrs = [
         "statusor.h",
     ],
+    visibility = [
+        "//tensorflow_lite_support:users",
+        "@org_tensorflow_lite_examples_classificationbyretrieval//:__subpackages__",
+    ],
     deps = [
         "@com_google_absl//absl/status:statusor",
     ],
@@ -19,6 +23,10 @@ cc_library(
     name = "status_macros",
     hdrs = [
         "status_macros.h",
+    ],
+    visibility = [
+        "//tensorflow_lite_support:users",
+        "@org_tensorflow_lite_examples_classificationbyretrieval//:__subpackages__",
     ],
     deps = [
         "//tensorflow_lite_support/cc/port/default:status_macros",

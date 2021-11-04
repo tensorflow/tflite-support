@@ -42,6 +42,7 @@ class MetadataWriter:
     self._model_buffer = model_buffer
     self._metadata_buffer = metadata_buffer
     self._associated_files = associated_files if associated_files else []
+    self._populated_model_buffer = None
 
   @classmethod
   def create_from_metadata_info(
@@ -95,7 +96,9 @@ class MetadataWriter:
       model_metadata: Optional[_metadata_fb.ModelMetadataT] = None,
       input_metadata: Optional[List[_metadata_fb.TensorMetadataT]] = None,
       output_metadata: Optional[List[_metadata_fb.TensorMetadataT]] = None,
-      associated_files: Optional[List[str]] = None):
+      associated_files: Optional[List[str]] = None,
+      input_process_units: Optional[List[_metadata_fb.ProcessUnitT]] = None,
+      output_process_units: Optional[List[_metadata_fb.ProcessUnitT]] = None):
     """Creates MetadataWriter based on the metadata Flatbuffers Python Objects.
 
     Args:
@@ -105,13 +108,18 @@ class MetadataWriter:
       input_metadata: a list of metadata of the input tensors [2].
       output_metadata: a list of metadata of the output tensors [3].
       associated_files: path to the associated files to be populated.
+      input_process_units: a lits of metadata of the input process units [4].
+      output_process_units: a lits of metadata of the output process units [5].
       [1]:
         https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L640-L681
       [2]:
         https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L590
       [3]:
         https://github.com/tensorflow/tflite-support/blob/b80289c4cd1224d0e1836c7654e82f070f9eefaa/tensorflow_lite_support/metadata/metadata_schema.fbs#L599
-
+      [4]:
+        https://github.com/tensorflow/tflite-support/blob/b5cc57c74f7990d8bc055795dfe8d50267064a57/tensorflow_lite_support/metadata/metadata_schema.fbs#L646
+      [5]:
+        https://github.com/tensorflow/tflite-support/blob/b5cc57c74f7990d8bc055795dfe8d50267064a57/tensorflow_lite_support/metadata/metadata_schema.fbs#L650
     Returns:
       A MetadataWriter Object.
     """
@@ -140,6 +148,9 @@ class MetadataWriter:
     subgraph_metadata = _metadata_fb.SubGraphMetadataT()
     subgraph_metadata.inputTensorMetadata = input_metadata
     subgraph_metadata.outputTensorMetadata = output_metadata
+    subgraph_metadata.inputProcessUnits = input_process_units
+    subgraph_metadata.outputProcessUnits = output_process_units
+
     if model_metadata is None:
       model_metadata = _metadata_fb.ModelMetadataT()
     model_metadata.subgraphMetadata = [subgraph_metadata]
@@ -156,6 +167,9 @@ class MetadataWriter:
     Returns:
       A new model buffer with the metadata and associated files.
     """
+    if self._populated_model_buffer:
+      return self._populated_model_buffer
+
     populator = _metadata.MetadataPopulator.with_model_buffer(
         self._model_buffer)
     if self._model_buffer is not None:
@@ -163,11 +177,34 @@ class MetadataWriter:
     if self._associated_files:
       populator.load_associated_files(self._associated_files)
     populator.populate()
-    return populator.get_model_buffer()
+    self._populated_model_buffer = populator.get_model_buffer()
+    return self._populated_model_buffer
 
   def get_metadata_json(self) -> str:
-    """Gets the generated metadata string in JSON format."""
+    """Gets the generated JSON metadata string before populated into model.
+
+    This method returns the metadata buffer before populated into the model.
+    More fields could be filled by MetadataPopulator, such as
+    min_parser_version. Use get_populated_metadata_json() if you want to get the
+    final metadata string.
+
+    Returns:
+      The generated JSON metadata string before populated into model.
+    """
     return _metadata.convert_to_json(bytes(self._metadata_buffer))
+
+  def get_populated_metadata_json(self) -> str:
+    """Gets the generated JSON metadata string after populated into model.
+
+    More fields could be filled by MetadataPopulator, such as
+    min_parser_version. Use get_metadata_json() if you want to get the
+    original metadata string.
+
+    Returns:
+      The generated JSON metadata string after populated into model.
+    """
+    displayer = _metadata.MetadataDisplayer.with_model_buffer(self.populate())
+    return displayer.get_metadata_json()
 
 
 # If tensor name in metadata is empty, default to the tensor name saved in

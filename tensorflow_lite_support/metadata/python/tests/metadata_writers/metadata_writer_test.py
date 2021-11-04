@@ -156,6 +156,19 @@ class MetadataWriterTest(tf.test.TestCase):
     expected_json = test_utils.load_file(_EXPECTED_DUMMY_NO_VERSION_JSON, "r")
     self.assertEqual(metadata_json, expected_json)
 
+  def test_get_populated_metadata_json_should_succeed(self):
+    model_buffer = test_utils.load_file(_MODEL)
+    model_metadata, input_metadata, output_metadata = (
+        self._create_dummy_metadata())
+
+    writer = metadata_writer.MetadataWriter.create_from_metadata(
+        model_buffer, model_metadata, [input_metadata], [output_metadata],
+        [_LABEL_FILE])
+    metadata_json = writer.get_populated_metadata_json()
+
+    expected_json = test_utils.load_file(_EXPECTED_DUMMY_JSON, "r")
+    self.assertEqual(metadata_json, expected_json)
+
   def _assert_correct_metadata(self,
                                model_with_metadata,
                                expected_json_file,

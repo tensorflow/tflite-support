@@ -118,7 +118,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
 
     Args:
       model_buffer: valid buffer of the model file.
-      general_md: general infromation about the model.
+      general_md: general information about the model.
       input_md: input image tensor informaton.
       output_location_md: output location tensor informaton. The location tensor
         is a multidimensional array of [N][4] floating point values between 0

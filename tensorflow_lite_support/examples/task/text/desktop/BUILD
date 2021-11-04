@@ -84,3 +84,25 @@ cc_binary(
         ],
     }),
 )
+
+# Example usage:
+# bazel run -c opt \
+#  tensorflow_lite_support/examples/task/text/desktop:universal_sentence_encoder_qa_main \
+#  -- \
+#  --model_path=/path/to/model_with_metadata.tflite
+cc_binary(
+    name = "universal_sentence_encoder_qa_demo",
+    srcs = [
+        "universal_sentence_encoder_qa_demo.cc",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc/task/text:universal_sentence_encoder_qa",
+        "//tensorflow_lite_support/custom_ops/kernel/ragged:py_tflite_registerer",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:py_tflite_registerer",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_tokenizer_op",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+    ],
+)

@@ -72,7 +72,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
 
     Args:
       model_buffer: valid buffer of the model file.
-      general_md: general infromation about the model.
+      general_md: general information about the model.
       input_md: input image tensor informaton.
       output_md: output segmentation mask tensor informaton. This tensor is a
         multidimensional array of [1 x mask_height x mask_width x num_classes],
@@ -128,7 +128,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
         [1].
       input_norm_std: the std value used in the input tensor normalizarion [1].
       label_file_paths: paths to the label files [2] in the category tensor.
-        Pass in an empty list, If the model does not have any label file.
+        Pass in an empty list If the model does not have any label file.
       [1]:
         https://www.tensorflow.org/lite/convert/metadata#normalization_and_quantization_parameters
       [2]:

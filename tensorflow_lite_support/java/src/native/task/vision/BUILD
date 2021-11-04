@@ -45,6 +45,7 @@ jni_binary_with_tflite(
     ],
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     tflite_deps = [
+        "//tensorflow_lite_support/java/src/native/task/core:builtin_op_resolver",
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
         "//tensorflow_lite_support/cc/task/vision:image_segmenter",
         "//tensorflow_lite_support/cc/task/vision:object_detector",

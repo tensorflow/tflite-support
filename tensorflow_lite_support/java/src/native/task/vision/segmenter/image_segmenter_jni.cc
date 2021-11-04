@@ -29,6 +29,14 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 #include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
+namespace tflite {
+namespace task {
+// To be provided by a link-time library
+extern std::unique_ptr<OpResolver> CreateOpResolver();
+
+}  // namespace task
+}  // namespace tflite
+
 namespace {
 
 using ::tflite::support::StatusOr;
@@ -168,7 +176,8 @@ void ConvertFromSegmentationResults(JNIEnv* env,
 jlong CreateImageSegmenterFromOptions(JNIEnv* env,
                                       const ImageSegmenterOptions& options) {
   StatusOr<std::unique_ptr<ImageSegmenter>> image_segmenter_or =
-      ImageSegmenter::CreateFromOptions(options);
+      ImageSegmenter::CreateFromOptions(options,
+                                        tflite::task::CreateOpResolver());
   if (image_segmenter_or.ok()) {
     return reinterpret_cast<jlong>(image_segmenter_or->release());
   } else {
