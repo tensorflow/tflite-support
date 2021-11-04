@@ -127,8 +127,44 @@ category[0]: 'negative' : '0.00006'
 category[1]: 'positive' : '0.99994'
 ```
 
+## UniversalSentenceEncoderQA
+
+#### Prerequisites
+
+You will need:
+
+*   a universal sentence encoder QA model from [TensorFlow Hub][6].
+
+#### Usage
+
+In the console, run:
+
+```bash
+# Download the model:
+curl \
+ -L 'https://tfhub.dev/google/lite-model/universal-sentence-encoder-qa-ondevice/1?lite-format=tflite' \
+ -o /tmp/universal_sentence_encoder_qa_with_metadata.tflite
+
+# Run UniversalSentenceEncoderQA model:
+bazel run -c opt \
+ tensorflow_lite_support/examples/task/text/desktop:universal_sentence_encoder_qa_demo -- \
+ --model_path=/tmp/universal_sentence_encoder_qa_with_metadata.tflite
+```
+
+#### Results
+
+In the console, you should get:
+
+```
+How are you feeling today?
+I'm not feeling very well., , 14.9595
+He looks good., , 8.80944
+Paris is the capital of France., , 5.63753
+```
+
 [1]: https://tfhub.dev/tensorflow/lite-model/mobilebert/1/default/1
 [2]: https://tfhub.dev/tensorflow/lite-model/albert_lite_base/squadv1/1
 [3]: https://www.tensorflow.org/lite/models/text_classification/overview
 [4]: https://github.com/tensorflow/tflite-support/blob/fe8b69002f5416900285dc69e2baa078c91bd994/tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h#L55
 [5]: http://bert/nl/classifier/model
+[6]: https://tfhub.dev/google/lite-model/universal-sentence-encoder-qa-ondevice/1
