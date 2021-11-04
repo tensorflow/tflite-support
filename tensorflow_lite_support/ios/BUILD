@@ -96,11 +96,15 @@ objc_library(
     hdrs = [
         "sources/TFLCommonUtils.h",
     ],
+    srcs = [
+        "sources/TFLCommonUtils.m"
+    ],
     module_name = "TFLCommonUtils",
     visibility = [
         "//tensorflow_lite_support:__subpackages__",
     ],
     deps = [
         "//tensorflow_lite_support/c:common",
+        "//tensorflow_lite_support/ios:TFLCommon"
     ],
 )
