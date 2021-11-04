@@ -15,9 +15,9 @@
 #import <Foundation/Foundation.h>
 
 #import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
-#import "tensorflow_lite_support/ios/task/core/apis/TFLBaseOptions.h"
-#import "tensorflow_lite_support/ios/task/processor/apis/TFLClassificationOptions.h"
-#import "tensorflow_lite_support/ios/task/processor/apis/TFLClassificationResult.h"
+#import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
