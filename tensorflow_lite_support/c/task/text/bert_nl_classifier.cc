@@ -43,7 +43,6 @@ TfLiteBertNLClassifier* TfLiteBertNLClassifierCreateFromOptions(
     const char* model_path, const TfLiteBertNLClassifierOptions* options) {
   BertNLClassifierOptionsCpp cc_options;
 
-  cc_options.set_max_seq_len(options->max_seq_len);
   cc_options.mutable_base_options()->mutable_model_file()->set_file_name(
       model_path);
   auto classifier_status = BertNLClassifierCpp::CreateFromOptions(cc_options);

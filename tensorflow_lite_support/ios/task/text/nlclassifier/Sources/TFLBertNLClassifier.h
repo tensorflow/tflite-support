@@ -20,6 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
  * Options to configure TFLBertNLClassifier.
  */
 @interface TFLBertNLClassifierOptions : NSObject
+
+// @deprecated maxSeqLen is now read from the model (i.e. input tensor size)
+// automatically.
 @property(nonatomic) int maxSeqLen;
 @end
 

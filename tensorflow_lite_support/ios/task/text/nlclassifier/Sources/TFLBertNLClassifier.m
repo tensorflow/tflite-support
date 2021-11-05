@@ -43,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)bertNLClassifierWithModelPath:(NSString *)modelPath
                                   options:(TFLBertNLClassifierOptions *)options {
+  // Note that maxSeqLen has been deprecated. Passing it to the C API is a no-op.
   TfLiteBertNLClassifierOptions cOptions = {.max_seq_len = options.maxSeqLen};
   TfLiteBertNLClassifier *classifier =
       TfLiteBertNLClassifierCreateFromOptions(modelPath.UTF8String, &cOptions);
