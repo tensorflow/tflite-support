@@ -17,7 +17,7 @@ limitations under the License.
 #define TENSORFLOW_LITE_SUPPORT_CC_TEST_UTILS_TEST_UTILS_H_
 
 #include <glog/logging.h>
-#include "external/com_google_absl/absl/strings/string_view.h"
+#include "absl/strings/string_view.h"  // from @com_google_absl
 #include "tensorflow_lite_support/cc/port/proto2.h"
 
 namespace tflite {

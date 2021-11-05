@@ -17,8 +17,8 @@ limitations under the License.
 
 #include <memory>
 
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
 #include "tensorflow/lite/c/c_api_types.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/task/core/label_map_item.h"

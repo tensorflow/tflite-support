@@ -19,7 +19,7 @@ limitations under the License.
 // This header file is used to manage the depended StatusOr library. It creates
 // an extra layer that makes it easier to switch between the desired version of
 // StatusOr.
-#include "external/com_google_absl/absl/status/statusor.h"
+#include "absl/status/statusor.h"  // from @com_google_absl
 
 namespace tflite {
 namespace support {

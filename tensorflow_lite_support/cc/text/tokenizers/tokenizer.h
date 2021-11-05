@@ -20,7 +20,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "external/com_google_absl/absl/strings/string_view.h"
+#include "absl/strings/string_view.h"  // from @com_google_absl
 
 namespace tflite {
 namespace support {

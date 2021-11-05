@@ -20,9 +20,9 @@ limitations under the License.
 #include <type_traits>
 #include <utility>
 
-#include "external/com_google_absl/absl/meta/type_traits.h"
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/utility/utility.h"
+#include "absl/meta/type_traits.h"  // from @com_google_absl
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/utility/utility.h"  // from @com_google_absl
 
 namespace tflite {
 namespace support {

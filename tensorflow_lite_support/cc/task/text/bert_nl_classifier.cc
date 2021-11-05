@@ -23,9 +23,9 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/ascii.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/ascii.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/string_type.h"

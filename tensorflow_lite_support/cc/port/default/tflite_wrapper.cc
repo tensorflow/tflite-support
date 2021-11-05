@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/port/default/tflite_wrapper.h"
 
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/delegates/interpreter_utils.h"
 #include "tensorflow/lite/experimental/acceleration/configuration/flatbuffer_to_proto.h"

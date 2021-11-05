@@ -17,9 +17,9 @@ limitations under the License.
 
 #include <algorithm>
 
-#include "external/com_google_absl/absl/memory/memory.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
-#include "external/com_google_absl/absl/strings/string_view.h"
+#include "absl/memory/memory.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
+#include "absl/strings/string_view.h"  // from @com_google_absl
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow_lite_support/cc/common.h"

@@ -16,8 +16,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_COMMON_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_COMMON_H_
 
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/string_view.h"
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/string_view.h"  // from @com_google_absl
 
 namespace tflite {
 namespace support {

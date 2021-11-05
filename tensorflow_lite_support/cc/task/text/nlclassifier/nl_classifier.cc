@@ -21,10 +21,10 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "external/com_google_absl/absl/algorithm/container.h"
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/str_cat.h"
-#include "external/com_google_absl/absl/strings/string_view.h"
+#include "absl/algorithm/container.h"  // from @com_google_absl
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/str_cat.h"  // from @com_google_absl
+#include "absl/strings/string_view.h"  // from @com_google_absl
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"

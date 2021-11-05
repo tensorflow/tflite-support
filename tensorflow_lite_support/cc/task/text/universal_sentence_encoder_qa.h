@@ -19,9 +19,9 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "external/com_google_absl/absl/container/flat_hash_map.h"
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
+#include "absl/container/flat_hash_map.h"  // from @com_google_absl
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/base_task_api.h"
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"

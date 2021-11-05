@@ -15,10 +15,10 @@ limitations under the License.
 
 // Demostration the usage of UniversalSentenceEncoderQA.
 #include "tensorflow_lite_support/cc/task/text/universal_sentence_encoder_qa.h"
-#include "external/com_google_absl/absl/strings/str_split.h"
-#include "external/com_google_absl/absl/flags/flag.h"
-#include "external/com_google_absl/absl/flags/parse.h"
-#include "external/com_google_absl/absl/status/status.h"
+#include "absl/strings/str_split.h"  // from @com_google_absl
+#include "absl/flags/flag.h"  // from @com_google_absl
+#include "absl/flags/parse.h"  // from @com_google_absl
+#include "absl/status/status.h"  // from @com_google_absl
 using tflite::task::text::RetrievalOptions;
 using tflite::task::text::RetrievalInput;
 using tflite::task::text::RetrievalOutput;

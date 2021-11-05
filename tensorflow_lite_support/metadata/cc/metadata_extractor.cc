@@ -17,9 +17,9 @@ limitations under the License.
 
 #include <functional>
 
-#include "external/com_google_absl/absl/memory/memory.h"
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
+#include "absl/memory/memory.h"  // from @com_google_absl
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "lib/zip.h"  // from @org_libzip
 #include "tensorflow/lite/schema/schema_generated.h"

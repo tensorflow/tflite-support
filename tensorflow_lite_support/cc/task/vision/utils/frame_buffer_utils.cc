@@ -22,9 +22,9 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "external/com_google_absl/absl/memory/memory.h"
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
+#include "absl/memory/memory.h"  // from @com_google_absl
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
 #include "tensorflow/lite/kernels/internal/compatibility.h"
 #include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
