@@ -1,11 +1,11 @@
 /* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,10 +13,10 @@
  limitations under the License.
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageClassifier.h"
-#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImageUtils.h"
-#import "tensorflow_lite_support/ios/task/processor/utils/sources/TFLClassificationUtils.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
+#import "tensorflow_lite_support/ios/task/processor/utils/sources/TFLClassificationUtils.h"
+#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImageUtils.h"
 
 #include "tensorflow_lite_support/c/task/vision/image_classifier.h"
 
@@ -90,7 +90,7 @@
   for (NSInteger i = 0; i < strings.count; i++) {
     char *cString = [TFLCommonUtils
         mallocWithSize:[strings[i] lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1
-                        error:error];
+                 error:error];
     if (!cString) return nil;
 
     strcpy(cString, strings[i].UTF8String);
@@ -197,7 +197,7 @@
                               error:error];
 }
 
-- (TFLClassificationResult *_Nullable)classifyWithGMLImage:(GMLImage *)image
+- (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                           regionOfInterest:(CGRect)roi
                                                      error:(NSError *_Nullable *)error {
   TfLiteFrameBuffer *cFrameBuffer = [GMLImageUtils cFrameBufferFromGMLImage:image error:error];
