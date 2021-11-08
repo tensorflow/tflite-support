@@ -18,7 +18,7 @@ limitations under the License.
 #include <memory>
 #include <string>
 
-#include "external/com_google_absl/absl/strings/string_view.h"
+#include "absl/strings/string_view.h"  // from @com_google_absl
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"

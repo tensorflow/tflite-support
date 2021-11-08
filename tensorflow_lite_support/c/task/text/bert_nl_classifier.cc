@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <memory>
 
-#include "external/com_google_absl/absl/strings/string_view.h"
+#include "absl/strings/string_view.h"  // from @com_google_absl
 #include "tensorflow_lite_support/cc/task/core/category.h"
 #include "tensorflow_lite_support/cc/task/text/bert_nl_classifier.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_nl_classifier_options_proto_inc.h"
@@ -43,7 +43,6 @@ TfLiteBertNLClassifier* TfLiteBertNLClassifierCreateFromOptions(
     const char* model_path, const TfLiteBertNLClassifierOptions* options) {
   BertNLClassifierOptionsCpp cc_options;
 
-  cc_options.set_max_seq_len(options->max_seq_len);
   cc_options.mutable_base_options()->mutable_model_file()->set_file_name(
       model_path);
   auto classifier_status = BertNLClassifierCpp::CreateFromOptions(cc_options);

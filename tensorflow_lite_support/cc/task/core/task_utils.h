@@ -21,8 +21,8 @@ limitations under the License.
 #include <numeric>
 #include <vector>
 
-#include "external/com_google_absl/absl/memory/memory.h"
-#include "external/com_google_absl/absl/strings/str_cat.h"
+#include "absl/memory/memory.h"  // from @com_google_absl
+#include "absl/strings/str_cat.h"  // from @com_google_absl
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
 #include "tensorflow/lite/kernels/op_macros.h"

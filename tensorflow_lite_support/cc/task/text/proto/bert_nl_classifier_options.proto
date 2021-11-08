@@ -27,5 +27,8 @@ message BertNLClassifierOptions {
   optional tflite.task.core.BaseOptions base_options = 1;
 
   // Max number of tokens to pass to the model.
+  //
+  // Deprecated: max_seq_len is now read from the model (i.e. input tensor size)
+  // automatically.
   optional int32 max_seq_len = 2 [default = 128];
 }

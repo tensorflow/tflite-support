@@ -24,8 +24,8 @@ limitations under the License.
 #include <iostream>
 #include <limits>
 
-#include "external/com_google_absl/absl/flags/flag.h"
-#include "external/com_google_absl/absl/flags/parse.h"
+#include "absl/flags/flag.h"  // from @com_google_absl
+#include "absl/flags/parse.h"  // from @com_google_absl
 #include "tensorflow_lite_support/examples/task/audio/desktop/audio_classifier_lib.h"
 
 ABSL_FLAG(std::string, model_path, "",

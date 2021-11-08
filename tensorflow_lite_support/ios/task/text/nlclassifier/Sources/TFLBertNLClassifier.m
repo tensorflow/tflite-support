@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/text/nlclassifier/Sources/TFLBertNLClassifier.h"
-#import "external/google_toolbox_for_mac/GTMDefines.h"
+#import "GTMDefines.h"
 #include "tensorflow_lite_support/c/task/text/bert_nl_classifier.h"
 #include "tensorflow_lite_support/c/task/text/nl_classifier_common.h"
 
@@ -43,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)bertNLClassifierWithModelPath:(NSString *)modelPath
                                   options:(TFLBertNLClassifierOptions *)options {
+  // Note that maxSeqLen has been deprecated. Passing it to the C API is a no-op.
   TfLiteBertNLClassifierOptions cOptions = {.max_seq_len = options.maxSeqLen};
   TfLiteBertNLClassifier *classifier =
       TfLiteBertNLClassifierCreateFromOptions(modelPath.UTF8String, &cOptions);

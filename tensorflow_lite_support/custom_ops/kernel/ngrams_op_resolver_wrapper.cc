@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "external/pybind11/include/pybind11/pybind11.h"
+#include "pybind11/pybind11.h"
 #include "tensorflow/lite/mutable_op_resolver.h"
 #include "tensorflow_lite_support/custom_ops/kernel/ngrams_op_resolver.h"
 

@@ -15,7 +15,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_C_COMMON_UTILS_H_
 #define TENSORFLOW_LITE_SUPPORT_C_COMMON_UTILS_H_
 
-#include "external/com_google_absl/absl/status/status.h"
+#include "absl/status/status.h"  // from @com_google_absl
 #include "tensorflow_lite_support/c/common.h"
 
 // Utils for Conversion of absl::Status to TfLiteError

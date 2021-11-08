@@ -19,8 +19,8 @@ limitations under the License.
 
 #include <memory>
 
-#include "external/com_google_absl/absl/strings/match.h"
-#include "external/com_google_absl/absl/strings/str_cat.h"
+#include "absl/strings/match.h"  // from @com_google_absl
+#include "absl/strings/str_cat.h"  // from @com_google_absl
 #include "tensorflow/lite/builtin_ops.h"
 #include "tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow/lite/core/shims/cc/tools/verifier.h"

@@ -15,9 +15,9 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 
-#include "external/com_google_absl/absl/algorithm/container.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
-#include "external/com_google_absl/absl/strings/string_view.h"
+#include "absl/algorithm/container.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
+#include "absl/strings/string_view.h"  // from @com_google_absl
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"

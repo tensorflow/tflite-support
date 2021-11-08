@@ -19,10 +19,10 @@ limitations under the License.
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "external/com_google_absl/absl/flags/flag.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
-#include "external/com_google_sentencepiece/src/sentencepiece.pb.h"
-#include "external/com_google_sentencepiece/src/sentencepiece_processor.h"
+#include "absl/flags/flag.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
+#include "src/sentencepiece.pb.h"  // from @com_google_sentencepiece
+#include "src/sentencepiece_processor.h"  // from @com_google_sentencepiece
 #include "tensorflow/core/platform/env.h"
 #include "tensorflow_lite_support/cc/test/test_utils.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/model_converter.h"

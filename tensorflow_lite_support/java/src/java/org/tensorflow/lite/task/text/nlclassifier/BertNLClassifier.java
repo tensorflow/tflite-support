@@ -54,7 +54,6 @@ public class BertNLClassifier extends BaseTaskApi {
   public abstract static class BertNLClassifierOptions {
     static final int DEFAULT_MAX_SEQ_LEN = 128;
 
-    @UsedByReflection("bert_nl_classifier_jni.cc")
     abstract int getMaxSeqLen();
 
     abstract BaseOptions getBaseOptions();
@@ -72,6 +71,13 @@ public class BertNLClassifier extends BaseTaskApi {
       /** Sets the general options to configure Task APIs, such as accelerators. */
       public abstract Builder setBaseOptions(BaseOptions baseOptions);
 
+      /**
+       * Set the maximum sequence length.
+       *
+       * @deprecated maximum sequence length is now read from the model (i.e. input tensor size)
+       *     automatically
+       */
+      @Deprecated
       public abstract Builder setMaxSeqLen(int value);
 
       public abstract BertNLClassifierOptions build();

@@ -18,7 +18,7 @@ limitations under the License.
 
 #include <vector>
 
-#include "external/com_google_absl/absl/status/status.h"
+#include "absl/status/status.h"  // from @com_google_absl
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/core/shims/cc/kernels/register.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"

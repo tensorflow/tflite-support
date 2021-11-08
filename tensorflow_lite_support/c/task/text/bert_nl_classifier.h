@@ -38,6 +38,10 @@ extern "C" {
 typedef struct TfLiteBertNLClassifier TfLiteBertNLClassifier;
 
 typedef struct TfLiteBertNLClassifierOptions {
+  // Max number of tokens to pass to the model.
+  //
+  // Deprecated: max_seq_len is now read from the model (i.e. input tensor size)
+  // automatically.
   int max_seq_len;
 } TfLiteBertNLClassifierOptions;
 

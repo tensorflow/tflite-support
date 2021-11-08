@@ -19,7 +19,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "external/com_google_absl/absl/container/node_hash_map.h"
+#include "absl/container/node_hash_map.h"  // from @com_google_absl
 
 namespace tflite {
 namespace support {

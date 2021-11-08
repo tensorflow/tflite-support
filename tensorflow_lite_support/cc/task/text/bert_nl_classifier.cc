@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/task/text/bert_nl_classifier.h"
 
+#include <limits.h>
 #include <stddef.h>
 
 #include <memory>
@@ -22,9 +23,9 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/ascii.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/ascii.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/string_type.h"
@@ -67,6 +68,11 @@ absl::Status SanityCheckOptions(const BertNLClassifierOptions& options) {
   }
   return absl::OkStatus();
 }
+
+int GetLastDimSize(const TfLiteTensor* tensor) {
+  return tensor->dims->data[tensor->dims->size - 1];
+}
+
 }  // namespace
 
 absl::Status BertNLClassifier::Preprocess(
@@ -80,6 +86,20 @@ absl::Status BertNLClassifier::Preprocess(
   auto* segment_ids_tensor = FindTensorByName(
       input_tensors, input_tensor_metadatas, kSegmentIdsTensorName);
 
+  if (GetLastDimSize(ids_tensor) != GetLastDimSize(mask_tensor) ||
+      GetLastDimSize(ids_tensor) != GetLastDimSize(segment_ids_tensor)) {
+    return CreateStatusWithPayload(
+        absl::StatusCode::kInternal,
+        absl::StrFormat("The three input tensors in BertNLClassifier models "
+                        "are expected to have same length, but got ids_tensor "
+                        "(%d), mask_tensor (%d), segment_ids_tensor (%d).",
+                        GetLastDimSize(ids_tensor), GetLastDimSize(mask_tensor),
+                        GetLastDimSize(ids_tensor)),
+        TfLiteSupportStatus::kInvalidNumOutputTensorsError);
+  }
+
+  int max_seq_len = GetLastDimSize(ids_tensor);
+
   std::string processed_input = input;
   absl::AsciiStrToLower(&processed_input);
 
@@ -87,11 +107,11 @@ absl::Status BertNLClassifier::Preprocess(
   input_tokenize_results = tokenizer_->Tokenize(processed_input);
 
   // 2 accounts for [CLS], [SEP]
-  absl::Span<const std::string> query_tokens = absl::MakeSpan(
-      input_tokenize_results.subwords.data(),
-      input_tokenize_results.subwords.data() +
-          std::min(static_cast<size_t>(options_->max_seq_len() - 2),
-                   input_tokenize_results.subwords.size()));
+  absl::Span<const std::string> query_tokens =
+      absl::MakeSpan(input_tokenize_results.subwords.data(),
+                     input_tokenize_results.subwords.data() +
+                         std::min(static_cast<size_t>(max_seq_len - 2),
+                                  input_tokenize_results.subwords.size()));
 
   std::vector<std::string> tokens;
   tokens.reserve(2 + query_tokens.size());
@@ -104,8 +124,8 @@ absl::Status BertNLClassifier::Preprocess(
   // For Separation.
   tokens.push_back(kSeparator);
 
-  std::vector<int> input_ids(options_->max_seq_len(), 0);
-  std::vector<int> input_mask(options_->max_seq_len(), 0);
+  std::vector<int> input_ids(max_seq_len, 0);
+  std::vector<int> input_mask(max_seq_len, 0);
   // Convert tokens back into ids and set mask
   for (int i = 0; i < tokens.size(); ++i) {
     tokenizer_->LookupId(tokens[i], &input_ids[i]);
@@ -118,8 +138,7 @@ absl::Status BertNLClassifier::Preprocess(
 
   PopulateTensor(input_ids, ids_tensor);
   PopulateTensor(input_mask, mask_tensor);
-  PopulateTensor(std::vector<int>(options_->max_seq_len(), 0),
-                 segment_ids_tensor);
+  PopulateTensor(std::vector<int>(max_seq_len, 0), segment_ids_tensor);
 
   return absl::OkStatus();
 }
@@ -178,6 +197,7 @@ absl::Status BertNLClassifier::Initialize(
   TrySetLabelFromMetadata(
       GetMetadataExtractor()->GetOutputTensorMetadata(kOutputTensorIndex))
       .IgnoreError();
+
   return absl::OkStatus();
 }
 

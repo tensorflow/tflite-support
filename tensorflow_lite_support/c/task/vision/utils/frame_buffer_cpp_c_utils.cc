@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
 
-#include "external/com_google_absl/absl/strings/str_format.h"
+#include "absl/strings/str_format.h"  // from @com_google_absl
 #include "tensorflow_lite_support/cc/common.h"
 
 namespace tflite {

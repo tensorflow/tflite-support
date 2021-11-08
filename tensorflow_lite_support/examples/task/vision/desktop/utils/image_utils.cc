@@ -23,11 +23,11 @@ limitations under the License.
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/match.h"
-#include "external/com_google_absl/absl/strings/str_format.h"
-#include "external/stblib/stb_image.h"
-#include "external/stblib/stb_image_write.h"
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/match.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl
+#include "stb_image.h"  // from @stblib
+#include "stb_image_write.h"  // from @stblib
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 

@@ -40,14 +40,6 @@ BertNLClassifierOptions ConvertJavaBertNLClassifierOptions(
     proto_options.set_allocated_base_options(
         reinterpret_cast<BaseOptions*>(base_options_handle));
   }
-
-  jclass java_options_class = env->FindClass(
-      "org/tensorflow/lite/task/text/nlclassifier/"
-      "BertNLClassifier$BertNLClassifierOptions");
-  jmethodID max_seq_len_id =
-      env->GetMethodID(java_options_class, "getMaxSeqLen", "()I");
-  proto_options.set_max_seq_len(
-      env->CallIntMethod(java_options, max_seq_len_id));
   return proto_options;
 }
 

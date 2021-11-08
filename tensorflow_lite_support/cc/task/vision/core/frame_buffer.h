@@ -22,13 +22,13 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "external/com_google_absl/absl/memory/memory.h"
-#include "external/com_google_absl/absl/status/status.h"
-#include "external/com_google_absl/absl/strings/str_cat.h"
-#include "external/com_google_absl/absl/time/clock.h"
-#include "external/com_google_absl/absl/time/time.h"
-#include "external/com_google_absl/absl/types/any.h"
-#include "external/com_google_absl/absl/types/optional.h"
+#include "absl/memory/memory.h"  // from @com_google_absl
+#include "absl/status/status.h"  // from @com_google_absl
+#include "absl/strings/str_cat.h"  // from @com_google_absl
+#include "absl/time/clock.h"  // from @com_google_absl
+#include "absl/time/time.h"  // from @com_google_absl
+#include "absl/types/any.h"  // from @com_google_absl
+#include "absl/types/optional.h"  // from @com_google_absl
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 

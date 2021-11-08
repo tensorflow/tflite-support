@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/metadata/cc/metadata_version.h"
 
-#include "external/pybind11/include/pybind11/pybind11.h"
+#include "pybind11/pybind11.h"
 #include "tensorflow/lite/c/common.h"
 
 namespace tflite {

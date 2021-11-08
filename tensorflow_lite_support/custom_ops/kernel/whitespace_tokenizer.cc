@@ -22,7 +22,7 @@ limitations under the License.
 #include "tensorflow/lite/context.h"
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/string_util.h"
-#include "external/utf_archive/libutf/utf.h"
+#include "libutf/utf.h"
 
 constexpr int kInput = 0;
 constexpr int kOutputValues = 0;
