@@ -292,11 +292,11 @@ absl::Status BertQuestionAnswerer::Preprocess(
   segment_ids.insert(segment_ids.end(), zeros_to_pad, 0);
 
   // input_ids INT32[1, 384]
-  PopulateTensor(input_ids, ids_tensor);
+  RETURN_IF_ERROR(PopulateTensor(input_ids, ids_tensor));
   // input_mask INT32[1, 384]
-  PopulateTensor(input_mask, mask_tensor);
+  RETURN_IF_ERROR(PopulateTensor(input_mask, mask_tensor));
   // segment_ids INT32[1, 384]
-  PopulateTensor(segment_ids, segment_ids_tensor);
+  RETURN_IF_ERROR(PopulateTensor(segment_ids, segment_ids_tensor));
 
   return absl::OkStatus();
 }
@@ -323,9 +323,9 @@ StatusOr<std::vector<QaAnswer>> BertQuestionAnswerer::Postprocess(
   std::vector<float> start_logits;
 
   // end_logits FLOAT[1, 384]
-  PopulateVector(end_logits_tensor, &end_logits);
+  RETURN_IF_ERROR(PopulateVector(end_logits_tensor, &end_logits));
   // start_logits FLOAT[1, 384]
-  PopulateVector(start_logits_tensor, &start_logits);
+  RETURN_IF_ERROR(PopulateVector(start_logits_tensor, &start_logits));
 
   auto start_indices = ReverseSortIndices(start_logits);
   auto end_indices = ReverseSortIndices(end_logits);

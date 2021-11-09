@@ -550,7 +550,7 @@ TEST_F(PostprocessTest, SucceedsWithMaxResultsOption) {
 
   std::vector<uint8_t> scores = {/*daisy*/ 0, /*dandelion*/ 64, /*roses*/ 255,
                                  /*sunflowers*/ 32, /*tulips*/ 128};
-  PopulateTensor(scores, output_tensor);
+  SUPPORT_ASSERT_OK(PopulateTensor(scores, output_tensor));
   SUPPORT_ASSERT_OK_AND_ASSIGN(ClassificationResult result,
                        test_image_classifier_->Postprocess(
                            {output_tensor}, *dummy_frame_buffer_, /*roi=*/{}));
@@ -581,7 +581,7 @@ TEST_F(PostprocessTest, SucceedsWithScoreThresholdOption) {
 
   std::vector<uint8_t> scores = {/*daisy*/ 0, /*dandelion*/ 64, /*roses*/ 255,
                                  /*sunflowers*/ 32, /*tulips*/ 128};
-  PopulateTensor(scores, output_tensor);
+  SUPPORT_ASSERT_OK(PopulateTensor(scores, output_tensor));
   SUPPORT_ASSERT_OK_AND_ASSIGN(ClassificationResult result,
                        test_image_classifier_->Postprocess(
                            {output_tensor}, *dummy_frame_buffer_, /*roi=*/{}));
@@ -613,7 +613,7 @@ TEST_F(PostprocessTest, SucceedsWithWhitelistOption) {
 
   std::vector<uint8_t> scores = {/*daisy*/ 0, /*dandelion*/ 64, /*roses*/ 255,
                                  /*sunflowers*/ 32, /*tulips*/ 128};
-  PopulateTensor(scores, output_tensor);
+  SUPPORT_ASSERT_OK(PopulateTensor(scores, output_tensor));
   SUPPORT_ASSERT_OK_AND_ASSIGN(ClassificationResult result,
                        test_image_classifier_->Postprocess(
                            {output_tensor}, *dummy_frame_buffer_, /*roi=*/{}));
@@ -644,7 +644,7 @@ TEST_F(PostprocessTest, SucceedsWithBlacklistOption) {
 
   std::vector<uint8_t> scores = {/*daisy*/ 0, /*dandelion*/ 64, /*roses*/ 255,
                                  /*sunflowers*/ 32, /*tulips*/ 128};
-  PopulateTensor(scores, output_tensor);
+  SUPPORT_ASSERT_OK(PopulateTensor(scores, output_tensor));
   SUPPORT_ASSERT_OK_AND_ASSIGN(ClassificationResult result,
                        test_image_classifier_->Postprocess(
                            {output_tensor}, *dummy_frame_buffer_, /*roi=*/{}));

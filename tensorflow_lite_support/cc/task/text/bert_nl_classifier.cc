@@ -136,9 +136,10 @@ absl::Status BertNLClassifier::Preprocess(
   // input_masks                 1    1   1...  1    1    0  0...  0
   // segment_ids                 0    0   0...  0    0    0  0...  0
 
-  PopulateTensor(input_ids, ids_tensor);
-  PopulateTensor(input_mask, mask_tensor);
-  PopulateTensor(std::vector<int>(max_seq_len, 0), segment_ids_tensor);
+  RETURN_IF_ERROR(PopulateTensor(input_ids, ids_tensor));
+  RETURN_IF_ERROR(PopulateTensor(input_mask, mask_tensor));
+  RETURN_IF_ERROR(
+      PopulateTensor(std::vector<int>(max_seq_len, 0), segment_ids_tensor));
 
   return absl::OkStatus();
 }

@@ -391,8 +391,9 @@ StatusOr<SegmentationResult> ImageSegmenter::Postprocess(
         int class_index = 0;
         float max_confidence = 0.0f;
         for (int d = 0; d < output_depth_; ++d) {
-          const float confidence =
-              GetOutputConfidence(*output_tensor, tensor_x, tensor_y, d);
+          ASSIGN_OR_RETURN(
+              const float confidence,
+              GetOutputConfidence(*output_tensor, tensor_x, tensor_y, d));
           if (confidence > max_confidence) {
             class_index = d;
             max_confidence = confidence;
@@ -418,8 +419,10 @@ StatusOr<SegmentationResult> ImageSegmenter::Postprocess(
                           /*to_x=*/&tensor_x,
                           /*to_y=*/&tensor_y);
         for (int d = 0; d < output_depth_; ++d) {
-          confidence_masks->mutable_confidence_mask(d)->add_value(
+          ASSIGN_OR_RETURN(
+              float confidence,
               GetOutputConfidence(*output_tensor, tensor_x, tensor_y, d));
+          confidence_masks->mutable_confidence_mask(d)->add_value(confidence);
         }
       }
     }
@@ -428,15 +431,17 @@ StatusOr<SegmentationResult> ImageSegmenter::Postprocess(
   return result;
 }
 
-float ImageSegmenter::GetOutputConfidence(const TfLiteTensor& output_tensor,
-                                          int x, int y, int depth) {
+StatusOr<float> ImageSegmenter::GetOutputConfidence(
+    const TfLiteTensor& output_tensor, int x, int y, int depth) {
   int index = output_width_ * output_depth_ * y + output_depth_ * x + depth;
   if (has_uint8_outputs_) {
-    const uint8* data = AssertAndReturnTypedTensor<uint8>(&output_tensor);
+    ASSIGN_OR_RETURN(const uint8* data,
+                     AssertAndReturnTypedTensor<uint8>(&output_tensor));
     return output_tensor.params.scale *
            (static_cast<int>(data[index]) - output_tensor.params.zero_point);
   } else {
-    const float* data = AssertAndReturnTypedTensor<float>(&output_tensor);
+    ASSIGN_OR_RETURN(const float* data,
+                     AssertAndReturnTypedTensor<float>(&output_tensor));
     return data[index];
   }
 }

@@ -429,7 +429,7 @@ class PostprocessTest : public tflite_shims::testing::Test {
     confidence_scores.resize(/*width*/ 257 *
                              /*height*/ 257 *
                              /*classes*/ 21);
-    PopulateTensor(confidence_scores, output_tensor);
+    RETURN_IF_ERROR(PopulateTensor(confidence_scores, output_tensor));
 
     return output_tensor;
   }

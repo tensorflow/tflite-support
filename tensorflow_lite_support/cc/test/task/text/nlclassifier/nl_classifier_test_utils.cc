@@ -56,7 +56,8 @@ TfLiteStatus Invoke(TfLiteContext* context, TfLiteNode* node) {
   TfLiteTensor* output = GetOutput(context, node, 0);
   TF_LITE_ENSURE(context, output != nullptr);
   // Default Quantize OP scale is 255, will be quantized to {1, 2, 3}
-  tflite::task::core::PopulateTensor(data, output);
+  TF_LITE_ENSURE(context,
+                 tflite::task::core::PopulateTensor(data, output).ok());
   return kTfLiteOk;
 }
 
@@ -93,7 +94,8 @@ TfLiteStatus Invoke(TfLiteContext* context, TfLiteNode* node) {
   TfLiteTensor* output = GetOutput(context, node, 0);
   TF_LITE_ENSURE(context, output != nullptr);
   // Default Quantize OP scale is 255, will be quantized to {1, 2, 3}
-  tflite::task::core::PopulateTensor(data, output);
+  TF_LITE_ENSURE(context,
+                 tflite::task::core::PopulateTensor(data, output).ok());
   return kTfLiteOk;
 }
 
@@ -129,7 +131,8 @@ TfLiteStatus Invoke(TfLiteContext* context, TfLiteNode* node) {
   bool data[] = {true, true, false};
   TfLiteTensor* output = GetOutput(context, node, 0);
   TF_LITE_ENSURE(context, output != nullptr);
-  tflite::task::core::PopulateTensor(data, 3, output);
+  TF_LITE_ENSURE(context,
+                 tflite::task::core::PopulateTensor(data, 3, output).ok());
   return kTfLiteOk;
 }
 
@@ -156,7 +159,8 @@ TfLiteStatus GenerateLabelsInvoke(TfLiteContext* context, TfLiteNode* node) {
   TfLiteTensor* output = GetOutput(context, node, 0);
   TF_LITE_ENSURE(context, output != nullptr);
   std::vector<std::string> data = {"label0", "label1", "label2"};
-  tflite::task::core::PopulateTensor(data, output);
+  TF_LITE_ENSURE(context,
+                 tflite::task::core::PopulateTensor(data, output).ok());
   return kTfLiteOk;
 }
 

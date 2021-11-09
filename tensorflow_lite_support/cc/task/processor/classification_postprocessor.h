@@ -107,16 +107,16 @@ absl::Status ClassificationPostprocessor::Postprocess(T* classifications) {
 
   const TfLiteTensor* output_tensor = Tensor();
   if (output_tensor->type == kTfLiteUInt8) {
-    const uint8* output_data =
-        core::AssertAndReturnTypedTensor<uint8>(output_tensor);
+    ASSIGN_OR_RETURN(const uint8* output_data,
+                     core::AssertAndReturnTypedTensor<uint8>(output_tensor));
     for (int j = 0; j < head.label_map_items.size(); ++j) {
       score_pairs.emplace_back(
           j, output_tensor->params.scale * (static_cast<int>(output_data[j]) -
                                             output_tensor->params.zero_point));
     }
   } else {
-    const float* output_data =
-        core::AssertAndReturnTypedTensor<float>(output_tensor);
+    ASSIGN_OR_RETURN(const float* output_data,
+                     core::AssertAndReturnTypedTensor<float>(output_tensor));
     for (int j = 0; j < head.label_map_items.size(); ++j) {
       score_pairs.emplace_back(j, output_data[j]);
     }

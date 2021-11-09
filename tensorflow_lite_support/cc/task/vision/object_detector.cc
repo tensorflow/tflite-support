@@ -224,8 +224,10 @@ absl::Status SanityCheckOutputTensors(
             "Expected tensor with dimensions [1] at index 3, found [%d]",
             num_results_tensor->dims->data[0]));
   }
-  int num_results = static_cast<int>(
-      AssertAndReturnTypedTensor<float>(num_results_tensor)[0]);
+
+  ASSIGN_OR_RETURN(float* num_results_data,
+                   AssertAndReturnTypedTensor<float>(num_results_tensor));
+  int num_results = static_cast<int>(num_results_data[0]);
 
   const TfLiteTensor* location_tensor = output_tensors[output_indices[0]];
   // Check dimensions for the other tensors are correct.
@@ -419,7 +421,8 @@ absl::Status ObjectDetector::InitScoreCalibrations() {
       output_tensor_metadata = metadata_extractor->GetOutputTensorMetadata();
   const tflite::TensorMetadata* output_tensor =
       output_tensor_metadata->Get(kDefaultScoresIndex);
-  ASSIGN_OR_RETURN(auto calibration_params,
+  ASSIGN_OR_RETURN(
+      auto calibration_params,
       BuildCalibrationParametersIfAny(*metadata_extractor, *output_tensor,
                                       label_map_, &has_score_calibration));
 
@@ -603,8 +606,10 @@ StatusOr<DetectionResult> ObjectDetector::Postprocess(
   RETURN_IF_ERROR(SanityCheckOutputTensors(output_tensors, output_indices_));
 
   // Get number of available results.
-  const int num_results = static_cast<int>(
-      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[3]])[0]);
+  ASSIGN_OR_RETURN(
+      float* num_results_data,
+      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[3]]));
+  const int num_results = static_cast<int>(num_results_data[0]);
   // Compute number of max results to return.
   const int max_results = options_->max_results() > 0
                               ? std::min(options_->max_results(), num_results)
@@ -617,12 +622,16 @@ StatusOr<DetectionResult> ObjectDetector::Postprocess(
                            FrameBuffer::Orientation::kTopLeft)) {
     upright_input_frame_dimensions.Swap();
   }
-  const float* locations =
-      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[0]]);
-  const float* classes =
-      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[1]]);
-  const float* scores =
-      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[2]]);
+
+  ASSIGN_OR_RETURN(
+      const float* locations,
+      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[0]]));
+  ASSIGN_OR_RETURN(
+      const float* classes,
+      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[1]]));
+  ASSIGN_OR_RETURN(
+      const float* scores,
+      AssertAndReturnTypedTensor<float>(output_tensors[output_indices_[2]]));
   DetectionResult results;
   for (int i = 0; i < num_results; ++i) {
     const int class_index = static_cast<int>(classes[i]);

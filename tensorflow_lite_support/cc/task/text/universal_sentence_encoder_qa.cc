@@ -47,12 +47,11 @@ using ::absl::Status;
 using ::absl::StatusCode;
 using internal::QAInput;
 using internal::QAOutput;
-using ::tflite::GetTensorData;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
-using ::tflite::task::core::AssertAndReturnTypedTensor;
 using ::tflite::task::core::FindTensorByName;
 using ::tflite::task::core::PopulateTensor;
+using ::tflite::task::core::PopulateVectorToRepeated;
 using ::tflite::task::core::TaskAPIFactory;
 using FeatureVector = UniversalSentenceEncoderQA::FeatureVector;
 
@@ -73,23 +72,9 @@ absl::Status SanityCheckOptions(const RetrievalOptions& options) {
   return absl::OkStatus();
 }
 
-// Populates vector to a repeated field.
-template <class TRepeatedField, class T = float>
-inline void PopulateVectorToRepeated(const TfLiteTensor* tensor,
-                                     TRepeatedField* data) {
-  AssertAndReturnTypedTensor<T>(tensor);
-  const T* results = GetTensorData<T>(tensor);
-  size_t num = tensor->bytes / sizeof(tensor->type);
-  data->Resize(num, T());
-  T* pdata = data->mutable_data();
-  for (size_t i = 0; i < num; i++) {
-    pdata[i] = results[i];
-  }
-}
-
 // Copy vector from model output.
-inline void CopyVector(const TfLiteTensor* src, FeatureVector* target) {
-  PopulateVectorToRepeated(src, target->mutable_value_float());
+inline absl::Status CopyVector(const TfLiteTensor* src, FeatureVector* target) {
+  return PopulateVectorToRepeated(src, target->mutable_value_float());
 }
 
 // Dot product of two vectors. Returns error status if size is mismatched.
@@ -162,12 +147,13 @@ StatusOr<RetrievalOutput> UniversalSentenceEncoderQA::Retrieve(
 
       // Only encode query for the first time.
       if (i == 0) {
-        CopyVector(out.query_encoding, output.mutable_query_encoding());
+        RETURN_IF_ERROR(
+            CopyVector(out.query_encoding, output.mutable_query_encoding()));
       }
 
       // For each answer, set the response result.
       auto r = output.mutable_response_results()->Add();
-      CopyVector(out.response_encoding, r->mutable_encoding());
+      RETURN_IF_ERROR(CopyVector(out.response_encoding, r->mutable_encoding()));
     } else {
       // If response is already encoded, encode query only and keep response
       // encoding.
@@ -206,7 +192,7 @@ StatusOr<FeatureVector> UniversalSentenceEncoderQA::EncodeQuery(
 
   const auto& output = Run(query_text, "", "");
   FeatureVector v;
-  CopyVector(output.query_encoding, &v);
+  RETURN_IF_ERROR(CopyVector(output.query_encoding, &v));
   return v;
 }
 
@@ -220,7 +206,7 @@ StatusOr<FeatureVector> UniversalSentenceEncoderQA::EncodeResponse(
 
   const auto& output = Run("", response_text, response_context);
   FeatureVector v;
-  CopyVector(output.response_encoding, &v);
+  RETURN_IF_ERROR(CopyVector(output.response_encoding, &v));
   return v;
 }
 
@@ -275,9 +261,10 @@ Status UniversalSentenceEncoderQA::Preprocess(
                              kResponseContextTensorName)
           : input_tensors[1];
 
-  PopulateTensor(input.query_text, query_text_tensor);
-  PopulateTensor(input.response_text, response_text_tensor);
-  PopulateTensor(input.response_context, response_context_tensor);
+  RETURN_IF_ERROR(PopulateTensor(input.query_text, query_text_tensor));
+  RETURN_IF_ERROR(PopulateTensor(input.response_text, response_text_tensor));
+  RETURN_IF_ERROR(
+      PopulateTensor(input.response_context, response_context_tensor));
 
   return absl::OkStatus();
 }

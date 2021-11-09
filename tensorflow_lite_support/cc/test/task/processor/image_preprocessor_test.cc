@@ -94,9 +94,9 @@ TEST_F(DynamicInputTest, GoldenImageComparison) {
   PreprocessImage();
 
   // Get the processed input image.
-  float* processed_input_data =
-      tflite::task::core::AssertAndReturnTypedTensor<float>(
-          engine_->GetInputs()[0]);
+  SUPPORT_ASSERT_OK_AND_ASSIGN(float* processed_input_data,
+                       tflite::task::core::AssertAndReturnTypedTensor<float>(
+                           engine_->GetInputs()[0]));
 
   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
   const uint8* image_data = image.pixel_data;

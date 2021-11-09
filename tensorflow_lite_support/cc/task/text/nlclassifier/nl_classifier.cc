@@ -248,9 +248,9 @@ absl::Status NLClassifier::Preprocess(
       }
     }
 
-    PopulateTensor(input_tokens, input_tensor);
+    RETURN_IF_ERROR(PopulateTensor(input_tokens, input_tensor));
   } else {
-    PopulateTensor(input, input_tensor);
+    RETURN_IF_ERROR(PopulateTensor(input, input_tensor));
   }
   return absl::OkStatus();
 }

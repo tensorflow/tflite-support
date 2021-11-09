@@ -167,8 +167,8 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
             "and input tensor.");
       }
       // No normalization required: directly populate data.
-      tflite::task::core::PopulateTensor(
-          input_data, input_data_byte_size / sizeof(uint8), Tensor());
+      RETURN_IF_ERROR(tflite::task::core::PopulateTensor(
+          input_data, input_data_byte_size / sizeof(uint8), Tensor()));
       break;
     case kTfLiteFloat32: {
       if (Tensor()->bytes / sizeof(float) !=
@@ -179,8 +179,9 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
             "and input tensor.");
       }
       // Normalize and populate.
-      float* normalized_input_data =
-          tflite::task::core::AssertAndReturnTypedTensor<float>(Tensor());
+      ASSIGN_OR_RETURN(
+          float* normalized_input_data,
+          tflite::task::core::AssertAndReturnTypedTensor<float>(Tensor()));
       const tflite::task::vision::NormalizationOptions& normalization_options =
           input_specs_.normalization_options.value();
       for (int i = 0; i < normalization_options.num_values; i++) {

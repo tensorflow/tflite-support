@@ -157,9 +157,8 @@ absl::Status AudioPreprocessor::Preprocess(
             audio_buffer.GetBufferSize(), input_buffer_size_),
         tflite::support::TfLiteSupportStatus::kInvalidArgumentError);
   }
-  tflite::task::core::PopulateTensor(audio_buffer.GetFloatBuffer(),
-                                     input_buffer_size_, Tensor());
-  return absl::OkStatus();
+  return tflite::task::core::PopulateTensor(audio_buffer.GetFloatBuffer(),
+                                            input_buffer_size_, Tensor());
 }
 
 }  // namespace processor
