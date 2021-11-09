@@ -1,7 +1,7 @@
 load("@build_bazel_rules_android//android:rules.bzl", "android_library")
 
 package(
-    default_visibility = ["//tensorflow_lite_support:users"],
+    default_visibility = ["//visibility:public"],
     licenses = ["notice"],  # Apache 2.0
 )
 

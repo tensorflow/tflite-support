@@ -4,13 +4,16 @@ load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_jni_binary")
 
 package(
     default_visibility = [
-        "//visibility:public",
+        "//tensorflow_lite_support:internal",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
 
 cc_library(
     name = "gpu_plugin",
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:gpu_plugin",
     ],
@@ -19,6 +22,9 @@ cc_library(
 
 cc_library(
     name = "nnapi_plugin",
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:nnapi_plugin",
     ],
@@ -27,6 +33,9 @@ cc_library(
 
 cc_library(
     name = "hexagon_plugin",
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:hexagon_plugin",
     ],
@@ -35,6 +44,9 @@ cc_library(
 
 cc_library(
     name = "xnnpack_plugin",
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:xnnpack_plugin",
     ],
@@ -46,6 +58,9 @@ cc_library(
 cc_library(
     name = "edgetpu_coral_plugin",
     srcs = ["edgetpu_coral_plugin.cc"],
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [
         "@com_google_absl//absl/container:node_hash_map",
         "@com_google_absl//absl/memory",
@@ -108,6 +123,9 @@ cc_library(
 # Use this target when GPU delegate is selected in the Task Library Java API.
 android_library(
     name = "gpu_delegate_plugin_android",
+    visibility = [
+        "//visibility:public",
+    ],
     exports = [":gpu_delegate_plugin_native"],
 )
 

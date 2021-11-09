@@ -4,7 +4,7 @@ load("@build_bazel_rules_apple//apple:ios.bzl", "ios_unit_test")
 load("@org_tensorflow//tensorflow/lite:special_rules.bzl", "tflite_ios_lab_runner")
 
 package(
-    default_visibility = ["//tensorflow_lite_support:users"],
+    default_visibility = ["//tensorflow_lite_support:internal"],
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -13,6 +13,7 @@ objc_library(
     srcs = ["Sources/TFLBertQuestionAnswerer.m"],
     hdrs = ["Sources/TFLBertQuestionAnswerer.h"],
     module_name = "TFLBertQuestionAnswerer",
+    visibility = ["//tensorflow_lite_support:internal"],
     deps = [
         "//tensorflow_lite_support/c/task/text:bert_question_answerer",
         "@google_toolbox_for_mac//:GTM_Defines",

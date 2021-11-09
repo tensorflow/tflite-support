@@ -2,7 +2,7 @@ load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "
 
 package(
     default_visibility = [
-        "//tensorflow_lite_support:__subpackages__",
+        "//tensorflow_lite_support:internal",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
