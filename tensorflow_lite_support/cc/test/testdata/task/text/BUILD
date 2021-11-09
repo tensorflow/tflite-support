@@ -1,7 +1,7 @@
 load("//tensorflow_lite_support/tools/build_rules:http_files.bzl", "tflite_file", "tflite_model")
 
 package(
-    default_visibility = ["//tensorflow_lite_support:users"],
+    default_visibility = ["//tensorflow_lite_support:internal"],
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -10,6 +10,9 @@ filegroup(
     srcs = glob([
         "test_model_nl_classifier*.tflite",
     ]),
+    visibility = [
+        "//tensorflow_lite_support:internal",
+    ],
 )
 
 filegroup(
@@ -25,6 +28,9 @@ filegroup(
         ":mobilebert_float",
         ":mobilebert_vocab",
         ":mobilebert_with_metadata",
+    ],
+    visibility = [
+        "//tensorflow_lite_support:internal",
     ],
 )
 

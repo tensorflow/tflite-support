@@ -1,6 +1,6 @@
 package(
     default_visibility = [
-        "//visibility:public",
+        "//tensorflow_lite_support:internal",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
@@ -9,6 +9,9 @@ cc_library(
     name = "audio_buffer",
     hdrs = [
         "audio_buffer.h",
+    ],
+    visibility = [
+        "//visibility:public",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",

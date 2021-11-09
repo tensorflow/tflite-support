@@ -2,7 +2,7 @@ load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "
 
 package(
     default_visibility = [
-        "//tensorflow_lite_support:users",
+        "//tensorflow_lite_support:internal",
     ],
     licenses = ["notice"],  # Apache 2.0
 )
@@ -11,6 +11,9 @@ cc_library(
     name = "score_calibration",
     srcs = ["score_calibration.cc"],
     hdrs = ["score_calibration.h"],
+    visibility = [
+        "//tensorflow_lite_support:internal",
+    ],
     deps = [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:status_macros",
@@ -55,6 +58,9 @@ cc_library(
     hdrs = [
         "frame_buffer_utils.h",
     ],
+    visibility = [
+        "//tensorflow_lite_support:internal",
+    ],
     deps = [
         ":frame_buffer_common_utils",
         ":libyuv_frame_buffer_utils",
@@ -79,6 +85,9 @@ cc_library(
     name = "libyuv_frame_buffer_utils",
     srcs = ["libyuv_frame_buffer_utils.cc"],
     hdrs = ["libyuv_frame_buffer_utils.h"],
+    visibility = [
+        "//tensorflow_lite_support:internal",
+    ],
     deps = [
         ":frame_buffer_common_utils",
         "//tensorflow_lite_support/cc:common",

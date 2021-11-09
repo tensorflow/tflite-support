@@ -1,7 +1,7 @@
 load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
 
 package(
-    default_visibility = ["//tensorflow_lite_support:users"],
+    default_visibility = ["//tensorflow_lite_support:internal"],
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -18,6 +18,9 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/core/shims:delegate_registry",
         "@org_tensorflow//tensorflow/lite/core/shims:jni_initialization",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:delegate_plugin_converter",
+    ],
+    visibility = [
+        "//tensorflow_lite_support:internal",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",
@@ -39,6 +42,9 @@ cc_library(
     ],
     hdrs = [
         "common_utils.h",
+    ],
+    visibility = [
+        "//tensorflow_lite_support:internal",
     ],
     deps = [
         "@com_google_absl//absl/container:node_hash_map",

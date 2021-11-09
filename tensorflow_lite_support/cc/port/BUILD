@@ -1,7 +1,7 @@
 load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
 
 package(
-    default_visibility = ["//tensorflow_lite_support:users"],
+    default_visibility = ["//tensorflow_lite_support:internal"],
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -10,10 +10,7 @@ cc_library(
     hdrs = [
         "statusor.h",
     ],
-    visibility = [
-        "//tensorflow_lite_support:users",
-        "@org_tensorflow_lite_examples_classificationbyretrieval//:__subpackages__",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
         "@com_google_absl//absl/status:statusor",
     ],
@@ -24,10 +21,7 @@ cc_library(
     hdrs = [
         "status_macros.h",
     ],
-    visibility = [
-        "//tensorflow_lite_support:users",
-        "@org_tensorflow_lite_examples_classificationbyretrieval//:__subpackages__",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
         "//tensorflow_lite_support/cc/port/default:status_macros",
     ],
@@ -48,6 +42,7 @@ cc_library_with_tflite(
 cc_library(
     name = "integral_types",
     hdrs = ["integral_types.h"],
+    visibility = ["//tensorflow_lite_support:users"],
 )
 
 cc_library(
@@ -58,6 +53,9 @@ cc_library(
         "gmock.h",
         "gtest.h",
         "status_matchers.h",
+    ],
+    visibility = [
+        "//tensorflow_lite_support:internal",
     ],
     deps = [
         "//tensorflow_lite_support/cc/port/default:status_matchers",

@@ -52,10 +52,6 @@ cc_library(
     name = "metadata_populator",
     srcs = ["metadata_populator.cc"],
     hdrs = ["metadata_populator.h"],
-    visibility = [
-        "//tensorflow_lite_support:users",
-        "@org_tensorflow_lite_examples_classificationbyretrieval//:__subpackages__",
-    ],
     deps = [
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:status_macros",

@@ -4,7 +4,9 @@ load(
 )
 
 package(
-    default_visibility = ["//tensorflow_lite_support:users"],
+    default_visibility = [
+        "//visibility:private",
+    ],
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -12,6 +14,7 @@ cc_library(
     name = "nl_classifier_test_utils",
     srcs = ["nl_classifier_test_utils.cc"],
     hdrs = ["nl_classifier_test_utils.h"],
+    visibility = ["//tensorflow_lite_support:internal"],
     deps = [
         "//tensorflow_lite_support/cc/task/core:task_utils",
         "@org_tensorflow//tensorflow/lite:op_resolver",
