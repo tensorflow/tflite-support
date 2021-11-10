@@ -78,11 +78,8 @@ absl::Status ImageTransformer::Init(
 
   RETURN_IF_ERROR(PostInit());
 
-  auto norm_options = std::make_unique<NormalizationOptions>(
-      GetInputSpecs().normalization_options.value());
-  ASSIGN_OR_RETURN(postprocessor_,
-                   processor::ImagePostprocessor::Create(
-                       GetTfLiteEngine(), {0}, std::move(norm_options)));
+  ASSIGN_OR_RETURN(postprocessor_, processor::ImagePostprocessor::Create(
+                                       GetTfLiteEngine(), {0}, {0}));
 
   return absl::OkStatus();
 }
@@ -98,12 +95,8 @@ absl::Status ImageTransformer::PostInit() {
 }
 
 absl::Status ImageTransformer::CheckAndSetOutputs() {
-  // First, sanity checks on the model itself.
-  const TfLiteEngine::Interpreter* interpreter =
-      GetTfLiteEngine()->interpreter();
-
   // Check the number of output tensors.
-  if (TfLiteEngine::OutputCount(interpreter) != 1) {
+  if (TfLiteEngine::OutputCount(GetTfLiteEngine()->interpreter()) != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         absl::StrFormat("Image segmentation models are expected to have only 1 "
