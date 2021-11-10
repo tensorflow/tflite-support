@@ -29,39 +29,36 @@
 @synthesize baseOptions;
 @synthesize classificationOptions;
 
-- (instancetype _Nullable)initWithModelPath:(nonnull NSString *)modelPath {
+- (instancetype)init {
   self = [super init];
   if (self) {
     self.baseOptions = [[TFLBaseOptions alloc] init];
     self.baseOptions.modelFile = [[TFLExternalFile alloc] init];
-    self.baseOptions.modelFile.filePath = modelPath;
 
     self.baseOptions.computeSettings = [[TFLComputeSettings alloc] init];
     self.baseOptions.computeSettings.cpuSettings = [[TFLCpuSettings alloc] init];
     self.baseOptions.computeSettings.cpuSettings.numThreads = -1;
 
     self.classificationOptions = [[TFLClassificationOptions alloc] init];
-    self.classificationOptions.maxResults = -1;
+    self.classificationOptions.maxResults = 5;
+    self.classificationOptions.scoreThreshold = 0;
   }
   return self;
 }
+
+- (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath {
+  self = [self init];
+  if (self) {
+    self.baseOptions.modelFile.filePath = modelPath;
+  }
+  return self;
+}
+
 @end
 
 @implementation TFLImageClassifier
 - (void)dealloc {
   TfLiteImageClassifierDelete(_imageClassifier);
-}
-
-+ (TFLImageClassifierOptions *)defaultImageClassifierOptionsWithModelPath:
-    (nonnull NSString *)modelPath {
-  TFLImageClassifierOptions *options =
-      [[TFLImageClassifierOptions alloc] initWithModelPath:modelPath];
-  if (!options) return nil;
-
-  options.classificationOptions.maxResults = 5;
-  options.classificationOptions.scoreThreshold = 0;
-
-  return options;
 }
 
 + (void)deleteCStringsArray:(char **)cStrings count:(int)count {
@@ -101,20 +98,12 @@
   return cStrings;
 }
 
-+ (nullable instancetype)imageClassifierWithModelPath:(nonnull NSString *)modelPath
-                                                error:(NSError **)error {
-  TFLImageClassifierOptions *options = [self defaultImageClassifierOptionsWithModelPath:modelPath];
-
-  TFLImageClassifier *imageClassifier = nil;
-  if (options)
-    imageClassifier = [TFLImageClassifier imageClassifierWithOptions:options error:error];
-  else
-    [TFLCommonUtils
-        customErrorWithCode:TFLSupportErrorCodeInternalError
-                description:@"Some error occured during initialization of image classifier."
-                      error:error];
-
-  return imageClassifier;
+- (instancetype)initWithImageClassifier:(TfLiteImageClassifier *)imageClassifier {
+  self = [super init];
+  if (self) {
+    _imageClassifier = imageClassifier;
+  }
+  return self;
 }
 
 + (nullable instancetype)imageClassifierWithOptions:(nonnull TFLImageClassifierOptions *)options
@@ -184,12 +173,21 @@
   return [[TFLImageClassifier alloc] initWithImageClassifier:imageClassifier];
 }
 
-- (instancetype)initWithImageClassifier:(TfLiteImageClassifier *)imageClassifier {
-  self = [super init];
-  if (self) {
-    _imageClassifier = imageClassifier;
-  }
-  return self;
++ (nullable instancetype)imageClassifierWithModelPath:(nonnull NSString *)modelPath
+                                                error:(NSError **)error {
+  TFLImageClassifierOptions *options = [[TFLImageClassifierOptions alloc] init];
+
+  TFLImageClassifier *imageClassifier = nil;
+  if (options) {
+    options.baseOptions.modelFile.filePath = modelPath;
+    imageClassifier = [TFLImageClassifier imageClassifierWithOptions:options error:error];
+  } else
+    [TFLCommonUtils
+        customErrorWithCode:TFLSupportErrorCodeInternalError
+                description:@"Some error occured during initialization of image classifier."
+                      error:error];
+
+  return imageClassifier;
 }
 
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
