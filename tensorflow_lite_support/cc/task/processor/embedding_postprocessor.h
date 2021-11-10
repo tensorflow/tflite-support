@@ -78,15 +78,15 @@ class EmbeddingPostprocessor : public Postprocessor {
 
 template <typename T>
 absl::Status EmbeddingPostprocessor::Postprocess(T* embedding) {
-  embedding->set_output_index(output_indices_.at(0));
+  embedding->set_output_index(tensor_indices_.at(0));
   auto* feature_vector = embedding->mutable_feature_vector();
-  if (Tensor()->type == kTfLiteUInt8) {
+  if (GetTensor()->type == kTfLiteUInt8) {
     const uint8* output_data =
         engine_->interpreter()->typed_output_tensor<uint8>(
-            output_indices_.at(0));
+            tensor_indices_.at(0));
     // Get the zero_point and scale parameters from the tensor metadata.
     const int output_tensor_index =
-        engine_->interpreter()->outputs()[output_indices_.at(0)];
+        engine_->interpreter()->outputs()[tensor_indices_.at(0)];
     const TfLiteTensor* output_tensor =
         engine_->interpreter()->tensor(output_tensor_index);
     for (int j = 0; j < embedding_dimension_; ++j) {
@@ -98,7 +98,7 @@ absl::Status EmbeddingPostprocessor::Postprocess(T* embedding) {
     // Float
     const float* output_data =
         engine_->interpreter()->typed_output_tensor<float>(
-            output_indices_.at(0));
+            tensor_indices_.at(0));
     for (int j = 0; j < embedding_dimension_; ++j) {
       feature_vector->add_value_float(output_data[j]);
     }

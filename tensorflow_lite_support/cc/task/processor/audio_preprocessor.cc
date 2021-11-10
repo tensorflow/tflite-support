@@ -74,11 +74,10 @@ tflite::support::StatusOr<const AudioProperties*> GetAudioPropertiesSafe(
 tflite::support::StatusOr<std::unique_ptr<AudioPreprocessor>>
 AudioPreprocessor::Create(tflite::task::core::TfLiteEngine* engine,
                           const std::initializer_list<int> input_indices) {
-  RETURN_IF_ERROR(Preprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                            engine, input_indices,
-                                            /* requires_metadata = */ true));
-  auto processor =
-      ::absl::WrapUnique(new AudioPreprocessor(engine, input_indices));
+  ASSIGN_OR_RETURN(auto processor,
+                   Processor::Create<AudioPreprocessor>(
+                       /* num_expected_tensors = */ 1, engine, input_indices));
+
   RETURN_IF_ERROR(processor->Init());
   return processor;
 }
@@ -90,8 +89,9 @@ absl::Status AudioPreprocessor::Init() {
 }
 
 absl::Status AudioPreprocessor::SetAudioFormatFromMetadata() {
-  ASSIGN_OR_RETURN(const AudioProperties* props,
-                   GetAudioPropertiesSafe(Metadata(), input_indices_.at(0)));
+  ASSIGN_OR_RETURN(
+      const AudioProperties* props,
+      GetAudioPropertiesSafe(GetTensorMetadata(), tensor_indices_.at(0)));
   audio_format_.channels = props->channels();
   audio_format_.sample_rate = props->sample_rate();
   if (audio_format_.channels <= 0 || audio_format_.sample_rate <= 0) {
@@ -106,16 +106,16 @@ absl::Status AudioPreprocessor::SetAudioFormatFromMetadata() {
 
 absl::Status AudioPreprocessor::CheckAndSetInputs() {
   input_buffer_size_ = 1;
-  for (int i = 0; i < Tensor()->dims->size; i++) {
-    if (Tensor()->dims->data[i] < 1) {
+  for (int i = 0; i < GetTensor()->dims->size; i++) {
+    if (GetTensor()->dims->data[i] < 1) {
       return CreateStatusWithPayload(
           absl::StatusCode::kInvalidArgument,
           absl::StrFormat("Invalid size: %d for input tensor dimension: %d.",
-                          Tensor()->dims->data[i], i),
+                          GetTensor()->dims->data[i], i),
           tflite::support::TfLiteSupportStatus::
               kInvalidInputTensorDimensionsError);
     }
-    input_buffer_size_ *= Tensor()->dims->data[i];
+    input_buffer_size_ *= GetTensor()->dims->data[i];
   }
   // Check if the input buffer size is divisible by the required audio channels.
   // This needs to be done after loading metadata and input.
@@ -158,7 +158,7 @@ absl::Status AudioPreprocessor::Preprocess(
         tflite::support::TfLiteSupportStatus::kInvalidArgumentError);
   }
   return tflite::task::core::PopulateTensor(audio_buffer.GetFloatBuffer(),
-                                            input_buffer_size_, Tensor());
+                                            input_buffer_size_, GetTensor());
 }
 
 }  // namespace processor

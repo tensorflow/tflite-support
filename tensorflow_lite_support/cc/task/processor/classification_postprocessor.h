@@ -100,12 +100,12 @@ class ClassificationPostprocessor : public Postprocessor {
 template <typename T>
 absl::Status ClassificationPostprocessor::Postprocess(T* classifications) {
   const auto& head = classification_head_;
-  classifications->set_head_index(output_indices_.at(0));
+  classifications->set_head_index(tensor_indices_.at(0));
 
   std::vector<std::pair<int, float>> score_pairs;
   score_pairs.reserve(head.label_map_items.size());
 
-  const TfLiteTensor* output_tensor = Tensor();
+  const TfLiteTensor* output_tensor = GetTensor();
   if (output_tensor->type == kTfLiteUInt8) {
     ASSIGN_OR_RETURN(const uint8* output_data,
                      core::AssertAndReturnTypedTensor<uint8>(output_tensor));

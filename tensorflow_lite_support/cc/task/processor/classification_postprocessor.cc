@@ -44,11 +44,9 @@ tflite::support::StatusOr<std::unique_ptr<ClassificationPostprocessor>>
 ClassificationPostprocessor::Create(
     core::TfLiteEngine* engine, const std::initializer_list<int> output_indices,
     std::unique_ptr<ClassificationOptions> options) {
-  RETURN_IF_ERROR(Postprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                             engine, output_indices));
-
-  auto processor =
-      absl::WrapUnique(new ClassificationPostprocessor(engine, output_indices));
+  ASSIGN_OR_RETURN(auto processor,
+                   Processor::Create<ClassificationPostprocessor>(
+                       /* num_expected_tensors = */ 1, engine, output_indices));
 
   RETURN_IF_ERROR(processor->Init(std::move(options)));
   return processor;
@@ -72,13 +70,13 @@ absl::Status ClassificationPostprocessor::Init(
         TfLiteSupportStatus::kInvalidArgumentError);
   }
 
-  ASSIGN_OR_RETURN(
-      classification_head_,
-      BuildClassificationHead(*engine_->metadata_extractor(), *Metadata(),
-                              options->display_names_locale()));
+  ASSIGN_OR_RETURN(classification_head_,
+                   BuildClassificationHead(*engine_->metadata_extractor(),
+                                           *GetTensorMetadata(),
+                                           options->display_names_locale()));
 
   // Sanity check output tensors
-  const TfLiteTensor* output_tensor = Tensor();
+  const TfLiteTensor* output_tensor = GetTensor();
   const int num_dimensions = output_tensor->dims->size;
   if (num_dimensions == 4) {
     if (output_tensor->dims->data[1] != 1 ||
@@ -87,7 +85,7 @@ absl::Status ClassificationPostprocessor::Init(
           StatusCode::kInvalidArgument,
           absl::StrFormat("Unexpected WxH sizes for output index %d: got "
                           "%dx%d, expected 1x1.",
-                          output_indices_.at(0), output_tensor->dims->data[2],
+                          tensor_indices_.at(0), output_tensor->dims->data[2],
                           output_tensor->dims->data[1]),
           TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
     }
@@ -98,7 +96,7 @@ absl::Status ClassificationPostprocessor::Init(
             "Unexpected number of dimensions for output index %d: got %dD, "
             "expected either 2D (BxN with B=1) or 4D (BxHxWxN with B=1, W=1, "
             "H=1).",
-            output_indices_.at(0), num_dimensions),
+            tensor_indices_.at(0), num_dimensions),
         TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
   }
   if (output_tensor->dims->data[0] != 1) {
@@ -106,7 +104,7 @@ absl::Status ClassificationPostprocessor::Init(
         StatusCode::kInvalidArgument,
         absl::StrFormat("The output array is expected to have a batch size "
                         "of 1. Got %d for output index %d.",
-                        output_tensor->dims->data[0], output_indices_.at(0)),
+                        output_tensor->dims->data[0], tensor_indices_.at(0)),
         TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
   }
   int num_classes = output_tensor->dims->data[num_dimensions - 1];
@@ -126,7 +124,7 @@ absl::Status ClassificationPostprocessor::Init(
         absl::StrFormat("Got %d class(es) for output index %d, expected %d "
                         "according to the label map.",
                         output_tensor->dims->data[num_dimensions - 1],
-                        output_indices_.at(0), num_label_map_items),
+                        tensor_indices_.at(0), num_label_map_items),
         TfLiteSupportStatus::kMetadataInconsistencyError);
   }
   if (output_tensor->type != kTfLiteUInt8 &&
@@ -156,7 +154,7 @@ absl::Status ClassificationPostprocessor::Init(
     if (head_class_names.empty()) {
       std::string name = classification_head_.name;
       if (name.empty()) {
-        name = absl::StrFormat("#%d", output_indices_.at(0));
+        name = absl::StrFormat("#%d", tensor_indices_.at(0));
       }
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,

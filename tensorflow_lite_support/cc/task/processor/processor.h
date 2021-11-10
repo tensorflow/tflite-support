@@ -29,104 +29,161 @@ namespace tflite {
 namespace task {
 namespace processor {
 
+// Abstract base class for all Processors.
+// Shares the common logics to handle tflite_engine and metadata.
+class Processor {
+ public:
+  Processor() = default;
+  virtual ~Processor() = default;
+
+  // Processor is neither copyable nor movable.
+  Processor(const Processor&) = delete;
+  Processor& operator=(const Processor&) = delete;
+
+  template <typename T>
+  using EnableIfProcessorSubclass =
+      typename std::enable_if<std::is_base_of<Processor, T>::value>::type*;
+
+  // Factory method to create a subclass of Processor.
+  //
+  // Example usage:
+  // auto processor = Processor::Create<MyPreprocessor>(
+  //   num_expected_tensors, engine, tensor_indices);
+  template <typename T, EnableIfProcessorSubclass<T> = nullptr>
+  static tflite::support::StatusOr<std::unique_ptr<T>> Create(
+      int num_expected_tensors, tflite::task::core::TfLiteEngine* engine,
+      const std::initializer_list<int> tensor_indices,
+      bool requires_metadata = true) {
+    auto processor = absl::make_unique<T>(engine, tensor_indices);
+    RETURN_IF_ERROR(
+        processor->SanityCheck(num_expected_tensors, requires_metadata));
+    return processor;
+  }
+
+  // `tensor_indices` is the indices of the input tensors or output tensors
+  // that the processor should process. For example, a model may have 4 input
+  // tensors, and a preprocessor can process the first and third tensor,
+  // then `tensor_indices` should be {0, 2}.
+  explicit Processor(core::TfLiteEngine* engine,
+                     const std::initializer_list<int> tensor_indices)
+      : engine_(engine), tensor_indices_(tensor_indices) {}
+
+  // Checks if tensor counts and metadata of the model matches what required
+  // by the processor in general.
+  absl::Status SanityCheck(int num_expected_tensors,
+                           bool requires_metadata = true);
+
+ protected:
+  // Gets the associated tensor.
+  // `i` refers to the element index in `tensor_indices`. For example,
+  // assume `tensor_indices` is {3, 6, 8}, to access second tensor in
+  // `tensor_indices`, which is the 6th tensor of the model inputs or ourputs,
+  // `i` should be 1.
+  virtual TfLiteTensor* GetTensor(int i) const = 0;
+
+  // Gets the associated tensor metadata.
+  // `i` refers to the element index in `tensor_indices`. For example,
+  // assume `tensor_indices` is {3, 6, 8}, to access second tensor in
+  // `tensor_indices`, which is the 6th tensor of the model inputs or ourputs,
+  // `i` should be 1.
+  virtual const tflite::TensorMetadata* GetTensorMetadata(int i = 0) const = 0;
+
+  core::TfLiteEngine* engine_;
+  const std::vector<int> tensor_indices_;
+
+ private:
+  // Gets the number of input or ourput tensors of the TfLiteEngine that this
+  // processor holds.
+  virtual int GetModelTensorCount() const = 0;
+
+  // Either "input" or "output".
+  virtual const char* GetTensorTypeName() const = 0;
+};
+
 // Abstract base class for all Preprocessors.
 // Preprocessor is a helper class that converts input structured data (such as
-// image) to raw bytes and populates the associated tensors in the interpreter.
+// image) to raw bytes and populates the associated tensors in the
+// interpreter.
 //
-// As a convention, child class needs to implement a factory `Create` method to
-// initialize and bind tensors.
+// As a convention, child class needs to implement a factory `Create` method
+// to initialize and bind tensors.
 //
 // Example usage:
 // auto processor = MyPreprocessor::Create(
 //   /* input_tensors */ {0}, engine, option);
 // // Populate the associate tensors.
 // processor->Preprocess(...);
-class Preprocessor {
- public:
-  Preprocessor() = default;
-  virtual ~Preprocessor() = default;
-
-  // Preprocessor is neither copyable nor movable.
-  Preprocessor(const Preprocessor&) = delete;
-  Preprocessor& operator=(const Preprocessor&) = delete;
-
+class Preprocessor : public Processor {
  protected:
-  explicit Preprocessor(core::TfLiteEngine* engine,
-                        const std::initializer_list<int> input_indices)
-      : engine_(engine), input_indices_(input_indices) {}
-
-  core::TfLiteEngine* engine_;
-  const std::vector<int> input_indices_;
+  using Processor::Processor;
 
   // Get the associated input tensor.
-  // Note: Calling this method before `VerifyAndInit` method will cause a crash.
   // Note: Caller is responsible for passing in a valid `i`.
-  inline TfLiteTensor* Tensor(int i = 0) const {
-    return engine_->GetInput(engine_->interpreter(), input_indices_.at(i));
+  inline TfLiteTensor* GetTensor(int i = 0) const override {
+    return engine_->GetInput(engine_->interpreter(), tensor_indices_.at(i));
   }
 
   // Get the associated input metadata.
-  // Note: Calling this method before `VerifyAndInit` method will cause a crash.
   // Note: Caller is responsible for passing in a valid `i`.
-  inline const tflite::TensorMetadata* Metadata(int i = 0) const {
+  inline const tflite::TensorMetadata* GetTensorMetadata(
+      int i = 0) const override {
     return engine_->metadata_extractor()->GetInputTensorMetadata(
-        input_indices_.at(i));
+        tensor_indices_.at(i));
   }
 
-  static absl::Status SanityCheck(
-      int num_expected_tensors, core::TfLiteEngine* engine,
-      const std::initializer_list<int> input_indices,
-      bool requires_metadata = true);
+ private:
+  static constexpr char kInputTypeName[] = "input";
+
+  inline int GetModelTensorCount() const override {
+    return engine_->InputCount(engine_->interpreter());
+  }
+
+  inline const char* GetTensorTypeName() const override {
+    return kInputTypeName;
+  }
 };
 
 // Abstract base class for all Postprocessors.
 // Postprocessor is a helper class to convert tensor value to structured
 // data.
-// As a convention, child class needs to implement a factory `Create` method to
-// initialize and bind tensors.
+// As a convention, child class needs to implement a factory `Create` method
+// to initialize and bind tensors.
 //
 // Example usage:
 // auto processor = MyPostprocessor::Create(
 //   /* output_tensors */ {0}, engine, option);
 // // Populate the associate tensors.
 // auto value = processor->Postprocess();
-class Postprocessor {
- public:
-  Postprocessor() = default;
-  virtual ~Postprocessor() = default;
-
-  // Preprocessor is neither copyable nor movable.
-  Postprocessor(const Postprocessor&) = delete;
-  Postprocessor& operator=(const Postprocessor&) = delete;
-
+class Postprocessor : public Processor {
  protected:
-  explicit Postprocessor(core::TfLiteEngine* engine,
-                         const std::initializer_list<int> output_indices)
-      : engine_(engine), output_indices_(output_indices) {}
-
-  core::TfLiteEngine* engine_;
-  const std::vector<int> output_indices_;
+  using Processor::Processor;
 
   // Get the associated output tensor.
-  // Note: Calling this method before `VerifyAndInit` method will cause a crash.
   // Note: Caller is responsible for passing in a valid `i`.
-  inline TfLiteTensor* Tensor(int i = 0) const {
-    return engine_->GetOutput(engine_->interpreter(), output_indices_.at(i));
+  inline TfLiteTensor* GetTensor(int i = 0) const override {
+    return engine_->GetOutput(engine_->interpreter(), tensor_indices_.at(i));
   }
 
   // Get the associated output metadata.
-  // Note: Calling this method before `VerifyAndInit` method will cause a crash.
   // Note: Caller is responsible for passing in a valid `i`.
-  inline const tflite::TensorMetadata* Metadata(int i = 0) const {
+  inline const tflite::TensorMetadata* GetTensorMetadata(
+      int i = 0) const override {
     return engine_->metadata_extractor()->GetOutputTensorMetadata(
-        output_indices_.at(i));
+        tensor_indices_.at(i));
   }
 
-  static absl::Status SanityCheck(
-      int num_expected_tensors, core::TfLiteEngine* engine,
-      const std::initializer_list<int> output_indices,
-      bool requires_metadata = true);
+ private:
+  static constexpr char kOutputTypeName[] = "output";
+
+  inline int GetModelTensorCount() const override {
+    return engine_->OutputCount(engine_->interpreter());
+  }
+
+  inline const char* GetTensorTypeName() const override {
+    return kOutputTypeName;
+  }
 };
+
 }  // namespace processor
 }  // namespace task
 }  // namespace tflite

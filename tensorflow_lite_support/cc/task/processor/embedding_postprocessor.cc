@@ -24,12 +24,10 @@ tflite::support::StatusOr<std::unique_ptr<EmbeddingPostprocessor>>
 EmbeddingPostprocessor::Create(core::TfLiteEngine* engine,
                                const std::initializer_list<int> output_indices,
                                std::unique_ptr<EmbeddingOptions> options) {
-  RETURN_IF_ERROR(Postprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                             engine, output_indices,
-                                             /* requires_metadata = */ false));
-
-  auto processor =
-      absl::WrapUnique(new EmbeddingPostprocessor(engine, output_indices));
+  ASSIGN_OR_RETURN(auto processor,
+                   Processor::Create<EmbeddingPostprocessor>(
+                       /* num_expected_tensors = */ 1, engine, output_indices,
+                       /* requires_metadata = */ false));
 
   RETURN_IF_ERROR(processor->Init(std::move(options)));
   return processor;
@@ -39,8 +37,8 @@ absl::Status EmbeddingPostprocessor::Init(
     std::unique_ptr<EmbeddingOptions> options) {
   options_ = std::move(options);
 
-  int output_index = output_indices_.at(0);
-  auto* output_tensor = Tensor();
+  int output_index = tensor_indices_.at(0);
+  auto* output_tensor = GetTensor();
   int num_dimensions = output_tensor->dims->size;
   if (num_dimensions == 4) {
     if (output_tensor->dims->data[1] != 1 ||

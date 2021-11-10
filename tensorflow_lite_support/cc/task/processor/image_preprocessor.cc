@@ -38,12 +38,10 @@ tflite::support::StatusOr<std::unique_ptr<ImagePreprocessor>>
 ImagePreprocessor::Create(
     core::TfLiteEngine* engine, const std::initializer_list<int> input_indices,
     const vision::FrameBufferUtils::ProcessEngine& process_engine) {
-  RETURN_IF_ERROR(Preprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                            engine, input_indices,
-                                            /* requires_metadata = */ false));
-
-  auto processor =
-      absl::WrapUnique(new ImagePreprocessor(engine, input_indices));
+  ASSIGN_OR_RETURN(auto processor,
+                   Processor::Create<ImagePreprocessor>(
+                       /* num_expected_tensors = */ 1, engine, input_indices,
+                       /* requires_metadata = */ false));
 
   RETURN_IF_ERROR(processor->Init(process_engine));
   return processor;
@@ -85,7 +83,7 @@ absl::Status ImagePreprocessor::Init(
   }
 
   // Determine if the input shape is resizable.
-  const TfLiteIntArray* dims_signature = Tensor()->dims_signature;
+  const TfLiteIntArray* dims_signature = GetTensor()->dims_signature;
 
   // Some fixed-shape models do not have dims_signature.
   if (dims_signature != nullptr && dims_signature->size > 2) {
@@ -152,15 +150,15 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
   // If dynamic, it will re-dim the entire graph as per the input.
   if (is_height_mutable_ || is_width_mutable_) {
     engine_->interpreter()->ResizeInputTensorStrict(
-        0, {Tensor()->dims->data[0], input_specs_.image_height,
-            input_specs_.image_width, Tensor()->dims->data[3]});
+        0, {GetTensor()->dims->data[0], input_specs_.image_height,
+            input_specs_.image_width, GetTensor()->dims->data[3]});
 
     engine_->interpreter()->AllocateTensors();
   }
   // Then normalize pixel data (if needed) and populate the input tensor.
   switch (input_specs_.tensor_type) {
     case kTfLiteUInt8:
-      if (Tensor()->bytes != input_data_byte_size) {
+      if (GetTensor()->bytes != input_data_byte_size) {
         return tflite::support::CreateStatusWithPayload(
             absl::StatusCode::kInternal,
             "Size mismatch or unsupported padding bytes between pixel data "
@@ -168,10 +166,10 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
       }
       // No normalization required: directly populate data.
       RETURN_IF_ERROR(tflite::task::core::PopulateTensor(
-          input_data, input_data_byte_size / sizeof(uint8), Tensor()));
+          input_data, input_data_byte_size / sizeof(uint8), GetTensor()));
       break;
     case kTfLiteFloat32: {
-      if (Tensor()->bytes / sizeof(float) !=
+      if (GetTensor()->bytes / sizeof(float) !=
           input_data_byte_size / sizeof(uint8)) {
         return tflite::support::CreateStatusWithPayload(
             absl::StatusCode::kInternal,
@@ -181,7 +179,7 @@ absl::Status ImagePreprocessor::Preprocess(const FrameBuffer& frame_buffer,
       // Normalize and populate.
       ASSIGN_OR_RETURN(
           float* normalized_input_data,
-          tflite::task::core::AssertAndReturnTypedTensor<float>(Tensor()));
+          tflite::task::core::AssertAndReturnTypedTensor<float>(GetTensor()));
       const tflite::task::vision::NormalizationOptions& normalization_options =
           input_specs_.normalization_options.value();
       for (int i = 0; i < normalization_options.num_values; i++) {
