@@ -39,8 +39,8 @@ class ImagePostprocessor : public Postprocessor {
  public:
   static tflite::support::StatusOr<std::unique_ptr<ImagePostprocessor>>
   Create(core::TfLiteEngine* engine,
-         const std::initializer_list<int> output_indices,
-         std::unique_ptr<vision::NormalizationOptions> options);
+         const std::initializer_list<int> output_indices.
+         const std::initializer_list<int> input_indices);
 
   // Processes the provided vision::FrameBuffer and populate tensor values.
   //
@@ -66,73 +66,10 @@ class ImagePostprocessor : public Postprocessor {
   // is currently detected by checking if all output tensors data type is uint8.
   bool has_uint8_outputs_;
 
-  std::unique_ptr<vision::NormalizationOptions> options_;
-
   absl::Status Init(std::unique_ptr<vision::NormalizationOptions> options);
+
+  absl::StatusOr<vision::FrameBuffer> Postprocess();
 };
-
-absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
-  has_uint8_outputs_ = Tensor()->type == kTfLiteUInt8;
-  const int kRgbPixelBytes = 3;
-
-  vision::FrameBuffer::Dimension to_buffer_dimension = {Tensor()->dims->data[2],
-                                                Tensor()->dims->data[1]};
-  size_t output_byte_size =
-      GetBufferByteSize(to_buffer_dimension, vision::FrameBuffer::Format::kRGB);
-  std::vector<uint8> postprocessed_data(output_byte_size / sizeof(uint8), 0);
-
-  if (has_uint8_outputs_) {  // No normalization required.
-    if (Tensor()->bytes != output_byte_size) {
-      return tflite::support::CreateStatusWithPayload(
-          absl::StatusCode::kInternal,
-          "Size mismatch or unsupported padding bytes between pixel data "
-          "and output tensor.");
-    }
-    const uint8* output_data = core::AssertAndReturnTypedTensor<uint8>(Tensor());
-    postprocessed_data.insert(postprocessed_data.end(), &output_data[0],
-                              &output_data[output_byte_size / sizeof(uint8)]);
-  } else {  // Denormalize to [0, 255] range.
-    if (Tensor()->bytes / sizeof(float) != output_byte_size / sizeof(uint8)) {
-      return tflite::support::CreateStatusWithPayload(
-          absl::StatusCode::kInternal,
-          "Size mismatch or unsupported padding bytes between pixel data "
-          "and output tensor.");
-    }
-
-    uint8* denormalized_output_data = postprocessed_data.data();
-    const float* output_data = core::AssertAndReturnTypedTensor<float>(Tensor());
-    const auto norm_options = GetNormalizationOptions();
-
-    if (norm_options.num_values == 1) {
-      float mean_value = norm_options.mean_values[0];
-      float std_value = norm_options.std_values[0];
-
-      for (size_t i = 0; i < output_byte_size / sizeof(uint8);
-           ++i, ++denormalized_output_data, ++output_data) {
-        *denormalized_output_data = static_cast<uint8>(std::round(std::min(
-            255.f, std::max(0.f, (*output_data) * std_value + mean_value))));
-      }
-    } else {
-      for (size_t i = 0; i < output_byte_size / sizeof(uint8);
-           ++i, ++denormalized_output_data, ++output_data) {
-        *denormalized_output_data = static_cast<uint8>(std::round(std::min(
-            255.f, std::max(0.f, (*output_data) * norm_options.std_values[i % 3] +
-                                     norm_options.mean_values[i % 3]))));
-      }
-    }
-  }
-
-  vision::FrameBuffer::Plane postprocessed_plane = {
-      /*buffer=*/postprocessed_data.data(),
-      /*stride=*/{Tensor()->dims->data[2] * kRgbPixelBytes, kRgbPixelBytes}};
-  auto postprocessed_frame_buffer = vision::FrameBuffer::Create(
-      {postprocessed_plane}, to_buffer_dimension, vision::FrameBuffer::Format::kRGB,
-      vision::FrameBuffer::Orientation::kTopLeft);
-
-  vision::FrameBuffer postprocessed_result = *postprocessed_frame_buffer.get();
-  return postprocessed_result;
-}
-
 }  // namespace processor
 }  // namespace task
 }  // namespace tflite
