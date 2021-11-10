@@ -18,10 +18,10 @@
 
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 
-@import CoreVideo;
-@import Accelerate;
-@import CoreImage;
-@import CoreGraphics;
+#import <CoreVideo/CoreVideo.h>
+#import <CoreImage/CoreImage.h>
+#import <CoreGraphics/CoreGraphics.h>
+#import <Accelerate/Accelerate.h>
 
 @interface TFLCVPixelBufferUtils : NSObject
 + (uint8_t *_Nullable)convertBGRAtoRGBforPixelBufferBaseAddress:(CVPixelBufferRef)pixelBuffer
@@ -65,7 +65,7 @@
 
   if (convertError != kvImageNoError) {
     [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
-                            description:@"Image Format Conversion Failed."
+                            description:@"Image format conversion failed."
                                   error:error];
 
     return NULL;
@@ -88,7 +88,7 @@
   } else {
     [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
                             description:@"UIImage should be initialized from"
-                                         " CIImage or CGImage"
+                                         " CIImage or CGImage."
                                   error:error];
   }
 
@@ -117,7 +117,7 @@
 
   if (buffer_to_return == NULL) {
     [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
-                            description:@"Image Format Conversion Error"
+                            description:@"Image format conversion failed."
                                   error:error];
   }
 
@@ -230,7 +230,7 @@
 
     default:
       [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                              description:@"Invalid source type for GMLImage"
+                              description:@"Invalid source type for GMLImage."
                                     error:error];
       break;
   }
@@ -270,7 +270,7 @@
 
     default: {
       [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                              description:@"Unsupported Pixel Format for TfLiteFrameBufferFormat."
+                              description:@"Unsupported pixel format for TfLiteFrameBufferFormat."
                                     error:error];
       break;
     }

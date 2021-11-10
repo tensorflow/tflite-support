@@ -34,10 +34,12 @@
   if (self) {
     self.baseOptions = [[TFLBaseOptions alloc] init];
     self.baseOptions.modelFile = [[TFLExternalFile alloc] init];
+    self.baseOptions.modelFile.filePath = modelPath;
+
     self.baseOptions.computeSettings = [[TFLComputeSettings alloc] init];
     self.baseOptions.computeSettings.cpuSettings = [[TFLCpuSettings alloc] init];
-    self.baseOptions.modelFile.filePath = modelPath;
     self.baseOptions.computeSettings.cpuSettings.numThreads = -1;
+
     self.classificationOptions = [[TFLClassificationOptions alloc] init];
     self.classificationOptions.maxResults = -1;
   }
@@ -109,7 +111,7 @@
   else
     [TFLCommonUtils
         customErrorWithCode:TFLSupportErrorCodeInternalError
-                description:@"Some error occured during initialization of Image Classifier."
+                description:@"Some error occured during initialization of image classifier."
                       error:error];
 
   return imageClassifier;

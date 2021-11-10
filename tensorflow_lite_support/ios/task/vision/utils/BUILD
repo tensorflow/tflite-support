@@ -8,6 +8,9 @@ objc_library(
     hdrs = [
         "sources/GMLImageUtils.h",
     ],
+    srcs = [
+        "sources/GMLImageUtils.m",
+    ],
     module_name = "GMLImageUtils",
     deps = [
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
