@@ -24,3 +24,21 @@ objc_library(
     ],
     module_name = "TFLClassificationResult",
 )
+
+objc_library(
+    name = "TFLClassificationOptionsHelpers",
+    hdrs = [
+        "sources/TFLClassificationOptions+Helpers.h",
+    ],
+    srcs = [
+        "sources/TFLClassificationOptions+Helpers.m",
+    ],
+    deps = [
+        "//tensorflow_lite_support/c/task/processor:classification_options",
+        "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptions",
+        "//tensorflow_lite_support/ios:TFLCommon",
+        "//tensorflow_lite_support/ios:TFLCommonUtils",
+    ],
+    module_name = "TFLClassificationOptionsHelpers",
+)
+
