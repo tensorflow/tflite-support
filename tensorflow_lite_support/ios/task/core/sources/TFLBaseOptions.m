@@ -1,11 +1,11 @@
 /* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,11 +17,11 @@
 @implementation TFLCpuSettings
 @synthesize numThreads;
 
--(id)copyWithZone:(NSZone *)zone{
+- (id)copyWithZone:(NSZone *)zone {
   TFLCpuSettings *cpuSettings = [[TFLCpuSettings alloc] init];
-  
+
   [cpuSettings setNumThreads:self.numThreads];
-  
+
   return cpuSettings;
 }
 
@@ -30,11 +30,11 @@
 @implementation TFLComputeSettings
 @synthesize cpuSettings;
 
--(id)copyWithZone:(NSZone *)zone{
+- (id)copyWithZone:(NSZone *)zone {
   TFLComputeSettings *computeSettings = [[TFLComputeSettings alloc] init];
-  
+
   [computeSettings setCpuSettings:self.cpuSettings];
-  
+
   return computeSettings;
 }
 
@@ -43,11 +43,11 @@
 @implementation TFLExternalFile
 @synthesize filePath;
 
--(id)copyWithZone:(NSZone *)zone{
+- (id)copyWithZone:(NSZone *)zone {
   TFLExternalFile *externalFile = [[TFLExternalFile alloc] init];
-  
+
   [externalFile setFilePath:self.filePath];
-  
+
   return externalFile;
 }
 
@@ -57,12 +57,12 @@
 @synthesize modelFile;
 @synthesize computeSettings;
 
--(id)copyWithZone:(NSZone *)zone{
+- (id)copyWithZone:(NSZone *)zone {
   TFLBaseOptions *baseOptions = [[TFLBaseOptions alloc] init];
-  
+
   [baseOptions setModelFile:self.modelFile];
   [baseOptions setComputeSettings:self.computeSettings];
-  
+
   return baseOptions;
 }
 
