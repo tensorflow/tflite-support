@@ -19,6 +19,62 @@ namespace tflite {
 namespace task {
 namespace processor {
 
+namespace {
+
+using ::absl::StatusCode;
+using ::tflite::metadata::ModelMetadataExtractor;
+using ::tflite::support::CreateStatusWithPayload;
+using ::tflite::support::StatusOr;
+using ::tflite::support::TfLiteSupportStatus;
+
+StatusOr<absl::optional<vision::NormalizationOptions>>
+GetNormalizationOptionsIfAny(const TensorMetadata& tensor_metadata) {
+  ASSIGN_OR_RETURN(
+      const tflite::ProcessUnit* normalization_process_unit,
+      ModelMetadataExtractor::FindFirstProcessUnit(
+          tensor_metadata, tflite::ProcessUnitOptions_NormalizationOptions));
+  if (normalization_process_unit == nullptr) {
+    return {absl::nullopt};
+  }
+  const tflite::NormalizationOptions* tf_normalization_options =
+      normalization_process_unit->options_as_NormalizationOptions();
+  const auto mean_values = tf_normalization_options->mean();
+  const auto std_values = tf_normalization_options->std();
+  if (mean_values->size() != std_values->size()) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        absl::StrCat("NormalizationOptions: expected mean and std of same "
+                     "dimension, got ",
+                     mean_values->size(), " and ", std_values->size(), "."),
+        TfLiteSupportStatus::kMetadataInvalidProcessUnitsError);
+  }
+  absl::optional<vision::NormalizationOptions> normalization_options;
+  if (mean_values->size() == 1) {
+    normalization_options = vision::NormalizationOptions{
+        .mean_values = {mean_values->Get(0), mean_values->Get(0),
+                        mean_values->Get(0)},
+        .std_values = {std_values->Get(0), std_values->Get(0),
+                       std_values->Get(0)},
+        .num_values = 1};
+  } else if (mean_values->size() == 3) {
+    normalization_options = vision::NormalizationOptions{
+        .mean_values = {mean_values->Get(0), mean_values->Get(1),
+                        mean_values->Get(2)},
+        .std_values = {std_values->Get(0), std_values->Get(1),
+                       std_values->Get(2)},
+        .num_values = 3};
+  } else {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        absl::StrCat("NormalizationOptions: only 1 or 3 mean and std "
+                     "values are supported, got ",
+                     mean_values->size(), "."),
+        TfLiteSupportStatus::kMetadataInvalidProcessUnitsError);
+  }
+  return normalization_options;
+}
+}  // namespace
+
 /* static */
 tflite::support::StatusOr<std::unique_ptr<ImagePostprocessor>>
 ImagePostprocessor::Create(core::TfLiteEngine* engine,
@@ -104,10 +160,13 @@ absl::Status ImagePostprocessor::Init(const std::vector<int>& input_indices) {
           "the number of normalization parameters.",
           TfLiteSupportStatus::kInvalidArgumentError);
     }
+
+    options_ = std::make_unique<vision::NormalizationOptions>(
+        normalization_options.value());
   }
+
+  return absl::OkStatus();
 }
-return absl::OkStatus();
-}  // namespace processor
 
 absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
   has_uint8_outputs_ = Tensor()->type == kTfLiteUInt8;
@@ -174,8 +233,7 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
   vision::FrameBuffer postprocessed_result = *postprocessed_frame_buffer.get();
   return postprocessed_result;
 }
-}  // namespace task
 
-}  // namespace tflite
-}  // namespace tflite
+}  // namespace processor
+}  // namespace task
 }  // namespace tflite
