@@ -80,7 +80,7 @@ android_local_test(
         "@maven//:androidx_test_core",
         "@maven//:com_google_truth_truth",  # android
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -97,7 +97,7 @@ android_local_test(
         "@maven//:androidx_test_core",
         "@maven//:com_google_truth_truth",  # android
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -114,7 +114,7 @@ android_local_test(
         "@maven//:androidx_test_core",
         "@maven//:com_google_truth_truth",  # android
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -137,7 +137,7 @@ android_local_test(
         "@maven//:org_mockito_mockito_core",
         "@maven//:org_mockito_mockito_inline",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -155,7 +155,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -176,7 +176,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -193,7 +193,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -210,7 +210,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -227,7 +227,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -244,7 +244,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -261,7 +261,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlitelib_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -279,7 +279,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -312,7 +312,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -329,7 +329,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -363,7 +363,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -384,7 +384,7 @@ android_local_test(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_robolectric_robolectric",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
         "@robolectric//bazel:android-all",
     ],
 )
@@ -427,7 +427,7 @@ android_library(
     manifest = "AndroidManifest.xml",
     deps = [
         "//tensorflow_lite_support/java:tensorflowlite_support",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
     ],
 )
 
@@ -461,7 +461,7 @@ android_library_instrumentation_tests(
         "@maven//:junit_junit",  # android
         "@maven//:org_mockito_mockito_core",
         "@maven//:org_mockito_mockito_inline",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
         "@org_tensorflow//tensorflow/lite/java:tensorflowlite_gpu",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
     ],
 )

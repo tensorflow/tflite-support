@@ -34,7 +34,7 @@ android_library(
     ],
     deps = [
         ":tensorflowlite_support_java",
-        "@org_tensorflow//tensorflow/lite/java:tensorflowlite",
+        "@org_tensorflow//tensorflow/lite/java:tensorflowlite_stable",
     ],
 )
 
