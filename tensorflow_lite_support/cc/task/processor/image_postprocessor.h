@@ -27,8 +27,8 @@ namespace tflite {
 namespace task {
 namespace processor {
 
-// Process input image and populate the associate input tensor.
-// Requirement for the input tensor:
+// Process the associated output image tensor and convert it to a FrameBuffer.
+// Requirement for the output tensor:
 //   (kTfLiteUInt8/kTfLiteFloat32)
 //    - image input of size `[batch x height x width x channels]`.
 //    - batch inference is not supported (`batch` is required to be 1).
@@ -62,7 +62,13 @@ class ImagePostprocessor : public Postprocessor {
   // is currently detected by checking if all output tensors data type is uint8.
   bool has_uint8_outputs_;
 
+  std::unique_ptr<vision::NormalizationOptions> options_;
+
   absl::Status Init(const std::vector<int>& input_indices);
+
+  const vision::NormalizationOptions& GetNormalizationOptions() {
+    return *options_.get();
+  }
 };
 }  // namespace processor
 }  // namespace task
