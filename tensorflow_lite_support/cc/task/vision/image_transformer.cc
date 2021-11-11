@@ -101,7 +101,7 @@ absl::Status ImageTransformer::CheckAndSetOutputs() {
         StatusCode::kInvalidArgument,
         absl::StrFormat("Image segmentation models are expected to have only 1 "
                         "output, found %d",
-                        TfLiteEngine::OutputCount(interpreter)),
+                        TfLiteEngine::OutputCount(GetTfLiteEngine()->interpreter())),
         TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
   return absl::OkStatus();
