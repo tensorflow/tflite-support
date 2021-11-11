@@ -34,7 +34,8 @@ namespace processor {
 //    - batch inference is not supported (`batch` is required to be 1).
 //    - only RGB inputs are supported (`channels` is required to be 3).
 //    - if type is kTfLiteFloat32, NormalizationOptions are required to be
-//      attached to the metadata for input normalization.
+//      attached to the metadata for output de-normalization. Uses input metadata
+//      as fallback in case output metadata isn't provided.
 class ImagePostprocessor : public Postprocessor {
  public:
   static tflite::support::StatusOr<std::unique_ptr<ImagePostprocessor>>
@@ -42,17 +43,9 @@ class ImagePostprocessor : public Postprocessor {
          const std::initializer_list<int> output_indices,
          const std::initializer_list<int> input_indices);
 
-  // Processes the provided vision::FrameBuffer and populate tensor values.
-  //
-  // The vision::FrameBuffer can be of any size and any of the supported formats, i.e.
-  // RGBA, RGB, NV12, NV21, YV12, YV21. It is automatically Post-processed before
-  // inference in order to (and in this order):
-  // - resize it (with bilinear interpolation, aspect-ratio *not* Postserved) to
-  //   the dimensions of the model input tensor,
-  // - convert it to the colorspace of the input tensor (i.e. RGB, which is the
-  //   only supported colorspace for now),
-  // - rotate it according to its `Orientation` so that inference is performed
-  //   on an "upright" image.
+  // Processes the output tensor to an RGB of FrameBuffer type.
+  // If output tensor is of type kTfLiteFloat32, denormalize it into [0 - 255]
+  // via normalization parameters.
   absl::StatusOr<vision::FrameBuffer> Postprocess();
 
  private:
