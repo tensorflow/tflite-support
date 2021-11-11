@@ -180,7 +180,7 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
     }
     const uint8* output_data =
         core::AssertAndReturnTypedTensor<uint8>(Tensor());
-    postprocessed_data.insert(postprocessed_data.end(), &output_data[0],
+    postprocessed_data.insert(postprocessed_data.begin(), &output_data[0],
                               &output_data[output_byte_size / sizeof(uint8)]);
   } else {  // Denormalize to [0, 255] range.
     if (Tensor()->bytes / sizeof(float) != output_byte_size / sizeof(uint8)) {
