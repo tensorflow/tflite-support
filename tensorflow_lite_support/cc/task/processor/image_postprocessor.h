@@ -39,7 +39,7 @@ class ImagePostprocessor : public Postprocessor {
  public:
   static tflite::support::StatusOr<std::unique_ptr<ImagePostprocessor>>
   Create(core::TfLiteEngine* engine,
-         const std::initializer_list<int> output_indices.
+         const std::initializer_list<int> output_indices,
          const std::initializer_list<int> input_indices);
 
   // Processes the provided vision::FrameBuffer and populate tensor values.
@@ -55,10 +55,6 @@ class ImagePostprocessor : public Postprocessor {
   //   on an "upright" image.
   absl::StatusOr<vision::FrameBuffer> Postprocess();
 
-  const vision::NormalizationOptions& GetNormalizationOptions() {
-    return *options_.get();
-  };
-
  private:
   using Postprocessor::Postprocessor;
 
@@ -66,9 +62,7 @@ class ImagePostprocessor : public Postprocessor {
   // is currently detected by checking if all output tensors data type is uint8.
   bool has_uint8_outputs_;
 
-  absl::Status Init(std::unique_ptr<vision::NormalizationOptions> options);
-
-  absl::StatusOr<vision::FrameBuffer> Postprocess();
+  absl::Status Init(const std::vector<int>& input_indices);
 };
 }  // namespace processor
 }  // namespace task
