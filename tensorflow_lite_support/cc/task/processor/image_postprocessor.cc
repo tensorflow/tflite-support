@@ -99,6 +99,7 @@ absl::Status ImagePostprocessor::Init(const std::vector<int>& input_indices) {
             core::TfLiteEngine::OutputCount(engine_->interpreter())),
         tflite::support::TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
+
   if (Tensor()->type != kTfLiteUInt8 && Tensor()->type != kTfLiteFloat32) {
     return tflite::support::CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
@@ -109,34 +110,16 @@ absl::Status ImagePostprocessor::Init(const std::vector<int>& input_indices) {
         tflite::support::TfLiteSupportStatus::kInvalidOutputTensorTypeError);
   }
 
-  // Check output tensor dimensions.
-  if (Tensor()->dims->size != 4) {
-    return tflite::support::CreateStatusWithPayload(
+  if (Tensor()->dims->data[0] != 1 || Tensor()->dims->data[3] != 3) {
+    return CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
-            "Output tensor is expected to have 4 dimensions, found %d.",
-            Tensor()->dims->size),
+        absl::StrCat("The input tensor should have dimensions 1 x height x "
+                     "width x 3. Got ",
+                     Tensor()->dims->data[0], " x ", Tensor()->dims->data[1],
+                     " x ", Tensor()->dims->data[2], " x ",
+                     Tensor()->dims->data[3], "."),
         tflite::support::TfLiteSupportStatus::
-            kInvalidOutputTensorDimensionsError);
-  }
-
-  if (Tensor()->dims->data[0] != 1) {
-    return tflite::support::CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Expected batch size of 1, found %d.",
-                        Tensor()->dims->data[0]),
-        tflite::support::TfLiteSupportStatus::
-            kInvalidOutputTensorDimensionsError);
-  }
-
-  // RGB check.
-  if (Tensor()->dims->data[3] != 3) {
-    return tflite::support::CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Expected depth size of 3, found %d.",
-                        Tensor()->dims->data[3]),
-        tflite::support::TfLiteSupportStatus::
-            kInvalidOutputTensorDimensionsError);
+            kInvalidInputTensorDimensionsError);
   }
 
   // Gather metadata
@@ -153,6 +136,7 @@ absl::Status ImagePostprocessor::Init(const std::vector<int>& input_indices) {
   absl::optional<vision::NormalizationOptions> normalization_options;
   ASSIGN_OR_RETURN(normalization_options,
                    GetNormalizationOptionsIfAny(*processing_metadata));
+
   if (Tensor()->type == kTfLiteFloat32) {
     if (!normalization_options.has_value()) {
       return CreateStatusWithPayload(
