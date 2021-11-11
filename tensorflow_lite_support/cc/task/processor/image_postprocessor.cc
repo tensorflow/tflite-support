@@ -90,6 +90,15 @@ ImagePostprocessor::Create(core::TfLiteEngine* engine,
 }
 
 absl::Status ImagePostprocessor::Init(const std::vector<int>& input_indices) {
+  if (core::TfLiteEngine::OutputCount(engine_->interpreter()) != 1) {
+    return tflite::support::CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        absl::StrFormat(
+            "Image segmentation models are expected to have only 1 "
+            "output, found %d",
+            core::TfLiteEngine::OutputCount(engine_->interpreter())),
+        tflite::support::TfLiteSupportStatus::kInvalidNumOutputTensorsError);
+  }
   if (Tensor()->type != kTfLiteUInt8 && Tensor()->type != kTfLiteFloat32) {
     return tflite::support::CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,

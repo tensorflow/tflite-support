@@ -95,15 +95,7 @@ absl::Status ImageTransformer::PostInit() {
 }
 
 absl::Status ImageTransformer::CheckAndSetOutputs() {
-  // Check the number of output tensors.
-  if (TfLiteEngine::OutputCount(GetTfLiteEngine()->interpreter()) != 1) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrFormat("Image segmentation models are expected to have only 1 "
-                        "output, found %d",
-                        TfLiteEngine::OutputCount(GetTfLiteEngine()->interpreter())),
-        TfLiteSupportStatus::kInvalidNumOutputTensorsError);
-  }
+  // Nothing to do.
   return absl::OkStatus();
 }
 
