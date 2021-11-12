@@ -35,7 +35,7 @@ class TFLImageClassifierTests: XCTestCase {
 
       let imageClassifier = try TFLImageClassifier.imageClassifier(modelPath: modelPath)
       
-      let image = UIImage(named: "burger_crop" )
+      let image = UIImage(named: "burger_crop.jpg" )
       let imageForInference = try XCTUnwrap(image)
       let gmlImage =  try XCTUnwrap(MLImage(image: imageForInference))
       
@@ -61,7 +61,7 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
     
-    let image = UIImage(named: "burger_crop" )
+    let image = UIImage(named: "burger_crop.jpg" )
     let imageForInference = try XCTUnwrap(image)
     let gmlImage =  try XCTUnwrap(MLImage(image: imageForInference))
     
@@ -87,7 +87,7 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
     
-    let image = UIImage(named: "burger_crop" )
+    let image = UIImage(named: "burger_crop.jpg" )
     let imageForInference = try XCTUnwrap(image)
     let gmlImage =  try XCTUnwrap(MLImage(image: imageForInference))
     
@@ -102,25 +102,25 @@ class TFLImageClassifierTests: XCTestCase {
     
   }
   
-  func testInferenceWithRGBAImage() throws {
+  // func testInferenceWithRGBAImage() throws {
     
-    let modelPath = try XCTUnwrap(TFLImageClassifierTests.modelPath)
+  //   let modelPath = try XCTUnwrap(TFLImageClassifierTests.modelPath)
   
-    let imageClassifier =
-      try TFLImageClassifier.imageClassifier(modelPath: modelPath)
+  //   let imageClassifier =
+  //     try TFLImageClassifier.imageClassifier(modelPath: modelPath)
     
-    let image = UIImage(named: "sparrow" )
-    let imageForInference = try XCTUnwrap(image)
-    let gmlImage =  try XCTUnwrap(MLImage(image: imageForInference))
+  //   let image = UIImage(named: "sparrow" )
+  //   let imageForInference = try XCTUnwrap(image)
+  //   let gmlImage =  try XCTUnwrap(MLImage(image: imageForInference))
     
-    let classificationResults =
-      try imageClassifier.classify(gmlImage: gmlImage)
+  //   let classificationResults =
+  //     try imageClassifier.classify(gmlImage: gmlImage)
     
-    XCTAssertNotNil(classificationResults)
-    XCTAssert(classificationResults.classifications.count == 1
-                && classificationResults.classifications[0].categories.count > 0
-                && classificationResults.classifications[0].categories[0].label == "brambling")
+  //   XCTAssertNotNil(classificationResults)
+  //   XCTAssert(classificationResults.classifications.count == 1
+  //               && classificationResults.classifications[0].categories.count > 0
+  //               && classificationResults.classifications[0].categories[0].label == "brambling")
     
-  }
+  // }
 
 }

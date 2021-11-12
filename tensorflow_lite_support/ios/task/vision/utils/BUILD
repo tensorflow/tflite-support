@@ -12,6 +12,7 @@ objc_library(
         "sources/GMLImageUtils.m",
     ],
     module_name = "GMLImageUtils",
+    sdk_frameworks = ["Accelerate"],
     deps = [
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/odml/ios/image:MLImage",

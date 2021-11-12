@@ -23,7 +23,8 @@
 
 - (void)setUp {
     // Put setup code here. This method is called before the invocation of each test method in the class.
-  self.modelPath = [[NSBundle mainBundle] pathForResource:@"mobilenet_v2_1.0_224" ofType:@"tflite"];
+      // static let bundle = Bundle(for: TFLSentencepieceTokenizerTest.self)
+  self.modelPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"mobilenet_v2_1.0_224" ofType:@"tflite"];
   XCTAssertNotNil(self.modelPath);
 }
 
@@ -37,7 +38,9 @@
   [TFLImageClassifier imageClassifierWithModelPath:self.modelPath error:nil];
   XCTAssertNotNil(imageClassifier);
   
-  UIImage *image = [UIImage imageNamed:@"burger_crop"];
+  NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
+                                                                         ofType:@"jpg"];
+  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
   XCTAssertNotNil(image);
 
   GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
@@ -61,7 +64,9 @@
   [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
   
-  UIImage *image = [UIImage imageNamed:@"burger_crop"];
+  NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
+                                                                         ofType:@"jpg"];
+  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
   XCTAssertNotNil(image);
   
   GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
@@ -86,7 +91,9 @@
                                              error:nil];
   XCTAssertNotNil(imageClassifier);
   
-  UIImage *image = [UIImage imageNamed:@"burger_crop"];
+  NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
+                                                                         ofType:@"jpg"];
+  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
   XCTAssertNotNil(image);
   
   GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
@@ -101,24 +108,6 @@
   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
 }
 
-- (void)testInferenceWithRGBAImage {
-  TFLImageClassifier *imageClassifier =
-  [TFLImageClassifier imageClassifierWithModelPath:self.modelPath
-                                             error:nil];
-  XCTAssertNotNil(imageClassifier);
-  
-  UIImage *image = [UIImage imageNamed:@"sparrow"];
-  XCTAssertNotNil(image);
-  
-  GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
-  XCTAssertNotNil(gmlImage);
-  
-  TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage error:nil];
-  XCTAssertTrue([classificationResults.classifications count] > 0);
-  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0 );
-  
-  TFLCategory *category = classificationResults.classifications[0].categories[0];
-  XCTAssertTrue([category.label isEqual:@"brambling"]);
-}
+//  
 
 @end
