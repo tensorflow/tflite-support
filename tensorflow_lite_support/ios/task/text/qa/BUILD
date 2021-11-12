@@ -31,7 +31,6 @@ swift_library(
     tags = TFL_DEFAULT_TAGS,
     deps = [
         ":TFLBertQuestionAnswerer",
-        "//third_party/swift/xctest",
     ],
 )
 

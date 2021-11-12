@@ -50,7 +50,6 @@ swift_library(
     tags = TFL_DEFAULT_TAGS,
     deps = [
         ":TFLBertTokenizer",
-        "//third_party/swift/xctest",
     ],
 )
 
@@ -91,7 +90,6 @@ swift_library(
     tags = TFL_DEFAULT_TAGS,
     deps = [
         ":TFLSentencepieceTokenizer",
-        "//third_party/swift/xctest",
     ],
 )
 

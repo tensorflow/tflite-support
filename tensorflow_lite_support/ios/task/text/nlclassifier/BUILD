@@ -30,7 +30,6 @@ swift_library(
     tags = TFL_DEFAULT_TAGS,
     deps = [
         ":TFLBertNLClassifier",
-        "//third_party/swift/xctest",
     ],
 )
 
@@ -89,7 +88,6 @@ swift_library(
     tags = TFL_DEFAULT_TAGS,
     deps = [
         ":TFLNLClassifier",
-        "//third_party/swift/xctest",
     ],
 )
 
