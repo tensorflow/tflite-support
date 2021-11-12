@@ -14,6 +14,7 @@ swift_library(
     srcs = ["TFLImageClassifierTests.swift"],
     data = [
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images"
     ],
     tags = TFL_DEFAULT_TAGS,
     deps = [
