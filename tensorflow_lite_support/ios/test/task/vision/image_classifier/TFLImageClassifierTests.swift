@@ -17,9 +17,10 @@ import XCTest
 
 class TFLImageClassifierTests: XCTestCase {
   
-  static let modelPath = Bundle.main.path(
-    forResource: "mobilenet_v2_1.0_224",
-    ofType: "tflite")
+  static let bundle = Bundle(for: TFLImageClassifierTests.self)
+  static let modelPath = bundle.path(
+    forResource: "test_model_nl_classifier_with_regex_tokenizer",
+    ofType: "tflite")!
   
     override func setUpWithError() throws {
       // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -35,7 +36,10 @@ class TFLImageClassifierTests: XCTestCase {
 
       let imageClassifier = try TFLImageClassifier.imageClassifier(modelPath: modelPath)
       
-      let image = UIImage(named: "burger_crop.jpg" )
+      let imageName = bundle.path(
+    forResource: "burger_crop",
+    ofType: "jpg")!
+      let image = UIImage(contentsOfFile: imageName)
       let imageForInference = try XCTUnwrap(image)
       let gmlImage =  try XCTUnwrap(MLImage(image: imageForInference))
       
@@ -86,7 +90,7 @@ class TFLImageClassifierTests: XCTestCase {
     
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
-    
+    bundle.path
     let image = UIImage(named: "burger_crop.jpg" )
     let imageForInference = try XCTUnwrap(image)
     let gmlImage =  try XCTUnwrap(MLImage(image: imageForInference))

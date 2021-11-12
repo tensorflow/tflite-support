@@ -15,6 +15,8 @@
 #import <XCTest/XCTest.h>
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageClassifier.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface TFLImageClassifierTests : XCTestCase
 @property(nonatomic, nullable) NSString *modelPath;
 @end
@@ -22,22 +24,23 @@
 @implementation TFLImageClassifierTests
 
 - (void)setUp {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
-      // static let bundle = Bundle(for: TFLSentencepieceTokenizerTest.self)
-  self.modelPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"mobilenet_v2_1.0_224" ofType:@"tflite"];
+  // Put setup code here. This method is called before the invocation of each test method in the
+  // class. static let bundle = Bundle(for: TFLSentencepieceTokenizerTest.self)
+  self.modelPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"mobilenet_v2_1.0_224"
+                                                                    ofType:@"tflite"];
   XCTAssertNotNil(self.modelPath);
 }
 
 - (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+  // Put teardown code here. This method is called after the invocation of each test method in the
+  // class.
 }
 
 - (void)testSuccessfullImageInferenceOnMLImageWithUIImage {
-    
   TFLImageClassifier *imageClassifier =
-  [TFLImageClassifier imageClassifierWithModelPath:self.modelPath error:nil];
+      [TFLImageClassifier imageClassifierWithModelPath:self.modelPath error:nil];
   XCTAssertNotNil(imageClassifier);
-  
+
   NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
                                                                          ofType:@"jpg"];
   UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
@@ -46,68 +49,93 @@
   GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
   XCTAssertNotNil(gmlImage);
 
-  TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage error:nil];
+  TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
+                                                                                   error:nil];
   XCTAssertTrue([classificationResults.classifications count] > 0);
-  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0 );
-  
+  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0);
+
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
 }
 
 - (void)testModelOptionsWithMaxResults {
   TFLImageClassifierOptions *imageClassifierOptions =
-    [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
+      [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
   int maxResults = 3;
   imageClassifierOptions.classificationOptions.maxResults = maxResults;
-  
+
   TFLImageClassifier *imageClassifier =
-  [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
+      [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
-  
+
   NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
                                                                          ofType:@"jpg"];
   UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
   XCTAssertNotNil(image);
-  
+
   GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
   XCTAssertNotNil(gmlImage);
-  
-  TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage error:nil];
+
+  TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
+                                                                                   error:nil];
   XCTAssertTrue([classificationResults.classifications count] > 0);
-  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0 );
-  
+  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0);
+
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
 }
 
 - (void)testInferenceWithBoundingBox {
   TFLImageClassifierOptions *imageClassifierOptions =
-  [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
+      [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
   int maxResults = 3;
   imageClassifierOptions.classificationOptions.maxResults = maxResults;
-  
+
   TFLImageClassifier *imageClassifier =
-  [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions
-                                             error:nil];
+      [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
-  
+
   NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
                                                                          ofType:@"jpg"];
   UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
   XCTAssertNotNil(image);
-  
+
   GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
   XCTAssertNotNil(gmlImage);
-  
+
   CGRect roi = CGRectMake(20, 20, 200, 200);
-  TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage regionOfInterest:roi error:nil];
+  TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
+                                                                        regionOfInterest:roi
+                                                                                   error:nil];
   XCTAssertTrue([classificationResults.classifications count] > 0);
-  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0 );
-  
+  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0);
+
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
 }
 
-//  
+- (void)testInferenceWithRGBAImage {
+  TFLImageClassifier *imageClassifier =
+      [TFLImageClassifier imageClassifierWithModelPath:self.modelPath error:nil];
+  XCTAssertNotNil(imageClassifier);
+
+  NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"sparrow"
+                                                                         ofType:@"png"];
+  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
+  XCTAssertNotNil(image);
+
+  GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
+  XCTAssertNotNil(gmlImage);
+
+  TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
+                                                                                   error:nil];
+  XCTAssertTrue([classificationResults.classifications count] > 0);
+  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0);
+
+  TFLCategory *category = classificationResults.classifications[0].categories[0];
+  XCTAssertTrue([category.label isEqual:@"junco"]);
+}
 
 @end
+
+NS_ASSUME_NONNULL_END
