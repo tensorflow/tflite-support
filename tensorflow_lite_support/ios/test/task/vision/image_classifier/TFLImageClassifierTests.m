@@ -23,6 +23,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation TFLImageClassifierTests
 
+- (GMLImage *)imageFromBundleWithName:(NSString *)name ofType:(NSString *)type {
+  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
+                                                                         ofType:@"jpg"];
+  XCTAssertNotNil(imagePath);
+  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+  XCTAssertNotNil(image);
+
+  GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
+  XCTAssertNotNil(gmlImage);
+
+  return gmlImage;
+}
 - (void)setUp {
   // Put setup code here. This method is called before the invocation of each test method in the
   // class. static let bundle = Bundle(for: TFLSentencepieceTokenizerTest.self)
@@ -39,18 +51,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testSuccessfullImageInferenceOnMLImageWithUIImage {
   TFLImageClassifierOptions *imageClassifierOptions =
       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
-  
+
   TFLImageClassifier *imageClassifier =
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
-
-  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
-                                                                         ofType:@"jpg"];
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-  XCTAssertNotNil(image);
-
-  GMLImage *gmlImage = [[GMLImage alloc] initWithIma,sge:image];
-  XCTAssertNotNil(gmlImage);
+  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger_crop" ofType:@"jpg"];
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                    error:nil];
@@ -71,13 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
-                                                                         ofType:@"jpg"];
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-  XCTAssertNotNil(image);
-
-  GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
-  XCTAssertNotNil(gmlImage);
+  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger_crop" ofType:@"jpg"];
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                    error:nil];
@@ -98,13 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
-                                                                         ofType:@"jpg"];
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-  XCTAssertNotNil(image);
-
-  GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
-  XCTAssertNotNil(gmlImage);
+  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger_crop" ofType:@"jpg"];
 
   CGRect roi = CGRectMake(20, 20, 200, 200);
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
@@ -120,17 +113,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testInferenceWithRGBAImage {
   TFLImageClassifierOptions *imageClassifierOptions =
       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
-  
+
   TFLImageClassifier *imageClassifier =
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"sparrow"
-                                                                         ofType:@"png"];
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-  XCTAssertNotNil(image);
-
-  GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
+  GMLImage *gmlImage = [self imageFromBundleWithName:@"sparrow" ofType:@"png"];
   XCTAssertNotNil(gmlImage);
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
