@@ -19,7 +19,6 @@ swift_library(
     tags = TFL_DEFAULT_TAGS,
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
-        "//third_party/swift/xctest",
     ],
 )
 
