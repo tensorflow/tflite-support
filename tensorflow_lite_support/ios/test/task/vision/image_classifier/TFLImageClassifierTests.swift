@@ -121,7 +121,7 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
     
-    let imagePath = try XCTUnwrap(TFLImageClassifierTests.bundle.path(forResource: "burger_crop", ofType: "jpg"))
+    let imagePath = try XCTUnwrap(TFLImageClassifierTests.bundle.path(forResource: "sparrow", ofType: "png"))
     let image = UIImage(contentsOfFile: imagePath)
     let imageForInference = try XCTUnwrap(image)
     let gmlImage =  try XCTUnwrap(MLImage(image: imageForInference))
