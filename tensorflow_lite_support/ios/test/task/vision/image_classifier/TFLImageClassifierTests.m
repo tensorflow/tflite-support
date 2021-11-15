@@ -44,12 +44,12 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
+  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
                                                                          ofType:@"jpg"];
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
+  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
   XCTAssertNotNil(image);
 
-  GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
+  GMLImage *gmlImage = [[GMLImage alloc] initWithIma,sge:image];
   XCTAssertNotNil(gmlImage);
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
@@ -71,9 +71,9 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
+  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
                                                                          ofType:@"jpg"];
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
+  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
   XCTAssertNotNil(image);
 
   GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
@@ -98,9 +98,9 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
+  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
                                                                          ofType:@"jpg"];
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
+  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
   XCTAssertNotNil(image);
 
   GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
@@ -125,9 +125,9 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"sparrow"
+  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"sparrow"
                                                                          ofType:@"png"];
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imageName];
+  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
   XCTAssertNotNil(image);
 
   GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
