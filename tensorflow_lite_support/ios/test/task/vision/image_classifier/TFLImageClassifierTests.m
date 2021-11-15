@@ -24,8 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation TFLImageClassifierTests
 
 - (GMLImage *)imageFromBundleWithName:(NSString *)name ofType:(NSString *)type {
-  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
-                                                                         ofType:@"jpg"];
+  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:name
+                                                                         ofType:type];
   XCTAssertNotNil(imagePath);
   UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
   XCTAssertNotNil(image);
