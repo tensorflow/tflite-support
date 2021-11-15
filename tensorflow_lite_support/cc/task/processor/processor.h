@@ -94,6 +94,9 @@ class Processor {
     return engine_->metadata_extractor();
   }
 
+  // Gets the tesnor indices in string format.
+  std::string GetTensorIndexString();
+
   core::TfLiteEngine* engine_;
   const std::vector<int> tensor_indices_;
 

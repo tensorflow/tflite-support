@@ -14,6 +14,9 @@ limitations under the License.
 ==============================================================================*/
 #include "tensorflow_lite_support/cc/task/processor/processor.h"
 
+#include <iterator>
+#include <sstream>
+
 namespace tflite {
 namespace task {
 namespace processor {
@@ -53,6 +56,13 @@ absl::Status Processor::SanityCheck(int num_expected_tensors,
   }
 
   return absl::OkStatus();
+}
+
+std::string Processor::GetTensorIndexString() {
+  std::stringstream stream;
+  std::copy(tensor_indices_.begin(), tensor_indices_.end(),
+            std::ostream_iterator<int>(stream, " "));
+  return stream.str();
 }
 
 }  // namespace processor

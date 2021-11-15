@@ -115,9 +115,11 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/core:task_utils",
         "//tensorflow_lite_support/cc/text/tokenizers:regex_tokenizer",
         "//tensorflow_lite_support/cc/text/tokenizers:tokenizer",
+        "//tensorflow_lite_support/cc/text/tokenizers:tokenizer_utils",
         "//tensorflow_lite_support/cc/utils:common_utils",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
     ],
 )
