@@ -22,6 +22,7 @@ limitations under the License.
 #include "absl/strings/str_format.h"  // from @com_google_absl
 #include "tensorflow/lite/core/shims/c/common.h"
 #include "tensorflow_lite_support/cc/common.h"
+#include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 
@@ -88,6 +89,11 @@ class Processor {
   // `i` should be 1.
   virtual const tflite::TensorMetadata* GetTensorMetadata(int i = 0) const = 0;
 
+  inline const tflite::metadata::ModelMetadataExtractor* GetMetadataExtractor()
+      const {
+    return engine_->metadata_extractor();
+  }
+
   core::TfLiteEngine* engine_;
   const std::vector<int> tensor_indices_;
 
@@ -127,7 +133,7 @@ class Preprocessor : public Processor {
   // Note: Caller is responsible for passing in a valid `i`.
   inline const tflite::TensorMetadata* GetTensorMetadata(
       int i = 0) const override {
-    return engine_->metadata_extractor()->GetInputTensorMetadata(
+    return GetMetadataExtractor()->GetInputTensorMetadata(
         tensor_indices_.at(i));
   }
 
@@ -168,7 +174,7 @@ class Postprocessor : public Processor {
   // Note: Caller is responsible for passing in a valid `i`.
   inline const tflite::TensorMetadata* GetTensorMetadata(
       int i = 0) const override {
-    return engine_->metadata_extractor()->GetOutputTensorMetadata(
+    return GetMetadataExtractor()->GetOutputTensorMetadata(
         tensor_indices_.at(i));
   }
 
