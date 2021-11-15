@@ -35,15 +35,7 @@
   self = [super init];
   if (self) {
     self.baseOptions = [[TFLBaseOptions alloc] init];
-    self.baseOptions.modelFile = [[TFLExternalFile alloc] init];
-
-    self.baseOptions.computeSettings = [[TFLComputeSettings alloc] init];
-    self.baseOptions.computeSettings.cpuSettings = [[TFLCpuSettings alloc] init];
-    self.baseOptions.computeSettings.cpuSettings.numThreads = -1;
-
     self.classificationOptions = [[TFLClassificationOptions alloc] init];
-    self.classificationOptions.maxResults = -1;
-    self.classificationOptions.scoreThreshold = 0;
   }
   return self;
 }

@@ -21,6 +21,15 @@
 @synthesize labelDenyList;
 @synthesize displayNamesLocal;
 
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    self.maxResults = -1;
+    self.scoreThreshold = 0;
+  }
+  return self;
+}
+
 - (id)copyWithZone:(NSZone *)zone {
   TFLClassificationOptions *classificationOptions = [[TFLClassificationOptions alloc] init];
 

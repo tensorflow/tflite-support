@@ -17,6 +17,14 @@
 @implementation TFLCpuSettings
 @synthesize numThreads;
 
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    self.numThreads = -1;
+  }
+  return self;
+}
+
 - (id)copyWithZone:(NSZone *)zone {
   TFLCpuSettings *cpuSettings = [[TFLCpuSettings alloc] init];
 
@@ -29,6 +37,14 @@
 
 @implementation TFLComputeSettings
 @synthesize cpuSettings;
+
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    self.cpuSettings = [[TFLCpuSettings alloc] init];
+  }
+  return self;
+}
 
 - (id)copyWithZone:(NSZone *)zone {
   TFLComputeSettings *computeSettings = [[TFLComputeSettings alloc] init];
@@ -56,6 +72,15 @@
 @implementation TFLBaseOptions
 @synthesize modelFile;
 @synthesize computeSettings;
+
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    self.computeSettings = [[TFLComputeSettings alloc] init];
+    self.modelFile = [[TFLExternalFile alloc] init];
+  }
+  return self;
+}
 
 - (id)copyWithZone:(NSZone *)zone {
   TFLBaseOptions *baseOptions = [[TFLBaseOptions alloc] init];
