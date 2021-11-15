@@ -37,8 +37,11 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)testSuccessfullImageInferenceOnMLImageWithUIImage {
+  TFLImageClassifierOptions *imageClassifierOptions =
+      [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
+  
   TFLImageClassifier *imageClassifier =
-      [TFLImageClassifier imageClassifierWithModelPath:self.modelPath error:nil];
+      [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
   NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"burger_crop"
@@ -115,8 +118,11 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)testInferenceWithRGBAImage {
+  TFLImageClassifierOptions *imageClassifierOptions =
+      [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
+  
   TFLImageClassifier *imageClassifier =
-      [TFLImageClassifier imageClassifierWithModelPath:self.modelPath error:nil];
+      [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
   NSString *imageName = [[NSBundle bundleForClass:[self class]] pathForResource:@"sparrow"

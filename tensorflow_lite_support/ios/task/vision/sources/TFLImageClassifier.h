@@ -60,17 +60,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLImageClassifier : NSObject
 
 /**
- * Creates TFLImageClassifier from a model file located at the specified
- * modelPath.
- *
- * @param modelPath Path to the classification model.
- * @return A TFLImageClassifier instance.
- */
-+ (nullable instancetype)imageClassifierWithModelPath:(nonnull NSString *)modelPath
-                                                error:(NSError **)error
-    NS_SWIFT_NAME(imageClassifier(modelPath:));
-
-/**
  * Creates TFLImageClassifier from a model file and specified options .
  *
  * @param options TFLImageClassifierOptions instance with the necessary

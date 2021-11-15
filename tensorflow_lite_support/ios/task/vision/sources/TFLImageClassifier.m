@@ -42,7 +42,7 @@
     self.baseOptions.computeSettings.cpuSettings.numThreads = -1;
 
     self.classificationOptions = [[TFLClassificationOptions alloc] init];
-    self.classificationOptions.maxResults = 5;
+    self.classificationOptions.maxResults = -1;
     self.classificationOptions.scoreThreshold = 0;
   }
   return self;
@@ -95,23 +95,6 @@
   }
 
   return [[TFLImageClassifier alloc] initWithImageClassifier:imageClassifier];
-}
-
-+ (nullable instancetype)imageClassifierWithModelPath:(nonnull NSString *)modelPath
-                                                error:(NSError **)error {
-  TFLImageClassifierOptions *options = [[TFLImageClassifierOptions alloc] init];
-
-  TFLImageClassifier *imageClassifier = nil;
-  if (options) {
-    options.baseOptions.modelFile.filePath = modelPath;
-    imageClassifier = [TFLImageClassifier imageClassifierWithOptions:options error:error];
-  } else
-    [TFLCommonUtils
-        customErrorWithCode:TFLSupportErrorCodeInternalError
-                description:@"Some error occured during initialization of image classifier."
-                      error:error];
-
-  return imageClassifier;
 }
 
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
