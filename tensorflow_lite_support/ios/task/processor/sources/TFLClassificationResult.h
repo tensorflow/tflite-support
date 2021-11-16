@@ -47,41 +47,12 @@ NS_ASSUME_NONNULL_BEGIN
  * probability). */
 @property(nonatomic, copy) NSArray<TFLCategory *> *categories;
 
-/**
- * Initializes an instance of TFLClassifications for an image classifier head with given index and
- * list of predicted categories.
- *
- * @param categories list of predicted categories for classification head that should be
- * represeented by the initialized TFLClassification.
- * @param headIndex index of the image classifier head this instance of TFLClassifications should
- * represent.
- * @return An instance of TFLClassifications.
- */
-- (instancetype)initWithCategories:(NSArray<TFLCategory *> *)categories headIndex:(int)headIndex;
-
-- (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)new NS_UNAVAILABLE;
-
 @end
 
 /** Encapsulates results of any classification task. */
 @interface TFLClassificationResult : NSObject
 
 @property(nonatomic, copy) NSArray<TFLClassifications *> *classifications;
-
-/**
- * Initializes an instance of TFLClassifications for an image classifier head with given index and
- * list of predicted categories.
- *
- * @param classifications list containing results of image classifier heads.
- * @return An instance of TFLClassifications.
- */
-- (instancetype)initWithClassifications:(NSArray<TFLClassifications *> *)classifications;
-
-- (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

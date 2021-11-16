@@ -49,13 +49,14 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
 
-    let gmlImage = try gmlImage(withName:"burger_crop", ofType:"jpg");
+    let gmlImage = try gmlImage(withName:"burger-224", ofType:"png");
     let classificationResults: TFLClassificationResult = try imageClassifier.classify(gmlImage:gmlImage)
       
     XCTAssertNotNil(classificationResults)
     XCTAssert(classificationResults.classifications.count == 1
                 && classificationResults.classifications[0].categories.count > 0
-                && classificationResults.classifications[0].categories[0].label == "cheeseburger")
+                && classificationResults.classifications[0].categories[0].label == "cheeseburger"
+                && classificationResults.classifications[0].categories[0].score >= 0.70)
 
     }
   
@@ -72,14 +73,15 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
     
-    let gmlImage = try gmlImage(withName:"burger_crop", ofType:"jpg");
+    let gmlImage = try gmlImage(withName:"burger-224", ofType:"png");
     
     let classificationResults: TFLClassificationResult = try imageClassifier.classify(gmlImage:gmlImage)
     
     XCTAssertNotNil(classificationResults)
     XCTAssert(classificationResults.classifications.count == 1
-                && classificationResults.classifications[0].categories.count > 0
-                && classificationResults.classifications[0].categories[0].label == "cheeseburger")
+                && classificationResults.classifications[0].categories.count <= maxResults
+                && classificationResults.classifications[0].categories[0].label == "cheeseburger"
+                && classificationResults.classifications[0].categories[0].score >= 0.70)
     
   }
   
@@ -89,14 +91,11 @@ class TFLImageClassifierTests: XCTestCase {
     
     let imageClassifierOptions = TFLImageClassifierOptions(modelPath: modelPath)
     XCTAssertNotNil(imageClassifierOptions)
-
-    let maxResults = 3
-    imageClassifierOptions!.classificationOptions.maxResults = maxResults
     
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
     
-    let gmlImage = try gmlImage(withName:"burger_crop", ofType:"jpg");
+    let gmlImage = try gmlImage(withName:"burger-224", ofType:"png");
     
     let roi = CGRect(x: 20, y: 20, width: 200, height: 200)
     let classificationResults =
@@ -105,7 +104,8 @@ class TFLImageClassifierTests: XCTestCase {
     XCTAssertNotNil(classificationResults)
     XCTAssert(classificationResults.classifications.count == 1
                 && classificationResults.classifications[0].categories.count > 0
-                && classificationResults.classifications[0].categories[0].label == "cheeseburger")
+                && classificationResults.classifications[0].categories[0].label == "cheeseburger"
+                && classificationResults.classifications[0].categories[0].score >= 0.90)
     
   }
   
@@ -127,7 +127,8 @@ class TFLImageClassifierTests: XCTestCase {
     XCTAssertNotNil(classificationResults)
     XCTAssert(classificationResults.classifications.count == 1
                 && classificationResults.classifications[0].categories.count > 0
-                && classificationResults.classifications[0].categories[0].label == "junco")
+                && classificationResults.classifications[0].categories[0].label == "junco"
+                && classificationResults.classifications[0].categories[0].score >= 0.25)
     
   }
 

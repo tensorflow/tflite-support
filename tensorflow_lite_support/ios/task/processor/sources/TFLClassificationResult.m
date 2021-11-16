@@ -25,33 +25,9 @@ limitations under the License.
 @synthesize headIndex;
 @synthesize categories;
 
-- (instancetype)initWithCategories:(NSArray<TFLCategory *> *)categories headIndex:(int)headIndex {
-  if (!categories) {
-    return nil;
-  }
-  self = [super init];
-  if (self) {
-    self.categories = categories;
-    self.headIndex = headIndex;
-  }
-  return self;
-}
 @end
 
 @implementation TFLClassificationResult
 @synthesize classifications;
-
-- (instancetype)initWithClassifications:(NSArray<TFLClassifications *> *)classifications {
-  if (!classifications) {
-    return nil;
-  }
-  self = [super init];
-
-  if (self) {
-    self.classifications = classifications;
-  }
-
-  return self;
-}
 
 @end

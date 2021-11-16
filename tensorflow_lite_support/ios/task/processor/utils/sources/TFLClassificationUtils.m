@@ -42,12 +42,15 @@
       resultCategory.classIndex = (NSInteger)cCategory.index;
       [classes addObject:resultCategory];
     }
-
-    [classificationHeads addObject:[[TFLClassifications alloc] initWithCategories:classes
-                                                                        headIndex:i]];
+    TFLClassifications *classificationHead = [[TFLClassifications alloc] init];
+    classificationHead.categories = classes;
+    classificationHead.headIndex = i;
+    [classificationHeads addObject:classificationHead];
   }
 
-  return [[TFLClassificationResult alloc] initWithClassifications:classificationHeads];
+  TFLClassificationResult *classificationResult = [[TFLClassificationResult alloc] init];
+  classificationResult.classifications = classificationHeads; 
+  return classificationResult;
 }
 
 @end
