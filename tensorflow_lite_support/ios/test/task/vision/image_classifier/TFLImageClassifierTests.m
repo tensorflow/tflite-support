@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
   TFLImageClassifier *imageClassifier =
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
-  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger_crop" ofType:@"jpg"];
+  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger-224" ofType:@"png"];
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                    error:nil];
@@ -64,6 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
+  XCTAssertGreaterThanOrEqual(category.score, 0.70);
 }
 
 - (void)testModelOptionsWithMaxResults {
@@ -76,15 +77,16 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger_crop" ofType:@"jpg"];
+  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger-224" ofType:@"png"];
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                    error:nil];
   XCTAssertTrue([classificationResults.classifications count] > 0);
-  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0);
+  XCTAssertLessThanOrEqual([classificationResults.classifications[0].categories count], maxResults);
 
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
+  XCTAssertGreaterThanOrEqual(category.score, 0.70);
 }
 
 - (void)testInferenceWithBoundingBox {
@@ -97,7 +99,7 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger_crop" ofType:@"jpg"];
+  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger-224" ofType:@"png"];
 
   CGRect roi = CGRectMake(20, 20, 200, 200);
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
@@ -108,6 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
+  XCTAssertGreaterThanOrEqual(category.score, 0.90);
 }
 
 - (void)testInferenceWithRGBAImage {
@@ -128,6 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"junco"]);
+  XCTAssertGreaterThanOrEqual(category.score, 0.25);
 }
 
 @end
