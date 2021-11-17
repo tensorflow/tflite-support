@@ -214,8 +214,7 @@ absl::Status TextPreprocessor::BertPreprocess(const std::string& input_text) {
 
 absl::Status TextPreprocessor::RegexPreprocess(const std::string& input_text) {
   TfLiteTensor* input_tensor = GetTensor();
-  auto regex_tokenizer = std::unique_ptr<RegexTokenizer>(
-      dynamic_cast<RegexTokenizer*>(tokenizer_.release()));
+  auto regex_tokenizer = dynamic_cast<RegexTokenizer*>(tokenizer_.get());
 
   //                              |<-------sentence_length-------->|
   // input_tensor                 <START>, t1, t2... <PAD>, <PAD>...
