@@ -79,11 +79,8 @@ GetNormalizationOptionsIfAny(const TensorMetadata& tensor_metadata) {
 tflite::support::StatusOr<std::unique_ptr<ImagePostprocessor>>
 ImagePostprocessor::Create(core::TfLiteEngine* engine,
                            const std::initializer_list<int> output_indices,
-                           const std::initializer_list<int> input_indices) {
-  RETURN_IF_ERROR(Postprocessor::SanityCheck(/* num_expected_tensors = */ 1,
-                                             engine, output_indices));
-  auto processor =
-      absl::WrapUnique(new ImagePostprocessor(engine, output_indices));
+                           const std::initializer_list<int> input_indices) { 
+  ASSIGN_OR_RETURN(auto processor, Processor::Create<ImagePostprocessor>(/* num_expected_tensors = */ 1, engine, output_indices, /* requires_metadata = */ false));
 
   RETURN_IF_ERROR(processor->Init(input_indices));
   return processor;
@@ -100,24 +97,24 @@ absl::Status ImagePostprocessor::Init(const std::vector<int>& input_indices) {
         tflite::support::TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
 
-  if (Tensor()->type != kTfLiteUInt8 && Tensor()->type != kTfLiteFloat32) {
+  if (GetTensor()->type != kTfLiteUInt8 && GetTensor()->type != kTfLiteFloat32) {
     return tflite::support::CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
         absl::StrFormat("Type mismatch for output tensor %s. Requested one "
                         "of these types: "
                         "kTfLiteUint8/kTfLiteFloat32, got %s.",
-                        Tensor()->name, TfLiteTypeGetName(Tensor()->type)),
+                        GetTensor()->name, TfLiteTypeGetName(GetTensor()->type)),
         tflite::support::TfLiteSupportStatus::kInvalidOutputTensorTypeError);
   }
 
-  if (Tensor()->dims->data[0] != 1 || Tensor()->dims->data[3] != 3) {
+  if (GetTensor()->dims->data[0] != 1 || GetTensor()->dims->data[3] != 3) {
     return CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
         absl::StrCat("The input tensor should have dimensions 1 x height x "
                      "width x 3. Got ",
-                     Tensor()->dims->data[0], " x ", Tensor()->dims->data[1],
-                     " x ", Tensor()->dims->data[2], " x ",
-                     Tensor()->dims->data[3], "."),
+                     GetTensor()->dims->data[0], " x ", GetTensor()->dims->data[1],
+                     " x ", GetTensor()->dims->data[2], " x ",
+                     GetTensor()->dims->data[3], "."),
         tflite::support::TfLiteSupportStatus::
             kInvalidInputTensorDimensionsError);
   }
@@ -125,7 +122,7 @@ absl::Status ImagePostprocessor::Init(const std::vector<int>& input_indices) {
   // Gather metadata
   auto* output_metadata =
       engine_->metadata_extractor()->GetOutputTensorMetadata(
-          output_indices_.at(0));
+          tensor_indices_.at(0));
   auto* input_metadata = engine_->metadata_extractor()->GetInputTensorMetadata(
       input_indices.at(0));
 
@@ -137,14 +134,14 @@ absl::Status ImagePostprocessor::Init(const std::vector<int>& input_indices) {
   ASSIGN_OR_RETURN(normalization_options,
                    GetNormalizationOptionsIfAny(*processing_metadata));
 
-  if (Tensor()->type == kTfLiteFloat32) {
+  if (GetTensor()->type == kTfLiteFloat32) {
     if (!normalization_options.has_value()) {
       return CreateStatusWithPayload(
           absl::StatusCode::kNotFound,
           "Output tensor has type kTfLiteFloat32: it requires specifying "
           "NormalizationOptions metadata to preprocess output images.",
           TfLiteSupportStatus::kMetadataMissingNormalizationOptionsError);
-    } else if (Tensor()->bytes / sizeof(float) %
+    } else if (GetTensor()->bytes / sizeof(float) %
                    normalization_options.value().num_values !=
                0) {
       return CreateStatusWithPayload(
@@ -162,28 +159,28 @@ absl::Status ImagePostprocessor::Init(const std::vector<int>& input_indices) {
 }
 
 absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
-  has_uint8_outputs_ = Tensor()->type == kTfLiteUInt8;
+  has_uint8_outputs_ = GetTensor()->type == kTfLiteUInt8;
   const int kRgbPixelBytes = 3;
 
   vision::FrameBuffer::Dimension to_buffer_dimension = {
-      Tensor()->dims->data[2], Tensor()->dims->data[1]};
+      GetTensor()->dims->data[2], GetTensor()->dims->data[1]};
   size_t output_byte_size =
       GetBufferByteSize(to_buffer_dimension, vision::FrameBuffer::Format::kRGB);
   std::vector<uint8> postprocessed_data(output_byte_size / sizeof(uint8), 0);
 
   if (has_uint8_outputs_) {  // No normalization required.
-    if (Tensor()->bytes != output_byte_size) {
+    if (GetTensor()->bytes != output_byte_size) {
       return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kInternal,
           "Size mismatch or unsupported padding bytes between pixel data "
           "and output tensor.");
     }
     const uint8* output_data =
-        core::AssertAndReturnTypedTensor<uint8>(Tensor());
+        core::AssertAndReturnTypedTensor<uint8>(GetTensor()).value();
     postprocessed_data.insert(postprocessed_data.begin(), &output_data[0],
                               &output_data[output_byte_size / sizeof(uint8)]);
   } else {  // Denormalize to [0, 255] range.
-    if (Tensor()->bytes / sizeof(float) != output_byte_size / sizeof(uint8)) {
+    if (GetTensor()->bytes / sizeof(float) != output_byte_size / sizeof(uint8)) {
       return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kInternal,
           "Size mismatch or unsupported padding bytes between pixel data "
@@ -192,7 +189,7 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
 
     uint8* denormalized_output_data = postprocessed_data.data();
     const float* output_data =
-        core::AssertAndReturnTypedTensor<float>(Tensor());
+        core::AssertAndReturnTypedTensor<float>(GetTensor()).value();
     const auto norm_options = GetNormalizationOptions();
 
     if (norm_options.num_values == 1) {
@@ -217,7 +214,7 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
 
   vision::FrameBuffer::Plane postprocessed_plane = {
       /*buffer=*/postprocessed_data.data(),
-      /*stride=*/{Tensor()->dims->data[2] * kRgbPixelBytes, kRgbPixelBytes}};
+      /*stride=*/{GetTensor()->dims->data[2] * kRgbPixelBytes, kRgbPixelBytes}};
   auto postprocessed_frame_buffer =
       vision::FrameBuffer::Create({postprocessed_plane}, to_buffer_dimension,
                                   vision::FrameBuffer::Format::kRGB,
