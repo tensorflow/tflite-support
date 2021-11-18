@@ -4,11 +4,19 @@ package(
 )
 
 cc_library(
+    name = "category",
+    hdrs = ["category.h"],
+)
+
+cc_library(
     name = "classification_result",
     srcs = [
         "classification_result.cc",
     ],
     hdrs = ["classification_result.h"],
+    deps = [
+        ":category"
+    ]
 )
 
 cc_library(
@@ -20,3 +28,16 @@ cc_library(
     name = "classification_options",
     hdrs = ["classification_options.h"],
 )
+
+cc_library(
+    name = "detection_result",
+    srcs = [
+        "detection_result.cc",
+    ],
+    hdrs = ["detection_result.h"],
+    deps = [
+        ":category",
+        ":bounding_box"
+    ]
+)
+
