@@ -168,7 +168,7 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
       GetBufferByteSize(to_buffer_dimension, vision::FrameBuffer::Format::kRGB);
   std::vector<uint8> postprocessed_data(output_byte_size / sizeof(uint8), 0);
 
-  if (has_uint8_outputs_) {  // No normalization required.
+  if (has_uint8_outputs_) {  // No denormalization required.
     if (GetTensor()->bytes != output_byte_size) {
       return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kInternal,
