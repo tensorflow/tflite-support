@@ -93,6 +93,9 @@ objc_library(
 
 objc_library(
     name = "TFLCommonUtils",
+    srcs = [
+        "sources/TFLCommonUtils.m",
+    ],
     hdrs = [
         "sources/TFLCommonUtils.h",
     ],
@@ -102,5 +105,6 @@ objc_library(
     ],
     deps = [
         "//tensorflow_lite_support/c:common",
+        "//tensorflow_lite_support/ios:TFLCommon",
     ],
 )

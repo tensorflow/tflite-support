@@ -15,29 +15,29 @@
 #import <Foundation/Foundation.h>
 
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
-#import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
+#import "third_party/tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Helper utility for performing operations on GMLImage specific to the 
+/** Helper utility for performing operations on GMLImage specific to the
  * TF Lite Task Vision library
  */
 @interface GMLImageUtils : NSObject
 /**
- * Creates and returns a TfLiteFrameBuffer from a GMLImage. TfLiteFrameBuffer 
- * is used by the TFLite Task Vision C library to hold the backing buffer of 
- * any image. Image inputs to the TFLite Task Vision C library is of type 
+ * Creates and returns a TfLiteFrameBuffer from a GMLImage. TfLiteFrameBuffer
+ * is used by the TFLite Task Vision C library to hold the backing buffer of
+ * any image. Image inputs to the TFLite Task Vision C library is of type
  * TfLiteFrameBuffer.
  *
- * @param gmlImage Image of type GMLImage which is to be converted into a 
+ * @param gmlImage Image of type GMLImage which is to be converted into a
  * TfLiteFrameBuffer.
- * @param error Pointer to the memory location where errors if any should be 
+ * @param error Pointer to the memory location where errors if any should be
  * saved. If `nil`, no error will be saved.
  *
- * @return The TfLiteFrameBuffer created from the gmlImage which can be used 
+ * @return The TfLiteFrameBuffer created from the gmlImage which can be used
  * with the TF Lite Task Vision C library.
  */
-+ (TfLiteFrameBuffer *_Nullable)cFrameBufferFromGMLImage:(GMLImage *)gmlImage
++ (nullable TfLiteFrameBuffer *)cFrameBufferFromGMLImage:(GMLImage *)gmlImage
                                                    error:(NSError *_Nullable *)error;
 
 - (instancetype)init NS_UNAVAILABLE;

@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Holds cpu settings.
  */
 NS_SWIFT_NAME(CpuSettings)
-@interface TFLCpuSettings : NSObject
+@interface TFLCpuSettings : NSObject <NSCopying>
 
 /** Specifies the number of threads to be used for TFLite ops that support multi-threadingwhen
  * running inference with CPU.
@@ -32,7 +32,7 @@ NS_SWIFT_NAME(CpuSettings)
  * Holds settings for one possible acceleration configuration.
  */
 NS_SWIFT_NAME(ComputeSettings)
-@interface TFLComputeSettings : NSObject
+@interface TFLComputeSettings : NSObject <NSCopying>
 
 /** Holds cpu settings. */
 @property(nonatomic, copy) TFLCpuSettings *cpuSettings;
@@ -43,7 +43,7 @@ NS_SWIFT_NAME(ComputeSettings)
  * Holds settings for one possible acceleration configuration.
  */
 NS_SWIFT_NAME(ExternalFile)
-@interface TFLExternalFile : NSObject
+@interface TFLExternalFile : NSObject <NSCopying>
 
 /** Path to the file in bundle. */
 @property(nonatomic, copy) NSString *filePath;
@@ -56,7 +56,7 @@ NS_SWIFT_NAME(ExternalFile)
  * important information acceleration configuration, tflite model source etc.
  */
 NS_SWIFT_NAME(BaseOptions)
-@interface TFLBaseOptions : NSObject
+@interface TFLBaseOptions : NSObject <NSCopying>
 
 /**
  * The external model file, as a single standalone TFLite file. It could be packed with TFLite Model

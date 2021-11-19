@@ -133,11 +133,11 @@ TEST_F(ImageClassifierFromOptionsTest,
   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
 
-  const char* label_denylist[] = {"brambling"};
+  char* label_denylist[9] = {(char*)"brambling"};
   options.classification_options.label_denylist.list = label_denylist;
   options.classification_options.label_denylist.length = 1;
 
-  const char* label_allowlist[] = {"cheeseburger"};
+  char* label_allowlist[12] = {(char*)"cheeseburger"};
   options.classification_options.label_allowlist.list = label_allowlist;
   options.classification_options.label_allowlist.length = 1;
 
@@ -329,7 +329,7 @@ TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBoundsAndError) {
 
 TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
      SucceedsWithClassNameDenyList) {
-  const char* denylisted_label_name = "cheeseburger";
+  char* denylisted_label_name = (char*)"cheeseburger";
   std::string model_path =
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata);
@@ -337,7 +337,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
 
-  const char* label_denylist[] = {denylisted_label_name};
+  char* label_denylist[12] = {denylisted_label_name};
   options.classification_options.label_denylist.list = label_denylist;
   options.classification_options.label_denylist.length = 1;
 
@@ -373,7 +373,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
 
 TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
      SucceedsWithClassNameAllowList) {
-  const char* allowlisted_label_name = "cheeseburger";
+  char* allowlisted_label_name = (char*)"cheeseburger";
   std::string model_path =
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata)
@@ -382,7 +382,7 @@ TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
 
-  const char* label_allowlist[] = {allowlisted_label_name};
+  char* label_allowlist[12] = {allowlisted_label_name};
   options.classification_options.label_allowlist.list = label_allowlist;
   options.classification_options.label_allowlist.length = 1;
 

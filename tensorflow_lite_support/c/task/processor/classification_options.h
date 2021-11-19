@@ -30,7 +30,7 @@ typedef struct TfLiteStringArrayOption {
   int length;
 
   // Array of C strings.
-  const char** list;
+  char** list;
 } TfLiteStringArrayOption;
 
 // Holds settings for any single classification task.
@@ -47,7 +47,7 @@ typedef struct TfLiteClassificationOptions {
 
   // The locale to use for display names specified through the TFLite Model
   // Metadata, if any. Defaults to English.
-  const char* display_names_local;
+  char* display_names_local;
 
   // The maximum number of top-scored classification results to return. If < 0,
   // all available results will be returned. If 0, an invalid argument error is
