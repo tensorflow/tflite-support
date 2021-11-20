@@ -15,31 +15,13 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_RESULT_H_
 #define TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_CLASSIFICATION_RESULT_H_
 
+#include "tensorflow_lite_support/c/task/processor/category.h"
+
 // Defines C structure for Classification Results and associated helper methods.
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
-
-// A single predicted class.
-typedef struct TfLiteCategory {
-  // The index of the class in the corresponding label map, usually packed in
-  // the TFLite Model Metadata [1].
-  //
-  // [1]: https://www.tensorflow.org/lite/convert/metadata
-  int index;
-
-  // The score for this class e.g. (but not necessarily) a probability in [0,1].
-  float score;
-
-  // A human readable name of the class filled from the label map.
-  char* display_name;
-  // An ID for the class, not necessarily human-readable (e.g. a Google
-  // Knowledge Graph ID [1]), filled from the label map.
-  //
-  // [1]: https://developers.google.com/knowledge-graph
-  char* label;
-} TfLiteCategory;
 
 // List of predicted classes (aka labels) for a given image classifier head.
 typedef struct TfLiteClassifications {
