@@ -34,6 +34,9 @@ cc_library_with_tflite(
 
 cc_library_with_tflite(
     name = "object_detector",
+    srcs = [
+        "object_detector.cc",
+    ],
     hdrs = [
         "object_detector.h",
     ],
@@ -41,10 +44,14 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/vision:object_detector",
     ],
     deps = [
-        "//tensorflow_lite_support/c:common",
+        "//tensorflow_lite_support/c:common_utils",
         "//tensorflow_lite_support/c/task/core:base_options",
+        "//tensorflow_lite_support/c/task/processor:bounding_box",
         "//tensorflow_lite_support/c/task/processor:classification_options",
         "//tensorflow_lite_support/c/task/processor:detection_result",
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
+        "//tensorflow_lite_support/c/task/vision/utils:frame_buffer_cpp_c_utils",
+        "//tensorflow_lite_support/cc/task/vision/proto:detections_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/proto:object_detector_options_proto_inc",
     ],
 )

@@ -15,6 +15,7 @@ cc_library(
     ],
     hdrs = ["classification_result.h"],
     deps = [
+
         ":category",
     ],
 )
