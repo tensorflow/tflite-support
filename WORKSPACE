@@ -475,3 +475,23 @@ maven_install(
     fetch_sources = True,
     version_conflict_policy = "pinned",
 )
+
+http_archive(
+    name = "tf_toolchains",
+    sha256 = "d72b2e52baf0592f5b94347b128ef75422fc22f63dfcf2d5fd46bc732cab052b",
+    strip_prefix = "toolchains-1.3.0",
+    urls = [
+        "http://mirror.tensorflow.org/github.com/tensorflow/toolchains/archive/v1.3.0.tar.gz",
+        "https://github.com/tensorflow/toolchains/archive/v1.3.0.tar.gz",
+    ],
+)
+
+load("@tf_toolchains//toolchains/embedded/arm-linux:arm_linux_toolchain_configure.bzl", "arm_linux_toolchain_configure")
+
+# TFLite crossbuild toolchain for embeddeds Linux
+arm_linux_toolchain_configure(
+    name = "local_config_embedded_arm",
+    build_file = "@tf_toolchains//toolchains/embedded/arm-linux:BUILD",
+    aarch64_repo = "../aarch64_linux_toolchain",
+    armhf_repo = "../armhf_linux_toolchain",
+)
