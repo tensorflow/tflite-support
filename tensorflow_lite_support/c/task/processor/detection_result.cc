@@ -26,10 +26,7 @@ void TfLiteDetectionResultDelete(TfLiteDetectionResult* detection_result) {
   for (int i = 0; i < detection_result->size; ++i) {
     TfLiteDetection detections = detection_result->detections[i];
     for (int j = 0; j < detections.size; ++j) {
-      // `strdup` obtains memory using `malloc` and the memory needs to be
-      // released using `free`.
-      free(detections.categories[j].display_name);
-      free(detections.categories[j].label);
+      TfLiteCategoryDelete(&(detections.categories[j]));
     }
 
     delete[] detections.categories;
