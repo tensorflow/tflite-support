@@ -19,9 +19,12 @@ limitations under the License.
 
 #include "tensorflow_lite_support/c/common_utils.h"
 #include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
+#include "tensorflow_lite_support/c/task/core/utils/base_options_utils.h"
+#include "tensorflow_lite_support/c/task/processor/utils/classification_options_utils.h"
 #include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
+
 
 namespace {
 using ::tflite::support::StatusOr;
@@ -100,10 +103,9 @@ struct TfLiteImageClassifier {
 
 TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate() {
   // Use brace-enclosed initializer list will break the Kokoro test.
-  TfLiteImageClassifierOptions options = {{{0}}};
-  options.classification_options.max_results = -1;
-  options.classification_options.score_threshold = 0.0;
-  options.base_options.compute_settings.cpu_settings.num_threads = -1;
+  TfLiteImageClassifierOptions options;
+  options.classification_options = tflite::task::GetDefaultClassificationOptions();
+  options.base_options = tflite::task::GetDefaultBaseOptions();
   return options;
 }
 
