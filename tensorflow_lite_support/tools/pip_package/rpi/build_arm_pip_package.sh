@@ -17,6 +17,6 @@
 set -ex
 
 bazel build -c opt --config=elinux_armhf tensorflow_lite_support/tools/pip_package:build_pip_package
-TENSORFLOW_TARGET=armhf ./bazel-bin/tensorflow_lite_support/tools/pip_package/build_pip_package --dst wheels --nightly_flag
+EXTRA_PKG_NAME_FLAG="--plat-name=manylinux2014-armv7l" ./bazel-bin/tensorflow_lite_support/tools/pip_package/build_pip_package --dst wheels --nightly_flag
 bazel build -c opt --config=elinux_aarch64 tensorflow_lite_support/tools/pip_package:build_pip_package
-TENSORFLOW_TARGET=aarch64 ./bazel-bin/tensorflow_lite_support/tools/pip_package/build_pip_package --dst wheels --nightly_flag
+EXTRA_PKG_NAME_FLAG="--plat-name=manylinux2014-aarch64" ./bazel-bin/tensorflow_lite_support/tools/pip_package/build_pip_package --dst wheels --nightly_flag

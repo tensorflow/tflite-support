@@ -211,15 +211,10 @@ function main() {
     PKG_NAME_FLAG="--project_name tflite_support_nightly"
   fi
 
-  # Set package name flags for ARM builds.
-  case "${TENSORFLOW_TARGET}" in
-    armhf)
-      PKG_NAME_FLAG="${PKG_NAME_FLAG} --plat-name=linux-armv7l"
-      ;;
-    aarch64)
-      PKG_NAME_FLAG="${PKG_NAME_FLAG} --plat-name=linux-aarch64"
-      ;;
-  esac
+  # Set additional package name flags (for ARM builds).
+  if [[ -n ${EXTRA_PKG_NAME_FLAG} ]]; then
+      PKG_NAME_FLAG="${PKG_NAME_FLAG} ${EXTRA_PKG_NAME_FLAG}"
+  fi
 
   if [[ ${NIGHTLY_BUILD} == "1" ]]; then
     # we use a script to update versions to avoid any tool differences on different platforms.
