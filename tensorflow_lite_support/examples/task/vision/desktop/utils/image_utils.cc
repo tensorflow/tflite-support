@@ -87,6 +87,54 @@ absl::Status EncodeImageToPngFile(const ImageData& image_data,
   return absl::OkStatus();
 }
 
+absl::Status EncodeImageToPngFile(const FrameBuffer& image_buffer,
+                                  const std::string& image_path) {
+
+  const int channels = [&image_buffer]()
+  {
+    int channels = -1;
+    switch(image_buffer.format()) {
+      case FrameBuffer::Format::kGRAY:
+        channels = 1;
+        break;
+      case FrameBuffer::Format::kRGB:
+        channels = 3;
+        break;
+      case FrameBuffer::Format::kRGBA:
+        channels = 4;
+        break;
+      default:
+        break;
+    }
+    return channels;
+  }();
+  // Sanity check inputs.
+  if (image_buffer.dimension().width <= 0 || image_buffer.dimension().height <= 0) {
+    return absl::InvalidArgumentError(
+        absl::StrFormat("Expected positive image dimensions, found %d x %d.",
+                        image_buffer.dimension().width, image_buffer.dimension().height));
+  }
+  if (channels == -1) {
+    return absl::UnimplementedError(
+        absl::StrFormat("Expected image buffer with 1 (grayscale), 3 (RGB) or 4 "
+                        "(RGBA) channels, found %d",
+                        image_buffer.format()));
+  }
+  if (image_buffer.plane(0).buffer == nullptr) {
+    return absl::InvalidArgumentError(
+        "Expected plane buffer to be set, found nullptr.");
+  }
+
+  if (stbi_write_png(
+          image_path.c_str(), image_buffer.dimension().width, image_buffer.dimension().height,
+          channels, image_buffer.plane(0).buffer,
+          /*stride_in_bytes=*/image_buffer.dimension().width * channels) == 0) {
+    return absl::InternalError("An error occurred while encoding image.");
+  }
+
+  return absl::OkStatus();
+}
+
 void ImageDataFree(ImageData* image) { stbi_image_free(image->pixel_data); }
 
 }  // namespace vision
