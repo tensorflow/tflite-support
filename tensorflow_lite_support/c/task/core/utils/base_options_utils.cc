@@ -17,6 +17,7 @@ limitations under the License.
 
 namespace tflite {
 namespace task {
+namespace core {
 
 TfLiteBaseOptions GetDefaultBaseOptions() {
   TfLiteBaseOptions base_options = {0};
@@ -24,5 +25,6 @@ TfLiteBaseOptions GetDefaultBaseOptions() {
   return base_options;
 }
 
+}  // namespace core
 }  // namespace task
 }  // namespace tflite

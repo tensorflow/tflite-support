@@ -20,9 +20,11 @@ limitations under the License.
 // Utils for Creating TfLiteBaseOptions
 namespace tflite {
 namespace task {
+namespace core {
 
 TfLiteBaseOptions GetDefaultBaseOptions();
 
+}  // namespace core
 }  // namespace task
 }  // namespace tflite
 #endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_CORE_UTILS_BASE_OPTIONS_UTILS_H_

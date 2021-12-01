@@ -18,13 +18,12 @@ limitations under the License.
 #include <memory>
 
 #include "tensorflow_lite_support/c/common_utils.h"
-#include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
 #include "tensorflow_lite_support/c/task/core/utils/base_options_utils.h"
 #include "tensorflow_lite_support/c/task/processor/utils/classification_options_utils.h"
+#include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
 #include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
-
 
 namespace {
 using ::tflite::support::StatusOr;
@@ -104,8 +103,9 @@ struct TfLiteImageClassifier {
 TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate() {
   // Use brace-enclosed initializer list will break the Kokoro test.
   TfLiteImageClassifierOptions options;
-  options.classification_options = tflite::task::GetDefaultClassificationOptions();
-  options.base_options = tflite::task::GetDefaultBaseOptions();
+  options.classification_options =
+      tflite::task::processor::GetDefaultClassificationOptions();
+  options.base_options = tflite::task::core::GetDefaultBaseOptions();
   return options;
 }
 
@@ -206,8 +206,7 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
 
   // fnc_sample(cpp_frame_buffer_status);
   StatusOr<ClassificationResultCpp> cpp_classification_result_status =
-      classifier->impl->Classify(*std::move(cpp_frame_buffer_status.value()),
-                                 cc_roi);
+      classifier->impl->Classify(*(cpp_frame_buffer_status.value()), cc_roi);
 
   if (!cpp_classification_result_status.ok()) {
     tflite::support::CreateTfLiteSupportErrorWithStatus(

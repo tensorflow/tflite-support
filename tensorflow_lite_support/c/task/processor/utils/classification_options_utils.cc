@@ -19,6 +19,7 @@ limitations under the License.
 
 namespace tflite {
 namespace task {
+namespace processor {
 
 TfLiteClassificationOptions GetDefaultClassificationOptions() {
   TfLiteClassificationOptions classification_options = {0};
@@ -27,5 +28,6 @@ TfLiteClassificationOptions GetDefaultClassificationOptions() {
   return classification_options;
 }
 
+}  // namespace processor
 }  // namespace task
 }  // namespace tflite

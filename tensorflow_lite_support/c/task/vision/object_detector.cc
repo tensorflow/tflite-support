@@ -102,8 +102,9 @@ struct TfLiteObjectDetector {
 TfLiteObjectDetectorOptions TfLiteObjectDetectorOptionsCreate() {
   // Use brace-enclosed initializer list will break the Kokoro test.
   TfLiteObjectDetectorOptions options;
-  options.classification_options = tflite::task::GetDefaultClassificationOptions();
-  options.base_options = tflite::task::GetDefaultBaseOptions();
+  options.classification_options =
+      tflite::task::processor::GetDefaultClassificationOptions();
+  options.base_options = tflite::task::processor::GetDefaultBaseOptions();
   return options;
 }
 
@@ -185,7 +186,7 @@ TfLiteDetectionResult* TfLiteObjectDetectorDetect(
   }
 
   StatusOr<DetectionResultCpp> cpp_detection_result_status =
-      detector->impl->Detect(*std::move(cpp_frame_buffer_status.value()));
+      detector->impl->Detect(*(cpp_frame_buffer_status.value()));
   if (!cpp_detection_result_status.ok()) {
     tflite::support::CreateTfLiteSupportErrorWithStatus(
         cpp_detection_result_status.status(), error);

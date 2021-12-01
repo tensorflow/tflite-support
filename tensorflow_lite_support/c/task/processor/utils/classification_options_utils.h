@@ -21,9 +21,11 @@ limitations under the License.
 
 namespace tflite {
 namespace task {
+namespace processor {
 
 TfLiteClassificationOptions GetDefaultClassificationOptions();
 
+}  // namespace processor
 }  // namespace task
 }  // namespace tflite
 #endif  // TENSORFLOW_LITE_SUPPORT_C_TASK_PROCESSOR_UTILS_CLASSIFICATION_OPTIONS_UTILS_H_
