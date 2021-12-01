@@ -22,7 +22,7 @@ namespace tflite {
 namespace task {
 namespace core {
 
-TfLiteBaseOptions GetDefaultBaseOptions();
+TfLiteBaseOptions CreateDefaultBaseOptions();
 
 }  // namespace core
 }  // namespace task

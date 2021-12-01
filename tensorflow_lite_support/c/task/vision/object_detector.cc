@@ -103,8 +103,8 @@ TfLiteObjectDetectorOptions TfLiteObjectDetectorOptionsCreate() {
   // Use brace-enclosed initializer list will break the Kokoro test.
   TfLiteObjectDetectorOptions options;
   options.classification_options =
-      tflite::task::processor::GetDefaultClassificationOptions();
-  options.base_options = tflite::task::processor::GetDefaultBaseOptions();
+      tflite::task::processor::CreateDefaultClassificationOptions();
+  options.base_options = tflite::task::processor::CreateDefaultBaseOptions();
   return options;
 }
 

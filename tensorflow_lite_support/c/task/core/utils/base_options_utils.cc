@@ -19,7 +19,7 @@ namespace tflite {
 namespace task {
 namespace core {
 
-TfLiteBaseOptions GetDefaultBaseOptions() {
+TfLiteBaseOptions CreateDefaultBaseOptions() {
   TfLiteBaseOptions base_options = {0};
   base_options.compute_settings.cpu_settings.num_threads = -1;
   return base_options;

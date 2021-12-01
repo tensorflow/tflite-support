@@ -21,7 +21,7 @@ namespace tflite {
 namespace task {
 namespace processor {
 
-TfLiteClassificationOptions GetDefaultClassificationOptions() {
+TfLiteClassificationOptions CreateDefaultClassificationOptions() {
   TfLiteClassificationOptions classification_options = {0};
   classification_options.max_results = -1;
   classification_options.score_threshold = -FLT_MAX;

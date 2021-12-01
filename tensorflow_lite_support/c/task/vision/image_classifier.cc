@@ -104,8 +104,8 @@ TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate() {
   // Use brace-enclosed initializer list will break the Kokoro test.
   TfLiteImageClassifierOptions options;
   options.classification_options =
-      tflite::task::processor::GetDefaultClassificationOptions();
-  options.base_options = tflite::task::core::GetDefaultBaseOptions();
+      tflite::task::processor::CreateDefaultClassificationOptions();
+  options.base_options = tflite::task::core::CreateDefaultBaseOptions();
   return options;
 }
 

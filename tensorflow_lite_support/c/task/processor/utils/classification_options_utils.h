@@ -23,7 +23,7 @@ namespace tflite {
 namespace task {
 namespace processor {
 
-TfLiteClassificationOptions GetDefaultClassificationOptions();
+TfLiteClassificationOptions CreateDefaultClassificationOptions();
 
 }  // namespace processor
 }  // namespace task
