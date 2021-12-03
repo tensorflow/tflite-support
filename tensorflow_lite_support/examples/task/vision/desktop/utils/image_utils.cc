@@ -92,21 +92,16 @@ absl::Status EncodeImageToPngFile(const FrameBuffer& image_buffer,
 
   const int channels = [&image_buffer]()
   {
-    int channels = -1;
     switch(image_buffer.format()) {
       case FrameBuffer::Format::kGRAY:
-        channels = 1;
-        break;
+        return 1;
       case FrameBuffer::Format::kRGB:
-        channels = 3;
-        break;
+        return 3;
       case FrameBuffer::Format::kRGBA:
-        channels = 4;
-        break;
+        return 4;
       default:
-        break;
+        return -1;
     }
-    return channels;
   }();
   // Sanity check inputs.
   if (image_buffer.dimension().width <= 0 || image_buffer.dimension().height <= 0) {
