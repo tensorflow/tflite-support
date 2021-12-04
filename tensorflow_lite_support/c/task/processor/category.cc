@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/c/task/processor/classification_result.h"
+#include "tensorflow_lite_support/c/task/processor/category.h"
 
 #include <cstdlib>
 #include <memory>
@@ -22,20 +22,11 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-void TfLiteClassificationResultDelete(
-    TfLiteClassificationResult* classification_result) {
-  for (int head = 0; head < classification_result->size; ++head) {
-    TfLiteClassifications classifications =
-        classification_result->classifications[head];
-    for (int rank = 0; rank < classifications.size; ++rank) {
-      TfLiteCategoryDelete(&(classifications.categories[rank]));
-    }
-
-    delete[] classifications.categories;
-  }
-
-  delete[] classification_result->classifications;
-  delete classification_result;
+void TfLiteCategoryDelete(TfLiteCategory* category) {
+  // `strdup` obtains memory using `malloc` and the memory needs to be
+  // released using `free`.
+  free(category->display_name);
+  free(category->label);
 }
 
 #ifdef __cplusplus

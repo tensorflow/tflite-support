@@ -5,6 +5,7 @@ package(
 
 cc_library(
     name = "category",
+    srcs = ["category.cc"],
     hdrs = ["category.h"],
 )
 

@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/c/task/vision/image_classifier.h"
+#include "tensorflow_lite_support/c/task/vision/object_detector.h"
 
 #include <memory>
 
@@ -21,24 +21,23 @@ limitations under the License.
 #include "tensorflow_lite_support/c/task/core/utils/base_options_utils.h"
 #include "tensorflow_lite_support/c/task/processor/utils/classification_options_utils.h"
 #include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
-#include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/vision/object_detector.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/detections_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/object_detector_options_proto_inc.h"
 
 namespace {
 using ::tflite::support::StatusOr;
-using ClassificationResultCpp = ::tflite::task::vision::ClassificationResult;
-using ClassificationsCpp = ::tflite::task::vision::Classifications;
+using DetectionResultCpp = ::tflite::task::vision::DetectionResult;
+using DetectionCpp = ::tflite::task::vision::Detection;
 using ClassCpp = ::tflite::task::vision::Class;
 using BoundingBoxCpp = ::tflite::task::vision::BoundingBox;
-using ImageClassifierCpp = ::tflite::task::vision::ImageClassifier;
-using ImageClassifierOptionsCpp =
-    ::tflite::task::vision::ImageClassifierOptions;
+using ObjectDetectorCpp = ::tflite::task::vision::ObjectDetector;
+using ObjectDetectorOptionsCpp = ::tflite::task::vision::ObjectDetectorOptions;
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 using ::tflite::support::TfLiteSupportStatus;
 
-StatusOr<ImageClassifierOptionsCpp> CreateImageClassifierCppOptionsFromCOptions(
-    const TfLiteImageClassifierOptions* c_options) {
+StatusOr<ObjectDetectorOptionsCpp> CreateObjectDetectorCppOptionsFromCOptions(
+    const TfLiteObjectDetectorOptions* c_options) {
   if (c_options == nullptr) {
     return CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
@@ -46,7 +45,7 @@ StatusOr<ImageClassifierOptionsCpp> CreateImageClassifierCppOptionsFromCOptions(
         TfLiteSupportStatus::kInvalidArgumentError);
   }
 
-  ImageClassifierOptionsCpp cpp_options = {};
+  ObjectDetectorOptionsCpp cpp_options = {};
 
   // More file sources can be added in else ifs
   if (c_options->base_options.model_file.file_path)
@@ -96,23 +95,23 @@ StatusOr<ImageClassifierOptionsCpp> CreateImageClassifierCppOptionsFromCOptions(
 extern "C" {
 #endif  // __cplusplus
 
-struct TfLiteImageClassifier {
-  std::unique_ptr<ImageClassifierCpp> impl;
+struct TfLiteObjectDetector {
+  std::unique_ptr<ObjectDetectorCpp> impl;
 };
 
-TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate() {
+TfLiteObjectDetectorOptions TfLiteObjectDetectorOptionsCreate() {
   // Use brace-enclosed initializer list will break the Kokoro test.
-  TfLiteImageClassifierOptions options;
+  TfLiteObjectDetectorOptions options;
   options.classification_options =
       tflite::task::processor::CreateDefaultClassificationOptions();
   options.base_options = tflite::task::core::CreateDefaultBaseOptions();
   return options;
 }
 
-TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
-    const TfLiteImageClassifierOptions* options, TfLiteSupportError** error) {
-  StatusOr<ImageClassifierOptionsCpp> cpp_option_status =
-      CreateImageClassifierCppOptionsFromCOptions(options);
+TfLiteObjectDetector* TfLiteObjectDetectorFromOptions(
+    const TfLiteObjectDetectorOptions* options, TfLiteSupportError** error) {
+  StatusOr<ObjectDetectorOptionsCpp> cpp_option_status =
+      CreateObjectDetectorCppOptionsFromCOptions(options);
 
   if (!cpp_option_status.ok()) {
     ::tflite::support::CreateTfLiteSupportErrorWithStatus(
@@ -120,68 +119,61 @@ TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
     return nullptr;
   }
 
-  StatusOr<std::unique_ptr<ImageClassifierCpp>> classifier_status =
-      ImageClassifierCpp::CreateFromOptions(cpp_option_status.value());
+  StatusOr<std::unique_ptr<ObjectDetectorCpp>> detector_status =
+      ObjectDetectorCpp::CreateFromOptions(cpp_option_status.value());
 
-  if (classifier_status.ok()) {
-    return new TfLiteImageClassifier{.impl =
-                                         std::move(classifier_status.value())};
+  if (detector_status.ok()) {
+    return new TfLiteObjectDetector{.impl = std::move(detector_status.value())};
   } else {
     ::tflite::support::CreateTfLiteSupportErrorWithStatus(
-        classifier_status.status(), error);
+        detector_status.status(), error);
     return nullptr;
   }
 }
 
-TfLiteClassificationResult* GetClassificationResultCStruct(
-    const ClassificationResultCpp& classification_result_cpp) {
-  auto c_classifications =
-      new TfLiteClassifications[classification_result_cpp
-                                    .classifications_size()];
+TfLiteDetectionResult* GetDetectionResultCStruct(
+    const DetectionResultCpp& detection_result_cpp) {
+  auto c_detections =
+      new TfLiteDetection[detection_result_cpp.detections_size()];
 
-  for (int head = 0; head < classification_result_cpp.classifications_size();
-       ++head) {
-    const ClassificationsCpp& classifications =
-        classification_result_cpp.classifications(head);
-    c_classifications[head].head_index = head;
+  for (int i = 0; i < detection_result_cpp.detections_size(); ++i) {
+    const DetectionCpp& detection = detection_result_cpp.detections(i);
 
-    auto c_categories = new TfLiteCategory[classifications.classes_size()];
-    c_classifications->size = classifications.classes_size();
+    auto c_categories = new TfLiteCategory[detection.classes_size()];
+    c_detections[i].size = detection.classes_size();
 
-    for (int rank = 0; rank < classifications.classes_size(); ++rank) {
-      const ClassCpp& classification = classifications.classes(rank);
-      c_categories[rank].index = classification.index();
-      c_categories[rank].score = classification.score();
+    for (int j = 0; j < detection.classes_size(); ++j) {
+      const ClassCpp& classification = detection.classes(j);
+      c_categories[j].index = classification.index();
+      c_categories[j].score = classification.score();
 
       if (classification.has_class_name())
-        c_categories[rank].label = strdup(classification.class_name().c_str());
+        c_categories[j].label = strdup(classification.class_name().c_str());
       else
-        c_categories[rank].label = nullptr;
+        c_categories[j].label = nullptr;
 
       if (classification.has_display_name())
-        c_categories[rank].display_name =
+        c_categories[j].display_name =
             strdup(classification.display_name().c_str());
       else
-        c_categories[rank].display_name = nullptr;
+        c_categories[j].display_name = nullptr;
     }
-    c_classifications[head].categories = c_categories;
+    c_detections[i].categories = c_categories;
   }
 
-  auto c_classification_result = new TfLiteClassificationResult;
-  c_classification_result->classifications = c_classifications;
-  c_classification_result->size =
-      classification_result_cpp.classifications_size();
+  auto c_detection_result = new TfLiteDetectionResult;
+  c_detection_result->detections = c_detections;
+  c_detection_result->size = detection_result_cpp.detections_size();
 
-  return c_classification_result;
+  return c_detection_result;
 }
 
-TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
-    const TfLiteImageClassifier* classifier,
-    const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi,
+TfLiteDetectionResult* TfLiteObjectDetectorDetect(
+    const TfLiteObjectDetector* detector, const TfLiteFrameBuffer* frame_buffer,
     TfLiteSupportError** error) {
-  if (classifier == nullptr) {
+  if (detector == nullptr) {
     tflite::support::CreateTfLiteSupportError(
-        kInvalidArgumentError, "Expected non null image classifier.", error);
+        kInvalidArgumentError, "Expected non null object detector.", error);
     return nullptr;
   }
 
@@ -193,40 +185,19 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
     return nullptr;
   }
 
-  BoundingBoxCpp cc_roi;
-  if (roi == nullptr) {
-    cc_roi.set_width(frame_buffer->dimension.width);
-    cc_roi.set_height(frame_buffer->dimension.height);
-  } else {
-    cc_roi.set_origin_x(roi->origin_x);
-    cc_roi.set_origin_y(roi->origin_y);
-    cc_roi.set_width(roi->width);
-    cc_roi.set_height(roi->height);
-  }
-
-  // fnc_sample(cpp_frame_buffer_status);
-  StatusOr<ClassificationResultCpp> cpp_classification_result_status =
-      classifier->impl->Classify(*(cpp_frame_buffer_status.value()), cc_roi);
-
-  if (!cpp_classification_result_status.ok()) {
+  StatusOr<DetectionResultCpp> cpp_detection_result_status =
+      detector->impl->Detect(*(cpp_frame_buffer_status.value()));
+  if (!cpp_detection_result_status.ok()) {
     tflite::support::CreateTfLiteSupportErrorWithStatus(
-        cpp_classification_result_status.status(), error);
+        cpp_detection_result_status.status(), error);
     return nullptr;
   }
 
-  return GetClassificationResultCStruct(
-      cpp_classification_result_status.value());
+  return GetDetectionResultCStruct(cpp_detection_result_status.value());
 }
 
-TfLiteClassificationResult* TfLiteImageClassifierClassify(
-    const TfLiteImageClassifier* classifier,
-    const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error) {
-  return TfLiteImageClassifierClassifyWithRoi(classifier, frame_buffer, nullptr,
-                                              error);
-}
-
-void TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier) {
-  delete classifier;
+void TfLiteObjectDetectorDelete(TfLiteObjectDetector* detector) {
+  delete detector;
 }
 
 #ifdef __cplusplus
