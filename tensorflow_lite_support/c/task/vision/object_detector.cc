@@ -104,7 +104,7 @@ TfLiteObjectDetectorOptions TfLiteObjectDetectorOptionsCreate() {
   TfLiteObjectDetectorOptions options;
   options.classification_options =
       tflite::task::processor::CreateDefaultClassificationOptions();
-  options.base_options = tflite::task::processor::CreateDefaultBaseOptions();
+  options.base_options = tflite::task::core::CreateDefaultBaseOptions();
   return options;
 }
 
@@ -138,6 +138,11 @@ TfLiteDetectionResult* GetDetectionResultCStruct(
 
   for (int i = 0; i < detection_result_cpp.detections_size(); ++i) {
     const DetectionCpp& detection = detection_result_cpp.detections(i);
+    
+    c_detections[i].bounding_box.origin_x = detection.bounding_box().origin_x();
+    c_detections[i].bounding_box.origin_y = detection.bounding_box().origin_y();
+    c_detections[i].bounding_box.width = detection.bounding_box().width();
+    c_detections[i].bounding_box.height = detection.bounding_box().height();
 
     auto c_categories = new TfLiteCategory[detection.classes_size()];
     c_detections[i].size = detection.classes_size();
