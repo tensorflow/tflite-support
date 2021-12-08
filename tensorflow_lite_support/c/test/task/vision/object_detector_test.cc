@@ -380,6 +380,48 @@ TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
   TfLiteDetectionResultDelete(detection_result);
 }
 
+TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
+     SucceedsWithScoreThreshold) {
+  char* allowlisted_label_name = (char*)"cat";
+  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                                    kMobileSsdWithMetadata)
+                               .data();
+
+  TfLiteObjectDetectorOptions options = TfLiteObjectDetectorOptionsCreate();
+  options.base_options.model_file.file_path = model_path.data();
+
+  options.classification_options.score_threshold = 0.6;
+
+  TfLiteObjectDetector* object_detector =
+      TfLiteObjectDetectorFromOptions(&options, nullptr);
+  ASSERT_NE(object_detector, nullptr);
+
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
+                               LoadImage("cats_and_dogs.jpg"));
+
+  TfLiteFrameBuffer frame_buffer = {
+      .format = kRGB,
+      .orientation = kTopLeft,
+      .dimension = {.width = image_data.width, .height = image_data.height},
+      .buffer = image_data.pixel_data};
+
+  TfLiteDetectionResult* detection_result =
+      TfLiteObjectDetectorDetect(object_detector, &frame_buffer, nullptr);
+
+  ImageDataFree(&image_data);
+  if (object_detector) TfLiteObjectDetectorDelete(object_detector);
+
+  ASSERT_NE(detection_result, nullptr);
+  EXPECT_EQ(detection_result->size, 1);
+  EXPECT_NE(detection_result->detections, nullptr);
+  VerifyDetection(
+      detection_result->detections[0],
+      {.origin_x = 54, .origin_y = 396, .width = 393, .height = 196},
+      0.64453125, "cat");
+
+  TfLiteDetectionResultDelete(detection_result);
+}
+
 }  // namespace
 }  // namespace vision
 }  // namespace task
