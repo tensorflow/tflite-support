@@ -19,6 +19,7 @@ cc_library(
         "//tensorflow_lite_support/cc/task/core:task_utils",
         "@org_tensorflow//tensorflow/lite:op_resolver",
         "@org_tensorflow//tensorflow/lite:string_util",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
     ],
 )

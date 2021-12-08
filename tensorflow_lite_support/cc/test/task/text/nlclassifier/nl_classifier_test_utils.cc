@@ -15,19 +15,10 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/test/task/text/nlclassifier/nl_classifier_test_utils.h"
 
+#include "tensorflow/lite/kernels/builtin_op_kernels.h"
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/string_util.h"
 #include "tensorflow_lite_support/cc/task/core/task_utils.h"
-
-namespace tflite {
-namespace ops {
-namespace builtin {
-
-TfLiteRegistration* Register_QUANTIZE();
-
-}  // namespace builtin
-}  // namespace ops
-}  // namespace tflite
 
 namespace tflite {
 namespace ops {

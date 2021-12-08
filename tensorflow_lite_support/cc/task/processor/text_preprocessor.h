@@ -19,19 +19,24 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/cc/task/processor/processor.h"
-#include "tensorflow_lite_support/cc/text/tokenizers/tokenizer.h"
 
 namespace tflite {
 namespace task {
 namespace processor {
 
-// Processes input text and populates the associated input tensor.
-// Requirements for the input tensor:
-//   (kTfLiteString) - input of the model, accepts a string.
-//      or
-//   (kTfLiteInt32) - input of the model, accepts a tokenized indices of a
-//   string input. A RegexTokenizer needs to be set up in the input tensor's
-//   metadata.
+// Processes input text and populates the associated input tensors.
+// Requirements for the input tensors (either one of the following):
+//   - One input tensor:
+//     A string tensor of type, kTfLiteString
+//        or
+//     An int32 tensor of type, kTfLiteInt32: contains the tokenized indices of
+//     a string input. A RegexTokenizer needs to be set up in the input tensor's
+//     metadata.
+//   - Three input tensors (input tensors of a Bert model):
+//     The 3 input tensors should be populated with metadata tensor names,
+//     "ids", "mask", and "segment_ids", respectively. The input_process_units
+//     metadata should contain WordPiece or Sentencepiece Tokenizer
+//     metadata.
 class TextPreprocessor : public Preprocessor {
  public:
   static tflite::support::StatusOr<std::unique_ptr<TextPreprocessor>> Create(
@@ -40,33 +45,8 @@ class TextPreprocessor : public Preprocessor {
 
   absl::Status Preprocess(const std::string& text);
 
- private:
+ protected:
   using Preprocessor::Preprocessor;
-
-  absl::Status Init();
-
-  tflite::support::StatusOr<const tflite::ProcessUnit*>
-  TryFindRegexTokenizerMetadata();
-
-  absl::Status RegexPreprocess(const std::string& input_text);
-
-  absl::Status BertPreprocess(const std::string& input_text);
-
-  int GetLastDimSize(int tensor_index);
-
-  enum class TokenizerType {
-    kNone = 0,
-    kRegex = 1,
-    kBert = 2,
-  };
-
-  TokenizerType tokenzier_type_;
-  std::unique_ptr<tflite::support::text::tokenizer::Tokenizer> tokenizer_;
-  // For BertTokenizer
-  int ids_tensor_index_;
-  int mask_tensor_index_;
-  int segment_ids_tensor_index_;
-  int bert_max_seq_len_;
 };
 
 }  // namespace processor
