@@ -33,6 +33,7 @@ namespace vision {
 namespace {
 
 using ::testing::HasSubstr;
+using ::testing::StrEq;
 using ::tflite::support::StatusOr;
 using ::tflite::task::JoinPath;
 
@@ -48,17 +49,18 @@ StatusOr<ImageData> LoadImage(const char* image_name) {
       JoinPath("./" /*test src dir*/, kTestDataDirectory, image_name));
 }
 
-void VerifyDetection(TfLiteDetection& detection, TfLiteBoundingBox bounding_box,
-                     float first_category_score, char* first_category_label) {
+void VerifyDetection(TfLiteDetection& detection,
+                     TfLiteBoundingBox expected_bounding_box,
+                     float expected_first_score, char* expected_first_label) {
   EXPECT_GE(detection.size, 1);
   EXPECT_NE(detection.categories, nullptr);
-  EXPECT_EQ(detection.bounding_box.origin_x, bounding_box.origin_x);
-  EXPECT_EQ(detection.bounding_box.origin_y, bounding_box.origin_y);
-  EXPECT_EQ(detection.bounding_box.height, bounding_box.height);
-  EXPECT_EQ(detection.bounding_box.width, bounding_box.width);
+  EXPECT_EQ(detection.bounding_box.origin_x, expected_bounding_box.origin_x);
+  EXPECT_EQ(detection.bounding_box.origin_y, expected_bounding_box.origin_y);
+  EXPECT_EQ(detection.bounding_box.height, expected_bounding_box.height);
+  EXPECT_EQ(detection.bounding_box.width, expected_bounding_box.width);
 
-  EXPECT_EQ(strcmp(detection.categories[0].label, first_category_label), 0);
-  EXPECT_NEAR(detection.categories[0].score, first_category_score, 0.001);
+  EXPECT_THAT(detection.categories[0].label, StrEq(expected_first_label));
+  EXPECT_NEAR(detection.categories[0].score, expected_first_score, 0.001);
 }
 
 void VerifyResults(TfLiteDetectionResult* detection_result) {
