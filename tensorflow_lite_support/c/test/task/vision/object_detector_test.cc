@@ -58,7 +58,7 @@ void VerifyDetection(TfLiteDetection& detection, TfLiteBoundingBox bounding_box,
   EXPECT_EQ(detection.bounding_box.width, bounding_box.width);
 
   EXPECT_EQ(strcmp(detection.categories[0].label, first_category_label), 0);
-  EXPECT_EQ(detection.categories[0].score, first_category_score);
+  EXPECT_NEAR(detection.categories[0].score, first_category_score, 0.001);
 }
 
 void VerifyResults(TfLiteDetectionResult* detection_result) {
