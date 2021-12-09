@@ -39,29 +39,38 @@ using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 using ::tflite::task::core::TfLiteEngine;
 
-StatusOr<const TensorMetadata*> GetInputTensorMetadataIfAny(
-    const ModelMetadataExtractor& metadata_extractor) {
+StatusOr<const TensorMetadata*> GetTensorMetadataIfAny(
+    const ModelMetadataExtractor& metadata_extractor, const bool is_input) {
   if (metadata_extractor.GetModelMetadata() == nullptr ||
       metadata_extractor.GetModelMetadata()->subgraph_metadata() == nullptr) {
     // Some models have no metadata at all (or very partial), so exit early.
     return nullptr;
-  } else if (metadata_extractor.GetInputTensorCount() != 1) {
+  } else if (is_input && metadata_extractor.GetInputTensorCount() != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         "Models are assumed to have a single input TensorMetadata.",
         TfLiteSupportStatus::kInvalidNumInputTensorsError);
+  } else if (!is_input && metadata_extractor.GetOutputTensorCount() != 1) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "Models are assumed to have a single output TensorMetadata.",
+        TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
 
-  const TensorMetadata* metadata = metadata_extractor.GetInputTensorMetadata(0);
+  const TensorMetadata* input_metadata =
+      metadata_extractor.GetInputTensorMetadata(0);
+  const TensorMetadata* output_metadata =
+      metadata_extractor.GetOutputTensorMetadata(0);
 
-  if (metadata == nullptr) {
+  if (input_metadata == nullptr) {
     // Should never happen.
     return CreateStatusWithPayload(StatusCode::kInternal,
                                    "Input TensorMetadata is null.");
   }
 
-  return metadata;
+  return is_input ? input_metadata : output_metadata;
 }
+}  // namespace
 
 StatusOr<const ImageProperties*> GetImagePropertiesIfAny(
     const TensorMetadata& tensor_metadata) {
@@ -132,13 +141,12 @@ StatusOr<absl::optional<NormalizationOptions>> GetNormalizationOptionsIfAny(
   return normalization_options;
 }
 
-}  // namespace
-
-StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
+StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
     const TfLiteEngine::Interpreter& interpreter,
-    const tflite::metadata::ModelMetadataExtractor& metadata_extractor) {
+    const tflite::metadata::ModelMetadataExtractor& metadata_extractor,
+    const bool is_input) {
   ASSIGN_OR_RETURN(const TensorMetadata* metadata,
-                   GetInputTensorMetadataIfAny(metadata_extractor));
+                   GetTensorMetadataIfAny(metadata_extractor, is_input));
 
   const ImageProperties* props = nullptr;
   absl::optional<NormalizationOptions> normalization_options;
@@ -146,41 +154,54 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
     ASSIGN_OR_RETURN(props, GetImagePropertiesIfAny(*metadata));
     ASSIGN_OR_RETURN(normalization_options,
                      GetNormalizationOptionsIfAny(*metadata));
+    if (!is_input && !normalization_options.has_value()) {
+      ASSIGN_OR_RETURN(normalization_options,
+                       GetNormalizationOptionsIfAny(
+                           *metadata_extractor.GetInputTensorMetadata(0)));
+    }
   }
 
-  if (TfLiteEngine::InputCount(&interpreter) != 1) {
+  if (is_input && TfLiteEngine::InputCount(&interpreter) != 1) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         "Models are assumed to have a single input.",
         TfLiteSupportStatus::kInvalidNumInputTensorsError);
+  } else if (!is_input && TfLiteEngine::OutputCount(&interpreter) != 1) {
+    return CreateStatusWithPayload(
+        StatusCode::kInvalidArgument,
+        "Models are assumed to have a single output.",
+        TfLiteSupportStatus::kInvalidNumOutputTensorsError);
   }
 
-  // Input-related specifications.
-  const TfLiteTensor* input_tensor = TfLiteEngine::GetInput(&interpreter, 0);
-  if (input_tensor->dims->size != 4) {
+  // Input/output-related specifications.
+  const TfLiteTensor* tensor = is_input
+                                   ? TfLiteEngine::GetInput(&interpreter, 0)
+                                   : TfLiteEngine::GetOutput(&interpreter, 0);
+
+  if (tensor->dims->size != 4) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         "Only 4D tensors in BHWD layout are supported.",
         TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
   }
   static constexpr TfLiteType valid_types[] = {kTfLiteUInt8, kTfLiteFloat32};
-  TfLiteType input_type = input_tensor->type;
-  if (!absl::c_linear_search(valid_types, input_type)) {
+  TfLiteType tensor_type = tensor->type;
+  if (!absl::c_linear_search(valid_types, tensor_type)) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
         absl::StrCat(
-            "Type mismatch for input tensor ", input_tensor->name,
+            "Type mismatch for tensor ", tensor->name,
             ". Requested one of these types: kTfLiteUint8/kTfLiteFloat32, got ",
-            TfLiteTypeGetName(input_type), "."),
+            TfLiteTypeGetName(tensor_type), "."),
         TfLiteSupportStatus::kInvalidInputTensorTypeError);
   }
 
   // The expected layout is BHWD, i.e. batch x height x width x color
   // See https://www.tensorflow.org/guide/tensors
-  const int batch = input_tensor->dims->data[0];
-  const int height = input_tensor->dims->data[1];
-  const int width = input_tensor->dims->data[2];
-  const int depth = input_tensor->dims->data[3];
+  const int batch = tensor->dims->data[0];
+  const int height = tensor->dims->data[1];
+  const int width = tensor->dims->data[2];
+  const int depth = tensor->dims->data[3];
 
   if (props != nullptr && props->color_space() != ColorSpaceType_RGB) {
     return CreateStatusWithPayload(StatusCode::kInvalidArgument,
@@ -190,47 +211,47 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
   if (batch != 1 || depth != 3) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrCat("The input tensor should have dimensions 1 x height x "
+        absl::StrCat("The tensor should have dimensions 1 x height x "
                      "width x 3. Got ",
                      batch, " x ", height, " x ", width, " x ", depth, "."),
         TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
   }
-  int bytes_size = input_tensor->bytes;
+  int bytes_size = tensor->bytes;
   size_t byte_depth =
-      input_type == kTfLiteFloat32 ? sizeof(float) : sizeof(uint8);
+      tensor_type == kTfLiteFloat32 ? sizeof(float) : sizeof(uint8);
 
   // Sanity checks.
-  if (input_type == kTfLiteFloat32) {
+  if (tensor_type == kTfLiteFloat32) {
     if (!normalization_options.has_value()) {
       return CreateStatusWithPayload(
           absl::StatusCode::kNotFound,
-          "Input tensor has type kTfLiteFloat32: it requires specifying "
-          "NormalizationOptions metadata to preprocess input images.",
+          "Tensor has type kTfLiteFloat32: it requires specifying "
+          "NormalizationOptions metadata to process images.",
           TfLiteSupportStatus::kMetadataMissingNormalizationOptionsError);
     } else if (bytes_size / sizeof(float) %
                    normalization_options.value().num_values !=
                0) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
-          "The number of elements in the input tensor must be a multiple of "
+          "The number of elements in the tensor must be a multiple of "
           "the number of normalization parameters.",
           TfLiteSupportStatus::kInvalidArgumentError);
     }
   }
   if (width <= 0) {
     return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument, "The input width should be positive.",
+        StatusCode::kInvalidArgument, "The width should be positive.",
         TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
   }
   if (height <= 0) {
     return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument, "The input height should be positive.",
+        StatusCode::kInvalidArgument, "The height should be positive.",
         TfLiteSupportStatus::kInvalidInputTensorDimensionsError);
   }
   if (bytes_size != height * width * depth * byte_depth) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        "The input size in bytes does not correspond to the expected number of "
+        "The tensor in bytes does not correspond to the expected number of "
         "pixels.",
         TfLiteSupportStatus::kInvalidInputTensorSizeError);
   }
@@ -243,8 +264,9 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
   result.image_width = width;
   result.image_height = height;
   result.color_space = ColorSpaceType_RGB;
-  result.tensor_type = input_type;
-  result.normalization_options = normalization_options;
+  result.tensor_type = tensor_type;
+  result.normalization_options =
+      normalization_options;
 
   return result;
 }
