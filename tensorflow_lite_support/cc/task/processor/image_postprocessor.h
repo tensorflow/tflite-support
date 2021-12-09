@@ -40,8 +40,8 @@ class ImagePostprocessor : public Postprocessor {
  public:
   static tflite::support::StatusOr<std::unique_ptr<ImagePostprocessor>>
   Create(core::TfLiteEngine* engine,
-         const std::initializer_list<int> output_indices,
-         const std::initializer_list<int> input_indices);
+         const int output_index,
+         const int input_index = -1);
 
   // Processes the output tensor to an RGB of FrameBuffer type.
   // If output tensor is of type kTfLiteFloat32, denormalize it into [0 - 255]
@@ -52,12 +52,12 @@ class ImagePostprocessor : public Postprocessor {
   using Postprocessor::Postprocessor;
 
   // Whether the model features quantized inference type (QUANTIZED_UINT8). This
-  // is currently detected by checking if all output tensors data type is uint8.
-  bool has_uint8_outputs_;
+  // is currently detected by checking if the output tensor data type is uint8.
+  bool has_uint8_output_;
 
   std::unique_ptr<vision::NormalizationOptions> options_;
 
-  absl::Status Init(const std::vector<int>& input_indices);
+  absl::Status Init(const int input_index);
 
   const vision::NormalizationOptions& GetNormalizationOptions() {
     return *options_.get();
