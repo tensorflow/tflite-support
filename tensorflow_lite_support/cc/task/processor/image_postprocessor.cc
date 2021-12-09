@@ -27,148 +27,40 @@ using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 
-StatusOr<absl::optional<vision::NormalizationOptions>>
-GetNormalizationOptionsIfAny(const TensorMetadata& tensor_metadata) {
-  ASSIGN_OR_RETURN(
-      const tflite::ProcessUnit* normalization_process_unit,
-      ModelMetadataExtractor::FindFirstProcessUnit(
-          tensor_metadata, tflite::ProcessUnitOptions_NormalizationOptions));
-  if (normalization_process_unit == nullptr) {
-    return {absl::nullopt};
-  }
-  const tflite::NormalizationOptions* tf_normalization_options =
-      normalization_process_unit->options_as_NormalizationOptions();
-  const auto mean_values = tf_normalization_options->mean();
-  const auto std_values = tf_normalization_options->std();
-  if (mean_values->size() != std_values->size()) {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrCat("NormalizationOptions: expected mean and std of same "
-                     "dimension, got ",
-                     mean_values->size(), " and ", std_values->size(), "."),
-        TfLiteSupportStatus::kMetadataInvalidProcessUnitsError);
-  }
-  absl::optional<vision::NormalizationOptions> normalization_options;
-  if (mean_values->size() == 1) {
-    normalization_options = vision::NormalizationOptions{
-        .mean_values = {mean_values->Get(0), mean_values->Get(0),
-                        mean_values->Get(0)},
-        .std_values = {std_values->Get(0), std_values->Get(0),
-                       std_values->Get(0)},
-        .num_values = 1};
-  } else if (mean_values->size() == 3) {
-    normalization_options = vision::NormalizationOptions{
-        .mean_values = {mean_values->Get(0), mean_values->Get(1),
-                        mean_values->Get(2)},
-        .std_values = {std_values->Get(0), std_values->Get(1),
-                       std_values->Get(2)},
-        .num_values = 3};
-  } else {
-    return CreateStatusWithPayload(
-        StatusCode::kInvalidArgument,
-        absl::StrCat("NormalizationOptions: only 1 or 3 mean and std "
-                     "values are supported, got ",
-                     mean_values->size(), "."),
-        TfLiteSupportStatus::kMetadataInvalidProcessUnitsError);
-  }
-  return normalization_options;
-}
 }  // namespace
 
 /* static */
 tflite::support::StatusOr<std::unique_ptr<ImagePostprocessor>>
-ImagePostprocessor::Create(core::TfLiteEngine* engine,
-                           const std::initializer_list<int> output_indices,
-                           const std::initializer_list<int> input_indices) {
+ImagePostprocessor::Create(core::TfLiteEngine* engine, const int output_index,
+                           const int input_index) {
   ASSIGN_OR_RETURN(auto processor,
                    Processor::Create<ImagePostprocessor>(
-                       /* num_expected_tensors = */ 1, engine, output_indices,
+                       /* num_expected_tensors = */ 1, engine, {output_index},
                        /* requires_metadata = */ false));
 
-  RETURN_IF_ERROR(processor->Init(input_indices));
+  RETURN_IF_ERROR(processor->Init(input_index));
   return processor;
 }
 
-absl::Status ImagePostprocessor::Init(const std::vector<int> &input_indices) {
-  if (core::TfLiteEngine::OutputCount(engine_->interpreter()) != 1) {
+absl::Status ImagePostprocessor::Init(const int input_index) {
+  if (input_index == -1) {
     return tflite::support::CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
-            "Image segmentation models are expected to have only 1 "
-            "output, found %d",
-            core::TfLiteEngine::OutputCount(engine_->interpreter())),
-        tflite::support::TfLiteSupportStatus::kInvalidNumOutputTensorsError);
+        absl::StrFormat("Input image tensor not set. Input index found: %d",
+                        input_index),
+        tflite::support::TfLiteSupportStatus::kInputTensorNotFoundError);
   }
-
-  if (GetTensor()->type != kTfLiteUInt8 &&
-      GetTensor()->type != kTfLiteFloat32) {
-    return tflite::support::CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Type mismatch for output tensor %s. Requested one "
-                        "of these types: "
-                        "kTfLiteUint8/kTfLiteFloat32, got %s.",
-                        GetTensor()->name,
-                        TfLiteTypeGetName(GetTensor()->type)),
-        tflite::support::TfLiteSupportStatus::kInvalidOutputTensorTypeError);
-  }
-
-  if (GetTensor()->dims->data[0] != 1 || GetTensor()->dims->data[3] != 3) {
-    return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrCat("The input tensor should have dimensions 1 x height x "
-                     "width x 3. Got ",
-                     GetTensor()->dims->data[0], " x ",
-                     GetTensor()->dims->data[1], " x ",
-                     GetTensor()->dims->data[2], " x ",
-                     GetTensor()->dims->data[3], "."),
-        tflite::support::TfLiteSupportStatus::
-            kInvalidInputTensorDimensionsError);
-  }
-
-  // Gather metadata
-  const tflite::TensorMetadata* output_metadata =
-      engine_->metadata_extractor()->GetOutputTensorMetadata(
-          tensor_indices_.at(0));
-  const tflite::TensorMetadata* input_metadata =
-      engine_->metadata_extractor()->GetInputTensorMetadata(
-          input_indices.at(0));
-
-  // Use input metadata for normalization as fallback.
-  const tflite::TensorMetadata* processing_metadata =
-      GetNormalizationOptionsIfAny(*output_metadata).value().has_value()
-          ? output_metadata
-          : input_metadata;
-
-  absl::optional<vision::NormalizationOptions> normalization_options;
-  ASSIGN_OR_RETURN(normalization_options,
-                   GetNormalizationOptionsIfAny(*processing_metadata));
-
-  if (GetTensor()->type == kTfLiteFloat32) {
-    if (!normalization_options.has_value()) {
-      return CreateStatusWithPayload(
-          absl::StatusCode::kNotFound,
-          "Output tensor has type kTfLiteFloat32: it requires specifying "
-          "NormalizationOptions metadata to preprocess output images.",
-          TfLiteSupportStatus::kMetadataMissingNormalizationOptionsError);
-    } else if (GetTensor()->bytes / sizeof(float) %
-                   normalization_options.value().num_values !=
-               0) {
-      return CreateStatusWithPayload(
-          StatusCode::kInvalidArgument,
-          "The number of elements in the output tensor must be a multiple of "
-          "the number of normalization parameters.",
-          TfLiteSupportStatus::kInvalidArgumentError);
-    }
-
-    options_ = std::make_unique<vision::NormalizationOptions>(
-        normalization_options.value());
-  }
-
+  ASSIGN_OR_RETURN(
+      auto output_specs,
+      vision::BuildImageTensorSpecs(*engine_->interpreter(),
+                                    *engine_->metadata_extractor(), false));
+  options_ = std::make_unique<vision::NormalizationOptions>(
+      output_specs.normalization_options.value());
   return absl::OkStatus();
 }
 
 absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
-  has_uint8_outputs_ = GetTensor()->type == kTfLiteUInt8;
+  has_uint8_output_ = GetTensor()->type == kTfLiteUInt8;
   const int kRgbPixelBytes = 3;
 
   vision::FrameBuffer::Dimension to_buffer_dimension = {
@@ -177,7 +69,7 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
       GetBufferByteSize(to_buffer_dimension, vision::FrameBuffer::Format::kRGB);
   std::vector<uint8> postprocessed_data(output_byte_size / sizeof(uint8), 0);
 
-  if (has_uint8_outputs_) {  // No denormalization required.
+  if (has_uint8_output_) {  // No denormalization required.
     if (GetTensor()->bytes != output_byte_size) {
       return tflite::support::CreateStatusWithPayload(
           absl::StatusCode::kInternal,
