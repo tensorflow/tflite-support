@@ -58,11 +58,11 @@ absl::Status ImagePostprocessor::Init(const int input_index) {
                                     *engine_->metadata_extractor(), false));
   options_ = std::make_unique<vision::NormalizationOptions>(
       output_specs.normalization_options.value());
+  has_uint8_output_ = GetTensor()->type == kTfLiteUInt8;
   return absl::OkStatus();
 }
 
 absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
-  has_uint8_output_ = GetTensor()->type == kTfLiteUInt8;
   vision::FrameBuffer::Dimension to_buffer_dimension = {
       GetTensor()->dims->data[2], GetTensor()->dims->data[1]};
   size_t output_byte_size =
