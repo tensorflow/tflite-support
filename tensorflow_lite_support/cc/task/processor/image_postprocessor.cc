@@ -27,6 +27,8 @@ using ::tflite::support::CreateStatusWithPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
 
+constexpr int kRgbPixelBytes = 3;
+
 }  // namespace
 
 /* static */
@@ -61,8 +63,6 @@ absl::Status ImagePostprocessor::Init(const int input_index) {
 
 absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
   has_uint8_output_ = GetTensor()->type == kTfLiteUInt8;
-  const int kRgbPixelBytes = 3;
-
   vision::FrameBuffer::Dimension to_buffer_dimension = {
       GetTensor()->dims->data[2], GetTensor()->dims->data[1]};
   size_t output_byte_size =
