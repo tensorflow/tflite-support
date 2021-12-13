@@ -13,9 +13,9 @@
  limitations under the License.
  ==============================================================================*/
 #import <Foundation/Foundation.h>
+#import "tensorflow_lite_support/ios/task/processor/core/TFLBaseOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult.h"
-#import "tensorflow_lite_support/ios/task/processor/core/TFLBaseOptions.h"
 #import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -53,7 +53,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-
 @interface TFLObjectDetector : NSObject
 
 /**
@@ -65,25 +64,24 @@ NS_ASSUME_NONNULL_BEGIN
  * @return A TFLObjectDetector instance.
  */
 + (nullable instancetype)objectDetectorWithOptions:(nonnull TFLObjectDetectorOptions *)options
-                                              error:(NSError **)error
-NS_SWIFT_NAME(objectDetector(options:));
+                                             error:(NSError **)error
+    NS_SWIFT_NAME(objectDetector(options:));
 
 /**
  * Performs object detection on a GMLImage input, returns the detected objects in the image.
  *
  * @param image input to the model.
  * @return Detection Result of type TFLDetectionResult an array of
- * detected objeects  where each detected object has a bounding box and an array of TFLCategory holding the predicted classes
- * for the detected object.
+ * detected objeects  where each detected object has a bounding box and an array of TFLCategory
+ * holding the predicted classes for the detected object.
  */
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
-                                                     error:(NSError *_Nullable *)error
-NS_SWIFT_NAME(detect(gmlImage:));
+                                              error:(NSError *_Nullable *)error
+    NS_SWIFT_NAME(detect(gmlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;
 
 + (instancetype)new NS_UNAVAILABLE;
-
 
 @end
 

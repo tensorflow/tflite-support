@@ -20,4 +20,3 @@
 @synthesize score;
 @synthesize classIndex;
 @end
-
