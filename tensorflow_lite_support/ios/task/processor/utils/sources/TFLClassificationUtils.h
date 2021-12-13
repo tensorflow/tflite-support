@@ -13,7 +13,7 @@
  limitations under the License.
  ==============================================================================*/
 #import <Foundation/Foundation.h>
-#import "third_party/tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult.h"
 
 #include "tensorflow_lite_support/c/task/processor/classification_result.h"
 
