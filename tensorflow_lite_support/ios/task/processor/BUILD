@@ -15,6 +15,17 @@ objc_library(
 )
 
 objc_library(
+    name = "TFLCategory",
+    srcs = [
+        "sources/TFLCategory.m",
+    ],
+    hdrs = [
+        "sources/TFLCategory.h",
+    ],
+    module_name = "TFLCategory",
+)
+
+objc_library(
     name = "TFLClassificationResult",
     srcs = [
         "sources/TFLClassificationResult.m",
@@ -22,7 +33,21 @@ objc_library(
     hdrs = [
         "sources/TFLClassificationResult.h",
     ],
+    deps = [
+        ":TFLCategory",
+    ],
     module_name = "TFLClassificationResult",
+)
+
+objc_library(
+    name = "TFLDetectionResult",
+    hdrs = [
+        "sources/TFLDetectionResult.h",
+    ],
+    deps = [
+        ":TFLCategory"
+    ],
+    module_name = "TFLDetectionResult",
 )
 
 objc_library(
