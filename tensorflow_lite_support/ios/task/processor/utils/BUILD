@@ -17,3 +17,15 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResult",
     ],
 )
+
+objc_library(
+    name = "TFLDetectionUtils",
+    hdrs = [
+        "sources/TFLDetectionUtils.h",
+    ],
+    module_name = "TFLDetectionUtils",
+    deps = [
+        "//tensorflow_lite_support/c/task/processor:detection_result",
+        "//tensorflow_lite_support/ios/task/processor:TFLDetectionResult",
+    ],
+)
