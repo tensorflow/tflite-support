@@ -54,4 +54,3 @@ cc_test_with_tflite(
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
     ],
 )
-

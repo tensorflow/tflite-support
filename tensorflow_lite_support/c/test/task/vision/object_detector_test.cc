@@ -34,6 +34,7 @@ namespace {
 
 using ::testing::HasSubstr;
 using ::testing::StrEq;
+using ::testing::StrNe;
 using ::tflite::support::StatusOr;
 using ::tflite::task::JoinPath;
 
@@ -45,13 +46,14 @@ constexpr char kMobileSsdWithMetadata[] =
     "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.tflite";
 
 StatusOr<ImageData> LoadImage(const char* image_name) {
-  return DecodeImageFromFile(
-      JoinPath("./" /*test src dir*/, kTestDataDirectory, image_name));
+  return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
+                                      kTestDataDirectory, image_name));
 }
 
-void VerifyDetection(TfLiteDetection& detection,
+void VerifyDetection(const TfLiteDetection& detection,
                      TfLiteBoundingBox expected_bounding_box,
-                     float expected_first_score, char* expected_first_label) {
+                     float expected_first_score,
+                     const std::string& expected_first_label) {
   EXPECT_GE(detection.size, 1);
   EXPECT_NE(detection.categories, nullptr);
   EXPECT_EQ(detection.bounding_box.origin_x, expected_bounding_box.origin_x);
@@ -131,8 +133,8 @@ TEST_F(ObjectDetectorFromOptionsTest, FailsWithMissingModelPathAndError) {
 }
 
 TEST_F(ObjectDetectorFromOptionsTest, SucceedsWithModelPath) {
-  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                                    kMobileSsdWithMetadata);
+  std::string model_path = JoinPath("./" /*test src dir*/,
+                                    kTestDataDirectory, kMobileSsdWithMetadata);
   TfLiteObjectDetectorOptions options = TfLiteObjectDetectorOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
   TfLiteObjectDetector* object_detector =
@@ -143,8 +145,8 @@ TEST_F(ObjectDetectorFromOptionsTest, SucceedsWithModelPath) {
 }
 
 TEST_F(ObjectDetectorFromOptionsTest, SucceedsWithNumberOfThreadsAndError) {
-  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                                    kMobileSsdWithMetadata);
+  std::string model_path = JoinPath("./" /*test src dir*/,
+                                    kTestDataDirectory, kMobileSsdWithMetadata);
   TfLiteObjectDetectorOptions options = TfLiteObjectDetectorOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
   options.base_options.compute_settings.cpu_settings.num_threads = 3;
@@ -162,8 +164,8 @@ TEST_F(ObjectDetectorFromOptionsTest, SucceedsWithNumberOfThreadsAndError) {
 
 TEST_F(ObjectDetectorFromOptionsTest,
        FailsWithClassNameDenyListAndClassNameAllowListAndError) {
-  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                                    kMobileSsdWithMetadata);
+  std::string model_path = JoinPath("./" /*test src dir*/,
+                                    kTestDataDirectory, kMobileSsdWithMetadata);
 
   TfLiteObjectDetectorOptions options = TfLiteObjectDetectorOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
@@ -193,8 +195,7 @@ TEST_F(ObjectDetectorFromOptionsTest,
 
 TEST(ObjectDetectorNullDetectorDetectTest,
      FailsWithNullObjectDetectorAndError) {
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
-                               LoadImage("cats_and_dogs.jpg"));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("cats_and_dogs.jpg"));
 
   TfLiteSupportError* error = nullptr;
   TfLiteDetectionResult* detection_result =
@@ -216,8 +217,9 @@ TEST(ObjectDetectorNullDetectorDetectTest,
 class ObjectDetectorDetectTest : public tflite_shims::testing::Test {
  protected:
   void SetUp() override {
-    std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                                      kMobileSsdWithMetadata);
+    std::string model_path =
+        JoinPath("./" /*test src dir*/, kTestDataDirectory,
+                 kMobileSsdWithMetadata);
 
     TfLiteObjectDetectorOptions options = TfLiteObjectDetectorOptionsCreate();
     options.base_options.model_file.file_path = model_path.data();
@@ -230,8 +232,7 @@ class ObjectDetectorDetectTest : public tflite_shims::testing::Test {
 };
 
 TEST_F(ObjectDetectorDetectTest, SucceedsWithImageData) {
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
-                               LoadImage("cats_and_dogs.jpg"));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("cats_and_dogs.jpg"));
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
@@ -250,8 +251,7 @@ TEST_F(ObjectDetectorDetectTest, SucceedsWithImageData) {
 }
 
 TEST_F(ObjectDetectorDetectTest, FailsWithNullFrameBufferAndError) {
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
-                               LoadImage("cats_and_dogs.jpg"));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("cats_and_dogs.jpg"));
 
   TfLiteSupportError* error = nullptr;
   TfLiteDetectionResult* detection_result =
@@ -271,11 +271,7 @@ TEST_F(ObjectDetectorDetectTest, FailsWithNullFrameBufferAndError) {
 }
 
 TEST_F(ObjectDetectorDetectTest, FailsWithNullImageDataAndError) {
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
-                               LoadImage("cats_and_dogs.jpg"));
-
-  TfLiteFrameBuffer frame_buffer = {.format = kRGB, .orientation = kTopLeft};
-
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("cats_and_dogs.jpg"));
   TfLiteSupportError* error = nullptr;
   TfLiteDetectionResult* detection_result =
       TfLiteObjectDetectorDetect(object_detector, nullptr, &error);
@@ -296,8 +292,8 @@ TEST_F(ObjectDetectorDetectTest, FailsWithNullImageDataAndError) {
 TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
      SucceedsWithClassNameDenyList) {
   char* denylisted_label_name = (char*)"cat";
-  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                                    kMobileSsdWithMetadata);
+  std::string model_path = JoinPath("./" /*test src dir*/,
+                                    kTestDataDirectory, kMobileSsdWithMetadata);
 
   TfLiteObjectDetectorOptions options = TfLiteObjectDetectorOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
@@ -310,8 +306,7 @@ TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
       TfLiteObjectDetectorFromOptions(&options, nullptr);
   ASSERT_NE(object_detector, nullptr);
 
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
-                               LoadImage("cats_and_dogs.jpg"));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("cats_and_dogs.jpg"));
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
@@ -330,9 +325,8 @@ TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
   EXPECT_NE(detection_result->detections, nullptr);
   EXPECT_GE(detection_result->detections->size, 1);
   EXPECT_NE(detection_result->detections[0].categories, nullptr);
-  EXPECT_NE(strcmp(detection_result->detections[0].categories[0].label,
-                   denylisted_label_name),
-            0);
+  EXPECT_THAT(detection_result->detections[0].categories[0].label,
+              StrNe(denylisted_label_name));
 
   TfLiteDetectionResultDelete(detection_result);
 }
@@ -340,8 +334,8 @@ TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
 TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
      SucceedsWithClassNameAllowList) {
   char* allowlisted_label_name = (char*)"cat";
-  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                                    kMobileSsdWithMetadata)
+  std::string model_path = JoinPath("./" /*test src dir*/,
+                                    kTestDataDirectory, kMobileSsdWithMetadata)
                                .data();
 
   TfLiteObjectDetectorOptions options = TfLiteObjectDetectorOptionsCreate();
@@ -355,8 +349,7 @@ TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
       TfLiteObjectDetectorFromOptions(&options, nullptr);
   ASSERT_NE(object_detector, nullptr);
 
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
-                               LoadImage("cats_and_dogs.jpg"));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("cats_and_dogs.jpg"));
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
@@ -375,18 +368,16 @@ TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
   EXPECT_NE(detection_result->detections, nullptr);
   EXPECT_GE(detection_result->detections->size, 1);
   EXPECT_NE(detection_result->detections[0].categories, nullptr);
-  EXPECT_EQ(strcmp(detection_result->detections[0].categories[0].label,
-                   allowlisted_label_name),
-            0);
+  EXPECT_THAT(detection_result->detections[0].categories[0].label,
+              StrEq(allowlisted_label_name));
 
   TfLiteDetectionResultDelete(detection_result);
 }
 
 TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
      SucceedsWithScoreThreshold) {
-  char* allowlisted_label_name = (char*)"cat";
-  std::string model_path = JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                                    kMobileSsdWithMetadata)
+  std::string model_path = JoinPath("./" /*test src dir*/,
+                                    kTestDataDirectory, kMobileSsdWithMetadata)
                                .data();
 
   TfLiteObjectDetectorOptions options = TfLiteObjectDetectorOptionsCreate();
@@ -398,8 +389,7 @@ TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
       TfLiteObjectDetectorFromOptions(&options, nullptr);
   ASSERT_NE(object_detector, nullptr);
 
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
-                               LoadImage("cats_and_dogs.jpg"));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("cats_and_dogs.jpg"));
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
