@@ -15,7 +15,7 @@
 #import <Foundation/Foundation.h>
 
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
-#import "third_party/tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
+#import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
