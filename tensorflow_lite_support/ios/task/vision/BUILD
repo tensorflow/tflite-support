@@ -1,5 +1,5 @@
 package(
-    default_visibility = ["//tensorflow_lite_support:__subpackages__"],
+    default_visibility = ["//tensorflow_lite_support:internal"],
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -22,5 +22,19 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResult",
         "//tensorflow_lite_support/ios/task/processor/utils:TFLClassificationUtils",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
+    ],
+)
+
+objc_library(
+    name = "TFLObjectDetector",
+    hdrs = [
+        "sources/TFLObjectDetector.h",
+    ],
+    module_name = "TFLObjectDetector",
+    deps = [
+        "//tensorflow_lite_support/ios/task/core:TFLBaseOptions",
+        "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptions",
+        "//tensorflow_lite_support/ios/task/processor:TFLDetectionResult",
+        "//tensorflow_lite_support/odml/ios/image:MLImage",
     ],
 )

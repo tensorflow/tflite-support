@@ -12,19 +12,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+#import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLCategory.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Encapsulates list of predicted classes (aka labels) for a given image classifier head. */
-@interface TFLClassifications : NSObject
+/** Encapsulates list of predicted classes (aka labels) and bounding box for a detected object. */
+@interface TFLDetection : NSObject
 
 /**
  * The index of the image classifier head these classes refer to. This is useful for multi-head
  * models.
  */
-@property(nonatomic, assign) int headIndex;
+@property(nonatomic, assign) CGRect boundingBox;
 
 /** The array of predicted classes, usually sorted by descending scores (e.g.from high to low
  * probability). */
@@ -32,10 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-/** Encapsulates results of any classification task. */
-@interface TFLClassificationResult : NSObject
+/** Encapsulates results of any object detection task. */
+@interface TFLDetectionResult : NSObject
 
-@property(nonatomic, copy) NSArray<TFLClassifications *> *classifications;
+@property(nonatomic, copy) NSArray<TFLDetection *> *detections;
 
 @end
 
