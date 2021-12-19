@@ -70,25 +70,10 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
   std::vector<uint8> postprocessed_data(output_byte_size / sizeof(uint8), 0);
 
   if (has_uint8_output_) {  // No denormalization required.
-    if (GetTensor()->bytes != output_byte_size) {
-      return tflite::support::CreateStatusWithPayload(
-          absl::StatusCode::kInternal,
-          "Size mismatch or unsupported padding bytes between pixel data "
-          "and output tensor.");
-    }
     const uint8* output_data =
         core::AssertAndReturnTypedTensor<uint8>(GetTensor()).value();
-    postprocessed_data.insert(postprocessed_data.begin(), &output_data[0],
-                              &output_data[output_byte_size / sizeof(uint8)]);
+    core::PopulateVector(output_data, postprocessed_data);
   } else {  // Denormalize to [0, 255] range.
-    if (GetTensor()->bytes / sizeof(float) !=
-        output_byte_size / sizeof(uint8)) {
-      return tflite::support::CreateStatusWithPayload(
-          absl::StatusCode::kInternal,
-          "Size mismatch or unsupported padding bytes between pixel data "
-          "and output tensor.");
-    }
-
     uint8* denormalized_output_data = postprocessed_data.data();
     const float* output_data =
         core::AssertAndReturnTypedTensor<float>(GetTensor()).value();
