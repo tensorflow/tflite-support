@@ -124,7 +124,7 @@ public class MlImage implements Closeable {
 
   /** Returns the timestamp attached to the image. */
   long getTimestamp() {
-    return timestamp;
+     return timestamp;
   }
 
   /** Returns the width of the image. */
