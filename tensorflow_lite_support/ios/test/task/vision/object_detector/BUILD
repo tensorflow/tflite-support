@@ -8,51 +8,27 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-swift_library(
-    name = "TFLImageClassifierSwiftTestLibrary",
-    testonly = 1,
-    srcs = ["TFLImageClassifierTests.swift"],
-    data = [
-        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
-        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
-    ],
-    tags = TFL_DEFAULT_TAGS,
-    deps = [
-        "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
-    ],
-)
-
-ios_unit_test(
-    name = "TFLImageClassifierSwiftTest",
-    minimum_os_version = TFL_MINIMUM_OS_VERSION,
-    runner = tflite_ios_lab_runner("IOS_LATEST"),
-    tags = TFL_DEFAULT_TAGS + TFL_DISABLED_SANITIZER_TAGS,
-    deps = [
-        ":TFLImageClassifierSwiftTestLibrary",
-    ],
-)
-
 objc_library(
-    name = "TFLImageClassifierObjcTestLibrary",
+    name = "TFLObjectDetectorObjcTestLibrary",
     testonly = 1,
-    srcs = ["TFLImageClassifierTests.m"],
+    srcs = ["TFLObjectDetectorTests.m"],
     data = [
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
     ],
     tags = TFL_DEFAULT_TAGS,
     deps = [
-        "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
+        "//tensorflow_lite_support/ios/task/vision:TFLObjectDetector",
         "//tensorflow_lite_support/ios/test/task/vision/utils:GMLImage+FileIOOperations"
     ],
 )
 
 ios_unit_test(
-    name = "TFLImageClassifierObjcTest",
+    name = "TFLObjectDetectorObjcTest",
     minimum_os_version = TFL_MINIMUM_OS_VERSION,
     runner = tflite_ios_lab_runner("IOS_LATEST"),
     tags = TFL_DEFAULT_TAGS + TFL_DISABLED_SANITIZER_TAGS,
     deps = [
-        ":TFLImageClassifierObjcTestLibrary",
+        ":TFLObjectDetectorObjcTestLibrary",
     ],
 )

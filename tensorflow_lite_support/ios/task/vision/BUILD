@@ -71,15 +71,23 @@ tflite_ios_framework(
 
 objc_library(
     name = "TFLObjectDetector",
+     srcs = [
+        "sources/TFLObjectDetector.m",
+    ],
     hdrs = [
         "sources/TFLObjectDetector.h",
     ],
     module_name = "TFLObjectDetector",
     deps = [
+        "//tensorflow_lite_support/c/task/vision:object_detector",
         "//tensorflow_lite_support/ios/task/core:TFLBaseOptions",
+        "//tensorflow_lite_support/ios/task/core:TFLBaseOptionsHelpers",
+        "//tensorflow_lite_support/ios:TFLCommonUtils",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptions",
+        "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLDetectionResult",
-        "//tensorflow_lite_support/odml/ios/image:MLImage",
+        "//tensorflow_lite_support/ios/task/processor/utils:TFLDetectionUtils",
+        "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
     ],
 )
 

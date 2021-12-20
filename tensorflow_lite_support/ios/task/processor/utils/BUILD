@@ -20,6 +20,9 @@ objc_library(
 
 objc_library(
     name = "TFLDetectionUtils",
+    srcs = [
+        "sources/TFLDetectionUtils.m",
+    ],
     hdrs = [
         "sources/TFLDetectionUtils.h",
     ],

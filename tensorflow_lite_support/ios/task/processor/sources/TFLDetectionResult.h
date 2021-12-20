@@ -12,9 +12,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
-#import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions.h"
+#import <Foundation/Foundation.h>
+
+#import "tensorflow_lite_support/ios/task/processor/Sources/TFLCategory.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -13,7 +13,7 @@
  limitations under the License.
  ==============================================================================*/
 #import <Foundation/Foundation.h>
-#import "tensorflow_lite_support/ios/task/processor/core/TFLBaseOptions.h"
+#import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult.h"
 #import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
