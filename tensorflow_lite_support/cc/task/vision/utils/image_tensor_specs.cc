@@ -127,14 +127,15 @@ StatusOr<absl::optional<NormalizationOptions>> GetNormalizationOptionsIfAny(
 }
 
 StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
-    const TfLiteEngine::Interpreter& interpreter,
+    const ModelMetadataExtractor& metadata_extractor,
     const TensorMetadata* tensor_metadata, const TfLiteTensor* tensor) {
   const ImageProperties* props = nullptr;
   absl::optional<NormalizationOptions> normalization_options;
-  if (tensor_metadata != nullptr) {
-    ASSIGN_OR_RETURN(props, GetImagePropertiesIfAny(*tensor_metadata));
+  ASSIGN_OR_RETURN(auto metadata, GetTensorMetadataIfAny(metadata_extractor, tensor_metadata));
+  if (metadata != nullptr) {
+    ASSIGN_OR_RETURN(props, GetImagePropertiesIfAny(*metadata));
     ASSIGN_OR_RETURN(normalization_options,
-                     GetNormalizationOptionsIfAny(*tensor_metadata));
+                     GetNormalizationOptionsIfAny(*metadata));
   }
 
   if (tensor->dims->size != 4) {
