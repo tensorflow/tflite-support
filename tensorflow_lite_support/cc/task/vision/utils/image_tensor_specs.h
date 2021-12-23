@@ -83,7 +83,7 @@ struct ImageTensorSpecs {
 // - `tflite::InterpreterBuilder`,
 // - `tflite::metadata::ModelMetadataExtractor::CreateFromModelBuffer`.
 tflite::support::StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
-    const ModelMetadataExtractor& metadata_extractor,
+    const tflite::metadata::ModelMetadataExtractor& metadata_extractor,
     const TensorMetadata* tensor_metadata, const TfLiteTensor* tensor);
 
 }  // namespace vision
