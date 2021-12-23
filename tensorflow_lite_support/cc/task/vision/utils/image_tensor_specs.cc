@@ -55,7 +55,6 @@ StatusOr<const TensorMetadata*> GetTensorMetadataIfAny(
   }
   return tensor_metadata;
 }
-}  // namespace
 
 StatusOr<const ImageProperties*> GetImagePropertiesIfAny(
     const TensorMetadata& tensor_metadata) {
@@ -126,12 +125,15 @@ StatusOr<absl::optional<NormalizationOptions>> GetNormalizationOptionsIfAny(
   return normalization_options;
 }
 
+}  // namespace
+
 StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
     const ModelMetadataExtractor& metadata_extractor,
     const TensorMetadata* tensor_metadata, const TfLiteTensor* tensor) {
   const ImageProperties* props = nullptr;
   absl::optional<NormalizationOptions> normalization_options;
-  ASSIGN_OR_RETURN(auto metadata, GetTensorMetadataIfAny(metadata_extractor, tensor_metadata));
+  ASSIGN_OR_RETURN(const TensorMetadata* metadata,
+                   GetTensorMetadataIfAny(metadata_extractor, tensor_metadata));
   if (metadata != nullptr) {
     ASSIGN_OR_RETURN(props, GetImagePropertiesIfAny(*metadata));
     ASSIGN_OR_RETURN(normalization_options,
@@ -211,7 +213,8 @@ StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
   if (bytes_size != height * width * depth * byte_depth) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        "The tensor in bytes does not correspond to the expected number of "
+        "The tensor size in bytes does not correspond to the expected number "
+        "of "
         "pixels.",
         TfLiteSupportStatus::kInvalidInputTensorSizeError);
   }
