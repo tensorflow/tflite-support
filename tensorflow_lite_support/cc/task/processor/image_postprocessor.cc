@@ -40,11 +40,12 @@ ImagePostprocessor::Create(core::TfLiteEngine* engine, const int output_index,
                        /* num_expected_tensors = */ 1, engine, {output_index},
                        /* requires_metadata = */ false));
 
-  RETURN_IF_ERROR(processor->Init(input_index));
+  RETURN_IF_ERROR(processor->Init(input_index, output_index));
   return processor;
 }
 
-absl::Status ImagePostprocessor::Init(const int input_index) {
+absl::Status ImagePostprocessor::Init(const int input_index,
+                                      const int output_index) {
   if (input_index == -1) {
     return tflite::support::CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
@@ -52,13 +53,23 @@ absl::Status ImagePostprocessor::Init(const int input_index) {
                         input_index),
         tflite::support::TfLiteSupportStatus::kInputTensorNotFoundError);
   }
+  const TensorMetadata* metadata = GetTensorMetadata(output_index);
   ASSIGN_OR_RETURN(
-      auto output_specs,
-      vision::BuildImageTensorSpecs(*engine_->interpreter(),
-                                    *engine_->metadata_extractor(), false));
+      const tflite::ProcessUnit* normalization_process_unit,
+      ModelMetadataExtractor::FindFirstProcessUnit(
+          *metadata, tflite::ProcessUnitOptions_NormalizationOptions));
+  if (normalization_process_unit == nullptr) {
+    metadata =
+        engine_->metadata_extractor()->GetInputTensorMetadata(input_index);
+  }
+
+  ASSIGN_OR_RETURN(auto output_specs, vision::BuildImageTensorSpecs(
+                                          *engine_->metadata_extractor(),
+                                          metadata, GetTensor(output_index)));
   options_ = std::make_unique<vision::NormalizationOptions>(
       output_specs.normalization_options.value());
-  has_uint8_output_ = GetTensor()->type == kTfLiteUInt8;
+  has_uint8_output_ = GetTensor(output_index)->type == kTfLiteUInt8;
+  has_float32_output_ = GetTensor(output_index)->type == kTfLiteFloat32;
   return absl::OkStatus();
 }
 
