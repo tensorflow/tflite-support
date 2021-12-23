@@ -83,9 +83,8 @@ struct ImageTensorSpecs {
 // - `tflite::InterpreterBuilder`,
 // - `tflite::metadata::ModelMetadataExtractor::CreateFromModelBuffer`.
 tflite::support::StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
-    const tflite::task::core::TfLiteEngine::Interpreter& interpreter,
-    const tflite::metadata::ModelMetadataExtractor& metadata_extractor,
-    const bool is_input);
+    const ModelMetadataExtractor& metadata_extractor,
+    const TensorMetadata* tensor_metadata, const TfLiteTensor* tensor);
 
 }  // namespace vision
 }  // namespace task
