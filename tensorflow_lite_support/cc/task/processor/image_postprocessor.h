@@ -51,13 +51,11 @@ class ImagePostprocessor : public Postprocessor {
  private:
   using Postprocessor::Postprocessor;
 
-  // Whether the model features quantized inference type (QUANTIZED_UINT8). This
-  // is currently detected by checking if the output tensor data type is uint8.
-  bool has_uint8_output_;
+  const TfLiteTensor* output_tensor_;
 
   std::unique_ptr<vision::NormalizationOptions> options_;
 
-  absl::Status Init(const int input_index);
+  absl::Status Init(const int input_index, const int output_index);
 
   const vision::NormalizationOptions& GetNormalizationOptions() {
     return *options_.get();

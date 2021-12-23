@@ -54,6 +54,7 @@ absl::Status ImagePostprocessor::Init(const int input_index,
         tflite::support::TfLiteSupportStatus::kInputTensorNotFoundError);
   }
   const TensorMetadata* metadata = GetTensorMetadata(output_index);
+  // Fallback to input metadata if output meta doesn't have norm params.
   ASSIGN_OR_RETURN(
       const tflite::ProcessUnit* normalization_process_unit,
       ModelMetadataExtractor::FindFirstProcessUnit(
@@ -62,32 +63,35 @@ absl::Status ImagePostprocessor::Init(const int input_index,
     metadata =
         engine_->metadata_extractor()->GetInputTensorMetadata(input_index);
   }
-
-  ASSIGN_OR_RETURN(auto output_specs, vision::BuildImageTensorSpecs(
-                                          *engine_->metadata_extractor(),
-                                          metadata, GetTensor(output_index)));
+  if (!GetTensor(output_index)->data.raw) {
+    return tflite::support::CreateStatusWithPayload(
+        absl::StatusCode::kInternal,
+        absl::StrFormat("Output tensor (%s) has no raw data.",
+                        GetTensor(output_index)->name));
+  }
+  output_tensor_ = GetTensor(output_index);
+  ASSIGN_OR_RETURN(auto output_specs,
+                   vision::BuildImageTensorSpecs(*engine_->metadata_extractor(),
+                                                 metadata, output_tensor_));
   options_ = std::make_unique<vision::NormalizationOptions>(
       output_specs.normalization_options.value());
-  has_uint8_output_ = GetTensor(output_index)->type == kTfLiteUInt8;
-  has_float32_output_ = GetTensor(output_index)->type == kTfLiteFloat32;
   return absl::OkStatus();
 }
 
 absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
   vision::FrameBuffer::Dimension to_buffer_dimension = {
-      GetTensor()->dims->data[2], GetTensor()->dims->data[1]};
+      output_tensor_->dims->data[2], output_tensor_->dims->data[1]};
   size_t output_byte_size =
       GetBufferByteSize(to_buffer_dimension, vision::FrameBuffer::Format::kRGB);
   std::vector<uint8> postprocessed_data(output_byte_size / sizeof(uint8), 0);
 
-  if (has_uint8_output_) {  // No denormalization required.
-    const uint8* output_data =
-        core::AssertAndReturnTypedTensor<uint8>(GetTensor()).value();
-    core::PopulateVector(output_data, postprocessed_data);
-  } else {  // Denormalize to [0, 255] range.
+  if (output_tensor_->type == kTfLiteUInt8) {  // No denormalization required.
+    core::PopulateVector(output_tensor_, &postprocessed_data);
+  } else if (output_tensor_->type ==
+             kTfLiteFloat32) {  // Denormalize to [0, 255] range.
     uint8* denormalized_output_data = postprocessed_data.data();
     const float* output_data =
-        core::AssertAndReturnTypedTensor<float>(GetTensor()).value();
+        core::AssertAndReturnTypedTensor<float>(output_tensor_).value();
     const auto norm_options = GetNormalizationOptions();
 
     if (norm_options.num_values == 1) {
@@ -112,7 +116,8 @@ absl::StatusOr<vision::FrameBuffer> ImagePostprocessor::Postprocess() {
 
   vision::FrameBuffer::Plane postprocessed_plane = {
       /*buffer=*/postprocessed_data.data(),
-      /*stride=*/{GetTensor()->dims->data[2] * kRgbPixelBytes, kRgbPixelBytes}};
+      /*stride=*/{output_tensor_->dims->data[2] * kRgbPixelBytes,
+                  kRgbPixelBytes}};
   auto postprocessed_frame_buffer =
       vision::FrameBuffer::Create({postprocessed_plane}, to_buffer_dimension,
                                   vision::FrameBuffer::Format::kRGB,
