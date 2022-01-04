@@ -20,7 +20,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptions",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResult",
-        "//tensorflow_lite_support/ios/task/processor/utils:TFLClassificationUtils",
+        "//tensorflow_lite_support/ios/task/processor:TFLClassificationResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
     ],
 )
@@ -42,7 +42,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptions",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLDetectionResult",
-        "//tensorflow_lite_support/ios/task/processor/utils:TFLDetectionUtils",
+        "//tensorflow_lite_support/ios/task/processor:TFLDetectionResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
     ],
 )
