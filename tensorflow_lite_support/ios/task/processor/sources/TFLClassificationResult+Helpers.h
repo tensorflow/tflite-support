@@ -18,6 +18,17 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TFLClassificationResult (Helpers)
+
+/**
+ * Creates and retrurns a TFLClassificationResult from a TfLiteClassificationResult returned by
+ * TFLite Task C Library Classification tasks.
+ *
+ * @param cClassificationResult Classification results returned by TFLite Task C Library
+ * Classification tasks
+ *
+ * @return Classification Result of type TFLClassificationResult to be returned by inference methods
+ * of the iOS TF Lite Task Classification tasks.
+ */
 + (TFLClassificationResult *)classificationResultFromCClassificationResults:
     (TfLiteClassificationResult *)cClassificationResult;
 @end
