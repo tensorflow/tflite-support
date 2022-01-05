@@ -71,6 +71,21 @@ objc_library(
 )
 
 objc_library(
+    name = "TFLCategoryHelpers",
+    srcs = [
+        "sources/TFLCategory+Helpers.m",
+    ],
+    hdrs = [
+        "sources/TFLCategory+Helpers.h",
+    ],
+    module_name = "TFLCategoryHelpers",
+    deps = [
+        "//tensorflow_lite_support/c/task/processor:category",
+        "//tensorflow_lite_support/ios/task/processor:TFLCategory",
+    ],
+)
+
+objc_library(
     name = "TFLClassificationResultHelpers",
     srcs = [
         "sources/TFLClassificationResult+Helpers.m",
@@ -82,6 +97,7 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/c/task/processor:classification_result",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResult",
+        ":TFLCategoryHelpers",
     ],
 )
 
@@ -97,6 +113,6 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/c/task/processor:classification_result",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResult",
+        ":TFLCategoryHelpers",
     ],
 )
-
