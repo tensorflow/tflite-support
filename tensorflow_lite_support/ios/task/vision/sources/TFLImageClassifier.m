@@ -67,11 +67,11 @@
                                               error:(NSError **)error {
   TfLiteImageClassifierOptions cOptions = TfLiteImageClassifierOptionsCreate();
   if (![options.classificationOptions
-          copyClassificationOptionsToCClassificationOptions:&(cOptions.classification_options)
-                                                      error:error])
+          copytoCClassificationOptions:&(cOptions.classification_options)
+                                 error:error])
     return nil;
 
-  [options.baseOptions copyBaseOptionsToCBaseOptions:&(cOptions.base_options)];
+  [options.baseOptions copyToCBaseOptions:&(cOptions.base_options)];
 
   TfLiteSupportError *createClassifierError = nil;
   TfLiteImageClassifier *imageClassifier =
@@ -127,7 +127,7 @@
   }
 
   TFLClassificationResult *classificationHeadsResults =
-      [TFLClassificationResult classificationResultFromCClassificationResults:cClassificationResult];
+      [TFLClassificationResult classificationResultFromCClassificationResult:cClassificationResult];
   TfLiteClassificationResultDelete(cClassificationResult);
 
   return classificationHeadsResults;

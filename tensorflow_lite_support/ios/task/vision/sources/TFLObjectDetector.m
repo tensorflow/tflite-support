@@ -67,11 +67,11 @@
                                              error:(NSError **)error {
   TfLiteObjectDetectorOptions cOptions = TfLiteObjectDetectorOptionsCreate();
   if (![options.classificationOptions
-          copyClassificationOptionsToCClassificationOptions:&(cOptions.classification_options)
-                                                      error:error])
+          copytoCClassificationOptions:&(cOptions.classification_options)
+                                 error:error])
     return nil;
 
-  [options.baseOptions copyBaseOptionsToCBaseOptions:&(cOptions.base_options)];
+  [options.baseOptions copyToCBaseOptions:&(cOptions.base_options)];
 
   TfLiteSupportError *createObjectDetectorError = nil;
   TfLiteObjectDetector *objectDetector =
@@ -114,7 +114,7 @@
   }
 
   TFLDetectionResult *detectionResult =
-      [TFLDetectionResult detectionResultFromCDetectionResults:cDetectionResult];
+      [TFLDetectionResult detectionResultFromCDetectionResult:cDetectionResult];
   TfLiteDetectionResultDelete(cDetectionResult);
 
   return detectionResult;

@@ -12,12 +12,12 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLCategory+Helpers.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult+Helpers.h"
 
 @implementation TFLDetectionResult (Helpers)
 
-+ (TFLDetectionResult *)detectionResultFromCDetectionResults:
++ (TFLDetectionResult *)detectionResultFromCDetectionResult:
     (TfLiteDetectionResult *)cDetectionResult {
   if (cDetectionResult == nil) return nil;
 
@@ -27,7 +27,7 @@
     NSMutableArray *categories = [[NSMutableArray alloc] init];
     for (int j = 0; j < cDetection.size; j++) {
       TfLiteCategory cCategory = cDetection.categories[j];
-      
+
       TFLCategory *resultCategory = [TFLCategory categoryFromCCategory:&cCategory];
       [categories addObject:resultCategory];
     }

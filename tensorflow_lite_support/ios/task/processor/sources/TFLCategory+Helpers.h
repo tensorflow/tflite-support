@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLCategory (Helpers)
 
 /**
- * Creates and retrurns a TFLCategory from a TfLiteCategory representing any 
+ * Creates and retrurns a TFLCategory from a TfLiteCategory representing any
  * result class retured by TFLite Task C Library Classification tasks.
  *
  * @param cCategory A result class returned by TFLite Task C Library

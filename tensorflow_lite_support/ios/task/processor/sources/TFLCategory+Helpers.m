@@ -27,8 +27,7 @@
   }
 
   if (cCategory->label != nil) {
-    category.label = [NSString stringWithCString:cCategory->label 
-                                        encoding:NSUTF8StringEncoding];
+    category.label = [NSString stringWithCString:cCategory->label encoding:NSUTF8StringEncoding];
   }
 
   category.score = cCategory->score;
