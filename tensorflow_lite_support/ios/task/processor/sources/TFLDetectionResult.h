@@ -15,7 +15,7 @@ limitations under the License.
 #import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
 
-#import "tensorflow_lite_support/ios/task/processor/Sources/TFLCategory.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLCategory.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -17,7 +17,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TFLClassificationResult (Helpers)
+@interface TFLDetectionResult (Helpers)
 /**
  * Creates and retrurns a TFLDetectionResult from a TfLiteDetectionResult returned by
  * TFLite Task C Library Object Detection task.
