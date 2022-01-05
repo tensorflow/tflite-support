@@ -43,7 +43,7 @@ objc_library(
     tags = TFL_DEFAULT_TAGS,
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
-        "//tensorflow_lite_support/ios/test/task/vision/utils:GMLImage+FileIOOperations"
+        "//tensorflow_lite_support/ios/test/task/vision/utils:GMLImageHelpers"
     ],
 )
 

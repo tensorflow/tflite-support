@@ -15,7 +15,7 @@
 #import <XCTest/XCTest.h>
 
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageClassifier.h"
-#import "tensorflow_lite_support/ios/test/task/vision/utils/sources/GMLImage+FileIOOperations.h"
+#import "tensorflow_lite_support/ios/test/task/vision/utils/sources/GMLImage+Helpers.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
