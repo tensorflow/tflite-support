@@ -12,20 +12,16 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#import "GMLImage+FileIOOperations.h"
+#import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
 
-@implementation GMLImage (FileIOOperations)
+NS_ASSUME_NONNULL_BEGIN
+
+@interface GMLImage (Helpers)
 
 + (GMLImage *)imageFromBundleWithClass:(Class)class
                               fileName:(NSString *)name
-                                ofType:(NSString *)type {
-  NSString *imagePath = [[NSBundle bundleForClass:class] pathForResource:name ofType:type];
-  if (!imagePath) return nil;
-
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-  if (!image) return nil;
-
-  return [[GMLImage alloc] initWithImage:image];
-}
+                                ofType:(NSString *)type;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -4,14 +4,14 @@ package(
 )
 
 objc_library(
-    name = "GMLImage+FileIOOperations",
+    name = "GMLImageHelpers",
     srcs = [
-        "sources/GMLImage+FileIOOperations.m",
+        "sources/GMLImage+Helpers.m",
     ],
     hdrs = [
-        "sources/GMLImage+FileIOOperations.h",
+        "sources/GMLImage+Helpers.h",
     ],
-    module_name = "GMLImage+FileIOOperations",
+    module_name = "GMLImageHelpers",
     deps = [
         "//tensorflow_lite_support/odml/ios/image:MLImage",
     ],
