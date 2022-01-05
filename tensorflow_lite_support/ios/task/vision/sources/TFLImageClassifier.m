@@ -17,7 +17,7 @@
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions+Helpers.h"
-#import "tensorflow_lite_support/ios/task/processor/utils/sources/TFLClassificationResult+Helpers.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult+Helpers.h"
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImageUtils.h"
 
 #include "tensorflow_lite_support/c/task/vision/image_classifier.h"
