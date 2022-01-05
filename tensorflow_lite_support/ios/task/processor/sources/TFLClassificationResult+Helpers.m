@@ -13,6 +13,7 @@
  limitations under the License.
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult+Helpers.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLCategory+Helpers.h"
 
 @implementation TFLClassificationResult (Helpers)
 
@@ -26,20 +27,8 @@
     NSMutableArray *classes = [[NSMutableArray alloc] init];
     for (int j = 0; j < cClassifications.size; j++) {
       TfLiteCategory cCategory = cClassifications.categories[j];
-      TFLCategory *resultCategory = [[TFLCategory alloc] init];
-
-      if (cCategory.display_name != nil) {
-        resultCategory.displayName = [NSString stringWithCString:cCategory.display_name
-                                                        encoding:NSUTF8StringEncoding];
-      }
-
-      if (cCategory.label != nil) {
-        resultCategory.label = [NSString stringWithCString:cCategory.label
-                                                  encoding:NSUTF8StringEncoding];
-      }
-
-      resultCategory.score = cCategory.score;
-      resultCategory.classIndex = (NSInteger)cCategory.index;
+      
+      TFLCategory *resultCategory = [TFLCategory categoryFromCCategory:&cCategory];
       [classes addObject:resultCategory];
     }
     TFLClassifications *classificationHead = [[TFLClassifications alloc] init];
