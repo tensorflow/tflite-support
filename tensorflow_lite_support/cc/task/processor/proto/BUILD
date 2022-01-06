@@ -65,3 +65,13 @@ cc_proto_library(
         ":classification_options_proto",
     ],
 )
+
+java_lite_proto_library(
+    name = "classification_options_java_proto_lite",
+    deps = [":classification_options_proto"],
+)
+
+java_lite_proto_library(
+    name = "embedding_options_java_proto_lite",
+    deps = [":embedding_options_proto"],
+)

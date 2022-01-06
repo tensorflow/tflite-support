@@ -77,3 +77,8 @@ cc_proto_library(
         ":class_proto",
     ],
 )
+
+java_lite_proto_library(
+    name = "base_options_java_proto_lite",
+    deps = [":base_options_proto"],
+)
