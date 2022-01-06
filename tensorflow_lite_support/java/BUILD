@@ -27,7 +27,6 @@ filegroup(
 android_library(
     name = "tensorflowlite_support",
     srcs = [],
-    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     exports = [
         ":tensorflowlite_support_java",
@@ -41,7 +40,6 @@ android_library(
 android_library(
     name = "tensorflowlite_support_java",
     srcs = [":java_srcs"],
-    javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     # LINT.IfChange(dep)
     deps = [
