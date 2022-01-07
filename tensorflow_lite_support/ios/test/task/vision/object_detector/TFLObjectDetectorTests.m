@@ -51,7 +51,7 @@
   XCTAssertEqual(detection.boundingBox.size.height, expectedBoundingBox.size.height);
 
   XCTAssertTrue([detection.categories[0].label isEqual:expectedFirstLabel]);
-  XCTAssertTrue(detection.categories[0].score >= expectedFirstScore);
+  XCTAssertEqualWithAccuracy(detection.categories[0].score, expectedFirstScore, 0.001);
 }
 
 - (void)verifyResults:(TFLDetectionResult *)detectionResult {
