@@ -67,7 +67,7 @@
                                              error:(NSError **)error {
   TfLiteObjectDetectorOptions cOptions = TfLiteObjectDetectorOptionsCreate();
   if (![options.classificationOptions
-          copytoCClassificationOptions:&(cOptions.classification_options)
+          copyToCClassificationOptions:&(cOptions.classification_options)
                                  error:error])
     return nil;
 
@@ -81,7 +81,7 @@
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
   if (!objectDetector) {
-    [TFLCommonUtils errorFromTfLiteSupportError:createObjectDetectorError error:error];
+    [TFLCommonUtils errorWithTfLiteSupportError:createObjectDetectorError error:error];
     TfLiteSupportErrorDelete(createObjectDetectorError);
     return nil;
   }
@@ -91,7 +91,7 @@
 
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
                                               error:(NSError *_Nullable *)error {
-  TfLiteFrameBuffer *cFrameBuffer = [GMLImageUtils cFrameBufferFromGMLImage:image error:error];
+  TfLiteFrameBuffer *cFrameBuffer = [GMLImageUtils cFrameBufferWithGMLImage:image error:error];
 
   if (!cFrameBuffer) {
     return nil;
@@ -108,13 +108,13 @@
   cFrameBuffer = nil;
 
   if (!cDetectionResult) {
-    [TFLCommonUtils errorFromTfLiteSupportError:detectError error:error];
+    [TFLCommonUtils errorWithTfLiteSupportError:detectError error:error];
     TfLiteSupportErrorDelete(detectError);
     return nil;
   }
 
   TFLDetectionResult *detectionResult =
-      [TFLDetectionResult detectionResultFromCDetectionResult:cDetectionResult];
+      [TFLDetectionResult detectionResultWithCDetectionResult:cDetectionResult];
   TfLiteDetectionResultDelete(cDetectionResult);
 
   return detectionResult;

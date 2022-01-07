@@ -16,7 +16,7 @@
 
 @implementation TFLCategory (Helpers)
 
-+ (TFLCategory *)categoryFromCCategory:(TfLiteCategory *)cCategory {
++ (TFLCategory *)categoryWithCCategory:(TfLiteCategory *)cCategory {
   if (cCategory == nil) return nil;
 
   TFLCategory *category = [[TFLCategory alloc] init];

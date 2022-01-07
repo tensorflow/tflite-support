@@ -17,7 +17,7 @@
 
 @implementation TFLDetectionResult (Helpers)
 
-+ (TFLDetectionResult *)detectionResultFromCDetectionResult:
++ (TFLDetectionResult *)detectionResultWithCDetectionResult:
     (TfLiteDetectionResult *)cDetectionResult {
   if (cDetectionResult == nil) return nil;
 
@@ -28,7 +28,7 @@
     for (int j = 0; j < cDetection.size; j++) {
       TfLiteCategory cCategory = cDetection.categories[j];
 
-      TFLCategory *resultCategory = [TFLCategory categoryFromCCategory:&cCategory];
+      TFLCategory *resultCategory = [TFLCategory categoryWithCCategory:&cCategory];
       [categories addObject:resultCategory];
     }
     TFLDetection *detection = [[TFLDetection alloc] init];

@@ -29,7 +29,7 @@ static NSString *const TFLSupportTaskErrorDomain = @"org.tensorflow.lite.tasks";
                              userInfo:@{NSLocalizedDescriptionKey : description}];
 }
 
-+ (void)errorFromTfLiteSupportError:(TfLiteSupportError *)supportError error:(NSError **)error {
++ (void)errorWithTfLiteSupportError:(TfLiteSupportError *)supportError error:(NSError **)error {
   if (supportError && error)
     *error = [NSError
         errorWithDomain:TFLSupportTaskErrorDomain

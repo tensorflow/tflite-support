@@ -55,7 +55,7 @@
   free(cStrings);
 }
 
-- (BOOL)copytoCClassificationOptions:(TfLiteClassificationOptions *)cClassificationOptions
+- (BOOL)copyToCClassificationOptions:(TfLiteClassificationOptions *)cClassificationOptions
                                error:(NSError **)error {
   cClassificationOptions->score_threshold = self.scoreThreshold;
   cClassificationOptions->max_results = (int)self.maxResults;

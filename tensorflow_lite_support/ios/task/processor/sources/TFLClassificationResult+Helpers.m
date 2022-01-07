@@ -17,7 +17,7 @@
 
 @implementation TFLClassificationResult (Helpers)
 
-+ (TFLClassificationResult *)classificationResultFromCClassificationResult:
++ (TFLClassificationResult *)classificationResultWithCClassificationResult:
     (TfLiteClassificationResult *)cClassificationResult {
   if (cClassificationResult == nil) return nil;
 
@@ -28,7 +28,7 @@
     for (int j = 0; j < cClassifications.size; j++) {
       TfLiteCategory cCategory = cClassifications.categories[j];
 
-      TFLCategory *resultCategory = [TFLCategory categoryFromCCategory:&cCategory];
+      TFLCategory *resultCategory = [TFLCategory categoryWithCCategory:&cCategory];
       [classes addObject:resultCategory];
     }
     TFLClassifications *classificationHead = [[TFLClassifications alloc] init];
