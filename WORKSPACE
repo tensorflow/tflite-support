@@ -94,9 +94,9 @@ http_archive(
     ],
 )
 
-# TF on 2021-11-09.
-TENSORFLOW_COMMIT = "6a144e7763914d3f6141a7cdc9cb116cc23425f9"
-TENSORFLOW_SHA256 = "cec9a514c09d2b171ad447f3413151b25a6c3d88d048148cced1e85db81f3617"
+# TF on 2021-12-11.
+TENSORFLOW_COMMIT = "529ffd527885f4e153fcec08d48b26b8dbf2ce2a"
+TENSORFLOW_SHA256 = "2c63c8d21001427c4dc919bbe86a90434b5beb7ab0761e5494e4847a1754b952"
 http_archive(
     name = "org_tensorflow",
     sha256 = TENSORFLOW_SHA256,
@@ -123,12 +123,36 @@ gflags()
 third_party_http_archive(
     name = "pybind11",
     urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pybind/pybind11/archive/v2.6.0.tar.gz",
-        "https://github.com/pybind/pybind11/archive/v2.6.0.tar.gz",
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pybind/pybind11/archive/v2.7.1.tar.gz",
+        "https://github.com/pybind/pybind11/archive/v2.7.1.tar.gz",
     ],
-    sha256 = "90b705137b69ee3b5fc655eaca66d0dc9862ea1759226f7ccd3098425ae69571",
-    strip_prefix = "pybind11-2.6.0",
-    build_file = "//third_party:pybind11.BUILD",
+    sha256 = "616d1c42e4cf14fa27b2a4ff759d7d7b33006fdc5ad8fd603bb2c22622f27020",
+    strip_prefix = "pybind11-2.7.1",
+    build_file = "@pybind11_bazel//:pybind11.BUILD",
+)
+
+# TODO(b/211393391): Updates the commit number once the new change is ready.
+PP_COMMIT = "30f02dd9ccd2fc7046c36ed913ed510fd1aa7301"
+PP_SHA256 = "178bcd587956b0f449fff2f46e663dc10baa6d4951a0a7f48cddfeef57d593a8"
+http_archive(
+    name = "pybind11_protobuf",
+    sha256 = PP_SHA256,
+    strip_prefix = "pybind11_protobuf-{commit}".format(commit = PP_COMMIT),
+    urls = [
+        "https://github.com/pybind/pybind11_protobuf/archive/{commit}.tar.gz".format(commit = PP_COMMIT),
+    ],
+)
+
+http_archive(
+    name = "com_google_protobuf",
+    sha256 = "bb1ddd8172b745cbdc75f06841bd9e7c9de0b3956397723d883423abfab8e176",
+    strip_prefix = "protobuf-3.18.0",
+    # Patched to give visibility into private targets to pybind11_protobuf
+    patches = ["//third_party/pybind11_protobuf:com_google_protobuf_build.patch"],
+    urls = [
+        "https://github.com/protocolbuffers/protobuf/archive/v3.18.0.zip",
+    ],
+    repo_mapping = {"@six": "@six_archive"},
 )
 
 http_archive(
