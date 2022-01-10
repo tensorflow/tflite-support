@@ -23,6 +23,7 @@ import android.graphics.RectF;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import org.tensorflow.lite.support.common.Operator;
 import org.tensorflow.lite.support.common.SequentialProcessor;
 import org.tensorflow.lite.support.common.TensorOperator;
@@ -200,7 +201,8 @@ public class ImageProcessor extends SequentialProcessor<TensorImage> {
         "The Rot90Op has not been added to the ImageProcessor.");
 
     List<Integer> indexes = operatorIndex.get(Rot90Op.class.getName());
-    SupportPreconditions.checkElementIndex(occurrence, indexes.size(), "occurrence");
+    SupportPreconditions.checkElementIndex(
+        occurrence, Objects.requireNonNull(indexes).size(), "occurrence");
 
     // The index of the Rot90Op to be replaced in operatorList.
     int index = indexes.get(occurrence);

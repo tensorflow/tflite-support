@@ -19,6 +19,7 @@ import android.content.Context;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.util.Map;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.tensorflow.lite.InterpreterApi;
@@ -92,7 +93,7 @@ public class Model {
   /** The memory-mapped model data. */
   private final MappedByteBuffer byteModel;
 
-  private final GpuDelegateProxy gpuDelegateProxy;
+  private final @Nullable GpuDelegateProxy gpuDelegateProxy;
 
   /**
    * Builder for {@link Model}.
@@ -198,7 +199,7 @@ public class Model {
         SupportPreconditions.checkArgument(
             gpuDelegateProxy != null,
             "Cannot inference with GPU. Did you add \"tensorflow-lite-gpu\" as dependency?");
-        interpreterOptions.addDelegate(gpuDelegateProxy);
+        interpreterOptions.addDelegate(Objects.requireNonNull(gpuDelegateProxy));
         break;
       case CPU:
         break;

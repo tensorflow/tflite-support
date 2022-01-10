@@ -16,6 +16,7 @@ limitations under the License.
 package org.tensorflow.lite.support.label;
 
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.tensorflow.lite.annotations.UsedByReflection;
 
 /**
@@ -95,7 +96,7 @@ public final class Category {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (o instanceof Category) {
       Category other = (Category) o;
       return (other.getLabel().equals(this.label)

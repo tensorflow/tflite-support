@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.common.internal.SupportPreconditions;
@@ -117,7 +118,7 @@ public class TensorLabel {
     SupportPreconditions.checkArgument(
         axisLabels.containsKey(labeledAxis),
         "get a <String, TensorBuffer> map requires the labels are set on the first non-1 axis.");
-    List<String> labels = axisLabels.get(labeledAxis);
+    List<String> labels = Objects.requireNonNull(axisLabels.get(labeledAxis));
 
     DataType dataType = tensorBuffer.getDataType();
     int typeSize = tensorBuffer.getTypeSize();
@@ -161,7 +162,7 @@ public class TensorLabel {
     SupportPreconditions.checkState(
         labeledAxis == shape.length - 1,
         "get a <String, Scalar> map is only valid when the only labeled axis is the last one.");
-    List<String> labels = axisLabels.get(labeledAxis);
+    List<String> labels = Objects.requireNonNull(axisLabels.get(labeledAxis));
     float[] data = tensorBuffer.getFloatArray();
     SupportPreconditions.checkState(labels.size() == data.length);
     Map<String, Float> result = new LinkedHashMap<>();
@@ -192,7 +193,7 @@ public class TensorLabel {
     SupportPreconditions.checkState(
         labeledAxis == shape.length - 1,
         "get a Category list is only valid when the only labeled axis is the last one.");
-    List<String> labels = axisLabels.get(labeledAxis);
+    List<String> labels = Objects.requireNonNull(axisLabels.get(labeledAxis));
     float[] data = tensorBuffer.getFloatArray();
     SupportPreconditions.checkState(labels.size() == data.length);
     List<Category> result = new ArrayList<>();

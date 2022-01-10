@@ -20,6 +20,7 @@ import static org.tensorflow.lite.support.common.internal.SupportPreconditions.c
 import android.graphics.Bitmap;
 import android.media.Image;
 import java.nio.ByteBuffer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
@@ -51,7 +52,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 public class TensorImage {
 
   private final DataType dataType;
-  private ImageContainer container = null;
+  private @Nullable ImageContainer container = null;
 
   /**
    * Initializes a {@link TensorImage} object.
@@ -110,7 +111,8 @@ public class TensorImage {
    */
   public static TensorImage createFrom(TensorImage src, DataType dataType) {
     TensorImage dst = new TensorImage(dataType);
-    dst.container = src.container.clone();
+    ImageContainer container = src.container;
+    dst.container = container == null ? null : container.clone();
     return dst;
   }
 
