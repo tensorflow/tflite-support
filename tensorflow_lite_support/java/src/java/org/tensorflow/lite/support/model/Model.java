@@ -114,7 +114,6 @@ public class Model {
      * @param modelPath Asset path of the model (.tflite file).
      * @throws IOException if an I/O error occurs when loading the tflite model.
      */
-    @NonNull
     public Builder(@NonNull Context context, @NonNull String modelPath) throws IOException {
       this.modelPath = modelPath;
       byteModel = FileUtil.loadMappedFile(context, modelPath);
