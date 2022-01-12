@@ -4,7 +4,7 @@ load("@build_bazel_rules_apple//apple:ios.bzl", "ios_unit_test")
 load("@org_tensorflow//tensorflow/lite:special_rules.bzl", "tflite_ios_lab_runner")
 
 package(
-    default_visibility = ["//tensorflow_lite_support:__subpackages__"],
+    default_visibility = ["//visibility:private"],
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -43,6 +43,7 @@ objc_library(
     tags = TFL_DEFAULT_TAGS,
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
+        "//tensorflow_lite_support/ios/test/task/vision/utils:GMLImageHelpers",
     ],
 )
 

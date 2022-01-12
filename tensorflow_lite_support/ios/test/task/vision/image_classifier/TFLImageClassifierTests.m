@@ -13,7 +13,9 @@
  limitations under the License.
  ==============================================================================*/
 #import <XCTest/XCTest.h>
+
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageClassifier.h"
+#import "tensorflow_lite_support/ios/test/task/vision/utils/sources/GMLImage+Helpers.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,17 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation TFLImageClassifierTests
 
-- (GMLImage *)imageFromBundleWithName:(NSString *)name ofType:(NSString *)type {
-  NSString *imagePath = [[NSBundle bundleForClass:[self class]] pathForResource:name ofType:type];
-  XCTAssertNotNil(imagePath);
-  UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-  XCTAssertNotNil(image);
-
-  GMLImage *gmlImage = [[GMLImage alloc] initWithImage:image];
-  XCTAssertNotNil(gmlImage);
-
-  return gmlImage;
-}
 - (void)setUp {
   // Put setup code here. This method is called before the invocation of each test method in the
   // class. static let bundle = Bundle(for: TFLSentencepieceTokenizerTest.self)
@@ -54,7 +45,11 @@ NS_ASSUME_NONNULL_BEGIN
   TFLImageClassifier *imageClassifier =
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
-  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger" ofType:@"jpg"];
+
+  GMLImage *gmlImage = [GMLImage imageFromBundleWithClass:[self class]
+                                                 fileName:@"burger"
+                                                   ofType:@"jpg"];
+  XCTAssertNotNil(gmlImage);
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                    error:nil];
@@ -77,7 +72,10 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  GMLImage *gmlImage = [self imageFromBundleWithName:@"burger" ofType:@"jpg"];
+  GMLImage *gmlImage = [GMLImage imageFromBundleWithClass:[self class]
+                                                 fileName:@"burger"
+                                                   ofType:@"jpg"];
+  XCTAssertNotNil(gmlImage);
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                    error:nil];
@@ -100,7 +98,10 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  GMLImage *gmlImage = [self imageFromBundleWithName:@"multi_objects" ofType:@"jpg"];
+  GMLImage *gmlImage = [GMLImage imageFromBundleWithClass:[self class]
+                                                 fileName:@"multi_objects"
+                                                   ofType:@"jpg"];
+  XCTAssertNotNil(gmlImage);
 
   CGRect roi = CGRectMake(406, 110, 148, 153);
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
@@ -123,7 +124,9 @@ NS_ASSUME_NONNULL_BEGIN
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
 
-  GMLImage *gmlImage = [self imageFromBundleWithName:@"sparrow" ofType:@"png"];
+  GMLImage *gmlImage = [GMLImage imageFromBundleWithClass:[self class]
+                                                 fileName:@"sparrow"
+                                                   ofType:@"png"];
   XCTAssertNotNil(gmlImage);
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage

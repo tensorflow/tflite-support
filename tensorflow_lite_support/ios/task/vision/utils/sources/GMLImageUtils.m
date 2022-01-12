@@ -210,7 +210,7 @@
 
 @implementation GMLImageUtils
 
-+ (nullable TfLiteFrameBuffer *)cFrameBufferFromGMLImage:(GMLImage *)gmlImage
++ (nullable TfLiteFrameBuffer *)cFrameBufferWithGMLImage:(GMLImage *)gmlImage
                                                    error:(NSError *_Nullable *)error {
   TfLiteFrameBuffer *cFrameBuffer = NULL;
 
