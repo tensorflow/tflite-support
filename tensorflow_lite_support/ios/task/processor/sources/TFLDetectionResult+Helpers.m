@@ -17,7 +17,7 @@
 
 @implementation TFLDetectionResult (Helpers)
 
-+ (TFLDetectionResult *)detectionResultWithCDetectionResult:
++ (TFLDetectionResult *)detectionResultWithCResult:
     (TfLiteDetectionResult *)cDetectionResult {
   if (cDetectionResult == nil) return nil;
 

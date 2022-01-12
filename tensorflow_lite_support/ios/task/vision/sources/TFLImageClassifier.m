@@ -67,11 +67,11 @@
                                               error:(NSError **)error {
   TfLiteImageClassifierOptions cOptions = TfLiteImageClassifierOptionsCreate();
   if (![options.classificationOptions
-          copyToCClassificationOptions:&(cOptions.classification_options)
+          copyToCOptions:&(cOptions.classification_options)
                                  error:error])
     return nil;
 
-  [options.baseOptions copyToCBaseOptions:&(cOptions.base_options)];
+  [options.baseOptions copyToCOptions:&(cOptions.base_options)];
 
   TfLiteSupportError *createClassifierError = nil;
   TfLiteImageClassifier *imageClassifier =
@@ -81,7 +81,7 @@
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
   if (!imageClassifier) {
-    [TFLCommonUtils errorWithTfLiteSupportError:createClassifierError error:error];
+    [TFLCommonUtils errorWithCError:createClassifierError error:error];
     TfLiteSupportErrorDelete(createClassifierError);
     return nil;
   }
@@ -121,13 +121,13 @@
   cFrameBuffer = nil;
 
   if (!cClassificationResult) {
-    [TFLCommonUtils errorWithTfLiteSupportError:classifyError error:error];
+    [TFLCommonUtils errorWithCError:classifyError error:error];
     TfLiteSupportErrorDelete(classifyError);
     return nil;
   }
 
   TFLClassificationResult *classificationHeadsResults =
-      [TFLClassificationResult classificationResultWithCClassificationResult:cClassificationResult];
+      [TFLClassificationResult classificationResultWithCResult:cClassificationResult];
   TfLiteClassificationResultDelete(cClassificationResult);
 
   return classificationHeadsResults;

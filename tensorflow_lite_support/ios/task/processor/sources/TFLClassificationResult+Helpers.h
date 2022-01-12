@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Classification Result of type TFLClassificationResult to be returned by inference methods
  * of the iOS TF Lite Task Classification tasks.
  */
-+ (TFLClassificationResult *)classificationResultWithCClassificationResult:
++ (TFLClassificationResult *)classificationResultWithCResult:
     (TfLiteClassificationResult *)cClassificationResult;
 @end
 

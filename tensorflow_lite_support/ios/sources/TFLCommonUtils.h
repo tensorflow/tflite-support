@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param error Pointer to the memory location where the created error should be saved. If `nil`, no
  * error will be saved.
  */
-+ (void)errorWithTfLiteSupportError:(TfLiteSupportError *)supportError error:(NSError **)error;
++ (void)errorWithCError:(TfLiteSupportError *)supportError error:(NSError **)error;
 
 /**
  * Allocates a block of memory with the specified size and returns a pointer to it. If memory cannot

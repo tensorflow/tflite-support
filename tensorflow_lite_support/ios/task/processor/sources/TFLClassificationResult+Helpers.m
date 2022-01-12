@@ -17,7 +17,7 @@
 
 @implementation TFLClassificationResult (Helpers)
 
-+ (TFLClassificationResult *)classificationResultWithCClassificationResult:
++ (TFLClassificationResult *)classificationResultWithCResult:
     (TfLiteClassificationResult *)cClassificationResult {
   if (cClassificationResult == nil) return nil;
 
