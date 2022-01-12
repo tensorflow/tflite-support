@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return The TfLiteFrameBuffer created from the gmlImage which can be used
  * with the TF Lite Task Vision C library.
  */
-+ (nullable TfLiteFrameBuffer *)cFrameBufferWithGMLImage:(GMLImage *)gmlImage
++ (nullable TfLiteFrameBuffer *)cFrameBufferFromGMLImage:(GMLImage *)gmlImage
                                                    error:(NSError *_Nullable *)error;
 
 - (instancetype)init NS_UNAVAILABLE;

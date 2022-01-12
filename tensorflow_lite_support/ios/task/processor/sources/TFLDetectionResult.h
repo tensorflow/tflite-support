@@ -1,4 +1,4 @@
-/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@ limitations under the License.
 ==============================================================================*/
 #import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
-
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLCategory.h"
 
 NS_ASSUME_NONNULL_BEGIN

@@ -18,8 +18,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TFLClassificationOptions (Helpers)
-- (BOOL)copyToCOptions:(TfLiteClassificationOptions *)cClassificationOptions
-                               error:(NSError **)error;
+- (BOOL)copyClassificationOptionsToCClassificationOptions:
+            (TfLiteClassificationOptions *)cClassificationOptions
+                                                    error:(NSError **)error;
 
 - (void)deleteCStringArraysOfClassificationOptions:
     (TfLiteClassificationOptions *)cClassificationOptions;
