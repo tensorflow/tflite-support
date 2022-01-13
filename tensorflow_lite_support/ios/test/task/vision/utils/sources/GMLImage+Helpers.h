@@ -12,14 +12,16 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
+#import "third_party/tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
 
-@implementation TFLBaseOptions (Helpers)
+NS_ASSUME_NONNULL_BEGIN
 
-- (void)copyToCOptions:(TfLiteBaseOptions *)cBaseOptions {
-  if (self.modelFile.filePath) {
-    cBaseOptions->model_file.file_path = self.modelFile.filePath.UTF8String;
-  }
-}
+@interface GMLImage (Helpers)
+
++ (nullable GMLImage *)imageFromBundleWithClass:(Class)classObject
+                                       fileName:(NSString *)name
+                                         ofType:(NSString *)type;
 
 @end
+
+NS_ASSUME_NONNULL_END
