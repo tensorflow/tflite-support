@@ -12,7 +12,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#import "third_party/tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
+#import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
