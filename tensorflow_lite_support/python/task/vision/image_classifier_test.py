@@ -23,9 +23,11 @@ from tensorflow_lite_support.python.task.vision import image_classifier
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
 import unittest
+import textwrap
 
 _MODEL_FLOAT = "mobilenet_v2_1.0_224.tflite"
 _MODEL_QUANTIZED = "mobilenet_v1_0.25_224_quant.tflite"
+
 
 class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
@@ -94,8 +96,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       image_classifier.ImageClassifier.create_from_options(options)
 
   @parameterized.parameters(
-    (3, 0.5, None, None, False),
-    # (3, 0.8, None, None, True),
+    (3, None, None, None, False),
   )
   def test_classify_float_model(self, max_results, score_threshold,
                                 class_name_whitelist, class_name_blacklist,
@@ -125,11 +126,56 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Classifies both inputs.
     image_result = classifier.classify(image, bounding_box)
-    # crop_result = classifier.classify(cropped_image)
+    crop_result = classifier.classify(cropped_image)
 
-    print(image_result.classifications)
-
-    # Checks results sizes.
+    self.assertMultiLineEqual(
+      str(image_result),
+      textwrap.dedent(
+        """\
+        classifications {
+          classes {
+            index: 934
+            score: 0.7399742007255554
+            class_name: "cheeseburger"
+          }
+          classes {
+            index: 925
+            score: 0.026928534731268883
+            class_name: "guacamole"
+          }
+          classes {
+            index: 932
+            score: 0.025737214833498
+            class_name: "bagel"
+          }
+          head_index: 0
+        }
+        """)
+    )
+    self.assertMultiLineEqual(
+      str(crop_result),
+      textwrap.dedent(
+        """\
+        classifications {
+          classes {
+            index: 934
+            score: 0.8810749650001526
+            class_name: "cheeseburger"
+          }
+          classes {
+            index: 925
+            score: 0.019916774705052376
+            class_name: "guacamole"
+          }
+          classes {
+            index: 932
+            score: 0.012394513003528118
+            class_name: "bagel"
+          }
+          head_index: 0
+        }
+        """)
+    )
 
 
 if __name__ == "__main__":
