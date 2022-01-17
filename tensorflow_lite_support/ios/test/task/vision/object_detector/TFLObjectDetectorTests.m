@@ -17,17 +17,7 @@
 
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLObjectDetector.h"
 #import "tensorflow_lite_support/ios/test/task/vision/utils/sources/GMLImage+Helpers.h"
-
-#define VerifyDetection(detection, expectedBoundingBox, expectedFirstScore, expectedFirstLabel) \
-  XCTAssertGreaterThan([detection.categories count], 0);                                        \
-  NSLog(@"Detected %f", detection.categories[0].score);                                         \
-  NSLog(@"Expected %f", expectedFirstScore);                                                    \
-  XCTAssertEqual(detection.boundingBox.origin.x, expectedBoundingBox.origin.x);                 \
-  XCTAssertEqual(detection.boundingBox.origin.y, expectedBoundingBox.origin.y);                 \
-  XCTAssertEqual(detection.boundingBox.size.width, expectedBoundingBox.size.width);             \
-  XCTAssertEqual(detection.boundingBox.size.height, expectedBoundingBox.size.height);           \
-  XCTAssertEqualObjects(detection.categories[0].label, expectedFirstLabel);                     \
-  XCTAssertEqualWithAccuracy(detection.categories[0].score, expectedFirstScore, 0.001)
+#import "tensorflow_lite_support/ios/test/task/vision/object_detector/utils/sources/TFLTestUtil.h"
 
 @interface TFLObjectDetectorTests : XCTestCase
 @property(nonatomic, nullable) NSString *modelPath;

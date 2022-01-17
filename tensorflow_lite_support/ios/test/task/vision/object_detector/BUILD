@@ -19,6 +19,7 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLObjectDetector",
         "//tensorflow_lite_support/ios/test/task/vision/utils:GMLImageHelpers",
+        "//tensorflow_lite_support/ios/test/task/vision/object_detector/utils:TFLTestUtil"
     ],
 )
 
