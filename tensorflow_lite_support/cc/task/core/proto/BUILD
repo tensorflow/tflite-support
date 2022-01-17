@@ -48,6 +48,17 @@ support_cc_proto_library(
     ],
 )
 
+support_py_proto_library(
+    name = "base_options_py_pb2",
+    srcs = ["base_options.proto"],
+    api_version = 2,
+    proto_deps = [":base_options_proto"],
+    py_proto_deps = [
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto_external_py",
+        "//tensorflow_lite_support/cc/task/core/proto:external_file_py_pb2",
+    ],
+)
+
 cc_library(
     name = "base_options_proto_inc",
     hdrs = ["base_options_proto_inc.h"],

@@ -14,7 +14,7 @@
 """Options to configure Embedding APIs."""
 
 import dataclasses
-from typing import Optional
+from typing import Optional, List
 
 
 @dataclasses.dataclass
@@ -31,3 +31,19 @@ class EmbeddingOptions:
   # therefore any dimension is guaranteed to have a value in [-1.0, 1.0]. Use
   # the l2_normalize option if this is not the case.
   quantize: Optional[bool] = None
+
+
+@dataclasses.dataclass
+class ClassificationOptions:
+  """Options for classification processor."""
+  # TODO: document
+
+  display_names_locale: Optional[str] = None
+
+  max_results: Optional[int] = None
+
+  score_threshold: Optional[float] = None
+
+  class_name_whitelist: List[str] = None
+
+  class_name_blacklist: List[str] = None

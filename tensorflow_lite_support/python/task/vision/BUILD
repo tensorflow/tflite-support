@@ -42,3 +42,44 @@ py_test(
         "@absl_py//absl/testing:parameterized",
     ],
 )
+
+py_library(
+    name = "image_classifier",
+    srcs = [
+        "image_classifier.py",
+    ],
+    deps = [
+        "//tensorflow_lite_support/python/task/core:task_options",
+        "//tensorflow_lite_support/python/task/core/proto:base_options_pb2",
+        "//tensorflow_lite_support/python/task/core/proto:configuration_pb2",
+        "//tensorflow_lite_support/python/task/processor:processor_options",
+        "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:image_classifier_options_pb2",
+        "//tensorflow_lite_support/python/task/vision/core:tensor_image",
+        "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
+        "//tensorflow_lite_support/python/task/vision/pybinds:image_classifier",
+    ],
+)
+
+py_test(
+    name = "image_classifier_test",
+    srcs = ["image_classifier_test.py"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
+    ],
+    deps = [
+        ":image_classifier",
+        "//tensorflow_lite_support/python/task/core:task_options",
+        "//tensorflow_lite_support/python/task/core/proto:base_options_pb2",
+        "//tensorflow_lite_support/python/task/processor:processor_options",
+        "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
+        "//tensorflow_lite_support/python/task/vision/core:tensor_image",
+        "//tensorflow_lite_support/python/test:test_util",
+        "@absl_py//absl/testing:parameterized",
+    ],
+)
