@@ -33,10 +33,10 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     super().setUp()
     # Float model path
     self.model_path = test_util.get_test_data_path(
-      "mobilenet_v2_1.0_224.tflite")
+      _MODEL_FLOAT)
     # Quantized model path
     self.quantized_model_path = test_util.get_test_data_path(
-      "mobilenet_v1_0.25_224_quant.tflite")
+      _MODEL_QUANTIZED)
 
   def test_create_from_options(self):
     # Creates with options containing model file successfully.
