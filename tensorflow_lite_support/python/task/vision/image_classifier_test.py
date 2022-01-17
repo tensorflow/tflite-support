@@ -18,7 +18,6 @@ from absl.testing import parameterized
 from tensorflow_lite_support.python.task.core import task_options
 from tensorflow_lite_support.python.task.processor import processor_options
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
-from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.vision import image_classifier
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
@@ -171,6 +170,88 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
             index: 932
             score: 0.012394513003528118
             class_name: "bagel"
+          }
+          head_index: 0
+        }
+        """)
+    )
+
+  @parameterized.parameters(
+    (3, None, None, None, False),
+  )
+  def test_classify_quantized_model(self, max_results, score_threshold,
+                                class_name_whitelist, class_name_blacklist,
+                                with_bounding_box):
+    # Creates classifier.
+    base_options = task_options.BaseOptions(model_file=self.quantized_model_path)
+    classifier_options = processor_options.ClassificationOptions(
+      max_results=max_results,
+      score_threshold=score_threshold,
+      class_name_whitelist=class_name_whitelist,
+      class_name_blacklist=class_name_blacklist)
+    options = image_classifier.ImageClassifierOptions(
+      base_options=base_options, classifier_options=classifier_options)
+    classifier = image_classifier.ImageClassifier(options)
+
+    # Loads images: one is a crop of the other.
+    image = tensor_image.TensorImage.from_file(
+      test_util.get_test_data_path("burger.jpg"))
+    cropped_image = tensor_image.TensorImage.from_file(
+      test_util.get_test_data_path("burger_crop.jpg"))
+
+    bounding_box = None
+    if with_bounding_box:
+      # Bounding box in "burger.jpg" corresponding to "burger_crop.jpg".
+      bounding_box = bounding_box_pb2.BoundingBox(
+        origin_x=0, origin_y=0, width=400, height=325)
+
+    # Classifies both inputs.
+    image_result = classifier.classify(image, bounding_box)
+    crop_result = classifier.classify(cropped_image)
+
+    self.assertMultiLineEqual(
+      str(image_result),
+      textwrap.dedent(
+        """\
+        classifications {
+          classes {
+            index: 934
+            score: 0.96484375
+            class_name: "cheeseburger"
+          }
+          classes {
+            index: 948
+            score: 0.0078125
+            class_name: "mushroom"
+          }
+          classes {
+            index: 924
+            score: 0.00390625
+            class_name: "plate"
+          }
+          head_index: 0
+        }
+        """)
+    )
+    self.assertMultiLineEqual(
+      str(crop_result),
+      textwrap.dedent(
+        """\
+        classifications {
+          classes {
+            index: 934
+            score: 0.96484375
+            class_name: "cheeseburger"
+          }
+          classes {
+            index: 935
+            score: 0.0078125
+            class_name: "hotdog"
+          }
+          classes {
+            index: 119
+            score: 0.0078125
+            class_name: "Dungeness crab"
           }
           head_index: 0
         }
