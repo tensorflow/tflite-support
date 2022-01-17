@@ -21,27 +21,34 @@ from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.vision import image_classifier
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
+
+from pathlib import Path
+
 import unittest
 import textwrap
 
+
 _MODEL_FLOAT = "mobilenet_v2_1.0_224.tflite"
 _MODEL_QUANTIZED = "mobilenet_v1_0.25_224_quant.tflite"
+_MODEL_AUTOML = "automl_labeler_model.tflite"
 
 
 class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
   def setUp(self):
     super().setUp()
-    # Float model path
-    self.model_path = test_util.get_test_data_path(
-      _MODEL_FLOAT)
-    # Quantized model path
-    self.quantized_model_path = test_util.get_test_data_path(
-      _MODEL_QUANTIZED)
 
-  def test_create_from_options(self):
+  @parameterized.parameters(
+    (_MODEL_FLOAT,),
+    (_MODEL_QUANTIZED,),
+    (_MODEL_AUTOML,),
+  )
+  def test_create_from_options(self, model_name):
+    # Get the model path from the test data directory
+    model_file = test_util.get_test_data_path(model_name)
+
     # Creates with options containing model file successfully.
-    base_options = task_options.BaseOptions(model_file=self.model_path)
+    base_options = task_options.BaseOptions(model_file=model_file)
     options = image_classifier.ImageClassifierOptions(base_options=base_options)
     image_classifier.ImageClassifier.create_from_options(options)
 
@@ -66,7 +73,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
             Exception,
             r"INVALID_ARGUMENT: Invalid `max_results` option: value must be != 0 "
             r"\[tflite::support::TfLiteSupportStatus='2'\]"):
-      base_options = task_options.BaseOptions(model_file=self.model_path)
+      base_options = task_options.BaseOptions(model_file=model_file)
       classifier_options = processor_options.ClassificationOptions(
         max_results=0)
       options = image_classifier.ImageClassifierOptions(
@@ -75,17 +82,23 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       image_classifier.ImageClassifier.create_from_options(options)
 
   @parameterized.parameters(
-    (['foo'], ['bar']),
+    (_MODEL_FLOAT, ['foo'], ['bar']),
+    (_MODEL_QUANTIZED, ['foo'], ['bar']),
+    (_MODEL_AUTOML, ['foo'], ['bar']),
   )
-  def test_combined_whitelist_and_blacklist(self, class_name_whitelist,
+  def test_combined_whitelist_and_blacklist(self, model_name,
+                                            class_name_whitelist,
                                             class_name_blacklist):
+    # Get the model path from the test data directory
+    model_file = test_util.get_test_data_path(model_name)
+
     # Fails with combined whitelist and blacklist
     with self.assertRaisesRegex(
             Exception,
             r"INVALID_ARGUMENT: `class_name_whitelist` and `class_name_blacklist` "
             r"are mutually exclusive options. "
             r"\[tflite::support::TfLiteSupportStatus='2'\]"):
-      base_options = task_options.BaseOptions(model_file=self.model_path)
+      base_options = task_options.BaseOptions(model_file=model_file)
       classifier_options = processor_options.ClassificationOptions(
         class_name_whitelist=class_name_whitelist,
         class_name_blacklist=class_name_blacklist)
@@ -95,13 +108,19 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       image_classifier.ImageClassifier.create_from_options(options)
 
   @parameterized.parameters(
-    (3, None, None, None, False),
+    (_MODEL_FLOAT, 3, None, None, None, False),
+    (_MODEL_QUANTIZED, 3, None, None, None, False),
+    (_MODEL_AUTOML, 3, None, None, None, False),
   )
-  def test_classify_float_model(self, max_results, score_threshold,
+  def test_classify_model(self, model_name,
+                                max_results, score_threshold,
                                 class_name_whitelist, class_name_blacklist,
                                 with_bounding_box):
+    # Get the model path from the test data directory
+    model_file = test_util.get_test_data_path(model_name)
+
     # Creates classifier.
-    base_options = task_options.BaseOptions(model_file=self.model_path)
+    base_options = task_options.BaseOptions(model_file=model_file)
     classifier_options = processor_options.ClassificationOptions(
       max_results=max_results,
       score_threshold=score_threshold,
@@ -127,136 +146,153 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     image_result = classifier.classify(image, bounding_box)
     crop_result = classifier.classify(cropped_image)
 
-    self.assertMultiLineEqual(
-      str(image_result),
-      textwrap.dedent(
-        """\
-        classifications {
-          classes {
-            index: 934
-            score: 0.7399742007255554
-            class_name: "cheeseburger"
+    if Path(model_file).name == _MODEL_FLOAT:
+      self.assertEqual(
+        str(image_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 934
+              score: 0.7399742007255554
+              class_name: "cheeseburger"
+            }
+            classes {
+              index: 925
+              score: 0.026928534731268883
+              class_name: "guacamole"
+            }
+            classes {
+              index: 932
+              score: 0.025737214833498
+              class_name: "bagel"
+            }
+            head_index: 0
           }
-          classes {
-            index: 925
-            score: 0.026928534731268883
-            class_name: "guacamole"
+          """)
+      )
+      self.assertEqual(
+        str(crop_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 934
+              score: 0.8810749650001526
+              class_name: "cheeseburger"
+            }
+            classes {
+              index: 925
+              score: 0.019916774705052376
+              class_name: "guacamole"
+            }
+            classes {
+              index: 932
+              score: 0.012394513003528118
+              class_name: "bagel"
+            }
+            head_index: 0
           }
-          classes {
-            index: 932
-            score: 0.025737214833498
-            class_name: "bagel"
+          """)
+      )
+    elif Path(model_file).name == _MODEL_QUANTIZED:
+      self.assertEqual(
+        str(image_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 934
+              score: 0.96484375
+              class_name: "cheeseburger"
+            }
+            classes {
+              index: 948
+              score: 0.0078125
+              class_name: "mushroom"
+            }
+            classes {
+              index: 924
+              score: 0.00390625
+              class_name: "plate"
+            }
+            head_index: 0
           }
-          head_index: 0
-        }
-        """)
-    )
-    self.assertMultiLineEqual(
-      str(crop_result),
-      textwrap.dedent(
-        """\
-        classifications {
-          classes {
-            index: 934
-            score: 0.8810749650001526
-            class_name: "cheeseburger"
+          """)
+      )
+      self.assertEqual(
+        str(crop_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 934
+              score: 0.96484375
+              class_name: "cheeseburger"
+            }
+            classes {
+              index: 935
+              score: 0.0078125
+              class_name: "hotdog"
+            }
+            classes {
+              index: 119
+              score: 0.0078125
+              class_name: "Dungeness crab"
+            }
+            head_index: 0
           }
-          classes {
-            index: 925
-            score: 0.019916774705052376
-            class_name: "guacamole"
+          """)
+      )
+    elif Path(model_file).name == _MODEL_AUTOML:
+      self.assertEqual(
+        str(image_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 2
+              score: 0.96484375
+              class_name: "roses"
+            }
+            classes {
+              index: 4
+              score: 0.01171875
+              class_name: "tulips"
+            }
+            classes {
+              index: 0
+              score: 0.0078125
+              class_name: "daisy"
+            }
+            head_index: 0
           }
-          classes {
-            index: 932
-            score: 0.012394513003528118
-            class_name: "bagel"
+          """)
+      )
+      self.assertEqual(
+        str(crop_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 2
+              score: 0.953125
+              class_name: "roses"
+            }
+            classes {
+              index: 0
+              score: 0.01171875
+              class_name: "daisy"
+            }
+            classes {
+              index: 1
+              score: 0.01171875
+              class_name: "dandelion"
+            }
+            head_index: 0
           }
-          head_index: 0
-        }
-        """)
-    )
-
-  @parameterized.parameters(
-    (3, None, None, None, False),
-  )
-  def test_classify_quantized_model(self, max_results, score_threshold,
-                                class_name_whitelist, class_name_blacklist,
-                                with_bounding_box):
-    # Creates classifier.
-    base_options = task_options.BaseOptions(model_file=self.quantized_model_path)
-    classifier_options = processor_options.ClassificationOptions(
-      max_results=max_results,
-      score_threshold=score_threshold,
-      class_name_whitelist=class_name_whitelist,
-      class_name_blacklist=class_name_blacklist)
-    options = image_classifier.ImageClassifierOptions(
-      base_options=base_options, classifier_options=classifier_options)
-    classifier = image_classifier.ImageClassifier(options)
-
-    # Loads images: one is a crop of the other.
-    image = tensor_image.TensorImage.from_file(
-      test_util.get_test_data_path("burger.jpg"))
-    cropped_image = tensor_image.TensorImage.from_file(
-      test_util.get_test_data_path("burger_crop.jpg"))
-
-    bounding_box = None
-    if with_bounding_box:
-      # Bounding box in "burger.jpg" corresponding to "burger_crop.jpg".
-      bounding_box = bounding_box_pb2.BoundingBox(
-        origin_x=0, origin_y=0, width=400, height=325)
-
-    # Classifies both inputs.
-    image_result = classifier.classify(image, bounding_box)
-    crop_result = classifier.classify(cropped_image)
-
-    self.assertMultiLineEqual(
-      str(image_result),
-      textwrap.dedent(
-        """\
-        classifications {
-          classes {
-            index: 934
-            score: 0.96484375
-            class_name: "cheeseburger"
-          }
-          classes {
-            index: 948
-            score: 0.0078125
-            class_name: "mushroom"
-          }
-          classes {
-            index: 924
-            score: 0.00390625
-            class_name: "plate"
-          }
-          head_index: 0
-        }
-        """)
-    )
-    self.assertMultiLineEqual(
-      str(crop_result),
-      textwrap.dedent(
-        """\
-        classifications {
-          classes {
-            index: 934
-            score: 0.96484375
-            class_name: "cheeseburger"
-          }
-          classes {
-            index: 935
-            score: 0.0078125
-            class_name: "hotdog"
-          }
-          classes {
-            index: 119
-            score: 0.0078125
-            class_name: "Dungeness crab"
-          }
-          head_index: 0
-        }
-        """)
-    )
+          """)
+      )
 
 
 if __name__ == "__main__":
