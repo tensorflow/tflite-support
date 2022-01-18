@@ -36,6 +36,16 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
   def setUp(self):
     super().setUp()
 
+  @staticmethod
+  def create_classifier_from_options(model_file, **classification_options):
+    base_options = task_options.BaseOptions(model_file=model_file)
+    classifier_options = processor_options.ClassificationOptions(
+      **classification_options)
+    options = image_classifier.ImageClassifierOptions(
+      base_options=base_options, classifier_options=classifier_options)
+    classifier = image_classifier.ImageClassifier(options)
+    return classifier
+
   @parameterized.parameters(
     (_MODEL_FLOAT,),
     (_MODEL_QUANTIZED,),
@@ -118,12 +128,10 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     model_file = test_util.get_test_data_path(model_name)
 
     # Creates classifier.
-    base_options = task_options.BaseOptions(model_file=model_file)
-    classifier_options = processor_options.ClassificationOptions(
-      max_results=max_results)
-    options = image_classifier.ImageClassifierOptions(
-      base_options=base_options, classifier_options=classifier_options)
-    classifier = image_classifier.ImageClassifier(options)
+    classifier = self.create_classifier_from_options(
+      model_file,
+      max_results=max_results
+    )
 
     # Loads images: one is a crop of the other.
     image = tensor_image.TensorImage.from_file(
@@ -386,13 +394,11 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     model_file = test_util.get_test_data_path(model_name)
 
     # Creates classifier.
-    base_options = task_options.BaseOptions(model_file=model_file)
-    classifier_options = processor_options.ClassificationOptions(
+    classifier = self.create_classifier_from_options(
+      model_file,
       max_results=max_results,
-      score_threshold=score_threshold)
-    options = image_classifier.ImageClassifierOptions(
-      base_options=base_options, classifier_options=classifier_options)
-    classifier = image_classifier.ImageClassifier(options)
+      score_threshold=score_threshold
+    )
 
     # Loads images: one is a crop of the other.
     image = tensor_image.TensorImage.from_file(
@@ -432,12 +438,10 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     model_file = test_util.get_test_data_path(model_name)
 
     # Creates classifier.
-    base_options = task_options.BaseOptions(model_file=model_file)
-    classifier_options = processor_options.ClassificationOptions(
-      class_name_whitelist=class_name_whitelist)
-    options = image_classifier.ImageClassifierOptions(
-      base_options=base_options, classifier_options=classifier_options)
-    classifier = image_classifier.ImageClassifier(options)
+    classifier = self.create_classifier_from_options(
+      model_file,
+      class_name_whitelist=class_name_whitelist
+    )
 
     # Loads images: one is a crop of the other.
     image = tensor_image.TensorImage.from_file(
@@ -477,13 +481,11 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     model_file = test_util.get_test_data_path(model_name)
 
     # Creates classifier.
-    base_options = task_options.BaseOptions(model_file=model_file)
-    classifier_options = processor_options.ClassificationOptions(
+    classifier = self.create_classifier_from_options(
+      model_file,
       score_threshold=score_threshold,
-      class_name_blacklist=class_name_blacklist)
-    options = image_classifier.ImageClassifierOptions(
-      base_options=base_options, classifier_options=classifier_options)
-    classifier = image_classifier.ImageClassifier(options)
+      class_name_blacklist=class_name_blacklist
+    )
 
     # Loads images: one is a crop of the other.
     image = tensor_image.TensorImage.from_file(
