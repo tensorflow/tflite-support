@@ -22,8 +22,6 @@ from tensorflow_lite_support.python.task.vision import image_classifier
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
 
-from pathlib import Path
-
 import unittest
 import textwrap
 
@@ -146,7 +144,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     image_result = classifier.classify(image, bounding_box)
     crop_result = classifier.classify(cropped_image)
 
-    if Path(model_file).name == _MODEL_FLOAT:
+    if model_name == _MODEL_FLOAT:
       self.assertEqual(
         str(image_result),
         textwrap.dedent(
@@ -195,7 +193,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
           }
           """)
       )
-    elif Path(model_file).name == _MODEL_QUANTIZED:
+    elif model_name == _MODEL_QUANTIZED:
       self.assertEqual(
         str(image_result),
         textwrap.dedent(
@@ -244,7 +242,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
           }
           """)
       )
-    elif Path(model_file).name == _MODEL_AUTOML:
+    elif model_name == _MODEL_AUTOML:
       self.assertEqual(
         str(image_result),
         textwrap.dedent(
