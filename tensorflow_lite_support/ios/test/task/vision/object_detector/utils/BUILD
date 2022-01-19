@@ -6,7 +6,7 @@ package(
 objc_library(
     name = "TFLTestUtil",
     hdrs = [
-        "TFLTestUtil.h",
+        "sources/TFLTestUtils.h",
     ],
     module_name = "TFLTestUtil",
 )

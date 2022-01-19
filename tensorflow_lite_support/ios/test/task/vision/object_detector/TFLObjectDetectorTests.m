@@ -17,7 +17,7 @@
 
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLObjectDetector.h"
 #import "tensorflow_lite_support/ios/test/task/vision/utils/sources/GMLImage+Helpers.h"
-#import "tensorflow_lite_support/ios/test/task/vision/object_detector/utils/sources/TFLTestUtil.h"
+#import "tensorflow_lite_support/ios/test/task/vision/object_detector/utils/sources/TFLTestUtils.h"
 
 @interface TFLObjectDetectorTests : XCTestCase
 @property(nonatomic, nullable) NSString *modelPath;

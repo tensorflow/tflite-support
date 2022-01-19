@@ -15,9 +15,11 @@
 import XCTest
 
 @testable import TFLObjectDetector
+import TFLTestUtil
 
 class TFLObjectDetectorTests: XCTestCase {
 
+  
   static let bundle = Bundle(for: TFLObjectDetectorTests.self)
   static let modelPath = bundle.path(
     forResource: "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29",
@@ -64,8 +66,8 @@ class TFLObjectDetectorTests: XCTestCase {
     let detectionResult: TFLDetectionResult = try objectDetector.detect(
       gmlImage: gmlImage)
 
-    XCTAssertNotNil(classificationResults)
-    XCTAssertEqual(classificationResults.classifications.count, 1)
+    XCTAssertNotNil(detectionResult)
+    XCTAssertEqual(detectionResult.detect.count, 1)
     XCTAssertLessThanOrEqual(classificationResults.classifications[0].categories.count, maxResults)
 
     // TODO: match the score as image_classifier_test.cc
