@@ -16,8 +16,8 @@
 #import <XCTest/XCTest.h>
 
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLObjectDetector.h"
-#import "tensorflow_lite_support/ios/test/task/vision/utils/sources/GMLImage+Helpers.h"
 #import "tensorflow_lite_support/ios/test/task/vision/object_detector/utils/sources/TFLTestUtils.h"
+#import "tensorflow_lite_support/ios/test/task/vision/utils/sources/GMLImage+Helpers.h"
 
 @interface TFLObjectDetectorTests : XCTestCase
 @property(nonatomic, nullable) NSString *modelPath;
@@ -35,30 +35,6 @@
   XCTAssertNotNil(self.modelPath);
 }
 
-- (void)verifyResults:(TFLDetectionResult *)detectionResult {
-  XCTAssertGreaterThan([detectionResult.detections count], 0);
-  VerifyDetection(detectionResult.detections[0],
-                  CGRectMake(54, 396, 393, 199),  // expectedBoundingBox
-                  0.632812,                       // expectedFirstScore
-                  @"cat"                          // expectedFirstLabel
-  );
-  VerifyDetection(detectionResult.detections[1],
-                  CGRectMake(602, 157, 394, 447),  // expectedBoundingBox
-                  0.609375,                        // expectedFirstScore
-                  @"cat"                           // expectedFirstLabel
-  );
-  VerifyDetection(detectionResult.detections[2],
-                  CGRectMake(260, 394, 179, 209),  // expectedBoundingBox
-                  0.5625,                          // expectedFirstScore
-                  @"cat"                           // expectedFirstLabel
-  );
-  VerifyDetection(detectionResult.detections[3],
-                  CGRectMake(387, 197, 281, 409),  // expectedBoundingBox
-                  0.488281,                        // expectedFirstScore
-                  @"dog"                           // expectedFirstLabel
-  );
-}
-
 - (void)testSuccessfullObjectDetectionOnMLImageWithUIImage {
   TFLObjectDetectorOptions *objectDetectorOptions =
       [[TFLObjectDetectorOptions alloc] initWithModelPath:self.modelPath];
@@ -72,8 +48,8 @@
                                                    ofType:@"jpg"];
   XCTAssertNotNil(gmlImage);
 
-  TFLDetectionResult *detectionResults = [objectDetector detectWithGMLImage:gmlImage error:nil];
-  [self verifyResults:detectionResults];
+  TFLDetectionResult *detectionResult = [objectDetector detectWithGMLImage:gmlImage error:nil];
+  [TFLTestUtils verifyDetectionResult:detectionResult];
 }
 
 - (void)testModelOptionsWithMaxResults {
@@ -94,21 +70,21 @@
   TFLDetectionResult *detectionResult = [objectDetector detectWithGMLImage:gmlImage error:nil];
 
   XCTAssertLessThanOrEqual([detectionResult.detections count], maxResults);
-  VerifyDetection(detectionResult.detections[0],
-                  CGRectMake(54, 396, 393, 199),  // expectedBoundingBox
-                  0.632812,                       // expectedFirstScore
-                  @"cat"                          // expectedFirstLabel
-  );
-  VerifyDetection(detectionResult.detections[1],
-                  CGRectMake(602, 157, 394, 447),  // expectedBoundingBox
-                  0.609375,                        // expectedFirstScore
-                  @"cat"                           // expectedFirstLabel
-  );
-  VerifyDetection(detectionResult.detections[2],
-                  CGRectMake(260, 394, 179, 209),  // expectedBoundingBox
-                  0.5625,                          // expectedFirstScore
-                  @"cat"                           // expectedFirstLabel
-  );
+
+  [TFLTestUtils verifyDetection:detectionResult.detections[0]
+            expectedBoundingBox:CGRectMake(54, 396, 393, 199)
+             expectedFirstScore:0.632812
+             expectedFirstLabel:@"cat"];
+
+  [TFLTestUtils verifyDetection:detectionResult.detections[1]
+            expectedBoundingBox:CGRectMake(602, 157, 394, 447)
+             expectedFirstScore:0.609375
+             expectedFirstLabel:@"cat"];
+
+  [TFLTestUtils verifyDetection:detectionResult.detections[2]
+            expectedBoundingBox:CGRectMake(260, 394, 179, 209)
+             expectedFirstScore:0.5625
+             expectedFirstLabel:@"cat"];
 }
 
 @end

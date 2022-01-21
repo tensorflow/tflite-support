@@ -20,7 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable GMLImage *)imageFromBundleWithClass:(Class)classObject
                                        fileName:(NSString *)name
-                                         ofType:(NSString *)type;
+                                         ofType:(NSString *)type  
+    NS_SWIFT_NAME(imageFromBundle(class:filename:type:));
 
 @end
 

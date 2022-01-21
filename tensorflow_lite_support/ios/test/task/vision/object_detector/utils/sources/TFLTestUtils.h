@@ -10,19 +10,20 @@
  limitations under the License.
  ==============================================================================*/
 #import <Foundation/Foundation.h>
-
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult.h"
 NS_ASSUME_NONNULL_BEGIN
 
-#define VerifyDetection(detection, expectedBoundingBox, expectedFirstScore, expectedFirstLabel) \
-  XCTAssertGreaterThan([detection.categories count], 0);                                        \
-  NSLog(@"Detected %f", detection.categories[0].score);                                         \
-  NSLog(@"Expected %f", expectedFirstScore);                                                    \
-  XCTAssertEqual(detection.boundingBox.origin.x, expectedBoundingBox.origin.x);                 \
-  XCTAssertEqual(detection.boundingBox.origin.y, expectedBoundingBox.origin.y);                 \
-  XCTAssertEqual(detection.boundingBox.size.width, expectedBoundingBox.size.width);             \
-  XCTAssertEqual(detection.boundingBox.size.height, expectedBoundingBox.size.height);           \
-  XCTAssertEqualObjects(detection.categories[0].label, expectedFirstLabel);                     \
-  XCTAssertEqualWithAccuracy(detection.categories[0].score, expectedFirstScore, 0.001)
+@interface TFLTestUtils : NSObject
 
++ (void)verifyDetectionResult:(TFLDetectionResult *)detectionResult
+    NS_SWIFT_NAME(verify(detectionResult:));
+
++ (void)verifyDetection:(TFLDetection *)detection
+    expectedBoundingBox:(CGRect)expectedBoundingBox
+     expectedFirstScore:(float)expectedFirstScore
+     expectedFirstLabel:(NSString *)expectedFirstLabel
+    NS_SWIFT_NAME(verify(detection:expectedBoundingBox:expectedFirstScore:expectedFirstLabel:));
+
+@end
 
 NS_ASSUME_NONNULL_END
