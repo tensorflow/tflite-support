@@ -22,7 +22,6 @@ import static org.tensorflow.lite.support.common.internal.SupportPreconditions.c
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.tensorflow.lite.DataType;
 
@@ -240,7 +239,7 @@ public abstract class TensorBuffer {
    * Returns the number of bytes of a single element in the array. For example, a float buffer will
    * return 4, and a byte buffer will return 1.
    */
-  public abstract int getTypeSize(@UnknownInitialization TensorBuffer this);
+  public abstract int getTypeSize();
 
   /** Returns if the {@link TensorBuffer} is dynamic sized (could resize arbitrarily). */
   public boolean isDynamic() {
@@ -439,7 +438,7 @@ public abstract class TensorBuffer {
    * @throws NullPointerException if {@code shape} is null.
    * @throws IllegalArgumentException if {@code shape} has negative elements.
    */
-  private void allocateMemory(@UnknownInitialization TensorBuffer this, @NonNull int[] shape) {
+  private void allocateMemory(@NonNull int[] shape) {
     checkNotNull(shape, "TensorBuffer shape cannot be null.");
     checkArgument(isShapeValid(shape), "Values in TensorBuffer shape should be non-negative.");
 

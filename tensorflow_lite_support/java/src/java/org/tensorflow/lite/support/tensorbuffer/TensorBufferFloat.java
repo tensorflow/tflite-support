@@ -16,7 +16,6 @@ limitations under the License.
 package org.tensorflow.lite.support.tensorbuffer;
 
 import java.nio.FloatBuffer;
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.common.internal.SupportPreconditions;
@@ -80,7 +79,7 @@ public final class TensorBufferFloat extends TensorBuffer {
   }
 
   @Override
-  public int getTypeSize(@UnknownInitialization TensorBufferFloat this) {
+  public int getTypeSize() {
     return DATA_TYPE.byteSize();
   }
 
