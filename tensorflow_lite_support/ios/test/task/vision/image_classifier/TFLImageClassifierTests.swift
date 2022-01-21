@@ -15,6 +15,7 @@
 import XCTest
 
 @testable import TFLImageClassifier
+import GMLImageHelpers
 
 class TFLImageClassifierTests: XCTestCase {
 
@@ -33,7 +34,10 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
 
-    let gmlImage = try gmlImage(withName: "burger", ofType: "jpg")
+    let gmlImage = try XCTUnwrap(MLImage.imageFromBundle(class: type(of:self), 
+                                             filename: "burger", 
+                                                 type: "jpg" ))
+
     let classificationResults: TFLClassificationResult =
       try imageClassifier.classify(gmlImage: gmlImage)
 
@@ -59,7 +63,9 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
 
-    let gmlImage = try gmlImage(withName: "burger", ofType: "jpg")
+    let gmlImage = try XCTUnwrap(MLImage.imageFromBundle(class: type(of:self), 
+                                             filename: "burger", 
+                                                 type: "jpg" ))
 
     let classificationResults: TFLClassificationResult = try imageClassifier.classify(
       gmlImage: gmlImage)
@@ -84,7 +90,9 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
 
-    let gmlImage = try gmlImage(withName: "multi_objects", ofType: "jpg")
+    let gmlImage =  try XCTUnwrap(MLImage.imageFromBundle(class: type(of:self), 
+                                             filename: "multi_objects", 
+                                                 type: "jpg" ))
 
     let roi = CGRect(x: 406, y: 110, width: 148, height: 153)
     let classificationResults =
@@ -110,7 +118,9 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
 
-    let gmlImage = try gmlImage(withName: "sparrow", ofType: "png")
+    let gmlImage = try XCTUnwrap(MLImage.imageFromBundle(class: type(of:self), 
+                                             filename: "sparrow", 
+                                                 type: "png" ))
 
     let classificationResults =
       try imageClassifier.classify(gmlImage: gmlImage)
@@ -123,14 +133,5 @@ class TFLImageClassifierTests: XCTestCase {
     XCTAssertEqual(category.label, "junco")
     XCTAssertEqual(category.score, 0.253016, accuracy: 0.001)
   }
-
-  private func gmlImage(withName name: String, ofType type: String) throws -> MLImage {
-    let imagePath =
-      try XCTUnwrap(TFLImageClassifierTests.bundle.path(forResource: name, ofType: type))
-    let image = UIImage(contentsOfFile: imagePath)
-    let imageForInference = try XCTUnwrap(image)
-    let gmlImage = try XCTUnwrap(MLImage(image: imageForInference))
-
-    return gmlImage
-  }
 }
+
