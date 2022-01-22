@@ -33,6 +33,21 @@ android_library_with_tflite(
     ],
 )
 
+
+
+load(
+    "@org_tensorflow//tensorflow/lite/delegates/flex:build_def.bzl",
+    "tflite_flex_android_library",
+)
+
+# generate cc_lib for IDDetector
+tflite_flex_android_library(
+    name = "tf_text_flex_delegate",
+    models = [
+        "2022IDDetectorWithMetadata.tflite",
+    ],
+)
+
 # Java-only target, needs to be used together with a native target similar to
 # tensorflow_lite_support/java/src/native/task/vision/classifier:image_classifier_native.
 # Use this target when you want to provide a MutableOpResolver with customized
@@ -46,6 +61,8 @@ android_library(
     javacopts = ["-source 7 -target 7"],
     manifest = "AndroidManifest.xml",
     deps = [
+        # adding the following dependency breaks the android target when build with --config=android_arm64
+        # ":tf_text_flex_delegate",
         "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "@com_google_auto_value",
