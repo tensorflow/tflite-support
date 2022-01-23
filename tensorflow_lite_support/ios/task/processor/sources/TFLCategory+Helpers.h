@@ -12,11 +12,25 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
+#include "tensorflow_lite_support/c/task/processor/category.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLCategory.h"
 
-@implementation TFLCategory
-@synthesize displayName;
-@synthesize label;
-@synthesize score;
-@synthesize classIndex;
+NS_ASSUME_NONNULL_BEGIN
+
+@interface TFLCategory (Helpers)
+
+/**
+ * Creates and retrurns a TFLCategory from a TfLiteCategory representing any
+ * result class retured by TFLite Task C Library Classification tasks.
+ *
+ * @param cCategory A result class returned by TFLite Task C Library
+ * Classification tasks
+ *
+ * @return Category of type TfLiteCategory which represents a result class in
+ * results returned by inference methods of the iOS TF Lite Task Classification
+ * tasks.
+ */
++ (TFLCategory *)categoryWithCCategory:(TfLiteCategory *)cCategory;
 @end
+
+NS_ASSUME_NONNULL_END

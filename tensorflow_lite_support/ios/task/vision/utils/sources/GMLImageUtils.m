@@ -64,9 +64,10 @@
   convertError = vImageConvert_BGRA8888toRGB888(&srcBuffer, &destBuffer, kvImageNoFlags);
 
   if (convertError != kvImageNoError) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
-                            description:@"Image format conversion failed."
-                                  error:error];
+    if (error) {
+      *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
+                                       description:@"Image format conversion failed."];
+    }
 
     return NULL;
   }
@@ -85,11 +86,10 @@
     frameBuffer = [self frameBufferFromCGImage:self.CGImage error:error];
   } else if (self.CIImage) {
     frameBuffer = [self frameBufferFromCIImage:self.CIImage error:error];
-  } else {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"UIImage should be initialized from"
-                                         " CIImage or CGImage."
-                                  error:error];
+  } else if (error) {
+    *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                                     description:@"UIImage should be initialized from"
+                                                  " CIImage or CGImage."];
   }
 
   return frameBuffer;
@@ -115,10 +115,9 @@
     CGContextRelease(context);
   }
 
-  if (buffer_to_return == NULL) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
-                            description:@"Image format conversion failed."
-                                  error:error];
+  if ((buffer_to_return == NULL) && (error)) {
+    *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
+                                     description:@"Image format conversion failed."];
   }
 
   CGColorSpaceRelease(colorSpace);
@@ -184,11 +183,10 @@
     buffer = [UIImage pixelDataFromCGImage:ciImage.CGImage error:error];
     width = (int)CGImageGetWidth(ciImage.CGImage);
     height = (int)CGImageGetWidth(ciImage.CGImage);
-  } else {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"CIImage should have CGImage or "
-                                         "CVPixelBuffer info."
-                                  error:error];
+  } else if (error) {
+    *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                                     description:@"CIImage should have CGImage or "
+                                                  "CVPixelBuffer info."];
   }
 
   if (buffer == NULL) {
@@ -210,7 +208,7 @@
 
 @implementation GMLImageUtils
 
-+ (nullable TfLiteFrameBuffer *)cFrameBufferFromGMLImage:(GMLImage *)gmlImage
++ (nullable TfLiteFrameBuffer *)cFrameBufferWithGMLImage:(GMLImage *)gmlImage
                                                    error:(NSError *_Nullable *)error {
   TfLiteFrameBuffer *cFrameBuffer = NULL;
 
@@ -229,9 +227,10 @@
     }
 
     default:
-      [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                              description:@"Invalid source type for GMLImage."
-                                    error:error];
+      if (error) {
+        *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                                         description:@"Invalid source type for GMLImage."];
+      }
       break;
   }
 
@@ -269,9 +268,11 @@
     }
 
     default: {
-      [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                              description:@"Unsupported pixel format for TfLiteFrameBufferFormat."
-                                    error:error];
+      if (error) {
+        *error = [TFLCommonUtils
+            customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                    description:@"Unsupported pixel format for TfLiteFrameBufferFormat."];
+      }
       break;
     }
   }

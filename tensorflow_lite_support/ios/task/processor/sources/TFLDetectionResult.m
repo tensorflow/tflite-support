@@ -1,4 +1,4 @@
-/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,22 +12,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#import "tensorflow_lite_support/ios/text/tokenizers/Sources/TFLTokenizer.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult.h"
 
-NS_ASSUME_NONNULL_BEGIN
-/**
- * Sentencepiece Tokenizer implemenation.
- */
-@interface TFLSentencepieceTokenizer : NSObject <TFLTokenizer>
+@implementation TFLDetection
 
-/**
- * Default initializer is not available.
- */
-- (instancetype)init NS_UNAVAILABLE;
+@synthesize boundingBox;
+@synthesize categories;
 
-/**
- * Initializes the tokenizer with the path to sentencepiece model file.
- */
-- (instancetype)initWithModelPath:(NSString *)modelPath;
 @end
-NS_ASSUME_NONNULL_END
+
+@implementation TFLDetectionResult
+
+@synthesize detections;
+
+@end
