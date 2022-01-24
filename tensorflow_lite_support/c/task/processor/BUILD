@@ -41,3 +41,9 @@ cc_library(
         ":category",
     ],
 )
+
+cc_library(
+    name = "segmentation_result",
+    hdrs = ["segmentation_result.h"],
+)
+

@@ -60,3 +60,20 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/vision/proto:object_detector_options_proto_inc",
     ],
 )
+
+cc_library_with_tflite(
+    name = "image_segmenter",
+    hdrs = [
+        "image_segmenter.h",
+    ],
+    tflite_deps = [
+        "//tensorflow_lite_support/cc/task/vision:image_segmenter",
+    ],
+    deps = [
+        "//tensorflow_lite_support/c:common",
+        "//tensorflow_lite_support/c/task/core:base_options",
+        "//tensorflow_lite_support/c/task/processor:segmentation_result",
+        "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
+    ],
+)
+
