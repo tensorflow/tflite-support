@@ -13,32 +13,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/c/task/vision/image_classifier.h"
+#include "tensorflow_lite_support/c/task/vision/image_segmenter.h"
 
 #include <memory>
 
 #include "tensorflow_lite_support/c/common_utils.h"
 #include "tensorflow_lite_support/c/task/core/utils/base_options_utils.h"
-#include "tensorflow_lite_support/c/task/processor/utils/classification_options_utils.h"
 #include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
-#include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/classifications_proto_inc.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/image_classifier_options_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/vision/image_segmenter.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/segmentations_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/image_segmenter_options_proto_inc.h"
+
+#define GTEST_COUT std::cerr << "[          ] [ INFO ]"
 
 namespace {
 using ::tflite::support::StatusOr;
-using ClassificationResultCpp = ::tflite::task::vision::ClassificationResult;
-using ClassificationsCpp = ::tflite::task::vision::Classifications;
-using ClassCpp = ::tflite::task::vision::Class;
-using BoundingBoxCpp = ::tflite::task::vision::BoundingBox;
-using ImageClassifierCpp = ::tflite::task::vision::ImageClassifier;
-using ImageClassifierOptionsCpp =
-    ::tflite::task::vision::ImageClassifierOptions;
+using SegmentationResultCpp = ::tflite::task::vision::SegmentationResult;
+using SegmentationCpp = ::tflite::task::vision::Segmentation;
+using ColoredLabelCpp = ::tflite::task::vision::Segmentation_ColoredLabel;
+// using ClassCpp = ::tflite::task::vision::Class;
+// using BoundingBoxCpp = ::tflite::task::vision::BoundingBox;
+using ImageSegmenterCpp = ::tflite::task::vision::ImageSegmenter;
+using ImageSegmenterOptionsCpp =
+    ::tflite::task::vision::ImageSegmenterOptions;
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 using ::tflite::support::TfLiteSupportStatus;
 
-StatusOr<ImageClassifierOptionsCpp> CreateImageClassifierCppOptionsFromCOptions(
-    const TfLiteImageClassifierOptions* c_options) {
+StatusOr<ImageSegmenterOptionsCpp> CreateImageSegmenterCppOptionsFromCOptions(
+    const TfLiteImageSegmenterOptions* c_options) {
   if (c_options == nullptr) {
     return CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
@@ -46,12 +48,13 @@ StatusOr<ImageClassifierOptionsCpp> CreateImageClassifierCppOptionsFromCOptions(
         TfLiteSupportStatus::kInvalidArgumentError);
   }
 
-  ImageClassifierOptionsCpp cpp_options = {};
+  ImageSegmenterOptionsCpp cpp_options = {};
 
   // More file sources can be added in else ifs
   if (c_options->base_options.model_file.file_path)
     cpp_options.mutable_base_options()->mutable_model_file()->set_file_name(
         c_options->base_options.model_file.file_path);
+  GTEST_COUT << "Model File" << std::endl;
 
   // c_options->base_options.compute_settings.num_threads is expected to be
   // set to value > 0 or -1. Otherwise invoking
@@ -62,31 +65,22 @@ StatusOr<ImageClassifierOptionsCpp> CreateImageClassifierCppOptionsFromCOptions(
       ->mutable_cpu_settings()
       ->set_num_threads(
           c_options->base_options.compute_settings.cpu_settings.num_threads);
-
-  for (int i = 0; i < c_options->classification_options.label_denylist.length;
-       i++)
-    cpp_options.add_class_name_blacklist(
-        c_options->classification_options.label_denylist.list[i]);
-
-  for (int i = 0; i < c_options->classification_options.label_allowlist.length;
-       i++)
-    cpp_options.add_class_name_whitelist(
-        c_options->classification_options.label_allowlist.list[i]);
+  GTEST_COUT << "Threads" << std::endl;
 
   // Check needed since setting a nullptr for this field results in a segfault
   // on invocation of ImageClassifierCpp::CreateFromOptions().
-  if (c_options->classification_options.display_names_local) {
+  if (c_options->display_names_locale) {
+      GTEST_COUT << "In Display" << std::endl;
     cpp_options.set_display_names_locale(
-        c_options->classification_options.display_names_local);
+        c_options->display_names_locale);
+      GTEST_COUT << "Out Display" << std::endl;
   }
+   GTEST_COUT << "Display Names" << std::endl;
 
   // c_options->classification_options.max_results is expected to be set to -1
   // or any value > 0. Otherwise invoking
   // ImageClassifierCpp::CreateFromOptions() results in a not ok status.
-  cpp_options.set_max_results(c_options->classification_options.max_results);
-
-  cpp_options.set_score_threshold(
-      c_options->classification_options.score_threshold);
+  // cpp_options.set_output_type((int)(c_options->output_type));
 
   return cpp_options;
 }
@@ -96,93 +90,117 @@ StatusOr<ImageClassifierOptionsCpp> CreateImageClassifierCppOptionsFromCOptions(
 extern "C" {
 #endif  // __cplusplus
 
-struct TfLiteImageClassifier {
-  std::unique_ptr<ImageClassifierCpp> impl;
+struct TfLiteImageSegmenter {
+  std::unique_ptr<ImageSegmenterCpp> impl;
 };
 
-TfLiteImageClassifierOptions TfLiteImageClassifierOptionsCreate() {
+TfLiteImageSegmenterOptions TfLiteImageSegmenterOptionsCreate() {
   // Use brace-enclosed initializer list will break the Kokoro test.
-  TfLiteImageClassifierOptions options;
-  options.classification_options =
-      tflite::task::processor::CreateDefaultClassificationOptions();
+  TfLiteImageSegmenterOptions options;
+  // options.output_type = 1;
   options.base_options = tflite::task::core::CreateDefaultBaseOptions();
+  options.display_names_locale = nullptr;
   return options;
 }
 
-TfLiteImageClassifier* TfLiteImageClassifierFromOptions(
-    const TfLiteImageClassifierOptions* options, TfLiteSupportError** error) {
-  StatusOr<ImageClassifierOptionsCpp> cpp_option_status =
-      CreateImageClassifierCppOptionsFromCOptions(options);
+TfLiteImageSegmenter* TfLiteImageSegmenterFromOptions(
+    const TfLiteImageSegmenterOptions* options, TfLiteSupportError** error) {
+  GTEST_COUT << "In Create" << std::endl;
+  StatusOr<ImageSegmenterOptionsCpp> cpp_option_status =
+      CreateImageSegmenterCppOptionsFromCOptions(options);
+  GTEST_COUT << "Well Before" << std::endl;
 
   if (!cpp_option_status.ok()) {
     ::tflite::support::CreateTfLiteSupportErrorWithStatus(
         cpp_option_status.status(), error);
     return nullptr;
   }
+  GTEST_COUT << "Before" << std::endl;
+  StatusOr<std::unique_ptr<ImageSegmenterCpp>> segmenter_status =
+      ImageSegmenterCpp::CreateFromOptions(cpp_option_status.value());
 
-  StatusOr<std::unique_ptr<ImageClassifierCpp>> classifier_status =
-      ImageClassifierCpp::CreateFromOptions(cpp_option_status.value());
-
-  if (classifier_status.ok()) {
-    return new TfLiteImageClassifier{.impl =
-                                         std::move(classifier_status.value())};
+  GTEST_COUT << "After" << std::endl;
+  if (segmenter_status.ok()) {
+    return new TfLiteImageSegmenter{.impl =
+                                         std::move(segmenter_status.value())};
   } else {
     ::tflite::support::CreateTfLiteSupportErrorWithStatus(
-        classifier_status.status(), error);
+        segmenter_status.status(), error);
     return nullptr;
   }
 }
 
-TfLiteClassificationResult* GetClassificationResultCStruct(
-    const ClassificationResultCpp& classification_result_cpp) {
-  auto c_classifications =
-      new TfLiteClassifications[classification_result_cpp
-                                    .classifications_size()];
+TfLiteSegmentationResult* GetSegmentationResultCStruct(
+    const SegmentationResultCpp& segmentation_result_cpp) {
+  auto c_segmentations =
+      new TfLiteSegmentation[segmentation_result_cpp
+                                    .segmentation_size()];
 
-  for (int head = 0; head < classification_result_cpp.classifications_size();
-       ++head) {
-    const ClassificationsCpp& classifications =
-        classification_result_cpp.classifications(head);
-    c_classifications[head].head_index = head;
+  for (int i = 0; i < segmentation_result_cpp.segmentation_size();
+       ++i) {
+    const SegmentationCpp& segmentation =
+        segmentation_result_cpp.segmentation(i);
+    // c_segmentations[i].head_index = head;
 
-    auto c_categories = new TfLiteCategory[classifications.classes_size()];
-    c_classifications->size = classifications.classes_size();
+   
+    c_segmentations[i].width = segmentation.width();
+    c_segmentations[i].height = segmentation.height();
 
-    for (int rank = 0; rank < classifications.classes_size(); ++rank) {
-      const ClassCpp& classification = classifications.classes(rank);
-      c_categories[rank].index = classification.index();
-      c_categories[rank].score = classification.score();
+    auto c_colored_labels = new TfLiteColoredLabel[segmentation.width() * segmentation.height()];
+    GTEST_COUT << "width * Height " << segmentation.width() * segmentation.height() << std::endl;
+    GTEST_COUT << "width " << segmentation.width() << std::endl;
+    GTEST_COUT << "Height " << segmentation.height() << std::endl;
+    GTEST_COUT << "Colored Labels Size " << segmentation.colored_labels_size() << std::endl;
 
-      if (classification.has_class_name())
-        c_categories[rank].label = strdup(classification.class_name().c_str());
+    // if (segmentation.has_category_mask()) {
+    //   c_segmentations[i].segmentation_mask.category_mask =
+    //   new uint8_t[segmentation.width() * segmentation.height()];
+  
+    //   std::memcpy( c_segmentations[i].segmentation_mask.category_mask , reinterpret_cast<const uint8_t*>(segmentation.category_mask().data()), segmentation.width() * segmentation.height()*sizeof(uint8_t));
+    // }
+    // else if (segmentation.confidence_masks()) {
+    //     for (int k = 0; k < segmentation.colored_labels_size(); ++k) {
+    //       std::memcpy( c_segmentations[i].segmentation_mask.confidence_mask , reinterpret_cast<const float*>(segmentation.confidence_mask().data()), segmentation.colored_labels_size() * segmentation.width() * segmentation.height()*sizeof(float));
+    //     }
+    // }
+      
+
+    for (int j = 0; j < segmentation.colored_labels_size(); ++j) {
+      const ColoredLabelCpp& colored_label = segmentation.colored_labels(j);
+      c_colored_labels[j].r = colored_label.r();
+      c_colored_labels[j].g = colored_label.g();
+      c_colored_labels[j].b = colored_label.b();
+
+      if (colored_label.has_class_name())
+        c_colored_labels[j].class_name = strdup(colored_label.class_name().c_str());
       else
-        c_categories[rank].label = nullptr;
+        c_colored_labels[j].class_name = nullptr;
 
-      if (classification.has_display_name())
-        c_categories[rank].display_name =
-            strdup(classification.display_name().c_str());
+      if (colored_label.has_display_name())
+        c_colored_labels[j].display_name =
+            strdup(colored_label.display_name().c_str());
       else
-        c_categories[rank].display_name = nullptr;
+        c_colored_labels[j].display_name = nullptr;
     }
-    c_classifications[head].categories = c_categories;
+    c_segmentations[i].colored_labels = c_colored_labels;
   }
 
-  auto c_classification_result = new TfLiteClassificationResult;
-  c_classification_result->classifications = c_classifications;
-  c_classification_result->size =
-      classification_result_cpp.classifications_size();
+  auto c_segmentation_result = new TfLiteSegmentationResult;
+  c_segmentation_result->segmentations = c_segmentations;
+  c_segmentation_result->size =
+      segmentation_result_cpp.segmentation_size();
 
-  return c_classification_result;
+  return c_segmentation_result;
 }
 
-TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
-    const TfLiteImageClassifier* classifier,
-    const TfLiteFrameBuffer* frame_buffer, const TfLiteBoundingBox* roi,
+TfLiteSegmentationResult* TfLiteImageSegmenterSegment(
+    const TfLiteImageSegmenter* segmenter,
+    const TfLiteFrameBuffer* frame_buffer,
     TfLiteSupportError** error) {
-  if (classifier == nullptr) {
+  if (segmenter == nullptr) {
     tflite::support::CreateTfLiteSupportError(
         kInvalidArgumentError, "Expected non null image classifier.", error);
-    return nullptr;
+     return nullptr;
   }
 
   StatusOr<std::unique_ptr<FrameBufferCpp>> cpp_frame_buffer_status =
@@ -190,43 +208,32 @@ TfLiteClassificationResult* TfLiteImageClassifierClassifyWithRoi(
   if (!cpp_frame_buffer_status.ok()) {
     tflite::support::CreateTfLiteSupportErrorWithStatus(
         cpp_frame_buffer_status.status(), error);
-    return nullptr;
-  }
-
-  BoundingBoxCpp cc_roi;
-  if (roi == nullptr) {
-    cc_roi.set_width(frame_buffer->dimension.width);
-    cc_roi.set_height(frame_buffer->dimension.height);
-  } else {
-    cc_roi.set_origin_x(roi->origin_x);
-    cc_roi.set_origin_y(roi->origin_y);
-    cc_roi.set_width(roi->width);
-    cc_roi.set_height(roi->height);
+     return nullptr;
   }
 
   // fnc_sample(cpp_frame_buffer_status);
-  StatusOr<ClassificationResultCpp> cpp_classification_result_status =
-      classifier->impl->Classify(*(cpp_frame_buffer_status.value()), cc_roi);
-
-  if (!cpp_classification_result_status.ok()) {
+  StatusOr<SegmentationResultCpp> cpp_segmentation_result_status =
+      segmenter->impl->Segment(*(cpp_frame_buffer_status.value()));
+  // GTEST_COUT << cpp_segmentation_result_status.value().segmentation(0).colored_labels(0) << std::endl;
+  if (!cpp_segmentation_result_status.ok()) {
     tflite::support::CreateTfLiteSupportErrorWithStatus(
-        cpp_classification_result_status.status(), error);
-    return nullptr;
+        cpp_segmentation_result_status.status(), error);
+      return nullptr;
   }
 
-  return GetClassificationResultCStruct(
-      cpp_classification_result_status.value());
+  return GetSegmentationResultCStruct(
+      cpp_segmentation_result_status.value());
 }
 
-TfLiteClassificationResult* TfLiteImageClassifierClassify(
-    const TfLiteImageClassifier* classifier,
-    const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error) {
-  return TfLiteImageClassifierClassifyWithRoi(classifier, frame_buffer, nullptr,
-                                              error);
-}
+// TfLiteClassificationResult* TfLiteImageClassifierClassify(
+//     const TfLiteImageClassifier* classifier,
+//     const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error) {
+//   return TfLiteImageClassifierClassifyWithRoi(classifier, frame_buffer, nullptr,
+//                                               error);
+// }
 
-void TfLiteImageClassifierDelete(TfLiteImageClassifier* classifier) {
-  delete classifier;
+void TfLiteImageSegmenterDelete(TfLiteImageSegmenter* segmenter) {
+  delete segmenter;
 }
 
 #ifdef __cplusplus

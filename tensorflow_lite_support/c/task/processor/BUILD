@@ -41,3 +41,11 @@ cc_library(
         ":category",
     ],
 )
+
+cc_library(
+    name = "segmentation_result",
+    srcs = [
+        "segmentation_result.cc",
+    ],
+    hdrs = ["segmentation_result.h"],
+)
