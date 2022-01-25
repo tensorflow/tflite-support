@@ -403,8 +403,8 @@ java_import_external(
 
 http_archive(
     name = "robolectric",
-    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.4.tar.gz"],
-    strip_prefix = "robolectric-bazel-4.4",
+    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.7.3.tar.gz"],
+    strip_prefix = "robolectric-bazel-4.7.3",
 )
 load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
 robolectric_repositories()
@@ -413,12 +413,12 @@ load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 
 flatbuffers()
 
-RULES_JVM_EXTERNAL_TAG = "3.2"
+RULES_JVM_EXTERNAL_TAG = "4.2"
 
 http_archive(
     name = "rules_jvm_external",
     strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
-    sha256 = "82262ff4223c5fda6fb7ff8bd63db8131b51b413d26eb49e3131037e79e324af",
+    sha256 = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca",
     url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
 )
 
@@ -484,7 +484,7 @@ maven_install(
         "org.mockito:mockito-android:jar:3.0.0",
         "org.mockito:mockito-core:jar:3.0.0",
         "org.mockito:mockito-inline:jar:3.0.0",
-        "org.robolectric:robolectric:jar:4.4",
+        "org.robolectric:robolectric:jar:4.7.3",
         "junit:junit:jar:4.13",
     ],
     repositories = [
