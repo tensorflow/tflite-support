@@ -123,7 +123,7 @@ StatusOr<std::vector<LabelMapItem>> GetLabelMapIfAny(
       ModelMetadataExtractor::FindFirstAssociatedFileName(
           tensor_metadata, tflite::AssociatedFileType_TENSOR_AXIS_LABELS,
           locale);
-  absl::string_view display_names_file = nullptr;
+  absl::string_view display_names_file = {};
   if (!display_names_filename.empty()) {
     ASSIGN_OR_RETURN(display_names_file, metadata_extractor.GetAssociatedFile(
                                              display_names_filename));
