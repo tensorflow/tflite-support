@@ -22,7 +22,6 @@ import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.tensorflow.lite.InterpreterApi;
-import org.tensorflow.lite.InterpreterFactory;
 import org.tensorflow.lite.Tensor;
 import org.tensorflow.lite.support.common.FileUtil;
 import org.tensorflow.lite.support.common.internal.SupportPreconditions;
@@ -203,7 +202,7 @@ public class Model {
         break;
     }
     interpreterOptions.setNumThreads(options.numThreads);
-    InterpreterApi interpreter = new InterpreterFactory().create(byteModel, interpreterOptions);
+    InterpreterApi interpreter = InterpreterApi.create(byteModel, interpreterOptions);
     return new Model(modelPath, byteModel, interpreter, gpuDelegateProxy);
   }
 
