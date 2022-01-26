@@ -22,6 +22,7 @@ import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.tensorflow.lite.InterpreterApi;
+import org.tensorflow.lite.InterpreterApi.Options.TfLiteRuntime;
 import org.tensorflow.lite.Tensor;
 import org.tensorflow.lite.support.common.FileUtil;
 import org.tensorflow.lite.support.common.internal.SupportPreconditions;
@@ -55,11 +56,13 @@ public class Model {
   public static class Options {
     private final Device device;
     private final int numThreads;
+    private final TfLiteRuntime tfLiteRuntime;
 
     /** Builder of {@link Options}. See its doc for details. */
     public static class Builder {
       private Device device = Device.CPU;
       private int numThreads = 1;
+      private TfLiteRuntime tfLiteRuntime;
 
       public Builder setDevice(Device device) {
         this.device = device;
@@ -71,6 +74,11 @@ public class Model {
         return this;
       }
 
+      public Builder setTfLiteRuntime(TfLiteRuntime tfLiteRuntime) {
+        this.tfLiteRuntime = tfLiteRuntime;
+        return this;
+      }
+
       public Options build() {
         return new Options(this);
       }
@@ -79,6 +87,7 @@ public class Model {
     private Options(Builder builder) {
       device = builder.device;
       numThreads = builder.numThreads;
+      tfLiteRuntime = builder.tfLiteRuntime;
     }
   }
 
@@ -202,6 +211,9 @@ public class Model {
         break;
     }
     interpreterOptions.setNumThreads(options.numThreads);
+    if (options.tfLiteRuntime != null) {
+      interpreterOptions.setRuntime(options.tfLiteRuntime);
+    }
     InterpreterApi interpreter = InterpreterApi.create(byteModel, interpreterOptions);
     return new Model(modelPath, byteModel, interpreter, gpuDelegateProxy);
   }
