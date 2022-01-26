@@ -14,7 +14,7 @@
 """Image classifier task."""
 
 import dataclasses
-from typing import Optional, List
+from typing import Optional
 
 from tensorflow_lite_support.python.task.core import task_options
 from tensorflow_lite_support.python.task.core.proto import configuration_pb2
@@ -134,21 +134,3 @@ class ImageClassifier(object):
       return self._classifier.classify(image_data)
 
     return self._classifier.classify(image_data, bounding_box)
-
-  # @property
-  # def get_input_count(self) -> int:
-  #   """Gets the input count of the model."""
-  #   return self._classifier.get_input_count()
-  #
-  # def get_input_shape(self, input_index: int) -> List:
-  #   """Gets the input shape of the model."""
-  #   return self._classifier.get_input_shape(input_index)
-  #
-  # @property
-  # def get_output_count(self) -> int:
-  #   """Gets the output count of the model."""
-  #   return self._classifier.get_output_count()
-  #
-  # def get_output_shape(self, output_index: int) -> List:
-  #   """Gets the output shape of the model."""
-  #   return self._classifier.get_output_shape(output_index)

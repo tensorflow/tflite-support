@@ -60,6 +60,11 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     options = image_classifier.ImageClassifierOptions(base_options=base_options)
     image_classifier.ImageClassifier.create_from_options(options)
 
+    # Creates the classifier with the `num_threads` option successfully
+    base_options = task_options.BaseOptions(model_file=model_file, num_threads=4)
+    options = image_classifier.ImageClassifierOptions(base_options=base_options)
+    image_classifier.ImageClassifier.create_from_options(options)
+
     # Missing the model file.
     with self.assertRaisesRegex(
             TypeError,
@@ -87,6 +92,15 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       options = image_classifier.ImageClassifierOptions(
         base_options=base_options,
         classifier_options=classifier_options)
+      image_classifier.ImageClassifier.create_from_options(options)
+
+    # Invalid number of threads.
+    with self.assertRaisesRegex(
+            Exception,
+            r"INVALID_ARGUMENT: `num_threads` must be greater than 0 or equal to -1. "
+            r"\[tflite::support::TfLiteSupportStatus='2']"):
+      base_options = task_options.BaseOptions(model_file=model_file, num_threads=-2)
+      options = image_classifier.ImageClassifierOptions(base_options=base_options)
       image_classifier.ImageClassifier.create_from_options(options)
 
   @parameterized.parameters(
@@ -388,8 +402,8 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
   @parameterized.parameters(
     (_MODEL_FLOAT, None, 0.5, False),
   )
-  def test_score_threshold(self, model_name,  max_results, score_threshold,
-                           with_bounding_box):
+  def test_score_threshold_option(self, model_name,  max_results,
+                                  score_threshold, with_bounding_box):
     # Get the model path from the test data directory
     model_file = test_util.get_test_data_path(model_name)
 
@@ -400,7 +414,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       score_threshold=score_threshold
     )
 
-    # Loads images: one is a crop of the other.
+    # Loads image
     image = tensor_image.TensorImage.from_file(
       test_util.get_test_data_path("burger.jpg"))
 
@@ -443,7 +457,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       class_name_whitelist=class_name_whitelist
     )
 
-    # Loads images: one is a crop of the other.
+    # Loads image
     image = tensor_image.TensorImage.from_file(
       test_util.get_test_data_path("burger.jpg"))
 
@@ -487,7 +501,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       class_name_blacklist=class_name_blacklist
     )
 
-    # Loads images: one is a crop of the other.
+    # Loads image
     image = tensor_image.TensorImage.from_file(
       test_util.get_test_data_path("burger.jpg"))
 
