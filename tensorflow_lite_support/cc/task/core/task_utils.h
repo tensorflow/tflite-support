@@ -25,6 +25,7 @@ limitations under the License.
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/str_cat.h"  // from @com_google_absl
 #include "absl/strings/str_format.h"  // from @com_google_absl
+#include "absl/strings/string_view.h"  // from @com_google_absl
 #include "flatbuffers/flatbuffers.h"  // from @flatbuffers
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
 #include "tensorflow/lite/kernels/op_macros.h"
@@ -196,27 +197,59 @@ std::string GetStringAtIndex(const TfLiteTensor* labels, int index);
 // Loads binary content of a file into a string.
 std::string LoadBinaryContent(const char* filename);
 
-// Gets the index from a vector of tensors with name specified inside metadata.
-// The range of the return value should be [0, output_tensor_size). If not
+// Finds the tensor from a vector of tensor metadata by checking tensor metadata
+// names. The range of the return value should be [0, tensor_size). If not
 // found, returns -1.
 int FindIndexByMetadataTensorName(
     const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
-        tensor_metadatas,
-    const std::string& name);
+        tensor_metadata,
+    absl::string_view name);
 
-// Gets the tensor from a vector of tensors with name specified inside metadata.
+// Finds the tensor from a vector of tensors by checking model tensor names.
+// The range of the return value should be [0, tensor_size). If not
+// found, returns -1.
+template <typename TensorType>
+int FindIndexByModelTensorName(const std::vector<TensorType*>& tensors,
+                               absl::string_view name) {
+  for (int i = 0; i < tensors.size(); i++) {
+    TensorType* tensor = tensors[i];
+    if (tensor->name == name) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+// Finds the tensor index of the specified tensor name from a vector of tensors
+// by first checking the metadata tensor name, and then the model tensor name.
+// Return -1 if no tensor is found by name.
+template <typename TensorType>
+int FindTensorIndexByName(
+    const std::vector<TensorType*>& tensors,
+    const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
+        tensor_metadata,
+    absl::string_view metadata_tensor_name,
+    absl::string_view model_tensor_name) {
+  if (tensor_metadata != nullptr && tensor_metadata->size() == tensors.size()) {
+    int index =
+        FindIndexByMetadataTensorName(tensor_metadata, metadata_tensor_name);
+    if (index > -1) return index;
+  }
+
+  return FindIndexByModelTensorName(tensors, model_tensor_name);
+}
+
+// Finds the tensor from a vector of tensors with name specified inside
+// metadata.
 template <typename TensorType>
 static TensorType* FindTensorByName(
     const std::vector<TensorType*>& tensors,
     const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
-        tensor_metadatas,
-    const std::string& name) {
-  if (tensor_metadatas == nullptr ||
-      tensor_metadatas->size() != tensors.size()) {
-    return nullptr;
-  }
-  int i = FindIndexByMetadataTensorName(tensor_metadatas, name);
-  return i == -1 ? nullptr : tensors[i];
+        tensor_metadata,
+    absl::string_view metadata_tensor_name) {
+  int index = FindTensorIndexByName(tensors, tensor_metadata,
+                                    metadata_tensor_name, absl::string_view());
+  return index == -1 ? nullptr : tensors[index];
 }
 
 }  // namespace core
