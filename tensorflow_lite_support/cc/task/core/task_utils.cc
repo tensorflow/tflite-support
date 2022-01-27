@@ -61,7 +61,7 @@ std::string LoadBinaryContent(const char* filename) {
   return buffer;
 }
 
-int FindIndexByMetadataTensorName(
+int FindTensorIndexByMetadataName(
     const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
         tensor_metadatas,
     absl::string_view name) {

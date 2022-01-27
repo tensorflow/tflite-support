@@ -197,19 +197,21 @@ std::string GetStringAtIndex(const TfLiteTensor* labels, int index);
 // Loads binary content of a file into a string.
 std::string LoadBinaryContent(const char* filename);
 
-// Finds the tensor from a vector of tensor metadata by checking tensor metadata
-// names. The range of the return value should be [0, tensor_size). If not
-// found, returns -1.
-int FindIndexByMetadataTensorName(
+// Finds the tensor index of the specified tensor name from a vector of tensors
+// by checking the metadata tensor name.
+// The range of the return value should be [0, tensor_size). Return -1 if no
+// tensor is found by name.
+int FindTensorIndexByMetadataName(
     const flatbuffers::Vector<flatbuffers::Offset<TensorMetadata>>*
         tensor_metadata,
     absl::string_view name);
 
-// Finds the tensor from a vector of tensors by checking model tensor names.
-// The range of the return value should be [0, tensor_size). If not
-// found, returns -1.
+// Finds the tensor index of the specified tensor name from a vector of tensors
+// by checking the model tensor name.
+// The range of the return value should be [0, tensor_size). Return -1 if no
+// tensor is found by name.
 template <typename TensorType>
-int FindIndexByModelTensorName(const std::vector<TensorType*>& tensors,
+int FindTensorIndexByModelName(const std::vector<TensorType*>& tensors,
                                absl::string_view name) {
   for (int i = 0; i < tensors.size(); i++) {
     TensorType* tensor = tensors[i];
@@ -222,7 +224,8 @@ int FindIndexByModelTensorName(const std::vector<TensorType*>& tensors,
 
 // Finds the tensor index of the specified tensor name from a vector of tensors
 // by first checking the metadata tensor name, and then the model tensor name.
-// Return -1 if no tensor is found by name.
+// The range of the return value should be [0, tensor_size). Return -1 if no
+// tensor is found by name.
 template <typename TensorType>
 int FindTensorIndexByName(
     const std::vector<TensorType*>& tensors,
@@ -232,11 +235,11 @@ int FindTensorIndexByName(
     absl::string_view model_tensor_name) {
   if (tensor_metadata != nullptr && tensor_metadata->size() == tensors.size()) {
     int index =
-        FindIndexByMetadataTensorName(tensor_metadata, metadata_tensor_name);
+        FindTensorIndexByMetadataName(tensor_metadata, metadata_tensor_name);
     if (index > -1) return index;
   }
 
-  return FindIndexByModelTensorName(tensors, model_tensor_name);
+  return FindTensorIndexByModelName(tensors, model_tensor_name);
 }
 
 // Finds the tensor from a vector of tensors with name specified inside
