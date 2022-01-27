@@ -40,17 +40,17 @@ limitations under the License.
 /// TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
 ///
 /// Set the model file path in options
-///   options.base_options.model_file.file_path = "/path/to/model.tflite";
+/// options.base_options.model_file.file_path = "/path/to/model.tflite";
 ///
 /// If need be, set values for any options to customize behaviour.
 /// options.base_options.compute_settings.cpu_settings.num_threads = 3
 ///
 /// Create TfLiteImageSegmenter using the options:
-/// If error information is not nedded in case of failure:
+/// If error information is not needed in case of failure:
 /// TfLiteImageSegmenter* image_segmenter =
 ///       TfLiteImageSegmenterFromOptions(&options, NULL);
 ///
-/// If error information is nedded in case of failure:
+/// If error information is needed in case of failure:
 /// TfLiteSupportError* create_error = NULL;
 /// TfLiteImageSegmenter* image_segmenter =
 ///       TTfLiteImageSegmenterFromOptions(&options, &create_error);
@@ -66,11 +66,11 @@ limitations under the License.
 /// Classify an image
 /// TfLiteFrameBuffer frame_buffer = { Initialize with image data }
 ///
-/// If error information is not nedded in case of failure:
+/// If error information is not needed in case of failure:
 /// TfLiteSegmentationResult* segmentation_result =
 ///       TfLiteImageSegmenterSegment(image_segmenter, &frame_buffer, NULL);
 ///
-/// If error information is nedded in case of failure:
+/// If error information is needed in case of failure:
 /// TfLiteSupportError* segment_error = NULL;
 /// TfLiteSegmentationResult* segmentation_result =
 ///       TfLiteImageSegmenterSegment(image_segmenter, &frame_buffer,
@@ -101,11 +101,11 @@ enum TfLiteImageSegmenterOutputType {
   kUnspecified,
   // Gives a single output mask where each pixel represents the class which
   // the pixel in the original image was predicted to belong to.
-  kConfidenceMask,
+  kCategoryMask,
 
   // Gives a list of output masks where, for each mask, each pixel represents
   // the prediction confidence, usually in the [0, 1] range.
-  kCategoryMask
+  kConfidenceMask
 };
 
 // Holds options for configuring the creation of TfLiteImageSegmenter.
@@ -124,7 +124,7 @@ typedef struct TfLiteImageSegmenterOptions {
 
 // Creates and returns TfLiteImageSegmenterOptions initialized with default
 // values. Default values are as follows:
-//  . .base_options.compute_settings.tflite_settings.cpu_settings.num_threads =
+// 1. .base_options.compute_settings.tflite_settings.cpu_settings.num_threads =
 // -1, which makes the TFLite runtime choose the value.
 // 2. .output_type = kCategoryMask
 // 3. display_names_locale is NULL.
@@ -156,7 +156,7 @@ TfLiteImageSegmenterOptions TfLiteImageSegmenterOptionsCreate();
 // NULL);
 //
 // If the caller wants to be informed of the reason for failure, they must pass
-// the adress of a pointer of type TfLiteSupportError to the `error` param as
+// the address of a pointer of type TfLiteSupportError to the `error` param as
 // shown below:
 //
 // TfLiteSupport *error = NULL:
@@ -184,7 +184,7 @@ TfLiteImageSegmenter* TfLiteImageSegmenterFromOptions(
 //      TfLiteImageSegmenterSegment(&options, NULL);
 //
 // If the caller wants to be informed of the reason for failure, they must pass
-// the adress of a pointer of type TfLiteSupportError to the `error` param as
+// the address of a pointer of type TfLiteSupportError to the `error` param as
 // shown below:
 //
 // TfLiteSupport *error = NULL:
@@ -202,7 +202,7 @@ TfLiteSegmentationResult* TfLiteImageSegmenterSegment(
     const TfLiteImageSegmenter* segmenter,
     const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error);
 
-// Disposes off the image segmenter.
+// Disposes of the image segmenter.
 void TfLiteImageSegmenterDelete(TfLiteImageSegmenter* segmenter);
 
 #ifdef __cplusplus
