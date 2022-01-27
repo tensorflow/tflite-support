@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,17 +12,12 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#import <Foundation/Foundation.h>
-#import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult.h"
-
 #include "tensorflow_lite_support/c/task/processor/detection_result.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Helper utility for conversion between TFLite Task C Library Detection Results and iOS
- * Detection Results . */
-@interface TFLDetectionUtils : NSObject
-
+@interface TFLDetectionResult (Helpers)
 /**
  * Creates and retrurns a TFLDetectionResult from a TfLiteDetectionResult returned by
  * TFLite Task C Library Object Detection task.
@@ -33,13 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Detection Result of type TFLDetectionResult to be returned by inference methods
  * of the iOS TF Lite Task Object Detection task.
  */
-+ (TFLDetectionResult *)detectionResultFromCDetectionResults:
++ (TFLDetectionResult *)detectionResultWithCResult:
     (TfLiteDetectionResult *)cDetectionResult;
-
-- (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)new NS_UNAVAILABLE;
-
 @end
 
 NS_ASSUME_NONNULL_END

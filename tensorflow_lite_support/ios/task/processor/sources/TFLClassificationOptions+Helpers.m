@@ -20,18 +20,21 @@
 
 + (char **)cStringArrayFromNSArray:(NSArray<NSString *> *)strings error:(NSError **)error {
   if (strings.count <= 0) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"Invalid length of strings found for list type options."
-                                  error:error];
+    if (error) {
+      *error = [TFLCommonUtils
+          customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                  description:@"Invalid length of strings found for list type options."];
+    }
     return NULL;
   }
 
   char **cStrings = (char **)calloc(strings.count, sizeof(char *));
 
   if (!cStrings) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInternalError
-                            description:@"Could not initialize list type options."
-                                  error:error];
+    if (error) {
+      *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInternalError
+                                       description:@"Could not initialize list type options."];
+    }
     return nil;
   }
 
@@ -55,9 +58,8 @@
   free(cStrings);
 }
 
-- (BOOL)copyClassificationOptionsToCClassificationOptions:
-            (TfLiteClassificationOptions *)cClassificationOptions
-                                                    error:(NSError **)error {
+- (BOOL)copyToCOptions:(TfLiteClassificationOptions *)cClassificationOptions
+                 error:(NSError **)error {
   cClassificationOptions->score_threshold = self.scoreThreshold;
   cClassificationOptions->max_results = (int)self.maxResults;
 

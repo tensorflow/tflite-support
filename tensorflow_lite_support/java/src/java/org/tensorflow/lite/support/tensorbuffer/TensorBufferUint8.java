@@ -15,7 +15,6 @@ limitations under the License.
 
 package org.tensorflow.lite.support.tensorbuffer;
 
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.common.internal.SupportPreconditions;
@@ -82,7 +81,7 @@ public final class TensorBufferUint8 extends TensorBuffer {
   }
 
   @Override
-  public int getTypeSize(@UnknownInitialization TensorBufferUint8 this) {
+  public int getTypeSize() {
     return DATA_TYPE.byteSize();
   }
 

@@ -16,8 +16,7 @@
 # External `common.sh`
 
 # Keep in sync with tensorflow core and configure.py.
-# TODO(b/158448780): Guard bazel version with IfChangeThenChange.
-LATEST_BAZEL_VERSION=3.1.0
+LATEST_BAZEL_VERSION=4.2.2
 
 # Run flaky functions with retries.
 # run_with_retry cmd
