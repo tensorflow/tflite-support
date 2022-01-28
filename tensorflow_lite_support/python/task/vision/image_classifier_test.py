@@ -108,7 +108,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     (_MODEL_QUANTIZED, ['foo'], ['bar']),
     (_MODEL_AUTOML, ['foo'], ['bar']),
   )
-  def test_combined_whitelist_and_blacklist(self, model_name,
+  def test_combined_allowlist_and_denylist(self, model_name,
                                             label_allowlist,
                                             label_denylist):
     # Get the model path from the test data directory
