@@ -15,4 +15,4 @@
 
 from tensorflow_lite_support.cc.task.vision.proto import class_pb2
 
-Class = class_pb2.Class
+Category = class_pb2.Class
