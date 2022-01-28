@@ -94,15 +94,6 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
         classifier_options=classifier_options)
       image_classifier.ImageClassifier.create_from_options(options)
 
-    # Invalid number of threads.
-    with self.assertRaisesRegex(
-            Exception,
-            r"INVALID_ARGUMENT: `num_threads` must be greater than 0 or equal to -1. "
-            r"\[tflite::support::TfLiteSupportStatus='2']"):
-      base_options = task_options.BaseOptions(model_file=model_file, num_threads=-2)
-      options = image_classifier.ImageClassifierOptions(base_options=base_options)
-      image_classifier.ImageClassifier.create_from_options(options)
-
   @parameterized.parameters(
     (_MODEL_FLOAT, ['foo'], ['bar']),
     (_MODEL_QUANTIZED, ['foo'], ['bar']),
