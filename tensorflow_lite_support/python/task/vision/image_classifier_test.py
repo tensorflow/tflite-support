@@ -130,15 +130,12 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       image_classifier.ImageClassifier.create_from_options(options)
 
   @parameterized.parameters(
-    (_MODEL_FLOAT, 3, False),
-    (_MODEL_QUANTIZED, 3, False),
-    (_MODEL_AUTOML, 3, False),
-    (_MODEL_FLOAT, 3, True),
-    (_MODEL_QUANTIZED, 3, True),
-    (_MODEL_AUTOML, 3, True),
+    (_MODEL_FLOAT, 3),
+    (_MODEL_QUANTIZED, 3),
+    (_MODEL_AUTOML, 3)
   )
-  def test_classify_model(self, model_name, max_results, with_bounding_box):
-    # Get the model path from the test data directory
+  def test_classify_model(self, model_name, max_results):
+    # Get the model path from the test data directory.
     model_file = test_util.get_test_data_path(model_name)
 
     # Creates classifier.
@@ -147,94 +144,33 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       max_results=max_results
     )
 
-    # Loads images: one is a crop of the other.
+    # Loads image.
     image = tensor_image.TensorImage.from_file(
       test_util.get_test_data_path("burger.jpg"))
-    cropped_image = tensor_image.TensorImage.from_file(
-      test_util.get_test_data_path("burger_crop.jpg"))
 
-    bounding_box = None
-    if with_bounding_box:
-      # Bounding box in "burger.jpg" corresponding to "burger_crop.jpg".
-      bounding_box = bounding_box_pb2.BoundingBox(
-        origin_x=0, origin_y=0, width=400, height=325)
-
-    # Classifies both inputs.
-    image_result = classifier.classify(image, bounding_box)
-    crop_result = classifier.classify(cropped_image)
+    # Classifies the input.
+    image_result = classifier.classify(image, bounding_box=None)
 
     if model_name == _MODEL_FLOAT:
-      if with_bounding_box:
-        # Testing the model on burger.jpg (w/ bounding box)
-        self.assertEqual(
-          str(image_result),
-          textwrap.dedent(
-            """\
-            classifications {
-              classes {
-                index: 934
-                score: 0.8815076351165771
-                class_name: "cheeseburger"
-              }
-              classes {
-                index: 925
-                score: 0.019456762820482254
-                class_name: "guacamole"
-              }
-              classes {
-                index: 932
-                score: 0.012489477172493935
-                class_name: "bagel"
-              }
-              head_index: 0
-            }
-            """)
-        )
-      else:
-        # Testing the model on burger.jpg (w/o bounding box)
-        self.assertEqual(
-          str(image_result),
-          textwrap.dedent(
-            """\
-            classifications {
-              classes {
-                index: 934
-                score: 0.7399742007255554
-                class_name: "cheeseburger"
-              }
-              classes {
-                index: 925
-                score: 0.026928534731268883
-                class_name: "guacamole"
-              }
-              classes {
-                index: 932
-                score: 0.025737214833498
-                class_name: "bagel"
-              }
-              head_index: 0
-            }
-            """)
-        )
-      # Testing the model on burger_crop.jpg
+      # Testing the model on burger.jpg (w/o bounding box).
       self.assertEqual(
-        str(crop_result),
+        str(image_result),
         textwrap.dedent(
           """\
           classifications {
             classes {
               index: 934
-              score: 0.8810749650001526
+              score: 0.7399742007255554
               class_name: "cheeseburger"
             }
             classes {
               index: 925
-              score: 0.019916774705052376
+              score: 0.026928534731268883
               class_name: "guacamole"
             }
             classes {
               index: 932
-              score: 0.012394513003528118
+              score: 0.025737214833498
               class_name: "bagel"
             }
             head_index: 0
@@ -242,61 +178,118 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
           """)
       )
     elif model_name == _MODEL_QUANTIZED:
-      if with_bounding_box:
-        # Testing the model on burger.jpg (w/ bounding box)
-        self.assertEqual(
-          str(image_result),
-          textwrap.dedent(
-            """\
-            classifications {
-              classes {
-                index: 934
-                score: 0.96484375
-                class_name: "cheeseburger"
-              }
-              classes {
-                index: 935
-                score: 0.0078125
-                class_name: "hotdog"
-              }
-              classes {
-                index: 119
-                score: 0.0078125
-                class_name: "Dungeness crab"
-              }
-              head_index: 0
-            }
-            """)
-        )
-      else:
-        # Testing the model on burger.jpg (w/o bounding box)
-        self.assertEqual(
-          str(image_result),
-          textwrap.dedent(
-            """\
-            classifications {
-              classes {
-                index: 934
-                score: 0.96484375
-                class_name: "cheeseburger"
-              }
-              classes {
-                index: 948
-                score: 0.0078125
-                class_name: "mushroom"
-              }
-              classes {
-                index: 924
-                score: 0.00390625
-                class_name: "plate"
-              }
-              head_index: 0
-            }
-            """)
-        )
-      # Testing the model on burger_crop.jpg
+      # Testing the model on burger.jpg (w/o bounding box).
       self.assertEqual(
-        str(crop_result),
+        str(image_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 934
+              score: 0.96484375
+              class_name: "cheeseburger"
+            }
+            classes {
+              index: 948
+              score: 0.0078125
+              class_name: "mushroom"
+            }
+            classes {
+              index: 924
+              score: 0.00390625
+              class_name: "plate"
+            }
+            head_index: 0
+          }
+          """)
+      )
+    elif model_name == _MODEL_AUTOML:
+      # Testing the model on burger.jpg (w/o bounding box).
+      self.assertEqual(
+        str(image_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 2
+              score: 0.96484375
+              class_name: "roses"
+            }
+            classes {
+              index: 4
+              score: 0.01171875
+              class_name: "tulips"
+            }
+            classes {
+              index: 0
+              score: 0.0078125
+              class_name: "daisy"
+            }
+            head_index: 0
+          }
+          """)
+      )
+
+  @parameterized.parameters(
+    (_MODEL_FLOAT, 3, True),
+    (_MODEL_QUANTIZED, 3, True),
+    (_MODEL_AUTOML, 3, True),
+  )
+  def test_classify_model_with_bounding_box(self, model_name, max_results,
+                                            with_bounding_box):
+    # Get the model path from the test data directory.
+    model_file = test_util.get_test_data_path(model_name)
+
+    # Creates classifier.
+    classifier = self.create_classifier_from_options(
+      model_file,
+      max_results=max_results
+    )
+
+    # Loads image.
+    image = tensor_image.TensorImage.from_file(
+      test_util.get_test_data_path("burger.jpg"))
+
+    bounding_box = None
+    if with_bounding_box:
+      # Bounding box in "burger.jpg" corresponding to "burger_crop.jpg".
+      bounding_box = bounding_box_pb2.BoundingBox(
+        origin_x=0, origin_y=0, width=400, height=325)
+
+    # Classifies the input.
+    image_result = classifier.classify(image, bounding_box)
+
+    if model_name == _MODEL_FLOAT:
+      # Testing the model on burger.jpg (w/ bounding box).
+      self.assertEqual(
+        str(image_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 934
+              score: 0.8815076351165771
+              class_name: "cheeseburger"
+            }
+            classes {
+              index: 925
+              score: 0.019456762820482254
+              class_name: "guacamole"
+            }
+            classes {
+              index: 932
+              score: 0.012489477172493935
+              class_name: "bagel"
+            }
+            head_index: 0
+          }
+          """)
+      )
+
+    elif model_name == _MODEL_QUANTIZED:
+      # Testing the model on burger.jpg (w/ bounding box).
+      self.assertEqual(
+        str(image_result),
         textwrap.dedent(
           """\
           classifications {
@@ -319,62 +312,11 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
           }
           """)
       )
+
     elif model_name == _MODEL_AUTOML:
-      if with_bounding_box:
-        # Testing the model on burger.jpg (w/ bounding box)
-        self.assertEqual(
-          str(image_result),
-          textwrap.dedent(
-            """\
-            classifications {
-              classes {
-                index: 2
-                score: 0.953125
-                class_name: "roses"
-              }
-              classes {
-                index: 0
-                score: 0.01171875
-                class_name: "daisy"
-              }
-              classes {
-                index: 1
-                score: 0.01171875
-                class_name: "dandelion"
-              }
-              head_index: 0
-            }
-            """)
-        )
-      else:
-        # Testing the model on burger.jpg (w/o bounding box)
-        self.assertEqual(
-          str(image_result),
-          textwrap.dedent(
-            """\
-            classifications {
-              classes {
-                index: 2
-                score: 0.96484375
-                class_name: "roses"
-              }
-              classes {
-                index: 4
-                score: 0.01171875
-                class_name: "tulips"
-              }
-              classes {
-                index: 0
-                score: 0.0078125
-                class_name: "daisy"
-              }
-              head_index: 0
-            }
-            """)
-        )
-      # Testing the model on burger_crop.jpg
+      # Testing the model on burger.jpg (w/ bounding box).
       self.assertEqual(
-        str(crop_result),
+        str(image_result),
         textwrap.dedent(
           """\
           classifications {
@@ -397,7 +339,6 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
           }
           """)
       )
-
 
   @parameterized.parameters(
     (_MODEL_FLOAT, None, 0.5, False),
