@@ -185,13 +185,14 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Testing the model on burger.jpg (w/o bounding box).
     for index in range(len(expected_categories)):
+      image_category = image_result_dict['classifications'][0]['classes'][index]
+      expected_category = expected_result_dict['classifications'][0]['classes'][index]
+
       self.assertAlmostEqual(
-        image_result_dict['classifications'][0]['classes'][index]['score'],
-        expected_result_dict['classifications'][0]['classes'][index]['score'],
-        places=5
-      )
-      image_result_dict['classifications'][0]['classes'][index].pop('score', None)
-      expected_result_dict['classifications'][0]['classes'][index].pop('score', None)
+        image_category['score'], expected_category['score'], places=5)
+
+      image_category.pop('score', None)
+      expected_category.pop('score', None)
 
     self.assertDictEqual(image_result_dict, expected_result_dict)
 
@@ -249,13 +250,14 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Testing the model on burger.jpg (w/ bounding box).
     for index in range(len(expected_categories)):
+      image_category = image_result_dict['classifications'][0]['classes'][index]
+      expected_category = expected_result_dict['classifications'][0]['classes'][index]
+
       self.assertAlmostEqual(
-        image_result_dict['classifications'][0]['classes'][index]['score'],
-        expected_result_dict['classifications'][0]['classes'][index]['score'],
-        places=5
-      )
-      image_result_dict['classifications'][0]['classes'][index].pop('score', None)
-      expected_result_dict['classifications'][0]['classes'][index].pop('score', None)
+        image_category['score'], expected_category['score'], places=5)
+
+      image_category.pop('score', None)
+      expected_category.pop('score', None)
 
     self.assertDictEqual(image_result_dict, expected_result_dict)
 
@@ -292,13 +294,14 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Testing the model on burger.jpg (w/o bounding box).
     for index in range(len(expected_categories)):
+      image_category = image_result_dict['classifications'][0]['classes'][index]
+      expected_category = expected_result_dict['classifications'][0]['classes'][index]
+
       self.assertAlmostEqual(
-        image_result_dict['classifications'][0]['classes'][index]['score'],
-        expected_result_dict['classifications'][0]['classes'][index]['score'],
-        places=5
-      )
-      image_result_dict['classifications'][0]['classes'][index].pop('score', None)
-      expected_result_dict['classifications'][0]['classes'][index].pop('score', None)
+        image_category['score'], expected_category['score'], places=5)
+
+      image_category.pop('score', None)
+      expected_category.pop('score', None)
 
     self.assertDictEqual(image_result_dict, expected_result_dict)
 
@@ -341,13 +344,14 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Testing the model on burger.jpg (w/o bounding box).
     for index in range(len(expected_categories)):
+      image_category = image_result_dict['classifications'][0]['classes'][index]
+      expected_category = expected_result_dict['classifications'][0]['classes'][index]
+
       self.assertAlmostEqual(
-        image_result_dict['classifications'][0]['classes'][index]['score'],
-        expected_result_dict['classifications'][0]['classes'][index]['score'],
-        places=5
-      )
-      image_result_dict['classifications'][0]['classes'][index].pop('score', None)
-      expected_result_dict['classifications'][0]['classes'][index].pop('score', None)
+        image_category['score'], expected_category['score'], places=5)
+
+      image_category.pop('score', None)
+      expected_category.pop('score', None)
 
     self.assertDictEqual(image_result_dict, expected_result_dict)
 
@@ -382,13 +386,14 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Testing the model on burger.jpg (w/o bounding box).
     for index in range(len(expected_categories)):
+      image_category = image_result_dict['classifications'][0]['classes'][index]
+      expected_category = expected_result_dict['classifications'][0]['classes'][index]
+
       self.assertAlmostEqual(
-        image_result_dict['classifications'][0]['classes'][index]['score'],
-        expected_result_dict['classifications'][0]['classes'][index]['score'],
-        places=5
-      )
-      image_result_dict['classifications'][0]['classes'][index].pop('score', None)
-      expected_result_dict['classifications'][0]['classes'][index].pop('score', None)
+        image_category['score'], expected_category['score'], places=5)
+
+      image_category.pop('score', None)
+      expected_category.pop('score', None)
 
     self.assertDictEqual(image_result_dict, expected_result_dict)
 
