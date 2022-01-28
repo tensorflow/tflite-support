@@ -17,7 +17,7 @@ from tensorflow_lite_support.python.task.core.proto import configuration_pb2
 
 
 def build_proto_base_options(proto_options, options):
-  """Builds initial proto options from the base options."""
+  """Builds initial proto options values from the base options."""
 
   proto_options.model_file_with_metadata.file_name = options.base_options.model_file
   proto_options.num_threads = options.base_options.num_threads
