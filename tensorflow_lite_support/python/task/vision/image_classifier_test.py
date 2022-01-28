@@ -14,16 +14,19 @@
 """Tests for image_classifier."""
 
 from absl.testing import parameterized
+from google.protobuf import json_format
 
 from tensorflow_lite_support.python.task.core import task_options
 from tensorflow_lite_support.python.task.processor import processor_options
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
+from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
+from tensorflow_lite_support.python.task.processor.proto import class_pb2
 from tensorflow_lite_support.python.task.vision import image_classifier
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
 
 import unittest
-import textwrap
+import json
 
 
 _MODEL_FLOAT = "mobilenet_v2_1.0_224.tflite"
@@ -44,7 +47,20 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     options = image_classifier.ImageClassifierOptions(
       base_options=base_options, classifier_options=classifier_options)
     classifier = image_classifier.ImageClassifier(options)
+
     return classifier
+
+  @staticmethod
+  def build_test_data(expected_categories):
+    classifications = classifications_pb2.Classifications(head_index=0)
+    classifications.classes.extend(
+      [class_pb2.Category(**args) for args in expected_categories]
+    )
+    expected_result = classifications_pb2.ClassificationResult()
+    expected_result.classifications.append(classifications)
+    expected_result_dict = json.loads(json_format.MessageToJson(expected_result))
+
+    return expected_result_dict
 
   @parameterized.parameters(
     (_MODEL_FLOAT,),
@@ -121,11 +137,32 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       image_classifier.ImageClassifier.create_from_options(options)
 
   @parameterized.parameters(
-    (_MODEL_FLOAT, 3),
-    (_MODEL_QUANTIZED, 3),
-    (_MODEL_AUTOML, 3)
+    (
+      _MODEL_FLOAT, 3,
+      [
+        {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"},
+        {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"},
+        {'index': 932, 'score': 0.025737214833498, 'class_name': "bagel"},
+      ]
+    ),
+    (
+      _MODEL_QUANTIZED, 3,
+      [
+        {'index': 934, 'score': 0.96484375, 'class_name': "cheeseburger"},
+        {'index': 948, 'score': 0.0078125, 'class_name': "mushroom"},
+        {'index': 924, 'score': 0.00390625, 'class_name': "plate"},
+      ]
+    ),
+    (
+      _MODEL_AUTOML, 3,
+      [
+        {'index': 2, 'score': 0.96484375, 'class_name': "roses"},
+        {'index': 4, 'score': 0.01171875, 'class_name': "tulips"},
+        {'index': 0, 'score': 0.0078125, 'class_name': "daisy"},
+      ]
+    )
   )
-  def test_classify_model(self, model_name, max_results):
+  def test_classify_model(self, model_name, max_results, expected_categories):
     # Get the model path from the test data directory.
     model_file = test_util.get_test_data_path(model_name)
 
@@ -141,93 +178,42 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
+    image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
-    if model_name == _MODEL_FLOAT:
-      # Testing the model on burger.jpg (w/o bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 934
-              score: 0.7399742007255554
-              class_name: "cheeseburger"
-            }
-            classes {
-              index: 925
-              score: 0.026928534731268883
-              class_name: "guacamole"
-            }
-            classes {
-              index: 932
-              score: 0.025737214833498
-              class_name: "bagel"
-            }
-            head_index: 0
-          }
-          """)
-      )
-    elif model_name == _MODEL_QUANTIZED:
-      # Testing the model on burger.jpg (w/o bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 934
-              score: 0.96484375
-              class_name: "cheeseburger"
-            }
-            classes {
-              index: 948
-              score: 0.0078125
-              class_name: "mushroom"
-            }
-            classes {
-              index: 924
-              score: 0.00390625
-              class_name: "plate"
-            }
-            head_index: 0
-          }
-          """)
-      )
-    elif model_name == _MODEL_AUTOML:
-      # Testing the model on burger.jpg (w/o bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 2
-              score: 0.96484375
-              class_name: "roses"
-            }
-            classes {
-              index: 4
-              score: 0.01171875
-              class_name: "tulips"
-            }
-            classes {
-              index: 0
-              score: 0.0078125
-              class_name: "daisy"
-            }
-            head_index: 0
-          }
-          """)
-      )
+    # Builds test data.
+    expected_result_dict = self.build_test_data(expected_categories)
+
+    # Testing the model on burger.jpg (w/o bounding box).
+    self.assertDictEqual(image_result_dict, expected_result_dict)
 
   @parameterized.parameters(
-    (_MODEL_FLOAT, 3, True),
-    (_MODEL_QUANTIZED, 3, True),
-    (_MODEL_AUTOML, 3, True),
+    (
+      _MODEL_FLOAT, 3,
+      [
+        {'index': 934, 'score': 0.8815076351165771, 'class_name': "cheeseburger"},
+        {'index': 925, 'score': 0.019456762820482254, 'class_name': "guacamole"},
+        {'index': 932, 'score': 0.012489477172493935, 'class_name': "bagel"},
+      ]
+    ),
+    (
+      _MODEL_QUANTIZED, 3,
+      [
+        {'index': 934, 'score': 0.96484375, 'class_name': "cheeseburger"},
+        {'index': 935, 'score': 0.0078125, 'class_name': "hotdog"},
+        {'index': 119, 'score': 0.0078125, 'class_name': "Dungeness crab"},
+      ]
+    ),
+    (
+      _MODEL_AUTOML, 3,
+      [
+        {'index': 2, 'score': 0.953125, 'class_name': "roses"},
+        {'index': 0, 'score': 0.01171875, 'class_name': "daisy"},
+        {'index': 1, 'score': 0.01171875, 'class_name': "dandelion"},
+      ]
+    )
   )
   def test_classify_model_with_bounding_box(self, model_name, max_results,
-                                            with_bounding_box):
+                                            expected_categories):
     # Get the model path from the test data directory.
     model_file = test_util.get_test_data_path(model_name)
 
@@ -241,101 +227,31 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     image = tensor_image.TensorImage.from_file(
       test_util.get_test_data_path("burger.jpg"))
 
-    bounding_box = None
-    if with_bounding_box:
-      # Bounding box in "burger.jpg" corresponding to "burger_crop.jpg".
-      bounding_box = bounding_box_pb2.BoundingBox(
-        origin_x=0, origin_y=0, width=400, height=325)
+    # Bounding box in "burger.jpg" corresponding to "burger_crop.jpg".
+    bounding_box = bounding_box_pb2.BoundingBox(
+      origin_x=0, origin_y=0, width=400, height=325)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box)
+    image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
-    if model_name == _MODEL_FLOAT:
-      # Testing the model on burger.jpg (w/ bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 934
-              score: 0.8815076351165771
-              class_name: "cheeseburger"
-            }
-            classes {
-              index: 925
-              score: 0.019456762820482254
-              class_name: "guacamole"
-            }
-            classes {
-              index: 932
-              score: 0.012489477172493935
-              class_name: "bagel"
-            }
-            head_index: 0
-          }
-          """)
-      )
+    # Builds test data.
+    expected_result_dict = self.build_test_data(expected_categories)
 
-    elif model_name == _MODEL_QUANTIZED:
-      # Testing the model on burger.jpg (w/ bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 934
-              score: 0.96484375
-              class_name: "cheeseburger"
-            }
-            classes {
-              index: 935
-              score: 0.0078125
-              class_name: "hotdog"
-            }
-            classes {
-              index: 119
-              score: 0.0078125
-              class_name: "Dungeness crab"
-            }
-            head_index: 0
-          }
-          """)
-      )
-
-    elif model_name == _MODEL_AUTOML:
-      # Testing the model on burger.jpg (w/ bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 2
-              score: 0.953125
-              class_name: "roses"
-            }
-            classes {
-              index: 0
-              score: 0.01171875
-              class_name: "daisy"
-            }
-            classes {
-              index: 1
-              score: 0.01171875
-              class_name: "dandelion"
-            }
-            head_index: 0
-          }
-          """)
-      )
+    # Testing the model on burger.jpg (w/ bounding box).
+    self.assertDictEqual(image_result_dict, expected_result_dict)
 
   @parameterized.parameters(
-    (_MODEL_FLOAT, 0.5),
-    (_MODEL_QUANTIZED, 0.5),
+    (
+      _MODEL_FLOAT, 0.5,
+      [{'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"}]
+    ),
+    (
+      _MODEL_QUANTIZED, 0.5,
+      [{'index': 934, 'score': 0.96484375, 'class_name': "cheeseburger"}]
+    )
   )
-  def test_score_threshold_option(self, model_name, score_threshold):
+  def test_score_threshold_option(self, model_name, score_threshold, expected_categories):
     # Get the model path from the test data directory.
     model_file = test_util.get_test_data_path(model_name)
 
@@ -351,45 +267,31 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
+    image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
-    if model_name == _MODEL_FLOAT:
-      # Testing the model on burger.jpg (w/o bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 934
-              score: 0.7399742007255554
-              class_name: "cheeseburger"
-            }
-            head_index: 0
-          }
-          """)
-      )
-    elif model_name == _MODEL_QUANTIZED:
-      # Testing the model on burger.jpg (w/o bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 934
-              score: 0.96484375
-              class_name: "cheeseburger"
-            }
-            head_index: 0
-          }
-          """)
-      )
+    # Builds test data.
+    expected_result_dict = self.build_test_data(expected_categories)
+
+    # Testing the model on burger.jpg (w/o bounding box).
+    self.assertDictEqual(image_result_dict, expected_result_dict)
 
   @parameterized.parameters(
-    (_MODEL_FLOAT, ['cheeseburger', 'guacamole']),
-    (_MODEL_QUANTIZED, ['cheeseburger', 'hotdog']),
+    (
+      _MODEL_FLOAT, ['cheeseburger', 'guacamole'],
+      [
+        {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"},
+        {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"},
+      ]
+    ),
+    (
+      _MODEL_QUANTIZED, ['cheeseburger', 'hotdog'],
+      [
+        {'index': 934, 'score': 0.96484375, 'class_name': "cheeseburger"},
+        {'index': 935, 'score': 0.00390625, 'class_name': "hotdog"},
+      ]
+    )
   )
-  def test_allowlist_option(self, model_name, label_allowlist):
+  def test_allowlist_option(self, model_name, label_allowlist, expected_categories):
     # Get the model path from the test data directory.
     model_file = test_util.get_test_data_path(model_name)
 
@@ -405,50 +307,13 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
+    image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
-    if model_name == _MODEL_FLOAT:
-      # Testing the model on burger.jpg (w/o bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 934
-              score: 0.7399742007255554
-              class_name: "cheeseburger"
-            }
-            classes {
-              index: 925
-              score: 0.026928534731268883
-              class_name: "guacamole"
-            }
-            head_index: 0
-          }
-          """)
-      )
+    # Builds test data.
+    expected_result_dict = self.build_test_data(expected_categories)
 
-    if model_name == _MODEL_QUANTIZED:
-      # Testing the model on burger.jpg (w/o bounding box).
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 934
-              score: 0.96484375
-              class_name: "cheeseburger"
-            }
-            classes {
-              index: 935
-              score: 0.00390625
-              class_name: "hotdog"
-            }
-            head_index: 0
-          }
-          """)
-      )
+    # Testing the model on burger.jpg (w/o bounding box).
+    self.assertDictEqual(image_result_dict, expected_result_dict)
 
   def test_denylist_option(self, model_name=_MODEL_FLOAT):
     # Get the model path from the test data directory.
@@ -467,32 +332,20 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
+    image_result_dict = json.loads(json_format.MessageToJson(image_result))
+
+    # Expected results.
+    expected_categories = [
+      {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"},
+      {'index': 932, 'score': 0.025737214833498, 'class_name': "bagel"},
+      {'index': 963, 'score': 0.010005592368543148, 'class_name': "meat loaf"},
+    ]
+
+    # Builds test data.
+    expected_result_dict = self.build_test_data(expected_categories)
 
     # Testing the model on burger.jpg (w/o bounding box).
-    self.assertEqual(
-      str(image_result),
-      textwrap.dedent(
-        """\
-        classifications {
-          classes {
-            index: 925
-            score: 0.026928534731268883
-            class_name: "guacamole"
-          }
-          classes {
-            index: 932
-            score: 0.025737214833498
-            class_name: "bagel"
-          }
-          classes {
-            index: 963
-            score: 0.010005592368543148
-            class_name: "meat loaf"
-          }
-          head_index: 0
-        }
-        """)
-    )
+    self.assertDictEqual(image_result_dict, expected_result_dict)
 
 
 if __name__ == "__main__":
