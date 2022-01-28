@@ -341,35 +341,28 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       )
 
   @parameterized.parameters(
-    (_MODEL_FLOAT, None, 0.5, False),
+    (_MODEL_FLOAT, 0.5),
+    (_MODEL_QUANTIZED, 0.5),
   )
-  def test_score_threshold_option(self, model_name,  max_results,
-                                  score_threshold, with_bounding_box):
-    # Get the model path from the test data directory
+  def test_score_threshold_option(self, model_name, score_threshold):
+    # Get the model path from the test data directory.
     model_file = test_util.get_test_data_path(model_name)
 
     # Creates classifier.
     classifier = self.create_classifier_from_options(
       model_file,
-      max_results=max_results,
       score_threshold=score_threshold
     )
 
-    # Loads image
+    # Loads image.
     image = tensor_image.TensorImage.from_file(
       test_util.get_test_data_path("burger.jpg"))
 
-    bounding_box = None
-    if with_bounding_box:
-      # Bounding box in "burger.jpg" corresponding to "burger_crop.jpg".
-      bounding_box = bounding_box_pb2.BoundingBox(
-        origin_x=0, origin_y=0, width=400, height=325)
-
     # Classifies the input.
-    image_result = classifier.classify(image, bounding_box)
+    image_result = classifier.classify(image, bounding_box=None)
 
     if model_name == _MODEL_FLOAT:
-      # Testing the model on burger.jpg (w/o bounding box)
+      # Testing the model on burger.jpg (w/o bounding box).
       self.assertEqual(
         str(image_result),
         textwrap.dedent(
@@ -384,12 +377,29 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
           }
           """)
       )
+    elif model_name == _MODEL_QUANTIZED:
+      # Testing the model on burger.jpg (w/o bounding box).
+      self.assertEqual(
+        str(image_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 934
+              score: 0.96484375
+              class_name: "cheeseburger"
+            }
+            head_index: 0
+          }
+          """)
+      )
 
   @parameterized.parameters(
     (_MODEL_FLOAT, ['cheeseburger', 'guacamole']),
+    (_MODEL_QUANTIZED, ['cheeseburger', 'hotdog']),
   )
-  def test_whitelist_option(self, model_name, label_allowlist):
-    # Get the model path from the test data directory
+  def test_allowlist_option(self, model_name, label_allowlist):
+    # Get the model path from the test data directory.
     model_file = test_util.get_test_data_path(model_name)
 
     # Creates classifier.
@@ -398,7 +408,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       label_allowlist=label_allowlist
     )
 
-    # Loads image
+    # Loads image.
     image = tensor_image.TensorImage.from_file(
       test_util.get_test_data_path("burger.jpg"))
 
@@ -406,7 +416,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     image_result = classifier.classify(image, bounding_box=None)
 
     if model_name == _MODEL_FLOAT:
-      # Testing the model on burger.jpg (w/o bounding box)
+      # Testing the model on burger.jpg (w/o bounding box).
       self.assertEqual(
         str(image_result),
         textwrap.dedent(
@@ -427,19 +437,37 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
           """)
       )
 
-  @parameterized.parameters(
-    (_MODEL_FLOAT, 0.01, ['cheeseburger', 'guacamole']),
-  )
-  def test_blacklist_option(self, model_name, score_threshold,
-                            label_denylist):
-    # Get the model path from the test data directory
+    if model_name == _MODEL_QUANTIZED:
+      # Testing the model on burger.jpg (w/o bounding box).
+      self.assertEqual(
+        str(image_result),
+        textwrap.dedent(
+          """\
+          classifications {
+            classes {
+              index: 934
+              score: 0.96484375
+              class_name: "cheeseburger"
+            }
+            classes {
+              index: 935
+              score: 0.00390625
+              class_name: "hotdog"
+            }
+            head_index: 0
+          }
+          """)
+      )
+
+  def test_denylist_option(self, model_name=_MODEL_FLOAT):
+    # Get the model path from the test data directory.
     model_file = test_util.get_test_data_path(model_name)
 
     # Creates classifier.
     classifier = self.create_classifier_from_options(
-      model_file,
-      score_threshold=score_threshold,
-      label_denylist=label_denylist
+      model_file=model_file,
+      score_threshold=0.01,
+      label_denylist=['cheeseburger']
     )
 
     # Loads image
@@ -449,27 +477,31 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
 
-    if model_name == _MODEL_FLOAT:
-      # Testing the model on burger.jpg (w/o bounding box)
-      self.assertEqual(
-        str(image_result),
-        textwrap.dedent(
-          """\
-          classifications {
-            classes {
-              index: 932
-              score: 0.025737214833498
-              class_name: "bagel"
-            }
-            classes {
-              index: 963
-              score: 0.010005592368543148
-              class_name: "meat loaf"
-            }
-            head_index: 0
+    # Testing the model on burger.jpg (w/o bounding box).
+    self.assertEqual(
+      str(image_result),
+      textwrap.dedent(
+        """\
+        classifications {
+          classes {
+            index: 925
+            score: 0.026928534731268883
+            class_name: "guacamole"
           }
-          """)
-      )
+          classes {
+            index: 932
+            score: 0.025737214833498
+            class_name: "bagel"
+          }
+          classes {
+            index: 963
+            score: 0.010005592368543148
+            class_name: "meat loaf"
+          }
+          head_index: 0
+        }
+        """)
+    )
 
 
 if __name__ == "__main__":
