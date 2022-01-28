@@ -17,7 +17,6 @@ import dataclasses
 from typing import Optional
 
 from tensorflow_lite_support.python.task.core import task_options
-from tensorflow_lite_support.python.task.core.proto import configuration_pb2
 from tensorflow_lite_support.python.task.processor import processor_options
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
@@ -25,6 +24,8 @@ from tensorflow_lite_support.python.task.processor.proto import image_classifier
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import image_classifier as _image_classifier
+
+from tensorflow_lite_support.python.task.vision.core.utils import build_proto_base_options
 
 
 @dataclasses.dataclass
@@ -42,10 +43,7 @@ def _build_proto_options(
   proto_options = image_classifier_options_pb2.ClassifierOptions()
 
   # Updates values from base_options.
-  proto_options.model_file_with_metadata.file_name = options.base_options.model_file
-  proto_options.num_threads = options.base_options.num_threads
-  if options.base_options.use_coral:
-    proto_options.compute_settings.tflite_settings.delegate = configuration_pb2.Delegate.EDGETPU_CORAL
+  proto_options = build_proto_base_options(proto_options, options)
 
   # Updates values from classifier_options.
   if options.classifier_options:

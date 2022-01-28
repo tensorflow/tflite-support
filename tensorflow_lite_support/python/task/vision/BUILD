@@ -58,6 +58,7 @@ py_library(
         "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:image_classifier_options_pb2",
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
+        "//tensorflow_lite_support/python/task/vision/core:utils",
         "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
         "//tensorflow_lite_support/python/task/vision/pybinds:image_classifier",
     ],
