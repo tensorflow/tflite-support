@@ -114,7 +114,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     # Get the model path from the test data directory
     model_file = test_util.get_test_data_path(model_name)
 
-    # Fails with combined whitelist and blacklist
+    # Fails with combined allowlist and denylist
     with self.assertRaisesRegex(
             Exception,
             r"INVALID_ARGUMENT: `class_name_whitelist` and `class_name_blacklist` "
