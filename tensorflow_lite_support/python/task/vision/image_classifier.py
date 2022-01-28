@@ -55,10 +55,10 @@ def _build_proto_options(
       proto_options.max_results = options.classifier_options.max_results
     if options.classifier_options.score_threshold is not None:
       proto_options.score_threshold = options.classifier_options.score_threshold
-    if options.classifier_options.class_name_whitelist is not None:
-      proto_options.class_name_whitelist.extend(options.classifier_options.class_name_whitelist)
-    if options.classifier_options.class_name_blacklist is not None:
-      proto_options.class_name_blacklist.extend(options.classifier_options.class_name_blacklist)
+    if options.classifier_options.label_allowlist is not None:
+      proto_options.class_name_whitelist.extend(options.classifier_options.label_allowlist)
+    if options.classifier_options.label_denylist is not None:
+      proto_options.class_name_blacklist.extend(options.classifier_options.label_denylist)
 
   return proto_options
 

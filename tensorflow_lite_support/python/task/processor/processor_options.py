@@ -65,15 +65,15 @@ class ClassificationOptions:
   score_threshold: Optional[float] = None
 
   """
-  Optional whitelist of class names. If non-empty, classifications whose
+  Optional allowlist of class names. If non-empty, classifications whose
   class name is not in this set will be filtered out. Duplicate or unknown
-  class names are ignored. Mutually exclusive with class_name_blacklist.
+  class names are ignored. Mutually exclusive with label_denylist.
   """
-  class_name_whitelist: List[str] = None
+  label_allowlist: List[str] = None
 
   """
-  Optional blacklist of class names. If non-empty, classifications whose
+  Optional denylist of class names. If non-empty, classifications whose
   class name is in this set will be filtered out. Duplicate or unknown
-  class names are ignored. Mutually exclusive with class_name_whitelist.
+  class names are ignored. Mutually exclusive with label_allowlist.
   """
-  class_name_blacklist: List[str] = None
+  label_denylist: List[str] = None

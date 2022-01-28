@@ -109,8 +109,8 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     (_MODEL_AUTOML, ['foo'], ['bar']),
   )
   def test_combined_whitelist_and_blacklist(self, model_name,
-                                            class_name_whitelist,
-                                            class_name_blacklist):
+                                            label_allowlist,
+                                            label_denylist):
     # Get the model path from the test data directory
     model_file = test_util.get_test_data_path(model_name)
 
@@ -122,8 +122,8 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
             r"\[tflite::support::TfLiteSupportStatus='2'\]"):
       base_options = task_options.BaseOptions(model_file=model_file)
       classifier_options = processor_options.ClassificationOptions(
-        class_name_whitelist=class_name_whitelist,
-        class_name_blacklist=class_name_blacklist)
+        label_allowlist=label_allowlist,
+        label_denylist=label_denylist)
       options = image_classifier.ImageClassifierOptions(
         base_options=base_options,
         classifier_options=classifier_options)
@@ -447,14 +447,14 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
   @parameterized.parameters(
     (_MODEL_FLOAT, ['cheeseburger', 'guacamole']),
   )
-  def test_whitelist_option(self, model_name, class_name_whitelist):
+  def test_whitelist_option(self, model_name, label_allowlist):
     # Get the model path from the test data directory
     model_file = test_util.get_test_data_path(model_name)
 
     # Creates classifier.
     classifier = self.create_classifier_from_options(
       model_file,
-      class_name_whitelist=class_name_whitelist
+      label_allowlist=label_allowlist
     )
 
     # Loads image
@@ -490,7 +490,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     (_MODEL_FLOAT, 0.01, ['cheeseburger', 'guacamole']),
   )
   def test_blacklist_option(self, model_name, score_threshold,
-                            class_name_blacklist):
+                            label_denylist):
     # Get the model path from the test data directory
     model_file = test_util.get_test_data_path(model_name)
 
@@ -498,7 +498,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     classifier = self.create_classifier_from_options(
       model_file,
       score_threshold=score_threshold,
-      class_name_blacklist=class_name_blacklist
+      label_denylist=label_denylist
     )
 
     # Loads image
