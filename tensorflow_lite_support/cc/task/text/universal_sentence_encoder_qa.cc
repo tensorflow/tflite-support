@@ -48,14 +48,14 @@ using FeatureVector = UniversalSentenceEncoderQA::FeatureVector;
 
 namespace {
 constexpr char kQueryTextMetadataName[] = "inp_text";
-constexpr char kResponseTextMetadataName[] = "res_text";
 constexpr char kResponseContextMetadataName[] = "res_context";
+constexpr char kResponseTextMetadataName[] = "res_text";
 constexpr char kQueryEncodingMetadataName[] = "query_encoding";
 constexpr char kResponseEncodingMetadataName[] = "response_encoding";
 
 constexpr char kQueryTextTensorName[] = "ParseExample/ParseExampleV2:1";
-constexpr char kResponseTextTensorName[] = "ParseExample/ParseExampleV2:2";
-constexpr char kResponseContextTensorName[] = "ParseExample/ParseExampleV2:3";
+constexpr char kResponseContextTensorName[] = "ParseExample/ParseExampleV2:2";
+constexpr char kResponseTextTensorName[] = "ParseExample/ParseExampleV2:3";
 constexpr char kQueryEncodingTensorName[] = "Final/EncodeQuery/mul";
 constexpr char kResponseEncodingTensorName[] = "Final/EncodeResult/mul";
 
