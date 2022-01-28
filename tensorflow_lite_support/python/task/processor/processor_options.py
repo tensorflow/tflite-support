@@ -23,13 +23,13 @@ class EmbeddingOptions:
 
   Attributes:
     l2_normalize: Whether to normalize the returned feature vector with L2 norm.
-     Use this option only if the model does not already contain a native
-     L2_NORMALIZATION TF Lite Op. In most cases, this is already the case and
-     L2 norm is thus achieved through TF Lite inference.
+      Use this option only if the model does not already contain a native
+      L2_NORMALIZATION TF Lite Op. In most cases, this is already the case and
+      L2 norm is thus achieved through TF Lite inference.
     quantize: Whether the returned embedding should be quantized to bytes via
-     scalar quantization. Embeddings are implicitly assumed to be unit-norm and
-     therefore any dimension is guaranteed to have a value in [-1.0, 1.0]. Use
-     the l2_normalize option if this is not the case.
+      scalar quantization. Embeddings are implicitly assumed to be unit-norm and
+      therefore any dimension is guaranteed to have a value in [-1.0, 1.0]. Use
+      the l2_normalize option if this is not the case.
   """
 
   l2_normalize: Optional[bool] = None
