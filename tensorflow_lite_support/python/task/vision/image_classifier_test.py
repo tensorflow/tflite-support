@@ -142,7 +142,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       [
         {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"},
         {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"},
-        {'index': 932, 'score': 0.025737214833498, 'class_name': "bagel"},
+        {'index': 932, 'score': 0.025737214833498, 'class_name': "bagel"}
       ]
     ),
     (
@@ -150,7 +150,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       [
         {'index': 934, 'score': 0.96484375, 'class_name': "cheeseburger"},
         {'index': 948, 'score': 0.0078125, 'class_name': "mushroom"},
-        {'index': 924, 'score': 0.00390625, 'class_name': "plate"},
+        {'index': 924, 'score': 0.00390625, 'class_name': "plate"}
       ]
     ),
     (
@@ -158,7 +158,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       [
         {'index': 2, 'score': 0.96484375, 'class_name': "roses"},
         {'index': 4, 'score': 0.01171875, 'class_name': "tulips"},
-        {'index': 0, 'score': 0.0078125, 'class_name': "daisy"},
+        {'index': 0, 'score': 0.0078125, 'class_name': "daisy"}
       ]
     )
   )
@@ -201,7 +201,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       [
         {'index': 934, 'score': 0.8815076351165771, 'class_name': "cheeseburger"},
         {'index': 925, 'score': 0.019456762820482254, 'class_name': "guacamole"},
-        {'index': 932, 'score': 0.012489477172493935, 'class_name': "bagel"},
+        {'index': 932, 'score': 0.012489477172493935, 'class_name': "bagel"}
       ]
     ),
     (
@@ -209,7 +209,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       [
         {'index': 934, 'score': 0.96484375, 'class_name': "cheeseburger"},
         {'index': 935, 'score': 0.0078125, 'class_name': "hotdog"},
-        {'index': 119, 'score': 0.0078125, 'class_name': "Dungeness crab"},
+        {'index': 119, 'score': 0.0078125, 'class_name': "Dungeness crab"}
       ]
     ),
     (
@@ -217,7 +217,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       [
         {'index': 2, 'score': 0.953125, 'class_name': "roses"},
         {'index': 0, 'score': 0.01171875, 'class_name': "daisy"},
-        {'index': 1, 'score': 0.01171875, 'class_name': "dandelion"},
+        {'index': 1, 'score': 0.01171875, 'class_name': "dandelion"}
       ]
     )
   )
@@ -307,14 +307,14 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
       _MODEL_FLOAT, ['cheeseburger', 'guacamole'],
       [
         {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"},
-        {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"},
+        {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"}
       ]
     ),
     (
       _MODEL_QUANTIZED, ['cheeseburger', 'hotdog'],
       [
         {'index': 934, 'score': 0.96484375, 'class_name': "cheeseburger"},
-        {'index': 935, 'score': 0.00390625, 'class_name': "hotdog"},
+        {'index': 935, 'score': 0.00390625, 'class_name': "hotdog"}
       ]
     )
   )
@@ -374,7 +374,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     expected_categories = [
       {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"},
       {'index': 932, 'score': 0.025737214833498, 'class_name': "bagel"},
-      {'index': 963, 'score': 0.010005592368543148, 'class_name': "meat loaf"},
+      {'index': 963, 'score': 0.010005592368543148, 'class_name': "meat loaf"}
     ]
 
     # Builds test data.
