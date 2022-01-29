@@ -184,7 +184,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Builds test data.
     expected_result_dict = self.build_test_data(expected_categories)
 
-    # Testing the model on burger.jpg (w/o bounding box).
+    # Comparing results (classification w/o bounding box).
     self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   @parameterized.parameters(
@@ -239,7 +239,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Builds test data.
     expected_result_dict = self.build_test_data(expected_categories)
 
-    # Testing the model on burger.jpg (w/ bounding box).
+    # Comparing results (classification w/ bounding box).
     self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   @parameterized.parameters(
@@ -273,7 +273,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Builds test data.
     expected_result_dict = self.build_test_data(expected_categories)
 
-    # Testing the model on burger.jpg (w/o bounding box).
+    # Comparing results (classification w/o bounding box).
     self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   @parameterized.parameters(
@@ -313,7 +313,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Builds test data.
     expected_result_dict = self.build_test_data(expected_categories)
 
-    # Testing the model on burger.jpg (w/o bounding box).
+    # Comparing results (classification w/o bounding box).
     self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   def test_denylist_option(self, model_name=_MODEL_FLOAT):
@@ -345,7 +345,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Builds test data.
     expected_result_dict = self.build_test_data(expected_categories)
 
-    # Testing the model on burger.jpg (w/o bounding box).
+    # Comparing results (classification w/o bounding box).
     self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
 
