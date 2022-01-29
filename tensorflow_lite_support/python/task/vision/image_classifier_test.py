@@ -23,6 +23,7 @@ from tensorflow_lite_support.python.task.processor.proto import classifications_
 from tensorflow_lite_support.python.task.processor.proto import class_pb2
 from tensorflow_lite_support.python.task.vision import image_classifier
 from tensorflow_lite_support.python.task.vision.core import tensor_image
+from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
 
 import unittest
@@ -34,7 +35,7 @@ _MODEL_QUANTIZED = "mobilenet_v1_0.25_224_quant.tflite"
 _MODEL_AUTOML = "automl_labeler_model.tflite"
 
 
-class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
+class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def setUp(self):
     super().setUp()
@@ -184,17 +185,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Testing the model on burger.jpg (w/o bounding box).
-    for index in range(len(expected_categories)):
-      image_category = image_result_dict['classifications'][0]['classes'][index]
-      expected_category = expected_result_dict['classifications'][0]['classes'][index]
-
-      self.assertAlmostEqual(
-        image_category['score'], expected_category['score'], places=5)
-
-      image_category.pop('score', None)
-      expected_category.pop('score', None)
-
-    self.assertDictEqual(image_result_dict, expected_result_dict)
+    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   @parameterized.parameters(
     (
@@ -249,17 +240,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Testing the model on burger.jpg (w/ bounding box).
-    for index in range(len(expected_categories)):
-      image_category = image_result_dict['classifications'][0]['classes'][index]
-      expected_category = expected_result_dict['classifications'][0]['classes'][index]
-
-      self.assertAlmostEqual(
-        image_category['score'], expected_category['score'], places=5)
-
-      image_category.pop('score', None)
-      expected_category.pop('score', None)
-
-    self.assertDictEqual(image_result_dict, expected_result_dict)
+    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   @parameterized.parameters(
     (
@@ -293,17 +274,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Testing the model on burger.jpg (w/o bounding box).
-    for index in range(len(expected_categories)):
-      image_category = image_result_dict['classifications'][0]['classes'][index]
-      expected_category = expected_result_dict['classifications'][0]['classes'][index]
-
-      self.assertAlmostEqual(
-        image_category['score'], expected_category['score'], places=5)
-
-      image_category.pop('score', None)
-      expected_category.pop('score', None)
-
-    self.assertDictEqual(image_result_dict, expected_result_dict)
+    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   @parameterized.parameters(
     (
@@ -343,17 +314,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Testing the model on burger.jpg (w/o bounding box).
-    for index in range(len(expected_categories)):
-      image_category = image_result_dict['classifications'][0]['classes'][index]
-      expected_category = expected_result_dict['classifications'][0]['classes'][index]
-
-      self.assertAlmostEqual(
-        image_category['score'], expected_category['score'], places=5)
-
-      image_category.pop('score', None)
-      expected_category.pop('score', None)
-
-    self.assertDictEqual(image_result_dict, expected_result_dict)
+    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   def test_denylist_option(self, model_name=_MODEL_FLOAT):
     # Get the model path from the test data directory.
@@ -385,17 +346,7 @@ class ImageClassifierTest(parameterized.TestCase, unittest.TestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Testing the model on burger.jpg (w/o bounding box).
-    for index in range(len(expected_categories)):
-      image_category = image_result_dict['classifications'][0]['classes'][index]
-      expected_category = expected_result_dict['classifications'][0]['classes'][index]
-
-      self.assertAlmostEqual(
-        image_category['score'], expected_category['score'], places=5)
-
-      image_category.pop('score', None)
-      expected_category.pop('score', None)
-
-    self.assertDictEqual(image_result_dict, expected_result_dict)
+    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
 
 if __name__ == "__main__":
