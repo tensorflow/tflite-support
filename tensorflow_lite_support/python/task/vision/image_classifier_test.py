@@ -66,7 +66,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
   @parameterized.parameters(
     (_MODEL_FLOAT,),
     (_MODEL_QUANTIZED,),
-    (_MODEL_AUTOML,),
+    (_MODEL_AUTOML,)
   )
   def test_create_from_options(self, model_name):
     # Get the model path from the test data directory
@@ -114,7 +114,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
   @parameterized.parameters(
     (_MODEL_FLOAT, ['foo'], ['bar']),
     (_MODEL_QUANTIZED, ['foo'], ['bar']),
-    (_MODEL_AUTOML, ['foo'], ['bar']),
+    (_MODEL_AUTOML, ['foo'], ['bar'])
   )
   def test_combined_allowlist_and_denylist(self, model_name,
                                             label_allowlist,
