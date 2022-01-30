@@ -25,8 +25,8 @@ class BaseTestCase(unittest.TestCase):
     Compares lists, dicts and tuples recursively. Checks numeric values
     using test_case's :py:meth:`unittest.TestCase.assertAlmostEqual` and
     checks all other values with :py:meth:`unittest.TestCase.assertEqual`.
-    Accepts additional positional and keyword arguments and pass those
-    intact to assertAlmostEqual() (that's how you specify comparison
+    Accepts additional keyword arguments and pass those intact to
+    assertAlmostEqual() (that's how you specify comparison
     precision).
     """
     if isinstance(expected, (int, float, complex)):
