@@ -15,12 +15,12 @@
 
 import unittest
 
-__unittest = True  # Allows shorter stack trace for .assertDictAlmostEqual
+__unittest = True  # Allows shorter stack trace for .assertDeepAlmostEqual
 
 
 class BaseTestCase(unittest.TestCase):
     """Base test case."""
-    def assertDictAlmostEqual(self, expected, actual, **kwargs):
+    def assertDeepAlmostEqual(self, expected, actual, **kwargs):
         """
         Compares lists, dicts and tuples recursively. Checks numeric values
         using test_case's :py:meth:`unittest.TestCase.assertAlmostEqual` and
@@ -35,10 +35,10 @@ class BaseTestCase(unittest.TestCase):
             self.assertEqual(len(expected), len(actual))
             for index in range(len(expected)):
                 v1, v2 = expected[index], actual[index]
-                self.assertDictAlmostEqual(v1, v2, **kwargs)
+                self.assertDeepAlmostEqual(v1, v2, **kwargs)
         elif isinstance(expected, dict):
             self.assertEqual(set(expected), set(actual))
             for key in expected:
-                self.assertDictAlmostEqual(expected[key], actual[key], **kwargs)
+                self.assertDeepAlmostEqual(expected[key], actual[key], **kwargs)
         else:
             self.assertEqual(expected, actual)
