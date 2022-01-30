@@ -19,26 +19,26 @@ __unittest = True  # Allows shorter stack trace for .assertDeepAlmostEqual
 
 
 class BaseTestCase(unittest.TestCase):
-    """Base test case."""
-    def assertDeepAlmostEqual(self, expected, actual, **kwargs):
-        """
-        Compares lists, dicts and tuples recursively. Checks numeric values
-        using test_case's :py:meth:`unittest.TestCase.assertAlmostEqual` and
-        checks all other values with :py:meth:`unittest.TestCase.assertEqual`.
-        Accepts additional positional and keyword arguments and pass those
-        intact to assertAlmostEqual() (that's how you specify comparison
-        precision).
-        """
-        if isinstance(expected, (int, float, complex)):
-            self.assertAlmostEqual(expected, actual, **kwargs)
-        elif isinstance(expected, (list, tuple)):
-            self.assertEqual(len(expected), len(actual))
-            for index in range(len(expected)):
-                v1, v2 = expected[index], actual[index]
-                self.assertDeepAlmostEqual(v1, v2, **kwargs)
-        elif isinstance(expected, dict):
-            self.assertEqual(set(expected), set(actual))
-            for key in expected:
-                self.assertDeepAlmostEqual(expected[key], actual[key], **kwargs)
-        else:
-            self.assertEqual(expected, actual)
+  """Base test case."""
+  def assertDeepAlmostEqual(self, expected, actual, **kwargs):
+    """
+    Compares lists, dicts and tuples recursively. Checks numeric values
+    using test_case's :py:meth:`unittest.TestCase.assertAlmostEqual` and
+    checks all other values with :py:meth:`unittest.TestCase.assertEqual`.
+    Accepts additional positional and keyword arguments and pass those
+    intact to assertAlmostEqual() (that's how you specify comparison
+    precision).
+    """
+    if isinstance(expected, (int, float, complex)):
+      self.assertAlmostEqual(expected, actual, **kwargs)
+    elif isinstance(expected, (list, tuple)):
+      self.assertEqual(len(expected), len(actual))
+      for index in range(len(expected)):
+        v1, v2 = expected[index], actual[index]
+        self.assertDeepAlmostEqual(v1, v2, **kwargs)
+    elif isinstance(expected, dict):
+      self.assertEqual(set(expected), set(actual))
+      for key in expected:
+        self.assertDeepAlmostEqual(expected[key], actual[key], **kwargs)
+    else:
+      self.assertEqual(expected, actual)
