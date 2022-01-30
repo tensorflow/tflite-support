@@ -185,7 +185,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Comparing results (classification w/o bounding box).
-    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
+    self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   @parameterized.parameters(
     (
@@ -240,7 +240,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Comparing results (classification w/ bounding box).
-    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
+    self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   @parameterized.parameters(
     (
@@ -274,7 +274,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Comparing results (classification w/o bounding box).
-    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
+    self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   @parameterized.parameters(
     (
@@ -314,7 +314,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Comparing results (classification w/o bounding box).
-    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
+    self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   def test_denylist_option(self, model_name=_MODEL_FLOAT):
     # Get the model path from the test data directory.
@@ -346,7 +346,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Comparing results (classification w/o bounding box).
-    self.assertDictAlmostEqual(image_result_dict, expected_result_dict, places=5)
+    self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
 
 if __name__ == "__main__":
