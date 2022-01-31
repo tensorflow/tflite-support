@@ -40,7 +40,8 @@ absl::Status TfLiteInterpreterWrapper::SanityCheckComputeSettings(
   Delegate delegate = compute_settings.tflite_settings().delegate();
   if (delegate != Delegate::NONE && delegate != Delegate::GPU &&
       delegate != Delegate::HEXAGON && delegate != Delegate::NNAPI &&
-      delegate != Delegate::XNNPACK && delegate != Delegate::EDGETPU_CORAL) {
+      delegate != Delegate::XNNPACK && delegate != Delegate::EDGETPU_CORAL &&
+      delegate != Delegate::CORE_ML) {
     return absl::UnimplementedError(absl::StrFormat(
         "Using delegate '%s' is not supported.", Delegate_Name(delegate)));
   }
@@ -53,7 +54,8 @@ TfLiteInterpreterWrapper::TfLiteInterpreterWrapper(
     : delegate_(nullptr, nullptr),
       got_error_do_not_delegate_anymore_(false),
       default_model_namespace_(default_model_namespace),
-      default_model_id_(default_model_id), mini_benchmark_(nullptr) {}
+      default_model_id_(default_model_id),
+      mini_benchmark_(nullptr) {}
 
 std::string TfLiteInterpreterWrapper::ModelNamespace() {
   const auto& ns_from_acceleration =
@@ -244,6 +246,9 @@ absl::Status TfLiteInterpreterWrapper::InitializeDelegate() {
     } else if (which_delegate == Delegate::XNNPACK) {
       RETURN_IF_ERROR(
           LoadDelegatePlugin("XNNPack", *compute_settings->tflite_settings()));
+    } else if (which_delegate == Delegate::CORE_ML) {
+      RETURN_IF_ERROR(
+          LoadDelegatePlugin("CoreML", *compute_settings->tflite_settings()));
     }
   }
   return absl::OkStatus();
