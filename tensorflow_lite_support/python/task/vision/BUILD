@@ -42,3 +42,15 @@ py_test(
         "@absl_py//absl/testing:parameterized",
     ],
 )
+
+py_library(
+    name = "image_classifier",
+    srcs = [
+        "image_classifier.py",
+    ],
+    deps = [
+        "//tensorflow_lite_support/python/task/core:task_options",
+        "//tensorflow_lite_support/python/task/processor:processor_options",
+        "//tensorflow_lite_support/python/task/processor/proto:image_classifier_options_pb2",
+    ],
+)
