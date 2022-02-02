@@ -39,7 +39,7 @@ typedef struct TfLiteColoredLabel {
   // the TFLite Model Metadata. See `display_names_locale` field in
   // ImageSegmenterOptions.
   char* display_name;
-  
+
 } TfLiteColoredLabel;
 
 // Holds a resulting segmentation mask and associated metadata.
@@ -47,16 +47,15 @@ typedef struct TfLiteSegmentation {
   // The width of the mask. This is an intrinsic parameter of the model being
   // used, and does not depend on the input image dimensions.
   unsigned int width;
-  
 
   // The height of the mask. This is an intrinsic parameter of the model being
   // used, and does not depend on the input image dimensions.
   unsigned int height;
-  
-  // IMPORTANT: A TfLiteSegmentation can either have `confidence_masks` 
-  // or `category_mask` based on the output type selected in 
+
+  // IMPORTANT: A TfLiteSegmentation can either have `confidence_masks`
+  // or `category_mask` based on the output type selected in
   // `TfLiteSegmentationOptions`i.e, they are mutually exclusive.
-  // Whichever field amongst the two is not applicable based on the selected 
+  // Whichever field amongst the two is not applicable based on the selected
   // output type will be null.
 
   // IMPORTANT: segmentation masks are not direcly suited for display, in
@@ -70,13 +69,15 @@ typedef struct TfLiteSegmentation {
   // classes. The value of each pixel in these masks represents the confidence
   // score for this particular class.
   float** confidence_masks;
-  
+
   // Flattened 2D-array of size `width` x `height`,
   // in row major order. The value of each pixel in this mask represents the
   // class to which the pixel belongs.
-  uint8_t* category_mask;  
-  
-  // The list of colored labels for all the supported categories (classes). 
+  uint8_t* category_mask;
+
+  uint8_t colored_labels_size;
+
+  // The list of colored labels for all the supported categories (classes).
   // Depending on which is present, this list is in 1:1 correspondence with:
   // * `category_mask` pixel values, i.e. a pixel with value `i` is
   //   associated with `colored_labels[i]`,
@@ -86,7 +87,6 @@ typedef struct TfLiteSegmentation {
 
 } TfLiteSegmentation;
 
-
 // Holds Image Segmentation Results.
 // Contains one set of results per detected object.
 typedef struct TfLiteSegmentationResult {
@@ -94,14 +94,16 @@ typedef struct TfLiteSegmentationResult {
   int size;
 
   // Array of seegmentations returned after inference by model.
-  // Note that at the time, this array is expected to have a single `TfLiteSegmentation`; 
-  // the field is made an array for later extension to e.g. instance
-  // segmentation models, which may return one segmentation per object.
+  // Note that at the time, this array is expected to have a single
+  // `TfLiteSegmentation`; the field is made an array for later extension to
+  // e.g. instance segmentation models, which may return one segmentation per
+  // object.
   TfLiteSegmentation* segmentations;
 } TfLiteSegmentationResult;
 
 // Frees up the TfLiteSegmentationResult Structure.
-void TfLiteSegmentationResultDelete(TfLiteSegmentationResult* segmentation_result);
+void TfLiteSegmentationResultDelete(
+    TfLiteSegmentationResult* segmentation_result);
 
 #ifdef __cplusplus
 }  // extern "C"
