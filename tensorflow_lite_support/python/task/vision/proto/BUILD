@@ -8,7 +8,10 @@ package(
 py_library(
     name = "image_classifier_options_pb2",
     srcs = ["image_classifier_options_pb2.py"],
-    deps = ["//tensorflow_lite_support/cc/task/vision/proto:image_classifier_options_py_pb2"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/vision/proto:image_classifier_options_py_pb2",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_py_pb2"
+    ],
 )
 
 py_library(
