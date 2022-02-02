@@ -93,27 +93,28 @@ extern "C" {
 
 typedef struct TfLiteImageSegmenter TfLiteImageSegmenter;
 
-// Specifies the type of output segmentation mask to be returned 
+// Specifies the type of output segmentation mask to be returned
 // as a result of the image segmentation operation.
 // This allows specifying the type of post-processing to
 // perform on the raw model results (see TfLiteSegmentationResult for more).
 enum TfLiteImageSegmenterOutputType {
   kUnspecified,
-  // Gives a single output mask where each pixel represents the class which
-  // the pixel in the original image was predicted to belong to.
-  kConfidenceMask,
 
   // Gives a list of output masks where, for each mask, each pixel represents
   // the prediction confidence, usually in the [0, 1] range.
-  kCategoryMask
+  kCategoryMask,
+
+  // Gives a single output mask where each pixel represents the class which
+  // the pixel in the original image was predicted to belong to.
+  kConfidenceMask,
 };
 
 // Holds options for configuring the creation of TfLiteImageSegmenter.
 typedef struct TfLiteImageSegmenterOptions {
   TfLiteBaseOptions base_options;
 
-  // Specifies the type of output segmentation mask to be returned 
-  // as a result of the image segmentation operation. (See 
+  // Specifies the type of output segmentation mask to be returned
+  // as a result of the image segmentation operation. (See
   // TfLiteImageSegmenterOutputType for more).
   TfLiteImageSegmenterOutputType output_type;
 
@@ -200,16 +201,14 @@ TfLiteImageSegmenter* TfLiteImageSegmenterFromOptions(
 //
 TfLiteSegmentationResult* TfLiteImageSegmenterSegment(
     const TfLiteImageSegmenter* segmenter,
-    const TfLiteFrameBuffer* frame_buffer,
-    TfLiteSupportError** error);
+    const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error);
 
 // Disposes off the image segmenter.
 void TfLiteImageSegmenterDelete(TfLiteImageSegmenter* segmenter);
 
 TfLiteSegmentationResult* TfLiteImageSegmenterSegment(
     const TfLiteImageSegmenter* segmenter,
-    const TfLiteFrameBuffer* frame_buffer,
-    TfLiteSupportError** error);
+    const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error);
 
 #ifdef __cplusplus
 }  // extern "C"
