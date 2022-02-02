@@ -27,9 +27,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/test/test_utils.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 
-#define GTEST_COUT std::cerr << "[          ] [ INFO ]"
-
-
 namespace tflite {
 namespace task {
 namespace vision {
@@ -46,76 +43,148 @@ constexpr char kTestDataDirectory[] =
 constexpr char kDeepLabV3[] = "deeplabv3.tflite";
 
 StatusOr<ImageData> LoadImage(const char* image_name) {
-  return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
-                                      kTestDataDirectory, image_name));
+  return DecodeImageFromFile(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory, image_name));
+}
+
+// The maximum fraction of pixels in the candidate mask that can have a
+// different class than the golden mask for the test to pass.
+constexpr float kGoldenMaskTolerance = 1e-2;
+// Magnification factor used when creating the golden category masks to make
+// them more human-friendly. Each pixel in the golden masks has its value
+// multiplied by this factor, i.e. a value of 10 means class index 1, a value of
+// 20 means class index 2, etc.
+constexpr int kGoldenMaskMagnificationFactor = 10;
+
+void InitializeColoredLabel(TfLiteColoredLabel& colored_label, uint8_t r,
+                            uint8_t g, uint8_t b, char* label) {
+  colored_label.r = r;
+  colored_label.g = g;
+  colored_label.b = b;
+  colored_label.label = strdup(label);
+  colored_label.display_name = nullptr;
+}
+
+TfLiteSegmentation CreatePartialDeepLabV3Segmentation() {
+  TfLiteSegmentation segmentation = {.width = 257, .height = 257};
+  segmentation.colored_labels = new TfLiteColoredLabel[21];
+  InitializeColoredLabel(segmentation.colored_labels[0], 0, 0, 0, "background");
+  InitializeColoredLabel(segmentation.colored_labels[1], 128, 0, 0,
+                         "aeroplane");
+  InitializeColoredLabel(segmentation.colored_labels[2], 0, 128, 0, "bicycle");
+  InitializeColoredLabel(segmentation.colored_labels[3], 128, 128, 0, "bird");
+  InitializeColoredLabel(segmentation.colored_labels[4], 0, 0, 128, "boat");
+  InitializeColoredLabel(segmentation.colored_labels[5], 128, 0, 128, "bottle");
+  InitializeColoredLabel(segmentation.colored_labels[6], 0, 128, 128, "bus");
+  InitializeColoredLabel(segmentation.colored_labels[7], 128, 128, 128, "car");
+  InitializeColoredLabel(segmentation.colored_labels[8], 64, 0, 0, "cat");
+  InitializeColoredLabel(segmentation.colored_labels[9], 192, 0, 0, "chair");
+  InitializeColoredLabel(segmentation.colored_labels[10], 64, 128, 0, "cow");
+  InitializeColoredLabel(segmentation.colored_labels[11], 192, 128, 0,
+                         "dining table");
+  InitializeColoredLabel(segmentation.colored_labels[12], 64, 0, 128, "dog");
+  InitializeColoredLabel(segmentation.colored_labels[13], 192, 0, 128, "horse");
+  InitializeColoredLabel(segmentation.colored_labels[14], 64, 128, 128,
+                         "motorbike");
+  InitializeColoredLabel(segmentation.colored_labels[15], 192, 128, 128,
+                         "person");
+  InitializeColoredLabel(segmentation.colored_labels[16], 0, 64, 0,
+                         "potted plant");
+  InitializeColoredLabel(segmentation.colored_labels[17], 128, 64, 0, "sheep");
+  InitializeColoredLabel(segmentation.colored_labels[18], 0, 192, 0, "sofa");
+  InitializeColoredLabel(segmentation.colored_labels[19], 128, 192, 0, "train");
+  InitializeColoredLabel(segmentation.colored_labels[20], 0, 64, 128, "tv");
+
+  return segmentation;
+}
+
+TfLiteSegmentation partial_deep_lab_v3_segmentation =
+    CreatePartialDeepLabV3Segmentation();
+
+// Checks that the two provided `TfLiteSegmentation`s are equal.
+void ExpectApproximatelyEqual(const TfLiteSegmentation& actual,
+                              const TfLiteSegmentation& expected) {
+  EXPECT_EQ(actual.height, expected.height);
+  EXPECT_EQ(actual.width, expected.width);
+  for (int i = 0; i < actual.colored_labels_size; i++) {
+    EXPECT_THAT(actual.colored_labels[i].r, expected.colored_labels[i].r);
+    EXPECT_THAT(actual.colored_labels[i].g, expected.colored_labels[i].g);
+    EXPECT_THAT(actual.colored_labels[i].b, expected.colored_labels[i].b);
+    EXPECT_THAT(actual.colored_labels[i].label,
+                expected.colored_labels[i].label);
+  }
 }
 
 class ImageSegmenterFromOptionsTest : public tflite_shims::testing::Test {};
 
-// TEST_F(ImageClassifierFromOptionsTest, FailsWithNullOptionsAndError) {
-//   TfLiteSupportError* error = nullptr;
-//   TfLiteImageClassifier* image_classifier =
-//       TfLiteImageClassifierFromOptions(nullptr, &error);
+TEST_F(ImageSegmenterFromOptionsTest, FailsWithNullOptionsAndError) {
+  TfLiteSupportError* error = nullptr;
 
-//   EXPECT_EQ(image_classifier, nullptr);
-//   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
+  TfLiteImageSegmenter* image_segmenter =
+      TfLiteImageSegmenterFromOptions(nullptr, &error);
 
-//   ASSERT_NE(error, nullptr);
-//   EXPECT_EQ(error->code, kInvalidArgumentError);
-//   EXPECT_NE(error->message, nullptr);
-//   EXPECT_THAT(error->message, HasSubstr("Expected non null options"));
+  EXPECT_EQ(image_segmenter, nullptr);
 
-//   TfLiteSupportErrorDelete(error);
-// }
+  if (image_segmenter) TfLiteImageSegmenterDelete(image_segmenter);
 
-// TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPath) {
-//   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
-//   TfLiteImageClassifier* image_classifier =
-//       TfLiteImageClassifierFromOptions(&options, nullptr);
-//   EXPECT_EQ(image_classifier, nullptr);
-//   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
-// }
+  ASSERT_NE(error, nullptr);
+  EXPECT_EQ(error->code, kInvalidArgumentError);
+  EXPECT_NE(error->message, nullptr);
+  EXPECT_THAT(error->message, HasSubstr("Expected non null options"));
 
-// TEST_F(ImageClassifierFromOptionsTest, FailsWithMissingModelPathAndError) {
-//   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
+  TfLiteSupportErrorDelete(error);
+}
 
-//   TfLiteSupportError* error = nullptr;
-//   TfLiteImageClassifier* image_classifier =
-//       TfLiteImageClassifierFromOptions(&options, &error);
-
-//   EXPECT_EQ(image_classifier, nullptr);
-//   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
-
-//   ASSERT_NE(error, nullptr);
-//   EXPECT_EQ(error->code, kInvalidArgumentError);
-//   EXPECT_NE(error->message, nullptr);
-//   EXPECT_THAT(error->message, HasSubstr("`base_options.model_file`"));
-
-//   TfLiteSupportErrorDelete(error);
-// }
-
-TEST_F(ImageSegmenterFromOptionsTest, SucceedsWithModelPath) {
-    GTEST_COUT << "In teest" << std::endl;
-  std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kDeepLabV3);
+TEST_F(ImageSegmenterFromOptionsTest, FailsWithMissingModelPath) {
   TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
-  GTEST_COUT << "Created Opt" << std::endl;
 
-  options.base_options.model_file.file_path = model_path.data();
-  GTEST_COUT << "ModelPath" << std::endl;
   TfLiteImageSegmenter* image_segmenter =
       TfLiteImageSegmenterFromOptions(&options, nullptr);
-  
-  GTEST_COUT << "Seggmeenteer Create" << std::endl;
+
+  EXPECT_EQ(image_segmenter, nullptr);
+
+  if (image_segmenter) TfLiteImageSegmenterDelete(image_segmenter);
+}
+
+TEST_F(ImageSegmenterFromOptionsTest, FailsWithMissingModelPathAndError) {
+  TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
+
+  TfLiteSupportError* error = nullptr;
+
+  TfLiteImageSegmenter* image_segmenter =
+      TfLiteImageSegmenterFromOptions(&options, &error);
+
+  EXPECT_EQ(image_segmenter, nullptr);
+
+  if (image_segmenter) TfLiteImageSegmenterDelete(image_segmenter);
+
+  ASSERT_NE(error, nullptr);
+  EXPECT_EQ(error->code, kInvalidArgumentError);
+  EXPECT_NE(error->message, nullptr);
+  EXPECT_THAT(error->message, HasSubstr("`base_options.model_file`"));
+
+  TfLiteSupportErrorDelete(error);
+}
+
+TEST_F(ImageSegmenterFromOptionsTest, SucceedsWithModelPath) {
+  std::string model_path =
+      JoinPath("./" /*test src dir*/, kTestDataDirectory, kDeepLabV3);
+
+  TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
+  options.base_options.model_file.file_path = model_path.data();
+
+  TfLiteImageSegmenter* image_segmenter =
+      TfLiteImageSegmenterFromOptions(&options, nullptr);
+
   EXPECT_NE(image_segmenter, nullptr);
+
   TfLiteImageSegmenterDelete(image_segmenter);
 }
 
 TEST_F(ImageSegmenterFromOptionsTest, SucceedsWithNumberOfThreadsAndError) {
   std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               kDeepLabV3);
+      JoinPath("./" /*test src dir*/, kTestDataDirectory, kDeepLabV3);
+
   TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
   options.base_options.compute_settings.cpu_settings.num_threads = 3;
@@ -131,47 +200,44 @@ TEST_F(ImageSegmenterFromOptionsTest, SucceedsWithNumberOfThreadsAndError) {
   if (error) TfLiteSupportErrorDelete(error);
 }
 
-// TEST(ImageClassifierNullClassifierClassifyTest,
-//      FailsWithNullImageClassifierAndError) {
-//   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("burger-224.png"));
+TEST_F(ImageSegmenterFromOptionsTest, FailsWithUnspecifiedOutputTypeAndError) {
+  std::string model_path =
+      JoinPath("./" /*test src dir*/, kTestDataDirectory, kDeepLabV3);
 
-//   TfLiteSupportError* error = nullptr;
-//   TfLiteClassificationResult* classification_result =
-//       TfLiteImageClassifierClassify(nullptr, nullptr, &error);
+  TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
+  options.base_options.model_file.file_path = model_path.data();
+  options.output_type = kUnspecified;
 
-//   ImageDataFree(&image_data);
+  TfLiteSupportError* error = nullptr;
+  TfLiteImageSegmenter* image_segmenter =
+      TfLiteImageSegmenterFromOptions(&options, &error);
 
-//   EXPECT_EQ(classification_result, nullptr);
-//   if (classification_result)
-//     TfLiteClassificationResultDelete(classification_result);
+  EXPECT_EQ(image_segmenter, nullptr);
+  EXPECT_NE(error, nullptr);
 
-//   ASSERT_NE(error, nullptr);
-//   EXPECT_EQ(error->code, kInvalidArgumentError);
-//   EXPECT_NE(error->message, nullptr);
-//   EXPECT_THAT(error->message, HasSubstr("Expected non null image classifier"));
-
-//   TfLiteSupportErrorDelete(error);
-// }
+  if (image_segmenter) TfLiteImageSegmenterDelete(image_segmenter);
+  if (error) TfLiteSupportErrorDelete(error);
+}
 
 class ImageSegmenterSegmentTest : public tflite_shims::testing::Test {
  protected:
   void SetUp() override {
     std::string model_path =
-        JoinPath("./" /*test src dir*/, kTestDataDirectory,
-                 kDeepLabV3);
+        JoinPath("./" /*test src dir*/, kTestDataDirectory, kDeepLabV3);
 
     TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
     options.base_options.model_file.file_path = model_path.data();
-    image_classifier = TfLiteImageSegmenterFromOptions(&options, nullptr);
-    ASSERT_NE(image_classifier, nullptr);
+    image_segmenter = TfLiteImageSegmenterFromOptions(&options, nullptr);
+    ASSERT_NE(image_segmenter, nullptr);
   }
 
-  void TearDown() override { TfLiteImageSegmenterDelete(image_classifier); }
-  TfLiteImageSegmenter* image_classifier;
+  void TearDown() override { TfLiteImageSegmenterDelete(image_segmenter); }
+  TfLiteImageSegmenter* image_segmenter;
 };
 
-TEST_F(ImageSegmenterSegmentTest, SucceedsWithImageData) {
-  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("burger_crop.jpg"));
+TEST_F(ImageSegmenterSegmentTest, SucceedsWithCategoryMask) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
+                               LoadImage("segmentation_input_rotation0.jpg"));
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
@@ -179,217 +245,40 @@ TEST_F(ImageSegmenterSegmentTest, SucceedsWithImageData) {
       .dimension = {.width = image_data.width, .height = image_data.height},
       .buffer = image_data.pixel_data};
 
-  TfLiteSegmentationResult* segmentation_result = TfLiteImageSegmenterSegment(image_classifier, &frame_buffer, nullptr);
+  TfLiteSegmentationResult* segmentation_result =
+      TfLiteImageSegmenterSegment(image_segmenter, &frame_buffer, nullptr);
 
   ImageDataFree(&image_data);
-  GTEST_COUT << "Done" << std::endl;
 
-  // ASSERT_NE(classification_result, nullptr);
-  // EXPECT_GE(classification_result->size, 1);
-  // EXPECT_NE(classification_result->classifications, nullptr);
-  // EXPECT_GE(classification_result->classifications->size, 1);
-  // EXPECT_NE(classification_result->classifications->categories, nullptr);
-  // EXPECT_EQ(strcmp(classification_result->classifications->categories[0].label,
-  //                  "cheeseburger"),
-  //           0);
-  // EXPECT_GE(classification_result->classifications->categories[0].score, 0.90);
+  ASSERT_NE(segmentation_result, nullptr);
+  EXPECT_EQ(segmentation_result->size, 1);
+  EXPECT_NE(segmentation_result->segmentations, nullptr);
+  EXPECT_NE(segmentation_result->segmentations[0].category_mask, nullptr);
 
-  // TfLiteClassificationResultDelete(classification_result);
+  ExpectApproximatelyEqual(partial_deep_lab_v3_segmentation,
+                           segmentation_result->segmentations[0]);
+
+  // Load golden mask output.
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData golden_mask,
+                               LoadImage("segmentation_golden_rotation0.png"));
+
+  int inconsistent_pixels = 0;
+  int num_pixels = golden_mask.height * golden_mask.width;
+
+  for (int i = 0; i < num_pixels; ++i) {
+    inconsistent_pixels +=
+        (segmentation_result->segmentations[0].category_mask[i] *
+             kGoldenMaskMagnificationFactor !=
+         golden_mask.pixel_data[i]);
+  }
+
+  EXPECT_LT(static_cast<float>(inconsistent_pixels) / num_pixels,
+            kGoldenMaskTolerance);
+
+  ImageDataFree(&golden_mask);
+
+  TfLiteSegmentationResultDelete(segmentation_result);
 }
-
-// TEST_F(ImageClassifierClassifyTest, FailsWithNullFrameBufferAndError) {
-//   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("burger-224.png"));
-
-//   TfLiteSupportError* error = nullptr;
-//   TfLiteClassificationResult* classification_result =
-//       TfLiteImageClassifierClassify(image_classifier, nullptr, &error);
-
-//   ImageDataFree(&image_data);
-
-//   EXPECT_EQ(classification_result, nullptr);
-//   if (classification_result)
-//     TfLiteClassificationResultDelete(classification_result);
-
-//   ASSERT_NE(error, nullptr);
-//   EXPECT_EQ(error->code, kInvalidArgumentError);
-//   EXPECT_NE(error->message, nullptr);
-//   EXPECT_THAT(error->message, HasSubstr("Expected non null frame buffer"));
-
-//   TfLiteSupportErrorDelete(error);
-// }
-
-// TEST_F(ImageClassifierClassifyTest, FailsWithNullImageDataAndError) {
-//   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("burger-224.png"));
-
-//   TfLiteFrameBuffer frame_buffer = {.format = kRGB, .orientation = kTopLeft};
-
-//   TfLiteSupportError* error = nullptr;
-//   TfLiteClassificationResult* classification_result =
-//       TfLiteImageClassifierClassify(image_classifier, &frame_buffer, &error);
-
-//   ImageDataFree(&image_data);
-
-//   EXPECT_EQ(classification_result, nullptr);
-//   if (classification_result)
-//     TfLiteClassificationResultDelete(classification_result);
-
-//   ASSERT_NE(error, nullptr);
-//   EXPECT_EQ(error->code, kInvalidArgumentError);
-//   EXPECT_NE(error->message, nullptr);
-//   EXPECT_THAT(error->message, HasSubstr("Invalid stride information"));
-
-//   TfLiteSupportErrorDelete(error);
-// }
-
-// TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
-//   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("burger-224.png"));
-
-//   TfLiteFrameBuffer frame_buffer = {
-//       .format = kRGB,
-//       .orientation = kTopLeft,
-//       .dimension = {.width = image_data.width, .height = image_data.height},
-//       .buffer = image_data.pixel_data};
-
-//   TfLiteBoundingBox bounding_box = {
-//       .origin_x = 0, .origin_y = 0, .width = 100, .height = 100};
-//   TfLiteSupportError* error = nullptr;
-//   TfLiteClassificationResult* classification_result =
-//       TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
-//                                            &bounding_box, &error);
-
-//   ImageDataFree(&image_data);
-
-//   ASSERT_NE(classification_result, nullptr);
-//   EXPECT_GE(classification_result->size, 1);
-//   EXPECT_NE(classification_result->classifications, nullptr);
-//   EXPECT_GE(classification_result->classifications->size, 1);
-//   EXPECT_NE(classification_result->classifications->categories, nullptr);
-//   EXPECT_EQ(strcmp(classification_result->classifications->categories[0].label,
-//                    "bagel"),
-//             0);
-//   EXPECT_GE(classification_result->classifications->categories[0].score, 0.30);
-
-//   TfLiteClassificationResultDelete(classification_result);
-// }
-
-// TEST_F(ImageClassifierClassifyTest, FailsWithRoiOutsideImageBoundsAndError) {
-//   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("burger-224.png"));
-
-//   TfLiteFrameBuffer frame_buffer = {
-//       .format = kRGB,
-//       .orientation = kTopLeft,
-//       .dimension = {.width = image_data.width, .height = image_data.height},
-//       .buffer = image_data.pixel_data};
-
-//   TfLiteBoundingBox bounding_box = {
-//       .origin_x = 0, .origin_y = 0, .width = 250, .height = 250};
-//   TfLiteSupportError* error = nullptr;
-//   TfLiteClassificationResult* classification_result =
-//       TfLiteImageClassifierClassifyWithRoi(image_classifier, &frame_buffer,
-//                                            &bounding_box, &error);
-
-//   ImageDataFree(&image_data);
-
-//   EXPECT_EQ(classification_result, nullptr);
-//   if (classification_result)
-//     TfLiteClassificationResultDelete(classification_result);
-
-//   ASSERT_NE(error, nullptr);
-//   EXPECT_EQ(error->code, kInvalidArgumentError);
-//   EXPECT_NE(error->message, nullptr);
-//   EXPECT_THAT(error->message, HasSubstr("Invalid crop coordinates"));
-
-//   TfLiteSupportErrorDelete(error);
-// }
-
-// TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
-//      SucceedsWithClassNameDenyList) {
-//   char* denylisted_label_name = (char*)"cheeseburger";
-//   std::string model_path =
-//       JoinPath("./" /*test src dir*/, kTestDataDirectory,
-//                kMobileNetQuantizedWithMetadata);
-
-//   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
-//   options.base_options.model_file.file_path = model_path.data();
-
-//   char* label_denylist[12] = {denylisted_label_name};
-//   options.classification_options.label_denylist.list = label_denylist;
-//   options.classification_options.label_denylist.length = 1;
-
-//   TfLiteImageClassifier* image_classifier =
-//       TfLiteImageClassifierFromOptions(&options, nullptr);
-//   ASSERT_NE(image_classifier, nullptr);
-
-//   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("burger-224.png"));
-
-//   TfLiteFrameBuffer frame_buffer = {
-//       .format = kRGB,
-//       .orientation = kTopLeft,
-//       .dimension = {.width = image_data.width, .height = image_data.height},
-//       .buffer = image_data.pixel_data};
-
-//   TfLiteClassificationResult* classification_result =
-//       TfLiteImageClassifierClassify(image_classifier, &frame_buffer, nullptr);
-
-//   ImageDataFree(&image_data);
-//   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
-
-//   ASSERT_NE(classification_result, nullptr);
-//   EXPECT_GE(classification_result->size, 1);
-//   EXPECT_NE(classification_result->classifications, nullptr);
-//   EXPECT_GE(classification_result->classifications->size, 1);
-//   EXPECT_NE(classification_result->classifications->categories, nullptr);
-//   EXPECT_NE(strcmp(classification_result->classifications->categories[0].label,
-//                    denylisted_label_name),
-//             0);
-
-//   TfLiteClassificationResultDelete(classification_result);
-// }
-
-// TEST(ImageClassifierWithUserDefinedOptionsClassifyTest,
-//      SucceedsWithClassNameAllowList) {
-//   char* allowlisted_label_name = (char*)"cheeseburger";
-//   std::string model_path =
-//       JoinPath("./" /*test src dir*/, kTestDataDirectory,
-//                kMobileNetQuantizedWithMetadata)
-//           .data();
-
-//   TfLiteImageClassifierOptions options = TfLiteImageClassifierOptionsCreate();
-//   options.base_options.model_file.file_path = model_path.data();
-
-//   char* label_allowlist[12] = {allowlisted_label_name};
-//   options.classification_options.label_allowlist.list = label_allowlist;
-//   options.classification_options.label_allowlist.length = 1;
-
-//   TfLiteImageClassifier* image_classifier =
-//       TfLiteImageClassifierFromOptions(&options, nullptr);
-//   ASSERT_NE(image_classifier, nullptr);
-
-//   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data, LoadImage("burger-224.png"));
-
-//   TfLiteFrameBuffer frame_buffer = {
-//       .format = kRGB,
-//       .orientation = kTopLeft,
-//       .dimension = {.width = image_data.width, .height = image_data.height},
-//       .buffer = image_data.pixel_data};
-
-//   TfLiteClassificationResult* classification_result =
-//       TfLiteImageClassifierClassify(image_classifier, &frame_buffer, nullptr);
-
-//   ImageDataFree(&image_data);
-//   if (image_classifier) TfLiteImageClassifierDelete(image_classifier);
-
-//   ASSERT_NE(classification_result, nullptr);
-//   EXPECT_GE(classification_result->size, 1);
-//   EXPECT_NE(classification_result->classifications, nullptr);
-//   EXPECT_GE(classification_result->classifications->size, 1);
-//   EXPECT_NE(classification_result->classifications->categories, nullptr);
-//   EXPECT_EQ(strcmp(classification_result->classifications->categories[0].label,
-//                    allowlisted_label_name),
-//             0);
-
-//   TfLiteClassificationResultDelete(classification_result);
-// }
 
 }  // namespace
 }  // namespace vision
