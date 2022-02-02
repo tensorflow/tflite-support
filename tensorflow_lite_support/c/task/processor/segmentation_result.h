@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -75,6 +75,8 @@ typedef struct TfLiteSegmentation {
   // class to which the pixel belongs.
   uint8_t* category_mask;
 
+  // Number of colored labels which is equivalent to number of classes
+  // supported by the model.
   uint8_t colored_labels_size;
 
   // The list of colored labels for all the supported categories (classes).

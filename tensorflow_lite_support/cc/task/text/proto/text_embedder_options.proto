@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@ limitations under the License.
 
 syntax = "proto2";
 
-package tflite.task.audio;
+package tflite.task.text;
 
 import "tensorflow_lite_support/cc/task/core/proto/base_options.proto";
 import "tensorflow_lite_support/cc/task/processor/proto/embedding_options.proto";
 
-// Options for setting up an AudioEmbedder.
+// Options for setting up a TextEmbedder.
 // Next Id: 3
-message AudioEmbedderOptions {
+message TextEmbedderOptions {
   // Base options for configuring the external model file.
   optional tflite.task.core.BaseOptions base_options = 1;
 

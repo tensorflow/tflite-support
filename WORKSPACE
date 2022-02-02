@@ -42,6 +42,12 @@ http_file(
 )
 
 http_file(
+    name = "mobilebert_embedding_with_metadata",
+    sha256 = "fa47142dcc6f446168bc672f2df9605b6da5d0c0d6264e9be62870282365b95c",
+    urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_embedder/mobilebert_embedding_with_metadata.tflite"],
+)
+
+http_file(
     name = "bert_nl_classifier",
     sha256 = "1e5a550c09bff0a13e61858bcfac7654d7fcc6d42106b4f15e11117695069600",
     urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_nl_classifier/bert_nl_classifier.tflite"],
@@ -90,9 +96,9 @@ http_archive(
     ],
 )
 
-# TF on 2021-12-11.
-TENSORFLOW_COMMIT = "529ffd527885f4e153fcec08d48b26b8dbf2ce2a"
-TENSORFLOW_SHA256 = "2c63c8d21001427c4dc919bbe86a90434b5beb7ab0761e5494e4847a1754b952"
+# TF on 2022-01-28.
+TENSORFLOW_COMMIT = "f2c2144d767a64236261fb4e4dd45947bd5f5815"
+TENSORFLOW_SHA256 = "32ba2f6ea07572fd05cdae7520fe1bc38409f1a21bb4524076df27f1e23d09c1"
 http_archive(
     name = "org_tensorflow",
     sha256 = TENSORFLOW_SHA256,
@@ -403,8 +409,8 @@ java_import_external(
 
 http_archive(
     name = "robolectric",
-    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.4.tar.gz"],
-    strip_prefix = "robolectric-bazel-4.4",
+    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.7.3.tar.gz"],
+    strip_prefix = "robolectric-bazel-4.7.3",
 )
 load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
 robolectric_repositories()
@@ -413,13 +419,13 @@ load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
 
 flatbuffers()
 
-RULES_JVM_EXTERNAL_TAG = "3.2"
+RULES_JVM_EXTERNAL_TAG = "4.2"
 
 http_archive(
     name = "rules_jvm_external",
     strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
-    sha256 = "82262ff4223c5fda6fb7ff8bd63db8131b51b413d26eb49e3131037e79e324af",
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca",
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/refs/tags/%s.zip" % RULES_JVM_EXTERNAL_TAG,
 )
 
 load("@rules_jvm_external//:defs.bzl", "maven_install")
@@ -484,7 +490,7 @@ maven_install(
         "org.mockito:mockito-android:jar:3.0.0",
         "org.mockito:mockito-core:jar:3.0.0",
         "org.mockito:mockito-inline:jar:3.0.0",
-        "org.robolectric:robolectric:jar:4.4",
+        "org.robolectric:robolectric:jar:4.7.3",
         "junit:junit:jar:4.13",
     ],
     repositories = [

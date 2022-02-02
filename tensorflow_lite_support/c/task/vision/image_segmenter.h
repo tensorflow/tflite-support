@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ limitations under the License.
 /// TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
 ///
 /// Set the model file path in options
-///   options.base_options.model_file.file_path = "/path/to/model.tflite";
+/// options.base_options.model_file.file_path = "/path/to/model.tflite";
 ///
 /// If need be, set values for any options to customize behaviour.
 /// options.base_options.compute_settings.cpu_settings.num_threads = 3
@@ -125,7 +125,7 @@ typedef struct TfLiteImageSegmenterOptions {
 
 // Creates and returns TfLiteImageSegmenterOptions initialized with default
 // values. Default values are as follows:
-//  . .base_options.compute_settings.tflite_settings.cpu_settings.num_threads =
+// 1. .base_options.compute_settings.tflite_settings.cpu_settings.num_threads =
 // -1, which makes the TFLite runtime choose the value.
 // 2. .output_type = kCategoryMask
 // 3. display_names_locale is NULL.
@@ -203,12 +203,8 @@ TfLiteSegmentationResult* TfLiteImageSegmenterSegment(
     const TfLiteImageSegmenter* segmenter,
     const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error);
 
-// Disposes off the image segmenter.
+// Disposes of the image segmenter.
 void TfLiteImageSegmenterDelete(TfLiteImageSegmenter* segmenter);
-
-TfLiteSegmentationResult* TfLiteImageSegmenterSegment(
-    const TfLiteImageSegmenter* segmenter,
-    const TfLiteFrameBuffer* frame_buffer, TfLiteSupportError** error);
 
 #ifdef __cplusplus
 }  // extern "C"
