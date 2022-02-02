@@ -22,13 +22,14 @@ limitations under the License.
 extern "C" {
 #endif  // __cplusplus
 
-void TfLiteSegmentationResultDelete(TfLiteSegmentationResult* segmentation_result) {
-  for (int i = 0; i < segmentation_result->size ; ++i) {
+void TfLiteSegmentationResultDelete(
+    TfLiteSegmentationResult* segmentation_result) {
+  for (int i = 0; i < segmentation_result->size; ++i) {
     TfLiteSegmentation segmentation = segmentation_result->segmentations[i];
-    for (int j = 0; j < segmentation.width * segmentation.height; ++j) {
+    for (int j = 0; j < segmentation.colored_labels_size; ++j) {
       free(segmentation.colored_labels[j].display_name);
-      free(segmentation.colored_labels[j].class_name);
-    }   
+      free(segmentation.colored_labels[j].label);
+    }
 
     delete[] segmentation.colored_labels;
   }
