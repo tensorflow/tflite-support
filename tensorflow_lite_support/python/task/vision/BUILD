@@ -50,7 +50,6 @@ py_library(
     ],
     deps = [
         "//tensorflow_lite_support/python/task/core:task_options",
-        "//tensorflow_lite_support/python/task/core/proto:base_options_pb2",
         "//tensorflow_lite_support/python/task/core/proto:configuration_pb2",
         "//tensorflow_lite_support/python/task/processor:processor_options",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
@@ -74,7 +73,6 @@ py_test(
     deps = [
         ":image_classifier",
         "//tensorflow_lite_support/python/task/core:task_options",
-        "//tensorflow_lite_support/python/task/core/proto:base_options_pb2",
         "//tensorflow_lite_support/python/task/processor:processor_options",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
