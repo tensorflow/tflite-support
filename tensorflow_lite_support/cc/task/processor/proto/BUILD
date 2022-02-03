@@ -1,3 +1,5 @@
+load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_py_proto_library")
+
 package(
     default_visibility = [
         "//visibility:public",
@@ -52,6 +54,13 @@ cc_proto_library(
     deps = [
         ":embedding_options_proto",
     ],
+)
+
+support_py_proto_library(
+    name = "embedding_options_py_pb2",
+    srcs = ["embedding_options.proto"],
+    api_version = 2,
+    proto_deps = [":embedding_options_proto"],
 )
 
 proto_library(

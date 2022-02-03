@@ -13,16 +13,28 @@
 # limitations under the License.
 """Tests for image_embedder."""
 
+import enum
+
 from absl.testing import parameterized
 
 from tensorflow_lite_support.python.task.core import task_options
-from tensorflow_lite_support.python.task.processor import processor_options
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
+from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embeddings_pb2
 from tensorflow_lite_support.python.task.vision import image_embedder
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
 import unittest
+
+_BaseOptions = task_options.BaseOptions
+_ExternalFile = task_options.ExternalFile
+_ImageEmbedder = image_embedder.ImageEmbedder
+_ImageEmbedderOptions = image_embedder.ImageEmbedderOptions
+
+
+class ModelFileType(enum.Enum):
+  FILE_CONTENT = 1
+  FILE_NAME = 2
 
 
 class ImageEmbedderTest(parameterized.TestCase, unittest.TestCase):
@@ -32,43 +44,66 @@ class ImageEmbedderTest(parameterized.TestCase, unittest.TestCase):
     self.model_path = test_util.get_test_data_path(
         "mobilenet_v3_small_100_224_embedder.tflite")
 
-  def test_create_from_options(self):
+  def test_create_from_options_succeeds_with_valid_model_path(self):
     # Creates with options containing model file successfully.
-    base_options = task_options.BaseOptions(model_file=self.model_path)
-    options = image_embedder.ImageEmbedderOptions(base_options=base_options)
-    image_embedder.ImageEmbedder.create_from_options(options)
+    base_options = _BaseOptions(
+        model_file=_ExternalFile(file_name=self.model_path))
+    options = _ImageEmbedderOptions(base_options=base_options)
+    embedder = _ImageEmbedder.create_from_options(options)
+    self.assertIsInstance(embedder, _ImageEmbedder)
 
+  def test_create_from_options_fails_with_missing_model_file(self):
     # Missing the model file.
     with self.assertRaisesRegex(
         TypeError,
         r"__init__\(\) missing 1 required positional argument: 'model_file'"):
-      base_options = task_options.BaseOptions()
+      _BaseOptions()
 
+  def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
         Exception,
         r"INVALID_ARGUMENT: ExternalFile must specify at least one of "
         r"'file_content', file_name' or 'file_descriptor_meta'\. "
         r"\[tflite::support::TfLiteSupportStatus='2'\]"):
-      base_options = task_options.BaseOptions(model_file="")
-      options = image_embedder.ImageEmbedderOptions(base_options=base_options)
-      image_embedder.ImageEmbedder.create_from_options(options)
+      base_options = _BaseOptions(model_file=_ExternalFile(file_name=""))
+      options = _ImageEmbedderOptions(base_options=base_options)
+      _ImageEmbedder.create_from_options(options)
+
+  def test_create_from_options_succeeds_with_valid_model_content(self):
+    # Creates with options containing model content successfully.
+    with open(self.model_path, "rb") as f:
+      base_options = _BaseOptions(
+          model_file=_ExternalFile(file_content=f.read()))
+      options = _ImageEmbedderOptions(base_options=base_options)
+      embedder = _ImageEmbedder.create_from_options(options)
+      self.assertIsInstance(embedder, _ImageEmbedder)
 
   @parameterized.parameters(
-      (None, None, False, 0.932738),
-      (True, None, False, 0.932738),
-      (True, True, False, 0.929717),
-      (None, None, True, 0.999914),
+      (False, False, False, ModelFileType.FILE_NAME, 0.932738),
+      (True, False, False, ModelFileType.FILE_NAME, 0.932738),
+      (True, True, False, ModelFileType.FILE_CONTENT, 0.929717),
+      (False, False, True, ModelFileType.FILE_CONTENT, 0.999914),
   )
   def test_embed(self, l2_normalize, quantize, with_bounding_box,
-                 expected_similarity):
+                 model_file_type, expected_similarity):
     # Creates embedder.
-    base_options = task_options.BaseOptions(model_file=self.model_path)
-    embedding_options = processor_options.EmbeddingOptions(
+    if model_file_type is ModelFileType.FILE_NAME:
+      model_file = _ExternalFile(file_name=self.model_path)
+    elif model_file_type is ModelFileType.FILE_CONTENT:
+      with open(self.model_path, "rb") as f:
+        model_content = f.read()
+      model_file = _ExternalFile(file_content=model_content)
+    else:
+      # Should never happen
+      raise ValueError("model_file_type is invalid.")
+
+    base_options = _BaseOptions(model_file)
+    embedding_options = embedding_options_pb2.EmbeddingOptions(
         l2_normalize=l2_normalize, quantize=quantize)
-    options = image_embedder.ImageEmbedderOptions(
+    options = _ImageEmbedderOptions(
         base_options=base_options, embedding_options=embedding_options)
-    embedder = image_embedder.ImageEmbedder(options)
+    embedder = _ImageEmbedder.create_from_options(options)
 
     # Loads images: one is a crop of the other.
     image = tensor_image.TensorImage.from_file(
@@ -104,9 +139,10 @@ class ImageEmbedderTest(parameterized.TestCase, unittest.TestCase):
     self.assertAlmostEqual(similarity, expected_similarity, places=6)
 
   def test_get_embedding_by_index(self):
-    base_options = task_options.BaseOptions(model_file=self.model_path)
-    options = image_embedder.ImageEmbedderOptions(base_options=base_options)
-    embedder = image_embedder.ImageEmbedder.create_from_options(options)
+    base_options = _BaseOptions(
+        model_file=_ExternalFile(file_name=self.model_path))
+    options = _ImageEmbedderOptions(base_options=base_options)
+    embedder = _ImageEmbedder.create_from_options(options)
 
     # Builds test data.
     embedding = embeddings_pb2.Embedding(output_index=0)
@@ -124,16 +160,18 @@ class ImageEmbedderTest(parameterized.TestCase, unittest.TestCase):
       embedder.get_embedding_by_index(embedding_result, 1)
 
   def test_get_embedding_dimension(self):
-    base_options = task_options.BaseOptions(model_file=self.model_path)
-    options = image_embedder.ImageEmbedderOptions(base_options=base_options)
-    embedder = image_embedder.ImageEmbedder.create_from_options(options)
+    base_options = _BaseOptions(
+        model_file=_ExternalFile(file_name=self.model_path))
+    options = _ImageEmbedderOptions(base_options=base_options)
+    embedder = _ImageEmbedder.create_from_options(options)
     self.assertEqual(embedder.get_embedding_dimension(0), 1024)
     self.assertEqual(embedder.get_embedding_dimension(1), -1)
 
   def test_number_of_output_layers(self):
-    base_options = task_options.BaseOptions(model_file=self.model_path)
-    options = image_embedder.ImageEmbedderOptions(base_options=base_options)
-    embedder = image_embedder.ImageEmbedder.create_from_options(options)
+    base_options = _BaseOptions(
+        model_file=_ExternalFile(file_name=self.model_path))
+    options = _ImageEmbedderOptions(base_options=base_options)
+    embedder = _ImageEmbedder.create_from_options(options)
     self.assertEqual(embedder.number_of_output_layers, 1)
 
 

@@ -18,7 +18,6 @@ limitations under the License.
 #include "pybind11/pybind11.h"
 #include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
-#include "tensorflow/lite/kernels/register_ref.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 
@@ -28,37 +27,9 @@ namespace vision {
 
 namespace {
 namespace py = ::pybind11;
-
-static constexpr int kBuiltinOpResolver = 1;
-static constexpr int kBuiltinRefOpResolver = 2;
-static constexpr int kBuiltinOpResolverWithoutDefaultDelegates = 3;
-
-std::unique_ptr<tflite::MutableOpResolver> get_resolver(int op_resolver_id) {
-  std::unique_ptr<tflite::MutableOpResolver> resolver;
-  switch (op_resolver_id) {
-    case kBuiltinOpResolver:
-      resolver = absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>();
-      break;
-    case kBuiltinRefOpResolver:
-      resolver =
-          absl::make_unique<tflite::ops::builtin::BuiltinRefOpResolver>();
-      break;
-    case kBuiltinOpResolverWithoutDefaultDelegates:
-      resolver = absl::make_unique<
-          tflite::ops::builtin::BuiltinOpResolverWithoutDefaultDelegates>();
-      break;
-    default:
-      // This should not never happen because the eventual caller in
-      // interpreter.py should have passed a valid id here.
-      TFLITE_DCHECK(false);
-      return nullptr;
-  }
-  return resolver;
-}
-
 }  // namespace
 
-PYBIND11_MODULE(image_embedder, m) {
+PYBIND11_MODULE(_pywrap_image_embedder, m) {
   // python wrapper for C++ ImageEmbeder class which shouldn't be directly used
   // by the users.
   pybind11::google::ImportStatusModule();
@@ -67,11 +38,9 @@ PYBIND11_MODULE(image_embedder, m) {
   py::class_<ImageEmbedder>(m, "ImageEmbedder")
       .def_static(
           "create_from_options",
-          [](const ImageEmbedderOptions& options, int op_resolver_id) {
-            return ImageEmbedder::CreateFromOptions(
-                options, get_resolver(op_resolver_id));
-          },
-          py::arg("options"), py::arg("op_resolver_id") = kBuiltinOpResolver)
+          [](const ImageEmbedderOptions& options) {
+            return ImageEmbedder::CreateFromOptions(options);
+          })
       .def("embed",
            [](ImageEmbedder& self, const ImageData& image_data)
                -> tflite::support::StatusOr<EmbeddingResult> {

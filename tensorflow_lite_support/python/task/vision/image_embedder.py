@@ -18,34 +18,43 @@ from typing import Optional
 
 from tensorflow_lite_support.python.task.core import task_options
 from tensorflow_lite_support.python.task.core.proto import configuration_pb2
-from tensorflow_lite_support.python.task.processor import processor_options
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
+from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embeddings_pb2
-from tensorflow_lite_support.python.task.processor.proto import image_embedder_options_pb2
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
-from tensorflow_lite_support.python.task.vision.pybinds import image_embedder as _image_embedder
+from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_embedder
+from tensorflow_lite_support.python.task.vision.pybinds import image_embedder_options_pb2
+
+_ProtoImageEmbedderOptions = image_embedder_options_pb2.ImageEmbedderOptions
+_CppImageEmbedder = _pywrap_image_embedder.ImageEmbedder
 
 
 @dataclasses.dataclass
 class ImageEmbedderOptions:
   """Options for the image embedder task."""
   base_options: task_options.BaseOptions
-  embedding_options: Optional[processor_options.EmbeddingOptions] = None
+  embedding_options: Optional[embedding_options_pb2.EmbeddingOptions] = None
 
 
 def _build_proto_options(
-    options: ImageEmbedderOptions
-) -> image_embedder_options_pb2.EmbedderOptions:
+    options: ImageEmbedderOptions) -> _ProtoImageEmbedderOptions:
   """Builds the protobuf image embdder options."""
   # Builds the initial proto_options.
-  proto_options = image_embedder_options_pb2.EmbedderOptions()
+  proto_options = _ProtoImageEmbedderOptions()
 
   # Updates values from base_options.
-  proto_options.model_file_with_metadata.file_name = options.base_options.model_file
+  if options.base_options.model_file.file_content:
+    proto_options.model_file_with_metadata.file_content = (
+        options.base_options.model_file.file_content)
+  elif options.base_options.model_file.file_name:
+    proto_options.model_file_with_metadata.file_name = (
+        options.base_options.model_file.file_name)
+
   proto_options.num_threads = options.base_options.num_threads
   if options.base_options.use_coral:
-    proto_options.compute_settings.tflite_settings.delegate = configuration_pb2.Delegate.EDGETPU_CORAL
+    proto_options.compute_settings.tflite_settings.delegate = (
+        configuration_pb2.Delegate.EDGETPU_CORAL)
 
   # Updates values from embedding_options.
   if options.embedding_options:
@@ -60,27 +69,9 @@ def _build_proto_options(
 class ImageEmbedder(object):
   """Class that performs dense feature vector extraction on images."""
 
-  def __init__(
-      self,
-      options: ImageEmbedderOptions,
-  ) -> None:
-    """Initializes the `ImageEmbedder` object.
-
-    Args:
-      options: Options for the image embedder task.
-
-    Raises:
-      status.StatusNotOk if failed to create `ImageEmbdder` object from
-        `ImageEmbedderOptions` such as missing the model. Need to import the
-        module to catch this error: `from pybind11_abseil import status`, see
-        https://github.com/pybind/pybind11_abseil#abslstatusor.
-    """
-    self._options = options
-
-    # Creates the object of C++ ImageEmbedder class.
-    proto_options = _build_proto_options(options)
-    self._embedder = _image_embedder.ImageEmbedder.create_from_options(
-        proto_options)
+  def __init__(self, embedder: _CppImageEmbedder) -> None:
+    """Initializes the `ImageEmbedder` object."""
+    self._embedder = embedder
 
   @classmethod
   def create_from_options(cls,
@@ -99,7 +90,11 @@ class ImageEmbedder(object):
         module to catch this error: `from pybind11_abseil import status`, see
         https://github.com/pybind/pybind11_abseil#abslstatusor.
     """
-    return cls(options)
+    # Creates the object of C++ ImageEmbedder class.
+    proto_options = _build_proto_options(options)
+    embedder = _CppImageEmbedder.create_from_options(proto_options)
+
+    return cls(embedder)
 
   def embed(
       self,
