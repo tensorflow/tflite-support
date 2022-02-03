@@ -252,9 +252,9 @@ internal::QAOutput UniversalSentenceEncoderQA::Run(
     absl::string_view query_text, absl::string_view response_text,
     absl::string_view response_context) {
   QAInput input;
-  input.query_text = query_text;
-  input.response_text = response_text;
-  input.response_context = response_context;
+  input.query_text = std::string(query_text);
+  input.response_text = std::string(response_text);
+  input.response_context = std::string(response_context);
   return Infer(input).value();
 }
 
