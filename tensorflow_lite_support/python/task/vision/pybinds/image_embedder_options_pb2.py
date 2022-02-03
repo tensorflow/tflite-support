@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2021 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Classifier options protobuf."""
+"""Embedder options protobuf."""
 
-from tensorflow_lite_support.cc.task.vision.proto import image_classifier_options_pb2 as classifier_options_pb2
+from tensorflow_lite_support.cc.task.vision.proto import image_embedder_options_pb2 as embedder_options_pb2
 
-ClassifierOptions = classifier_options_pb2.ImageClassifierOptions
+ImageEmbedderOptions = embedder_options_pb2.ImageEmbedderOptions

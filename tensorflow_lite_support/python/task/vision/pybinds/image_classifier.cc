@@ -10,7 +10,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/vision/image_embedder.h"
+#include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 
 #include "pybind11/pybind11.h"
 #include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
@@ -26,38 +26,33 @@ namespace tflite {
                 namespace py = ::pybind11;
             }  // namespace
 
-            PYBIND11_MODULE(_pywrap_image_embedder, m) {
+            PYBIND11_MODULE(_pywrap_image_classifier, m) {
                 // python wrapper for C++ ImageEmbeder class which shouldn't be directly used
                 // by the users.
                 pybind11::google::ImportStatusModule();
                 pybind11_protobuf::ImportNativeProtoCasters();
 
-                py::class_<ImageEmbedder>(m, "ImageEmbedder")
+                py::class_<ImageClassifier>(m, "ImageClassifier")
                         .def_static(
                                 "create_from_options",
-                                [](const ImageEmbedderOptions& options) {
-                                    return ImageEmbedder::CreateFromOptions(options);
+                                [](const ImageClassifierOptions& options) {
+                                    return ImageClassifier::CreateFromOptions(options);
                                 })
-                        .def("embed",
-                             [](ImageEmbedder& self, const ImageData& image_data)
-                                     -> tflite::support::StatusOr<EmbeddingResult> {
+                        .def("classify",
+                             [](ImageClassifier& self, const ImageData& image_data)
+                                     -> tflite::support::StatusOr<ClassificationResult> {
                                  ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
                                                   CreateFrameBufferFromImageData(image_data));
-                                 return self.Embed(*frame_buffer);
+                                 return self.Classify(*frame_buffer);
                              })
-                        .def("embed",
-                             [](ImageEmbedder& self, const ImageData& image_data,
+                        .def("classify",
+                             [](ImageClassifier& self, const ImageData& image_data,
                                 const BoundingBox& bounding_box)
-                                     -> tflite::support::StatusOr<EmbeddingResult> {
+                                     -> tflite::support::StatusOr<ClassificationResult> {
                                  ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
                                                   CreateFrameBufferFromImageData(image_data));
-                                 return self.Embed(*frame_buffer, bounding_box);
-                             })
-                        .def("get_embedding_by_index", &ImageEmbedder::GetEmbeddingByIndex)
-                        .def("get_number_of_output_layers",
-                             &ImageEmbedder::GetNumberOfOutputLayers)
-                        .def("get_embedding_dimension", &ImageEmbedder::GetEmbeddingDimension)
-                        .def_static("cosine_similarity", &ImageEmbedder::CosineSimilarity);
+                                 return self.Classify(*frame_buffer, bounding_box);
+                             });
             }
 
         }  // namespace vision

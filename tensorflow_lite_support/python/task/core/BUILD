@@ -9,3 +9,8 @@ py_library(
     name = "task_options",
     srcs = ["task_options.py"],
 )
+
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+)
