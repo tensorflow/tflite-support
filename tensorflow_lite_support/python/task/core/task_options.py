@@ -21,10 +21,13 @@ from typing import Optional
 @dataclasses.dataclass
 class ExternalFile:
   """Represents external files used by the Task APIs.
+
   The files can be specified by one of the following
   two ways:
+
   (1) file contents loaded in `file_content`.
   (2) file path in `file_name`.
+
   If more than one field of these fields is provided, they are used in this
   precedence order.
   """

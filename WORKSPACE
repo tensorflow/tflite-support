@@ -42,6 +42,12 @@ http_file(
 )
 
 http_file(
+    name = "mobilebert_embedding_with_metadata",
+    sha256 = "fa47142dcc6f446168bc672f2df9605b6da5d0c0d6264e9be62870282365b95c",
+    urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_embedder/mobilebert_embedding_with_metadata.tflite"],
+)
+
+http_file(
     name = "bert_nl_classifier",
     sha256 = "1e5a550c09bff0a13e61858bcfac7654d7fcc6d42106b4f15e11117695069600",
     urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_nl_classifier/bert_nl_classifier.tflite"],
@@ -90,9 +96,9 @@ http_archive(
     ],
 )
 
-# TF on 2022-01-25.
-TENSORFLOW_COMMIT = "6a0c68842ee14e1e9995b42304f651c2068054ad"
-TENSORFLOW_SHA256 = "9383da4d081cc882f4636e4d865005ecde9c2abb33dfd9ec09dfe5929a27d5d4"
+# TF on 2022-01-28.
+TENSORFLOW_COMMIT = "f2c2144d767a64236261fb4e4dd45947bd5f5815"
+TENSORFLOW_SHA256 = "32ba2f6ea07572fd05cdae7520fe1bc38409f1a21bb4524076df27f1e23d09c1"
 http_archive(
     name = "org_tensorflow",
     sha256 = TENSORFLOW_SHA256,
@@ -419,7 +425,7 @@ http_archive(
     name = "rules_jvm_external",
     strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
     sha256 = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca",
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/refs/tags/%s.zip" % RULES_JVM_EXTERNAL_TAG,
 )
 
 load("@rules_jvm_external//:defs.bzl", "maven_install")

@@ -38,7 +38,7 @@ class ImageEmbedderOptions:
 
 
 def _build_proto_options(
-        options: ImageEmbedderOptions) -> _ProtoImageEmbedderOptions:
+    options: ImageEmbedderOptions) -> _ProtoImageEmbedderOptions:
   """Builds the protobuf image embdder options."""
   # Builds the initial proto_options.
   proto_options = _ProtoImageEmbedderOptions()
@@ -46,15 +46,15 @@ def _build_proto_options(
   # Updates values from base_options.
   if options.base_options.model_file.file_content:
     proto_options.model_file_with_metadata.file_content = (
-      options.base_options.model_file.file_content)
+        options.base_options.model_file.file_content)
   elif options.base_options.model_file.file_name:
     proto_options.model_file_with_metadata.file_name = (
-      options.base_options.model_file.file_name)
+        options.base_options.model_file.file_name)
 
   proto_options.num_threads = options.base_options.num_threads
   if options.base_options.use_coral:
     proto_options.compute_settings.tflite_settings.delegate = (
-      configuration_pb2.Delegate.EDGETPU_CORAL)
+        configuration_pb2.Delegate.EDGETPU_CORAL)
 
   # Updates values from embedding_options.
   if options.embedding_options:
@@ -77,10 +77,13 @@ class ImageEmbedder(object):
   def create_from_options(cls,
                           options: ImageEmbedderOptions) -> "ImageEmbedder":
     """Creates the `ImageEmbedder` object from image embedder options.
+
     Args:
       options: Options for the image embedder task.
+
     Returns:
       `ImageEmbedder` object that's created from `options`.
+
     Raises:
       status.StatusNotOk if failed to create `ImageEmbdder` object from
         `ImageEmbedderOptions` such as missing the model. Need to import the
@@ -94,19 +97,22 @@ class ImageEmbedder(object):
     return cls(embedder)
 
   def embed(
-          self,
-          image: tensor_image.TensorImage,
-          bounding_box: Optional[bounding_box_pb2.BoundingBox] = None
+      self,
+      image: tensor_image.TensorImage,
+      bounding_box: Optional[bounding_box_pb2.BoundingBox] = None
   ) -> embeddings_pb2.EmbeddingResult:
     """Performs actual feature vector extraction on the provided TensorImage.
+
     Args:
       image: Tensor image, used to extract the feature vectors.
       bounding_box: Bounding box, optional. If set, performed feature vector
         extraction only on the provided region of interest. Note that the region
         of interest is not clamped, so this method will fail if the region is
         out of bounds of the input image.
+
     Returns:
       embedding result.
+
     Raises:
       status.StatusNotOk if failed to get the embedding vector. Need to import
         the module to catch this error: `from pybind11_abseil import status`,
@@ -121,13 +127,16 @@ class ImageEmbedder(object):
   def get_embedding_by_index(self, result: embeddings_pb2.EmbeddingResult,
                              output_index: int) -> embeddings_pb2.Embedding:
     """Gets the embedding in the embedding result by `output_index`.
+
     Args:
       result: embedding result.
       output_index: output index of the output layer.
+
     Returns:
       The Embedding output by the output_index'th layer. In (the most common)
       case where a single embedding is produced, you can just call
       get_feature_vector_by_index(result, 0).
+
     Raises:
       ValueError if the output index is out of bound.
     """
@@ -143,8 +152,10 @@ class ImageEmbedder(object):
 
   def get_embedding_dimension(self, output_index: int) -> int:
     """Gets the dimensionality of the embedding output.
+
     Args:
       output_index: The output index of output layer.
+
     Returns:
       Dimensionality of the embedding output by the output_index'th output
       layer. Returns -1 if `output_index` is out of bounds.
