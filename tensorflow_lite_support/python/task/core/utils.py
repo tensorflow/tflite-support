@@ -27,8 +27,8 @@ def build_proto_base_options(proto_options, options):
       proto_options.base_options.model_file.file_name = (
         options.base_options.model_file.file_name)
 
-    proto_options.compute_settings.tflite_settings.cpu_settings.num_threads = \
-        options.base_options.num_threads
+    proto_options.compute_settings.tflite_settings.cpu_settings.num_threads = (
+        options.base_options.num_threads)
     
     if options.base_options.use_coral:
       proto_options.compute_settings.tflite_settings.delegate = (
