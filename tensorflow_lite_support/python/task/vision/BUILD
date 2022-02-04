@@ -40,4 +40,3 @@ py_library(
         "//tensorflow_lite_support/python/task/vision/pybinds:image_classifier_options_pb2",
     ],
 )
-
