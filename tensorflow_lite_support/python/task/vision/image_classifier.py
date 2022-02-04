@@ -32,14 +32,14 @@ _CppImageClassifier = _pywrap_image_classifier.ImageClassifier
 
 @dataclasses.dataclass
 class ImageClassifierOptions:
-    """Options for the image embedder task."""
+    """Options for the image classifier task."""
     base_options: task_options.BaseOptions
-    embedding_options: Optional[classification_options_pb2.ClassificationOptions] = None
+    classification_options: Optional[classification_options_pb2.ClassificationOptions] = None
 
 
 def _build_proto_options(
         options: ImageClassifierOptions) -> _ProtoImageClassifierOptions:
-    """Builds the protobuf image embdder options."""
+    """Builds the protobuf image classifier options."""
     # Builds the initial proto_options.
     proto_options = _ProtoImageClassifierOptions()
 
