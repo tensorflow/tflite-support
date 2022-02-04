@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Utils for Vision APIs."""
+"""Utils for Task APIs."""
 
 from tensorflow_lite_support.python.task.core.proto import configuration_pb2
 
