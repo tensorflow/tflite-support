@@ -117,7 +117,7 @@ TfLiteImageSegmenter* TfLiteImageSegmenterFromOptions(
 TfLiteSegmentationResult* GetSegmentationResultCStruct(
     const SegmentationResultCpp& segmentation_result_cpp) {
   auto c_segmentations =
-      new TfLiteSegmentation[segmentation_result_cpp.segmentation_size()];
+      new TfLiteSegmentation[segmentation_result_cpp.segmentation_size()]();
 
   for (int i = 0; i < segmentation_result_cpp.segmentation_size(); ++i) {
     const SegmentationCpp& segmentation =
@@ -127,7 +127,7 @@ TfLiteSegmentationResult* GetSegmentationResultCStruct(
     c_segmentations[i].height = segmentation.height();
 
     auto c_colored_labels =
-        new TfLiteColoredLabel[segmentation.width() * segmentation.height()];
+        new TfLiteColoredLabel[segmentation.width() * segmentation.height()]();
 
     if (segmentation.has_category_mask()) {
       c_segmentations[i].category_mask =
@@ -137,6 +137,7 @@ TfLiteSegmentationResult* GetSegmentationResultCStruct(
           c_segmentations[i].category_mask,
           reinterpret_cast<const uint8_t*>(segmentation.category_mask().data()),
           segmentation.width() * segmentation.height() * sizeof(uint8_t));
+
     } else if (segmentation.has_confidence_masks()) {
       c_segmentations[i].confidence_masks =
           new float*[segmentation.colored_labels_size()];
@@ -160,16 +161,14 @@ TfLiteSegmentationResult* GetSegmentationResultCStruct(
       c_colored_labels[j].g = colored_label.g();
       c_colored_labels[j].b = colored_label.b();
 
-      if (colored_label.has_class_name())
+      if (colored_label.has_class_name()) {
         c_colored_labels[j].label = strdup(colored_label.class_name().c_str());
-      else
-        c_colored_labels[j].label = nullptr;
+      }
 
-      if (colored_label.has_display_name())
+      if (colored_label.has_display_name()) {
         c_colored_labels[j].display_name =
             strdup(colored_label.display_name().c_str());
-      else
-        c_colored_labels[j].display_name = nullptr;
+      }
     }
     c_segmentations[i].colored_labels = c_colored_labels;
   }

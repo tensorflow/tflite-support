@@ -31,6 +31,15 @@ void TfLiteSegmentationResultDelete(
       free(segmentation.colored_labels[j].label);
     }
 
+    if (segmentation.confidence_masks != nullptr) {
+      for (int j = 0; j < segmentation.colored_labels_size; ++j) {
+        delete[] segmentation.confidence_masks[j];
+      }
+      delete[] segmentation.confidence_masks;
+    }
+
+    delete[] segmentation.category_mask;
+
     delete[] segmentation.colored_labels;
   }
 
