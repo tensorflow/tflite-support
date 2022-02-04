@@ -27,7 +27,7 @@ namespace tflite {
             }  // namespace
 
             PYBIND11_MODULE(_pywrap_image_classifier, m) {
-                // python wrapper for C++ ImageEmbeder class which shouldn't be directly used
+                // python wrapper for C++ ImageClassifier class which shouldn't be directly used
                 // by the users.
                 pybind11::google::ImportStatusModule();
                 pybind11_protobuf::ImportNativeProtoCasters();
