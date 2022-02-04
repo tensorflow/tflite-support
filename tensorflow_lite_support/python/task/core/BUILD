@@ -13,4 +13,7 @@ py_library(
 py_library(
     name = "utils",
     srcs = ["utils.py"],
+    deps = [
+        "//tensorflow_lite_support/python/task/core/proto:configuration_pb2",
+    ],
 )
