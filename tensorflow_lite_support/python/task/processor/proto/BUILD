@@ -24,6 +24,18 @@ py_library(
 )
 
 py_library(
+    name = "class_pb2",
+    srcs = ["class_pb2.py"],
+    deps = ["//tensorflow_lite_support/cc/task/vision/proto:class_py_pb2"],
+)
+
+py_library(
+    name = "classifications_pb2",
+    srcs = ["classifications_pb2.py"],
+    deps = ["//tensorflow_lite_support/cc/task/vision/proto:classifications_py_pb2"],
+)
+
+py_library(
     name = "classification_options_pb2",
     srcs = ["classification_options_pb2.py"],
     deps = ["//tensorflow_lite_support/cc/task/processor/proto:classification_options_py_pb2"],
