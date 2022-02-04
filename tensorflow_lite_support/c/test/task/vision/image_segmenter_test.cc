@@ -219,7 +219,7 @@ TEST_F(ImageSegmenterFromOptionsTest, FailsWithUnspecifiedOutputTypeAndError) {
   if (error) TfLiteSupportErrorDelete(error);
 }
 
-class ImageSegmenterSegmentTest : public tflite_shims::testing::Test {
+class ImageSegmenterDefaultSegmentTest : public tflite_shims::testing::Test {
  protected:
   void SetUp() override {
     std::string model_path =
@@ -235,7 +235,7 @@ class ImageSegmenterSegmentTest : public tflite_shims::testing::Test {
   TfLiteImageSegmenter* image_segmenter;
 };
 
-TEST_F(ImageSegmenterSegmentTest, SucceedsWithCategoryMask) {
+TEST_F(ImageSegmenterDefaultSegmentTest, SucceedsWithCategoryMask) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
                                LoadImage("segmentation_input_rotation0.jpg"));
 
@@ -261,6 +261,54 @@ TEST_F(ImageSegmenterSegmentTest, SucceedsWithCategoryMask) {
   // Load golden mask output.
   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData golden_mask,
                                LoadImage("segmentation_golden_rotation0.png"));
+
+  int inconsistent_pixels = 0;
+  int num_pixels = golden_mask.height * golden_mask.width;
+
+  for (int i = 0; i < num_pixels; ++i) {
+    inconsistent_pixels +=
+        (segmentation_result->segmentations[0].category_mask[i] *
+             kGoldenMaskMagnificationFactor !=
+         golden_mask.pixel_data[i]);
+  }
+
+  EXPECT_LT(static_cast<float>(inconsistent_pixels) / num_pixels,
+            kGoldenMaskTolerance);
+
+  ImageDataFree(&golden_mask);
+
+  TfLiteSegmentationResultDelete(segmentation_result);
+}
+
+TEST_F(ImageSegmenterDefaultSegmentTest,
+       SucceedsWithCategoryMaskAndOrientation) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(
+      ImageData image_data,
+      LoadImage("segmentation_input_rotation90_flop.jpg"));
+
+  TfLiteFrameBuffer frame_buffer = {
+      .format = kRGB,
+      .orientation = kRightBottom,
+      .dimension = {.width = image_data.width, .height = image_data.height},
+      .buffer = image_data.pixel_data};
+
+  TfLiteSegmentationResult* segmentation_result =
+      TfLiteImageSegmenterSegment(image_segmenter, &frame_buffer, nullptr);
+
+  ImageDataFree(&image_data);
+
+  ASSERT_NE(segmentation_result, nullptr);
+  EXPECT_EQ(segmentation_result->size, 1);
+  EXPECT_NE(segmentation_result->segmentations, nullptr);
+  EXPECT_NE(segmentation_result->segmentations[0].category_mask, nullptr);
+
+  ExpectApproximatelyEqual(partial_deep_lab_v3_segmentation,
+                           segmentation_result->segmentations[0]);
+
+  // Load golden mask output.
+  SUPPORT_ASSERT_OK_AND_ASSIGN(
+      ImageData golden_mask,
+      LoadImage("segmentation_golden_rotation90_flop.png"));
 
   int inconsistent_pixels = 0;
   int num_pixels = golden_mask.height * golden_mask.width;
