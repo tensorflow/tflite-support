@@ -30,11 +30,11 @@ py_library(
     ],
     deps = [
         "//tensorflow_lite_support/python/task/core:task_options",
+        "//tensorflow_lite_support/python/task/core:utils",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classification_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
-        "//tensorflow_lite_support/python/task/vision/core:utils",
         "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
         "//tensorflow_lite_support/python/task/vision/pybinds:image_classifier",
         "//tensorflow_lite_support/python/task/vision/pybinds:image_classifier_options_pb2",
