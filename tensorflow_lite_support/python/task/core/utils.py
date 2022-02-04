@@ -18,16 +18,18 @@ from tensorflow_lite_support.python.task.core.proto import configuration_pb2
 
 def build_proto_base_options(proto_options, options):
     """Builds initial proto options values from the base options."""
-
+    
     # Updates values from base_options.
     if options.base_options.model_file.file_content:
-      proto_options.model_file_with_metadata.file_content = (
+      proto_options.base_options.model_file.file_content = (
         options.base_options.model_file.file_content)
     elif options.base_options.model_file.file_name:
-      proto_options.model_file_with_metadata.file_name = (
+      proto_options.base_options.model_file.file_name = (
         options.base_options.model_file.file_name)
 
-    proto_options.num_threads = options.base_options.num_threads
+    proto_options.compute_settings.tflite_settings.cpu_settings.num_threads = \
+        options.base_options.num_threads
+    
     if options.base_options.use_coral:
       proto_options.compute_settings.tflite_settings.delegate = (
         configuration_pb2.Delegate.EDGETPU_CORAL)
