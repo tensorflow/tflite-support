@@ -12,4 +12,3 @@ py_library(
     srcs = ["configuration_pb2.py"],
     deps = ["@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto_external_py"],
 )
-
