@@ -38,11 +38,11 @@ StatusOr<std::unique_ptr<FrameBufferCpp>> CreateCppFrameBuffer(
 
   FrameBufferCpp::Format frame_buffer_format =
       FrameBufferCpp::Format(frame_buffer->format);
-
+  
   return CreateFromRawBuffer(
       frame_buffer->buffer,
       {frame_buffer->dimension.width, frame_buffer->dimension.height},
-      frame_buffer_format);
+      frame_buffer_format, (FrameBuffer::Orientation)frame_buffer->orientation);
 }
 
 }  // namespace vision
