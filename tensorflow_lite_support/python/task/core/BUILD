@@ -11,9 +11,11 @@ py_library(
 )
 
 py_library(
-    name = "utils",
-    srcs = ["utils.py"],
+    name = "task_utils",
+    srcs = ["task_utils.py"],
     deps = [
+        ":task_options",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_py_pb2",
         "//tensorflow_lite_support/python/task/core/proto:configuration_pb2",
     ],
 )
