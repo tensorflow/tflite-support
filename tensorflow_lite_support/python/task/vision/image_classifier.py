@@ -32,85 +32,85 @@ _CppImageClassifier = _pywrap_image_classifier.ImageClassifier
 
 @dataclasses.dataclass
 class ImageClassifierOptions:
-    """Options for the image classifier task."""
-    base_options: task_options.BaseOptions
-    classification_options: Optional[classification_options_pb2.ClassificationOptions] = None
+  """Options for the image classifier task."""
+  base_options: task_options.BaseOptions
+  classification_options: Optional[classification_options_pb2.ClassificationOptions] = None
 
 
 def _build_proto_options(
-        options: ImageClassifierOptions) -> _ProtoImageClassifierOptions:
-    """Builds the protobuf image classifier options."""
-    # Builds the initial proto_options.
-    proto_options = _ProtoImageClassifierOptions()
+    options: ImageClassifierOptions) -> _ProtoImageClassifierOptions:
+  """Builds the protobuf image classifier options."""
+  # Builds the initial proto_options.
+  proto_options = _ProtoImageClassifierOptions()
 
-    # Updates values from base_options.
-    proto_options.base_options.CopyFrom(
-        task_utils.ConvertToProtoBaseOptions(options.base_options))
+  # Updates values from base_options.
+  proto_options.base_options.CopyFrom(
+    task_utils.ConvertToProtoBaseOptions(options.base_options))
 
-    # Updates values from classifier_options.
-    if options.classification_options:
-        if options.classification_options.display_names_locale is not None:
-            proto_options.display_names_locale = options.classification_options.display_names_locale
-        if options.classification_options.max_results is not None:
-            proto_options.max_results = options.classification_options.max_results
-        if options.classification_options.score_threshold is not None:
-            proto_options.score_threshold = options.classification_options.score_threshold
-        if options.classification_options.class_name_allowlist is not None:
-            proto_options.class_name_whitelist.extend(options.classification_options.class_name_allowlist)
-        if options.classification_options.class_name_denylist is not None:
-            proto_options.class_name_blacklist.extend(options.classification_options.class_name_denylist)
+  # Updates values from classifier_options.
+  if options.classification_options:
+    if options.classification_options.display_names_locale is not None:
+      proto_options.display_names_locale = options.classification_options.display_names_locale
+    if options.classification_options.max_results is not None:
+      proto_options.max_results = options.classification_options.max_results
+    if options.classification_options.score_threshold is not None:
+      proto_options.score_threshold = options.classification_options.score_threshold
+    if options.classification_options.class_name_allowlist is not None:
+      proto_options.class_name_whitelist.extend(options.classification_options.class_name_allowlist)
+    if options.classification_options.class_name_denylist is not None:
+      proto_options.class_name_blacklist.extend(options.classification_options.class_name_denylist)
 
-    return proto_options
+  return proto_options
 
 
 class ImageClassifier(object):
-    """Class that performs classification on images."""
+  """Class that performs classification on images."""
 
-    def __init__(self, classifier: _CppImageClassifier) -> None:
-        """Initializes the `ImageClassifier` object."""
-        self._classifier = classifier
+  def __init__(self, classifier: _CppImageClassifier) -> None:
+    """Initializes the `ImageClassifier` object."""
+    self._classifier = classifier
 
-    @classmethod
-    def create_from_options(cls,
-                            options: ImageClassifierOptions) -> "ImageClassifier":
-        """Creates the `ImageClassifier` object from image classifier options.
-        Args:
-          options: Options for the image classifier task.
-        Returns:
-          `ImageClassifier` object that's created from `options`.
-        Raises:
-          status.StatusNotOk if failed to create `ImageClassifier` object from
-            `ImageClassifierOptions` such as missing the model. Need to import the
-            module to catch this error: `from pybind11_abseil import status`, see
-            https://github.com/pybind/pybind11_abseil#abslstatusor.
-        """
-        # Creates the object of C++ ImageClassifier class.
-        proto_options = _build_proto_options(options)
-        classifier = _CppImageClassifier.create_from_options(proto_options)
+  @classmethod
+  def create_from_options(cls,
+                          options: ImageClassifierOptions) -> "ImageClassifier":
+    """Creates the `ImageClassifier` object from image classifier options.
+    Args:
+      options: Options for the image classifier task.
+    Returns:
+      `ImageClassifier` object that's created from `options`.
+    Raises:
+      status.StatusNotOk if failed to create `ImageClassifier` object from
+        `ImageClassifierOptions` such as missing the model. Need to import the
+        module to catch this error: `from pybind11_abseil import status`, see
+        https://github.com/pybind/pybind11_abseil#abslstatusor.
+    """
+    # Creates the object of C++ ImageClassifier class.
+    proto_options = _build_proto_options(options)
+    classifier = _CppImageClassifier.create_from_options(proto_options)
 
-        return cls(classifier)
+    return cls(classifier)
 
-    def classify(
-            self,
-            image: tensor_image.TensorImage,
-            bounding_box: Optional[bounding_box_pb2.BoundingBox] = None
-    ) -> classifications_pb2.ClassificationResult:
-        """Performs classification on the provided TensorImage.
-        Args:
-          image: Tensor image, used to extract the feature vectors.
-          bounding_box: Bounding box, optional. If set, performed feature vector
-            extraction only on the provided region of interest. Note that the region
-            of interest is not clamped, so this method will fail if the region is
-            out of bounds of the input image.
-        Returns:
-          classification result.
-        Raises:
-          status.StatusNotOk if failed to get the feature vector. Need to import
-            the module to catch this error: `from pybind11_abseil import status`,
-            see https://github.com/pybind/pybind11_abseil#abslstatusor.
-        """
-        image_data = image_utils.ImageData(image.get_buffer())
-        if bounding_box is None:
-            return self._classifier.classify(image_data)
+  def classify(
+      self,
+      image: tensor_image.TensorImage,
+      bounding_box: Optional[bounding_box_pb2.BoundingBox] = None
+  ) -> classifications_pb2.ClassificationResult:
+    """Performs classification on the provided TensorImage.
+    Args:
+      image: Tensor image, used to extract the feature vectors.
+      bounding_box: Bounding box, optional. If set, performed feature vector
+        extraction only on the provided region of interest. Note that the region
+        of interest is not clamped, so this method will fail if the region is
+        out of bounds of the input image.
+    Returns:
+      classification result.
+    Raises:
+      status.StatusNotOk if failed to get the feature vector. Need to import
+        the module to catch this error: `from pybind11_abseil import status`,
+        see https://github.com/pybind/pybind11_abseil#abslstatusor.
+    """
+    image_data = image_utils.ImageData(image.get_buffer())
+    if bounding_box is None:
+      return self._classifier.classify(image_data)
 
-        return self._classifier.classify(image_data, bounding_box)
+    return self._classifier.classify(image_data, bounding_box)
