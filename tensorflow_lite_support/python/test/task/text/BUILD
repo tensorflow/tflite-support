@@ -18,8 +18,6 @@ py_test(
         "//tensorflow_lite_support/python/task/processor/proto:embeddings_pb2",
         "//tensorflow_lite_support/python/task/text:text_embedder",
         "//tensorflow_lite_support/python/test:test_util",
-        "//testing/pybase",
         "@absl_py//absl/testing:parameterized",
-        "@pybind11_abseil//pybind11_abseil:status",
     ],
 )
