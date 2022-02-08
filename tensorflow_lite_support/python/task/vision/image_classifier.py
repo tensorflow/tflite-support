@@ -17,10 +17,10 @@ import dataclasses
 from typing import Optional
 
 from tensorflow_lite_support.python.task.core import task_options
+from tensorflow_lite_support.python.task.core import task_utils
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
-from tensorflow_lite_support.python.task.core.utils import build_proto_base_options
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_classifier
@@ -44,7 +44,8 @@ def _build_proto_options(
     proto_options = _ProtoImageClassifierOptions()
 
     # Updates values from base_options.
-    proto_options = build_proto_base_options(proto_options, options)
+    proto_options.base_options.CopyFrom(
+        task_utils.ConvertToProtoBaseOptions(options.base_options))
 
     # Updates values from classifier_options.
     if options.classification_options:
