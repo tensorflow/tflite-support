@@ -29,3 +29,28 @@ pybind_extension(
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
+
+py_library(
+    name = "image_classifier_options_pb2",
+    srcs = ["image_classifier_options_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_py_pb2",
+        "//tensorflow_lite_support/cc/task/vision/proto:image_classifier_options_py_pb2",
+    ],
+)
+
+pybind_extension(
+    name = "image_classifier",
+    srcs = [
+        "image_classifier.cc",
+    ],
+    module_name = "_pywrap_image_classifier",
+    deps = [
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/vision:image_classifier",
+        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
+        "@pybind11",
+        "@pybind11_abseil//pybind11_abseil:status_casters",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)
