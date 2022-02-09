@@ -27,31 +27,31 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('model_path', None,
                     'Absolute path to the ".tflite" image classifier model.')
 flags.DEFINE_string(
-  'image_path', None,
-  'Absolute path to the image to classify. The image must be RGB or '
-  'RGBA (grayscale is not supported). The image EXIF orientation '
-  'flag, if any, is NOT taken into account.')
+    'image_path', None,
+    'Absolute path to the image to classify. The image must be RGB or '
+    'RGBA (grayscale is not supported). The image EXIF orientation '
+    'flag, if any, is NOT taken into account.')
 flags.DEFINE_integer('max_results', 5,
                      'Maximum number of classification results to display.')
 flags.DEFINE_float(
-  'score_threshold', 0,
-  'Classification results with a confidence score below this value are '
-  'rejected. If >= 0, overrides the score threshold(s) provided in the '
-  'TFLite Model Metadata. Ignored otherwise.')
+    'score_threshold', 0,
+    'Classification results with a confidence score below this value are '
+    'rejected. If >= 0, overrides the score threshold(s) provided in the '
+    'TFLite Model Metadata. Ignored otherwise.')
 flags.DEFINE_string(
-  'class_name_whitelist', '',
-  'Comma-separated list of class names that acts as a whitelist. If '
-  'non-empty, classification results whose "class_name" is not in this list '
-  'are filtered out. Mutually exclusive with "class_name_blacklist".')
+    'class_name_whitelist', '',
+    'Comma-separated list of class names that acts as a whitelist. If '
+    'non-empty, classification results whose "class_name" is not in this list '
+    'are filtered out. Mutually exclusive with "class_name_blacklist".')
 flags.DEFINE_string(
-  'class_name_blacklist', '',
-  'Comma-separated list of class names that acts as a blacklist. If '
-  'non-empty, classification results whose "class_name" is in this list '
-  'are filtered out. Mutually exclusive with "class_name_whitelist".')
+    'class_name_blacklist', '',
+    'Comma-separated list of class names that acts as a blacklist. If '
+    'non-empty, classification results whose "class_name" is in this list '
+    'are filtered out. Mutually exclusive with "class_name_whitelist".')
 flags.DEFINE_bool(
-  'use_coral', False,
-  'If true, inference will be delegated to a connected Coral Edge TPU '
-  'device.')
+    'use_coral', False,
+    'If true, inference will be delegated to a connected Coral Edge TPU '
+    'device.')
 # Required flag.
 flags.mark_flag_as_required('model_path')
 flags.mark_flag_as_required('image_path')
@@ -64,7 +64,6 @@ _IMAGE_CLASSIFICATION_NATIVE_PATH = _os_path.join(
 def classify(model_path, image_path, max_results, score_threshold,
              class_name_whitelist, class_name_blacklist, use_coral):
   """Classifies input image into different categories.
-
   Args:
       model_path: Path to model
       image_path: Absolute path to the image to classify
