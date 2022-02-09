@@ -64,7 +64,7 @@ def build_options():
   classification_options = classification_options_pb2.ClassificationOptions(
     max_results=FLAGS.max_results, score_threshold=FLAGS.score_threshold,
     class_name_allowlist=FLAGS.class_name_allowlist,
-    class_name_denylist=FLAGS.class_name_denylist, use_coral=FLAGS.use_coral)
+    class_name_denylist=FLAGS.class_name_denylist)
   return image_classifier.ImageClassifierOptions(
     base_options=base_options, classification_options=classification_options)
 

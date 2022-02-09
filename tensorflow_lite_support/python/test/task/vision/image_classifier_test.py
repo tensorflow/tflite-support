@@ -91,9 +91,9 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Invalid empty model path.
     with self.assertRaisesRegex(
         Exception,
-        r"INVALID_ARGUMENT: ExternalFile must specify at least one of "
-        r"'file_content', file_name' or 'file_descriptor_meta'\. "
-        r"\[tflite::support::TfLiteSupportStatus='2'\]"):
+        r"INVALID_ARGUMENT: Expected exactly one of `base_options.model_file` or "
+        r"`model_file_with_metadata` to be provided, found 0. "
+        r"\[tflite::support::TfLiteSupportStatus='2']"):
       base_options = _BaseOptions(model_file=_ExternalFile(file_name=""))
       options = _ImageClassifierOptions(base_options=base_options)
       _ImageClassifier.create_from_options(options)
@@ -113,7 +113,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
         Exception,
         r"INVALID_ARGUMENT: Invalid `max_results` option: value must be != 0 "
         r"\[tflite::support::TfLiteSupportStatus='2'\]"):
-      base_options = _BaseOptions(model_file=_ExternalFile(file_name=""))
+      base_options = _BaseOptions(model_file=_ExternalFile(file_name=self.model_path))
       classification_options = classification_options_pb2.ClassificationOptions(
         max_results=0)
       options = _ImageClassifierOptions(
@@ -122,13 +122,15 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
   @parameterized.parameters(
     (
-      _MODEL_FLOAT, ModelFileType.FILE_NAME, 3,
+      ModelFileType.FILE_NAME, 3,
       [
         {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"},
         {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"},
         {'index': 932, 'score': 0.025737214833498, 'class_name': "bagel"}
-      ],
-      _MODEL_FLOAT, ModelFileType.FILE_CONTENT, 3,
+      ]
+    ),
+    (
+      ModelFileType.FILE_CONTENT, 3,
       [
         {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"},
         {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"},
@@ -167,24 +169,13 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Comparing results (classification w/o bounding box).
     self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
-  @parameterized.parameters(
-    (
-      _MODEL_FLOAT, 3,
-      [
-        {'index': 934, 'score': 0.8815076351165771, 'class_name': "cheeseburger"},
-        {'index': 925, 'score': 0.019456762820482254, 'class_name': "guacamole"},
-        {'index': 932, 'score': 0.012489477172493935, 'class_name': "bagel"}
-      ]
-    )
-  )
-  def test_classify_model_with_bounding_box(self, max_results,
-                                            expected_categories):
+  def test_classify_model_with_bounding_box(self):
     # Creates classifier.
     model_file = _ExternalFile(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
       model_file,
-      max_results=max_results
+      max_results=3
     )
 
     # Loads image.
@@ -199,25 +190,26 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     image_result = classifier.classify(image, bounding_box)
     image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
+    # Expected results.
+    expected_categories = [
+      {'index': 934, 'score': 0.8815076351165771, 'class_name': "cheeseburger"},
+      {'index': 925, 'score': 0.019456762820482254, 'class_name': "guacamole"},
+      {'index': 932, 'score': 0.012489477172493935, 'class_name': "bagel"}
+    ]
+
     # Builds test data.
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Comparing results (classification w/ bounding box).
     self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
-  @parameterized.parameters(
-    (
-      _MODEL_FLOAT, 0.5,
-      [{'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"}]
-    )
-  )
-  def test_score_threshold_option(self, model_name, score_threshold, expected_categories):
+  def test_score_threshold_option(self):
     # Creates classifier.
     model_file = _ExternalFile(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
       model_file,
-      score_threshold=score_threshold
+      score_threshold=0.5
     )
 
     # Loads image.
@@ -228,28 +220,24 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     image_result = classifier.classify(image, bounding_box=None)
     image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
+    # Expected results.
+    expected_categories = [
+      {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"}
+    ]
+
     # Builds test data.
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Comparing results (classification w/o bounding box).
     self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
-  @parameterized.parameters(
-    (
-      _MODEL_FLOAT, ['cheeseburger', 'guacamole'],
-      [
-        {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"},
-        {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"}
-      ]
-    )
-  )
-  def test_allowlist_option(self, model_name, class_name_allowlist, expected_categories):
+  def test_allowlist_option(self):
     # Creates classifier.
     model_file = _ExternalFile(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
       model_file,
-      class_name_allowlist=class_name_allowlist
+      class_name_allowlist=['cheeseburger', 'guacamole']
     )
 
     # Loads image.
@@ -260,13 +248,19 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     image_result = classifier.classify(image, bounding_box=None)
     image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
+    # Expected results.
+    expected_categories = [
+      {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"},
+      {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"}
+    ]
+
     # Builds test data.
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Comparing results (classification w/o bounding box).
     self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
-  def test_denylist_option(self, model_name=_MODEL_FLOAT):
+  def test_denylist_option(self):
     # Creates classifier.
     model_file = _ExternalFile(file_name=self.model_path)
 
@@ -298,9 +292,6 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
 
   def test_combined_allowlist_and_denylist(self):
-    # Get the model path from the test data directory
-    model_file = test_util.get_test_data_path(self.model_path)
-
     # Fails with combined allowlist and denylist
     with self.assertRaisesRegex(
         Exception,

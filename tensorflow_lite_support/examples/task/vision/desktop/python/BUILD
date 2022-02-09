@@ -53,13 +53,14 @@ py_binary(
 
 # bazel run \
 #  tensorflow_lite_support/examples/task/vision/desktop/python:image_classifier_demo -- \
-#  --model_path=/tmp/aiy_vision_classifier_birds_V1_3.tflite \
+#  --model_path=$(pwd)/tensorflow_lite_support/cc/test/testdata/task/vision/mobilenet_v2_1.0_224.tflite \
 #  --image_path=\
-# $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/sparrow.jpg \
+# $(pwd)/tensorflow_lite_support/cc/test/testdata/task/vision/burger.jpg \
 #  --max_results=3
 py_binary(
     name = "image_classifier_demo",
     srcs = ["image_classifier_demo.py"],
+    data = ["//tensorflow_lite_support/examples/task/vision/desktop:image_classifier_demo"],
     deps = [
         "//tensorflow_lite_support/python/task/core:task_options",
         "//tensorflow_lite_support/python/task/processor/proto:classification_options_pb2",
@@ -70,4 +71,3 @@ py_binary(
         "@com_google_protobuf//:protobuf_python",
     ],
 )
-

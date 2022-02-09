@@ -23,7 +23,7 @@ from tensorflow_lite_support.python.task.processor.proto import classification_o
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
-from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_classifier
+from tensorflow_lite_support.python.task.vision.pybinds import image_classifier as _pywrap_image_classifier
 from tensorflow_lite_support.python.task.vision.pybinds import image_classifier_options_pb2
 
 _ProtoImageClassifierOptions = image_classifier_options_pb2.ImageClassifierOptions
@@ -64,9 +64,27 @@ class ImageClassifier(object):
     proto_options = _ProtoImageClassifierOptions()
     proto_options.base_options.CopyFrom(
         task_utils.ConvertToProtoBaseOptions(options.base_options))
+
+    # if options.classification_options:
+    #   classification_options = proto_options.classification_options.add()
+    #   classification_options.CopyFrom(options.classification_options)
+    # TODO: Revert to this once
+    # //tensorflow_lite_support/cc/task/vision/proto/image_classifier_options.proto
+    # is updated with a self-contained ClassificationOptions proto
+
+    # Updates values from classifier_options.
     if options.classification_options:
-      classification_options = proto_options.classification_options.add()
-      classification_options.CopyFrom(options.classification_options)
+      if options.classification_options.display_names_locale is not None:
+        proto_options.display_names_locale = options.classification_options.display_names_locale
+      if options.classification_options.max_results is not None:
+        proto_options.max_results = options.classification_options.max_results
+      if options.classification_options.score_threshold is not None:
+        proto_options.score_threshold = options.classification_options.score_threshold
+      if options.classification_options.class_name_allowlist is not None:
+        proto_options.class_name_whitelist.extend(options.classification_options.class_name_allowlist)
+      if options.classification_options.class_name_denylist is not None:
+        proto_options.class_name_blacklist.extend(options.classification_options.class_name_denylist)
+
     classifier = _CppImageClassifier.create_from_options(proto_options)
 
     return cls(classifier)
