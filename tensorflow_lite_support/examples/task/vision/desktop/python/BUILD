@@ -6,22 +6,6 @@ package(
 )
 
 # bazel run \
-#  tensorflow_lite_support/examples/task/vision/desktop/python:image_classifier_demo -- \
-#  --model_path=/tmp/aiy_vision_classifier_birds_V1_3.tflite \
-#  --image_path=\
-# $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/sparrow.jpg \
-#  --max_results=3
-py_binary(
-    name = "image_classifier_demo",
-    srcs = ["image_classifier_demo.py"],
-    data = ["//tensorflow_lite_support/examples/task/vision/desktop:image_classifier_demo"],
-    deps = [
-        "@absl_py//absl:app",
-        "@absl_py//absl/flags",
-    ],
-)
-
-# bazel run \
 #  tensorflow_lite_support/examples/task/vision/desktop/python:object_detector_demo -- \
 #  --model_path=/tmp/ssd_mobilenet_v1_1_metadata_1.tflite \
 #  --image_path=\
@@ -66,3 +50,24 @@ py_binary(
         "@absl_py//absl/flags",
     ],
 )
+
+# bazel run \
+#  tensorflow_lite_support/examples/task/vision/desktop/python:image_classifier_demo -- \
+#  --model_path=/tmp/aiy_vision_classifier_birds_V1_3.tflite \
+#  --image_path=\
+# $(pwd)/tensorflow_lite_support/examples/task/vision/desktop/g3doc/sparrow.jpg \
+#  --max_results=3
+py_binary(
+    name = "image_classifier_demo",
+    srcs = ["image_classifier_demo.py"],
+    deps = [
+        "//tensorflow_lite_support/python/task/core:task_options",
+        "//tensorflow_lite_support/python/task/processor/proto:classification_options_pb2",
+        "//tensorflow_lite_support/python/task/vision:image_classifier",
+        "//tensorflow_lite_support/python/task/vision/core:tensor_image",
+        "@absl_py//absl:app",
+        "@absl_py//absl/flags",
+        "@com_google_protobuf//:protobuf_python",
+    ],
+)
+

@@ -14,13 +14,16 @@
 # ==============================================================================
 """Python demo tool for Image Classification."""
 
-import inspect
-import os.path as _os_path
-import subprocess
-import sys
+import json
 
 from absl import app
 from absl import flags
+from google.protobuf import json_format
+
+from tensorflow_lite_support.python.task.core import task_options
+from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
+from tensorflow_lite_support.python.task.vision import image_classifier
+from tensorflow_lite_support.python.task.vision.core import tensor_image
 
 FLAGS = flags.FLAGS
 
@@ -39,69 +42,50 @@ flags.DEFINE_float(
     'rejected. If >= 0, overrides the score threshold(s) provided in the '
     'TFLite Model Metadata. Ignored otherwise.')
 flags.DEFINE_string(
-    'class_name_whitelist', '',
+    'class_name_allowlist', '',
     'Comma-separated list of class names that acts as a whitelist. If '
     'non-empty, classification results whose "class_name" is not in this list '
-    'are filtered out. Mutually exclusive with "class_name_blacklist".')
+    'are filtered out. Mutually exclusive with "class_name_denylist".')
 flags.DEFINE_string(
-    'class_name_blacklist', '',
+    'class_name_denylist', '',
     'Comma-separated list of class names that acts as a blacklist. If '
     'non-empty, classification results whose "class_name" is in this list '
-    'are filtered out. Mutually exclusive with "class_name_whitelist".')
+    'are filtered out. Mutually exclusive with "class_name_allowlist".')
 flags.DEFINE_bool(
     'use_coral', False,
     'If true, inference will be delegated to a connected Coral Edge TPU '
     'device.')
-# Required flag.
-flags.mark_flag_as_required('model_path')
-flags.mark_flag_as_required('image_path')
-
-_IMAGE_CLASSIFICATION_NATIVE_PATH = _os_path.join(
-    _os_path.dirname(inspect.getfile(inspect.currentframe())),
-    '../image_classifier_demo')
 
 
-def classify(model_path, image_path, max_results, score_threshold,
-             class_name_whitelist, class_name_blacklist, use_coral):
-  """Classifies input image into different categories.
-
-  Args:
-      model_path: Path to model
-      image_path: Absolute path to the image to classify
-      max_results: Maximum number of classification results to display
-      score_threshold: Optional; Classification results with a confidence 
-        score below this value are rejected
-      class_name_whitelist: Optional; Comma-separated list of class names 
-        that acts as a whitelist
-      class_name_blacklist: Optional; Comma-separated list of class names 
-        that acts as a blacklist
-      use_coral: Optional; If true, inference will be delegated to a 
-        connected Coral Edge TPU device
-  """
-  # Run the classification tool:
-  subprocess.run([
-      _IMAGE_CLASSIFICATION_NATIVE_PATH + ' --model_path=' + model_path +
-      ' --image_path=' + image_path + ' --max_results=' + str(max_results) +
-      ' --score_threshold=' + str(score_threshold) +
-      ' --class_name_whitelist="' + str(class_name_whitelist) +
-      '" --class_name_blacklist="' + str(class_name_blacklist) +
-      '" --use_coral=' + str(use_coral)
-  ],
-                 shell=True,
-                 check=True)
+def build_options():
+  base_options = task_options.BaseOptions(
+    model_file=task_options.ExternalFile(file_name=FLAGS.model_path),
+    use_coral=FLAGS.use_coral)
+  classification_options = classification_options_pb2.ClassificationOptions(
+    max_results=FLAGS.max_results, score_threshold=FLAGS.score_threshold,
+    class_name_allowlist=FLAGS.class_name_allowlist,
+    class_name_denylist=FLAGS.class_name_denylist, use_coral=FLAGS.use_coral)
+  return image_classifier.ImageClassifierOptions(
+    base_options=base_options, classification_options=classification_options)
 
 
-def run_main(argv):
-  del argv  # Unused.
-  classify(FLAGS.model_path, FLAGS.image_path, FLAGS.max_results,
-           FLAGS.score_threshold, FLAGS.class_name_whitelist,
-           FLAGS.class_name_blacklist, FLAGS.use_coral)
+def main(_) -> None:
+  # Creates classifier.
+  options = build_options()
+  classifier = image_classifier.ImageClassifier.create_from_options(options)
+
+  # Loads image.
+  image = tensor_image.TensorImage.from_file(FLAGS.image_path)
+
+  # Run classification.
+  result = classifier.classify(image)
+
+  # Gets results.
+  image_result_dict = json.loads(json_format.MessageToJson(result))
+  print(image_result_dict)
 
 
-# Simple wrapper to make the code pip-friendly
-def main():
-  app.run(main=run_main, argv=sys.argv)
-
-
-if __name__ == '__main__':
-  main()
+if __name__ == "__main__":
+  flags.mark_flag_as_required('model_path')
+  flags.mark_flag_as_required('image_path')
+  app.run(main)

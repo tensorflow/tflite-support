@@ -140,6 +140,7 @@ support_py_proto_library(
     proto_deps = [":image_classifier_options_proto"],
     py_proto_deps = [
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto_external_py",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_py_pb2",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_py_pb2",
     ],
 )
@@ -174,6 +175,9 @@ support_py_proto_library(
     srcs = ["classifications.proto"],
     api_version = 2,
     proto_deps = [":classifications_proto"],
+    py_proto_deps = [
+        ":class_py_pb2",
+    ],
 )
 
 cc_library(
