@@ -69,13 +69,13 @@ def classify(model_path, image_path, max_results, score_threshold,
       model_path: Path to model
       image_path: Absolute path to the image to classify
       max_results: Maximum number of classification results to display
-      score_threshold: Optional; Classification results with a confidence
+      score_threshold: Optional; Classification results with a confidence 
         score below this value are rejected
-      class_name_whitelist: Optional; Comma-separated list of class names
+      class_name_whitelist: Optional; Comma-separated list of class names 
         that acts as a whitelist
-      class_name_blacklist: Optional; Comma-separated list of class names
+      class_name_blacklist: Optional; Comma-separated list of class names 
         that acts as a blacklist
-      use_coral: Optional; If true, inference will be delegated to a
+      use_coral: Optional; If true, inference will be delegated to a 
         connected Coral Edge TPU device
   """
   # Run the classification tool:
