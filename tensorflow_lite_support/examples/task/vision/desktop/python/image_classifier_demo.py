@@ -57,13 +57,14 @@ flags.mark_flag_as_required('model_path')
 flags.mark_flag_as_required('image_path')
 
 _IMAGE_CLASSIFICATION_NATIVE_PATH = _os_path.join(
-  _os_path.dirname(inspect.getfile(inspect.currentframe())),
-  '../image_classifier_demo')
+    _os_path.dirname(inspect.getfile(inspect.currentframe())),
+    '../image_classifier_demo')
 
 
 def classify(model_path, image_path, max_results, score_threshold,
              class_name_whitelist, class_name_blacklist, use_coral):
   """Classifies input image into different categories.
+
   Args:
       model_path: Path to model
       image_path: Absolute path to the image to classify
@@ -79,15 +80,15 @@ def classify(model_path, image_path, max_results, score_threshold,
   """
   # Run the classification tool:
   subprocess.run([
-    _IMAGE_CLASSIFICATION_NATIVE_PATH + ' --model_path=' + model_path +
-    ' --image_path=' + image_path + ' --max_results=' + str(max_results) +
-    ' --score_threshold=' + str(score_threshold) +
-    ' --class_name_whitelist="' + str(class_name_whitelist) +
-    '" --class_name_blacklist="' + str(class_name_blacklist) +
-    '" --use_coral=' + str(use_coral)
+      _IMAGE_CLASSIFICATION_NATIVE_PATH + ' --model_path=' + model_path +
+      ' --image_path=' + image_path + ' --max_results=' + str(max_results) +
+      ' --score_threshold=' + str(score_threshold) +
+      ' --class_name_whitelist="' + str(class_name_whitelist) +
+      '" --class_name_blacklist="' + str(class_name_blacklist) +
+      '" --use_coral=' + str(use_coral)
   ],
-    shell=True,
-    check=True)
+                 shell=True,
+                 check=True)
 
 
 def run_main(argv):
