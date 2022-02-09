@@ -43,12 +43,12 @@ flags.DEFINE_float(
     'TFLite Model Metadata. Ignored otherwise.')
 flags.DEFINE_string(
     'class_name_allowlist', '',
-    'Comma-separated list of class names that acts as a whitelist. If '
+    'Comma-separated list of class names that acts as a allowlist. If '
     'non-empty, classification results whose "class_name" is not in this list '
     'are filtered out. Mutually exclusive with "class_name_denylist".')
 flags.DEFINE_string(
     'class_name_denylist', '',
-    'Comma-separated list of class names that acts as a blacklist. If '
+    'Comma-separated list of class names that acts as a denylist. If '
     'non-empty, classification results whose "class_name" is in this list '
     'are filtered out. Mutually exclusive with "class_name_allowlist".')
 flags.DEFINE_bool(
