@@ -43,7 +43,7 @@ pybind_extension(
     srcs = [
         "_pywrap_image_classifier.cc",
     ],
-    module_name = "image_classifier",
+    module_name = "_pywrap_image_classifier",
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
