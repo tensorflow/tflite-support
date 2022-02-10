@@ -71,54 +71,6 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
     return expected_result_dict
 
-  def test_create_from_options_succeeds_with_valid_model_path(self):
-    # Creates with options containing model file successfully.
-    base_options = _BaseOptions(
-      model_file=_ExternalFile(file_name=self.model_path))
-    options = _ImageClassifierOptions(base_options=base_options)
-    classifier = _ImageClassifier.create_from_options(options)
-    self.assertIsInstance(classifier, _ImageClassifier)
-
-  def test_create_from_options_fails_with_missing_model_file(self):
-    # Missing the model file.
-    with self.assertRaisesRegex(
-        TypeError,
-        r"__init__\(\) missing 1 required positional argument: 'model_file'"):
-      _BaseOptions()
-
-  def test_create_from_options_fails_with_invalid_model_path(self):
-    # Invalid empty model path.
-    with self.assertRaisesRegex(
-        Exception,
-        r"INVALID_ARGUMENT: Expected exactly one of `base_options.model_file` or "
-        r"`model_file_with_metadata` to be provided, found 0. "
-        r"\[tflite::support::TfLiteSupportStatus='2']"):
-      base_options = _BaseOptions(model_file=_ExternalFile(file_name=""))
-      options = _ImageClassifierOptions(base_options=base_options)
-      _ImageClassifier.create_from_options(options)
-
-  def test_create_from_options_succeeds_with_valid_model_content(self):
-    # Creates with options containing model content successfully.
-    with open(self.model_path, "rb") as f:
-      base_options = _BaseOptions(
-        model_file=_ExternalFile(file_content=f.read()))
-      options = _ImageClassifierOptions(base_options=base_options)
-      classifier = _ImageClassifier.create_from_options(options)
-      self.assertIsInstance(classifier, _ImageClassifier)
-
-  def test_create_from_options_fails_with_invalid_max_results(self):
-    # Invalid max results.
-    with self.assertRaisesRegex(
-        Exception,
-        r"INVALID_ARGUMENT: Invalid `max_results` option: value must be != 0 "
-        r"\[tflite::support::TfLiteSupportStatus='2'\]"):
-      base_options = _BaseOptions(model_file=_ExternalFile(file_name=self.model_path))
-      classification_options = classification_options_pb2.ClassificationOptions(
-        max_results=0)
-      options = _ImageClassifierOptions(
-        base_options=base_options, classification_options=classification_options)
-      _ImageClassifier.create_from_options(options)
-
   @parameterized.parameters(
     (
       ModelFileType.FILE_NAME, 3,
