@@ -20,9 +20,7 @@ py_test(
         "//tensorflow_lite_support/python/task/vision:image_embedder",
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
         "//tensorflow_lite_support/python/test:test_util",
-        "//testing/pybase",
         "@absl_py//absl/testing:parameterized",
-        "@pybind11_abseil//pybind11_abseil:status",
     ],
 )
 
