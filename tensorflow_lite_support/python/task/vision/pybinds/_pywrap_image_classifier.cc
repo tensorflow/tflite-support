@@ -29,7 +29,7 @@ namespace {
 namespace py = ::pybind11;
 }  // namespace
 
-PYBIND11_MODULE(image_classifier, m) {
+PYBIND11_MODULE(_pywrap_image_classifier, m) {
   // python wrapper for C++ ImageClassifier class which shouldn't be directly
   // used by the users.
   pybind11::google::ImportStatusModule();
