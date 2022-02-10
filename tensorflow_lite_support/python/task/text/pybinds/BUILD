@@ -15,9 +15,9 @@ py_library(
 )
 
 pybind_extension(
-    name = "text_embedder",
+    name = "_pywrap_text_embedder",
     srcs = [
-        "text_embedder.cc",
+        "_pywrap_text_embedder.cc",
     ],
     module_name = "_pywrap_text_embedder",
     deps = [
