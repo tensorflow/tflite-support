@@ -65,14 +65,7 @@ class ImageClassifier(object):
     proto_options.base_options.CopyFrom(
         task_utils.ConvertToProtoBaseOptions(options.base_options))
 
-    # if options.classification_options:
-    #   classification_options = proto_options.classification_options.add()
-    #   classification_options.CopyFrom(options.classification_options)
-    # TODO: Revert to this once
-    # //tensorflow_lite_support/cc/task/vision/proto/image_classifier_options.proto
-    # is updated with a self-contained ClassificationOptions proto
-
-    # Updates values from classifier_options.
+    # Updates values from classification_options.
     if options.classification_options:
       if options.classification_options.display_names_locale is not None:
         proto_options.display_names_locale = options.classification_options.display_names_locale
