@@ -15,9 +15,9 @@ py_library(
 )
 
 pybind_extension(
-    name = "image_embedder",
+    name = "_pywrap_image_embedder",
     srcs = [
-        "image_embedder.cc",
+        "_pywrap_image_embedder.cc",
     ],
     module_name = "_pywrap_image_embedder",
     deps = [
@@ -40,9 +40,9 @@ py_library(
 )
 
 pybind_extension(
-    name = "image_classifier",
+    name = "_pywrap_image_classifier",
     srcs = [
-        "image_classifier.cc",
+        "_pywrap_image_classifier.cc",
     ],
     module_name = "_pywrap_image_classifier",
     deps = [
