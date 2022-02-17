@@ -102,15 +102,15 @@ TfLiteSegmentation partial_deep_lab_v3_segmentation =
     CreatePartialDeepLabV3Segmentation();
 
 // Checks that the two provided `TfLiteSegmentation`s are equal.
-void ExpectApproximatelyEqual(const TfLiteSegmentation& actual,
+void ExpectPartiallyEqual(const TfLiteSegmentation& actual,
                               const TfLiteSegmentation& expected) {
   EXPECT_EQ(actual.height, expected.height);
   EXPECT_EQ(actual.width, expected.width);
   for (int i = 0; i < actual.colored_labels_size; i++) {
-    EXPECT_THAT(actual.colored_labels[i].r, expected.colored_labels[i].r);
-    EXPECT_THAT(actual.colored_labels[i].g, expected.colored_labels[i].g);
-    EXPECT_THAT(actual.colored_labels[i].b, expected.colored_labels[i].b);
-    EXPECT_THAT(actual.colored_labels[i].label,
+    EXPECT_EQ(actual.colored_labels[i].r, expected.colored_labels[i].r);
+    EXPECT_EQ(actual.colored_labels[i].g, expected.colored_labels[i].g);
+    EXPECT_EQ(actual.colored_labels[i].b, expected.colored_labels[i].b);
+    EXPECT_EQ(actual.colored_labels[i].label,
                 expected.colored_labels[i].label);
   }
 }
@@ -255,7 +255,7 @@ TEST_F(ImageSegmenterDefaultSegmentTest, SucceedsWithCategoryMask) {
   EXPECT_NE(segmentation_result->segmentations, nullptr);
   EXPECT_NE(segmentation_result->segmentations[0].category_mask, nullptr);
 
-  ExpectApproximatelyEqual(partial_deep_lab_v3_segmentation,
+  ExpectPartiallyEqual(partial_deep_lab_v3_segmentation,
                            segmentation_result->segmentations[0]);
 
   // Load golden mask output.
@@ -302,7 +302,7 @@ TEST_F(ImageSegmenterDefaultSegmentTest,
   EXPECT_NE(segmentation_result->segmentations, nullptr);
   EXPECT_NE(segmentation_result->segmentations[0].category_mask, nullptr);
 
-  ExpectApproximatelyEqual(partial_deep_lab_v3_segmentation,
+  ExpectPartiallyEqual(partial_deep_lab_v3_segmentation,
                            segmentation_result->segmentations[0]);
 
   // Load golden mask output.
