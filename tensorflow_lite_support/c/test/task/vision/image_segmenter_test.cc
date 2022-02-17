@@ -219,7 +219,7 @@ TEST_F(ImageSegmenterFromOptionsTest, FailsWithUnspecifiedOutputTypeAndError) {
   if (error) TfLiteSupportErrorDelete(error);
 }
 
-class ImageSegmenterDefaultSegmentTest : public tflite_shims::testing::Test {
+class ImageSegmenterSegmentTest : public tflite_shims::testing::Test {
  protected:
   void SetUp() override {
     std::string model_path =
@@ -235,7 +235,7 @@ class ImageSegmenterDefaultSegmentTest : public tflite_shims::testing::Test {
   TfLiteImageSegmenter* image_segmenter;
 };
 
-TEST_F(ImageSegmenterDefaultSegmentTest, SucceedsWithCategoryMask) {
+TEST_F(ImageSegmenterSegmentTest, SucceedsWithCategoryMask) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
                                LoadImage("segmentation_input_rotation0.jpg"));
 
@@ -280,7 +280,7 @@ TEST_F(ImageSegmenterDefaultSegmentTest, SucceedsWithCategoryMask) {
   TfLiteSegmentationResultDelete(segmentation_result);
 }
 
-TEST_F(ImageSegmenterDefaultSegmentTest,
+TEST_F(ImageSegmenterSegmentTest,
        SucceedsWithCategoryMaskAndOrientation) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(
       ImageData image_data,
