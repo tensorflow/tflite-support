@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Classifier options protobuf."""
+"""ImageClassifierOptions protobuf."""
 
 from tensorflow_lite_support.cc.task.vision.proto import image_classifier_options_pb2 as classifier_options_pb2
 
