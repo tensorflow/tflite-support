@@ -15,14 +15,43 @@
 
 import dataclasses
 
+from typing import Optional
+
+
+@dataclasses.dataclass
+class ExternalFile:
+  """Represents external files used by the Task APIs.
+
+  The files can be specified by one of the following
+  two ways:
+
+  (1) file contents loaded in `file_content`.
+  (2) file path in `file_name`.
+
+  If more than one field of these fields is provided, they are used in this
+  precedence order.
+  """
+  # The file contents as a byte array.
+  file_content: Optional[bytearray] = None
+
+  # The path to the file to open and mmap in memory.
+  file_name: Optional[str] = None
+
 
 @dataclasses.dataclass
 class BaseOptions:
   """Base options that is used for creation of any type of task."""
-  # Path to the model.
-  model_file: str
+  # The external model file, as a single standalone TFLite file. It could be
+  # packed with TFLite Model Metadata[1] and associated files if exist. Failure
+  # to provide the necessary metadata and associated files might result in
+  # errors.
+  # Check the documentation for each task about the specific requirement.
+  # [1]: https://www.tensorflow.org/lite/convert/metadata
+  model_file: ExternalFile
+
   # Number of thread: the defaule value -1 means Interpreter will decide what
   # is the most appropriate num_threads.
   num_threads: int = -1
+
   # If true, inference will be delegated to a connected Coral Edge TPU device.
   use_coral: bool = False

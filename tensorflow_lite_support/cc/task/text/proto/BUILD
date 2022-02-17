@@ -1,4 +1,4 @@
-load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_cc_proto_library")
+load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_cc_proto_library", "support_py_proto_library")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -115,4 +115,15 @@ proto_library(
 support_cc_proto_library(
     name = "text_embedder_options_cc_proto",
     deps = [":text_embedder_options_proto"],
+)
+
+support_py_proto_library(
+    name = "text_embedder_options_py_pb2",
+    srcs = ["text_embedder_options.proto"],
+    api_version = 2,
+    proto_deps = [":text_embedder_options_proto"],
+    py_proto_deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_py_pb2",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_py_pb2",
+    ],
 )

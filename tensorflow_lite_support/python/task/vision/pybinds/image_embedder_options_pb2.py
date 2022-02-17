@@ -11,10 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Embedding result protobuf."""
+"""ImageEmbedderOptions protobuf."""
 
-from tensorflow_lite_support.cc.task.vision.proto import embeddings_pb2
+from tensorflow_lite_support.cc.task.vision.proto import image_embedder_options_pb2 as embedder_options_pb2
 
-FeatureVector = embeddings_pb2.FeatureVector
-Embedding = embeddings_pb2.Embedding
-EmbeddingResult = embeddings_pb2.EmbeddingResult
+ImageEmbedderOptions = embedder_options_pb2.ImageEmbedderOptions

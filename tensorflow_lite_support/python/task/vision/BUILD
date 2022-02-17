@@ -1,4 +1,3 @@
-# Placeholder for internal Python strict test compatibility macro.
 # Placeholder for internal Python strict library compatibility macro.
 
 package(
@@ -14,31 +13,30 @@ py_library(
     deps = [
         "//tensorflow_lite_support/python/task/core:task_options",
         "//tensorflow_lite_support/python/task/core/proto:configuration_pb2",
-        "//tensorflow_lite_support/python/task/processor:processor_options",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:embedding_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:embeddings_pb2",
-        "//tensorflow_lite_support/python/task/processor/proto:image_embedder_options_pb2",
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
         "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
-        "//tensorflow_lite_support/python/task/vision/pybinds:image_embedder",
+        "//tensorflow_lite_support/python/task/vision/pybinds:_pywrap_image_embedder",
+        "//tensorflow_lite_support/python/task/vision/pybinds:image_embedder_options_pb2",
     ],
 )
 
-py_test(
-    name = "image_embedder_test",
-    srcs = ["image_embedder_test.py"],
-    data = [
-        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
-        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
+py_library(
+    name = "image_classifier",
+    srcs = [
+        "image_classifier.py",
     ],
     deps = [
-        ":image_embedder",
         "//tensorflow_lite_support/python/task/core:task_options",
-        "//tensorflow_lite_support/python/task/processor:processor_options",
+        "//tensorflow_lite_support/python/task/core:task_utils",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
-        "//tensorflow_lite_support/python/task/processor/proto:embeddings_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:classification_options_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
-        "//tensorflow_lite_support/python/test:test_util",
-        "@absl_py//absl/testing:parameterized",
+        "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
+        "//tensorflow_lite_support/python/task/vision/pybinds:_pywrap_image_classifier",
+        "//tensorflow_lite_support/python/task/vision/pybinds:image_classifier_options_pb2",
     ],
 )
