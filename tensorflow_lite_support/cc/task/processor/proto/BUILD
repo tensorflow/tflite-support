@@ -91,3 +91,27 @@ java_lite_proto_library(
     name = "embedding_options_java_proto_lite",
     deps = [":embedding_options_proto"],
 )
+
+proto_library(
+    name = "detection_options_proto",
+    srcs = ["detection_options.proto"],
+)
+
+cc_proto_library(
+    name = "detection_options_cc_proto",
+    deps = [
+        ":detection_options_proto",
+    ],
+)
+
+support_py_proto_library(
+    name = "detection_options_py_pb2",
+    srcs = ["detection_options.proto"],
+    api_version = 2,
+    proto_deps = [":detection_options_proto"],
+)
+
+java_lite_proto_library(
+    name = "detection_options_java_proto_lite",
+    deps = [":detection_options_proto"],
+)

@@ -46,3 +46,19 @@ py_library(
         "//tensorflow_lite_support/cc/task/processor/proto:classification_options_py_pb2",
     ],
 )
+
+py_library(
+    name = "detections_pb2",
+    srcs = ["detections_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/vision/proto:detections_py_pb2",
+    ],
+)
+
+py_library(
+    name = "detection_options_pb2",
+    srcs = ["detection_options_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:detection_options_py_pb2",
+    ],
+)
