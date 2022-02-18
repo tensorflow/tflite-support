@@ -176,7 +176,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
       # Should never happen
       raise ValueError('model_file_type is invalid.')
 
-    classifier = self.create_detector_from_options(
+    detector = self.create_detector_from_options(
       model_file=model_file, score_threshold=score_threshold)
 
     # Loads image.
@@ -184,7 +184,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
         test_util.get_test_data_path('cats_and_dogs.jpg'))
 
     # Performs object detection on the input.
-    image_result = classifier.detect(image)
+    image_result = detector.detect(image)
     image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
     # Builds test data.
