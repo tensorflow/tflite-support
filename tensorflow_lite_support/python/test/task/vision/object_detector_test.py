@@ -101,67 +101,67 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
         }
       ]
     ), (
+      {
+        'origin_x': 261, 'origin_y': 394, 'width': 179, 'height': 209
+      }, [
         {
-          'origin_x': 261, 'origin_y': 394, 'width': 179, 'height': 209
-        }, [
-          {
-            'index': 16,
-            'score': 0.5625,
-            'class_name': 'cat'
-          }
-        ]
+          'index': 16,
+          'score': 0.5625,
+          'class_name': 'cat'
+        }
+      ]
     ), (
+      {
+        'origin_x': 389, 'origin_y': 197, 'width': 276, 'height': 409
+      }, [
         {
-          'origin_x': 389, 'origin_y': 197, 'width': 276, 'height': 409
-        }, [
-          {
-            'index': 17,
-            'score': 0.51171875,
-            'class_name': 'dog'
-          }
-        ]
+          'index': 17,
+          'score': 0.51171875,
+          'class_name': 'dog'
+        }
+      ]
     )
   ]), (ModelFileType.FILE_CONTENT, 0.5, [
     (
+      {
+        'origin_x': 54, 'origin_y': 396, 'width': 393, 'height': 196
+      }, [
         {
-          'origin_x': 54, 'origin_y': 396, 'width': 393, 'height': 196
-        }, [
-          {
-            'index': 16,
-            'score': 0.64453125,
-            'class_name': 'cat'
-          }
-        ]
+          'index': 16,
+          'score': 0.64453125,
+          'class_name': 'cat'
+        }
+      ]
     ), (
+      {
+        'origin_x': 602, 'origin_y': 157, 'width': 394, 'height': 447
+      }, [
         {
-          'origin_x': 602, 'origin_y': 157, 'width': 394, 'height': 447
-        }, [
-          {
-            'index': 16,
-            'score': 0.59765625,
-            'class_name': 'cat'
-          }
-        ]
+          'index': 16,
+          'score': 0.59765625,
+          'class_name': 'cat'
+        }
+      ]
     ), (
+      {
+        'origin_x': 261, 'origin_y': 394, 'width': 179, 'height': 209
+      }, [
         {
-          'origin_x': 261, 'origin_y': 394, 'width': 179, 'height': 209
-        }, [
-          {
-            'index': 16,
-            'score': 0.5625,
-            'class_name': 'cat'
-          }
-        ]
+          'index': 16,
+          'score': 0.5625,
+          'class_name': 'cat'
+        }
+      ]
     ), (
+      {
+        'origin_x': 389, 'origin_y': 197, 'width': 276, 'height': 409
+      }, [
         {
-          'origin_x': 389, 'origin_y': 197, 'width': 276, 'height': 409
-        }, [
-          {
-            'index': 17,
-            'score': 0.51171875,
-            'class_name': 'dog'
-          }
-        ]
+          'index': 17,
+          'score': 0.51171875,
+          'class_name': 'dog'
+        }
+      ]
     )
   ]))
   def test_detect_model(self, model_file_type, score_threshold, expected_detections):
