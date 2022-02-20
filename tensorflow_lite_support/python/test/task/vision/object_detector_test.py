@@ -57,7 +57,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
         **detection_options)
     options = _ObjectDetectorOptions(
         base_options=base_options,
-      detection_options=detection_options)
+        detection_options=detection_options)
     detector = _ObjectDetector.create_from_options(options)
     return detector
 
