@@ -99,6 +99,7 @@ typedef struct TfLiteImageSegmenter TfLiteImageSegmenter;
 // perform on the raw model results (see TfLiteSegmentationResult for more).
 enum TfLiteImageSegmenterOutputType {
   kUnspecified,
+
   // Gives a single output mask where each pixel represents the class which
   // the pixel in the original image was predicted to belong to.
   kCategoryMask,

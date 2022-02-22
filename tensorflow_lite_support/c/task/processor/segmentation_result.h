@@ -39,7 +39,6 @@ typedef struct TfLiteColoredLabel {
   // the TFLite Model Metadata. See `display_names_locale` field in
   // ImageSegmenterOptions.
   char* display_name;
-
 } TfLiteColoredLabel;
 
 // Holds a resulting segmentation mask and associated metadata.
@@ -75,6 +74,10 @@ typedef struct TfLiteSegmentation {
   // class to which the pixel belongs.
   uint8_t* category_mask;
 
+  // Number of colored labels which is equivalent to number of classes
+  // supported by the model.
+  uint8_t colored_labels_size;
+
   // The list of colored labels for all the supported categories (classes).
   // Depending on which is present, this list is in 1:1 correspondence with:
   // * `category_mask` pixel values, i.e. a pixel with value `i` is
@@ -82,7 +85,6 @@ typedef struct TfLiteSegmentation {
   // * `confidence_masks` indices, i.e. `confidence_masks[i]` is associated with
   //   `colored_labels[i]`.
   TfLiteColoredLabel* colored_labels;
-
 } TfLiteSegmentation;
 
 // Holds Image Segmentation Results.
@@ -99,7 +101,7 @@ typedef struct TfLiteSegmentationResult {
   TfLiteSegmentation* segmentations;
 } TfLiteSegmentationResult;
 
-// Frees up the TfLiteSegmentationResult Structure.
+// Frees up the TfLiteSegmentationResult structure.
 void TfLiteSegmentationResultDelete(
     TfLiteSegmentationResult* segmentation_result);
 
