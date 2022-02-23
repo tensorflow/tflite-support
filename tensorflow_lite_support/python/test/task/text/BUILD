@@ -15,7 +15,6 @@ py_test(
     deps = [
         "//tensorflow_lite_support/python/task/core:task_options",
         "//tensorflow_lite_support/python/task/processor/proto:embedding_options_pb2",
-        "//tensorflow_lite_support/python/task/processor/proto:embeddings_pb2",
         "//tensorflow_lite_support/python/task/text:text_embedder",
         "//tensorflow_lite_support/python/test:test_util",
         "@absl_py//absl/testing:parameterized",

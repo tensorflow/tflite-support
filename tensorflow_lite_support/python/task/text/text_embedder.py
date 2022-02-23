@@ -14,7 +14,7 @@
 """Text embedder task."""
 
 import dataclasses
-from typing import Optional
+from typing import Any, Optional
 
 from tensorflow_lite_support.python.task.core import task_options
 from tensorflow_lite_support.python.task.core import task_utils
@@ -33,13 +33,29 @@ class TextEmbedderOptions:
   base_options: task_options.BaseOptions
   embedding_options: Optional[embedding_options_pb2.EmbeddingOptions] = None
 
+  def __eq__(self, other: Any) -> bool:
+    if (not isinstance(other, self.__class__) or
+        self.base_options != other.base_options):
+      return False
+
+    if self.embedding_options is None and other.embedding_options is None:
+      return True
+    elif (self.embedding_options and other.embedding_options and
+          self.embedding_options.SerializeToString()
+          == self.embedding_options.SerializeToString()):
+      return True
+    else:
+      return False
+
 
 class TextEmbedder(object):
   """Class that performs dense feature vector extraction on text."""
 
-  def __init__(self, embedder: _CppTextEmbedder) -> None:
+  def __init__(self, options: TextEmbedderOptions,
+               cpp_embedder: _CppTextEmbedder) -> None:
     """Initializes the `TextEmbedder` object."""
-    self._embedder = embedder
+    self._options = options
+    self._embedder = cpp_embedder
 
   @classmethod
   def create_from_options(cls, options: TextEmbedderOptions) -> "TextEmbedder":
@@ -52,6 +68,7 @@ class TextEmbedder(object):
       `TextEmbedder` object that's created from `options`.
 
     Raises:
+      TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
       status.StatusNotOk if failed to create `TextEmbdder` object from
         `TextEmbedderOptions` such as missing the model. Need to import the
         module to catch this error: `from pybind11_abseil import status`, see
@@ -65,8 +82,7 @@ class TextEmbedder(object):
       embedding_options = proto_options.embedding_options.add()
       embedding_options.CopyFrom(options.embedding_options)
     embedder = _CppTextEmbedder.create_from_options(proto_options)
-
-    return cls(embedder)
+    return cls(options, embedder)
 
   def embed(self, text: str) -> embeddings_pb2.EmbeddingResult:
     """Performs actual feature vector extraction on the provided text.
@@ -105,3 +121,11 @@ class TextEmbedder(object):
   def number_of_output_layers(self) -> int:
     """Gets the number of output layers of the model."""
     return self._embedder.get_number_of_output_layers()
+
+  def __eq__(self, other: Any) -> bool:
+    return (isinstance(other, self.__class__) and
+            self._options == other._options)
+
+  @property
+  def options(self) -> TextEmbedderOptions:
+    return self._options
