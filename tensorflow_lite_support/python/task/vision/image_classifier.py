@@ -42,11 +42,11 @@ class ImageClassifierOptions:
         self.base_options != other.base_options):
       return False
 
-    if self.embedding_options is None and other.embedding_options is None:
+    if self.classification_options is None and other.classification_options is None:
       return True
-    elif (self.embedding_options and other.embedding_options and
-          self.embedding_options.SerializeToString()
-          == self.embedding_options.SerializeToString()):
+    elif (self.classification_options and other.classification_options and
+          self.classification_options.SerializeToString()
+          == self.classification_options.SerializeToString()):
       return True
     else:
       return False
