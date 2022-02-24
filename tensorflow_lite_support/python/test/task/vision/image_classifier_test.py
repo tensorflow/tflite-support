@@ -282,8 +282,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
         r"\[tflite::support::TfLiteSupportStatus='2'\]"):
       base_options = _BaseOptions(model_file=_ExternalFile(file_name=self.model_path))
       classification_options = classification_options_pb2.ClassificationOptions(
-        class_name_allowlist=['foo'],
-        class_name_denylist=['bar'])
+        class_name_allowlist=['foo'], class_name_denylist=['bar'])
       options = _ImageClassifierOptions(
         base_options=base_options, classification_options=classification_options)
       _ImageClassifier.create_from_options(options)
