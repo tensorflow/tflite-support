@@ -36,7 +36,13 @@ _ExternalFile = task_options.ExternalFile
 _ImageClassifier = image_classifier.ImageClassifier
 _ImageClassifierOptions = image_classifier.ImageClassifierOptions
 
-_MODEL_FLOAT = 'mobilenet_v2_1.0_224.tflite'
+_MODEL_FILE = 'mobilenet_v2_1.0_224.tflite'
+_IMAGE_FILE = 'burger.jpg'
+_ALLOW_LIST = ['cheeseburger', 'guacamole']
+_DENY_LIST = ['cheeseburger']
+_SCORE_THRESHOLD = 0.5
+_MAX_RESULTS = 3
+_ACCEPTABLE_ERROR_RANGE = 0.000001
 
 
 class ModelFileType(enum.Enum):
@@ -48,8 +54,8 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def setUp(self):
     super().setUp()
-    self.test_image_path = test_util.get_test_data_path('burger.jpg')
-    self.model_path = test_util.get_test_data_path(_MODEL_FLOAT)
+    self.test_image_path = test_util.get_test_data_path(_IMAGE_FILE)
+    self.model_path = test_util.get_test_data_path(_MODEL_FILE)
 
   @staticmethod
   def create_classifier_from_options(model_file, **classification_options):
@@ -162,7 +168,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
     # Comparing results (classification w/o bounding box).
     self.assertDeepAlmostEqual(
-        image_result_dict, expected_result_dict, places=5)
+        image_result_dict, expected_result_dict, delta=_ACCEPTABLE_ERROR_RANGE)
 
   def test_classify_model_with_bounding_box(self):
     # Creates classifier.
@@ -193,14 +199,34 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     expected_result_dict = self.build_test_data(expected_categories)
 
     # Comparing results (classification w/ bounding box).
-    self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
+    self.assertDeepAlmostEqual(
+      image_result_dict, expected_result_dict, delta=_ACCEPTABLE_ERROR_RANGE)
+
+  def test_max_results_option(self):
+    # Creates classifier.
+    model_file = _ExternalFile(file_name=self.model_path)
+
+    classifier = self.create_classifier_from_options(
+      model_file, max_results=_MAX_RESULTS)
+
+    # Loads image.
+    image = tensor_image.TensorImage.from_file(self.test_image_path)
+
+    # Classifies the input.
+    image_result = classifier.classify(image, bounding_box=None)
+    image_result_dict = json.loads(json_format.MessageToJson(image_result))
+
+    categories = image_result_dict['classifications'][0]['classes']
+
+    self.assertLessEqual(
+      len(categories), _MAX_RESULTS, 'Too many results returned.')
 
   def test_score_threshold_option(self):
     # Creates classifier.
     model_file = _ExternalFile(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
-      model_file, score_threshold=0.5)
+      model_file, score_threshold=_SCORE_THRESHOLD)
 
     # Loads image.
     image = tensor_image.TensorImage.from_file(self.test_image_path)
@@ -209,23 +235,21 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     image_result = classifier.classify(image, bounding_box=None)
     image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
-    # Expected results.
-    expected_categories = [
-      {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"}
-    ]
+    categories = image_result_dict['classifications'][0]['classes']
 
-    # Builds test data.
-    expected_result_dict = self.build_test_data(expected_categories)
-
-    # Comparing results.
-    self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
+    for category in categories:
+      score = category['score']
+      self.assertGreaterEqual(
+        score, _SCORE_THRESHOLD,
+        'Classification with score lower than threshold found. {0}'.format(
+          category))
 
   def test_allowlist_option(self):
     # Creates classifier.
     model_file = _ExternalFile(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
-      model_file, class_name_allowlist=['cheeseburger', 'guacamole'])
+      model_file, class_name_allowlist=_ALLOW_LIST)
 
     # Loads image.
     image = tensor_image.TensorImage.from_file(self.test_image_path)
@@ -234,24 +258,20 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     image_result = classifier.classify(image, bounding_box=None)
     image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
-    # Expected results.
-    expected_categories = [
-      {'index': 934, 'score': 0.7399742007255554, 'class_name': "cheeseburger"},
-      {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"}
-    ]
+    categories = image_result_dict['classifications'][0]['classes']
 
-    # Builds test data.
-    expected_result_dict = self.build_test_data(expected_categories)
-
-    # Comparing results.
-    self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
+    for category in categories:
+      label = category['className']
+      self.assertIn(
+        label, _ALLOW_LIST,
+        'Label "{0}" found but not in label allow list'.format(label))
 
   def test_denylist_option(self):
     # Creates classifier.
     model_file = _ExternalFile(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
-      model_file, score_threshold=0.01, class_name_denylist=['cheeseburger'])
+      model_file, score_threshold=0.01, class_name_denylist=_DENY_LIST)
 
     # Loads image
     image = tensor_image.TensorImage.from_file(self.test_image_path)
@@ -260,18 +280,12 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     image_result = classifier.classify(image, bounding_box=None)
     image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
-    # Expected results.
-    expected_categories = [
-      {'index': 925, 'score': 0.026928534731268883, 'class_name': "guacamole"},
-      {'index': 932, 'score': 0.025737214833498, 'class_name': "bagel"},
-      {'index': 963, 'score': 0.010005592368543148, 'class_name': "meat loaf"}
-    ]
+    categories = image_result_dict['classifications'][0]['classes']
 
-    # Builds test data.
-    expected_result_dict = self.build_test_data(expected_categories)
-
-    # Comparing results.
-    self.assertDeepAlmostEqual(image_result_dict, expected_result_dict, places=5)
+    for category in categories:
+      label = category['className']
+      self.assertNotIn(label, _DENY_LIST,
+                       'Label "{0}" found but in deny list.'.format(label))
 
   def test_combined_allowlist_and_denylist(self):
     # Fails with combined allowlist and denylist
