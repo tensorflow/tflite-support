@@ -23,10 +23,15 @@ strip_c_api_include_path_prefix(
         "//tensorflow_lite_support/c/task/text:nl_classifier_common.h",
         "//tensorflow_lite_support/c/task/text:bert_question_answerer.h",
         "//tensorflow_lite_support/c/task/vision:image_classifier.h",
+        "//tensorflow_lite_support/c/task/vision:object_detector.h",
+        "//tensorflow_lite_support/c/task/vision:image_segmenter.h",
         "//tensorflow_lite_support/c/task/processor:bounding_box.h",
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer.h",
         "//tensorflow_lite_support/c/task/processor:classification_result.h",
+        "//tensorflow_lite_support/c/task/processor:detection_result.h",
+        "//tensorflow_lite_support/c/task/processor:segmentation_result.h",
         "//tensorflow_lite_support/c/task/processor:classification_options.h",
+        "//tensorflow_lite_support/c/task/processor:category.h",
         "//tensorflow_lite_support/c/task/core:base_options.h",
         "//tensorflow_lite_support/c:common.h",
     ],
@@ -66,17 +71,61 @@ tflite_ios_framework(
     hdrs = [
         ":base_options.h",
         ":bounding_box.h",
+        ":category.h",
         ":classification_options.h",
         ":classification_result.h",
+        ":detection_result.h",
+        ":segmentation_result.h",
         ":common.h",
         ":frame_buffer.h",
         ":image_classifier.h",
+        ":object_detector.h",
+        ":image_segmenter.h",
     ],
     allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
     bundle_name = "TensorFlowLiteTaskVisionC",
     minimum_os_version = TFL_MINIMUM_OS_VERSION,
     deps = [
         "//tensorflow_lite_support/c/task/vision:image_classifier",
+        "//tensorflow_lite_support/c/task/vision:object_detector",
+        "//tensorflow_lite_support/c/task/vision:image_segmenter",
+    ],
+)
+
+tflite_ios_framework(
+    name = "TensorFlowLiteTaskObjectDetector_framework",
+    hdrs = [
+        ":base_options.h",
+        ":classification_options.h",
+        ":detection_result.h",
+        ":bounding_box.h",
+        ":category.h",
+        ":common.h",
+        ":frame_buffer.h",
+        ":object_detector.h",
+    ],
+    allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
+    bundle_name = "TensorFlowLiteTaskObjectDetectorC",
+    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    deps = [
+        "//tensorflow_lite_support/c/task/vision:object_detector",
+    ],
+)
+
+tflite_ios_framework(
+    name = "TensorFlowLiteTaskImageSegmenterC_framework",
+    hdrs = [
+        ":base_options.h",
+        ":segmentation_result.h",
+        ":common.h",
+        ":frame_buffer.h",
+        ":image_segmenter.h",
+    ],
+    allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
+    bundle_name = "TensorFlowLiteTaskImageSegmenterC",
+    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    deps = [
+        "//tensorflow_lite_support/c/task/vision:image_segmenter",
     ],
 )
 
