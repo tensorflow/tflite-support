@@ -68,8 +68,8 @@ cc_test_with_tflite(
     ],
     deps = [
         "//tensorflow_lite_support/c:common",
-        "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/c/task/processor:segmentation_result",
+        "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/cc/port:gtest_main",
         "//tensorflow_lite_support/cc/test:test_utils",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",

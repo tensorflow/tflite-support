@@ -17,6 +17,8 @@ limitations under the License.
 
 #include <string.h>
 
+#include <cstdio>
+
 #include "tensorflow/lite/core/shims/cc/shims_test_util.h"
 #include "tensorflow_lite_support/c/common.h"
 #include "tensorflow_lite_support/c/task/processor/segmentation_result.h"
@@ -33,6 +35,7 @@ namespace vision {
 namespace {
 
 using ::testing::HasSubstr;
+using ::testing::StrEq;
 using ::tflite::support::StatusOr;
 using ::tflite::task::JoinPath;
 
@@ -43,8 +46,8 @@ constexpr char kTestDataDirectory[] =
 constexpr char kDeepLabV3[] = "deeplabv3.tflite";
 
 StatusOr<ImageData> LoadImage(const char* image_name) {
-  return DecodeImageFromFile(
-      JoinPath("./" /*test src dir*/, kTestDataDirectory, image_name));
+  return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
+                                      kTestDataDirectory, image_name));
 }
 
 // The maximum fraction of pixels in the candidate mask that can have a
@@ -57,7 +60,7 @@ constexpr float kGoldenMaskTolerance = 1e-2;
 constexpr int kGoldenMaskMagnificationFactor = 10;
 
 void InitializeColoredLabel(TfLiteColoredLabel& colored_label, uint8_t r,
-                            uint8_t g, uint8_t b, char* label) {
+                            uint8_t g, uint8_t b, const char* label) {
   colored_label.r = r;
   colored_label.g = g;
   colored_label.b = b;
@@ -68,6 +71,7 @@ void InitializeColoredLabel(TfLiteColoredLabel& colored_label, uint8_t r,
 TfLiteSegmentation CreatePartialDeepLabV3Segmentation() {
   TfLiteSegmentation segmentation = {.width = 257, .height = 257};
   segmentation.colored_labels = new TfLiteColoredLabel[21];
+  segmentation.colored_labels_size = 21;
   InitializeColoredLabel(segmentation.colored_labels[0], 0, 0, 0, "background");
   InitializeColoredLabel(segmentation.colored_labels[1], 128, 0, 0,
                          "aeroplane");
@@ -103,15 +107,15 @@ TfLiteSegmentation partial_deep_lab_v3_segmentation =
 
 // Checks that the two provided `TfLiteSegmentation`s are equal.
 void ExpectPartiallyEqual(const TfLiteSegmentation& actual,
-                              const TfLiteSegmentation& expected) {
+                          const TfLiteSegmentation& expected) {
   EXPECT_EQ(actual.height, expected.height);
   EXPECT_EQ(actual.width, expected.width);
   for (int i = 0; i < actual.colored_labels_size; i++) {
     EXPECT_EQ(actual.colored_labels[i].r, expected.colored_labels[i].r);
     EXPECT_EQ(actual.colored_labels[i].g, expected.colored_labels[i].g);
     EXPECT_EQ(actual.colored_labels[i].b, expected.colored_labels[i].b);
-    EXPECT_EQ(actual.colored_labels[i].label,
-                expected.colored_labels[i].label);
+    EXPECT_THAT(actual.colored_labels[i].label,
+                StrEq(expected.colored_labels[i].label));
   }
 }
 
@@ -167,8 +171,8 @@ TEST_F(ImageSegmenterFromOptionsTest, FailsWithMissingModelPathAndError) {
 }
 
 TEST_F(ImageSegmenterFromOptionsTest, SucceedsWithModelPath) {
-  std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory, kDeepLabV3);
+  std::string model_path = JoinPath("./" /*test src dir*/,
+                                    kTestDataDirectory, kDeepLabV3);
 
   TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
@@ -182,8 +186,8 @@ TEST_F(ImageSegmenterFromOptionsTest, SucceedsWithModelPath) {
 }
 
 TEST_F(ImageSegmenterFromOptionsTest, SucceedsWithNumberOfThreadsAndError) {
-  std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory, kDeepLabV3);
+  std::string model_path = JoinPath("./" /*test src dir*/,
+                                    kTestDataDirectory, kDeepLabV3);
 
   TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
@@ -201,8 +205,8 @@ TEST_F(ImageSegmenterFromOptionsTest, SucceedsWithNumberOfThreadsAndError) {
 }
 
 TEST_F(ImageSegmenterFromOptionsTest, FailsWithUnspecifiedOutputTypeAndError) {
-  std::string model_path =
-      JoinPath("./" /*test src dir*/, kTestDataDirectory, kDeepLabV3);
+  std::string model_path = JoinPath("./" /*test src dir*/,
+                                    kTestDataDirectory, kDeepLabV3);
 
   TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
   options.base_options.model_file.file_path = model_path.data();
@@ -222,8 +226,8 @@ TEST_F(ImageSegmenterFromOptionsTest, FailsWithUnspecifiedOutputTypeAndError) {
 class ImageSegmenterSegmentTest : public tflite_shims::testing::Test {
  protected:
   void SetUp() override {
-    std::string model_path =
-        JoinPath("./" /*test src dir*/, kTestDataDirectory, kDeepLabV3);
+    std::string model_path = JoinPath("./" /*test src dir*/,
+                                      kTestDataDirectory, kDeepLabV3);
 
     TfLiteImageSegmenterOptions options = TfLiteImageSegmenterOptionsCreate();
     options.base_options.model_file.file_path = model_path.data();
@@ -237,7 +241,7 @@ class ImageSegmenterSegmentTest : public tflite_shims::testing::Test {
 
 TEST_F(ImageSegmenterSegmentTest, SucceedsWithCategoryMask) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
-                               LoadImage("segmentation_input_rotation0.jpg"));
+                       LoadImage("segmentation_input_rotation0.jpg"));
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
@@ -256,11 +260,11 @@ TEST_F(ImageSegmenterSegmentTest, SucceedsWithCategoryMask) {
   EXPECT_NE(segmentation_result->segmentations[0].category_mask, nullptr);
 
   ExpectPartiallyEqual(partial_deep_lab_v3_segmentation,
-                           segmentation_result->segmentations[0]);
+                       segmentation_result->segmentations[0]);
 
   // Load golden mask output.
   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData golden_mask,
-                               LoadImage("segmentation_golden_rotation0.png"));
+                       LoadImage("segmentation_golden_rotation0.png"));
 
   int inconsistent_pixels = 0;
   int num_pixels = golden_mask.height * golden_mask.width;
@@ -280,11 +284,9 @@ TEST_F(ImageSegmenterSegmentTest, SucceedsWithCategoryMask) {
   TfLiteSegmentationResultDelete(segmentation_result);
 }
 
-TEST_F(ImageSegmenterSegmentTest,
-       SucceedsWithCategoryMaskAndOrientation) {
-  SUPPORT_ASSERT_OK_AND_ASSIGN(
-      ImageData image_data,
-      LoadImage("segmentation_input_rotation90_flop.jpg"));
+TEST_F(ImageSegmenterSegmentTest, SucceedsWithCategoryMaskAndOrientation) {
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image_data,
+                       LoadImage("segmentation_input_rotation90_flop.jpg"));
 
   TfLiteFrameBuffer frame_buffer = {
       .format = kRGB,
@@ -303,12 +305,11 @@ TEST_F(ImageSegmenterSegmentTest,
   EXPECT_NE(segmentation_result->segmentations[0].category_mask, nullptr);
 
   ExpectPartiallyEqual(partial_deep_lab_v3_segmentation,
-                           segmentation_result->segmentations[0]);
+                       segmentation_result->segmentations[0]);
 
   // Load golden mask output.
-  SUPPORT_ASSERT_OK_AND_ASSIGN(
-      ImageData golden_mask,
-      LoadImage("segmentation_golden_rotation90_flop.png"));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData golden_mask,
+                       LoadImage("segmentation_golden_rotation90_flop.png"));
 
   int inconsistent_pixels = 0;
   int num_pixels = golden_mask.height * golden_mask.width;

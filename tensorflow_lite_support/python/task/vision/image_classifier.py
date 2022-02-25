@@ -57,16 +57,30 @@ class ImageClassifier(object):
     Raises:
       status.StatusNotOk if failed to create `ImageClassifier` object from
         `ImageClassifierOptions` such as missing the model. Need to import the
-        module to catch this error: `from pybind11_abseil import status`, see
+        module to catch this error: `from pybind11_abseil
+        import status`, see
         https://github.com/pybind/pybind11_abseil#abslstatusor.
     """
     # Creates the object of C++ ImageClassifier class.
     proto_options = _ProtoImageClassifierOptions()
     proto_options.base_options.CopyFrom(
         task_utils.ConvertToProtoBaseOptions(options.base_options))
+
+    # Updates values from classification_options.
     if options.classification_options:
-      classification_options = proto_options.classification_options.add()
-      classification_options.CopyFrom(options.classification_options)
+      if options.classification_options.display_names_locale:
+        proto_options.display_names_locale = options.classification_options.display_names_locale
+      if options.classification_options.max_results:
+        proto_options.max_results = options.classification_options.max_results
+      if options.classification_options.score_threshold:
+        proto_options.score_threshold = options.classification_options.score_threshold
+      if options.classification_options.class_name_allowlist:
+        proto_options.class_name_whitelist.extend(
+            options.classification_options.class_name_allowlist)
+      if options.classification_options.class_name_denylist:
+        proto_options.class_name_blacklist.extend(
+            options.classification_options.class_name_denylist)
+
     classifier = _CppImageClassifier.create_from_options(proto_options)
 
     return cls(classifier)
@@ -88,7 +102,8 @@ class ImageClassifier(object):
       classification result.
     Raises:
       status.StatusNotOk if failed to get the feature vector. Need to import the
-        module to catch this error: `from pybind11_abseil import status`, see
+        module to catch this error: `from pybind11_abseil
+        import status`, see
         https://github.com/pybind/pybind11_abseil#abslstatusor.
     """
     image_data = image_utils.ImageData(image.get_buffer())

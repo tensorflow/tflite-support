@@ -125,9 +125,10 @@ TfLiteSegmentationResult* GetSegmentationResultCStruct(
 
     c_segmentations[i].width = segmentation.width();
     c_segmentations[i].height = segmentation.height();
+    c_segmentations[i].colored_labels_size = segmentation.colored_labels_size();
 
     auto c_colored_labels =
-        new TfLiteColoredLabel[segmentation.width() * segmentation.height()]();
+        new TfLiteColoredLabel[segmentation.colored_labels_size()]();
 
     if (segmentation.has_category_mask()) {
       c_segmentations[i].category_mask =

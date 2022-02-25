@@ -80,7 +80,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/c/task/processor:segmentation_result",
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/c/task/vision/utils:frame_buffer_cpp_c_utils",
-        "//tensorflow_lite_support/cc/task/vision/proto:segmentations_proto_inc",
         "//tensorflow_lite_support/cc/task/vision/proto:image_segmenter_options_proto_inc",
+        "//tensorflow_lite_support/cc/task/vision/proto:segmentations_proto_inc",
     ],
 )
