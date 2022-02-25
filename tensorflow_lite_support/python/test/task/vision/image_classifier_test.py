@@ -141,7 +141,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     options2 = _ImageClassifierOptions(base_options=base_options2)
     classifier2 = _ImageClassifier.create_from_options(options2)
     # Checks the classifiers with same file name.
-    self.assertEqual(classifier2, classifier2)
+    self.assertEqual(classifier1, classifier2)
 
     with open(self.model_path, "rb") as f:
       model_content = f.read()
