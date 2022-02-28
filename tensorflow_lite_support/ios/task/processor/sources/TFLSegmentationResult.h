@@ -20,9 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLColoredLabel : NSObject
 
 /** The RGB color components for the label, in the [0, 255] range. */
-@property(nonatomic, assign) UInt8 r;
-@property(nonatomic, assign) UInt8 g;
-@property(nonatomic, assign) UInt8 b;
+@property(nonatomic, assign) NSUInteger r;
+@property(nonatomic, assign) NSUInteger g;
+@property(nonatomic, assign) NSUInteger b;
 
 /** The class name, as provided in the label map packed in the TFLite Model
  * Metadata.
@@ -44,13 +44,13 @@ NS_ASSUME_NONNULL_BEGIN
  * The width of the mask. This is an intrinsic parameter of the model being
  * used, and does not depend on the input image dimensions.
  */
-@property(nonatomic, assign) UInt8 width;
+@property(nonatomic, assign) NSUInteger width;
 
 /**
  *  The height of the mask. This is an intrinsic parameter of the model being
  * used, and does not depend on the input image dimensions.
  */
-@property(nonatomic, assign) UInt8 height;
+@property(nonatomic, assign) NSUInteger height;
 
 /**
  *  One confidence masks of size `width` x `height` for each of the supported
@@ -63,12 +63,12 @@ NS_ASSUME_NONNULL_BEGIN
  * The value of each pixel in this mask represents the class to which the
  * pixel belongs.
  */
-@property(nonatomic, assign, nullable) UInt8 *categoryMask;
+@property(nonatomic, assign, nullable) NSUInteger *categoryMask;
 
 /** Number of colored labels which is equivalent to number of classes
  * supported by the model.
  */
-@property(nonatomic, assign) UInt8 coloredLabelsSize;
+@property(nonatomic, assign) NSUInteger coloredLabelsSize;
 
 /**
  * The list of colored labels for all the supported categories (classes).
