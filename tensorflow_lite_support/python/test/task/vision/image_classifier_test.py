@@ -99,8 +99,8 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Invalid empty model path.
     with self.assertRaisesRegex(
         Exception,
-        r"INVALID_ARGUMENT: Expected exactly one of `base_options.model_file` or "
-        r"`model_file_with_metadata` to be provided, found 0. "
+        r"INVALID_ARGUMENT: Expected exactly one of `base_options.model_file` "
+        r"or `model_file_with_metadata` to be provided, found 0. "
         r"\[tflite::support::TfLiteSupportStatus='2']"):
       base_options = _BaseOptions(model_file=_ExternalFile(file_name=""))
       options = _ImageClassifierOptions(base_options=base_options)
@@ -294,11 +294,13 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
         r"INVALID_ARGUMENT: `class_name_whitelist` and `class_name_blacklist` "
         r"are mutually exclusive options. "
         r"\[tflite::support::TfLiteSupportStatus='2'\]"):
-      base_options = _BaseOptions(model_file=_ExternalFile(file_name=self.model_path))
+      base_options = _BaseOptions(
+        model_file=_ExternalFile(file_name=self.model_path))
       classification_options = classification_options_pb2.ClassificationOptions(
         class_name_allowlist=['foo'], class_name_denylist=['bar'])
       options = _ImageClassifierOptions(
-        base_options=base_options, classification_options=classification_options)
+        base_options=base_options,
+        classification_options=classification_options)
       _ImageClassifier.create_from_options(options)
 
 
