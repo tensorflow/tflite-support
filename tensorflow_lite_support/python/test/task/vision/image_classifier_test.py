@@ -128,6 +128,39 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     self.assertDeepAlmostEqual(
         image_result_dict, expected_result_dict, places=5)
 
+  def test_equal(self):
+    base_options1 = _BaseOptions(
+        model_file=_ExternalFile(file_name=self.model_path))
+    options1 = _ImageClassifierOptions(base_options=base_options1)
+    classifier1 = _ImageClassifier.create_from_options(options1)
+    # Checks the same classifier object.
+    self.assertEqual(classifier1, classifier1)
+
+    base_options2 = _BaseOptions(
+        model_file=_ExternalFile(file_name=self.model_path))
+    options2 = _ImageClassifierOptions(base_options=base_options2)
+    classifier2 = _ImageClassifier.create_from_options(options2)
+    # Checks the classifiers with same file name.
+    self.assertEqual(classifier1, classifier2)
+
+    with open(self.model_path, 'rb') as f:
+      model_content = f.read()
+    base_options3 = _BaseOptions(
+        model_file=_ExternalFile(file_content=model_content))
+    options3 = _ImageClassifierOptions(base_options=base_options3)
+    classifier3 = _ImageClassifier.create_from_options(options3)
+    # Checks one classifier with file_name and the other with model_content.
+    self.assertNotEqual(classifier1, classifier3)
+
+    base_options4 = _BaseOptions(
+        model_file=_ExternalFile(file_name=self.model_path))
+    options4 = _ImageClassifierOptions(base_options=base_options4)
+    options4.classification_options = classification_options_pb2.ClassificationOptions(
+        score_threshold=0.5)
+    classifier4 = _ImageClassifier.create_from_options(options4)
+    # Checks the classifiers with different classification options.
+    self.assertNotEqual(classifier1, classifier4)
+
 
 if __name__ == '__main__':
   unittest.main()
