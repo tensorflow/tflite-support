@@ -33,6 +33,7 @@ py_test(
     ],
     deps = [
         "//tensorflow_lite_support/python/task/core:task_options",
+        "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classification_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
