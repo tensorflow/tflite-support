@@ -52,7 +52,7 @@
     segmentation.height = cSegmentation.height;
     segmentation.coloredLabelsSize = cSegmentation.colored_labels_size;
 
-    if (segmentation.confidenceMasks) {
+    if (cSegmentation.confidence_masks) {
       segmentation.confidenceMasks = malloc(segmentation.coloredLabelsSize * sizeof(float *));
 
       for (int i = 0; i < segmentation.coloredLabelsSize; i++) {
@@ -61,7 +61,7 @@
         memcpy(segmentation.confidenceMasks[i], cSegmentation.confidence_masks[i],
                segmentation.width * segmentation.height);
       }
-    } else if (segmentation.categoryMask) {
+    } else if (cSegmentation.category_mask) {
       segmentation.categoryMask = malloc(segmentation.width * segmentation.height * sizeof(int));
       memcpy(segmentation.categoryMask, cSegmentation.category_mask,
              segmentation.width * segmentation.height);

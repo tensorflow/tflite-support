@@ -62,7 +62,7 @@
   return self;
 }
 
-+ (nullable instancetype)objectDetectorWithOptions:(nonnull TFLImageSegmenterOptions *)options
++ (nullable instancetype)imageSegmenterWithOptions:(nonnull TFLImageSegmenterOptions *)options
                                              error:(NSError **)error {
   TfLiteImageSegmenterOptions cOptions = TfLiteImageSegmenterOptionsCreate();
 
