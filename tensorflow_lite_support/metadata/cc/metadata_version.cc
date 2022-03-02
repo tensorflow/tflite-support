@@ -46,6 +46,7 @@ enum class SchemaMembers {
   kSubGraphMetadataOutputTensorGroups = 6,
   kProcessUnitOptionsRegexTokenizerOptions = 7,
   kContentPropertiesAudioProperties = 8,
+  kAssociatedFileTypeScannIndexFile = 9,
 };
 
 // Helper class to compare semantic versions in terms of three integers, major,
@@ -110,6 +111,8 @@ Version GetMemberVersion(SchemaMembers member) {
       return Version(1, 2, 1);
     case SchemaMembers::kContentPropertiesAudioProperties:
       return Version(1, 3, 0);
+    case SchemaMembers::kAssociatedFileTypeScannIndexFile:
+      return Version(1, 4, 0);
     default:
       // Should never happen.
       TFLITE_LOG(FATAL) << "Unsupported schema member: "
@@ -149,6 +152,12 @@ void UpdateMinimumVersionForTable<tflite::AssociatedFile>(
   if (table->type() == AssociatedFileType_VOCABULARY) {
     UpdateMinimumVersion(
         GetMemberVersion(SchemaMembers::kAssociatedFileTypeVocabulary),
+        min_version);
+  }
+
+  if (table->type() == AssociatedFileType_SCANN_INDEX_FILE) {
+    UpdateMinimumVersion(
+        GetMemberVersion(SchemaMembers::kAssociatedFileTypeScannIndexFile),
         min_version);
   }
 }
