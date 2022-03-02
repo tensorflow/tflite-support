@@ -65,6 +65,7 @@ build:elinux_aarch64 --distinct_host_configuration=true
 build:elinux_armhf --config=elinux
 build:elinux_armhf --cpu=armhf
 build:elinux_armhf --distinct_host_configuration=true
+build:elinux_armhf --copt -mfp16-format=ieee
 
 # By default, build TF in C++ 14 mode.
 build:android --cxxopt=-std=c++14
