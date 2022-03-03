@@ -28,4 +28,35 @@
   return [[GMLImage alloc] initWithImage:image];
 }
 
+- (CVPixelBufferRef)grayScalePixelBufferFromUIImage {
+  CFDictionaryRef options = (__bridge CFDictionaryRef) @{};
+
+  if (self.imageSourceType != GMLImageSourceTypeImage) {
+    return nil;
+  }
+
+  CGImageRef cgImage = [self.image CGImage];
+
+  if (cgImage == nil) {
+    return nil;
+  }
+
+  CGDataProviderRef imageDataProvider = CGImageGetDataProvider(cgImage);
+  CFMutableDataRef mutableDataRef =
+      CFDataCreateMutableCopy(kCFAllocatorDefault, 0, CGDataProviderCopyData(imageDataProvider));
+
+  UInt8 *pixelData = CFDataGetMutableBytePtr(mutableDataRef);
+
+  if (pixelData == nil) return nil;
+
+  CVPixelBufferRef cvPixelBuffer = nil;
+
+  CVPixelBufferCreateWithBytes(kCFAllocatorDefault, CGImageGetWidth(cgImage),
+                               CGImageGetHeight(cgImage), kCVPixelFormatType_OneComponent8,
+                               pixelData, CGImageGetBytesPerRow(cgImage), nil, nil, options,
+                               &cvPixelBuffer);
+
+  return cvPixelBuffer;
+}
+
 @end
