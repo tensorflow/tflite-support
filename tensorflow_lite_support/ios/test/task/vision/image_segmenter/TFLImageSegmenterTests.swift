@@ -34,9 +34,9 @@ class TFLImageSegmenterTests: XCTestCase {
     forResource: "deeplabv3",
     ofType: "tflite")!
 
-  ffunc testSuccessfullInferenceOnMLImageWithUIImage() throws {
+  func testSuccessfullInferenceOnMLImageWithUIImage() throws {
     
-    let modelPath = try XCTUnwrap(ImageSegmenterTests.modelPath)
+    let modelPath = try XCTUnwrap(TFLImageSegmenterTests.modelPath)
     
     let imageSegmenterOptions = TFLImageSegmenterOptions(modelPath: modelPath)
     XCTAssertNotNil(imageSegmenterOptions)
