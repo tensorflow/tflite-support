@@ -58,22 +58,24 @@ class TFLImageSegmenterTests: XCTestCase {
       MLImage.imageFromBundle(
         class: type(of: self),
         filename: "segmentation_golden_rotation0",
-        type: "jpg"))
+        type: "png"))
 
     let cvPixelBuffer: CVPixelBuffer = goldenImage.grayScalePixelBufferFromUIImage() as! CVPixelBuffer;
 
     CVPixelBufferLockBaseAddress(cvPixelBuffer, CVPixelBufferLockFlags.readOnly);
     
     let baseAddress =  try XCTUnwrap(CVPixelBufferGetBaseAddress(cvPixelBuffer))
-    
     let pixelBufferBaseAddress = baseAddress.assumingMemoryBound(to: UInt8.self)
 
+    // Category Mask is an UnsafeMutablePoiner<UInt>?
+    let categoryMask = try XCTUnwrap(segmentationResults.segmentations[0].categoryMask)
+   
     let num_pixels = CVPixelBufferGetWidth(cvPixelBuffer) * CVPixelBufferGetHeight(cvPixelBuffer)
     var inconsistentPixels = 0
     
     for i in 0..<num_pixels {
       
-      if segmentationResults.segmentations[0].categoryMask![i] *
+      if categoryMask[i] *
           kGoldenMaskMagnificationFactor !=
           pixelBufferBaseAddress[i] {
           inconsistentPixels += 1
