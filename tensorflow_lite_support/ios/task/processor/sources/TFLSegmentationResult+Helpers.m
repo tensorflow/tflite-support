@@ -28,9 +28,9 @@
       TfLiteColoredLabel cColoredLabel = cSegmentation.colored_labels[j];
 
       TFLColoredLabel *coloredLabel = [[TFLColoredLabel alloc] init];
-      coloredLabel.r = cColoredLabel.r;
-      coloredLabel.g = cColoredLabel.g;
-      coloredLabel.b = cColoredLabel.b;
+      coloredLabel.r = (NSUInteger)cColoredLabel.r;
+      coloredLabel.g = (NSUInteger)cColoredLabel.g;
+      coloredLabel.b = (NSUInteger)cColoredLabel.b;
 
       if (cColoredLabel.display_name != nil) {
         coloredLabel.displayName = [NSString stringWithCString:cColoredLabel.display_name
