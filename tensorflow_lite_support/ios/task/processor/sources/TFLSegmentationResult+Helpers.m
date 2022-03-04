@@ -48,9 +48,9 @@
     TFLSegmentation *segmentation = [[TFLSegmentation alloc] init];
     segmentation.coloredLabels = coloredLabels;
 
-    segmentation.width = cSegmentation.width;
-    segmentation.height = cSegmentation.height;
     segmentation.coloredLabelsSize = cSegmentation.colored_labels_size;
+    segmentation.width = (NSInteger)cSegmentation.width;
+    segmentation.height = (NSInteger)cSegmentation.height;
 
     if (cSegmentation.confidence_masks) {
       segmentation.confidenceMasks = malloc(segmentation.coloredLabelsSize * sizeof(float *));
