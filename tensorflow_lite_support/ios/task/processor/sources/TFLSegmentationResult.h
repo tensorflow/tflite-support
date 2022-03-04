@@ -44,13 +44,13 @@ NS_ASSUME_NONNULL_BEGIN
  * The width of the mask. This is an intrinsic parameter of the model being
  * used, and does not depend on the input image dimensions.
  */
-@property(nonatomic, assign) NSUInteger width;
+@property(nonatomic, assign) NSInteger width;
 
 /**
  *  The height of the mask. This is an intrinsic parameter of the model being
  * used, and does not depend on the input image dimensions.
  */
-@property(nonatomic, assign) NSUInteger height;
+@property(nonatomic, assign) NSInteger height;
 
 /**
  *  One confidence masks of size `width` x `height` for each of the supported
