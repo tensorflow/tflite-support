@@ -123,8 +123,8 @@ TfLiteSegmentationResult* GetSegmentationResultCStruct(
     const SegmentationCpp& segmentation =
         segmentation_result_cpp.segmentation(i);
 
-    c_segmentations[i].width = segmentation.width();
-    c_segmentations[i].height = segmentation.height();
+    c_segmentations[i].width = (int)segmentation.width();
+    c_segmentations[i].height = (int)segmentation.height();
     c_segmentations[i].colored_labels_size = segmentation.colored_labels_size();
 
     auto c_colored_labels =
@@ -133,7 +133,6 @@ TfLiteSegmentationResult* GetSegmentationResultCStruct(
     if (segmentation.has_category_mask()) {
       c_segmentations[i].category_mask =
           new uint8_t[segmentation.width() * segmentation.height()];
-
       std::memcpy(
           c_segmentations[i].category_mask,
           reinterpret_cast<const uint8_t*>(segmentation.category_mask().data()),
