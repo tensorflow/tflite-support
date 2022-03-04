@@ -60,7 +60,7 @@ class TFLImageSegmenterTests: XCTestCase {
         filename: "segmentation_golden_rotation0",
         type: "png"))
 
-    let cvPixelBuffer: CVPixelBuffer = goldenImage.grayScalePixelBufferFromUIImage() as! CVPixelBuffer;
+    let cvPixelBuffer: CVPixelBuffer = goldenImage.grayScalePixelBufferFromUIImage().takeRetainedValue();
 
     CVPixelBufferLockBaseAddress(cvPixelBuffer, CVPixelBufferLockFlags.readOnly);
     
