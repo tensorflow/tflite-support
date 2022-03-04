@@ -143,10 +143,10 @@
   if (!buffer_to_return) {
     return nil;
   }
-  for (int row = 0; row < width; row++) {
-    for (int col = 0; col < height; col++) {
-      long offset = sourceChannelCount * (col * width + row);
-      long rgbOffset = destChannelCount * (col * width + row);
+  for (int col = 0; col < width; col++) {
+    for (int row = 0; row < height; row++) {
+      long offset = sourceChannelCount * (row * width + col);
+      long rgbOffset = destChannelCount * (row * width + col);
       buffer_to_return[rgbOffset] = buffer[offset];
       buffer_to_return[rgbOffset + 1] = buffer[offset + 1];
       buffer_to_return[rgbOffset + 2] = buffer[offset + 2];
