@@ -57,9 +57,9 @@
 
       for (int i = 0; i < cSegmentation.colored_labels_size; i++) {
         segmentation.confidenceMasks[i] =
-            malloc(segmentation.width * segmentation.height * sizeof(float));
+            malloc(imageSize * sizeof(float));
         memcpy(segmentation.confidenceMasks[i], cSegmentation.confidence_masks[i],
-               segmentation.width * segmentation.height);
+               imageSize * sizeof(float));
       }
     } else if (cSegmentation.category_mask) {
       segmentation.categoryMask = malloc(segmentation.width * segmentation.height * sizeof(int));
