@@ -62,9 +62,11 @@
                imageSize * sizeof(float));
       }
     } else if (cSegmentation.category_mask) {
-      segmentation.categoryMask = malloc(segmentation.width * segmentation.height * sizeof(int));
-      memcpy(segmentation.categoryMask, cSegmentation.category_mask,
-             segmentation.width * segmentation.height);
+      segmentation.categoryMask = malloc(imageSize * sizeof(NSUInteger));
+      
+      for (int i = 0; i < imageSize; i++) {
+        segmentation.categoryMask[i] = (NSUInteger)cSegmentation.category_mask[i];
+      }
     }
 
     [segmentations addObject:segmentation];
