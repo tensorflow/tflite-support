@@ -27,12 +27,11 @@
 @synthesize height;
 @synthesize confidenceMasks;
 @synthesize categoryMask;
-@synthesize coloredLabelsSize;
 @synthesize coloredLabels;
 
 - (void)dealloc {
   if (self.confidenceMasks != NULL) {
-    for (int j = 0; j < self.coloredLabelsSize; ++j) {
+    for (int j = 0; j < self.coloredLabels.count; ++j) {
       free(self.confidenceMasks[j]);
     }
     free(self.confidenceMasks);

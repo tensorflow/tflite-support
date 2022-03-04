@@ -65,11 +65,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property(nonatomic, assign, nullable) NSUInteger *categoryMask;
 
-/** Number of colored labels which is equivalent to number of classes
- * supported by the model.
- */
-@property(nonatomic, assign) NSUInteger coloredLabelsSize;
-
 /**
  * The list of colored labels for all the supported categories (classes).
  * Depending on which is present, this list is in 1:1 correspondence with:
