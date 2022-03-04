@@ -48,14 +48,14 @@
     TFLSegmentation *segmentation = [[TFLSegmentation alloc] init];
     segmentation.coloredLabels = coloredLabels;
 
-    segmentation.coloredLabelsSize = cSegmentation.colored_labels_size;
     segmentation.width = (NSInteger)cSegmentation.width;
     segmentation.height = (NSInteger)cSegmentation.height;
+    NSInteger imageSize = segmentation.width * segmentation.height;
 
     if (cSegmentation.confidence_masks) {
-      segmentation.confidenceMasks = malloc(segmentation.coloredLabelsSize * sizeof(float *));
+      segmentation.confidenceMasks = malloc(cSegmentation.colored_labels_size * sizeof(float *));
 
-      for (int i = 0; i < segmentation.coloredLabelsSize; i++) {
+      for (int i = 0; i < cSegmentation.colored_labels_size; i++) {
         segmentation.confidenceMasks[i] =
             malloc(segmentation.width * segmentation.height * sizeof(float));
         memcpy(segmentation.confidenceMasks[i], cSegmentation.confidence_masks[i],
