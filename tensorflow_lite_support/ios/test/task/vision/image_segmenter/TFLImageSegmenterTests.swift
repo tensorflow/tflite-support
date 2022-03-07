@@ -67,15 +67,19 @@ class TFLImageSegmenterTests: XCTestCase {
     let baseAddress =  try XCTUnwrap(CVPixelBufferGetBaseAddress(cvPixelBuffer))
     let pixelBufferBaseAddress = baseAddress.assumingMemoryBound(to: UInt8.self)
 
-    // Category Mask is an UnsafeMutablePoiner<UInt>?
+    // Category Mask is TFLCategoryMask
     let categoryMask = try XCTUnwrap(segmentationResults.segmentations[0].categoryMask)
+
+    XCTAssertEqual(CVPixelBufferGetWidth(cvPixelBuffer), categoryMask.width)
+    XCTAssertEqual(CVPixelBufferGetHeight(cvPixelBuffer), categoryMask.height)
    
     let num_pixels = CVPixelBufferGetWidth(cvPixelBuffer) * CVPixelBufferGetHeight(cvPixelBuffer)
+
     var inconsistentPixels = 0
     
     for i in 0..<num_pixels {
       
-      if categoryMask[i] *
+      if categoryMask.mask[i] *
           kGoldenMaskMagnificationFactor !=
           pixelBufferBaseAddress[i] {
           inconsistentPixels += 1
