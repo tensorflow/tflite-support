@@ -14,29 +14,61 @@
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSegmentationResult.h"
 
+@implementation TFLCategoryMask
+@synthesize mask;
+@synthesize width;
+@synthesize height;
+
+- (id)copyWithZone:(NSZone *)zone {
+  TFLCategoryMask *categoryMask = [[TFLCategoryMask alloc] init];
+
+  [categoryMask setWidth:self.width];
+  [categoryMask setHeight:self.height];
+  [categoryMask setMask:self.mask];
+
+  return categoryMask;
+}
+
+@end
+
+@implementation TFLConfidenceMask
+@synthesize mask;
+@synthesize width;
+@synthesize height;
+
+- (id)copyWithZone:(NSZone *)zone {
+  TFLConfidenceMask *confidenceMask = [[TFLConfidenceMask alloc] init];
+
+  [confidenceMask setWidth:self.width];
+  [confidenceMask setHeight:self.height];
+  [confidenceMask setMask:self.mask];
+
+  return confidenceMask;
+}
+
+@end
+
 @implementation TFLColoredLabel
 @synthesize r;
 @synthesize g;
 @synthesize b;
 @synthesize label;
 @synthesize displayName;
+
 @end
 
 @implementation TFLSegmentation
-@synthesize width;
-@synthesize height;
 @synthesize confidenceMasks;
 @synthesize categoryMask;
 @synthesize coloredLabels;
 
 - (void)dealloc {
   if (self.confidenceMasks != NULL) {
-    for (int j = 0; j < self.coloredLabels.count; ++j) {
-      free(self.confidenceMasks[j]);
+    for (int j = 0; j < self.confidenceMasks.count; ++j) {
+      free([[self.confidenceMasks objectAtIndex:j] mask]);
     }
-    free(self.confidenceMasks);
   } else if (self.categoryMask != NULL) {
-    free(self.categoryMask);
+    free([self.categoryMask mask]);
   }
 }
 

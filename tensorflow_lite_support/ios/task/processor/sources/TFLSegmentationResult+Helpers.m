@@ -48,25 +48,29 @@
     TFLSegmentation *segmentation = [[TFLSegmentation alloc] init];
     segmentation.coloredLabels = coloredLabels;
 
-    segmentation.width = (NSInteger)cSegmentation.width;
-    segmentation.height = (NSInteger)cSegmentation.height;
-    NSInteger imageSize = segmentation.width * segmentation.height;
+    NSInteger imageSize = cSegmentation.width * cSegmentation.height;
 
     if (cSegmentation.confidence_masks) {
-      segmentation.confidenceMasks = malloc(cSegmentation.colored_labels_size * sizeof(float *));
-
+      NSMutableArray *confidenceMasks = [[NSMutableArray alloc] init];
       for (int i = 0; i < cSegmentation.colored_labels_size; i++) {
-        segmentation.confidenceMasks[i] =
-            malloc(imageSize * sizeof(float));
-        memcpy(segmentation.confidenceMasks[i], cSegmentation.confidence_masks[i],
-               imageSize * sizeof(float));
+        TFLConfidenceMask *confidenceMask = [[TFLConfidenceMask alloc] init];
+        confidenceMask.width = (NSInteger)cSegmentation.width;
+        confidenceMask.height = (NSInteger)cSegmentation.height;
+        confidenceMask.mask = malloc(imageSize * sizeof(float));
+        memcpy(confidenceMask.mask, cSegmentation.confidence_masks[i], imageSize * sizeof(float));
+        [confidenceMasks addObject:confidenceMask];
       }
+      segmentation.confidenceMasks = confidenceMasks;
+
     } else if (cSegmentation.category_mask) {
-      segmentation.categoryMask = malloc(imageSize * sizeof(NSUInteger));
-      
+      TFLCategoryMask *categoryMask = [[TFLCategoryMask alloc] init];
+      categoryMask.width = (NSInteger)cSegmentation.width;
+      categoryMask.height = (NSInteger)cSegmentation.height;
+      categoryMask.mask = malloc(imageSize * sizeof(NSUInteger));
       for (int i = 0; i < imageSize; i++) {
-        segmentation.categoryMask[i] = (NSUInteger)cSegmentation.category_mask[i];
+        categoryMask.mask[i] = (NSUInteger)cSegmentation.category_mask[i];
       }
+      segmentation.categoryMask = categoryMask;
     }
 
     [segmentations addObject:segmentation];
