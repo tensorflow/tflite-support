@@ -127,3 +127,44 @@ support_py_proto_library(
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_py_pb2",
     ],
 )
+
+proto_library(
+    name = "clu_proto",
+    srcs = ["clu.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:class_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "clu_cc_proto",
+    deps = [":clu_proto"],
+)
+
+cc_library(
+    name = "clu_proto_inc",
+    hdrs = ["clu_proto_inc.h"],
+    deps = [":clu_cc_proto"],
+)
+
+proto_library(
+    name = "bert_clu_annotator_options_proto",
+    srcs = ["bert_clu_annotator_options.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "bert_clu_annotator_options_cc_proto",
+    deps = [":bert_clu_annotator_options_proto"],
+)
+
+cc_library(
+    name = "bert_clu_annotator_options_proto_inc",
+    hdrs = ["bert_clu_annotator_options_proto_inc.h"],
+    deps = [
+        ":bert_clu_annotator_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
+    ],
+)

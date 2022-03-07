@@ -51,3 +51,11 @@ pybind_extension(
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
+
+py_library(
+    name = "object_detector_options_pb2",
+    srcs = ["object_detector_options_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/vision/proto:object_detector_options_py_pb2",
+    ],
+)

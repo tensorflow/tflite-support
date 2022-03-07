@@ -1,4 +1,4 @@
-/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,15 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package org.tensorflow.lite.support.metadata;
+#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_PROTO_CLU_BERT_CLU_ANNOTATOR_OPTIONS_PROTO_INC_H_
+#define TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_PROTO_CLU_BERT_CLU_ANNOTATOR_OPTIONS_PROTO_INC_H_
 
-/** Information about the metadata parser that this metadata extractor library is depending on. */
-public final class MetadataParser {
-  /**
-   * The version of the metadata parser that this metadata extractor library is depending on. The
-   * value should match the value of "Schema Semantic version" in metadata_schema.fbs.
-   */
-  public static final String VERSION = "1.4.0";
+#include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/text/proto/bert_clu_annotator_options.pb.h"
 
-  private MetadataParser() {}
-}
+#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_TEXT_PROTO_CLU_BERT_CLU_ANNOTATOR_OPTIONS_PROTO_INC_H_

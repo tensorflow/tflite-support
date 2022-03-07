@@ -14,7 +14,7 @@
 """Image classifier task."""
 
 import dataclasses
-from typing import Optional
+from typing import Any, Optional
 
 from tensorflow_lite_support.python.task.core import task_options
 from tensorflow_lite_support.python.task.core import task_utils
@@ -37,12 +37,29 @@ class ImageClassifierOptions:
   classification_options: Optional[
       classification_options_pb2.ClassificationOptions] = None
 
+  def __eq__(self, other: Any) -> bool:
+    if (not isinstance(other, self.__class__) or
+        self.base_options != other.base_options):
+      return False
+
+    if self.classification_options is None and other.classification_options is None:
+      return True
+    elif (self.classification_options and other.classification_options and
+          self.classification_options.SerializeToString()
+          == self.classification_options.SerializeToString()):
+      return True
+    else:
+      return False
+
 
 class ImageClassifier(object):
   """Class that performs classification on images."""
 
-  def __init__(self, classifier: _CppImageClassifier) -> None:
+  def __init__(self, options: ImageClassifierOptions,
+               classifier: _CppImageClassifier) -> None:
     """Initializes the `ImageClassifier` object."""
+    # Creates the object of C++ ImageClassifier class.
+    self._options = options
     self._classifier = classifier
 
   @classmethod
@@ -55,13 +72,13 @@ class ImageClassifier(object):
     Returns:
       `ImageClassifier` object that's created from `options`.
     Raises:
+      TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
       status.StatusNotOk if failed to create `ImageClassifier` object from
         `ImageClassifierOptions` such as missing the model. Need to import the
         module to catch this error: `from pybind11_abseil
         import status`, see
         https://github.com/pybind/pybind11_abseil#abslstatusor.
     """
-    # Creates the object of C++ ImageClassifier class.
     proto_options = _ProtoImageClassifierOptions()
     proto_options.base_options.CopyFrom(
         task_utils.ConvertToProtoBaseOptions(options.base_options))
@@ -83,7 +100,7 @@ class ImageClassifier(object):
 
     classifier = _CppImageClassifier.create_from_options(proto_options)
 
-    return cls(classifier)
+    return cls(options, classifier)
 
   def classify(
       self,
@@ -111,3 +128,11 @@ class ImageClassifier(object):
       return self._classifier.classify(image_data)
 
     return self._classifier.classify(image_data, bounding_box)
+
+  def __eq__(self, other: Any) -> bool:
+    return (isinstance(other, self.__class__) and
+            self._options == other._options)
+
+  @property
+  def options(self) -> ImageClassifierOptions:
+    return self._options
