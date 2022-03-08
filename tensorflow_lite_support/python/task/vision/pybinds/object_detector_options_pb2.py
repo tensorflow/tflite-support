@@ -13,6 +13,6 @@
 # limitations under the License.
 """ObjectDetectorOptions protobuf."""
 
-from tensorflow_lite_support.cc.task.vision.proto import object_detector_options_pb2 as detection_options_pb2
+from tensorflow_lite_support.cc.task.vision.proto import object_detector_options_pb2
 
-ObjectDetectorOptions = detection_options_pb2.ObjectDetectorOptions
+ObjectDetectorOptions = object_detector_options_pb2.ObjectDetectorOptions

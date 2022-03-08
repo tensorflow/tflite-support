@@ -45,3 +45,25 @@ py_test(
         "@com_google_protobuf//:protobuf_python",
     ],
 )
+
+py_test(
+    name = "object_detector_test",
+    srcs = ["object_detector_test.py"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
+    ],
+    deps = [
+        "//tensorflow_lite_support/python/task/core:task_options",
+        "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:detection_options_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:detections_pb2",
+        "//tensorflow_lite_support/python/task/vision:object_detector",
+        "//tensorflow_lite_support/python/task/vision/core:tensor_image",
+        "//tensorflow_lite_support/python/test:base_test",
+        "//tensorflow_lite_support/python/test:test_util",
+        "@absl_py//absl/testing:parameterized",
+        "@com_google_protobuf//:protobuf_python",
+    ],
+)
