@@ -197,7 +197,7 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
           metadata_array,
       const std::string& name, int default_index) {
     if (metadata_array != nullptr && metadata_array->size() == tensors.size()) {
-      for (int i = 0; i < metadata_array->size(); i++) {
+      for (size_t i = 0; i < metadata_array->size(); i++) {
         if (strcmp(name.data(), metadata_array->Get(i)->name()->c_str()) == 0) {
           return i;
         }
