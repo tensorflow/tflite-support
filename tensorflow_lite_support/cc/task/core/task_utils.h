@@ -145,7 +145,7 @@ inline absl::Status PopulateVector(const TfLiteTensor* tensor,
 template <>
 inline absl::Status PopulateVector<std::string>(
     const TfLiteTensor* tensor, std::vector<std::string>* data) {
-  std::string* v;
+  std::string* v __attribute__((unused));
   ASSIGN_OR_RETURN(v, AssertAndReturnTypedTensor<std::string>(tensor));
   int num = GetStringCount(tensor);
   data->reserve(num);
