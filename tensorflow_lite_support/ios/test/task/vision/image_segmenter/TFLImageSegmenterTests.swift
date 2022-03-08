@@ -27,7 +27,7 @@ class TFLImageSegmenterTests: XCTestCase {
   // them more human-friendly. Each pixel in the golden masks has its value
   // multiplied by this factor, i.e. a value of 10 means class index 1, a value of
   // 20 means class index 2, etc.
-  let kGoldenMaskMagnificationFactor: UInt = 10;
+  let kGoldenMaskMagnificationFactor: UInt8 = 10;
   
   static let bundle = Bundle(for: TFLImageSegmenterTests.self)
   static let modelPath = bundle.path(

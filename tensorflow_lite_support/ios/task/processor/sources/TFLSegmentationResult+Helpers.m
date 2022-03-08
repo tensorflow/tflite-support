@@ -66,10 +66,8 @@
       TFLCategoryMask *categoryMask = [[TFLCategoryMask alloc] init];
       categoryMask.width = (NSInteger)cSegmentation.width;
       categoryMask.height = (NSInteger)cSegmentation.height;
-      categoryMask.mask = malloc(imageSize * sizeof(NSUInteger));
-      for (int i = 0; i < imageSize; i++) {
-        categoryMask.mask[i] = (NSUInteger)cSegmentation.category_mask[i];
-      }
+      categoryMask.mask = malloc(imageSize * sizeof(UInt8));
+      memcpy(categoryMask.mask, cSegmentation.category_mask,imageSize * sizeof(UInt8));
       segmentation.categoryMask = categoryMask;
     }
 

@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
  * The value of each pixel in this mask represents the class to which the
  * pixel belongs.
  */
-@property(nonatomic, assign) NSUInteger *mask;
+@property(nonatomic, assign) UInt8 *mask;
 
 /**
  * The width of the mask. This is an intrinsic parameter of the model being
