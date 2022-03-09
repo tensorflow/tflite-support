@@ -27,9 +27,11 @@ extern "C" {
 // Holds a label associated with an RGB color, for display purposes.
 typedef struct TfLiteColoredLabel {
   // The RGB color components for the label, in the [0, 255] range.
-  unsigned int r;
-  unsigned int g;
-  unsigned int b;
+  // Note uint32_t to keep it consistent with underlying C++ segmentations
+  // proto.
+  uint32_t r;
+  uint32_t g;
+  uint32_t b;
 
   // The class name, as provided in the label map packed in the TFLite Model
   // Metadata.
@@ -45,11 +47,11 @@ typedef struct TfLiteColoredLabel {
 typedef struct TfLiteSegmentation {
   // The width of the mask. This is an intrinsic parameter of the model being
   // used, and does not depend on the input image dimensions.
-  unsigned int width;
+  int width;
 
   // The height of the mask. This is an intrinsic parameter of the model being
   // used, and does not depend on the input image dimensions.
-  unsigned int height;
+  int height;
 
   // IMPORTANT: A TfLiteSegmentation can either have `confidence_masks`
   // or `category_mask` based on the output type selected in
@@ -76,7 +78,7 @@ typedef struct TfLiteSegmentation {
 
   // Number of colored labels which is equivalent to number of classes
   // supported by the model.
-  uint8_t colored_labels_size;
+  int colored_labels_size;
 
   // The list of colored labels for all the supported categories (classes).
   // Depending on which is present, this list is in 1:1 correspondence with:

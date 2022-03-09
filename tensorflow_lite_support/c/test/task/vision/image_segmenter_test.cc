@@ -59,8 +59,8 @@ constexpr float kGoldenMaskTolerance = 1e-2;
 // 20 means class index 2, etc.
 constexpr int kGoldenMaskMagnificationFactor = 10;
 
-void InitializeColoredLabel(TfLiteColoredLabel& colored_label, uint8_t r,
-                            uint8_t g, uint8_t b, const char* label) {
+void InitializeColoredLabel(TfLiteColoredLabel& colored_label, uint32_t r,
+                            uint32_t g, uint32_t b, const char* label) {
   colored_label.r = r;
   colored_label.g = g;
   colored_label.b = b;

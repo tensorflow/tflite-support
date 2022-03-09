@@ -97,7 +97,7 @@ typedef struct TfLiteImageSegmenter TfLiteImageSegmenter;
 // as a result of the image segmentation operation.
 // This allows specifying the type of post-processing to
 // perform on the raw model results (see TfLiteSegmentationResult for more).
-enum TfLiteImageSegmenterOutputType {
+typedef enum TfLiteImageSegmenterOutputType {
   kUnspecified,
 
   // Gives a single output mask where each pixel represents the class which
@@ -107,7 +107,7 @@ enum TfLiteImageSegmenterOutputType {
   // Gives a list of output masks where, for each mask, each pixel represents
   // the prediction confidence, usually in the [0, 1] range.
   kConfidenceMask
-};
+} TfLiteImageSegmenterOutputType;
 
 // Holds options for configuring the creation of TfLiteImageSegmenter.
 typedef struct TfLiteImageSegmenterOptions {
