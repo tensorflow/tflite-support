@@ -20,10 +20,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Specifies the type of output segmentation mask to be returned as a result
- * of the image segmentation operation. This allows specifying the type of
- * post-processing to perform on the raw model results
- *
+ * Specifies the type of output segmentation mask to be returned as a result 
+ * of the image segmentation operation. This allows specifying the type of 
+ * post-processing to perform on the raw model results 
+ * 
  * @seealso TfLiteSegmentationResult for more.
  */
 typedef NS_ENUM(NSUInteger, TFLOutputType) {
@@ -31,13 +31,13 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
   TFLUnspecifiedOutputType,
 
   /**
-   * Gives a single output mask where each pixel represents the class which
+   * Gives a single output mask where each pixel represents the class which 
    * the pixel in the original image was predicted to belong to.
    */
   TFLCategoryMaskOutputType,
 
   /**
-   * Gives a list of output masks where, for each mask, each pixel represents
+   * Gives a list of output masks where, for each mask, each pixel represents 
    * the prediction confidence, usually in the [0, 1] range.
    */
   TFLConfidenceMasksOutputType,
@@ -56,7 +56,7 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
 @property(nonatomic, copy) TFLBaseOptions *baseOptions;
 
 /**
- * Specifies the type of output segmentation mask to be returned as a result
+ * Specifies the type of output segmentation mask to be returned as a result 
  * of the image segmentation operation.
  * @seealso TFLOutputType
  */
@@ -68,14 +68,14 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
 /**
  * Initializes TFLImageSegmenterOptions with the model path set to the specified
  * path to a model file.
- * @description The external model file, must be a single standalone TFLite
- * file. It could be packed with TFLite Model Metadata[1] and associated files
- * if exist. Fail to provide the necessary metadata and associated files might
- * result in errors. Check the [documentation](https://www.tensorflow.org/lite/convert/metadata)
+ * @description The external model file, must be a single standalone TFLite 
+ * file. It could be packed with TFLite Model Metadata[1] and associated files 
+ * if exist. Fail to provide the necessary metadata and associated files might 
+ * result in errors. Check the [documentation](https://www.tensorflow.org/lite/convert/metadata) 
  * for each task about the specific requirement.
- *
+ * 
  * @param modelPath Path to a TFLite model file.
- *
+ * 
  * @return An instance of TFLImageSegmenterOptions set to the specified
  * modelPath.
  */
@@ -98,11 +98,11 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
     NS_SWIFT_NAME(imageSegmenter(options:));
 
 /**
- * Performs image segmentation on a GMLImage input, returns the segmentation
+ * Performs image segmentation on a GMLImage input, returns the segmentation 
  * results.
  *
  * @param image input to the model.
- *
+ * 
  * @return Segmentation Result of type TFLSegmentationResult holds the
  * segmentation masks returned by the image segmentation task.
  */
