@@ -27,7 +27,7 @@ extern "C" {
 // Holds a label associated with an RGB color, for display purposes.
 typedef struct TfLiteColoredLabel {
   // The RGB color components for the label, in the [0, 255] range.
-  // Note uint32_t to keep it consistent with undeerlying C++ segmentations 
+  // Note uint32_t to keep it consistent with underlying C++ segmentations
   // proto.
   uint32_t r;
   uint32_t g;

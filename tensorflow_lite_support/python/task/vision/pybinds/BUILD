@@ -55,7 +55,21 @@ pybind_extension(
 py_library(
     name = "object_detector_options_pb2",
     srcs = ["object_detector_options_pb2.py"],
+    deps = ["//tensorflow_lite_support/cc/task/vision/proto:object_detector_options_py_pb2"],
+)
+
+pybind_extension(
+    name = "_pywrap_object_detector",
+    srcs = [
+        "_pywrap_object_detector.cc",
+    ],
+    module_name = "_pywrap_object_detector",
     deps = [
-        "//tensorflow_lite_support/cc/task/vision/proto:object_detector_options_py_pb2",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/vision:object_detector",
+        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
+        "@pybind11",
+        "@pybind11_abseil//pybind11_abseil:status_casters",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
