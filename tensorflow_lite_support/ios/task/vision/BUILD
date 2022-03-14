@@ -11,6 +11,7 @@ objc_library(
     hdrs = [
         "sources/TFLImageClassifier.h",
     ],
+    features = ["-layering_check"],
     module_name = "TFLImageClassifier",
     deps = [
         "//tensorflow_lite_support/c/task/vision:image_classifier",
@@ -33,6 +34,7 @@ objc_library(
     hdrs = [
         "sources/TFLObjectDetector.h",
     ],
+    features = ["-layering_check"],
     module_name = "TFLObjectDetector",
     deps = [
         "//tensorflow_lite_support/c/task/vision:object_detector",
