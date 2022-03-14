@@ -120,6 +120,41 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
     return expected_result_dict
 
+  def test_create_from_options_succeeds_with_valid_model_path(self):
+    # Creates with options containing model file successfully.
+    base_options = _BaseOptions(
+      model_file=_ExternalFile(file_name=self.model_path))
+    options = _ObjectDetectorOptions(base_options=base_options)
+    detector = _ObjectDetector.create_from_options(options)
+    self.assertIsInstance(detector, _ObjectDetector)
+
+  def test_create_from_options_fails_with_missing_model_file(self):
+    # Missing the model file.
+    with self.assertRaisesRegex(
+        TypeError,
+        r"__init__\(\) missing 1 required positional argument: 'model_file'"):
+      _BaseOptions()
+
+  def test_create_from_options_fails_with_invalid_model_path(self):
+    # Invalid empty model path.
+    with self.assertRaisesRegex(
+        Exception,
+        r"INVALID_ARGUMENT: Expected exactly one of `base_options.model_file` "
+        r"or `model_file_with_metadata` to be provided, found 0. "
+        r"\[tflite::support::TfLiteSupportStatus='2']"):
+      base_options = _BaseOptions(model_file=_ExternalFile(file_name=""))
+      options = _ObjectDetectorOptions(base_options=base_options)
+      _ObjectDetector.create_from_options(options)
+
+  def test_create_from_options_succeeds_with_valid_model_content(self):
+    # Creates with options containing model content successfully.
+    with open(self.model_path, "rb") as f:
+      base_options = _BaseOptions(
+        model_file=_ExternalFile(file_content=f.read()))
+      options = _ObjectDetectorOptions(base_options=base_options)
+      detector = _ObjectDetector.create_from_options(options)
+      self.assertIsInstance(detector, _ObjectDetector)
+
   @parameterized.parameters(
     (ModelFileType.FILE_NAME, 4, _EXPECTED_DETECTIONS),
     (ModelFileType.FILE_CONTENT, 4, _EXPECTED_DETECTIONS))
