@@ -34,9 +34,7 @@
 }
 
 - (void)dealloc {
-  if (self.mask != nil) {
-    free(self.mask);
-  }
+  free(self.mask);
 }
 
 @end
@@ -61,9 +59,7 @@
 }
 
 - (void)dealloc {
-  if (self.mask != nil) {
-    free(self.mask);
-  }
+  free(self.mask);
 }
 
 @end
