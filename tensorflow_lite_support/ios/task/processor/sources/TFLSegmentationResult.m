@@ -22,11 +22,19 @@
 - (id)copyWithZone:(NSZone *)zone {
   TFLCategoryMask *categoryMask = [[TFLCategoryMask alloc] init];
 
-  [categoryMask setWidth:self.width];
-  [categoryMask setHeight:self.height];
-  [categoryMask setMask:self.mask];
+  categoryMask.width = self.width;
+  categoryMask.height = self.height;
+  
+  categoryMask.mask = malloc(self.width * self.height * sizeof(UInt8));
+  memcpy(categoryMask.mask, self.mask, self.width * self.height * sizeof(UInt8));
 
   return categoryMask;
+}
+
+- (void)dealloc {
+  if (self.mask != nil) {
+    free(self.mask);
+  }
 }
 
 @end
@@ -39,11 +47,19 @@
 - (id)copyWithZone:(NSZone *)zone {
   TFLConfidenceMask *confidenceMask = [[TFLConfidenceMask alloc] init];
 
-  [confidenceMask setWidth:self.width];
-  [confidenceMask setHeight:self.height];
-  [confidenceMask setMask:self.mask];
+  confidenceMask.width = self.width;
+  confidenceMask.height = self.height;
+   
+  confidenceMask.mask = malloc(self.width * self.height * sizeof(float));
+  memcpy(confidenceMask.mask, self.mask, self.width * self.height * sizeof(float));
 
   return confidenceMask;
+}
+
+- (void)dealloc {
+  if (self.mask != nil) {
+    free(self.mask);
+  }
 }
 
 @end
@@ -62,19 +78,10 @@
 @synthesize categoryMask;
 @synthesize coloredLabels;
 
-- (void)dealloc {
-  if (self.confidenceMasks != NULL) {
-    for (int j = 0; j < self.confidenceMasks.count; ++j) {
-      free([[self.confidenceMasks objectAtIndex:j] mask]);
-    }
-  } else if (self.categoryMask != NULL) {
-    free([self.categoryMask mask]);
-  }
-}
-
 @end
 
 @implementation TFLSegmentationResult
 @synthesize segmentations;
 
 @end
+
