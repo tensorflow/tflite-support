@@ -25,8 +25,10 @@
   categoryMask.width = self.width;
   categoryMask.height = self.height;
   
-  categoryMask.mask = malloc(self.width * self.height * sizeof(UInt8));
-  memcpy(categoryMask.mask, self.mask, self.width * self.height * sizeof(UInt8));
+  if (self.mask != nil) {
+    categoryMask.mask = malloc(self.width * self.height * sizeof(UInt8));
+    memcpy(categoryMask.mask, self.mask, self.width * self.height * sizeof(UInt8));
+  }
 
   return categoryMask;
 }
@@ -49,9 +51,11 @@
 
   confidenceMask.width = self.width;
   confidenceMask.height = self.height;
-   
-  confidenceMask.mask = malloc(self.width * self.height * sizeof(float));
-  memcpy(confidenceMask.mask, self.mask, self.width * self.height * sizeof(float));
+  
+  if (self.mask != nil) {
+    confidenceMask.mask = malloc(self.width * self.height * sizeof(float));
+    memcpy(confidenceMask.mask, self.mask, self.width * self.height * sizeof(float));
+  }
 
   return confidenceMask;
 }
@@ -84,4 +88,3 @@
 @synthesize segmentations;
 
 @end
-
