@@ -43,6 +43,11 @@ class TextEmbedderTest(parameterized.TestCase, unittest.TestCase):
     super().setUp()
     self.model_path = test_util.get_test_data_path(_REGEX_MODEL)
 
+  def test_create_from_file_succeeds_with_valid_model_path(self):
+    # Creates with default option and valid model file successfully.
+    embedder = _TextEmbedder.create_from_file(self.model_path)
+    self.assertIsInstance(embedder, _TextEmbedder)
+
   def test_create_from_options_succeeds_with_valid_model_path(self):
     options = _TextEmbedderOptions(
         _BaseOptions(model_file=_ExternalFile(file_name=self.model_path)))
