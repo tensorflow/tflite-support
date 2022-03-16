@@ -99,4 +99,3 @@ PYBIND11_MODULE(_pywrap_audio_buffer, m) {
 }  // namespace vision
 }  // namespace task
 }  // namespace tflite
-
