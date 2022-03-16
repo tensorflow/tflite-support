@@ -28,12 +28,14 @@ from tensorflow_lite_support.python.task.vision.pybinds import image_classifier_
 
 _ProtoImageClassifierOptions = image_classifier_options_pb2.ImageClassifierOptions
 _CppImageClassifier = _pywrap_image_classifier.ImageClassifier
+_BaseOptions = task_options.BaseOptions
+_ExternalFile = task_options.ExternalFile
 
 
 @dataclasses.dataclass
 class ImageClassifierOptions:
   """Options for the image classifier task."""
-  base_options: task_options.BaseOptions
+  base_options: _BaseOptions
   classification_options: Optional[
       classification_options_pb2.ClassificationOptions] = None
 
@@ -63,6 +65,27 @@ class ImageClassifier(object):
     self._classifier = classifier
 
   @classmethod
+  def create_from_file(cls, file_path: str) -> "ImageClassifier":
+    """Creates the `ImageClassifier` object from a TensorFlow Lite model.
+
+    Args:
+      file_path: Path to the model.
+    Returns:
+      `ImageClassifier` object that's created from `options`.
+    Raises:
+      status.StatusNotOk if failed to create `ImageClassifier` object from the
+      provided file such as invalid file.
+    """
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
+    base_options = _BaseOptions(
+        model_file=_ExternalFile(file_name=file_path))
+    options = ImageClassifierOptions(base_options=base_options)
+    return cls.create_from_options(options)
+
+  @classmethod
   def create_from_options(cls,
                           options: ImageClassifierOptions) -> "ImageClassifier":
     """Creates the `ImageClassifier` object from image classifier options.
@@ -72,13 +95,13 @@ class ImageClassifier(object):
     Returns:
       `ImageClassifier` object that's created from `options`.
     Raises:
-      TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
       status.StatusNotOk if failed to create `ImageClassifier` object from
-        `ImageClassifierOptions` such as missing the model. Need to import the
-        module to catch this error: `from pybind11_abseil
-        import status`, see
-        https://github.com/pybind/pybind11_abseil#abslstatusor.
+      `ImageClassifierOptions` such as missing the model.
     """
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     proto_options = _ProtoImageClassifierOptions()
     proto_options.base_options.CopyFrom(
         task_utils.ConvertToProtoBaseOptions(options.base_options))
