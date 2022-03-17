@@ -42,6 +42,24 @@ py_library(
 )
 
 py_library(
+    name = "image_segmenter",
+    srcs = [
+        "image_segmenter.py",
+    ],
+    deps = [
+        "//tensorflow_lite_support/python/task/core:task_options",
+        "//tensorflow_lite_support/python/task/core:task_utils",
+        "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:segmentation_options_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:segmentations_pb2",
+        "//tensorflow_lite_support/python/task/vision/core:tensor_image",
+        "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
+        "//tensorflow_lite_support/python/task/vision/pybinds:_pywrap_image_segmenter",
+        "//tensorflow_lite_support/python/task/vision/pybinds:image_segmenter_options_pb2",
+    ],
+)
+
+py_library(
     name = "object_detector",
     srcs = [
         "object_detector.py",

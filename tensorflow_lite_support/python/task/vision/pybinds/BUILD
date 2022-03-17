@@ -73,3 +73,25 @@ pybind_extension(
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
+
+py_library(
+    name = "image_segmenter_options_pb2",
+    srcs = ["image_segmenter_options_pb2.py"],
+    deps = ["//tensorflow_lite_support/cc/task/vision/proto:image_segmenter_options_py_pb2"],
+)
+
+pybind_extension(
+    name = "_pywrap_image_segmenter",
+    srcs = [
+        "_pywrap_image_segmenter.cc",
+    ],
+    module_name = "_pywrap_image_segmenter",
+    deps = [
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/vision:image_segmenter",
+        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
+        "@pybind11",
+        "@pybind11_abseil//pybind11_abseil:status_casters",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)

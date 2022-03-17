@@ -62,3 +62,19 @@ py_library(
         "//tensorflow_lite_support/cc/task/processor/proto:detection_options_py_pb2",
     ],
 )
+
+py_library(
+    name = "segmentations_pb2",
+    srcs = ["segmentations_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/vision/proto:segmentations_py_pb2",
+    ],
+)
+
+py_library(
+    name = "segmentation_options_pb2",
+    srcs = ["segmentation_options_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_py_pb2",
+    ],
+)
