@@ -64,7 +64,31 @@ _EXPECTED_COLORED_LABELS = [
   {'r': 0, 'g': 64, 'b': 128, 'className': 'tv'}
 ]
 _EXPECTED_LABELS = ['background', 'person', 'horse']
+_EXPECTED_CONFIDENCE_SCORES = [
+  26.507366,  # background
+  0.485706,   # aeroplane
+  6.271478,   # bicycle
+  4.955750,   # bird
+  5.547837,   # boat
+  4.219896,   # bottle
+  6.324943,   # bus
+  11.343983,  # car
+  3.380705,   # cat
+  11.234914,  # chair
+  6.232298,   # cow
+  0.048281,   # dining table
+  4.541492,   # dog
+  16.816034,  # horse
+  6.126998,   # motorbike
+  15.339876,  # person
+  14.327930,  # potted plant
+  2.027244,   # sheep
+  9.419443,   # sofa
+  5.105732,   # train
+  1.544247,   # tv
+]
 _MATCH_PIXELS_THRESHOLD = 0.01
+_ACCEPTABLE_ERROR_RANGE = 0.000001
 
 
 class ModelFileType(enum.Enum):
@@ -122,8 +146,8 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     # Python and pass it over to Numpy's C++ implementation to improve
     # performance.
     found_colors = [
-      # BGR mode.
-      (colored_labels[idx].b, colored_labels[idx].g, colored_labels[idx].r)
+      # RGB mode.
+      (colored_labels[idx].r, colored_labels[idx].g, colored_labels[idx].b)
       for idx in found_label_indices
     ]
     output_shape = [segmentation.width, segmentation.height, 3]
@@ -134,13 +158,9 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     return seg_map_img, found_colored_labels
 
   @parameterized.parameters(
-    (ModelFileType.FILE_NAME, OutputType.CATEGORY_MASK,
-     _EXPECTED_COLORED_LABELS, _EXPECTED_LABELS),
-    (ModelFileType.FILE_CONTENT, OutputType.CATEGORY_MASK,
-     _EXPECTED_COLORED_LABELS, _EXPECTED_LABELS))
-  def test_segmentation_category_mask(self, model_file_type, output_type,
-                                      expected_colored_labels, expected_labels):
-    """Check if category mask match with ground truth."""
+    (ModelFileType.FILE_NAME, _EXPECTED_COLORED_LABELS),
+    (ModelFileType.FILE_CONTENT, _EXPECTED_COLORED_LABELS))
+  def test_segment_model(self, model_file_type, expected_colored_labels):
     # Creates segmenter.
     if model_file_type is ModelFileType.FILE_NAME:
       model_file = _ExternalFile(file_name=self.model_path)
@@ -152,8 +172,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
       # Should never happen
       raise ValueError('model_file_type is invalid.')
 
-    segmenter = self.create_segmenter_from_options(model_file,
-                                                   output_type=output_type)
+    segmenter = self.create_segmenter_from_options(model_file)
 
     # Loads image.
     image = tensor_image.TensorImage.from_file(self.test_image_path)
@@ -168,10 +187,21 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     self.assertDeepAlmostEqual(
       segmentation_colored_labels, expected_colored_labels)
 
-    if output_type != segmentation_options_pb2.OutputType.CATEGORY_MASK:
-      raise ValueError(
-        'Unsupported output type. Only OutputType.CATEGORY_MASK is supported.')
+  def test_segmentation_category_mask(self):
+    """Check if category mask match with ground truth."""
+    # Creates segmenter.
+    model_file = _ExternalFile(file_name=self.model_path)
+    segmenter = self.create_segmenter_from_options(
+      model_file, output_type=OutputType.CATEGORY_MASK)
 
+    # Loads image.
+    image = tensor_image.TensorImage.from_file(self.test_image_path)
+
+    # Performs image segmentation on the input.
+    image_result = segmenter.segment(image)
+    segmentation = image_result.segmentation[0]
+
+    # Convert the segmentation result into RGB image.
     seg_map_img, found_labels = self.segmentation_map_to_image(segmentation)
     result_pixels = seg_map_img.flatten()
 
@@ -190,7 +220,37 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
       len(inconsistent_pixels) / len(result_pixels), _MATCH_PIXELS_THRESHOLD,
       "Segmentation mask value must be the same size as ground truth.")
 
-    self.assertEqual(found_labels, expected_labels, "Labels do not match.")
+    self.assertEqual(found_labels, _EXPECTED_LABELS, "Labels do not match.")
+
+  def test_segmentation_confidence_mask(self):
+    """Check if confidence mask matches with category mask."""
+    # Creates segmenter.
+    model_file = _ExternalFile(file_name=self.model_path)
+    segmenter = self.create_segmenter_from_options(
+      model_file, output_type=OutputType.CONFIDENCE_MASK)
+
+    # Loads image.
+    image = tensor_image.TensorImage.from_file(self.test_image_path)
+
+    # Performs image segmentation on the input.
+    image_result = segmenter.segment(image)
+    segmentation = image_result.segmentation[0]
+    confidence_mask = segmentation.confidence_masks.confidence_mask
+    colored_labels = segmentation.colored_labels
+
+    # Check if confidence mask shape is correct.
+    self.assertEqual(len(confidence_mask), len(colored_labels),
+                     'Number of confidence masks must match with number of '
+                     'categories.')
+
+    # Check top-left corner has expected confidences.
+    for index in range(len(confidence_mask)):
+      output_shape = [segmentation.width, segmentation.height]
+      confidence_score = np.array(confidence_mask[index].value) \
+                           .reshape(output_shape)
+      self.assertAlmostEqual(confidence_score[0][0],
+                             _EXPECTED_CONFIDENCE_SCORES[index],
+                             delta=_ACCEPTABLE_ERROR_RANGE)
 
 
 if __name__ == '__main__':
