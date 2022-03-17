@@ -99,12 +99,19 @@
   long width = CGImageGetWidth(cgImage);
   long height = CGImageGetHeight(cgImage);
 
-  int bitsPerComponent = 8;
+  NSInteger bitsPerComponent = 8;
+  NSInteger channelCount = 4;
   UInt8 *buffer_to_return = NULL;
 
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-  CGContextRef context = CGBitmapContextCreate(nil, width, height, bitsPerComponent, 0, colorSpace,
-                                               kCGImageAlphaNoneSkipLast);
+
+  // iOS infers bytesPerRow if it is set to 0.
+  // See https://developer.apple.com/documentation/coregraphics/1455939-cgbitmapcontextcreate
+  // But for segmentation test image, this was not the case.
+  // Hence setting it to the value of channelCount*width.
+  CGContextRef context =
+      CGBitmapContextCreate(nil, width, height, bitsPerComponent, channelCount * width, colorSpace,
+                            kCGImageAlphaNoneSkipLast);
 
   if (context) {
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), cgImage);
@@ -137,10 +144,10 @@
   if (!buffer_to_return) {
     return nil;
   }
-  for (int row = 0; row < width; row++) {
-    for (int col = 0; col < height; col++) {
-      long offset = sourceChannelCount * (col * width + row);
-      long rgbOffset = destChannelCount * (col * width + row);
+  for (int col = 0; col < width; col++) {
+    for (int row = 0; row < height; row++) {
+      long offset = sourceChannelCount * (row * width + col);
+      long rgbOffset = destChannelCount * (row * width + col);
       buffer_to_return[rgbOffset] = buffer[offset];
       buffer_to_return[rgbOffset + 1] = buffer[offset + 1];
       buffer_to_return[rgbOffset + 2] = buffer[offset + 2];
