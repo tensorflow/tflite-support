@@ -25,12 +25,14 @@ from tensorflow_lite_support.python.task.text.pybinds import text_embedder_optio
 
 _ProtoTextEmbedderOptions = text_embedder_options_pb2.TextEmbedderOptions
 _CppTextEmbedder = _pywrap_text_embedder.TextEmbedder
+_BaseOptions = task_options.BaseOptions
+_ExternalFile = task_options.ExternalFile
 
 
 @dataclasses.dataclass
 class TextEmbedderOptions:
   """Options for the text embedder task."""
-  base_options: task_options.BaseOptions
+  base_options: _BaseOptions
   embedding_options: Optional[embedding_options_pb2.EmbeddingOptions] = None
 
   def __eq__(self, other: Any) -> bool:
@@ -54,8 +56,30 @@ class TextEmbedder(object):
   def __init__(self, options: TextEmbedderOptions,
                cpp_embedder: _CppTextEmbedder) -> None:
     """Initializes the `TextEmbedder` object."""
+    # Creates the object of C++ TextEmbedder class.
     self._options = options
     self._embedder = cpp_embedder
+
+  @classmethod
+  def create_from_file(cls, file_path: str) -> "TextEmbedder":
+    """Creates the `TextEmbedder` object from a TensorFlow Lite model.
+
+    Args:
+      file_path: Path to the model.
+
+    Returns:
+      `TextEmbedder` object that's created from the model file.
+    Raises:
+      status.StatusNotOk if failed to create `TextEmbedder` object from the
+      provided file such as invalid file.
+    """
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
+    base_options = _BaseOptions(model_file=_ExternalFile(file_name=file_path))
+    options = TextEmbedderOptions(base_options=base_options)
+    return cls.create_from_options(options)
 
   @classmethod
   def create_from_options(cls, options: TextEmbedderOptions) -> "TextEmbedder":
@@ -66,15 +90,14 @@ class TextEmbedder(object):
 
     Returns:
       `TextEmbedder` object that's created from `options`.
-
     Raises:
-      TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
       status.StatusNotOk if failed to create `TextEmbdder` object from
-        `TextEmbedderOptions` such as missing the model. Need to import the
-        module to catch this error: `from pybind11_abseil import status`, see
-        https://github.com/pybind/pybind11_abseil#abslstatusor.
+        `TextEmbedderOptions` such as missing the model.
     """
-    # Creates the object of C++ TextEmbedder class.
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     proto_options = _ProtoTextEmbedderOptions()
     proto_options.base_options.CopyFrom(
         task_utils.ConvertToProtoBaseOptions(options.base_options))
@@ -94,10 +117,12 @@ class TextEmbedder(object):
       embedding result.
 
     Raises:
-      status.StatusNotOk if failed to get the embedding vector. Need to import
-        the module to catch this error: `from pybind11_abseil import status`,
-        see https://github.com/pybind/pybind11_abseil#abslstatusor.
+      status.StatusNotOk if failed to get the embedding vector.
     """
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     return self._embedder.embed(text)
 
   def cosine_similarity(self, u: embeddings_pb2.FeatureVector,

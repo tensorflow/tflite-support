@@ -71,7 +71,7 @@ class ImageClassifier(object):
     Args:
       file_path: Path to the model.
     Returns:
-      `ImageClassifier` object that's created from `options`.
+      `ImageClassifier` object that's created from the model file.
     Raises:
       status.StatusNotOk if failed to create `ImageClassifier` object from the
       provided file such as invalid file.

@@ -28,12 +28,14 @@ from tensorflow_lite_support.python.task.vision.pybinds import image_embedder_op
 
 _ProtoImageEmbedderOptions = image_embedder_options_pb2.ImageEmbedderOptions
 _CppImageEmbedder = _pywrap_image_embedder.ImageEmbedder
+_BaseOptions = task_options.BaseOptions
+_ExternalFile = task_options.ExternalFile
 
 
 @dataclasses.dataclass
 class ImageEmbedderOptions:
   """Options for the image embedder task."""
-  base_options: task_options.BaseOptions
+  base_options: _BaseOptions
   embedding_options: Optional[embedding_options_pb2.EmbeddingOptions] = None
 
   def __eq__(self, other: Any) -> bool:
@@ -91,22 +93,42 @@ class ImageEmbedder(object):
     self._embedder = cpp_embedder
 
   @classmethod
+  def create_from_file(cls, file_path: str) -> "ImageEmbedder":
+    """Creates the `ImageEmbedder` object from a TensorFlow Lite model.
+
+    Args:
+      file_path: Path to the model.
+    Returns:
+      `ImageEmbedder` object that's created from the model file.
+    Raises:
+      status.StatusNotOk if failed to create `ImageEmbedder` object from the
+      provided file such as invalid file.
+    """
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
+    base_options = _BaseOptions(model_file=_ExternalFile(file_name=file_path))
+    options = ImageEmbedderOptions(base_options=base_options)
+    return cls.create_from_options(options)
+
+  @classmethod
   def create_from_options(cls,
                           options: ImageEmbedderOptions) -> "ImageEmbedder":
     """Creates the `ImageEmbedder` object from image embedder options.
 
     Args:
       options: Options for the image embedder task.
-
     Returns:
       `ImageEmbedder` object that's created from `options`.
-
     Raises:
       status.StatusNotOk if failed to create `ImageEmbdder` object from
-        `ImageEmbedderOptions` such as missing the model. Need to import the
-        module to catch this error: `from pybind11_abseil import status`, see
-        https://github.com/pybind/pybind11_abseil#abslstatusor.
+        `ImageEmbedderOptions` such as missing the model.
     """
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     proto_options = _build_proto_options(options)
     embedder = _CppImageEmbedder.create_from_options(proto_options)
     return cls(options, embedder)
@@ -129,10 +151,11 @@ class ImageEmbedder(object):
       embedding result.
 
     Raises:
-      status.StatusNotOk if failed to get the embedding vector. Need to import
-        the module to catch this error: `from pybind11_abseil import status`,
-        see https://github.com/pybind/pybind11_abseil#abslstatusor.
+      status.StatusNotOk if failed to get the embedding vector.
     """
+    # TODO(b/220931229) Need to import the module to catch this error:
+    # `from pybind11_abseil import status`,
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     image_data = image_utils.ImageData(image.get_buffer())
     if bounding_box is None:
       return self._embedder.embed(image_data)

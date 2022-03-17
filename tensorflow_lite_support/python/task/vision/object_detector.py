@@ -27,12 +27,14 @@ from tensorflow_lite_support.python.task.vision.pybinds import object_detector_o
 
 _ProtoObjectDetectorOptions = object_detector_options_pb2.ObjectDetectorOptions
 _CppObjectDetector = _pywrap_object_detector.ObjectDetector
+_BaseOptions = task_options.BaseOptions
+_ExternalFile = task_options.ExternalFile
 
 
 @dataclasses.dataclass
 class ObjectDetectorOptions:
   """Options for the object detector task."""
-  base_options: task_options.BaseOptions
+  base_options: _BaseOptions
   detection_options: Optional[detection_options_pb2.DetectionOptions] = None
 
   def __eq__(self, other: Any) -> bool:
@@ -61,6 +63,27 @@ class ObjectDetector(object):
     self._detector = detector
 
   @classmethod
+  def create_from_file(cls, file_path: str) -> "ObjectDetector":
+    """Creates the `ObjectDetector` object from a TensorFlow Lite model.
+
+    Args:
+      file_path: Path to the model.
+
+    Returns:
+      `ObjectDetector` object that's created from the model file.
+    Raises:
+      status.StatusNotOk if failed to create `ObjectDetector` object from the
+      provided file such as invalid file.
+    """
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
+    base_options = _BaseOptions(model_file=_ExternalFile(file_name=file_path))
+    options = ObjectDetectorOptions(base_options=base_options)
+    return cls.create_from_options(options)
+
+  @classmethod
   def create_from_options(cls,
                           options: ObjectDetectorOptions) -> "ObjectDetector":
     """Creates the `ObjectDetector` object from object detector options.
@@ -71,13 +94,13 @@ class ObjectDetector(object):
     Returns:
       `ObjectDetector` object that's created from `options`.
     Raises:
-      TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
       status.StatusNotOk if failed to create `ObjectDetector` object from
-        `ObjectDetectorOptions` such as missing the model. Need to import the
-        module to catch this error: `from pybind11_abseil
-        import status`, see
-        https://github.com/pybind/pybind11_abseil#abslstatusor.
+        `ObjectDetectorOptions` such as missing the model.
     """
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     proto_options = _ProtoObjectDetectorOptions()
     proto_options.base_options.CopyFrom(
         task_utils.ConvertToProtoBaseOptions(options.base_options))

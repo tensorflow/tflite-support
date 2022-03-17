@@ -44,6 +44,11 @@ class ImageEmbedderTest(parameterized.TestCase, unittest.TestCase):
     self.model_path = test_util.get_test_data_path(
         "mobilenet_v3_small_100_224_embedder.tflite")
 
+  def test_create_from_file_succeeds_with_valid_model_path(self):
+    # Creates with default option and valid model file successfully.
+    embedder = _ImageEmbedder.create_from_file(self.model_path)
+    self.assertIsInstance(embedder, _ImageEmbedder)
+
   def test_create_from_options_succeeds_with_valid_model_path(self):
     # Creates with options containing model file successfully.
     base_options = _BaseOptions(
