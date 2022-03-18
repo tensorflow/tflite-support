@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** Helper utility for performing operations on GMLImage specific to the
  * TF Lite Task Vision library
  */
-@interface GMLImageUtils : NSObject
+@interface GMLImage (Utils)
 /**
  * Creates and returns a TfLiteFrameBuffer from a GMLImage. TfLiteFrameBuffer
  * is used by the TFLite Task Vision C library to hold the backing buffer of
@@ -37,8 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return The TfLiteFrameBuffer created from the gmlImage which can be used
  * with the TF Lite Task Vision C library.
  */
-+ (nullable TfLiteFrameBuffer *)cFrameBufferWithGMLImage:(GMLImage *)gmlImage
-                                                   error:(NSError *_Nullable *)error;
+- (nullable TfLiteFrameBuffer *)cFrameBufferWithError:(NSError *_Nullable *)error;
 
 /**
  * Gets grayscale pixel buffer from GMLImage if source type is
@@ -53,11 +52,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return The CVPixelBufferRef for the newly created gray scale pixel buffer.
  */
-+ (CVPixelBufferRef)grayScalePixelBufferWithGMLImage:(GMLImage *)gmlImage;
+- (CVPixelBufferRef)grayScalePixelBuffer;
 
-- (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)new NS_UNAVAILABLE;
++ (nullable GMLImage *)imageFromBundleWithClass:(Class)classObject
+                                       fileName:(NSString *)name
+                                         ofType:(NSString *)type
+    NS_SWIFT_NAME(imageFromBundle(class:filename:type:));
 
 @end
 
