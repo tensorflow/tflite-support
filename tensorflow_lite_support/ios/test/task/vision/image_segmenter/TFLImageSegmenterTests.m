@@ -16,8 +16,7 @@
 #import <XCTest/XCTest.h>
 
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageSegmenter.h"
-#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImageUtils.h"
-#import "tensorflow_lite_support/ios/test/task/vision/utils/sources/GMLImage+Helpers.h"
+#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
 #define VerifyColoredLabel(coloredLabel, expectedR, expectedG, expectedB, expectedLabel) \
   NSLog(@"Expected %d", coloredLabel.r);                                                 \
@@ -235,7 +234,7 @@ float const deepLabV3SegmentationHeight = 257;
                                                       ofType:@"png"];
 
   XCTAssertNotNil(goldenImage);
-  CVPixelBufferRef pixelBuffer = [GMLImageUtils grayScalePixelBufferWithGMLImage:goldenImage];
+  CVPixelBufferRef pixelBuffer = [goldenImage grayScalePixelBuffer];
 
   CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
 

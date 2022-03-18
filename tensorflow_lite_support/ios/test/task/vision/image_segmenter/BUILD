@@ -20,7 +20,6 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
-        "//tensorflow_lite_support/ios/test/task/vision/utils:GMLImageHelpers",
 
     ],
 )
