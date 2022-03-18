@@ -13,7 +13,6 @@
  limitations under the License.
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageSegmenter.h"
-#import "tensorflow_lite_support/ios/sources/TFLCommon.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSegmentationResult+Helpers.h"
