@@ -223,34 +223,51 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     self.assertEqual(found_labels, _EXPECTED_LABELS, "Labels do not match.")
 
   def test_segmentation_confidence_mask(self):
-    """Check if confidence mask matches with category mask."""
-    # Creates segmenter.
+    """Check if top-left corner has expected confidences and also verify if the
+     confidence mask matches with the category mask."""
+    # Loads image.
+    image = tensor_image.TensorImage.from_file(self.test_image_path)
     model_file = _ExternalFile(file_name=self.model_path)
+
+    # Run segmentation on the model in CATEGORY_MASK mode.
+    segmenter = self.create_segmenter_from_options(
+      model_file, output_type=OutputType.CATEGORY_MASK)
+
+    # Performs image segmentation on the input and gets the category mask.
+    segmentation = segmenter.segment(image).segmentation[0]
+    category_mask = np.array(bytearray(segmentation.category_mask))
+
+    # Run segmentation on the model in CONFIDENCE_MASK mode.
     segmenter = self.create_segmenter_from_options(
       model_file, output_type=OutputType.CONFIDENCE_MASK)
 
-    # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    # Performs image segmentation on the input again.
+    segmentation = segmenter.segment(image).segmentation[0]
 
-    # Performs image segmentation on the input.
-    image_result = segmenter.segment(image)
-    segmentation = image_result.segmentation[0]
-    confidence_mask = segmentation.confidence_masks.confidence_mask
+    # Gets the list of confidence masks and colored_labels.
+    confidence_masks = segmentation.confidence_masks.confidence_mask
     colored_labels = segmentation.colored_labels
 
     # Check if confidence mask shape is correct.
-    self.assertEqual(len(confidence_mask), len(colored_labels),
+    self.assertEqual(len(confidence_masks), len(colored_labels),
                      'Number of confidence masks must match with number of '
                      'categories.')
 
-    # Check top-left corner has expected confidences.
-    for index in range(len(confidence_mask)):
-      output_shape = [segmentation.width, segmentation.height]
-      confidence_score = np.array(confidence_mask[index].value) \
-                           .reshape(output_shape)
-      self.assertAlmostEqual(confidence_score[0][0],
+    masks = []
+
+    for index in range(len(confidence_masks)):
+      confidence_mask = confidence_masks[index].value
+      # Gather the confidence masks in a single array named `masks`.
+      masks.append(confidence_mask)
+      # Check top-left corner has expected confidences.
+      self.assertAlmostEqual(confidence_mask[0],
                              _EXPECTED_CONFIDENCE_SCORES[index],
                              delta=_ACCEPTABLE_ERROR_RANGE)
+
+    # Compute the category mask from the created confidence mask.
+    calculated_category_mask = np.argmax(np.array(masks), axis=0)
+    self.assertListEqual(calculated_category_mask.tolist(),
+                         category_mask.tolist())
 
 
 if __name__ == '__main__':
