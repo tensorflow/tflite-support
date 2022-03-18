@@ -23,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
                                          ofType:(NSString *)type
     NS_SWIFT_NAME(imageFromBundle(class:filename:type:));
 
+- (CVPixelBufferRef)grayScalePixelBufferFromUIImage 
+    NS_SWIFT_NAME(grayScalePixelBufferFromUIImage());
+
 @end
 
 NS_ASSUME_NONNULL_END
