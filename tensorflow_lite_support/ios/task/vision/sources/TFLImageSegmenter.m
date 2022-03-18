@@ -16,7 +16,7 @@
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSegmentationResult+Helpers.h"
-#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImageUtils.h"
+#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
 #include "tensorflow_lite_support/c/task/vision/image_segmenter.h"
 
@@ -84,7 +84,7 @@
 
 - (nullable TFLSegmentationResult *)segmentWithGMLImage:(GMLImage *)image
                                                   error:(NSError *_Nullable *)error {
-  TfLiteFrameBuffer *cFrameBuffer = [GMLImageUtils cFrameBufferWithGMLImage:image error:error];
+  TfLiteFrameBuffer *cFrameBuffer = [image cFrameBufferWithError:error];
 
   if (!cFrameBuffer) {
     return nil;
