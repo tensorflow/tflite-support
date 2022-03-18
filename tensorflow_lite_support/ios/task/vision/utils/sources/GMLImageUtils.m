@@ -30,6 +30,7 @@
 
 @interface UIImage (RawPixelDataUtils)
 - (TfLiteFrameBuffer *)frameBufferWithError:(NSError **)error;
+- (CVPixelBufferRef)grayScalePixelBuffer;
 @end
 
 @implementation TFLCVPixelBufferUtils
@@ -93,6 +94,32 @@
   }
 
   return frameBuffer;
+}
+
+- (CVPixelBufferRef)grayScalePixelBuffer {
+  CFDictionaryRef options = (__bridge CFDictionaryRef) @{};
+
+  CGImageRef cgImage = [self CGImage];
+  if (cgImage == nil) {
+    return nil;
+  }
+
+  CGDataProviderRef imageDataProvider = CGImageGetDataProvider(cgImage);
+  CFMutableDataRef mutableDataRef =
+      CFDataCreateMutableCopy(kCFAllocatorDefault, 0, CGDataProviderCopyData(imageDataProvider));
+
+  UInt8 *pixelData = CFDataGetMutableBytePtr(mutableDataRef);
+
+  if (pixelData == nil) return nil;
+
+  CVPixelBufferRef cvPixelBuffer = nil;
+
+  CVPixelBufferCreateWithBytes(kCFAllocatorDefault, CGImageGetWidth(cgImage),
+                               CGImageGetHeight(cgImage), kCVPixelFormatType_OneComponent8,
+                               pixelData, CGImageGetBytesPerRow(cgImage), nil, nil, options,
+                               &cvPixelBuffer);
+
+  return cvPixelBuffer;
 }
 
 + (UInt8 *_Nullable)pixelDataFromCGImage:(CGImageRef)cgImage error:(NSError **)error {
@@ -242,6 +269,21 @@
   }
 
   return cFrameBuffer;
+}
+
++ (CVPixelBufferRef)grayScalePixelBufferWithGMLImage:(GMLImage *)gmlImage {
+  switch (gmlImage.imageSourceType) {
+    case GMLImageSourceTypeSampleBuffer:
+      break;
+    case GMLImageSourceTypePixelBuffer:
+      break;
+    case GMLImageSourceTypeImage:
+      return [gmlImage.image grayScalePixelBuffer];
+    default:
+      break;
+  }
+
+  return nil;
 }
 
 + (TfLiteFrameBuffer *)frameBufferFromUIImage:(UIImage *)image error:(NSError **)error {
