@@ -21,9 +21,9 @@
 
 #define VerifyColoredLabel(coloredLabel, expectedR, expectedG, expectedB, expectedLabel) \
   NSLog(@"Expected %d", coloredLabel.r);                                                 \
-  XCTAssertEqual((unsigned long)coloredLabel.r, expectedR);                              \
-  XCTAssertEqual((unsigned long)coloredLabel.g, expectedG);                              \
-  XCTAssertEqual((unsigned long)coloredLabel.b, expectedB);                              \
+  XCTAssertEqual(coloredLabel.r, expectedR);                              \
+  XCTAssertEqual(coloredLabel.g, expectedG);                              \
+  XCTAssertEqual(coloredLabel.b, expectedB);                              \
   XCTAssertEqualObjects(coloredLabel.label, expectedLabel)
 
 // The maximum fraction of pixels in the candidate mask that can have a
