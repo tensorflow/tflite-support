@@ -58,10 +58,10 @@ float const deepLabV3SegmentationHeight = 257;
 
 - (void)compareWithDepLabV3PartialColoredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
   VerifyColoredLabel(coloredLabels[0],
-                     0,  // expectedR
-                     0,  // expectedG
-                     0,  // expectedB
-                     @"background");
+                     0,             // expectedR
+                     0,             // expectedG
+                     0,             // expectedB
+                     @"background");// expectedLabel
 
   VerifyColoredLabel(coloredLabels[1],
                      128,          // expectedR
