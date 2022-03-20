@@ -20,7 +20,6 @@
 #import "tensorflow_lite_support/ios/test/task/vision/utils/sources/GMLImage+Helpers.h"
 
 #define VerifyColoredLabel(coloredLabel, expectedR, expectedG, expectedB, expectedLabel) \
-  NSLog(@"Expected %d", coloredLabel.r);                                                 \
   XCTAssertEqual(coloredLabel.r, expectedR);                              \
   XCTAssertEqual(coloredLabel.g, expectedG);                              \
   XCTAssertEqual(coloredLabel.b, expectedB);                              \
