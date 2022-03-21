@@ -240,9 +240,6 @@ float const deepLabV3SegmentationHeight = 257;
 
   UInt8 *pixelBufferBaseAddress = (UInt8 *)CVPixelBufferGetBaseAddress(pixelBuffer);
 
-  NSInteger goldenImageWidth = CVPixelBufferGetWidth(pixelBuffer);
-  NSInteger goldenImageHeight = CVPixelBufferGetHeight(pixelBuffer);
-
   XCTAssertEqual(deepLabV3SegmentationWidth,
                  segmentationResult.segmentations[0].categoryMask.width);
   XCTAssertEqual(deepLabV3SegmentationHeight,
