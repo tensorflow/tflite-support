@@ -34,3 +34,29 @@ ios_unit_test(
         ":TFLImageSegmenterObjcTestLibrary",
     ],
 )
+
+swift_library(
+    name = "TFLImageSegmenterSwiftTestLibrary",
+    testonly = 1,
+    srcs = ["TFLImageSegmenterTests.swift"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
+    ],
+    tags = TFL_DEFAULT_TAGS,
+    deps = [
+        "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
+        "//tensorflow_lite_support/ios/test/task/vision/utils:GMLImageHelpers",
+        "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
+    ],
+)
+
+ios_unit_test(
+    name = "TFLImageSegmenterSwiftTest",
+    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    runner = tflite_ios_lab_runner("IOS_LATEST"),
+    tags = TFL_DEFAULT_TAGS + TFL_DISABLED_SANITIZER_TAGS,
+    deps = [
+        ":TFLImageSegmenterSwiftTestLibrary",
+    ],
+)
