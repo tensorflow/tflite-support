@@ -134,13 +134,14 @@ class ImageSegmenter(object):
   def segment(
       self,
       image: tensor_image.TensorImage
-  ) -> segmentations_pb2.SegmentationResult:
-    """Performs segmentation on the provided TensorImage.
+  ) -> Segmentation:
+    """Performs segmentation on the provided TensorImage and postprocesses
+    the segmentation result.
 
     Args:
       image: Tensor image, used to extract the feature vectors.
     Returns:
-      segmentation result.
+      segmentation output.
     Raises:
       status.StatusNotOk if failed to get the feature vector. Need to import the
         module to catch this error: `from pybind11_abseil
@@ -155,6 +156,13 @@ class ImageSegmenter(object):
       self,
       segmentation_result: segmentations_pb2.SegmentationResult
   ) -> Segmentation:
+    """Post-process the output segmentation result into segmentation output.
+
+    Args:
+      segmentation_result: segmentation result, used for post-processing.
+    Returns:
+      segmentation output.
+    """
     segmentation = segmentation_result.segmentation[0]
     output_type = self._options.segmentation_options.output_type
 
