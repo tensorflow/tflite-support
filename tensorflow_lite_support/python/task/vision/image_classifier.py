@@ -146,7 +146,7 @@ class ImageClassifier(object):
         import status`, see
         https://github.com/pybind/pybind11_abseil#abslstatusor.
     """
-    image_data = image_utils.ImageData(image.get_buffer())
+    image_data = image_utils.ImageData(image.buffer)
     if bounding_box is None:
       return self._classifier.classify(image_data)
 

@@ -139,6 +139,6 @@ class ObjectDetector(object):
         import status`, see
         https://github.com/pybind/pybind11_abseil#abslstatusor.
     """
-    image_data = image_utils.ImageData(image.get_buffer())
+    image_data = image_utils.ImageData(image.buffer)
 
     return self._detector.detect(image_data)

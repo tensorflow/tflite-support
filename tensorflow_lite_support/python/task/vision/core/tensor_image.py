@@ -39,7 +39,7 @@ class TensorImage(object):
     # Gets the FrameBuffer object.
 
   @classmethod
-  def from_file(cls, file_name: str) -> "TensorImage":
+  def create_from_file(cls, file_name: str) -> "TensorImage":
     """Creates `TensorImage` object from the image file.
 
     Args:
@@ -57,7 +57,7 @@ class TensorImage(object):
     return cls(image_data, is_from_file=True)
 
   @classmethod
-  def from_array(cls, array: np.ndarray) -> "TensorImage":
+  def create_from_array(cls, array: np.ndarray) -> "TensorImage":
     """Creates `TensorImage` object from the numpy array.
 
     Args:
@@ -83,7 +83,8 @@ class TensorImage(object):
     if self._is_from_file:
       image_utils.ImageDataFree(self._image_data)
 
-  def get_buffer(self) -> np.ndarray:
+  @property
+  def buffer(self) -> np.ndarray:
     """Gets the numpy array that represents `self.image_data`.
 
     Returns:
@@ -94,15 +95,18 @@ class TensorImage(object):
     """
     return np.array(self._image_data, copy=False)
 
-  def get_height(self) -> int:
+  @property
+  def height(self) -> int:
     """Gets the height of the image."""
     return self._image_data.height
 
-  def get_width(self) -> int:
+  @property
+  def width(self) -> int:
     """Gets the width of the image."""
     return self._image_data.width
 
-  def get_color_space_type(self) -> color_space_type.ColorSpaceType:
+  @property
+  def color_space_type(self) -> color_space_type.ColorSpaceType:
     """Gets the color space type of the image."""
     channels = self._image_data.channels
     if channels == 1:

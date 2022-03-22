@@ -111,9 +111,9 @@ class ImageEmbedderTest(parameterized.TestCase, unittest.TestCase):
     embedder = _ImageEmbedder.create_from_options(options)
 
     # Loads images: one is a crop of the other.
-    image = tensor_image.TensorImage.from_file(
+    image = tensor_image.TensorImage.create_from_file(
         test_util.get_test_data_path("burger.jpg"))
-    cropped_image = tensor_image.TensorImage.from_file(
+    cropped_image = tensor_image.TensorImage.create_from_file(
         test_util.get_test_data_path("burger_crop.jpg"))
 
     bounding_box = None
