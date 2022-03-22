@@ -156,7 +156,7 @@ class ImageEmbedder(object):
     # TODO(b/220931229) Need to import the module to catch this error:
     # `from pybind11_abseil import status`,
     # see https://github.com/pybind/pybind11_abseil#abslstatusor.
-    image_data = image_utils.ImageData(image.get_buffer())
+    image_data = image_utils.ImageData(image.buffer)
     if bounding_box is None:
       return self._embedder.embed(image_data)
 

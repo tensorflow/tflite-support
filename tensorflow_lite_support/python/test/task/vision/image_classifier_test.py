@@ -162,7 +162,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file, max_results=max_results)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
@@ -182,7 +182,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     classifier = self.create_classifier_from_options(model_file, max_results=3)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Bounding box in "burger.jpg" corresponding to "burger_crop.jpg".
     bounding_box = bounding_box_pb2.BoundingBox(
@@ -222,7 +222,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file, max_results=_MAX_RESULTS)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
@@ -241,7 +241,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file, score_threshold=_SCORE_THRESHOLD)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
@@ -264,7 +264,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file, class_name_allowlist=_ALLOW_LIST)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
@@ -286,7 +286,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file, score_threshold=0.01, class_name_denylist=_DENY_LIST)
 
     # Loads image
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)

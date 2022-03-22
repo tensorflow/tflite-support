@@ -187,7 +187,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file=model_file, max_results=max_results)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
@@ -207,7 +207,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file=model_file, score_threshold=_SCORE_THRESHOLD)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
@@ -229,7 +229,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file=model_file, max_results=_MAX_RESULTS)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
@@ -246,7 +246,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file=model_file, class_name_allowlist=_ALLOW_LIST)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
@@ -267,7 +267,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
         model_file=model_file, class_name_denylist=_DENY_LIST)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
