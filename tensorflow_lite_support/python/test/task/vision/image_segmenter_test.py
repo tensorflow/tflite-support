@@ -175,7 +175,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     segmenter = self.create_segmenter_from_options(model_file)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs image segmentation on the input.
     image_result = segmenter.segment(image)
@@ -195,7 +195,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
       model_file, output_type=OutputType.CATEGORY_MASK)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs image segmentation on the input.
     image_result = segmenter.segment(image)
@@ -206,8 +206,9 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     result_pixels = seg_map_img.flatten()
 
     # Loads ground truth segmentation file.
-    gt_segmentation = tensor_image.TensorImage.from_file(self.test_seg_path)
-    ground_truth_pixels = gt_segmentation.get_buffer().flatten()
+    gt_segmentation = tensor_image.TensorImage.create_from_file(
+      self.test_seg_path)
+    ground_truth_pixels = gt_segmentation.buffer.flatten()
 
     self.assertEqual(
       len(result_pixels), len(ground_truth_pixels),
@@ -226,7 +227,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     """Check if top-left corner has expected confidences and also verify if the
      confidence mask matches with the category mask."""
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
     model_file = _ExternalFile(file_name=self.model_path)
 
     # Run segmentation on the model in CATEGORY_MASK mode.
