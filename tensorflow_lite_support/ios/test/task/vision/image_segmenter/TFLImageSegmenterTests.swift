@@ -64,11 +64,31 @@ class TFLImageSegmenterTests: XCTestCase {
 
     self.verifyColoredLabel(
       coloredLabels[3],
+      expectedR: 128,
+      expectedG: 128,
+      expectedB: 0,
+      expectedLabel: "bird")
+
+    self.verifyColoredLabel(
+      coloredLabels[4],
       expectedR: 0,
       expectedG: 0,
       expectedB: 128,
       expectedLabel: "boat")
 
+    self.verifyColoredLabel(
+      coloredLabels[5],
+      expectedR: 128,
+      expectedG: 0,
+      expectedB: 128,
+      expectedLabel: "bottle")
+
+    self.verifyColoredLabel(
+      coloredLabels[5],
+      expectedR: 0,
+      expectedG: 128,
+      expectedB: 128,
+      expectedLabel: "bus")
     // self.verifyDetection(
     //   detectionResult.detections[1],
     //   expectedBoundingBox: CGRect(x: 602, y: 157, width: 394, height: 447),
