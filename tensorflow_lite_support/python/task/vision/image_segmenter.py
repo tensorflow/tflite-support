@@ -44,7 +44,7 @@ class ColoredLabel:
 
 @dataclasses.dataclass
 class Segmentation:
-  colored_labels: List[segmentations_pb2.ColoredLabel]
+  colored_labels: List[ColoredLabel]
   """The map between RGB color and label name."""
 
   masks: np.ndarray
