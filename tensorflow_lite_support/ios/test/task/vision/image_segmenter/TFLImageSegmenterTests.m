@@ -37,7 +37,7 @@ NSInteger const kGoldenMaskMagnificationFactor = 10;
 
 NSInteger const deepLabV3SegmentationWidth = 257;
 
-float const deepLabV3SegmentationHeight = 257;
+NSInteger const deepLabV3SegmentationHeight = 257;
 
 @interface TFLImageSegmenterTests : XCTestCase
 
