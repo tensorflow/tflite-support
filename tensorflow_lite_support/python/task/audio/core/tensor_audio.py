@@ -140,7 +140,7 @@ class TensorAudio(object):
   def buffer(self) -> np.ndarray:
     """Gets the internal buffer."""
     if self._is_from_file:
-      audio_data = np.array(self._buffer, copy=False)
+      buffer = np.array(self._buffer, copy=False)
     else:
-      audio_data = self._buffer
-    return audio_data
+      buffer = self._buffer
+    return buffer
