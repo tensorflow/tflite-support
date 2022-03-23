@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for tensor_audio."""
+import unittest
 from unittest import mock
 
 import numpy as np
 from numpy import testing
-from numpy.testing import assert_almost_equal
-import unittest
 
 from tensorflow_lite_support.python.task.audio.core import tensor_audio
 from tensorflow_lite_support.python.task.audio.core import audio_record
@@ -63,7 +62,7 @@ class TensorAudioTest(unittest.TestCase):
     self.assertEqual(cpp_audio_format.sample_rate, _SAMPLE_RATE)
     self.assertEqual(cpp_audio_buffer.buffer_size, _SAMPLE_COUNT)
     self.assertIsInstance(cpp_audio_buffer, _CppAudioBuffer)
-    assert_almost_equal(cpp_audio_buffer.float_buffer, array)
+    testing.assert_almost_equal(cpp_audio_buffer.float_buffer, array)
 
   def test_load_from_array_fails_with_input_size_matching_sample_rate(self):
     # Fails loading audio data from a NumPy array with an input size
