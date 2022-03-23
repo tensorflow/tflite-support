@@ -28,28 +28,28 @@ class TensorAudio(object):
 
   def __init__(self,
                audio_format: _CppAudioFormat,
-               sample_count: int,
+               buffer_size: int,
                audio_data: _CppAudioBuffer = None,
                is_from_file: bool = False,
                ) -> None:
     """Initializes the `TensorAudio` object.
 
     Args:
-      audio_format: C++ AudioFormat object, format of the audio.
-      sample_count: int, number of samples in the audio.
-      audio_data: C++ AudioBuffer object, contains raw audio data, buffer size
+      audio_format: AudioFormat, format of the audio.
+      buffer_size: int, buffer size of the audio.
+      audio_data: AudioBuffer, contains raw audio data, buffer size
       and audio format info.
       is_from_file: boolean, whether `audio_data` is loaded from the audio file.
     """
     self._format = audio_format
-    self._sample_count = sample_count
+    self._buffer_size = buffer_size
     self._is_from_file = is_from_file
 
     if self._is_from_file:
-      self._data = audio_data
+      self._buffer = audio_data
     else:
       self._buffer = np.zeros(
-        [self._sample_count, self._format.channels], dtype=np.float32)
+        [self._buffer_size, self._format.channels], dtype=np.float32)
 
   def clear(self):
     """Clear the internal buffer and fill it with zeros."""
@@ -58,7 +58,7 @@ class TensorAudio(object):
   @classmethod
   def create_from_wav_file(cls,
                            file_name: str,
-                           buffer_size: int) -> "TensorAudio":
+                           buffer_size: int = None) -> "TensorAudio":
     """Creates `TensorAudio` object from the WAV file.
 
     Args:
@@ -69,13 +69,16 @@ class TensorAudio(object):
       `TensorAudio` object.
 
     Raises:
-      status.StatusNotOk if the audio file can't be decoded. Need to import
-        the module to catch this error: `from pybind11_abseil import status`,
-        see https://github.com/pybind/pybind11_abseil#abslstatusor.
+      status.StatusNotOk if the audio file can't be decoded.
     """
+    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
+    # Need to import the module to catch this error:
+    # `from pybind11_abseil import status`
+    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     audio = _LoadAudioBufferFromFile(
       file_name, buffer_size, np.zeros([buffer_size]))
-    return cls(audio.audio_format, audio.buffer_size, audio, is_from_file=True)
+    return cls(audio.audio_format, audio.buffer_size,
+               audio.float_buffer, is_from_file=True)
 
   def load_from_audio_record(self, record: audio_record.AudioRecord) -> None:
     """Loads audio data from an AudioRecord instance.
@@ -84,7 +87,7 @@ class TensorAudio(object):
     Raises:
       ValueError: Raised if the audio record's config is invalid.
     """
-    if record.buffer_size < self._sample_count:
+    if record.buffer_size < self._buffer_size:
       raise ValueError(
         "The audio record's buffer size cannot be smaller than the tensor "
         "audio's sample count.")
@@ -100,7 +103,7 @@ class TensorAudio(object):
         f"Expects {self._format.sample_rate}Hz.")
 
     # Load audio data from the AudioRecord instance.
-    data = record.read(self._sample_count)
+    data = record.read(self._buffer_size)
     self.load_from_array(data.astype(np.float32))
 
   def load_from_array(self, src: np.ndarray) -> None:
@@ -130,16 +133,15 @@ class TensorAudio(object):
     return self._format
 
   @property
-  def sample_count(self) -> int:
+  def buffer_size(self) -> int:
     """Gets the sample count of the audio."""
-    return self._sample_count
+    return self._buffer_size
 
   @property
-  def data(self) -> _CppAudioBuffer:
-    """Gets the C++ AudioBuffer object."""
+  def buffer(self) -> np.ndarray:
+    """Gets the internal buffer."""
     if self._is_from_file:
-      audio_data = self._data
+      audio_data = np.array(self._buffer, copy=False)
     else:
-      audio_data = _CppAudioBuffer(
-        self._buffer, self._sample_count, self._format)
+      audio_data = self._buffer
     return audio_data
