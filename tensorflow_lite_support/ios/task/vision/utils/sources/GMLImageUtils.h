@@ -40,6 +40,21 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable TfLiteFrameBuffer *)cFrameBufferWithGMLImage:(GMLImage *)gmlImage
                                                    error:(NSError *_Nullable *)error;
 
+/**
+ * Gets grayscale pixel buffer from GMLImage if source type is
+ * GMLImageSourceTypeImage.
+ *
+ * @param gmlImage Image of type GMLImage from which a grayScale pixel
+ * buffer has to be extracted.
+ *
+ * @warning Currently method only returns gray scale pixel buffer if source type
+ * is GMLImageSourceTypeImage since extracting gray scale pixel buffer from
+ * other source types is not a necessity for the current testing framework.
+ *
+ * @return The CVPixelBufferRef for the newly created gray scale pixel buffer.
+ */
++ (CVPixelBufferRef)grayScalePixelBufferWithGMLImage:(GMLImage *)gmlImage;
+
 - (instancetype)init NS_UNAVAILABLE;
 
 + (instancetype)new NS_UNAVAILABLE;
