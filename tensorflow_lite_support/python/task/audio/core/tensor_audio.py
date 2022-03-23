@@ -27,8 +27,7 @@ class TensorAudio(object):
 
   def __init__(self,
                audio_format: _CppAudioFormat,
-               buffer_size: int,
-               audio_data: np.ndarray = None) -> None:
+               buffer_size: int) -> None:
     """Initializes the `TensorAudio` object.
 
     Args:
@@ -40,9 +39,6 @@ class TensorAudio(object):
     self._buffer_size = buffer_size
     self._buffer = np.zeros(
         [self._buffer_size, self._format.channels], dtype=np.float32)
-
-    if audio_data is not None:
-      self.load_from_array(np.array(audio_data, copy=False))
 
   def clear(self):
     """Clear the internal buffer and fill it with zeros."""
@@ -70,7 +66,9 @@ class TensorAudio(object):
     # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     audio = _LoadAudioBufferFromFile(
       file_name, buffer_size, np.zeros([buffer_size]))
-    return cls(audio.audio_format, audio.buffer_size, audio.float_buffer)
+    tensor = TensorAudio(audio.audio_format, audio.buffer_size)
+    tensor.load_from_array(np.array(audio.float_buffer, copy=False))
+    return tensor
 
   def load_from_audio_record(self, record: audio_record.AudioRecord) -> None:
     """Loads audio data from an AudioRecord instance.
