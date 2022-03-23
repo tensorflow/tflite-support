@@ -41,13 +41,12 @@ tflite::support::StatusOr<AudioBuffer> LoadAudioBufferFromFile(
   uint32 decoded_sample_count;
   uint16 decoded_channel_count;
   uint32 decoded_sample_rate;
+
+  decoded_sample_count = buffer_size;
+
   RETURN_IF_ERROR(DecodeLin16WaveAsFloatVector(
       contents, wav_data, &decoded_sample_count, &decoded_channel_count,
       &decoded_sample_rate));
-
-  if (decoded_sample_count > buffer_size) {
-    decoded_sample_count = buffer_size;
-  }
 
   return AudioBuffer(
       wav_data->data(), decoded_sample_count,

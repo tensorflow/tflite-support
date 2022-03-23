@@ -29,17 +29,16 @@ class TensorAudio(object):
   def __init__(self,
                audio_format: _CppAudioFormat,
                buffer_size: int,
-               audio_data: _CppAudioBuffer = None,
+               audio_data: np.ndarray = None,
                is_from_file: bool = False,
                ) -> None:
     """Initializes the `TensorAudio` object.
 
     Args:
-      audio_format: AudioFormat, format of the audio.
-      buffer_size: int, buffer size of the audio.
-      audio_data: AudioBuffer, contains raw audio data, buffer size
-      and audio format info.
-      is_from_file: boolean, whether `audio_data` is loaded from the audio file.
+      audio_format: format of the audio.
+      buffer_size: buffer size of the audio.
+      audio_data: contains raw audio data.
+      is_from_file: whether `audio_data` is loaded from the audio file.
     """
     self._format = audio_format
     self._buffer_size = buffer_size
@@ -58,7 +57,7 @@ class TensorAudio(object):
   @classmethod
   def create_from_wav_file(cls,
                            file_name: str,
-                           buffer_size: int = None) -> "TensorAudio":
+                           buffer_size: int) -> "TensorAudio":
     """Creates `TensorAudio` object from the WAV file.
 
     Args:
