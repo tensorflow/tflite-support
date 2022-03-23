@@ -47,7 +47,7 @@ class TensorAudioTest(unittest.TestCase):
     self.assertEqual(tensor_audio_format.sample_rate, _SAMPLE_RATE)
     self.assertEqual(tensor.buffer_size, _BUFFER_SIZE)
     self.assertIsInstance(tensor.buffer, np.ndarray)
-    self.assertEqual(tensor.buffer[-1], -0.09640503)
+    self.assertAlmostEqual(tensor.buffer[-1], -0.09640503)
 
   def test_create_from_wav_file_fails_with_empty_file_path(self):
     # Fails loading TensorAudio object from WAV file.
@@ -135,7 +135,8 @@ class TensorAudioTest(unittest.TestCase):
     # Assert read all data in the float buffer.
     testing.assert_almost_equal(self.test_tensor_audio.buffer, expected_data)
 
-  def test_load_from_audio_record_fails_with_invalid_buffer_size(self):
+  @mock.patch("sounddevice.InputStream", return_value=mock.MagicMock())
+  def test_load_from_audio_record_fails_with_invalid_buffer_size(self, *args):
     # Fails loading audio data from an AudioRecord instance having
     # a buffer size less than that of TensorAudio.
     with self.assertRaisesRegex(
@@ -145,7 +146,9 @@ class TensorAudioTest(unittest.TestCase):
       record = audio_record.AudioRecord(_CHANNELS, _SAMPLE_RATE, 10000)
       self.test_tensor_audio.load_from_audio_record(record)
 
-  def test_load_from_audio_record_fails_with_invalid_number_of_channels(self):
+  @mock.patch("sounddevice.InputStream", return_value=mock.MagicMock())
+  def test_load_from_audio_record_fails_with_invalid_number_of_channels(self,
+                                                                        *args):
     # Fails loading audio data from an AudioRecord instance having
     # an invalid number of channels.
     with self.assertRaisesRegex(
@@ -155,7 +158,8 @@ class TensorAudioTest(unittest.TestCase):
       record = audio_record.AudioRecord(2, _SAMPLE_RATE, _BUFFER_SIZE)
       self.test_tensor_audio.load_from_audio_record(record)
 
-  def test_load_from_audio_record_fails_with_invalid_sample_rate(self):
+  @mock.patch("sounddevice.InputStream", return_value=mock.MagicMock())
+  def test_load_from_audio_record_fails_with_invalid_sample_rate(self, *args):
     # Fails loading audio data from an AudioRecord instance having
     # an invalid sample rate.
     with self.assertRaisesRegex(
