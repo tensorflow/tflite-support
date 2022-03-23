@@ -124,15 +124,11 @@ class TensorAudioTest(unittest.TestCase):
       callback_fn(dummy_data)
     expected_data = np.concatenate(input_data[-2:])
 
-    # Assert read all data in buffer.
-    recorded_audio_data = record.read(chunk_size * 2)
-    testing.assert_almost_equal(recorded_audio_data, expected_data)
-
     # Load audio data into TensorAudio from the AudioRecord instance.
     self.test_tensor_audio.load_from_audio_record(record)
     tensor_audio_data = self.test_tensor_audio.data.float_buffer
 
-    # Assert read same data.
+    # Assert read all data in the float buffer.
     testing.assert_almost_equal(tensor_audio_data, expected_data)
 
   def test_load_from_audio_record_fails_with_invalid_buffer_size(self):
