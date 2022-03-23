@@ -13,3 +13,16 @@ py_test(
         "//tensorflow_lite_support/python/task/audio/core:audio_record",
     ],
 )
+
+py_test(
+    name = "tensor_audio_test",
+    srcs = ["tensor_audio_test.py"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/audio:test_audio_clips",
+    ],
+    deps = [
+        # build rule placeholder: numpy dep,
+        "//tensorflow_lite_support/python/task/audio/core:tensor_audio",
+        "//tensorflow_lite_support/python/test:test_util",
+    ],
+)
