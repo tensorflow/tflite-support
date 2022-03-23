@@ -18,7 +18,6 @@ import numpy as np
 from tensorflow_lite_support.python.task.audio.core.pybinds import _pywrap_audio_buffer
 from tensorflow_lite_support.python.task.audio.core import audio_record
 
-_CppAudioBuffer = _pywrap_audio_buffer.AudioBuffer
 _CppAudioFormat = _pywrap_audio_buffer.AudioFormat
 _LoadAudioBufferFromFile = _pywrap_audio_buffer.LoadAudioBufferFromFile
 
