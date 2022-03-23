@@ -57,8 +57,8 @@ class TensorAudio(object):
 
   @classmethod
   def create_from_wav_file(cls,
-                    file_name: str,
-                    buffer_size: int) -> "TensorAudio":
+                           file_name: str,
+                           buffer_size: int) -> "TensorAudio":
     """Creates `TensorAudio` object from the WAV file.
 
     Args:
