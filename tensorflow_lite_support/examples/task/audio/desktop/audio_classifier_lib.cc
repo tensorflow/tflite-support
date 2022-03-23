@@ -46,7 +46,7 @@ tflite::support::StatusOr<AudioBuffer> LoadAudioBufferFromFile(
       &decoded_sample_rate));
 
   if (decoded_sample_count > buffer_size) {
-      decoded_sample_count = buffer_size;
+    decoded_sample_count = buffer_size;
   }
 
   return AudioBuffer(
