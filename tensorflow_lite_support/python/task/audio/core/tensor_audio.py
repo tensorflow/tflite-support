@@ -29,7 +29,7 @@ class TensorAudio(object):
   def __init__(self,
                audio_format: _CppAudioFormat,
                buffer_size: int,
-               audio_data: np.ndarray = None,
+               buffer: np.ndarray = None,
                is_from_file: bool = False,
                ) -> None:
     """Initializes the `TensorAudio` object.
@@ -37,7 +37,7 @@ class TensorAudio(object):
     Args:
       audio_format: format of the audio.
       buffer_size: buffer size of the audio.
-      audio_data: contains raw audio data.
+      buffer: contains raw audio data.
       is_from_file: whether `audio_data` is loaded from the audio file.
     """
     self._format = audio_format
@@ -45,7 +45,7 @@ class TensorAudio(object):
     self._is_from_file = is_from_file
 
     if self._is_from_file:
-      self._buffer = audio_data
+      self._buffer = buffer
     else:
       self._buffer = np.zeros(
         [self._buffer_size, self._format.channels], dtype=np.float32)
@@ -77,7 +77,7 @@ class TensorAudio(object):
     audio = _LoadAudioBufferFromFile(
       file_name, buffer_size, np.zeros([buffer_size]))
     return cls(audio.audio_format, audio.buffer_size,
-               audio.float_buffer, is_from_file=True)
+               np.array(audio.float_buffer, copy=False), is_from_file=True)
 
   def load_from_audio_record(self, record: audio_record.AudioRecord) -> None:
     """Loads audio data from an AudioRecord instance.
@@ -139,8 +139,4 @@ class TensorAudio(object):
   @property
   def buffer(self) -> np.ndarray:
     """Gets the internal buffer."""
-    if self._is_from_file:
-      buffer = np.array(self._buffer, copy=False)
-    else:
-      buffer = self._buffer
-    return buffer
+    return self._buffer
