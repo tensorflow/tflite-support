@@ -33,7 +33,6 @@ class TensorAudio(object):
     Args:
       audio_format: format of the audio.
       buffer_size: buffer size of the audio.
-      audio_data, optional: contains raw audio data.
     """
     self._format = audio_format
     self._buffer_size = buffer_size
