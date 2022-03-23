@@ -11,8 +11,7 @@ py_library(
         "image_embedder.py",
     ],
     deps = [
-        "//tensorflow_lite_support/python/task/core:task_options",
-        "//tensorflow_lite_support/python/task/core/proto:configuration_pb2",
+        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:embedding_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:embeddings_pb2",
@@ -29,8 +28,7 @@ py_library(
         "image_classifier.py",
     ],
     deps = [
-        "//tensorflow_lite_support/python/task/core:task_options",
-        "//tensorflow_lite_support/python/task/core:task_utils",
+        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classification_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
@@ -47,8 +45,7 @@ py_library(
         "object_detector.py",
     ],
     deps = [
-        "//tensorflow_lite_support/python/task/core:task_options",
-        "//tensorflow_lite_support/python/task/core:task_utils",
+        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:detection_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:detections_pb2",

@@ -75,7 +75,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
       !external_file_.has_file_descriptor_meta()) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        "ExternalFile must specify at least one of 'file_content', file_name' "
+        "ExternalFile must specify at least one of 'file_content', 'file_name' "
         "or 'file_descriptor_meta'.",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
