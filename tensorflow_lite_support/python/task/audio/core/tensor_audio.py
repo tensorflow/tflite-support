@@ -101,7 +101,7 @@ class TensorAudio(object):
 
     # Load audio data from the AudioRecord instance.
     data = record.read(self._sample_count)
-    self.load_from_array(data)
+    self.load_from_array(data.astype(np.float32))
 
   def load_from_array(self, src: np.ndarray) -> None:
     """Loads audio data from a NumPy array.

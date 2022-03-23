@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for tensor_audio."""
+from unittest import mock
+
 import numpy as np
+from numpy import testing
 from numpy.testing import assert_almost_equal
 import unittest
 
@@ -103,6 +106,34 @@ class TensorAudioTest(unittest.TestCase):
         f"Expect {_SAMPLE_COUNT}."):
       array = np.random.rand(20000, _CHANNELS).astype(np.float32)
       self.test_tensor_audio.load_from_array(array)
+
+  @mock.patch("sounddevice.InputStream", return_value=mock.MagicMock())
+  def test_load_from_audio_record(self, mock_input_stream):
+    record = audio_record.AudioRecord(_CHANNELS, _SAMPLE_RATE, _SAMPLE_COUNT)
+
+    # Get AudioRecord's audio callback function.
+    _, mock_input_stream_init_args = mock_input_stream.call_args
+    callback_fn = mock_input_stream_init_args["callback"]
+
+    # Create dummy data to feed to the AudioRecord instance.
+    chunk_size = int(_SAMPLE_COUNT * 0.5)
+    input_data = []
+    for _ in range(3):
+      dummy_data = np.random.rand(chunk_size, _CHANNELS).astype(float)
+      input_data.append(dummy_data)
+      callback_fn(dummy_data)
+    expected_data = np.concatenate(input_data[-2:])
+
+    # Assert read all data in buffer.
+    recorded_audio_data = record.read(chunk_size * 2)
+    testing.assert_almost_equal(recorded_audio_data, expected_data)
+
+    # Load audio data into TensorAudio from the AudioRecord instance.
+    self.test_tensor_audio.load_from_audio_record(record)
+    tensor_audio_data = self.test_tensor_audio.data.float_buffer
+
+    # Assert read same data.
+    testing.assert_almost_equal(tensor_audio_data, expected_data)
 
   def test_load_from_audio_record_fails_with_invalid_buffer_size(self):
     # Fails loading audio data from an AudioRecord instance having
