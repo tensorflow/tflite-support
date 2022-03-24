@@ -53,7 +53,7 @@ class TensorAudio(object):
       file_name: WAV file name.
       buffer_size: Required input buffer size. The number of samples that the
       C++ AudioBuffer object can store. If the WAV file contains more samples
-      than`buffer_size`, only the samples at the beginning of the WAV file will
+      than `buffer_size`, only the samples at the beginning of the WAV file will
       be loaded.
 
     Returns:
