@@ -246,8 +246,7 @@ class TFLImageSegmenterTests: XCTestCase {
         filename: "segmentation_golden_rotation0",
         type: "png"))
 
-    let pixelBuffer = GMLImageUtils.grayScalePixelBuffer(with: goldenMaskImage)
-                                   .takeRetainedValue()
+    let pixelBuffer = goldenMaskImage.grayScalePixelBuffer().takeRetainedValue()
 
     CVPixelBufferLockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.readOnly)
 
