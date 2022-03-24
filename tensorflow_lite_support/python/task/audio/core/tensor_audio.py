@@ -46,15 +46,16 @@ class TensorAudio(object):
   @classmethod
   def create_from_wav_file(cls,
                            file_name: str,
-                           buffer_size: int) -> "TensorAudio":
+                           sample_count: int) -> "TensorAudio":
     """Creates `TensorAudio` object from the WAV file.
 
     Args:
       file_name: WAV file name.
-      buffer_size: Required input buffer size. The number of samples that the
-      C++ AudioBuffer object can store. If the WAV file contains more samples
-      than `buffer_size`, only the samples at the beginning of the WAV file will
-      be loaded.
+      sample_count: The number of samples to read from the WAV file. This value
+       should match with the input size of the TensorFlow Lite audio model that
+       will consume the created TensorAudio object. If the WAV file contains
+       more samples than sample_count, only the samples at the beginning of the
+       WAV file will be loaded.
 
     Returns:
       `TensorAudio` object.
@@ -67,7 +68,7 @@ class TensorAudio(object):
     # `from pybind11_abseil import status`
     # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     audio = _LoadAudioBufferFromFile(
-      file_name, buffer_size, np.zeros([buffer_size]))
+      file_name, sample_count, np.zeros([sample_count]))
     tensor = TensorAudio(audio.audio_format, audio.buffer_size)
     tensor.load_from_array(np.array(audio.float_buffer, copy=False))
     return tensor
