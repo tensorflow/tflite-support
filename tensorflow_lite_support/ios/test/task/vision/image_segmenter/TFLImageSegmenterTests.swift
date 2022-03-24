@@ -84,28 +84,111 @@ class TFLImageSegmenterTests: XCTestCase {
       expectedLabel: "bottle")
 
     self.verifyColoredLabel(
-      coloredLabels[5],
+      coloredLabels[6],
       expectedR: 0,
       expectedG: 128,
       expectedB: 128,
       expectedLabel: "bus")
-    // self.verifyDetection(
-    //   detectionResult.detections[1],
-    //   expectedBoundingBox: CGRect(x: 602, y: 157, width: 394, height: 447),
-    //   expectedFirstScore: 0.609375,
-    //   expectedFirstLabel: "cat")
 
-    // self.verifyDetection(
-    //   detectionResult.detections[2],
-    //   expectedBoundingBox: CGRect(x: 260, y: 394, width: 179, height: 209),
-    //   expectedFirstScore: 0.5625,
-    //   expectedFirstLabel: "cat")
+    self.verifyColoredLabel(
+      coloredLabels[7],
+      expectedR: 128,
+      expectedG: 128,
+      expectedB: 128,
+      expectedLabel: "car")
 
-    // self.verifyDetection(
-    //   detectionResult.detections[3],
-    //   expectedBoundingBox: CGRect(x: 387, y: 197, width: 281, height: 409),
-    //   expectedFirstScore: 0.488281,
-    //   expectedFirstLabel: "dog")
+    self.verifyColoredLabel(
+      coloredLabels[8],
+      expectedR: 64,
+      expectedG: 0,
+      expectedB: 0,
+      expectedLabel: "cat")
+    
+    self.verifyColoredLabel(
+      coloredLabels[9],
+      expectedR: 192,
+      expectedG: 0,
+      expectedB: 0,
+      expectedLabel: "chair")
+      
+    self.verifyColoredLabel(
+      coloredLabels[10],
+      expectedR: 64,
+      expectedG: 128,
+      expectedB: 0,
+      expectedLabel: "cow")
+
+    self.verifyColoredLabel(
+      coloredLabels[11],
+      expectedR: 192,
+      expectedG: 128,
+      expectedB: 0,
+      expectedLabel: "dining table")
+
+    self.verifyColoredLabel(
+      coloredLabels[12],
+      expectedR: 64,
+      expectedG: 0,
+      expectedB: 128,
+      expectedLabel: "dog")
+
+    self.verifyColoredLabel(
+      coloredLabels[13],
+      expectedR: 192,
+      expectedG: 0,
+      expectedB: 128,
+      expectedLabel: "horse")
+
+    
+    self.verifyColoredLabel(
+      coloredLabels[14],
+      expectedR: 64,
+      expectedG: 128,
+      expectedB: 128,
+      expectedLabel: "motorbike")
+
+        
+    self.verifyColoredLabel(
+      coloredLabels[15],
+      expectedR: 192,
+      expectedG: 128,
+      expectedB: 128,
+      expectedLabel: "person")
+
+    self.verifyColoredLabel(
+      coloredLabels[16],
+      expectedR: 0,
+      expectedG: 64,
+      expectedB: 0,
+      expectedLabel: "potted plant")
+
+    self.verifyColoredLabel(
+      coloredLabels[17],
+      expectedR: 128,
+      expectedG: 64,
+      expectedB: 0,
+      expectedLabel: "sheep")
+
+    self.verifyColoredLabel(
+      coloredLabels[18],
+      expectedR: 0,
+      expectedG: 192,
+      expectedB: 0,
+      expectedLabel: "sofa")
+
+    self.verifyColoredLabel(
+      coloredLabels[19],
+      expectedR: 128,
+      expectedG: 192,
+      expectedB: 0,
+      expectedLabel: "train")
+
+    self.verifyColoredLabel(
+      coloredLabels[20],
+      expectedR: 0,
+      expectedG: 64,
+      expectedB: 128,
+      expectedLabel: "tv")
   }
 
   func verifyColoredLabel(
