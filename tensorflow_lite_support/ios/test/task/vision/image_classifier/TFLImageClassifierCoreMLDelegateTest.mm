@@ -68,8 +68,8 @@ using ClassificationResult = ::tflite::task::vision::ClassificationResult;
   XCTAssertNotNil(gmlImage);
 
   // Converts the test image to a frame buffer.
-  NSError* error;
-  TfLiteFrameBuffer* cFrameBuffer = [gmlImage cFrameBufferWithGMLImage:gmlImage error:&error];
+  NSError* error = nullptr;
+  TfLiteFrameBuffer* cFrameBuffer = [gmlImage cFrameBufferWithError:&error];
   XCTAssertNotEqual(cFrameBuffer, nullptr);
   tflite::support::StatusOr<std::unique_ptr<::tflite::task::vision::FrameBuffer>>
       frame_buffer_status = ::tflite::task::vision::CreateCppFrameBuffer(cFrameBuffer);
