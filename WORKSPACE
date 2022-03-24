@@ -28,6 +28,11 @@ http_file(
     urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_qa/mobilebert_vocab.txt"],
 )
 
+http_file(
+    name = "universal_sentence_encoder_qa_with_metadata",
+    sha256 = "82c2d0450aa458adbec2f78eff33cfbf2a41b606b44246726ab67373926e32bc",
+    urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_qa/universal_sentence_encoder_qa_with_metadata.tflite"],
+)
 
 http_file(
     name = "albert",

@@ -14,10 +14,8 @@
 """Text embedder task."""
 
 import dataclasses
-from typing import Any, Optional
 
-from tensorflow_lite_support.python.task.core import task_options
-from tensorflow_lite_support.python.task.core import task_utils
+from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embeddings_pb2
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_text_embedder
@@ -25,29 +23,15 @@ from tensorflow_lite_support.python.task.text.pybinds import text_embedder_optio
 
 _ProtoTextEmbedderOptions = text_embedder_options_pb2.TextEmbedderOptions
 _CppTextEmbedder = _pywrap_text_embedder.TextEmbedder
-_BaseOptions = task_options.BaseOptions
-_ExternalFile = task_options.ExternalFile
+_BaseOptions = base_options_pb2.BaseOptions
+_EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 
 
 @dataclasses.dataclass
 class TextEmbedderOptions:
   """Options for the text embedder task."""
   base_options: _BaseOptions
-  embedding_options: Optional[embedding_options_pb2.EmbeddingOptions] = None
-
-  def __eq__(self, other: Any) -> bool:
-    if (not isinstance(other, self.__class__) or
-        self.base_options != other.base_options):
-      return False
-
-    if self.embedding_options is None and other.embedding_options is None:
-      return True
-    elif (self.embedding_options and other.embedding_options and
-          self.embedding_options.SerializeToString()
-          == self.embedding_options.SerializeToString()):
-      return True
-    else:
-      return False
+  embedding_options: _EmbeddingOptions = _EmbeddingOptions()
 
 
 class TextEmbedder(object):
@@ -77,7 +61,7 @@ class TextEmbedder(object):
     # Need to import the module to catch this error:
     # `from pybind11_abseil import status`
     # see https://github.com/pybind/pybind11_abseil#abslstatusor.
-    base_options = _BaseOptions(model_file=_ExternalFile(file_name=file_path))
+    base_options = _BaseOptions(file_name=file_path)
     options = TextEmbedderOptions(base_options=base_options)
     return cls.create_from_options(options)
 
@@ -98,13 +82,8 @@ class TextEmbedder(object):
     # Need to import the module to catch this error:
     # `from pybind11_abseil import status`
     # see https://github.com/pybind/pybind11_abseil#abslstatusor.
-    proto_options = _ProtoTextEmbedderOptions()
-    proto_options.base_options.CopyFrom(
-        task_utils.ConvertToProtoBaseOptions(options.base_options))
-    if options.embedding_options:
-      embedding_options = proto_options.embedding_options.add()
-      embedding_options.CopyFrom(options.embedding_options)
-    embedder = _CppTextEmbedder.create_from_options(proto_options)
+    embedder = _CppTextEmbedder.create_from_options(options.base_options,
+                                                    options.embedding_options)
     return cls(options, embedder)
 
   def embed(self, text: str) -> embeddings_pb2.EmbeddingResult:
@@ -146,10 +125,6 @@ class TextEmbedder(object):
   def number_of_output_layers(self) -> int:
     """Gets the number of output layers of the model."""
     return self._embedder.get_number_of_output_layers()
-
-  def __eq__(self, other: Any) -> bool:
-    return (isinstance(other, self.__class__) and
-            self._options == other._options)
 
   @property
   def options(self) -> TextEmbedderOptions:

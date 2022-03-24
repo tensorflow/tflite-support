@@ -48,6 +48,22 @@ cc_test(
 )
 
 cc_test(
+    name = "universal_sentence_encoder_qa_test",
+    timeout = "long",
+    srcs = ["universal_sentence_encoder_qa_test.cc"],
+    data = ["//tensorflow_lite_support/cc/test/testdata/task/text:universal_sentence_encoder_qa"],
+    deps = [
+        "//tensorflow_lite_support/cc/port:gtest_main",
+        "//tensorflow_lite_support/cc/task/core:task_utils",
+        "//tensorflow_lite_support/cc/task/text:universal_sentence_encoder_qa",
+        "//tensorflow_lite_support/cc/task/text/proto:retrieval_cc_proto",
+        "//tensorflow_lite_support/cc/test:test_utils",
+        "//tensorflow_lite_support/examples/task/text/desktop:universal_sentence_encoder_qa_op_resolver",
+        "@org_tensorflow//tensorflow/lite/core/shims:cc_shims_test_util",
+    ],
+)
+
+cc_test(
     name = "text_embedder_test",
     srcs = ["text_embedder_test.cc"],
     data = [

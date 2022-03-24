@@ -21,7 +21,7 @@ from absl.testing import parameterized
 # fixed the dependency issue.
 from google.protobuf import json_format
 import unittest
-from tensorflow_lite_support.python.task.core import task_options
+from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import class_pb2
 from tensorflow_lite_support.python.task.processor.proto import detection_options_pb2
@@ -31,8 +31,7 @@ from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
 
-_BaseOptions = task_options.BaseOptions
-_ExternalFile = task_options.ExternalFile
+_BaseOptions = base_options_pb2.BaseOptions
 _ObjectDetector = object_detector.ObjectDetector
 _ObjectDetectorOptions = object_detector.ObjectDetectorOptions
 
@@ -100,9 +99,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
     self.model_path = test_util.get_test_data_path(_MODEL_FILE)
 
   @classmethod
-  def create_detector_from_options(cls, model_file, **detection_options):
-    print(detection_options)
-    base_options = _BaseOptions(model_file=model_file)
+  def create_detector_from_options(cls, base_options, **detection_options):
     detection_options = detection_options_pb2.DetectionOptions(
         **detection_options)
     options = _ObjectDetectorOptions(
@@ -134,35 +131,26 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_create_from_options_succeeds_with_valid_model_path(self):
     # Creates with options containing model file successfully.
-    base_options = _BaseOptions(
-        model_file=_ExternalFile(file_name=self.model_path))
+    base_options = _BaseOptions(file_name=self.model_path)
     options = _ObjectDetectorOptions(base_options=base_options)
     detector = _ObjectDetector.create_from_options(options)
     self.assertIsInstance(detector, _ObjectDetector)
-
-  def test_create_from_options_fails_with_missing_model_file(self):
-    # Missing the model file.
-    with self.assertRaisesRegex(
-        TypeError,
-        r"__init__\(\) missing 1 required positional argument: 'model_file'"):
-      _BaseOptions()
 
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
         Exception,
-        r'INVALID_ARGUMENT: Expected exactly one of `base_options.model_file` '
-        r'or `model_file_with_metadata` to be provided, found 0. '
+        r'INVALID_ARGUMENT: ExternalFile must specify at least one of '
+        r"'file_content', 'file_name' or 'file_descriptor_meta'. "
         r"\[tflite::support::TfLiteSupportStatus='2']"):
-      base_options = _BaseOptions(model_file=_ExternalFile(file_name=''))
+      base_options = _BaseOptions(file_name='')
       options = _ObjectDetectorOptions(base_options=base_options)
       _ObjectDetector.create_from_options(options)
 
   def test_create_from_options_succeeds_with_valid_model_content(self):
     # Creates with options containing model content successfully.
     with open(self.model_path, 'rb') as f:
-      base_options = _BaseOptions(
-          model_file=_ExternalFile(file_content=f.read()))
+      base_options = _BaseOptions(file_content=f.read())
       options = _ObjectDetectorOptions(base_options=base_options)
       detector = _ObjectDetector.create_from_options(options)
       self.assertIsInstance(detector, _ObjectDetector)
@@ -174,20 +162,20 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
                         expected_detections):
     # Creates detector.
     if model_file_type is ModelFileType.FILE_NAME:
-      model_file = _ExternalFile(file_name=self.model_path)
+      base_options = _BaseOptions(file_name=self.model_path)
     elif model_file_type is ModelFileType.FILE_CONTENT:
       with open(self.model_path, 'rb') as f:
         model_content = f.read()
-      model_file = _ExternalFile(file_content=model_content)
+      base_options = _BaseOptions(file_content=model_content)
     else:
       # Should never happen
       raise ValueError('model_file_type is invalid.')
 
     detector = self.create_detector_from_options(
-        model_file=model_file, max_results=max_results)
+        base_options, max_results=max_results)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
@@ -202,12 +190,12 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_score_threshold_option(self):
     # Creates detector.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
     detector = self.create_detector_from_options(
-        model_file=model_file, score_threshold=_SCORE_THRESHOLD)
+        base_options, score_threshold=_SCORE_THRESHOLD)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
@@ -224,12 +212,12 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_max_results_option(self):
     # Creates detector.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
     detector = self.create_detector_from_options(
-        model_file=model_file, max_results=_MAX_RESULTS)
+        base_options, max_results=_MAX_RESULTS)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
@@ -241,12 +229,12 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_allow_list_option(self):
     # Creates detector.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
     detector = self.create_detector_from_options(
-        model_file=model_file, class_name_allowlist=_ALLOW_LIST)
+        base_options, class_name_allowlist=_ALLOW_LIST)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
@@ -262,12 +250,12 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_deny_list_option(self):
     # Creates detector.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
     detector = self.create_detector_from_options(
-        model_file=model_file, class_name_denylist=_DENY_LIST)
+        base_options, class_name_denylist=_DENY_LIST)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
@@ -287,8 +275,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
         r'INVALID_ARGUMENT: `class_name_whitelist` and `class_name_blacklist` '
         r'are mutually exclusive options. '
         r"\[tflite::support::TfLiteSupportStatus='2'\]"):
-      base_options = _BaseOptions(
-          model_file=_ExternalFile(file_name=self.model_path))
+      base_options = _BaseOptions(file_name=self.model_path)
       detection_options = detection_options_pb2.DetectionOptions(
           class_name_allowlist=['foo'], class_name_denylist=['bar'])
       options = _ObjectDetectorOptions(

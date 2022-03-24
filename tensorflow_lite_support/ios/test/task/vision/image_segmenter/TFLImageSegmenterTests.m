@@ -19,10 +19,9 @@
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
 #define VerifyColoredLabel(coloredLabel, expectedR, expectedG, expectedB, expectedLabel) \
-  NSLog(@"Expected %d", coloredLabel.r);                                                 \
-  XCTAssertEqual((unsigned long)coloredLabel.r, expectedR);                              \
-  XCTAssertEqual((unsigned long)coloredLabel.g, expectedG);                              \
-  XCTAssertEqual((unsigned long)coloredLabel.b, expectedB);                              \
+  XCTAssertEqual(coloredLabel.r, expectedR);                                             \
+  XCTAssertEqual(coloredLabel.g, expectedG);                                             \
+  XCTAssertEqual(coloredLabel.b, expectedB);                                             \
   XCTAssertEqualObjects(coloredLabel.label, expectedLabel)
 
 // The maximum fraction of pixels in the candidate mask that can have a
@@ -37,7 +36,7 @@ NSInteger const kGoldenMaskMagnificationFactor = 10;
 
 NSInteger const deepLabV3SegmentationWidth = 257;
 
-float const deepLabV3SegmentationHeight = 257;
+NSInteger const deepLabV3SegmentationHeight = 257;
 
 @interface TFLImageSegmenterTests : XCTestCase
 
@@ -56,12 +55,12 @@ float const deepLabV3SegmentationHeight = 257;
   XCTAssertNotNil(self.modelPath);
 }
 
-- (void)compareWithDepLabV3PartialColoredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
+- (void)compareWithDeepLabV3PartialColoredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
   VerifyColoredLabel(coloredLabels[0],
-                     0,  // expectedR
-                     0,  // expectedG
-                     0,  // expectedB
-                     @"background");
+                     0,               // expectedR
+                     0,               // expectedG
+                     0,               // expectedB
+                     @"background");  // expectedLabel
 
   VerifyColoredLabel(coloredLabels[1],
                      128,          // expectedR
@@ -204,7 +203,7 @@ float const deepLabV3SegmentationHeight = 257;
   );
 }
 
-- (void)testSuccessfullImageSegmentationWithCategoryMask {
+- (void)testSuccessfulImageSegmentationWithCategoryMask {
   TFLImageSegmenterOptions *imageSegmenterOptions =
       [[TFLImageSegmenterOptions alloc] initWithModelPath:self.modelPath];
 
@@ -224,7 +223,7 @@ float const deepLabV3SegmentationHeight = 257;
   XCTAssertEqual(segmentationResult.segmentations.count, 1);
 
   XCTAssertNotNil(segmentationResult.segmentations[0].coloredLabels);
-  [self compareWithDepLabV3PartialColoredLabels:segmentationResult.segmentations[0].coloredLabels];
+  [self compareWithDeepLabV3PartialColoredLabels:segmentationResult.segmentations[0].coloredLabels];
 
   XCTAssertNotNil(segmentationResult.segmentations[0].categoryMask);
   XCTAssertTrue(segmentationResult.segmentations[0].categoryMask.mask != nil);
@@ -239,9 +238,6 @@ float const deepLabV3SegmentationHeight = 257;
   CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
 
   UInt8 *pixelBufferBaseAddress = (UInt8 *)CVPixelBufferGetBaseAddress(pixelBuffer);
-
-  NSInteger goldenImageWidth = CVPixelBufferGetWidth(pixelBuffer);
-  NSInteger goldenImageHeight = CVPixelBufferGetHeight(pixelBuffer);
 
   XCTAssertEqual(deepLabV3SegmentationWidth,
                  segmentationResult.segmentations[0].categoryMask.width);

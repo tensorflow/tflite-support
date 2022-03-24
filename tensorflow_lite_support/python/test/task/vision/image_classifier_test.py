@@ -21,7 +21,7 @@ from google.protobuf import json_format
 # TODO(b/220067158): Change to import tensorflow and leverage tf.test once
 # fixed the dependency issue.
 import unittest
-from tensorflow_lite_support.python.task.core import task_options
+from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import class_pb2
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
@@ -31,8 +31,7 @@ from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
 
-_BaseOptions = task_options.BaseOptions
-_ExternalFile = task_options.ExternalFile
+_BaseOptions = base_options_pb2.BaseOptions
 _ImageClassifier = image_classifier.ImageClassifier
 _ImageClassifierOptions = image_classifier.ImageClassifierOptions
 
@@ -58,8 +57,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     self.model_path = test_util.get_test_data_path(_MODEL_FILE)
 
   @staticmethod
-  def create_classifier_from_options(model_file, **classification_options):
-    base_options = _BaseOptions(model_file=model_file)
+  def create_classifier_from_options(base_options, **classification_options):
     classification_options = classification_options_pb2.ClassificationOptions(
         **classification_options)
     options = _ImageClassifierOptions(
@@ -87,35 +85,26 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_create_from_options_succeeds_with_valid_model_path(self):
     # Creates with options containing model file successfully.
-    base_options = _BaseOptions(
-        model_file=_ExternalFile(file_name=self.model_path))
+    base_options = _BaseOptions(file_name=self.model_path)
     options = _ImageClassifierOptions(base_options=base_options)
     classifier = _ImageClassifier.create_from_options(options)
     self.assertIsInstance(classifier, _ImageClassifier)
-
-  def test_create_from_options_fails_with_missing_model_file(self):
-    # Missing the model file.
-    with self.assertRaisesRegex(
-        TypeError,
-        r"__init__\(\) missing 1 required positional argument: 'model_file'"):
-      _BaseOptions()
 
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
         Exception,
-        r'INVALID_ARGUMENT: Expected exactly one of `base_options.model_file` '
-        r'or `model_file_with_metadata` to be provided, found 0. '
+        r'INVALID_ARGUMENT: ExternalFile must specify at least one of '
+        r"'file_content', 'file_name' or 'file_descriptor_meta'. "
         r"\[tflite::support::TfLiteSupportStatus='2']"):
-      base_options = _BaseOptions(model_file=_ExternalFile(file_name=''))
+      base_options = _BaseOptions(file_name='')
       options = _ImageClassifierOptions(base_options=base_options)
       _ImageClassifier.create_from_options(options)
 
   def test_create_from_options_succeeds_with_valid_model_content(self):
     # Creates with options containing model content successfully.
     with open(self.model_path, 'rb') as f:
-      base_options = _BaseOptions(
-          model_file=_ExternalFile(file_content=f.read()))
+      base_options = _BaseOptions(file_content=f.read())
       options = _ImageClassifierOptions(base_options=base_options)
       classifier = _ImageClassifier.create_from_options(options)
       self.assertIsInstance(classifier, _ImageClassifier)
@@ -149,20 +138,20 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
                           expected_categories):
     # Creates classifier.
     if model_file_type is ModelFileType.FILE_NAME:
-      model_file = _ExternalFile(file_name=self.model_path)
+      base_options = _BaseOptions(file_name=self.model_path)
     elif model_file_type is ModelFileType.FILE_CONTENT:
       with open(self.model_path, 'rb') as f:
         model_content = f.read()
-      model_file = _ExternalFile(file_content=model_content)
+      base_options = _BaseOptions(file_content=model_content)
     else:
       # Should never happen
       raise ValueError('model_file_type is invalid.')
 
     classifier = self.create_classifier_from_options(
-        model_file, max_results=max_results)
+        base_options, max_results=max_results)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
@@ -177,12 +166,13 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_classify_model_with_bounding_box(self):
     # Creates classifier.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
 
-    classifier = self.create_classifier_from_options(model_file, max_results=3)
+    classifier = self.create_classifier_from_options(
+        base_options, max_results=3)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Bounding box in "burger.jpg" corresponding to "burger_crop.jpg".
     bounding_box = bounding_box_pb2.BoundingBox(
@@ -216,13 +206,13 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_max_results_option(self):
     # Creates classifier.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
-        model_file, max_results=_MAX_RESULTS)
+        base_options, max_results=_MAX_RESULTS)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
@@ -235,13 +225,13 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_score_threshold_option(self):
     # Creates classifier.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
-        model_file, score_threshold=_SCORE_THRESHOLD)
+        base_options, score_threshold=_SCORE_THRESHOLD)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
@@ -258,13 +248,13 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_allowlist_option(self):
     # Creates classifier.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
-        model_file, class_name_allowlist=_ALLOW_LIST)
+        base_options, class_name_allowlist=_ALLOW_LIST)
 
     # Loads image.
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
@@ -280,13 +270,13 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def test_denylist_option(self):
     # Creates classifier.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = self.create_classifier_from_options(
-        model_file, score_threshold=0.01, class_name_denylist=_DENY_LIST)
+        base_options, score_threshold=0.01, class_name_denylist=_DENY_LIST)
 
     # Loads image
-    image = tensor_image.TensorImage.from_file(self.test_image_path)
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
@@ -306,47 +296,13 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
         r'INVALID_ARGUMENT: `class_name_whitelist` and `class_name_blacklist` '
         r'are mutually exclusive options. '
         r"\[tflite::support::TfLiteSupportStatus='2'\]"):
-      base_options = _BaseOptions(
-          model_file=_ExternalFile(file_name=self.model_path))
+      base_options = _BaseOptions(file_name=self.model_path)
       classification_options = classification_options_pb2.ClassificationOptions(
           class_name_allowlist=['foo'], class_name_denylist=['bar'])
       options = _ImageClassifierOptions(
           base_options=base_options,
           classification_options=classification_options)
       _ImageClassifier.create_from_options(options)
-
-  def test_equal(self):
-    base_options1 = _BaseOptions(
-        model_file=_ExternalFile(file_name=self.model_path))
-    options1 = _ImageClassifierOptions(base_options=base_options1)
-    classifier1 = _ImageClassifier.create_from_options(options1)
-    # Checks the same classifier object.
-    self.assertEqual(classifier1, classifier1)
-
-    base_options2 = _BaseOptions(
-        model_file=_ExternalFile(file_name=self.model_path))
-    options2 = _ImageClassifierOptions(base_options=base_options2)
-    classifier2 = _ImageClassifier.create_from_options(options2)
-    # Checks the classifiers with same file name.
-    self.assertEqual(classifier1, classifier2)
-
-    with open(self.model_path, 'rb') as f:
-      model_content = f.read()
-    base_options3 = _BaseOptions(
-        model_file=_ExternalFile(file_content=model_content))
-    options3 = _ImageClassifierOptions(base_options=base_options3)
-    classifier3 = _ImageClassifier.create_from_options(options3)
-    # Checks one classifier with file_name and the other with model_content.
-    self.assertNotEqual(classifier1, classifier3)
-
-    base_options4 = _BaseOptions(
-        model_file=_ExternalFile(file_name=self.model_path))
-    options4 = _ImageClassifierOptions(base_options=base_options4)
-    options4.classification_options = classification_options_pb2.ClassificationOptions(
-        score_threshold=0.5)
-    classifier4 = _ImageClassifier.create_from_options(options4)
-    # Checks the classifiers with different classification options.
-    self.assertNotEqual(classifier1, classifier4)
 
 
 if __name__ == '__main__':

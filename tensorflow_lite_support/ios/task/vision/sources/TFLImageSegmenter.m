@@ -20,11 +20,6 @@
 
 #include "tensorflow_lite_support/c/task/vision/image_segmenter.h"
 
-@interface TFLImageSegmenter ()
-/** ImageSegmenter backed by C API */
-@property(nonatomic) TfLiteImageSegmenter *imageSegmenter;
-@end
-
 @implementation TFLImageSegmenterOptions
 @synthesize baseOptions;
 @synthesize outputType;
@@ -48,7 +43,11 @@
 
 @end
 
-@implementation TFLImageSegmenter
+@implementation TFLImageSegmenter {
+  /** ImageSegmenter backed by C API */
+  TfLiteImageSegmenter *_imageSegmenter;
+}
+
 - (void)dealloc {
   TfLiteImageSegmenterDelete(_imageSegmenter);
 }
@@ -90,9 +89,9 @@
     return nil;
   }
 
-  TfLiteSupportError *detectError = nil;
+  TfLiteSupportError *segmentError = nil;
   TfLiteSegmentationResult *cSegmentationResult =
-      TfLiteImageSegmenterSegment(_imageSegmenter, cFrameBuffer, &detectError);
+      TfLiteImageSegmenterSegment(_imageSegmenter, cFrameBuffer, &segmentError);
 
   free(cFrameBuffer->buffer);
   cFrameBuffer->buffer = nil;
@@ -102,9 +101,9 @@
 
   if (!cSegmentationResult) {
     if (error) {
-      *error = [TFLCommonUtils errorWithCError:detectError];
+      *error = [TFLCommonUtils errorWithCError:segmentError];
     }
-    TfLiteSupportErrorDelete(detectError);
+    TfLiteSupportErrorDelete(segmentError);
     return nil;
   }
 
