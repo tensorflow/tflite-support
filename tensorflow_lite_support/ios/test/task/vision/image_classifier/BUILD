@@ -71,7 +71,6 @@ objc_library(
         "//tensorflow_lite_support/c/task/vision/utils:frame_buffer_cpp_c_utils",
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
-        "//third_party/apple_frameworks:XCTest",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:coreml_plugin",
     ],
 )
