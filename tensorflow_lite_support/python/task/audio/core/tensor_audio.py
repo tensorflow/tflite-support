@@ -99,26 +99,48 @@ class TensorAudio(object):
     data = record.read(self._buffer_size)
     self.load_from_array(data.astype(np.float32))
 
-  def load_from_array(self, src: np.ndarray) -> None:
-    """Loads audio data from a NumPy array.
+  def load_from_array(self,
+                      src: np.ndarray,
+                      offset: int = None,
+                      size: int = None) -> None:
+    """Loads the audio data from a NumPy array.
 
     Args:
-      src: A NumPy array contains the input audio.
-
+      src: A NumPy source array contains the input audio.
+      offset: An optional offset for loading a slice of the `src` array to the
+        buffer.
+      size: An optional size parameter denoting the number of samples to load
+        from the `src` array.
     Raises:
-      ValueError if the input audio is too large or if it contains an invalid
-      number of channels.
+      ValueError: Raised if the input array has an incorrect shape or if
+      offset + size exceeds the length of the `src` array.
     """
-    if len(src) != len(self._buffer):
-      raise ValueError(
-        f"Input audio contains an invalid number of samples. "
-        f"Expect {len(self._buffer)}.")
-    elif src.shape[1] != self._format.channels:
+    if src.shape[1] != self._format.channels:
       raise ValueError(
         f"Input audio contains an invalid number of channels. "
         f"Expect {self._format.channels}.")
 
-    self._buffer = src
+    if size is None:
+      size = len(src)
+    if offset is None:
+      offset = 0
+
+    if offset + size > len(src):
+      raise ValueError(
+        f"Index out of range. offset {offset} + size {size} should be <= "
+        f"src's length: {len(src)}")
+
+    if len(src) > len(self._buffer):
+      # Copy values from the source array to the internal buffer.
+      new_offset = offset + size - len(self._buffer)
+      new_size = len(self._buffer)
+      self._buffer = src[new_offset:new_offset + new_size]
+    else:
+      # Shift the internal buffer backward and add the incoming data to the end
+      # of the buffer.
+      shift = len(src)
+      self._buffer = np.roll(self._buffer, -shift, axis=0)
+      self._buffer[-shift:, :] = src
 
   @property
   def format(self) -> _CppAudioFormat:

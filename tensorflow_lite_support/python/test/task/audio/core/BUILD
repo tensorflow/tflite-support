@@ -24,5 +24,6 @@ py_test(
         # build rule placeholder: numpy dep,
         "//tensorflow_lite_support/python/task/audio/core:tensor_audio",
         "//tensorflow_lite_support/python/test:test_util",
+        "@absl_py//absl/testing:parameterized",
     ],
 )

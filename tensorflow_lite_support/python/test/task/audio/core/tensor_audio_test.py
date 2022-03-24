@@ -14,6 +14,7 @@
 """Tests for tensor_audio."""
 import unittest
 from unittest import mock
+from absl.testing import parameterized
 
 import numpy as np
 from numpy import testing
@@ -30,7 +31,7 @@ _SAMPLE_RATE = 16000
 _BUFFER_SIZE = 15600
 
 
-class TensorAudioTest(unittest.TestCase):
+class TensorAudioTest(parameterized.TestCase, unittest.TestCase):
   def setUp(self):
     super().setUp()
     self.test_audio_path = test_util.get_test_data_path('speech.wav')
@@ -56,7 +57,7 @@ class TensorAudioTest(unittest.TestCase):
         "INVALID_ARGUMENT: Data too short when trying to read string"):
       tensor_audio.TensorAudio.create_from_wav_file('', _BUFFER_SIZE)
 
-  def test_load_from_array_succeeds(self):
+  def test_load_from_array_succeeds_with_input_size_matches_buffer_size(self):
     # Loads audio data from a NumPy array.
     array = np.random.rand(_BUFFER_SIZE, _CHANNELS).astype(np.float32)
     self.test_tensor_audio.load_from_array(array)
@@ -70,27 +71,67 @@ class TensorAudioTest(unittest.TestCase):
     self.assertIsInstance(audio_buffer, np.ndarray)
     testing.assert_almost_equal(audio_buffer, array)
 
-  def test_load_from_array_fails_with_input_size_matching_sample_rate(self):
-    # Fails loading audio data from a NumPy array with an input size
-    # matching sample rate.
-    with self.assertRaisesRegex(
-        ValueError,
-        f"Input audio contains an invalid number of samples. "
-        f"Expect {_BUFFER_SIZE}."):
-      array = np.random.rand(_SAMPLE_RATE, _CHANNELS).astype(np.float32)
-      self.test_tensor_audio.load_from_array(array)
+  def test_load_from_array_succeeds_with_larger_input_size(self):
+    # Loads audio data from a NumPy array.
+    array = np.random.rand(_BUFFER_SIZE * 2, _CHANNELS).astype(np.float32)
+    self.test_tensor_audio.load_from_array(array)
 
-  def test_load_from_array_fails_with_input_size_less_than_sample_rate(self):
-    # Fails loading audio data from a NumPy array with an input size
-    # less than sample rate.
-    with self.assertRaisesRegex(
-        ValueError,
-        f"Input audio contains an invalid number of samples. "
-        f"Expect {_BUFFER_SIZE}."):
-      input_buffer_size = 10000
-      self.assertLess(input_buffer_size, _SAMPLE_RATE)
-      array = np.random.rand(input_buffer_size, _CHANNELS).astype(np.float32)
-      self.test_tensor_audio.load_from_array(array)
+    audio_buffer = self.test_tensor_audio.buffer
+    audio_format = self.test_tensor_audio.format
+
+    self.assertEqual(audio_format.channels, _CHANNELS)
+    self.assertEqual(audio_format.sample_rate, _SAMPLE_RATE)
+    self.assertEqual(self.test_tensor_audio.buffer_size, _BUFFER_SIZE)
+    self.assertIsInstance(audio_buffer, np.ndarray)
+    testing.assert_almost_equal(audio_buffer, array[_BUFFER_SIZE:])
+
+  @parameterized.parameters(
+    (0, 15600),
+    (7800, 15600))
+  def test_load_from_array_succeeds_with_larger_input_size(self, offset, size):
+    # Loads audio data from a NumPy array.
+    array = np.random.rand(_BUFFER_SIZE * 2, _CHANNELS).astype(np.float32)
+    self.test_tensor_audio.load_from_array(array, offset, size)
+
+    audio_buffer = self.test_tensor_audio.buffer
+    audio_format = self.test_tensor_audio.format
+
+    self.assertEqual(audio_format.channels, _CHANNELS)
+    self.assertEqual(audio_format.sample_rate, _SAMPLE_RATE)
+    self.assertEqual(self.test_tensor_audio.buffer_size, _BUFFER_SIZE)
+    self.assertIsInstance(audio_buffer, np.ndarray)
+    testing.assert_almost_equal(audio_buffer, array[offset:offset + size])
+
+  def test_load_from_array_succeeds_with_smaller_input_size(self):
+    # Loads audio data from a NumPy array.
+    array = np.random.rand(_BUFFER_SIZE // 2, _CHANNELS).astype(np.float32)
+    self.test_tensor_audio.load_from_array(array)
+
+    audio_buffer = self.test_tensor_audio.buffer
+    audio_format = self.test_tensor_audio.format
+
+    self.assertEqual(audio_format.channels, _CHANNELS)
+    self.assertEqual(audio_format.sample_rate, _SAMPLE_RATE)
+    self.assertEqual(self.test_tensor_audio.buffer_size, _BUFFER_SIZE)
+    self.assertIsInstance(audio_buffer, np.ndarray)
+    testing.assert_almost_equal(audio_buffer[_BUFFER_SIZE // 2:], array)
+
+  @parameterized.parameters(
+    (0, 7800),
+    (3900, 3900))
+  def test_load_from_array_succeeds_with_smaller_input_size(self, offset, size):
+    # Loads audio data from a NumPy array.
+    array = np.random.rand(_BUFFER_SIZE // 2, _CHANNELS).astype(np.float32)
+    self.test_tensor_audio.load_from_array(array, offset, size)
+
+    audio_buffer = self.test_tensor_audio.buffer
+    audio_format = self.test_tensor_audio.format
+
+    self.assertEqual(audio_format.channels, _CHANNELS)
+    self.assertEqual(audio_format.sample_rate, _SAMPLE_RATE)
+    self.assertEqual(self.test_tensor_audio.buffer_size, _BUFFER_SIZE)
+    self.assertIsInstance(audio_buffer, np.ndarray)
+    testing.assert_almost_equal(audio_buffer[offset + size:], array)
 
   def test_load_from_array_fails_with_invalid_number_of_channels(self):
     # Fails loading audio data from a NumPy array with an invalid
@@ -100,16 +141,6 @@ class TensorAudioTest(unittest.TestCase):
         f"Input audio contains an invalid number of channels. "
         f"Expect {_CHANNELS}."):
       array = np.random.rand(_BUFFER_SIZE, 2).astype(np.float32)
-      self.test_tensor_audio.load_from_array(array)
-
-  def test_load_from_array_fails_with_too_many_input_samples(self):
-    # Fails loading audio data from a NumPy array with a sample count
-    # exceeding TensorAudio's internal buffer capacity.
-    with self.assertRaisesRegex(
-        ValueError,
-        f"Input audio contains an invalid number of samples. "
-        f"Expect {_BUFFER_SIZE}."):
-      array = np.random.rand(20000, _CHANNELS).astype(np.float32)
       self.test_tensor_audio.load_from_array(array)
 
   @mock.patch("sounddevice.InputStream", return_value=mock.MagicMock())
