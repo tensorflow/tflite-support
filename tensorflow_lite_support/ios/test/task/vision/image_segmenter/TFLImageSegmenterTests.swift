@@ -255,10 +255,10 @@ class TFLImageSegmenterTests: XCTestCase {
     let pixelBufferBaseAddress =  (try XCTUnwrap(CVPixelBufferGetBaseAddress(pixelBuffer)))
                                     .assumingMemoryBound(to: UInt8.self)
 
-    let numPixels = deepLabV3SegmentationWidth * deepLabV3SegmentationHeight
 
     let mask = try XCTUnwrap(categoryMask.mask)
-    
+
+    let numPixels = deepLabV3SegmentationWidth * deepLabV3SegmentationHeight
     var inconsistentPixels: Float = 0.0;
 
     for i in 0..<numPixels {
