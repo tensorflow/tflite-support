@@ -44,7 +44,6 @@ swift_library(
     tags = TFL_DEFAULT_TAGS,
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
-        "//tensorflow_lite_support/ios/test/task/vision/utils:GMLImageHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
     ],
 )
