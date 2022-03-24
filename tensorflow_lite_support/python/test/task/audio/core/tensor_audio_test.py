@@ -133,6 +133,23 @@ class TensorAudioTest(parameterized.TestCase, unittest.TestCase):
     self.assertIsInstance(audio_buffer, np.ndarray)
     testing.assert_almost_equal(audio_buffer[offset + size:], array)
 
+  @parameterized.parameters(
+    (None, 20000),
+    (7800, None),
+    (7800, 15600),
+    (0, 20000)
+  )
+  def test_load_from_array_fails_with_invalid_offset_size(self, offset, size):
+    # Fails loading audio data from a NumPy array with an invalid
+    # config for offset and size.
+    array = np.random.rand(_BUFFER_SIZE, _CHANNELS).astype(np.float32)
+    with self.assertRaisesRegex(
+        ValueError,
+        f"Index out of range. offset {offset if offset else 0} \+ size "
+        f"{size if size else len(self.test_tensor_audio.buffer)} should be "
+        f"<= src\'s length: {len(array)}"):
+      self.test_tensor_audio.load_from_array(array, offset, size)
+
   def test_load_from_array_fails_with_invalid_number_of_channels(self):
     # Fails loading audio data from a NumPy array with an invalid
     # number of input channels.
