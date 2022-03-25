@@ -26,17 +26,17 @@ class TFLImageSegmenterTests: XCTestCase {
 
   // The maximum fraction of pixels in the candidate mask that can have a
   // different class than the golden mask for the test to pass.
-  let kGoldenMaskTolerance: Float = 1e-2;
+  let kGoldenMaskTolerance: Float = 1e-2
 
   // Magnification factor used when creating the golden category masks to make
   // them more human-friendly. Each pixel in the golden masks has its value
   // multiplied by this factor, i.e. a value of 10 means class index 1, a value of
   // 20 means class index 2, etc.
-  let kGoldenMaskMagnificationFactor: UInt8 = 10;
+  let kGoldenMaskMagnificationFactor: UInt8 = 10
 
-  let deepLabV3SegmentationWidth = 257;
+  let deepLabV3SegmentationWidth = 257
 
-  let deepLabV3SegmentationHeight = 257;
+  let deepLabV3SegmentationHeight = 257
 
   func verifyDeeplabV3PartialSegmentationResult(_ coloredLabels: [TFLColoredLabel]) {
 
@@ -102,14 +102,14 @@ class TFLImageSegmenterTests: XCTestCase {
       expectedG: 0,
       expectedB: 0,
       expectedLabel: "cat")
-    
+
     self.verifyColoredLabel(
       coloredLabels[9],
       expectedR: 192,
       expectedG: 0,
       expectedB: 0,
       expectedLabel: "chair")
-      
+
     self.verifyColoredLabel(
       coloredLabels[10],
       expectedR: 64,
@@ -138,7 +138,6 @@ class TFLImageSegmenterTests: XCTestCase {
       expectedB: 128,
       expectedLabel: "horse")
 
-    
     self.verifyColoredLabel(
       coloredLabels[14],
       expectedR: 64,
@@ -146,7 +145,6 @@ class TFLImageSegmenterTests: XCTestCase {
       expectedB: 128,
       expectedLabel: "motorbike")
 
-        
     self.verifyColoredLabel(
       coloredLabels[15],
       expectedR: 192,
@@ -191,7 +189,7 @@ class TFLImageSegmenterTests: XCTestCase {
   }
 
   func verifyColoredLabel(
-    _ coloredLabel: TFLColoredLabel, 
+    _ coloredLabel: TFLColoredLabel,
     expectedR: UInt,
     expectedG: UInt,
     expectedB: UInt,
@@ -230,11 +228,10 @@ class TFLImageSegmenterTests: XCTestCase {
 
     XCTAssertEqual(segmentationResult.segmentations.count, 1);
     
-    let coloredLabels = try XCTUnwrap(segmentationResult.segmentations[0].coloredLabels);
+    let coloredLabels = try XCTUnwrap(segmentationResult.segmentations[0].coloredLabels)
     verifyDeeplabV3PartialSegmentationResult(coloredLabels)
 
-    let categoryMask = try XCTUnwrap(segmentationResult.segmentations[0].categoryMask);
-
+    let categoryMask = try XCTUnwrap(segmentationResult.segmentations[0].categoryMask)
     XCTAssertEqual(deepLabV3SegmentationWidth,
                   categoryMask.width);
     XCTAssertEqual(deepLabV3SegmentationHeight,
