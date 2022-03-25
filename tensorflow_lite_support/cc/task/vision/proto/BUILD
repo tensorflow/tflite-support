@@ -214,6 +214,7 @@ proto_library(
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_proto",
     ],
 )
 
@@ -233,6 +234,7 @@ support_py_proto_library(
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto_external_py",
         "//tensorflow_lite_support/cc/task/core/proto:base_options_py_pb2",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_py_pb2",
+        "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_py_pb2",
     ],
 )
 

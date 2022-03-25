@@ -17,8 +17,10 @@ limitations under the License.
 #include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/segmentation_options.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_segmenter.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
 namespace task {
@@ -26,6 +28,8 @@ namespace vision {
 
 namespace {
 namespace py = ::pybind11;
+using PythonBaseOptions = ::tflite::python::task::core::BaseOptions;
+using CppBaseOptions = ::tflite::task::core::BaseOptions;
 }  // namespace
 
 PYBIND11_MODULE(_pywrap_image_segmenter, m) {
@@ -35,10 +39,25 @@ PYBIND11_MODULE(_pywrap_image_segmenter, m) {
   pybind11_protobuf::ImportNativeProtoCasters();
 
   py::class_<ImageSegmenter>(m, "ImageSegmenter")
-      .def_static("create_from_options",
-                  [](const ImageSegmenterOptions& options) {
-                    return ImageSegmenter::CreateFromOptions(options);
-                  })
+      .def_static(
+          "create_from_options",
+          [](const PythonBaseOptions& base_options,
+             const processor::SegmentationOptions& segmentation_options) {
+            ImageSegmenterOptions options;
+            auto cpp_base_options =
+                core::convert_to_cpp_base_options(base_options);
+            options.set_allocated_base_options(cpp_base_options.release());
+
+            if (segmentation_options.has_display_names_locale()) {
+              options.set_display_names_locale(
+            segmentation_options.display_names_locale());
+            }
+            if (segmentation_options.has_output_type()) {
+              options.set_output_type(segmentation_options.output_type());
+            }
+
+            return ImageSegmenter::CreateFromOptions(options);
+          })
       .def("segment",
            [](ImageSegmenter& self, const ImageData& image_data)
                -> tflite::support::StatusOr<SegmentationResult> {

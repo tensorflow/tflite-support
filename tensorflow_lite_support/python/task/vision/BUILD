@@ -45,8 +45,7 @@ py_library(
         "image_segmenter.py",
     ],
     deps = [
-        "//tensorflow_lite_support/python/task/core:task_options",
-        "//tensorflow_lite_support/python/task/core:task_utils",
+        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:segmentation_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:segmentations_pb2",

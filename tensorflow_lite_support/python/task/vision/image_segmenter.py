@@ -17,8 +17,7 @@ import dataclasses
 import numpy as np
 from typing import List, Tuple, Optional
 
-from tensorflow_lite_support.python.task.core import task_options
-from tensorflow_lite_support.python.task.core import task_utils
+from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentation_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentations_pb2
 from tensorflow_lite_support.python.task.vision.core import tensor_image
@@ -29,8 +28,7 @@ from tensorflow_lite_support.python.task.vision.pybinds import image_segmenter_o
 _ProtoOutputType = segmentation_options_pb2.OutputType
 _ProtoImageSegmenterOptions = image_segmenter_options_pb2.ImageSegmenterOptions
 _CppImageSegmenter = _pywrap_image_segmenter.ImageSegmenter
-_BaseOptions = task_options.BaseOptions
-_ExternalFile = task_options.ExternalFile
+_BaseOptions = base_options_pb2.BaseOptions
 
 
 @dataclasses.dataclass
@@ -94,8 +92,7 @@ class ImageSegmenter(object):
     # Need to import the module to catch this error:
     # `from pybind11_abseil import status`
     # see https://github.com/pybind/pybind11_abseil#abslstatusor.
-    base_options = _BaseOptions(
-        model_file=_ExternalFile(file_name=file_path))
+    base_options = _BaseOptions(file_name=file_path)
     options = ImageSegmenterOptions(base_options=base_options)
     return cls.create_from_options(options)
 
@@ -116,19 +113,20 @@ class ImageSegmenter(object):
     # Need to import the module to catch this error:
     # `from pybind11_abseil import status`
     # see https://github.com/pybind/pybind11_abseil#abslstatusor.
-    proto_options = _ProtoImageSegmenterOptions()
-    proto_options.base_options.CopyFrom(
-        task_utils.ConvertToProtoBaseOptions(options.base_options))
-
-    # Updates values from classification_options.
-    if options.segmentation_options:
-      if options.segmentation_options.display_names_locale:
-        proto_options.display_names_locale = options.segmentation_options.display_names_locale
-      if options.segmentation_options.output_type:
-        proto_options.output_type = options.segmentation_options.output_type
-
-    segmenter = _CppImageSegmenter.create_from_options(proto_options)
-
+    # proto_options = _ProtoImageSegmenterOptions()
+    # proto_options.base_options.CopyFrom(
+    #     task_utils.ConvertToProtoBaseOptions(options.base_options))
+    #
+    # # Updates values from classification_options.
+    # if options.segmentation_options:
+    #   if options.segmentation_options.display_names_locale:
+    #     proto_options.display_names_locale = options.segmentation_options.display_names_locale
+    #   if options.segmentation_options.output_type:
+    #     proto_options.output_type = options.segmentation_options.output_type
+    #
+    # segmenter = _CppImageSegmenter.create_from_options(proto_options)
+    segmenter = _CppImageSegmenter.create_from_options(
+        options.base_options, options.segmentation_options)
     return cls(options, segmenter)
 
   def segment(

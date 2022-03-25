@@ -21,7 +21,7 @@ from absl.testing import parameterized
 # TODO(b/220067158): Change to import tensorflow and leverage tf.test once
 # fixed the dependency issue.
 import unittest
-from tensorflow_lite_support.python.task.core import task_options
+from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentation_options_pb2
 from tensorflow_lite_support.python.task.vision import image_segmenter
 from tensorflow_lite_support.python.task.vision.core import tensor_image
@@ -30,8 +30,7 @@ from tensorflow_lite_support.python.test import test_util
 
 OutputType = segmentation_options_pb2.OutputType
 
-_BaseOptions = task_options.BaseOptions
-_ExternalFile = task_options.ExternalFile
+_BaseOptions = base_options_pb2.BaseOptions
 _ImageSegmenter = image_segmenter.ImageSegmenter
 _ImageSegmenterOptions = image_segmenter.ImageSegmenterOptions
 
@@ -103,8 +102,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     self.model_path = test_util.get_test_data_path(_MODEL_FILE)
 
   @staticmethod
-  def create_segmenter_from_options(model_file, **segmentation_options):
-    base_options = _BaseOptions(model_file=model_file)
+  def create_segmenter_from_options(base_options, **segmentation_options):
     segmentation_options = segmentation_options_pb2.SegmentationOptions(
         **segmentation_options)
     options = _ImageSegmenterOptions(
@@ -159,16 +157,16 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_segment_model(self, model_file_type, expected_colored_labels):
     # Creates segmenter.
     if model_file_type is ModelFileType.FILE_NAME:
-      model_file = _ExternalFile(file_name=self.model_path)
+      base_options = _BaseOptions(file_name=self.model_path)
     elif model_file_type is ModelFileType.FILE_CONTENT:
-      with open(self.model_path, 'rb') as f:
+      with open(self.model_path, "rb") as f:
         model_content = f.read()
-      model_file = _ExternalFile(file_content=model_content)
+      base_options = _BaseOptions(file_content=model_content)
     else:
       # Should never happen
-      raise ValueError('model_file_type is invalid.')
+      raise ValueError("model_file_type is invalid.")
 
-    segmenter = self.create_segmenter_from_options(model_file)
+    segmenter = self.create_segmenter_from_options(base_options)
 
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
@@ -189,9 +187,9 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_segmentation_category_mask(self):
     """Check if category mask match with ground truth."""
     # Creates segmenter.
-    model_file = _ExternalFile(file_name=self.model_path)
+    base_options = _BaseOptions(file_name=self.model_path)
     segmenter = self.create_segmenter_from_options(
-      model_file, output_type=OutputType.CATEGORY_MASK)
+      base_options, output_type=OutputType.CATEGORY_MASK)
 
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
@@ -224,21 +222,23 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_segmentation_confidence_mask(self):
     """Check if top-left corner has expected confidences and also verify if the
      confidence mask matches with the category mask."""
+    # Create BaseOptions from model file.
+    base_options = _BaseOptions(file_name=self.model_path)
+
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
-    model_file = _ExternalFile(file_name=self.model_path)
 
     # Run segmentation on the model in CATEGORY_MASK mode.
     segmenter = self.create_segmenter_from_options(
-      model_file, output_type=OutputType.CATEGORY_MASK)
+      base_options, output_type=OutputType.CATEGORY_MASK)
 
     # Performs image segmentation on the input and gets the category mask.
     segmentation = segmenter.segment(image)
     category_mask = segmentation.masks
 
-    # Run segmentation on the model in CONFIDENCE_MASK mode.
+    # Run segmentation on the model in CATEGORY_MASK mode.
     segmenter = self.create_segmenter_from_options(
-      model_file, output_type=OutputType.CONFIDENCE_MASK)
+      base_options, output_type=OutputType.CONFIDENCE_MASK)
 
     # Performs image segmentation on the input again.
     segmentation = segmenter.segment(image)

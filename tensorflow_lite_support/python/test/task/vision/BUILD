@@ -54,7 +54,7 @@ py_test(
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
     ],
     deps = [
-        "//tensorflow_lite_support/python/task/core:task_options",
+        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:segmentation_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:segmentations_pb2",
         "//tensorflow_lite_support/python/task/vision:image_segmenter",
