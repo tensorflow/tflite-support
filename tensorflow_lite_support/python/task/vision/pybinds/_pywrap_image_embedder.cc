@@ -13,13 +13,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/vision/image_embedder.h"
-
 #include "pybind11/pybind11.h"
 #include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/vision/image_embedder.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
 namespace task {
@@ -27,6 +27,8 @@ namespace vision {
 
 namespace {
 namespace py = ::pybind11;
+using PythonBaseOptions = ::tflite::python::task::core::BaseOptions;
+using CppBaseOptions = ::tflite::task::core::BaseOptions;
 }  // namespace
 
 PYBIND11_MODULE(_pywrap_image_embedder, m) {
@@ -38,7 +40,31 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
   py::class_<ImageEmbedder>(m, "ImageEmbedder")
       .def_static(
           "create_from_options",
-          [](const ImageEmbedderOptions& options) {
+          [](const PythonBaseOptions& base_options,
+             const processor::EmbeddingOptions& embedding_options) {
+            ImageEmbedderOptions options;
+            if (base_options.has_file_content()) {
+              options.mutable_model_file_with_metadata()->set_file_content(
+                  base_options.file_content());
+            }
+            if (base_options.has_file_name()) {
+              options.mutable_model_file_with_metadata()->set_file_name(
+                  base_options.file_name());
+            }
+
+            options.set_num_threads(base_options.num_threads());
+            if (base_options.use_coral()) {
+              options.mutable_compute_settings()
+                  ->mutable_tflite_settings()
+                  ->set_delegate(tflite::proto::Delegate::EDGETPU_CORAL);
+            }
+
+            if (embedding_options.has_l2_normalize()) {
+              options.set_l2_normalize(embedding_options.l2_normalize());
+            }
+            if (embedding_options.has_quantize()) {
+              options.set_quantize(embedding_options.quantize());
+            }
             return ImageEmbedder::CreateFromOptions(options);
           })
       .def("embed",

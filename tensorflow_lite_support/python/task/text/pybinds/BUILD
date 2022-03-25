@@ -22,6 +22,7 @@ pybind_extension(
     module_name = "_pywrap_text_embedder",
     deps = [
         "//tensorflow_lite_support/cc/task/text:text_embedder",
+        "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
         "@pybind11",
         "@pybind11_abseil//pybind11_abseil:status_casters",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",

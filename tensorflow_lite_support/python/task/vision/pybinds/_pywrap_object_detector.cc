@@ -17,8 +17,10 @@ limitations under the License.
 #include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/detection_options.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/object_detector.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
 namespace task {
@@ -26,6 +28,8 @@ namespace vision {
 
 namespace {
 namespace py = ::pybind11;
+using PythonBaseOptions = ::tflite::python::task::core::BaseOptions;
+using CppBaseOptions = ::tflite::task::core::BaseOptions;
 }  // namespace
 
 PYBIND11_MODULE(_pywrap_object_detector, m) {
@@ -35,10 +39,32 @@ PYBIND11_MODULE(_pywrap_object_detector, m) {
   pybind11_protobuf::ImportNativeProtoCasters();
 
   py::class_<ObjectDetector>(m, "ObjectDetector")
-      .def_static("create_from_options",
-                  [](const ObjectDetectorOptions& options) {
-                    return ObjectDetector::CreateFromOptions(options);
-                  })
+      .def_static(
+          "create_from_options",
+          [](const PythonBaseOptions& base_options,
+             const processor::DetectionOptions& detection_options) {
+            ObjectDetectorOptions options;
+            auto cpp_base_options =
+                core::convert_to_cpp_base_options(base_options);
+            options.set_allocated_base_options(cpp_base_options.release());
+
+            if (detection_options.has_display_names_locale()) {
+              options.set_display_names_locale(
+                  detection_options.display_names_locale());
+            }
+            if (detection_options.has_max_results()) {
+              options.set_max_results(detection_options.max_results());
+            }
+            if (detection_options.has_score_threshold()) {
+              options.set_score_threshold(detection_options.score_threshold());
+            }
+            options.mutable_class_name_whitelist()->CopyFrom(
+                detection_options.class_name_allowlist());
+            options.mutable_class_name_blacklist()->CopyFrom(
+                detection_options.class_name_denylist());
+
+            return ObjectDetector::CreateFromOptions(options);
+          })
       .def("detect",
            [](ObjectDetector& self, const ImageData& image_data)
                -> tflite::support::StatusOr<DetectionResult> {

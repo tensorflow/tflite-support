@@ -19,10 +19,11 @@ set -ex
 
 bash tensorflow_lite_support/custom_ops/tf_configure.sh
 
-# TODO(b/200756963): Make it possible to build flatbuffer schema libraries with
-# more jobs.
+# Break down metadata builds and avoid the flacky issue when building schema
+# with Bazel. See b/200756963.
 bazel build -c opt --config=monolithic \
-    //tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata_lib \
+    //tensorflow_lite_support/metadata/java:tensorflowlite_support_metadata_lib
+bazel build -c opt --config=monolithic \
     //tensorflow_lite_support/metadata/cc:metadata_extractor
 
 export BAZEL_PARALLEL="-j 32"

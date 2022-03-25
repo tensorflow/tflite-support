@@ -13,13 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
-
 #include "pybind11/pybind11.h"
 #include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/classification_options.pb.h"
+#include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
 namespace task {
@@ -27,6 +28,8 @@ namespace vision {
 
 namespace {
 namespace py = ::pybind11;
+using PythonBaseOptions = ::tflite::python::task::core::BaseOptions;
+using CppBaseOptions = ::tflite::task::core::BaseOptions;
 }  // namespace
 
 PYBIND11_MODULE(_pywrap_image_classifier, m) {
@@ -38,7 +41,29 @@ PYBIND11_MODULE(_pywrap_image_classifier, m) {
   py::class_<ImageClassifier>(m, "ImageClassifier")
       .def_static(
           "create_from_options",
-          [](const ImageClassifierOptions& options) {
+          [](const PythonBaseOptions& base_options,
+             const processor::ClassificationOptions& classification_options) {
+            ImageClassifierOptions options;
+            auto cpp_base_options =
+                core::convert_to_cpp_base_options(base_options);
+            options.set_allocated_base_options(cpp_base_options.release());
+
+            if (classification_options.has_display_names_locale()) {
+              options.set_display_names_locale(
+                  classification_options.display_names_locale());
+            }
+            if (classification_options.has_max_results()) {
+              options.set_max_results(classification_options.max_results());
+            }
+            if (classification_options.has_score_threshold()) {
+              options.set_score_threshold(
+                  classification_options.score_threshold());
+            }
+            options.mutable_class_name_whitelist()->CopyFrom(
+                classification_options.class_name_allowlist());
+            options.mutable_class_name_blacklist()->CopyFrom(
+                classification_options.class_name_denylist());
+
             return ImageClassifier::CreateFromOptions(options);
           })
       .def("classify",
