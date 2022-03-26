@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""AudioClassifierOptions protobuf."""
+"""AudioEmbedderOptions protobuf."""
 
 from tensorflow_lite_support.cc.task.audio.proto import audio_embedder_options_pb2 as embedder_options_pb2
 
