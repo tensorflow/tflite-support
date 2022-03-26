@@ -1,3 +1,5 @@
+load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_py_proto_library")
+
 package(
     default_visibility = [
         "//visibility:public",
@@ -50,4 +52,14 @@ proto_library(
 cc_proto_library(
     name = "audio_embedder_options_cc_proto",
     deps = [":audio_embedder_options_proto"],
+)
+
+support_py_proto_library(
+    name = "audio_embedder_options_py_pb2",
+    srcs = ["audio_embedder_options.proto"],
+    api_version = 2,
+    proto_deps = [":audio_embedder_options_proto"],
+    py_proto_deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_py_pb2",
+    ],
 )
