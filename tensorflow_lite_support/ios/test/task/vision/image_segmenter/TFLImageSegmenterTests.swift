@@ -12,7 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-import GMLImageHelpers
 import GMLImageUtils
 import XCTest
 
@@ -233,13 +232,8 @@ class TFLImageSegmenterTests: XCTestCase {
     verifyDeeplabV3PartialSegmentationResult(coloredLabels)
 
     let categoryMask = try XCTUnwrap(segmentationResult.segmentations[0].categoryMask)
-
-    XCTAssertEqual(
-      deepLabV3SegmentationWidth,
-      categoryMask.width)
-    XCTAssertEqual(
-      deepLabV3SegmentationHeight,
-      categoryMask.height)
+    XCTAssertEqual(deepLabV3SegmentationWidth, categoryMask.width)
+    XCTAssertEqual(deepLabV3SegmentationHeight, categoryMask.height)
 
     let goldenMaskImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -247,17 +241,17 @@ class TFLImageSegmenterTests: XCTestCase {
         filename: "segmentation_golden_rotation0",
         type: "png"))
 
-    let pixelBuffer = GMLImageUtils.grayScalePixelBuffer(with: goldenMaskImage)
-      .takeRetainedValue()
+    let pixelBuffer = goldenMaskImage.grayScalePixelBuffer().takeRetainedValue()
 
     CVPixelBufferLockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.readOnly)
 
     let pixelBufferBaseAddress = (try XCTUnwrap(CVPixelBufferGetBaseAddress(pixelBuffer)))
       .assumingMemoryBound(to: UInt8.self)
 
+    let numPixels = deepLabV3SegmentationWidth * deepLabV3SegmentationHeight
+
     let mask = try XCTUnwrap(categoryMask.mask)
 
-    let numPixels = deepLabV3SegmentationWidth * deepLabV3SegmentationHeight
     var inconsistentPixels: Float = 0.0
 
     for i in 0..<numPixels {
