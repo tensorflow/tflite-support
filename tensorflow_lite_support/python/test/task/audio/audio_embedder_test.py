@@ -32,7 +32,7 @@ _BaseOptions = base_options_pb2.BaseOptions
 _AudioEmbedder = audio_embedder.AudioEmbedder
 _AudioEmbedderOptions = audio_embedder.AudioEmbedderOptions
 
-_YAMNET_EMBEDDING_MODEL_FILE = 'yamnet_audio_classifier_with_metadata.tflite'
+_YAMNET_EMBEDDING_MODEL_FILE = 'yamnet_embedding_metadata.tflite'
 
 
 class ModelFileType(enum.Enum):
@@ -66,9 +66,9 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
     feature_vector = result0.embeddings[0].feature_vector
 
     if options.embedding_options.quantize:
-      self.assertLen(feature_vector.value_string, 521)
+      self.assertLen(feature_vector.value_string, 1024)
     else:
-      self.assertLen(feature_vector.value_float, 521)
+      self.assertLen(feature_vector.value_float, 1024)
 
 
 if __name__ == '__main__':
