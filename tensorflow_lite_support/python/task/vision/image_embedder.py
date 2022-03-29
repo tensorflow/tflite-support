@@ -23,9 +23,7 @@ from tensorflow_lite_support.python.task.processor.proto import embeddings_pb2
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_embedder
-from tensorflow_lite_support.python.task.vision.pybinds import image_embedder_options_pb2
 
-_ProtoImageEmbedderOptions = image_embedder_options_pb2.ImageEmbedderOptions
 _CppImageEmbedder = _pywrap_image_embedder.ImageEmbedder
 _BaseOptions = base_options_pb2.BaseOptions
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions

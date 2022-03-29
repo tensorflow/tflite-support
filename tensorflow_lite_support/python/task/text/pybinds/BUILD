@@ -1,4 +1,3 @@
-# Placeholder for internal Python strict library compatibility macro.
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
 
 package(
@@ -6,12 +5,6 @@ package(
         "//tensorflow_lite_support:internal",
     ],
     licenses = ["notice"],  # Apache 2.0
-)
-
-py_library(
-    name = "text_embedder_options_pb2",
-    srcs = ["text_embedder_options_pb2.py"],
-    deps = ["//tensorflow_lite_support/cc/task/text/proto:text_embedder_options_py_pb2"],
 )
 
 pybind_extension(

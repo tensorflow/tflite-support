@@ -17,11 +17,11 @@ import enum
 
 from absl.testing import parameterized
 
+import tensorflow as tf
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.text import text_embedder
 from tensorflow_lite_support.python.test import test_util
-import unittest
 
 _BaseOptions = base_options_pb2.BaseOptions
 _TextEmbedder = text_embedder.TextEmbedder
@@ -36,7 +36,7 @@ class ModelFileType(enum.Enum):
   FILE_NAME = 2
 
 
-class TextEmbedderTest(parameterized.TestCase, unittest.TestCase):
+class TextEmbedderTest(parameterized.TestCase, tf.test.TestCase):
 
   def setUp(self):
     super().setUp()
@@ -124,4 +124,4 @@ class TextEmbedderTest(parameterized.TestCase, unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  tf.test.main()
