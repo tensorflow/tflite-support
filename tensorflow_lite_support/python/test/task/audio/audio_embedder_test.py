@@ -62,16 +62,13 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
     result0 = embedder.embed(tensor0)
 
     # Check embedding sizes.
-    def _check_embedding_size(result):
-      self.assertLen(result.embeddings, 1)
-      feature_vector = result.embeddings[0].feature_vector
+    self.assertLen(result0.embeddings, 1)
+    feature_vector = result0.embeddings[0].feature_vector
 
-      if options.embedding_options.quantize:
-        self.assertLen(feature_vector.value_string, 521)
-      else:
-        self.assertLen(feature_vector.value_float, 521)
-
-    _check_embedding_size(result0)
+    if options.embedding_options.quantize:
+      self.assertLen(feature_vector.value_string, 521)
+    else:
+      self.assertLen(feature_vector.value_float, 521)
 
 
 if __name__ == '__main__':
