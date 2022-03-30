@@ -13,12 +13,9 @@ load(
     "ios_static_framework",
     "ios_unit_test",
 )
-load("@build_bazel_rules_swift//swift:swift.bzl", "SWIFT_EXPLICIT_MODULES_MIGRATION_FEATURES")
-load("//tools/build_defs/swift:swift_explicit_module_build_test.bzl", "swift_explicit_module_build_test")
 
 package(
     default_visibility = ["//visibility:private"],
-    features = SWIFT_EXPLICIT_MODULES_MIGRATION_FEATURES,
     licenses = ["notice"],  # Apache 2.0
 )
 
@@ -74,13 +71,12 @@ objc_library(
     hdrs = API_HEADERS,
     copts = RELEASE_COPTS,
     module_name = "MLImage",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//third_party/apple_frameworks:CoreGraphics",
-        "//third_party/apple_frameworks:CoreMedia",
-        "//third_party/apple_frameworks:CoreVideo",
-        "//third_party/apple_frameworks:UIKit",
+    sdk_frameworks = [
+        "CoreGraphics",
+        "CoreMedia",
+        "CoreVideo",
     ],
+    visibility = ["//visibility:public"],
     alwayslink = 1,
 )
 
@@ -118,19 +114,13 @@ objc_library(
     data = glob([
         "resources/*.jpg",
     ]),
+    sdk_frameworks = [
+        "Accelerate",
+        "CoreGraphics",
+        "CoreMedia",
+        "CoreVideo",
+    ],
     deps = [
         ":MLImage",
-        "//third_party/apple_frameworks:Accelerate",
-        "//third_party/apple_frameworks:CoreGraphics",
-        "//third_party/apple_frameworks:CoreMedia",
-        "//third_party/apple_frameworks:CoreVideo",
-        "//third_party/apple_frameworks:UIKit",
-        "//third_party/apple_frameworks:XCTest",
     ],
-)
-
-swift_explicit_module_build_test(
-    name = "SwiftExplicitModuleBuildTest",
-    minimum_os_version = TFL_MINIMUM_OS_VERSION,
-    platform_type = "ios",
 )

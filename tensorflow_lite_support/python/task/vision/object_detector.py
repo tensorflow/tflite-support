@@ -21,9 +21,7 @@ from tensorflow_lite_support.python.task.processor.proto import detections_pb2
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_object_detector
-from tensorflow_lite_support.python.task.vision.pybinds import object_detector_options_pb2
 
-_ProtoObjectDetectorOptions = object_detector_options_pb2.ObjectDetectorOptions
 _CppObjectDetector = _pywrap_object_detector.ObjectDetector
 _BaseOptions = base_options_pb2.BaseOptions
 _DetectionOptions = detection_options_pb2.DetectionOptions
