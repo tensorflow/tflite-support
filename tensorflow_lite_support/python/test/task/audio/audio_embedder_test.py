@@ -46,11 +46,30 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
     super().setUp()
     self.model_path = test_util.get_test_data_path(_YAMNET_EMBEDDING_MODEL_FILE)
 
-  def test_embed_default(self):
+  @parameterized.parameters(
+    (_YAMNET_EMBEDDING_MODEL_FILE, False, False, ModelFileType.FILE_NAME, 1024,
+     1),
+    (_YAMNET_EMBEDDING_MODEL_FILE, True, True, ModelFileType.FILE_CONTENT, 1024,
+     1)
+  )
+  def test_embed(self, model_name, l2_normalize, quantize, model_file_type,
+                 embedding_length, expected_similarity):
     # Create embedder.
-    base_options = _BaseOptions(file_name=self.model_path)
+    model_path = test_util.get_test_data_path(model_name)
+    if model_file_type is ModelFileType.FILE_NAME:
+      base_options = _BaseOptions(file_name=model_path)
+    elif model_file_type is ModelFileType.FILE_CONTENT:
+      with open(model_path, "rb") as f:
+        model_content = f.read()
+      base_options = _BaseOptions(file_content=model_content)
+    else:
+      # Should never happen
+      raise ValueError("model_file_type is invalid.")
+
     options = _AudioEmbedderOptions(
-      base_options)
+      base_options,
+      embedding_options_pb2.EmbeddingOptions(
+        l2_normalize=l2_normalize, quantize=quantize))
     embedder = _AudioEmbedder.create_from_options(options)
 
     # Load the input audio files.
@@ -58,17 +77,51 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
       test_util.get_test_data_path("speech.wav"),
       embedder.required_input_buffer_size)
 
+    tensor1 = tensor_audio.TensorAudio.create_from_wav_file(
+      test_util.get_test_data_path("speech.wav"),
+      embedder.required_input_buffer_size)
+
     # Extract embeddings.
     result0 = embedder.embed(tensor0)
+    result1 = embedder.embed(tensor1)
 
     # Check embedding sizes.
-    self.assertLen(result0.embeddings, 1)
-    feature_vector = result0.embeddings[0].feature_vector
+    def _check_embedding_size(result):
+      self.assertLen(result.embeddings, 1)
+      feature_vector = result.embeddings[0].feature_vector
+      if quantize:
+        self.assertLen(feature_vector.value_string, embedding_length)
+      else:
+        self.assertLen(feature_vector.value_float, embedding_length)
 
-    if options.embedding_options.quantize:
-      self.assertLen(feature_vector.value_string, 1024)
+    _check_embedding_size(result0)
+    _check_embedding_size(result1)
+
+    result0_feature_vector = result0.embeddings[0].feature_vector
+    result1_feature_vector = result1.embeddings[0].feature_vector
+
+    if quantize:
+      self.assertLen(result0_feature_vector.value_string, 1024)
+      self.assertLen(result1_feature_vector.value_string, 1024)
     else:
-      self.assertLen(feature_vector.value_float, 1024)
+      self.assertLen(result0_feature_vector.value_float, 1024)
+      self.assertLen(result1_feature_vector.value_float, 1024)
+
+    # Checks cosine similarity.
+    similarity = embedder.cosine_similarity(
+      result0_feature_vector, result1_feature_vector)
+    self.assertAlmostEqual(similarity, expected_similarity, places=6)
+
+  def test_get_embedding_dimension(self):
+    options = _AudioEmbedderOptions(_BaseOptions(file_name=self.model_path))
+    embedder = _AudioEmbedder.create_from_options(options)
+    self.assertEqual(embedder.get_embedding_dimension(0), 1024)
+    self.assertEqual(embedder.get_embedding_dimension(1), -1)
+
+  def test_number_of_output_layers(self):
+    options = _AudioEmbedderOptions(_BaseOptions(file_name=self.model_path))
+    embedder = _AudioEmbedder.create_from_options(options)
+    self.assertEqual(embedder.number_of_output_layers, 1)
 
 
 if __name__ == '__main__':
