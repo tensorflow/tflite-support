@@ -1,5 +1,3 @@
-load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_py_proto_library")
-
 package(
     default_visibility = [
         "//visibility:public",
