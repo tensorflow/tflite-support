@@ -48,9 +48,9 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
 
   @parameterized.parameters(
     (_YAMNET_EMBEDDING_MODEL_FILE, False, False, ModelFileType.FILE_NAME, 1024,
-     1),
+     0.091439),
     (_YAMNET_EMBEDDING_MODEL_FILE, True, True, ModelFileType.FILE_CONTENT, 1024,
-     1)
+     0.092382)
   )
   def test_embed(self, model_name, l2_normalize, quantize, model_file_type,
                  embedding_length, expected_similarity):
@@ -78,7 +78,7 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
       embedder.required_input_buffer_size)
 
     tensor1 = tensor_audio.TensorAudio.create_from_wav_file(
-      test_util.get_test_data_path("speech.wav"),
+      test_util.get_test_data_path("two_heads.wav"),
       embedder.required_input_buffer_size)
 
     # Extract embeddings.
