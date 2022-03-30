@@ -8,12 +8,6 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-py_library(
-    name = "audio_embedder_options_pb2",
-    srcs = ["audio_embedder_options_pb2.py"],
-    deps = ["//tensorflow_lite_support/cc/task/audio/proto:audio_embedder_options_py_pb2"],
-)
-
 pybind_extension(
     name = "_pywrap_audio_embedder",
     srcs = [
