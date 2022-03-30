@@ -50,7 +50,6 @@ py_library(
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
         "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
         "//tensorflow_lite_support/python/task/vision/pybinds:_pywrap_image_segmenter",
-        "//tensorflow_lite_support/python/task/vision/pybinds:image_segmenter_options_pb2",
     ],
 )
 

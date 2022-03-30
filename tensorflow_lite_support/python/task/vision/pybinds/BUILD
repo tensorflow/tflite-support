@@ -61,12 +61,6 @@ pybind_extension(
     ],
 )
 
-py_library(
-    name = "image_segmenter_options_pb2",
-    srcs = ["image_segmenter_options_pb2.py"],
-    deps = ["//tensorflow_lite_support/cc/task/vision/proto:image_segmenter_options_py_pb2"],
-)
-
 pybind_extension(
     name = "_pywrap_image_segmenter",
     srcs = [
