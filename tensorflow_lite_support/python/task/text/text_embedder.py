@@ -19,9 +19,7 @@ from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embeddings_pb2
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_text_embedder
-from tensorflow_lite_support.python.task.text.pybinds import text_embedder_options_pb2
 
-_ProtoTextEmbedderOptions = text_embedder_options_pb2.TextEmbedderOptions
 _CppTextEmbedder = _pywrap_text_embedder.TextEmbedder
 _BaseOptions = base_options_pb2.BaseOptions
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions

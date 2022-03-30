@@ -13,12 +13,11 @@
  limitations under the License.
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLObjectDetector.h"
-#import "tensorflow_lite_support/ios/sources/TFLCommon.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult+Helpers.h"
-#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImageUtils.h"
+#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
 #include "tensorflow_lite_support/c/task/vision/object_detector.h"
 
@@ -93,7 +92,7 @@
 
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
                                               error:(NSError *_Nullable *)error {
-  TfLiteFrameBuffer *cFrameBuffer = [GMLImageUtils cFrameBufferWithGMLImage:image error:error];
+  TfLiteFrameBuffer *cFrameBuffer = [image cFrameBufferWithError:error];
 
   if (!cFrameBuffer) {
     return nil;

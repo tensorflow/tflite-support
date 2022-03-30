@@ -13,3 +13,13 @@ py_library(
         # build rule placeholder: sounddevice dep,
     ],
 )
+
+py_library(
+    name = "tensor_audio",
+    srcs = ["tensor_audio.py"],
+    deps = [
+        ":audio_record",
+        # build rule placeholder: numpy dep,
+        "//tensorflow_lite_support/python/task/audio/core/pybinds:_pywrap_audio_buffer",
+    ],
+)

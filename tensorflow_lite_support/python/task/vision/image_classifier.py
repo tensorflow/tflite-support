@@ -23,9 +23,7 @@ from tensorflow_lite_support.python.task.processor.proto import classifications_
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_classifier
-from tensorflow_lite_support.python.task.vision.pybinds import image_classifier_options_pb2
 
-_ProtoImageClassifierOptions = image_classifier_options_pb2.ImageClassifierOptions
 _CppImageClassifier = _pywrap_image_classifier.ImageClassifier
 _ClassificationOptions = classification_options_pb2.ClassificationOptions
 _BaseOptions = base_options_pb2.BaseOptions

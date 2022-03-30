@@ -346,6 +346,37 @@ http_archive(
   ],
 )
 
+http_archive(
+  name = "eigen",
+  sha256 = "b4c198460eba6f28d34894e3a5710998818515104d6e74e5cc331ce31e46e626",
+  strip_prefix = "eigen-3.4.0",
+  urls = [
+      "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.bz2",
+  ],
+  build_file = "@//third_party:eigen3.BUILD",
+)
+
+http_archive(
+  name = "com_google_leveldb",
+  build_file = "@//third_party:leveldb.BUILD",
+  patch_cmds = [
+      """mkdir leveldb; cp include/leveldb/* leveldb""",
+  ],
+  sha256 = "9a37f8a6174f09bd622bc723b55881dc541cd50747cbd08831c2a82d620f6d76",
+  strip_prefix = "leveldb-1.23",
+  urls = [
+      "https://github.com/google/leveldb/archive/refs/tags/1.23.tar.gz",
+  ],
+)
+
+http_archive(
+  name = "snappy",
+  build_file = "@//third_party:snappy.BUILD",
+  sha256 = "16b677f07832a612b0836178db7f374e414f94657c138e6993cbfc5dcc58651f",
+  strip_prefix = "snappy-1.1.8",
+  urls = ["https://github.com/google/snappy/archive/1.1.8.tar.gz"],
+)
+
 # Set up TensorFlow version for Coral.
 load("@libedgetpu//:workspace.bzl", "libedgetpu_dependencies")
 libedgetpu_dependencies(TENSORFLOW_COMMIT, TENSORFLOW_SHA256)

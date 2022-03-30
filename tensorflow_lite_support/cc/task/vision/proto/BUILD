@@ -121,6 +121,10 @@ support_py_proto_library(
     srcs = ["detections.proto"],
     api_version = 2,
     proto_deps = [":detections_proto"],
+    py_proto_deps = [
+        ":class_py_pb2",
+        ":bounding_box_py_pb2",
+    ],
 )
 
 cc_library(
@@ -194,6 +198,7 @@ support_py_proto_library(
     srcs = ["classifications.proto"],
     api_version = 2,
     proto_deps = [":classifications_proto"],
+    py_proto_deps = [":class_py_pb2"],
 )
 
 cc_library(

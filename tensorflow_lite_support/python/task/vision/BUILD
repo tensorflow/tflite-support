@@ -18,7 +18,6 @@ py_library(
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
         "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
         "//tensorflow_lite_support/python/task/vision/pybinds:_pywrap_image_embedder",
-        "//tensorflow_lite_support/python/task/vision/pybinds:image_embedder_options_pb2",
     ],
 )
 
@@ -35,7 +34,6 @@ py_library(
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
         "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
         "//tensorflow_lite_support/python/task/vision/pybinds:_pywrap_image_classifier",
-        "//tensorflow_lite_support/python/task/vision/pybinds:image_classifier_options_pb2",
     ],
 )
 
@@ -69,6 +67,5 @@ py_library(
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
         "//tensorflow_lite_support/python/task/vision/core/pybinds:image_utils",
         "//tensorflow_lite_support/python/task/vision/pybinds:_pywrap_object_detector",
-        "//tensorflow_lite_support/python/task/vision/pybinds:object_detector_options_pb2",
     ],
 )
