@@ -17,6 +17,5 @@ py_library(
         "//tensorflow_lite_support/python/task/audio/core:tensor_audio",
         "//tensorflow_lite_support/python/task/audio/core/pybinds:_pywrap_audio_buffer",
         "//tensorflow_lite_support/python/task/audio/pybinds:_pywrap_audio_embedder",
-        "//tensorflow_lite_support/python/task/audio/pybinds:audio_embedder_options_pb2",
     ],
 )

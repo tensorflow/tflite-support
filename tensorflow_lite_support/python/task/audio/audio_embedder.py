@@ -22,11 +22,9 @@ from tensorflow_lite_support.python.task.audio.core import tensor_audio
 from tensorflow_lite_support.python.task.audio.core import audio_record
 from tensorflow_lite_support.python.task.audio.core.pybinds import _pywrap_audio_buffer
 from tensorflow_lite_support.python.task.audio.pybinds import _pywrap_audio_embedder
-from tensorflow_lite_support.python.task.audio.pybinds import audio_embedder_options_pb2
 
 _CppAudioFormat = _pywrap_audio_buffer.AudioFormat
 _CppAudioBuffer = _pywrap_audio_buffer.AudioBuffer
-_ProtoAudioEmbedderOptions = audio_embedder_options_pb2.AudioEmbedderOptions
 _CppAudioEmbedder = _pywrap_audio_embedder.AudioEmbedder
 _BaseOptions = base_options_pb2.BaseOptions
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
