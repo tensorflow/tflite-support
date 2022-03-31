@@ -20,6 +20,13 @@ cc_proto_library(
     ],
 )
 
+support_py_proto_library(
+    name = "classifications_py_pb2",
+    srcs = ["classifications.proto"],
+    api_version = 2,
+    proto_deps = [":classifications_proto"],
+)
+
 proto_library(
     name = "class_proto",
     srcs = ["class.proto"],
@@ -30,6 +37,13 @@ cc_proto_library(
     deps = [
         ":class_proto",
     ],
+)
+
+support_py_proto_library(
+    name = "class_py_pb2",
+    srcs = ["class.proto"],
+    api_version = 2,
+    proto_deps = [":class_proto"],
 )
 
 proto_library(
