@@ -18,7 +18,6 @@ pybind_extension(
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/processor/proto:classification_options_cc_proto",
         "//tensorflow_lite_support/cc/task/audio:audio_classifier",
-        "//tensorflow_lite_support/cc/task/audio/core:audio_buffer",
         "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
         "@pybind11",
         "@pybind11_abseil//pybind11_abseil:status_casters",

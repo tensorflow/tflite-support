@@ -19,7 +19,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/classification_options.pb.h"
 #include "tensorflow_lite_support/cc/task/audio/audio_classifier.h"
-#include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
