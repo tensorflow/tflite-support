@@ -163,14 +163,10 @@ function create_framework_archive {
   popd
 
   pushd "${TFLS_ROOT_DIR}"
+
   # List of individual files obtained from the patterns above.
   IOS_HEADER_FILES=$(xargs -n1 find * -wholename <<< "${IOS_HEADER_PATTERNS}" | sort | uniq) 
   popd
-  
-  # STRIPPED_HEADERS_DIR="${TFLS_TMPDIR}/stripped_headers"
-  
-  # # # pushd "${HOME}/Documents"
-  # mkdir -p ${STRIPPED_HEADERS_DIR}
   # # # popd
 
   for filename in ${IOS_HEADER_FILES}
