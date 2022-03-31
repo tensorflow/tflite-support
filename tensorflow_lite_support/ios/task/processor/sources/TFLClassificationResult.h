@@ -24,18 +24,22 @@ NS_ASSUME_NONNULL_BEGIN
  * The index of the image classifier head these classes refer to. This is useful for multi-head
  * models.
  */
-@property(nonatomic, assign) int headIndex;
+@property(nonatomic, assign, readonly) NSInteger headIndex;
 
 /** The array of predicted classes, usually sorted by descending scores (e.g.from high to low
  * probability). */
-@property(nonatomic, copy) NSArray<TFLCategory *> *categories;
+@property(nonatomic, copy, readonly) NSArray<TFLCategory *> *categories;
+
+- (instancetype)initWithHeadIndex:(NSInteger)headIndex categories:(NSArray<TFLCategory *> *)categories;
 
 @end
 
 /** Encapsulates results of any classification task. */
 @interface TFLClassificationResult : NSObject
 
-@property(nonatomic, copy) NSArray<TFLClassifications *> *classifications;
+@property(nonatomic, copy, readonly) NSArray<TFLClassifications *> *classifications;
+
+- (instancetype)initWithClassifications:(NSArray<TFLClassifications *> *)classifications;
 
 @end
 

@@ -31,14 +31,11 @@
       TFLCategory *resultCategory = [TFLCategory categoryWithCCategory:&cCategory];
       [classes addObject:resultCategory];
     }
-    TFLClassifications *classificationHead = [[TFLClassifications alloc] init];
-    classificationHead.categories = classes;
-    classificationHead.headIndex = i;
+    TFLClassifications *classificationHead = [[TFLClassifications alloc] initWithHeadIndex:i categories:classes];
     [classificationHeads addObject:classificationHead];
   }
 
-  TFLClassificationResult *classificationResult = [[TFLClassificationResult alloc] init];
-  classificationResult.classifications = classificationHeads;
+  TFLClassificationResult *classificationResult = [[TFLClassificationResult alloc] initWithClassifications:classificationHeads];
   return classificationResult;
 }
 @end

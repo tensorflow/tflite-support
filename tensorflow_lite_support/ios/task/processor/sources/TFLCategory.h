@@ -20,17 +20,23 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLCategory : NSObject
 
 /** Display name of the class. */
-@property(nonatomic, copy) NSString *displayName;
+@property(nonatomic, copy, readonly) NSString *displayName;
 
 /** Class name of the class . */
-@property(nonatomic, copy) NSString *label;
+@property(nonatomic, copy, readonly) NSString *label;
 
 /** Confidence score for this class . */
-@property(nonatomic, assign) float score;
+@property(nonatomic, assign, readonly) float score;
 
 /** The index of the class in the corresponding label map, usually packed in the TFLite Model
  * Metadata. */
-@property(nonatomic, assign) NSInteger classIndex;
+@property(nonatomic, assign, readonly) NSInteger classIndex;
+
+
+- (instancetype)initWithClassIndex:(NSInteger)classIndex 
+                             score:(float)score 
+                             label:(NSString *)label 
+                       displayName:(NSString *)displayName;
 
 @end
 

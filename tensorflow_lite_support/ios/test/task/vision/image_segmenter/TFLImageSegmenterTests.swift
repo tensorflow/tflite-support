@@ -22,7 +22,7 @@ class TFLImageSegmenterTests: XCTestCase {
   static let bundle = Bundle(for: TFLImageSegmenterTests.self)
   static let modelPath = bundle.path(
     forResource: "deeplabv3",
-    ofType: "tflite")!
+    ofType: "tflite")
 
   // The maximum fraction of pixels in the candidate mask that can have a
   // different class than the golden mask for the test to pass.
