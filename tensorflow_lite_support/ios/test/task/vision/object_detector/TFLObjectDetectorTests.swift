@@ -22,7 +22,7 @@ class TFLObjectDetectorTests: XCTestCase {
   static let bundle = Bundle(for: TFLObjectDetectorTests.self)
   static let modelPath = bundle.path(
     forResource: "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29",
-    ofType: "tflite")!
+    ofType: "tflite")
 
   func verifyDetectionResult(_ detectionResult: TFLDetectionResult) {
     XCTAssertGreaterThan(detectionResult.detections.count, 0)
@@ -103,14 +103,13 @@ class TFLObjectDetectorTests: XCTestCase {
 
     let modelPath = try XCTUnwrap(TFLObjectDetectorTests.modelPath)
 
-    let objectDetectorOptions = TFLObjectDetectorOptions(modelPath: modelPath)
-    XCTAssertNotNil(objectDetectorOptions)
+    let objectDetectorOptions = try XCTUnwrap(TFLObjectDetectorOptions(modelPath: modelPath))
 
     let maxResults = 3
-    objectDetectorOptions!.classificationOptions.maxResults = maxResults
+    objectDetectorOptions.classificationOptions.maxResults = maxResults
 
     let objectDetector =
-      try TFLObjectDetector.objectDetector(options: objectDetectorOptions!)
+      try TFLObjectDetector.objectDetector(options: objectDetectorOptions)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(

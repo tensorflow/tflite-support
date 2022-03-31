@@ -28,8 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Detection Result of type TFLDetectionResult to be returned by inference methods
  * of the iOS TF Lite Task Object Detection task.
  */
-+ (TFLDetectionResult *)detectionResultWithCResult:
-    (TfLiteDetectionResult *)cDetectionResult;
++ (TFLDetectionResult *)detectionResultWithCResult:(TfLiteDetectionResult *)cDetectionResult;
 @end
 
 NS_ASSUME_NONNULL_END

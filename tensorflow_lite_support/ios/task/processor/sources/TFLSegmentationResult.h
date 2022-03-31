@@ -39,9 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Initializes a confidence mask.
  */
-- (instancetype)initWithWidth:(NSInteger)width
-                       height:(NSInteger)height
-                         mask:(float * _Nullable)mask;
+- (instancetype)initWithWidth:(NSInteger)width height:(NSInteger)height mask:(float *_Nullable)mask;
 
 @end
 
@@ -70,9 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Initializes a category mask.
  */
-- (instancetype)initWithWidth:(NSInteger)width
-                       height:(NSInteger)height
-                         mask:(UInt8 * _Nullable)mask;
+- (instancetype)initWithWidth:(NSInteger)width height:(NSInteger)height mask:(UInt8 *_Nullable)mask;
 
 @end
 

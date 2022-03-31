@@ -26,18 +26,39 @@ NS_ASSUME_NONNULL_BEGIN
  * The index of the image classifier head these classes refer to. This is useful for multi-head
  * models.
  */
-@property(nonatomic, assign) CGRect boundingBox;
+@property(nonatomic, assign, readonly) CGRect boundingBox;
 
 /** The array of predicted classes, usually sorted by descending scores (e.g.from high to low
  * probability). */
-@property(nonatomic, copy) NSArray<TFLCategory *> *categories;
+@property(nonatomic, copy, readonly) NSArray<TFLCategory *> *categories;
+
+/**
+ * Initializes TFLDetection.
+ *
+ * @param boundingBox CGRect specifying the bounds of the object represented by this detection.
+ * @param categories Array of predicted classes, usually sorted by descending scores (e.g.from high
+ * to low probability).
+ *
+ * @return An instance of TFLDetection initialized to the specified values.
+ */
+- (instancetype)initWithBoundingBox:(CGRect)boundingBox
+                         categories:(NSArray<TFLCategory *> *)categories;
 
 @end
 
 /** Encapsulates results of any object detection task. */
 @interface TFLDetectionResult : NSObject
 
-@property(nonatomic, copy) NSArray<TFLDetection *> *detections;
+@property(nonatomic, copy, readonly) NSArray<TFLDetection *> *detections;
+
+/**
+ * Initializes TFLDetectionResult.
+ *
+ * @param detections Array of detected objects of type TFLDetection.
+ *
+ * @return An instance of TFLDetectionResult initialized to the specified values.
+ */
+- (instancetype)initWithDetections:(NSArray<TFLDetection *> *)detections;
 
 @end
 
