@@ -24,7 +24,7 @@ from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_segmenter
 
-_ProtoOutputType = segmentation_options_pb2.OutputType
+_OutputType = segmentation_options_pb2.OutputType
 _CppImageSegmenter = _pywrap_image_segmenter.ImageSegmenter
 _BaseOptions = base_options_pb2.BaseOptions
 
@@ -46,7 +46,7 @@ class Segmentation:
   masks: np.ndarray
   """The pixel mask representing the segmentation result."""
 
-  output_type: _ProtoOutputType
+  output_type: _OutputType
   """The format of the model output."""
 
   width: int
@@ -111,18 +111,6 @@ class ImageSegmenter(object):
     # Need to import the module to catch this error:
     # `from pybind11_abseil import status`
     # see https://github.com/pybind/pybind11_abseil#abslstatusor.
-    # proto_options = _ProtoImageSegmenterOptions()
-    # proto_options.base_options.CopyFrom(
-    #     task_utils.ConvertToProtoBaseOptions(options.base_options))
-    #
-    # # Updates values from classification_options.
-    # if options.segmentation_options:
-    #   if options.segmentation_options.display_names_locale:
-    #     proto_options.display_names_locale = options.segmentation_options.display_names_locale
-    #   if options.segmentation_options.output_type:
-    #     proto_options.output_type = options.segmentation_options.output_type
-    #
-    # segmenter = _CppImageSegmenter.create_from_options(proto_options)
     segmenter = _CppImageSegmenter.create_from_options(
         options.base_options, options.segmentation_options)
     return cls(options, segmenter)
@@ -162,10 +150,9 @@ class ImageSegmenter(object):
     segmentation = segmentation_result.segmentation[0]
     output_type = self._options.segmentation_options.output_type
 
-    if output_type == _ProtoOutputType.CATEGORY_MASK:
+    if output_type == _OutputType.CATEGORY_MASK:
       masks = np.array(bytearray(segmentation.category_mask))
-
-    elif output_type == _ProtoOutputType.CONFIDENCE_MASK:
+    elif output_type == _OutputType.CONFIDENCE_MASK:
       confidence_masks = segmentation.confidence_masks.confidence_mask
       masks = np.array([confidence_masks[index].value
                         for index in range(len(confidence_masks))])

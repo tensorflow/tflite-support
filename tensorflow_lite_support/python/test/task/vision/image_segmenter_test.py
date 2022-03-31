@@ -14,7 +14,6 @@
 """Tests for image_segmenter."""
 
 import enum
-import json
 
 import numpy as np
 from absl.testing import parameterized
@@ -28,9 +27,8 @@ from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
 
-OutputType = segmentation_options_pb2.OutputType
-
 _BaseOptions = base_options_pb2.BaseOptions
+_OutputType = segmentation_options_pb2.OutputType
 _ImageSegmenter = image_segmenter.ImageSegmenter
 _ImageSegmenterOptions = image_segmenter.ImageSegmenterOptions
 
@@ -189,7 +187,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     # Creates segmenter.
     base_options = _BaseOptions(file_name=self.model_path)
     segmenter = self.create_segmenter_from_options(
-      base_options, output_type=OutputType.CATEGORY_MASK)
+      base_options, output_type=_OutputType.CATEGORY_MASK)
 
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
@@ -230,7 +228,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
 
     # Run segmentation on the model in CATEGORY_MASK mode.
     segmenter = self.create_segmenter_from_options(
-      base_options, output_type=OutputType.CATEGORY_MASK)
+      base_options, output_type=_OutputType.CATEGORY_MASK)
 
     # Performs image segmentation on the input and gets the category mask.
     segmentation = segmenter.segment(image)
@@ -238,7 +236,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
 
     # Run segmentation on the model in CATEGORY_MASK mode.
     segmenter = self.create_segmenter_from_options(
-      base_options, output_type=OutputType.CONFIDENCE_MASK)
+      base_options, output_type=_OutputType.CONFIDENCE_MASK)
 
     # Performs image segmentation on the input again.
     segmentation = segmenter.segment(image)
