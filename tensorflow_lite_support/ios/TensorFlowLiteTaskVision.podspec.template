@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
   gml_image_dir = 'tensorflow_lite_support/odml/ios/image/'
   s.public_header_files = [
     objc_vision_dir + 'apis/*.h',
+    gml_image_dir + 'apis/*.h',
     objc_dir + 'sources/TFLCommon.h',
     objc_core_dir + 'sources/TFLBaseOptions.h',
-    objc_processor_dir + 'sources/{TFLSegmentationResult}.h',
-    objc_vision_dir + 'sources/*.h',
-    gml_image_dir + 'apis/*.h'
+    objc_processor_dir + 'sources/{TFLClassificationOptions,TFLCategory,TFLClassificationResult,TFLDetectionResult,TFLSegmentationResult}.h',
+    objc_vision_dir + 'sources/*.h'
   ]
 
   c_dir = 'tensorflow_lite_support/c/'
@@ -46,7 +46,7 @@ Pod::Spec.new do |s|
     objc_vision_dir + '*/sources/*',
     objc_vision_dir + 'sources/*',
     gml_image_dir + 'apis/*.h',
-    gml_image_dir + 'sources/*.h'
+    gml_image_dir + 'sources/*'
   ]
 
   s.module_map = objc_vision_dir + 'apis/framework.modulemap'
