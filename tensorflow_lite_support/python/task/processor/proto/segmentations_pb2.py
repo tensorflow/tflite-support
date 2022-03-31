@@ -17,4 +17,3 @@ from tensorflow_lite_support.cc.task.vision.proto import segmentations_pb2
 
 Segmentation = segmentations_pb2.Segmentation
 SegmentationResult = segmentations_pb2.SegmentationResult
-ColoredLabel = Segmentation.ColoredLabel
