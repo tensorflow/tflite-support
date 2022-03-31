@@ -167,8 +167,10 @@ function create_framework_archive {
   # List of individual files obtained from the patterns above.
   IOS_HEADER_FILES=$(xargs -n1 find * -wholename <<< "${IOS_HEADER_PATTERNS}" | sort | uniq) 
   popd
-  # # # popd
 
+  # The iOS headers should be stripped off the path prefixes in the #imports.
+  # This is required for the cocoapods to build fine since the header files in
+  # an iOS framework cannot be organised in multilevel directories.
   for filename in ${IOS_HEADER_FILES}
   do
     LAST_PATH_COMPONENT=$(basename ${filename})
