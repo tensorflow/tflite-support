@@ -174,8 +174,9 @@ function create_framework_archive {
   for filename in ${IOS_HEADER_FILES}
   do
     LAST_PATH_COMPONENT=$(basename ${filename})
-    FULL_SOURCE_PATH="$TFLS_TMPDIR/$filename"
-    sed -i '' -E 's|#import ".+\/([^/]+.h)"|#import "\1"|' $FULL_SOURCE_PATH
+    FULL_SOURCE_PATH="$TFLS_ROOT_DIR/$filename"
+    FULL_DEST_PATH="$TFLS_TMPDIR/$filename"
+    sed -E 's|#import ".+\/([^/]+.h)"|#import "\1"|' $FULL_SOURCE_PATH > $FULL_DEST_PATH
   done
 
   # ----- (2) Unzip the prebuilt C API framework -----
