@@ -28,25 +28,18 @@
     return NULL;
   }
 
-  char **cStrings = (char **)calloc(strings.count, sizeof(char *));
-
-  if (!cStrings) {
-    if (error) {
-      *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInternalError
-                                       description:@"Could not initialize list type options."];
-    }
-    return nil;
-  }
+  char **cStrings = (char **)[TFLCommonUtils mallocWithSize:strings.count * sizeof(char *)
+                                                      error:error];
 
   for (NSInteger i = 0; i < strings.count; i++) {
-    char *cString = [TFLCommonUtils
-        mallocWithSize:[strings[i] lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1
+    cStrings[i] = (char *)[TFLCommonUtils
+        mallocWithSize:([strings[i] lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1) *
+                       sizeof(char)
                  error:error];
-    if (!cString) return nil;
+    if (!cStrings[i]) return nil;
 
-    strcpy(cString, strings[i].UTF8String);
+    strcpy(cStrings[i], strings[i].UTF8String);
   }
-
   return cStrings;
 }
 
