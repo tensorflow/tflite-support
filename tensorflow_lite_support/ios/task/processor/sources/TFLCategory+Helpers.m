@@ -33,7 +33,7 @@
     label = [NSString stringWithCString:cCategory->label encoding:NSUTF8StringEncoding];
   }
 
-  return [[TFLCategory alloc] initWithClassIndex:(NSInteger)cCategory->index 
+  return [[TFLCategory alloc] initWithCategoryIndex:(NSInteger)cCategory->index 
                                            score:cCategory->score 
                                            label:label 
                                      displayName:displayName];

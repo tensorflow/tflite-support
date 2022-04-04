@@ -37,7 +37,7 @@
   classificationOptions.maxResults = self.maxResults;
   classificationOptions.labelDenyList = self.labelDenyList;
   classificationOptions.labelAllowList = self.labelAllowList;
-  classificationOptions.displayNamesLocal = self.displayNamesLocal;
+  classificationOptions.displayNamesLocale = self.displayNamesLocale;
 
   return classificationOptions;
 }

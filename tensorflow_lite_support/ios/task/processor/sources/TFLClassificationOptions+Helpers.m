@@ -84,8 +84,8 @@
     cClassificationOptions->label_allowlist.length = (int)self.labelAllowList.count;
   }
 
-  if (self.displayNamesLocal) {
-    cClassificationOptions->display_names_local = (char *)self.displayNamesLocal.UTF8String;
+  if (self.displayNamesLocale) {
+    cClassificationOptions->display_names_local = (char *)self.displayNamesLocale.UTF8String;
   }
 
   return YES;
