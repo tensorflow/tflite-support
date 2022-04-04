@@ -27,17 +27,12 @@
     NSMutableArray *categories = [[NSMutableArray alloc] init];
     for (int j = 0; j < cClassifications.size; j++) {
       TfLiteCategory cCategory = cClassifications.categories[j];
-
-      TFLCategory *resultCategory = [TFLCategory categoryWithCCategory:&cCategory];
-      [categories addObject:resultCategory];
+      [categories addObject:[TFLCategory categoryWithCCategory:&cCategory]];
     }
-    TFLClassifications *classificationHead = [[TFLClassifications alloc] initWithHeadIndex:i
-                                                                                categories:categories];
-    [classificationHeads addObject:classificationHead];
+    [classificationHeads addObject:[[TFLClassifications alloc] initWithHeadIndex:i
+                                                                      categories:categories]];
   }
 
-  TFLClassificationResult *classificationResult =
-      [[TFLClassificationResult alloc] initWithClassifications:classificationHeads];
-  return classificationResult;
+  return [[TFLClassificationResult alloc] initWithClassifications:classificationHeads];
 }
 @end
