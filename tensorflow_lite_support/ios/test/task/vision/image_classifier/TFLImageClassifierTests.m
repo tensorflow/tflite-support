@@ -43,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
   // Put setup code here. This method is called before the invocation of each test method in the
   // class.
   [super setUp];
+  self.continueAfterFailure = NO;
   self.modelPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"mobilenet_v2_1.0_224"
                                                                     ofType:@"tflite"];
   XCTAssertNotNil(self.modelPath);
@@ -71,6 +72,24 @@ NS_ASSUME_NONNULL_BEGIN
                  nil);
   VerifyCategory(classificationResult.classifications[0].categories[2], 932, 0.022505, @"bagel",
                  nil);
+
+- (void)testErrorObjectForSimultaneousClassNameBlackListAndWhiteList {
+
+  TFLImageClassifierOptions *imageClassifierOptions =
+      [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
+  
+  imageClassifierOptions.classificationOptions.labelDenyList = [NSArray arrayWithObjects:@"cheeseburger", nil];
+  imageClassifierOptions.classificationOptions.labelAllowList = [NSArray arrayWithObjects:@"bagel", nil];
+
+  NSError *error = nil;
+  TFLImageClassifier *imageClassifier =
+      [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:&error];
+  XCTAssertNil(imageClassifier);
+  XCTAssertNotNil(error);
+//   NSLog(@"%@", error.localizedDescription);
+//   NSLog(@"%ld", error.code);
+//   NSLog(@"%@", error.domain);
+
 }
 
 - (void)testModelOptionsWithMaxResults {
