@@ -28,9 +28,8 @@ class TFLImageClassifierTests: XCTestCase {
     _ error: Error,
     expectedLocalizedDescription: String
   ) {
-    XCTAssertEqual(
-      error.localizedDescription,
-      expectedLocalizedDescription)
+    XCTAssert(
+      error.localizedDescription.contains(expectedLocalizedDescription))
   }
 
   func verifyCategory(
