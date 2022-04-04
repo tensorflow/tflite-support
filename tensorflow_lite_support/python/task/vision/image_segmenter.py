@@ -105,7 +105,7 @@ class ImageSegmenter(object):
       `ImageSegmenter` object that's created from `options`.
     Raises:
       status.StatusNotOk if failed to create `ImageSegmenter` object from
-      `ImageSegmenterOptionsn` such as missing the model.
+      `ImageSegmenterOptions` such as missing the model.
     """
     # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
     # Need to import the module to catch this error:
