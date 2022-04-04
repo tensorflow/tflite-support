@@ -52,6 +52,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath;
 
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
