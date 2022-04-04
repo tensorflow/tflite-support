@@ -46,6 +46,34 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
     super().setUp()
     self.model_path = test_util.get_test_data_path(_YAMNET_EMBEDDING_MODEL_FILE)
 
+  def test_create_from_file_succeeds_with_valid_model_path(self):
+    # Creates with default option and valid model file successfully.
+    embedder = _AudioEmbedder.create_from_file(self.model_path)
+    self.assertIsInstance(embedder, _AudioEmbedder)
+
+  def test_create_from_options_succeeds_with_valid_model_path(self):
+    # Creates with options containing model file successfully.
+    options = _AudioEmbedderOptions(_BaseOptions(file_name=self.model_path))
+    embedder = _AudioEmbedder.create_from_options(options)
+    self.assertIsInstance(embedder, _AudioEmbedder)
+
+  def test_create_from_options_fails_with_invalid_model_path(self):
+    # Invalid empty model path.
+    with self.assertRaisesRegex(
+        Exception,
+        r"INVALID_ARGUMENT: ExternalFile must specify at least one of "
+        r"'file_content', 'file_name' or 'file_descriptor_meta'. "
+        r"\[tflite::support::TfLiteSupportStatus='2']"):
+      options = _AudioEmbedderOptions(_BaseOptions(file_name=""))
+      _AudioEmbedder.create_from_options(options)
+
+  def test_create_from_options_succeeds_with_valid_model_content(self):
+    # Creates with options containing model content successfully.
+    with open(self.model_path, "rb") as f:
+      options = _AudioEmbedderOptions(_BaseOptions(file_content=f.read()))
+      embedder = _AudioEmbedder.create_from_options(options)
+      self.assertIsInstance(embedder, _AudioEmbedder)
+
   @parameterized.parameters((_YAMNET_EMBEDDING_MODEL_FILE, False, False,
                              ModelFileType.FILE_NAME, 1024, 0.091439),
                             (_YAMNET_EMBEDDING_MODEL_FILE, True, True,
