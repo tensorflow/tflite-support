@@ -20,7 +20,6 @@ package tflite.task.vision;
 import "tensorflow/lite/experimental/acceleration/configuration/configuration.proto";
 import "tensorflow_lite_support/cc/task/core/proto/base_options.proto";
 import "tensorflow_lite_support/cc/task/core/proto/external_file.proto";
-import "tensorflow_lite_support/cc/task/processor/proto/segmentation_options.proto";
 
 // Options for setting up an ImageSegmenter.
 // Next Id: 9
@@ -58,7 +57,7 @@ message ImageSegmenterOptions {
     CONFIDENCE_MASK = 2;
   }
   // Optional output mask type.
-  optional tflite.task.processor.SegmentationOptions.OutputType output_type = 3 [default = CATEGORY_MASK];
+  optional OutputType output_type = 3 [default = CATEGORY_MASK];
 
   // Legacy method for specifying the number of threads to be used for TFLite
   // ops that support multi-threading when running inference with CPU.

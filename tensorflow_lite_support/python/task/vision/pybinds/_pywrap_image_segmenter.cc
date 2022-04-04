@@ -53,7 +53,9 @@ PYBIND11_MODULE(_pywrap_image_segmenter, m) {
             segmentation_options.display_names_locale());
             }
             if (segmentation_options.has_output_type()) {
-              options.set_output_type(segmentation_options.output_type());
+              options.set_output_type(
+                  static_cast<ImageSegmenterOptions::OutputType>(
+                          segmentation_options.output_type()));
             }
 
             return ImageSegmenter::CreateFromOptions(options);

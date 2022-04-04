@@ -219,7 +219,6 @@ proto_library(
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
-        "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_proto",
     ],
 )
 
