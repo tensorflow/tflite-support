@@ -13,6 +13,7 @@
  limitations under the License.
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageClassifier.h"
+#import "tensorflow_lite_support/ios/sources/TFLCommon.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions+Helpers.h"
@@ -65,9 +66,8 @@
 + (nullable instancetype)imageClassifierWithOptions:(nonnull TFLImageClassifierOptions *)options
                                               error:(NSError **)error {
   TfLiteImageClassifierOptions cOptions = TfLiteImageClassifierOptionsCreate();
-  if (![options.classificationOptions
-          copyToCOptions:&(cOptions.classification_options)
-                                 error:error])
+  if (!
+      [options.classificationOptions copyToCOptions:&(cOptions.classification_options) error:error])
     return nil;
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
@@ -100,6 +100,12 @@
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                           regionOfInterest:(CGRect)roi
                                                      error:(NSError *_Nullable *)error {
+  if (image == nil) {
+    if (error != nil) {
+      *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                                       description:@"GMLImage argument cannot be nil."];
+    }
+  }
   TfLiteFrameBuffer *cFrameBuffer = [image cFrameBufferWithError:error];
 
   if (!cFrameBuffer) {
