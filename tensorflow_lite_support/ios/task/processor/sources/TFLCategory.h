@@ -20,10 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLCategory : NSObject
 
 /** Display name of the class. */
-@property(nonatomic, copy, readonly) NSString *displayName;
+@property(nonatomic, copy, readonly, nullable) NSString *displayName;
 
 /** Class name of the class . */
-@property(nonatomic, copy, readonly) NSString *label;
+@property(nonatomic, copy, readonly, nullable) NSString *label;
 
 /** Confidence score for this class . */
 @property(nonatomic, assign, readonly) float score;
