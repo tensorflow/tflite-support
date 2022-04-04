@@ -18,16 +18,16 @@
   NSString *_displayName;
   NSString *_label;
   float _score;
-  NSInteger _categoryIndex;
+  NSInteger _index;
 }
 
-- (instancetype)initWithCategoryIndex:(NSInteger)categoryIndex 
-                             score:(float)score 
-                             label:(NSString *)label 
-                       displayName:(NSString *)displayName {
+- (instancetype)initWithIndex:(NSInteger)index
+                        score:(float)score
+                        label:(NSString *)label
+                  displayName:(NSString *)displayName {
   self = [super init];
   if (self) {
-    _categoryIndex = categoryIndex;
+    _index = index;
     _score = score;
     _label = label;
     _displayName = displayName;

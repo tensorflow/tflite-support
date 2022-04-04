@@ -30,7 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
  * probability). */
 @property(nonatomic, copy, readonly) NSArray<TFLCategory *> *categories;
 
-- (instancetype)initWithHeadIndex:(NSInteger)headIndex categories:(NSArray<TFLCategory *> *)categories;
+- (instancetype)initWithHeadIndex:(NSInteger)headIndex
+                       categories:(NSArray<TFLCategory *> *)categories;
 
 @end
 

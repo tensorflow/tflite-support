@@ -19,7 +19,7 @@
 @synthesize maxResults;
 @synthesize labelAllowList;
 @synthesize labelDenyList;
-@synthesize displayNamesLocal;
+@synthesize displayNamesLocale;
 
 - (instancetype)init {
   self = [super init];

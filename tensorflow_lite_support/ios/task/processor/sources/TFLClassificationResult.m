@@ -15,11 +15,12 @@ limitations under the License.
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult.h"
 
 @implementation TFLClassifications {
-NSInteger _headIndex;
-NSArray<TFLCategory *> *_categories;
+  NSInteger _headIndex;
+  NSArray<TFLCategory *> *_categories;
 }
 
-- (instancetype)initWithHeadIndex:(NSInteger)headIndex categories:(nonnull NSArray<TFLCategory *> *)categories {
+- (instancetype)initWithHeadIndex:(NSInteger)headIndex
+                       categories:(nonnull NSArray<TFLCategory *> *)categories {
   self = [super init];
   if (self) {
     _headIndex = headIndex;
@@ -30,8 +31,8 @@ NSArray<TFLCategory *> *_categories;
 
 @end
 
-@implementation TFLClassificationResult{
- NSArray<TFLClassifications *> *_classifications;
+@implementation TFLClassificationResult {
+  NSArray<TFLClassifications *> *_classifications;
 }
 
 - (instancetype)initWithClassifications:(NSArray<TFLClassifications *> *)classifications {

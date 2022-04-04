@@ -19,7 +19,7 @@
 
 #define VerifyCategory(category, expectedIndex, expectedScore, expectedlLabel, \
                        expectedDisplayName)                                    \
-  XCTAssertEqual(category.categoryIndex, expectedIndex);                          \
+  XCTAssertEqual(category.index, expectedIndex);                          \
   XCTAssertEqualWithAccuracy(category.score, expectedScore, 1e-6);             \
   XCTAssertEqualObjects(category.label, expectedlLabel);                       \
   XCTAssertEqualObjects(category.displayName, expectedDisplayName);

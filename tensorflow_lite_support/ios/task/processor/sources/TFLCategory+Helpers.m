@@ -20,22 +20,22 @@
   if (cCategory == nil) return nil;
 
   TFLCategory *category = [[TFLCategory alloc] init];
-  
+
   NSString *displayName;
   NSString *label;
-  
+
   if (cCategory->display_name != nil) {
     displayName = [NSString stringWithCString:cCategory->display_name
-                                              encoding:NSUTF8StringEncoding];
+                                     encoding:NSUTF8StringEncoding];
   }
 
   if (cCategory->label != nil) {
     label = [NSString stringWithCString:cCategory->label encoding:NSUTF8StringEncoding];
   }
 
-  return [[TFLCategory alloc] initWithCategoryIndex:(NSInteger)cCategory->index 
-                                           score:cCategory->score 
-                                           label:label 
-                                     displayName:displayName];
+  return [[TFLCategory alloc] initWithIndex:(NSInteger)cCategory->index
+                                      score:cCategory->score
+                                      label:label
+                                displayName:displayName];
 }
 @end

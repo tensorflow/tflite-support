@@ -30,13 +30,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** The index of the class in the corresponding label map, usually packed in the TFLite Model
  * Metadata. */
-@property(nonatomic, assign, readonly) NSInteger categoryIndex;
+@property(nonatomic, assign, readonly) NSInteger index;
 
-
-- (instancetype)initWithCategoryIndex:(NSInteger)categoryIndex 
-                             score:(float)score 
-                             label:(NSString *)label 
-                       displayName:(NSString *)displayName;
+- (instancetype)initWithIndex:(NSInteger)index
+                        score:(float)score
+                        label:(NSString *)label
+                  displayName:(NSString *)displayName;
 
 @end
 
