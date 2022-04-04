@@ -34,7 +34,9 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  return [[TFLCategoryMask alloc] initWithWidth:self.width height:self.height mask:self.mask];
+  return [[TFLCategoryMask alloc] initWithWidth:self.width
+                                         height:self.height
+                                           mask:self.mask];
 }
 
 - (void)dealloc {
@@ -63,7 +65,9 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  return [[TFLConfidenceMask alloc] initWithWidth:self.width height:self.height mask:self.mask];
+  return [[TFLConfidenceMask alloc] initWithWidth:self.width
+                                           height:self.height
+                                             mask:self.mask];
 }
 
 - (void)dealloc {
