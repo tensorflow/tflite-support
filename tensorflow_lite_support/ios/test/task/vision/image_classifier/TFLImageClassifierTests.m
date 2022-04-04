@@ -29,6 +29,7 @@
   XCTAssertEqual(classifications.headIndex, expectedHeadIndex)
 
 #define VerifyClassificationResult(classificationResult, expectedClassificationsCount) \
+  XCTAssertNotNil(classificationResult); \
   XCTAssertEqual(classificationResult.classifications.count, expectedClassificationsCount)
 
 NS_ASSUME_NONNULL_BEGIN
@@ -43,13 +44,15 @@ NS_ASSUME_NONNULL_BEGIN
   // Put setup code here. This method is called before the invocation of each test method in the
   // class.
   [super setUp];
+
+  // Setting this property causes the tests to break after a test case fails.
   self.continueAfterFailure = NO;
   self.modelPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"mobilenet_v2_1.0_224"
                                                                     ofType:@"tflite"];
   XCTAssertNotNil(self.modelPath);
 }
 
-- (void)testSuccessfullImageInferenceOnMLImageWithUIImage {
+- (void)testInferenceOnMLImageWithUIImage {
   TFLImageClassifierOptions *imageClassifierOptions =
       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
 
@@ -63,15 +66,32 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLClassificationResult *classificationResult = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                   error:nil];
-  const NSInteger categoryCount = 1001;
-  VerifyClassificationResult(classificationResult, 1);
-  VerifyClassifications(classificationResult.classifications[0], 0, categoryCount);
-  VerifyCategory(classificationResult.classifications[0].categories[0], 934, 0.748976,
-                 @"cheeseburger", nil);
-  VerifyCategory(classificationResult.classifications[0].categories[1], 925, 0.024646, @"guacamole",
-                 nil);
-  VerifyCategory(classificationResult.classifications[0].categories[2], 932, 0.022505, @"bagel",
-                 nil);
+  
+  const NSInteger expectedClassificationsCount = 1;
+  VerifyClassificationResult(classificationResult, expectedClassificationsCount);
+ 
+  const NSInteger expectedHeadIndex = 0;
+  const NSInteger expectedCategoryCount = 1001;
+  VerifyClassifications(classificationResult.classifications[0], expectedHeadIndex, expectedCategoryCount);
+  VerifyCategory(classificationResult.classifications[0].categories[0], 
+                 934,             //expectedIndex
+                 0.748976,        //expectedScore
+                 @"cheeseburger", //expectedLabel
+                 nil              //expectedDisplaName
+  );
+  VerifyCategory(classificationResult.classifications[0].categories[1], 
+                 925,          //expectedIndex
+                 0.024646,     //expectedScore
+                 @"guacamole", //expectedLabel
+                 nil           //expectedDisplaName
+  );
+  VerifyCategory(classificationResult.classifications[0].categories[2], 
+                 932,      //expectedIndex
+                 0.022505, //expectedScore
+                 @"bagel", //expectedLabel
+                 nil       //expectedDisplaName
+  );
+}
 
 - (void)testErrorObjectForSimultaneousClassNameBlackListAndWhiteList {
 
@@ -108,20 +128,42 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLClassificationResult *classificationResult = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                   error:nil];
+  
+  const NSInteger expectedClassificationsCount = 1;
+  VerifyClassificationResult(classificationResult, 
+                             expectedClassificationsCount //expectedClassificationsCount
+  );
+ 
+  const NSInteger expectedHeadIndex = 0;
+  VerifyClassifications(classificationResult.classifications[0], 
+                        expectedHeadIndex, //expectedHeadIndex
+                        maxResults         //expectedCategoryCount
+  );       
 
-  VerifyClassificationResult(classificationResult, 1);
-  VerifyClassifications(classificationResult.classifications[0], 0, maxResults);
-  VerifyCategory(classificationResult.classifications[0].categories[0], 934, 0.748976,
-                 @"cheeseburger", nil);
-  VerifyCategory(classificationResult.classifications[0].categories[1], 925, 0.024646, @"guacamole",
-                 nil);
-  VerifyCategory(classificationResult.classifications[0].categories[2], 932, 0.022505, @"bagel",
-                 nil);
+  VerifyCategory(classificationResult.classifications[0].categories[0], 
+                 934,             //expectedIndex
+                 0.748976,        //expectedScore
+                 @"cheeseburger", //expectedLabel
+                 nil              //expectedDisplaName
+  );
+  VerifyCategory(classificationResult.classifications[0].categories[1], 
+                 925,          //expectedIndex
+                 0.024646,     //expectedScore
+                 @"guacamole", //expectedLabel
+                 nil           //expectedDisplaName
+  );
+  VerifyCategory(classificationResult.classifications[0].categories[2], 
+                 932,      //expectedIndex
+                 0.022505, //expectedScore
+                 @"bagel", //expectedLabel
+                 nil       //expectedDisplaName
+  );
 }
 
 - (void)testInferenceWithBoundingBox {
   TFLImageClassifierOptions *imageClassifierOptions =
       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
+  
   int maxResults = 3;
   imageClassifierOptions.classificationOptions.maxResults = maxResults;
 
@@ -138,20 +180,44 @@ NS_ASSUME_NONNULL_BEGIN
                                                                        regionOfInterest:roi
                                                                                   error:nil];
 
-  VerifyClassificationResult(classificationResult, 1);
-  VerifyClassifications(classificationResult.classifications[0], 0, maxResults);
+  const NSInteger expectedClassificationsCount = 1;
+  VerifyClassificationResult(classificationResult, 
+                             expectedClassificationsCount //expectedClassificationsCount
+  );
+ 
+  const NSInteger expectedHeadIndex = 0;
+  VerifyClassifications(classificationResult.classifications[0], 
+                        expectedHeadIndex, //expectedHeadIndex 
+                        maxResults         //expectedCategoryCount
+  );
+  
   // TODO: match the label and score as image_classifier_test.cc
-  VerifyCategory(classificationResult.classifications[0].categories[0], 806, 0.997143,
-                 @"soccer ball", nil);
-  VerifyCategory(classificationResult.classifications[0].categories[1], 891, 0.000380,
-                 @"volleyball", nil);
-  VerifyCategory(classificationResult.classifications[0].categories[2], 685, 0.000198, @"ocarina",
-                 nil);
+  VerifyCategory(classificationResult.classifications[0].categories[0], 
+                 806,            //expectedIndex
+                 0.997143,       //expectedScore
+                 @"soccer ball", //expectedLabel
+                 nil             //expectedDisplaName
+  );
+  VerifyCategory(classificationResult.classifications[0].categories[1], 
+                 891,           //expectedIndex
+                 0.000380,      //expectedScore
+                 @"volleyball", //expectedLabel
+                 nil            //expectedDisplaName
+  );
+  VerifyCategory(classificationResult.classifications[0].categories[2], 
+                 685,        //expectedIndex
+                 0.000198,   //expectedScore
+                 @"ocarina", //expectedLabel
+                 nil         //expectedDisplaName
+  );
 }
 
 - (void)testInferenceWithRGBAImage {
   TFLImageClassifierOptions *imageClassifierOptions =
       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
+  
+  int maxResults = 3;
+  imageClassifierOptions.classificationOptions.maxResults = maxResults;
 
   TFLImageClassifier *imageClassifier =
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
@@ -163,13 +229,36 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLClassificationResult *classificationResult = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                   error:nil];
+ 
+  const NSInteger expectedClassificationsCount = 1;
+  VerifyClassificationResult(classificationResult, 
+                             expectedClassificationsCount //expectedClassificationsCount
+  );
+ 
+  const NSInteger expectedHeadIndex = 0;
+  VerifyClassifications(classificationResult.classifications[0], 
+                        expectedHeadIndex, //expectedHeadIndex 
+                        maxResults         //expectedCategoryCount
+  );
 
-  VerifyCategory(classificationResult.classifications[0].categories[0], 934, 0.738065,
-                 @"cheeseburger", nil);
-  VerifyCategory(classificationResult.classifications[0].categories[1], 925, 0.027371, @"guacamole",
-                 nil);
-  VerifyCategory(classificationResult.classifications[0].categories[2], 932, 0.026174, @"bagel",
-                 nil);
+  VerifyCategory(classificationResult.classifications[0].categories[0], 
+                 934,             //expectedIndex
+                 0.738065,        //expectedScore
+                 @"cheeseburger", //expectedLabel
+                 nil              //expectedDisplaName
+  );
+  VerifyCategory(classificationResult.classifications[0].categories[1], 
+                 925,          //expectedIndex
+                 0.027371,     //expectedScore
+                 @"guacamole", //expectedLabel
+                 nil           //expectedDisplaName
+  );
+  VerifyCategory(classificationResult.classifications[0].categories[2], 
+                 932,      //expectedIndex
+                 0.026174, //expectedScoree 
+                 @"bagel", //expectedLabel
+                 nil       //expectedDisplaName
+  );
 }
 
 @end
