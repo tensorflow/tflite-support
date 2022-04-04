@@ -41,7 +41,8 @@ leveldb::Status MemRandomAccessFile::Read(uint64_t offset, size_t n,
         "Read offset is beyond buffer size");
   }
   // Truncate result if the requested chunk extends beyond the buffer.
-  const size_t result_size = std::min(n, buffer_size_ - offset);
+  const size_t result_size =
+      std::min(n, buffer_size_ - static_cast<size_t>(offset));
   *result = leveldb::Slice(buffer_data_ + offset, result_size);
   return leveldb::Status::OK();
 }
