@@ -130,8 +130,3 @@ support_py_proto_library(
     api_version = 2,
     proto_deps = [":segmentation_options_proto"],
 )
-
-java_lite_proto_library(
-    name = "segmentation_options_java_proto_lite",
-    deps = [":segmentation_options_proto"],
-)
