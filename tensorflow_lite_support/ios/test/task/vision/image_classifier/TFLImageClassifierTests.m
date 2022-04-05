@@ -49,8 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                    error:nil];
-  XCTAssertTrue([classificationResults.classifications count] > 0);
-  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0);
+  XCTAssertTrue(classificationResults.classifications.count > 0);
+  XCTAssertTrue(classificationResults.classifications[0].categories.count > 0);
 
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
@@ -75,8 +75,8 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                    error:nil];
-  XCTAssertTrue([classificationResults.classifications count] > 0);
-  XCTAssertLessThanOrEqual([classificationResults.classifications[0].categories count], maxResults);
+  XCTAssertTrue(classificationResults.classifications.count > 0);
+  XCTAssertLessThanOrEqual(classificationResults.classifications[0].categories.count, maxResults);
 
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
@@ -103,8 +103,8 @@ NS_ASSUME_NONNULL_BEGIN
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                         regionOfInterest:roi
                                                                                    error:nil];
-  XCTAssertTrue([classificationResults.classifications count] > 0);
-  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0);
+  XCTAssertTrue(classificationResults.classifications.count > 0);
+  XCTAssertTrue(classificationResults.classifications[0].categories.count > 0);
 
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   // TODO: match the label and score as image_classifier_test.cc
@@ -127,8 +127,8 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
                                                                                    error:nil];
-  XCTAssertTrue([classificationResults.classifications count] > 0);
-  XCTAssertTrue([classificationResults.classifications[0].categories count] > 0);
+  XCTAssertTrue(classificationResults.classifications.count > 0);
+  XCTAssertTrue(classificationResults.classifications[0].categories.count > 0);
 
   TFLCategory *category = classificationResults.classifications[0].categories[0];
   XCTAssertTrue([category.label isEqual:@"junco"]);
