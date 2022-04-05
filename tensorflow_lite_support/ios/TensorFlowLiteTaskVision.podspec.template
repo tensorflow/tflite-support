@@ -1,10 +1,10 @@
 Pod::Spec.new do |s|
   s.name             = 'TensorFlowLiteTaskVision'
-  s.version          = '0.0.1'
+  s.version          = '${TFLS_BUILD_VERSION}'
   s.authors          = 'Google Inc.'
-  s.license          = { :type => 'Apache' }
+  s.license          = { :type => 'Apache',:file => "LICENSE.txt"}
   s.homepage         = 'https://github.com/tensorflow/tflite-support'
-  s.source           = { :http => ENV['TFLS_DOWNLOAD_URL'] }
+  s.source           = { :http => '${TFLS_DOWNLOAD_URL}' }
   s.summary          = 'TensorFlow Lite Task Library - Vision'
   s.description      = 'The Natural Language APIs of the TFLite Task Library'
 
@@ -13,12 +13,13 @@ Pod::Spec.new do |s|
   s.module_name = 'TensorFlowLiteTaskVision'
   s.static_framework = true
 
-  objc_dir =  'tensorflow_lite_support/ios/'
+  root_dir_name = "tensorflow_lite_support"
+  objc_dir =  root_dir_name +  '/ios/'
   objc_task_dir =  objc_dir + 'task/'
   objc_core_dir = objc_task_dir + 'core/'
   objc_processor_dir = objc_task_dir + 'processor/'
   objc_vision_dir = objc_task_dir + 'vision/'
-  gml_image_dir = 'tensorflow_lite_support/odml/ios/image/'
+  gml_image_dir = root_dir_name + '/odml/ios/image/'
   s.public_header_files = [
     objc_vision_dir + 'apis/*.h',
     gml_image_dir + 'apis/*.h',
@@ -28,8 +29,8 @@ Pod::Spec.new do |s|
     objc_vision_dir + 'sources/*.h'
   ]
 
-  c_dir = 'tensorflow_lite_support/c/'
-  c_task_dir = 'tensorflow_lite_support/c/task/'
+  c_dir = root_dir_name + '/c/'
+  c_task_dir = c_dir + 'task/'
   c_core_dir = c_task_dir + 'core/'
   c_processor_dir = c_task_dir + 'processor/'
   c_vision_dir = c_task_dir + 'vision/'
@@ -52,18 +53,7 @@ Pod::Spec.new do |s|
   s.module_map = objc_vision_dir + 'apis/framework.modulemap'
   s.pod_target_xcconfig = {
     'HEADER_SEARCH_PATHS' =>
-      '"${PODS_TARGET_SRCROOT}" ' +
-      '"${PODS_TARGET_SRCROOT}/' + c_dir + '" ' +
-      '"${PODS_TARGET_SRCROOT}/' + c_dir + 'core" ' +
-      '"${PODS_TARGET_SRCROOT}/' + c_dir + 'processor" ' +
-      '"${PODS_TARGET_SRCROOT}/' + c_dir + 'vision" ' +
-      '"${PODS_TARGET_SRCROOT}/' + c_dir + 'vision/core" ' +
-      '"${PODS_TARGET_SRCROOT}/' + gml_image_dir + 'apis" ' +
-      '"${PODS_TARGET_SRCROOT}/' + objc_dir + 'sources" ' +
-      '"${PODS_TARGET_SRCROOT}/' + objc_core_dir + 'sources" ' +
-      '"${PODS_TARGET_SRCROOT}/' + objc_processor_dir + 'sources" ' +
-      '"${PODS_TARGET_SRCROOT}/' + objc_vision_dir + 'apis" ' +
-      '"${PODS_TARGET_SRCROOT}/' + objc_vision_dir + 'sources" ',
+      '"${PODS_TARGET_SRCROOT}/' + root_dir_name + '/.."/**',
     'VALID_ARCHS' => 'x86_64 armv7 arm64',
   }
 
