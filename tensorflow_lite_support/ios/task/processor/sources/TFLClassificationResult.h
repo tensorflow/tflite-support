@@ -30,6 +30,16 @@ NS_ASSUME_NONNULL_BEGIN
  * probability). */
 @property(nonatomic, copy, readonly) NSArray<TFLCategory *> *categories;
 
+/**
+ * Initializes TFLClassifications.
+ *
+ * @param categories Array of TFLCategory objects encapsulating a list of
+ * predictions usually sorted by descending scores (e.g. from high to low probability).
+ * @seealso TFLCategory
+ *
+ * @return An instance of TFLClassifications initialized to
+ * the specified values.
+ */
 - (instancetype)initWithHeadIndex:(NSInteger)headIndex
                        categories:(NSArray<TFLCategory *> *)categories;
 
@@ -38,8 +48,20 @@ NS_ASSUME_NONNULL_BEGIN
 /** Encapsulates results of any classification task. */
 @interface TFLClassificationResult : NSObject
 
+/** Array of TFLClassifications objects containing image classifier predictions per image classifier
+ * head.
+ */
 @property(nonatomic, copy, readonly) NSArray<TFLClassifications *> *classifications;
 
+/**
+ * Initializes TFLClassificationResult.
+ *
+ * @param classifications Array of TFLClassifications objects containing image classifier
+ * predictions per image classifier head.
+ * @seealso TFLClassifications
+ *
+ * @return An instance of TFLClassificationResult initialized to the specified values.
+ */
 - (instancetype)initWithClassifications:(NSArray<TFLClassifications *> *)classifications;
 
 @end
