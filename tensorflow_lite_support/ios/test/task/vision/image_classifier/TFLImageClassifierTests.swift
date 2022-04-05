@@ -23,69 +23,16 @@ class TFLImageClassifierTests: XCTestCase {
   static let modelPath = bundle.path(
     forResource: "mobilenet_v2_1.0_224",
     ofType: "tflite")
-  
-  func verifyError(
-    _ error: Error,
-    expectedLocalizedDescription: String
-  ) {
-    XCTAssert(
-      error.localizedDescription.contains(expectedLocalizedDescription))
-  }
 
-  func verifyCategory(
-    _ category: TFLCategory,
-    expectedIndex: NSInteger,
-    expectedScore: Float,
-    expectedLabel: String,
-    expectedDisplayName: String?
-  ) {
-    XCTAssertEqual(
-      category.index,
-      expectedIndex)
-    XCTAssertEqual(
-      category.score, 
-      expectedScore, 
-      accuracy: 1e-6); 
-
-    XCTAssertEqual(
-      category.label,
-      expectedLabel)
-    
-    XCTAssertEqual(
-      category.displayName,
-      expectedDisplayName)
-  }
-
-  func verifyClassifications(
-    _ classifications: TFLClassifications,
-    expectedHeadIndex: NSInteger,
-    expectedCategoryCount: NSInteger
-  ) {
-    XCTAssertEqual(
-      classifications.headIndex,
-      expectedHeadIndex)
-    XCTAssertEqual(
-      classifications.categories.count,
-      expectedCategoryCount)
-  }
-
-  func verifyClassificationResult(
-    _ classificationResult: TFLClassificationResult,
-    expectedClassificationsCount: NSInteger
-  ) {
-    XCTAssertEqual(
-      classificationResult.classifications.count,
-      expectedClassificationsCount)
-  }
-
-  func testInferenceOnMLImageWithUIImage() throws {
+  func testSuccessfullInferenceOnMLImageWithUIImage() throws {
 
     let modelPath = try XCTUnwrap(TFLImageClassifierTests.modelPath)
 
-    let imageClassifierOptions = try XCTUnwrap(TFLImageClassifierOptions(modelPath: modelPath))
+    let imageClassifierOptions = TFLImageClassifierOptions(modelPath: modelPath)
+    XCTAssertNotNil(imageClassifierOptions)
 
     let imageClassifier =
-      try XCTUnwrap(TFLImageClassifier.imageClassifier(options: imageClassifierOptions))
+      try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -93,71 +40,30 @@ class TFLImageClassifierTests: XCTestCase {
         filename: "burger",
         type: "jpg"))
 
-    let classificationResult: TFLClassificationResult =
-      try XCTUnwrap(imageClassifier.classify(gmlImage: gmlImage))
-    
-    let expectedClassificationsCount = 1
-    self.verifyClassificationResult(classificationResult, 
-                                    expectedClassificationsCount: expectedClassificationsCount)
+    let classificationResults: TFLClassificationResult =
+      try imageClassifier.classify(gmlImage: gmlImage)
 
-    let expectedCategoryCount = 1001
-    let expectedHeadIndex = 0
-    self.verifyClassifications(classificationResult.classifications[0], 
-                               expectedHeadIndex: expectedHeadIndex, 
-                               expectedCategoryCount: expectedCategoryCount)
-    
+    XCTAssertNotNil(classificationResults)
+    XCTAssertEqual(classificationResults.classifications.count, 1)
+    XCTAssertGreaterThan(classificationResults.classifications[0].categories.count, 0)
     // TODO: match the score as image_classifier_test.cc
-    self.verifyCategory(classificationResult.classifications[0].categories[0], 
-                        expectedIndex: 934, 
-                        expectedScore: 0.748976,
-                        expectedLabel: "cheeseburger", 
-                        expectedDisplayName: nil);
-    self.verifyCategory(classificationResult.classifications[0].categories[1], 
-                        expectedIndex: 925, 
-                        expectedScore: 0.024646, 
-                        expectedLabel: "guacamole",
-                        expectedDisplayName: nil);
-    self.verifyCategory(classificationResult.classifications[0].categories[2], 
-                        expectedIndex: 932, 
-                        expectedScore: 0.022505, 
-                        expectedLabel: "bagel",
-                        expectedDisplayName: nil);
+    let category = classificationResults.classifications[0].categories[0]
+    XCTAssertEqual(category.label, "cheeseburger")
+    XCTAssertEqual(category.score, 0.748976, accuracy: 0.001)
   }
 
-  func testErrorForSimultaneousLabelAllowListAndDenyList() throws {
-
-    let modelPath = try XCTUnwrap(TFLImageClassifierTests.modelPath)
-
-    let imageClassifierOptions = try XCTUnwrap(TFLImageClassifierOptions(modelPath: modelPath))
-    imageClassifierOptions.classificationOptions.labelAllowList = ["cheeseburger"];
-    imageClassifierOptions.classificationOptions.labelDenyList = ["cheeseburger"];
-
-    var imageClassifier: TFLImageClassifier?
-    do {
-      let imageClassifier =
-        try TFLImageClassifier.imageClassifier(options: imageClassifierOptions)
-      XCTAssertNil(imageClassifier)
-    }
-    catch  {
-      let expectedLocalizedDescription =
-        "INVALID_ARGUMENT: `class_name_whitelist` and `class_name_blacklist` are mutually exclusive options"
-      self.verifyError(error,
-                       expectedLocalizedDescription: expectedLocalizedDescription)
-    }
-  }
-    
   func testModelOptionsWithMaxResults() throws {
 
     let modelPath = try XCTUnwrap(TFLImageClassifierTests.modelPath)
 
-    let imageClassifierOptions = try XCTUnwrap(TFLImageClassifierOptions(modelPath: modelPath))
+    let imageClassifierOptions = TFLImageClassifierOptions(modelPath: modelPath)
     XCTAssertNotNil(imageClassifierOptions)
 
     let maxResults = 3
-    imageClassifierOptions.classificationOptions.maxResults = maxResults
+    imageClassifierOptions!.classificationOptions.maxResults = maxResults
 
     let imageClassifier =
-      try XCTUnwrap(TFLImageClassifier.imageClassifier(options: imageClassifierOptions))
+      try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -165,70 +71,28 @@ class TFLImageClassifierTests: XCTestCase {
         filename: "burger",
         type: "jpg"))
 
-    let classificationResult = 
-      try XCTUnwrap(imageClassifier.classify(gmlImage: gmlImage))
+    let classificationResults: TFLClassificationResult = try imageClassifier.classify(
+      gmlImage: gmlImage)
 
-    let expectedClassificationsCount = 1
-    self.verifyClassificationResult(classificationResult, 
-                                    expectedClassificationsCount: expectedClassificationsCount)
+    XCTAssertNotNil(classificationResults)
+    XCTAssertEqual(classificationResults.classifications.count, 1)
+    XCTAssertLessThanOrEqual(classificationResults.classifications[0].categories.count, maxResults)
 
-    let expectedHeadIndex = 0
-    self.verifyClassifications(classificationResult.classifications[0], 
-                               expectedHeadIndex: expectedHeadIndex, 
-                               expectedCategoryCount: maxResults)
-    
     // TODO: match the score as image_classifier_test.cc
-    self.verifyCategory(classificationResult.classifications[0].categories[0], 
-                        expectedIndex: 934, 
-                        expectedScore: 0.748976,
-                        expectedLabel: "cheeseburger", 
-                        expectedDisplayName: nil);
-    self.verifyCategory(classificationResult.classifications[0].categories[1], 
-                        expectedIndex: 925, 
-                        expectedScore: 0.024646, 
-                        expectedLabel: "guacamole",
-                        expectedDisplayName: nil);
-    self.verifyCategory(classificationResult.classifications[0].categories[2], 
-                        expectedIndex: 932, 
-                        expectedScore: 0.022505, 
-                        expectedLabel: "bagel",
-                        expectedDisplayName: nil);
-  }
-
-    func testErrorForOptionsWithInvalidMaxResults() throws {
-    
-    let modelPath = try XCTUnwrap(TFLImageClassifierTests.modelPath)
-    
-    let imageClassifierOptions = try XCTUnwrap(TFLImageClassifierOptions(modelPath: modelPath))
-    XCTAssertNotNil(imageClassifierOptions)
-    
-    let maxResults = 0
-    imageClassifierOptions.classificationOptions.maxResults = maxResults
-    
-    do {
-      let imageClassifier =
-        try TFLImageClassifier.imageClassifier(options: imageClassifierOptions)
-        XCTAssertNil(imageClassifier)
-    }
-    catch {
-      let expectedLocalizedDescription =
-        "INVALID_ARGUMENT: Invalid `max_results` option: value must be != 0"
-      self.verifyError(error,
-                       expectedLocalizedDescription: expectedLocalizedDescription)
-    }
+    let category = classificationResults.classifications[0].categories[0]
+    XCTAssertEqual(category.label, "cheeseburger")
+    XCTAssertEqual(category.score, 0.748976, accuracy: 0.001)
   }
 
   func testInferenceWithBoundingBox() throws {
 
     let modelPath = try XCTUnwrap(TFLImageClassifierTests.modelPath)
 
-    let imageClassifierOptions = try XCTUnwrap(TFLImageClassifierOptions(modelPath: modelPath))
-
-    let maxResults = 3
-    imageClassifierOptions.classificationOptions.maxResults = maxResults
+    let imageClassifierOptions = TFLImageClassifierOptions(modelPath: modelPath)
+    XCTAssertNotNil(imageClassifierOptions)
 
     let imageClassifier =
-      try XCTUnwrap(TFLImageClassifier.imageClassifier(options: imageClassifierOptions))
+      try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -237,69 +101,44 @@ class TFLImageClassifierTests: XCTestCase {
         type: "jpg"))
 
     let roi = CGRect(x: 406, y: 110, width: 148, height: 153)
-    let classificationResult =
-      try XCTUnwrap(imageClassifier.classify(gmlImage: gmlImage, regionOfInterest: roi))
+    let classificationResults =
+      try imageClassifier.classify(gmlImage: gmlImage, regionOfInterest: roi)
 
-    let expectedClassificationsCount = 1
-    self.verifyClassificationResult(classificationResult, 
-                                    expectedClassificationsCount: expectedClassificationsCount)
+    XCTAssertNotNil(classificationResults)
+    XCTAssertEqual(classificationResults.classifications.count, 1)
+    XCTAssertGreaterThan(classificationResults.classifications[0].categories.count, 0)
 
-    let expectedHeadIndex = 0
-    self.verifyClassifications(classificationResult.classifications[0], 
-                               expectedHeadIndex: expectedHeadIndex, 
-                               expectedCategoryCount: maxResults)
-    
-    // TODO: match the score as image_classifier_test.cc
-    self.verifyCategory(classificationResult.classifications[0].categories[0], 
-                        expectedIndex: 806, 
-                        expectedScore: 0.997143,
-                        expectedLabel: "soccer ball", 
-                        expectedDisplayName: nil);
-    self.verifyCategory(classificationResult.classifications[0].categories[1], 
-                        expectedIndex: 891, 
-                        expectedScore: 0.000380, 
-                        expectedLabel: "volleyball",
-                        expectedDisplayName: nil);
-    self.verifyCategory(classificationResult.classifications[0].categories[2], 
-                        expectedIndex: 685, 
-                        expectedScore: 0.000198, 
-                        expectedLabel: "ocarina",
-                        expectedDisplayName: nil);
+    // TODO: match the label and score as image_classifier_test.cc
+    // let category = classificationResults.classifications[0].categories[0]
+    // XCTAssertEqual(category.label, "soccer ball")
+    // XCTAssertEqual(category.score, 0.256512, accuracy:0.001);
   }
 
   func testInferenceWithRGBAImage() throws {
 
     let modelPath = try XCTUnwrap(TFLImageClassifierTests.modelPath)
 
-    let imageClassifierOptions = try XCTUnwrap(TFLImageClassifierOptions(modelPath: modelPath))
+    let imageClassifierOptions = TFLImageClassifierOptions(modelPath: modelPath)
+    XCTAssertNotNil(imageClassifierOptions)
 
     let imageClassifier =
-      try XCTUnwrap(TFLImageClassifier.imageClassifier(options: imageClassifierOptions))
+      try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
         class: type(of: self),
-        filename: "burger",
+        filename: "sparrow",
         type: "png"))
 
-    let classificationResult =
-      try XCTUnwrap(imageClassifier.classify(gmlImage: gmlImage))
+    let classificationResults =
+      try imageClassifier.classify(gmlImage: gmlImage)
 
-   self.verifyCategory(classificationResult.classifications[0].categories[0], 
-                        expectedIndex: 934, 
-                        expectedScore: 0.738065,
-                        expectedLabel: "cheeseburger", 
-                        expectedDisplayName: nil);
-    self.verifyCategory(classificationResult.classifications[0].categories[1], 
-                        expectedIndex: 925, 
-                        expectedScore: 0.027371, 
-                        expectedLabel: "guacamole",
-                        expectedDisplayName: nil);
-    self.verifyCategory(classificationResult.classifications[0].categories[2], 
-                        expectedIndex: 932, 
-                        expectedScore: 0.026174, 
-                        expectedLabel: "bagel",
-                        expectedDisplayName: nil);
-    }
+    XCTAssertNotNil(classificationResults)
+    XCTAssertEqual(classificationResults.classifications.count, 1)
+    XCTAssertGreaterThan(classificationResults.classifications[0].categories.count, 0)
 
+    let category = classificationResults.classifications[0].categories[0]
+    XCTAssertEqual(category.label, "junco")
+    XCTAssertEqual(category.score, 0.253016, accuracy: 0.001)
+  }
 }
