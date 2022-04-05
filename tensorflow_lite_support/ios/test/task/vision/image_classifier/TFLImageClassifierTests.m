@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   // Setting this property causes the tests to break after a test case fails.
   self.continueAfterFailure = NO;
-  self.modelPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"mobilenet_v2_1.0_224"
+  self.modelPath = [[NSBundle bundleForClass:self.class] pathForResource:@"mobilenet_v2_1.0_224"
                                                                     ofType:@"tflite"];
   XCTAssertNotNil(self.modelPath);
 }
