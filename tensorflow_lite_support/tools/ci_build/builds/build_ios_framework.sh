@@ -16,7 +16,8 @@
 
 # Set the following variables as appropriate.
 #   * BAZEL: path to bazel. defaults to the first one available in PATH
-#   * FRAMEWORK_NAME: Name of the iOS framework to be built.
+#   * FRAMEWORK_NAME: name of the iOS framework to be built. Currently the 
+#   * accepted values are TensorFlowLiteTaskVision, TensorFlowLiteTaskText.
 #   * TFLS_BUILD_VERSION: to specify the release version. defaults to 0.0.1-dev
 #   * IS_RELEASE_BUILD: set as true if this build should be a release build
 #   * ARCHIVE_FRAMEWORK: set as true if the framework should be archived
@@ -94,7 +95,7 @@ function create_framework_archive {
   #      +-- TensorFlowLiteTaskTextC.framework
   #
 
-  # ----- (1) Copy ssource files -----
+  # ----- (1) Copy source files -----
   pushd "${TFLS_ROOT_DIR}"
 
   # Set Source files and iOS header files which are to be stripped off header prefixes,
@@ -150,7 +151,9 @@ function create_framework_archive {
       "
     ;;
     *)
-      echo "Framework Name Provided is not in the list of buildable frameworks."
+      echo "FRAMEWORK_NAME provided is not in the list of buildable frameworks. 
+            The accepted values are TensorFlowLiteTaskVision, 
+            TensorFlowLiteTaskText"
       exit 1
     ;;
   esac
