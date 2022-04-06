@@ -105,6 +105,7 @@
       *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
                                        description:@"GMLImage argument cannot be nil."];
     }
+    return nil;
   }
   TfLiteFrameBuffer *cFrameBuffer = [image cFrameBufferWithError:error];
 
