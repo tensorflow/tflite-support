@@ -20,27 +20,26 @@
 
 + (char **)cStringArrayFromNSArray:(NSArray<NSString *> *)strings error:(NSError **)error {
   if (strings.count <= 0) {
-    if (error) {
-      *error = [TFLCommonUtils
-          customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                  description:@"Invalid length of strings found for list type options."];
-    }
-    return NULL;
+    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                            description:@"Invalid length of strings found for list type options."
+                                  error:error];
   }
+  return nil;
+}
 
-  char **cStrings = (char **)[TFLCommonUtils mallocWithSize:strings.count * sizeof(char *)
-                                                      error:error];
+char **cStrings = (char **)[TFLCommonUtils mallocWithSize:strings.count * sizeof(char *)
+                                                    error:error];
 
-  for (NSInteger i = 0; i < strings.count; i++) {
-    cStrings[i] = (char *)[TFLCommonUtils
-        mallocWithSize:([strings[i] lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1) *
-                       sizeof(char)
-                 error:error];
-    if (!cStrings[i]) return nil;
+for (NSInteger i = 0; i < strings.count; i++) {
+  cStrings[i] = (char *)[TFLCommonUtils
+      mallocWithSize:([strings[i] lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1) *
+                     sizeof(char)
+               error:error];
+  if (!cStrings[i]) return nil;
 
-    strcpy(cStrings[i], strings[i].UTF8String);
-  }
-  return cStrings;
+  strcpy(cStrings[i], strings[i].UTF8String);
+}
+return cStrings;
 }
 
 + (void)deleteCStringsArray:(char **)cStrings count:(int)count {
