@@ -20,12 +20,10 @@
 
 + (char **)cStringArrayFromNSArray:(NSArray<NSString *> *)strings error:(NSError **)error {
   if (strings.count <= 0) {
-    if (error) {
-      *error = [TFLCommonUtils
-          customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                  description:@"Invalid length of strings found for list type options."];
-    }
-    return NULL;
+    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                            description:@"Invalid length of strings found for list type options."
+                                  error:error];
+    return nil;
   }
 
   char **cStrings = (char **)[TFLCommonUtils mallocWithSize:strings.count * sizeof(char *)

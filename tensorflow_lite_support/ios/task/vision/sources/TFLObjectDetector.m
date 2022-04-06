@@ -65,9 +65,8 @@
 + (nullable instancetype)objectDetectorWithOptions:(nonnull TFLObjectDetectorOptions *)options
                                              error:(NSError **)error {
   TfLiteObjectDetectorOptions cOptions = TfLiteObjectDetectorOptionsCreate();
-  if (![options.classificationOptions
-          copyToCOptions:&(cOptions.classification_options)
-                                 error:error])
+  if (!
+      [options.classificationOptions copyToCOptions:&(cOptions.classification_options) error:error])
     return nil;
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
@@ -80,9 +79,7 @@
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
   if (!objectDetector) {
-    if (error) {
-      *error = [TFLCommonUtils errorWithCError:createObjectDetectorError];
-    }
+    [TFLCommonUtils errorWithCError:createObjectDetectorError error:error];
     TfLiteSupportErrorDelete(createObjectDetectorError);
     return nil;
   }
@@ -109,9 +106,7 @@
   cFrameBuffer = nil;
 
   if (!cDetectionResult) {
-    if (error) {
-      *error = [TFLCommonUtils errorWithCError:detectError];
-    }
+    [TFLCommonUtils errorWithCError:detectError error:error];
     TfLiteSupportErrorDelete(detectError);
     return nil;
   }
