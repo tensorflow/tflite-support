@@ -51,6 +51,7 @@ objc_library(
     hdrs = [
         "sources/TFLImageSegmenter.h",
     ],
+    features = ["-layering_check"],
     module_name = "TFLImageSegmenter",
     deps = [
         "//tensorflow_lite_support/c/task/vision:image_segmenter",
