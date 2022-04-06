@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A TFLImageClassifier instance.
  */
-+ (nullable instancetype)imageClassifierWithOptions:(nonnull TFLImageClassifierOptions *)options
++ (nullable instancetype)imageClassifierWithOptions:(TFLImageClassifierOptions *)options
                                               error:(NSError **)error
     NS_SWIFT_NAME(imageClassifier(options:));
 
