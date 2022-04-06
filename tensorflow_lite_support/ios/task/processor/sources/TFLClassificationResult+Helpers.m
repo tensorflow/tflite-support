@@ -29,7 +29,7 @@
       TfLiteCategory cCategory = cClassifications.categories[j];
       [categories addObject:[TFLCategory categoryWithCCategory:&cCategory]];
     }
-    TFLClassifications *classifications = [TFLClassifications alloc] initWithHeadIndex:i
+    TFLClassifications *classifications = [[TFLClassifications alloc] initWithHeadIndex:i
                                                                       categories:categories];
 
     [classificationHeads addObject:classifications];
