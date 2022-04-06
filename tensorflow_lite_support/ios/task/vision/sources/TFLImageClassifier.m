@@ -80,13 +80,14 @@
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
   if (!imageClassifier) {
-    [TFLCommonUtils errorWithCError:createClassifierError error:error];
+    if (error) {
+      *error = [TFLCommonUtils errorWithCError:createClassifierError];
+    }
+    TfLiteSupportErrorDelete(createClassifierError);
+    return nil;
   }
-  TfLiteSupportErrorDelete(createClassifierError);
-  return nil;
-}
 
-return [[TFLImageClassifier alloc] initWithImageClassifier:imageClassifier];
+  return [[TFLImageClassifier alloc] initWithImageClassifier:imageClassifier];
 }
 
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
@@ -100,43 +101,44 @@ return [[TFLImageClassifier alloc] initWithImageClassifier:imageClassifier];
                                           regionOfInterest:(CGRect)roi
                                                      error:(NSError *_Nullable *)error {
   if (image == nil) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"GMLImage argument cannot be nil."
-                                  error:error];
+    if (error != nil) {
+      *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                                       description:@"GMLImage argument cannot be nil."];
+    }
   }
-}
-TfLiteFrameBuffer *cFrameBuffer = [image cFrameBufferWithError:error];
+  TfLiteFrameBuffer *cFrameBuffer = [image cFrameBufferWithError:error];
 
-if (!cFrameBuffer) {
-  return nil;
-}
+  if (!cFrameBuffer) {
+    return nil;
+  }
 
-TfLiteBoundingBox boundingBox = {.origin_x = roi.origin.x,
-                                 .origin_y = roi.origin.y,
-                                 .width = roi.size.width,
-                                 .height = roi.size.height};
+  TfLiteBoundingBox boundingBox = {.origin_x = roi.origin.x,
+                                   .origin_y = roi.origin.y,
+                                   .width = roi.size.width,
+                                   .height = roi.size.height};
 
-TfLiteSupportError *classifyError = nil;
-TfLiteClassificationResult *cClassificationResult = TfLiteImageClassifierClassifyWithRoi(
-    _imageClassifier, cFrameBuffer, &boundingBox, &classifyError);
+  TfLiteSupportError *classifyError = nil;
+  TfLiteClassificationResult *cClassificationResult = TfLiteImageClassifierClassifyWithRoi(
+      _imageClassifier, cFrameBuffer, &boundingBox, &classifyError);
 
-free(cFrameBuffer->buffer);
-cFrameBuffer->buffer = nil;
+  free(cFrameBuffer->buffer);
+  cFrameBuffer->buffer = nil;
 
-free(cFrameBuffer);
-cFrameBuffer = nil;
+  free(cFrameBuffer);
+  cFrameBuffer = nil;
 
-if (!cClassificationResult) {
-  [TFLCommonUtils errorWithCError:classifyError, error:error];
-}
-TfLiteSupportErrorDelete(classifyError);
-return nil;
-}
+  if (!cClassificationResult) {
+    if (error) {
+      *error = [TFLCommonUtils errorWithCError:classifyError];
+    }
+    TfLiteSupportErrorDelete(classifyError);
+    return nil;
+  }
 
-TFLClassificationResult *classificationHeadsResults =
-    [TFLClassificationResult classificationResultWithCResult:cClassificationResult];
-TfLiteClassificationResultDelete(cClassificationResult);
+  TFLClassificationResult *classificationHeadsResults =
+      [TFLClassificationResult classificationResultWithCResult:cClassificationResult];
+  TfLiteClassificationResultDelete(cClassificationResult);
 
-return classificationHeadsResults;
+  return classificationHeadsResults;
 }
 @end

@@ -20,25 +20,20 @@ static NSString *const TFLSupportTaskErrorDomain = @"org.tensorflow.lite.tasks";
 
 @implementation TFLCommonUtils
 
-+ (void)customErrorWithCode:(NSInteger)code
-                description:(NSString *)description
-                      error:(NSError **)error {
-  if (error)
-    *error = [NSError errorWithDomain:TFLSupportTaskErrorDomain
-                               code:code
-                           userInfo:@{NSLocalizedDescriptionKey : description}];
++ (NSError *)customErrorWithCode:(NSInteger)code description:(NSString *)description {
+  return [NSError errorWithDomain:TFLSupportTaskErrorDomain
+                             code:code
+                         userInfo:@{NSLocalizedDescriptionKey : description}];
 }
 
-+ (void)errorWithCError:(TfLiteSupportError *)supportError error:(NSError **)error {
-  if (supportError && error) {
-    *error = [NSError
++ (NSError *)errorWithCError:(TfLiteSupportError *)supportError {
+  return [NSError
       errorWithDomain:TFLSupportTaskErrorDomain
                  code:supportError->code
              userInfo:@{
                NSLocalizedDescriptionKey : [NSString stringWithCString:supportError->message
                                                               encoding:NSUTF8StringEncoding]
              }];
-  }
 }
 
 + (void *)mallocWithSize:(size_t)memSize error:(NSError **)error {

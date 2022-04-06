@@ -71,13 +71,14 @@
       TfLiteImageSegmenterFromOptions(&cOptions, &createImageSegmenterError);
 
   if (!imageSegmenter) {
-    [TFLCommonUtils errorWithCError:createImageSegmenterError error:error];
+    if (error) {
+      *error = [TFLCommonUtils errorWithCError:createImageSegmenterError];
+    }
+    TfLiteSupportErrorDelete(createImageSegmenterError);
+    return nil;
   }
-  TfLiteSupportErrorDelete(createImageSegmenterError);
-  return nil;
-}
 
-return [[TFLImageSegmenter alloc] initWithImageSegmenter:imageSegmenter];
+  return [[TFLImageSegmenter alloc] initWithImageSegmenter:imageSegmenter];
 }
 
 - (nullable TFLSegmentationResult *)segmentWithGMLImage:(GMLImage *)image
@@ -99,17 +100,18 @@ return [[TFLImageSegmenter alloc] initWithImageSegmenter:imageSegmenter];
   cFrameBuffer = nil;
 
   if (!cSegmentationResult) {
-    [TFLCommonUtils errorWithCError:segmentError error:error];
+    if (error) {
+      *error = [TFLCommonUtils errorWithCError:segmentError];
+    }
+    TfLiteSupportErrorDelete(segmentError);
+    return nil;
   }
-  TfLiteSupportErrorDelete(segmentError);
-  return nil;
-}
 
-TFLSegmentationResult *segmentationResult =
-    [TFLSegmentationResult segmentationResultWithCResult:cSegmentationResult];
-TfLiteSegmentationResultDelete(cSegmentationResult);
+  TFLSegmentationResult *segmentationResult =
+      [TFLSegmentationResult segmentationResultWithCResult:cSegmentationResult];
+  TfLiteSegmentationResultDelete(cSegmentationResult);
 
-return segmentationResult;
+  return segmentationResult;
 }
 
 @end
