@@ -40,7 +40,7 @@
   return self;
 }
 
-- (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath {
+- (nullable instancetype)initWithModelPath:(NSString *)modelPath {
   self = [self init];
   if (self) {
     self.baseOptions.modelFile.filePath = modelPath;
@@ -63,7 +63,7 @@
   return self;
 }
 
-+ (nullable instancetype)imageClassifierWithOptions:(nonnull TFLImageClassifierOptions *)options
++ (nullable instancetype)imageClassifierWithOptions:(TFLImageClassifierOptions *)options
                                               error:(NSError **)error {
   TfLiteImageClassifierOptions cOptions = TfLiteImageClassifierOptionsCreate();
   if (!
