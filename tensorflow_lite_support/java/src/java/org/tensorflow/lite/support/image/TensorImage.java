@@ -44,7 +44,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
  *
  * <p>IMPORTANT: all methods are not proved thread-safe.
  *
- * @see ImageProcessor which is often used for transforming a {@link TensorImage}.
+ * @see ImageProcessor which is often used for transforming a {@code TensorImage}.
  */
 // TODO(b/138907116): Support loading images from TensorBuffer with properties.
 // TODO(b/138905544): Support directly loading RGBBytes, YUVBytes and other types if necessary.
