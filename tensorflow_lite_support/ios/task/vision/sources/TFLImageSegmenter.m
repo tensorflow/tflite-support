@@ -71,7 +71,7 @@
       TfLiteImageSegmenterFromOptions(&cOptions, &createImageSegmenterError);
 
   if (!imageSegmenter) {
-    [TFLCommonUtils errorWithCError:createImageSegmenterError error:error];
+    [TFLCommonUtils convertCError:createImageSegmenterError toError:error];
     TfLiteSupportErrorDelete(createImageSegmenterError);
     return nil;
   }
@@ -98,7 +98,7 @@
   cFrameBuffer = nil;
 
   if (!cSegmentationResult) {
-    [TFLCommonUtils errorWithCError:segmentError error:error];
+    [TFLCommonUtils convertCError:segmentError toError:error];
     TfLiteSupportErrorDelete(segmentError);
     return nil;
   }

@@ -80,7 +80,7 @@
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
   if (!imageClassifier) {
-    [TFLCommonUtils errorWithCError:createClassifierError error:error];
+    [TFLCommonUtils convertCError:createClassifierError toError:error];
     TfLiteSupportErrorDelete(createClassifierError);
     return nil;
   }
@@ -99,9 +99,9 @@
                                           regionOfInterest:(CGRect)roi
                                                      error:(NSError *_Nullable *)error {
   if (image == nil) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"GMLImage argument cannot be nil."
-                                  error:error];
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeInvalidArgumentError
+                          description:@"GMLImage argument cannot be nil."];
     return nil;
   }
 
@@ -127,7 +127,7 @@
   cFrameBuffer = nil;
 
   if (!cClassificationResult) {
-    [TFLCommonUtils errorWithCError:classifyError error:error];
+    [TFLCommonUtils convertCError:classifyError toError:error];
     TfLiteSupportErrorDelete(classifyError);
     return nil;
   }

@@ -79,7 +79,7 @@
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
   if (!objectDetector) {
-    [TFLCommonUtils errorWithCError:createObjectDetectorError error:error];
+    [TFLCommonUtils convertCError:createObjectDetectorError toError:error];
     TfLiteSupportErrorDelete(createObjectDetectorError);
     return nil;
   }
@@ -106,7 +106,7 @@
   cFrameBuffer = nil;
 
   if (!cDetectionResult) {
-    [TFLCommonUtils errorWithCError:detectError error:error];
+    [TFLCommonUtils convertCError:detectError toError:error];
     TfLiteSupportErrorDelete(detectError);
     return nil;
   }

@@ -21,26 +21,24 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLCommonUtils : NSObject
 
 /**
- * Creates and saves an error originating from the task library with the given error code and
- * description.
+ * Creates and saves an NSError with the given code and description.
  *
  * @param code Error code.
  * @param description Error description.
  *  @param error Pointer to the memory location where the created error should be saved. If `nil`,
  * no error will be saved.
  */
-+ (void)customErrorWithCode:(NSInteger)code
-                description:(NSString *)description
-                      error:(NSError **)error;
++ (void)createCustomError:(NSError **)error
+                 withCode:(NSInteger)code
+              description:(NSString *)description;
 /**
- * Creates and saves an error originating from the task library from a C library error,
- * TfLiteSupportError .
+ * Converts a C library error, TfLiteSupportError to an NSError.
  *
  * @param supportError C library error.
  * @param error Pointer to the memory location where the created error should be saved. If `nil`,
  * no error will be saved.
  */
-+ (void)errorWithCError:(TfLiteSupportError *)supportError error:(NSError **)error;
++ (void)convertCError:(TfLiteSupportError *)supportError toError:(NSError **)error;
 
 /**
  * Allocates a block of memory with the specified size and returns a pointer to it. If memory

@@ -64,9 +64,9 @@
       break;
     }
     default: {
-      [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                              description:@"Unsupported pixel format for TfLiteFrameBufferFormat."
-                                    error:error];
+      [TFLCommonUtils createCustomError:error
+                               withCode:TFLSupportErrorCodeInvalidArgumentError
+                            description:@"Unsupported pixel format for TfLiteFrameBufferFormat."];
     }
   }
 
@@ -126,9 +126,9 @@
   convertError = vImageConvert_BGRA8888toRGB888(&srcBuffer, &destBuffer, kvImageNoFlags);
 
   if (convertError != kvImageNoError) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
-                            description:@"Image format conversion failed."
-                                  error:error];
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeImageProcessingError
+                          description:@"Image format conversion failed."];
     return nil;
   }
 
@@ -147,10 +147,10 @@
   } else if (self.CIImage) {
     frameBuffer = [self frameBufferFromCIImage:self.CIImage error:error];
   } else {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"UIImage should be initialized from"
-                                         " CIImage or CGImage."
-                                  error:error];
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeInvalidArgumentError
+                          description:@"UIImage should be initialized from"
+                                       " CIImage or CGImage."];
   }
 
   return frameBuffer;
@@ -210,9 +210,9 @@
   }
 
   if (buffer_to_return == nil) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
-                            description:@"Image format conversion failed."
-                                  error:error];
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeImageProcessingError
+                          description:@"Image format conversion failed."];
   }
 
   CGColorSpaceRelease(colorSpace);
@@ -279,10 +279,10 @@
     width = (int)CGImageGetWidth(ciImage.CGImage);
     height = (int)CGImageGetWidth(ciImage.CGImage);
   } else {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"CIImage should have CGImage or "
-                                         "CVPixelBuffer info."
-                                  error:error];
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeInvalidArgumentError
+                          description:@"CIImage should have CGImage or "
+                                       "CVPixelBuffer info."];
   }
 
   if (buffer == nil) {
@@ -324,9 +324,9 @@
       break;
     }
     default:
-      [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                              description:@"Invalid source type for GMLImage."
-                                    error:error];
+      [TFLCommonUtils createCustomError:error
+                               withCode:TFLSupportErrorCodeInvalidArgumentError
+                            description:@"Invalid source type for GMLImage."];
   }
 
   return cFrameBuffer;

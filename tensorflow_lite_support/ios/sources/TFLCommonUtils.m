@@ -20,16 +20,16 @@ static NSString *const TFLSupportTaskErrorDomain = @"org.tensorflow.lite.tasks";
 
 @implementation TFLCommonUtils
 
-+ (void)customErrorWithCode:(NSInteger)code
-                description:(NSString *)description
-                      error:(NSError **)error {
++ (void)createCustomError:(NSError **)error
+                 withCode:(NSInteger)code
+              description:(NSString *)description {
   if (error)
     *error = [NSError errorWithDomain:TFLSupportTaskErrorDomain
                                  code:code
                              userInfo:@{NSLocalizedDescriptionKey : description}];
 }
 
-+ (void)errorWithCError:(TfLiteSupportError *)supportError error:(NSError **)error {
++ (void)convertCError:(TfLiteSupportError *)supportError toError:(NSError **)error {
   if (supportError && error) {
     *error = [NSError
         errorWithDomain:TFLSupportTaskErrorDomain
@@ -43,9 +43,9 @@ static NSString *const TFLSupportTaskErrorDomain = @"org.tensorflow.lite.tasks";
 
 + (void *)mallocWithSize:(size_t)memSize error:(NSError **)error {
   if (!memSize) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"Invalid memory size passed for allocation of object."
-                                  error:error];
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeInvalidArgumentError
+                          description:@"Invalid memory size passed for allocation of object."];
     return nil;
   }
 
