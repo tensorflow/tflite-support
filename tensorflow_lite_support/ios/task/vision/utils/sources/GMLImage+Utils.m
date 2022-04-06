@@ -12,9 +12,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
+#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
-#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
 
@@ -28,7 +28,7 @@
                                                           error:(NSError **)error;
 
 + (TfLiteFrameBuffer *)cFramebufferFromCVPixelBuffer:(CVPixelBufferRef)pixelBuffer
-                                               error:(NSError **)error;
+                                         error:(NSError **)error;
 @end
 
 @interface UIImage (RawPixelDataUtils)
@@ -39,7 +39,7 @@
 @implementation TFLCVPixelBufferUtils
 
 + (TfLiteFrameBuffer *)cFramebufferFromCVPixelBuffer:(CVPixelBufferRef)pixelBuffer
-                                               error:(NSError **)error {
+                                         error:(NSError **)error {
   uint8_t *buffer = nil;
   enum TfLiteFrameBufferFormat cPixelFormat = kRGB;
 
@@ -65,9 +65,11 @@
     }
 
     default: {
-      [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                              description:@"Unsupported pixel format for TfLiteFrameBufferFormat."
-                                    error:error];
+      if (error) {
+        *error = [TFLCommonUtils
+            customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                    description:@"Unsupported pixel format for TfLiteFrameBufferFormat."];
+      }
       break;
     }
   }
@@ -113,7 +115,7 @@
                                                              error:error];
 
   if (!destPixelBufferAddress) {
-    return nil;
+    return NULL;
   }
 
   vImage_Buffer srcBuffer = {
@@ -128,11 +130,12 @@
   convertError = vImageConvert_BGRA8888toRGB888(&srcBuffer, &destBuffer, kvImageNoFlags);
 
   if (convertError != kvImageNoError) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
-                            description:@"Image format conversion failed."
-                                  error:error];
+    if (error) {
+      *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
+                                       description:@"Image format conversion failed."];
+    }
 
-    return nil;
+    return NULL;
   }
 
   return destPixelBufferAddress;
@@ -143,17 +146,16 @@
 @implementation UIImage (RawPixelDataUtils)
 
 - (TfLiteFrameBuffer *)frameBufferWithError:(NSError **)error {
-  TfLiteFrameBuffer *frameBuffer = nil;
+  TfLiteFrameBuffer *frameBuffer = NULL;
 
   if (self.CGImage) {
     frameBuffer = [self frameBufferFromCGImage:self.CGImage error:error];
   } else if (self.CIImage) {
     frameBuffer = [self frameBufferFromCIImage:self.CIImage error:error];
-  } else {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"UIImage should be initialized from"
-                                         " CIImage or CGImage."
-                                  error:error];
+  } else if (error) {
+    *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                                     description:@"UIImage should be initialized from"
+                                                  " CIImage or CGImage."];
   }
 
   return frameBuffer;
@@ -191,7 +193,7 @@
 
   NSInteger bitsPerComponent = 8;
   NSInteger channelCount = 4;
-  UInt8 *buffer_to_return = nil;
+  UInt8 *buffer_to_return = NULL;
 
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 
@@ -212,10 +214,9 @@
     CGContextRelease(context);
   }
 
-  if ((buffer_to_return == nil)) {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
-                            description:@"Image format conversion failed."
-                                  error:error];
+  if ((buffer_to_return == NULL) && (error)) {
+    *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeImageProcessingError
+                                     description:@"Image format conversion failed."];
   }
 
   CGColorSpaceRelease(colorSpace);
@@ -250,8 +251,8 @@
 - (TfLiteFrameBuffer *)frameBufferFromCGImage:(CGImageRef)cgImage error:(NSError **)error {
   UInt8 *buffer = [UIImage pixelDataFromCGImage:cgImage error:error];
 
-  if (buffer == nil) {
-    return nil;
+  if (buffer == NULL) {
+    return NULL;
   }
 
   TfLiteFrameBuffer *cFrameBuffer = malloc(sizeof(TfLiteFrameBuffer));
@@ -281,15 +282,14 @@
     buffer = [UIImage pixelDataFromCGImage:ciImage.CGImage error:error];
     width = (int)CGImageGetWidth(ciImage.CGImage);
     height = (int)CGImageGetWidth(ciImage.CGImage);
-  } else {
-    [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"CIImage should have CGImage or "
-                                         "CVPixelBuffer info."
-                                  error:error];
+  } else if (error) {
+    *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                                     description:@"CIImage should have CGImage or "
+                                                  "CVPixelBuffer info."];
   }
 
-  if (buffer == nil) {
-    return nil;
+  if (buffer == NULL) {
+    return NULL;
   }
 
   TfLiteFrameBuffer *cFrameBuffer = malloc(sizeof(TfLiteFrameBuffer));
@@ -305,21 +305,19 @@
 
 @end
 
-@implementation GMLImage (Utils)
+@implementation GMLImage(Utils)
 
 - (nullable TfLiteFrameBuffer *)cFrameBufferWithError:(NSError *_Nullable *)error {
-  TfLiteFrameBuffer *cFrameBuffer = nil;
+  TfLiteFrameBuffer *cFrameBuffer = NULL;
 
   switch (self.imageSourceType) {
     case GMLImageSourceTypeSampleBuffer: {
       CVPixelBufferRef sampleImagePixelBuffer = CMSampleBufferGetImageBuffer(self.sampleBuffer);
-      cFrameBuffer = [TFLCVPixelBufferUtils cFramebufferFromCVPixelBuffer:sampleImagePixelBuffer
-                                                                    error:error];
+      cFrameBuffer = [TFLCVPixelBufferUtils cFramebufferFromCVPixelBuffer:sampleImagePixelBuffer error:error];
       break;
     }
     case GMLImageSourceTypePixelBuffer: {
-      cFrameBuffer = [TFLCVPixelBufferUtils cFramebufferFromCVPixelBuffer:self.pixelBuffer
-                                                                    error:error];
+      cFrameBuffer = [TFLCVPixelBufferUtils cFramebufferFromCVPixelBuffer:self.pixelBuffer error:error];
       break;
     }
     case GMLImageSourceTypeImage: {
@@ -327,9 +325,10 @@
     }
 
     default:
-      [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
-                              description:@"Invalid source type for GMLImage."
-                                    error:error];
+      if (error) {
+        *error = [TFLCommonUtils customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
+                                         description:@"Invalid source type for GMLImage."];
+      }
       break;
   }
 
