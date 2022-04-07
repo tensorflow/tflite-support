@@ -17,6 +17,8 @@ limitations under the License.
 #include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/bounding_box.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/embedding.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_embedder.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
@@ -76,13 +78,29 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
            })
       .def("embed",
            [](ImageEmbedder& self, const ImageData& image_data,
-              const BoundingBox& bounding_box)
+              const processor::BoundingBox& bounding_box)
                -> tflite::support::StatusOr<EmbeddingResult> {
+             // Convert from processor::BoundingBox to vision::BoundingBox as
+             // the later is used in the C++ layer.
+             BoundingBox vision_bounding_box;
+             vision_bounding_box.ParseFromString(
+                 bounding_box.SerializeAsString());
+
              ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
                               CreateFrameBufferFromImageData(image_data));
-             return self.Embed(*frame_buffer, bounding_box);
+             return self.Embed(*frame_buffer, vision_bounding_box);
            })
-      .def("get_embedding_by_index", &ImageEmbedder::GetEmbeddingByIndex)
+      .def("get_embedding_by_index",
+           [](ImageEmbedder& self,
+              const processor::EmbeddingResult& embedding_result,
+              const int index) -> Embedding {
+             // Convert from processor::EmbeddingResult to
+             // vision::EmbeddingResult as the later is used in the C++ API.
+             EmbeddingResult vision_embedding_result;
+             vision_embedding_result.ParseFromString(
+                 embedding_result.SerializeAsString());
+             return self.GetEmbeddingByIndex(vision_embedding_result, index);
+           })
       .def("get_number_of_output_layers",
            &ImageEmbedder::GetNumberOfOutputLayers)
       .def("get_embedding_dimension", &ImageEmbedder::GetEmbeddingDimension)

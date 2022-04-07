@@ -21,7 +21,7 @@ from tensorflow_lite_support.python.task.audio.core.pybinds import _pywrap_audio
 from tensorflow_lite_support.python.task.audio.pybinds import _pywrap_audio_embedder
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import embeddings_pb2
+from tensorflow_lite_support.python.task.processor.proto import embedding_pb2
 
 _CppAudioFormat = _pywrap_audio_buffer.AudioFormat
 _CppAudioBuffer = _pywrap_audio_buffer.AudioBuffer
@@ -112,7 +112,7 @@ class AudioEmbedder(object):
                                     self.required_input_buffer_size)
 
   def embed(self,
-            audio: tensor_audio.TensorAudio) -> embeddings_pb2.EmbeddingResult:
+            audio: tensor_audio.TensorAudio) -> embedding_pb2.EmbeddingResult:
     """Performs actual feature vector extraction on the provided audio.
 
     Args:
@@ -132,8 +132,8 @@ class AudioEmbedder(object):
     return self._embedder.embed(
         _CppAudioBuffer(audio.buffer, audio.buffer_size, audio.format))
 
-  def cosine_similarity(self, u: embeddings_pb2.FeatureVector,
-                        v: embeddings_pb2.FeatureVector) -> float:
+  def cosine_similarity(self, u: embedding_pb2.FeatureVector,
+                        v: embedding_pb2.FeatureVector) -> float:
     """Computes cosine similarity [1] between two feature vectors."""
     return self._embedder.cosine_similarity(u, v)
 
