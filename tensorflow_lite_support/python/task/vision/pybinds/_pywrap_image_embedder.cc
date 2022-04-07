@@ -71,15 +71,23 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
           })
       .def("embed",
            [](ImageEmbedder& self, const ImageData& image_data)
-               -> tflite::support::StatusOr<EmbeddingResult> {
+               -> tflite::support::StatusOr<processor::EmbeddingResult> {
              ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
                               CreateFrameBufferFromImageData(image_data));
-             return self.Embed(*frame_buffer);
+             ASSIGN_OR_RETURN(EmbeddingResult vision_embedding_result,
+                              self.Embed(*frame_buffer));
+
+             // Convert from vision::EmbeddingResult to
+             // processor::EmbeddingResult
+             processor::EmbeddingResult embedding_result;
+             embedding_result.ParseFromString(
+                     vision_embedding_result.SerializeAsString());
+             return embedding_result;
            })
       .def("embed",
            [](ImageEmbedder& self, const ImageData& image_data,
               const processor::BoundingBox& bounding_box)
-               -> tflite::support::StatusOr<EmbeddingResult> {
+               -> tflite::support::StatusOr<processor::EmbeddingResult> {
              // Convert from processor::BoundingBox to vision::BoundingBox as
              // the later is used in the C++ layer.
              BoundingBox vision_bounding_box;
@@ -88,7 +96,15 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
 
              ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
                               CreateFrameBufferFromImageData(image_data));
-             return self.Embed(*frame_buffer, vision_bounding_box);
+             ASSIGN_OR_RETURN(EmbeddingResult vision_embedding_result,
+                              self.Embed(*frame_buffer, vision_bounding_box));
+
+             // Convert from vision::EmbeddingResult to
+             // processor::EmbeddingResult
+             processor::EmbeddingResult embedding_result;
+               embedding_result.ParseFromString(
+                       vision_embedding_result.SerializeAsString());
+             return embedding_result;
            })
       .def("get_embedding_by_index",
            [](ImageEmbedder& self,

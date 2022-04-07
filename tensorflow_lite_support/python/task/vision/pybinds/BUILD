@@ -36,6 +36,7 @@ pybind_extension(
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/processor/proto:bounding_box_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:classifications_cc_proto",
         "//tensorflow_lite_support/cc/task/processor/proto:classification_options_cc_proto",
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
