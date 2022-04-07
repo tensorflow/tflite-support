@@ -24,3 +24,20 @@ cc_library_with_tflite(
         "@com_google_absl//absl/strings:str_format",
     ],
 )
+
+cc_library_with_tflite(
+    name = "bert_utils",
+    srcs = ["bert_utils.cc"],
+    hdrs = ["bert_utils.h"],
+    tflite_deps = [
+        "//tensorflow_lite_support/cc/task/core:tflite_engine",
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc:common",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core:task_utils",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
+    ],
+)

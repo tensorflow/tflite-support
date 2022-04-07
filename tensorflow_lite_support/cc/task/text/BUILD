@@ -21,6 +21,7 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/processor:bert_preprocessor",
+        "//tensorflow_lite_support/cc/task/text/utils:bert_utils",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",
@@ -121,6 +122,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/processor:text_preprocessor",
         "//tensorflow_lite_support/cc/task/processor:bert_preprocessor",
         "//tensorflow_lite_support/cc/task/processor:regex_preprocessor",
+        "//tensorflow_lite_support/cc/task/text/utils:bert_utils",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",
