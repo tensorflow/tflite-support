@@ -132,9 +132,20 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
       .def("get_embedding_dimension", &ImageEmbedder::GetEmbeddingDimension)
       .def_static(
           "cosine_similarity",
-          [](const FeatureVector& u, const FeatureVector& v) {
+          [](const processor::FeatureVector& u,
+             const processor::FeatureVector& v) {
+              // Convert from processor::FeatureVector to vision::FeatureVector
+              // as the later is used in the C++ layer.
+              FeatureVector vision_feature_vector_u;
+              vision_feature_vector_u.ParseFromString(
+                      u.SerializeAsString());
+              FeatureVector vision_feature_vector_v;
+              vision_feature_vector_v.ParseFromString(
+                      v.SerializeAsString());
+
               return static_cast<tflite::support::StatusOr<float>>(
-                      ImageEmbedder::CosineSimilarity(u, v));
+              ImageEmbedder::CosineSimilarity(
+                      vision_feature_vector_u, vision_feature_vector_v));
           })
       .def_static("cosine_similarity", &ImageEmbedder::CosineSimilarity);
 }
