@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_PYTHON_TASK_CORE_PYBINDS_TASK_UTILS_H_
 #define TENSORFLOW_LITE_SUPPORT_PYTHON_TASK_CORE_PYBINDS_TASK_UTILS_H_
 
+#include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/python/task/core/proto/base_options.pb.h"
 
@@ -28,6 +29,17 @@ namespace core {
 // configurations that are useless in Python development.
 std::unique_ptr<::tflite::task::core::BaseOptions> convert_to_cpp_base_options(
     ::tflite::python::task::core::BaseOptions options);
+
+// Returns the object value if the status is ok, otherwise throw the runtime
+// error.
+template <typename T>
+inline T get_value(tflite::support::StatusOr<T>& status_or_object) {
+  if (status_or_object.ok()) {
+    return std::move(status_or_object.value());
+  } else {
+    throw std::runtime_error(std::string(status_or_object.status().message()));
+  }
+}
 
 }  // namespace core
 }  // namespace task
