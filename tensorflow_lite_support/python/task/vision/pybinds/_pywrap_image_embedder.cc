@@ -19,6 +19,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/bounding_box.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/embedding.pb.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/embeddings.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_embedder.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
@@ -109,17 +110,32 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
       .def("get_embedding_by_index",
            [](ImageEmbedder& self,
               const processor::EmbeddingResult& embedding_result,
-              const int index) -> Embedding {
+              const int index)
+              -> tflite::support::StatusOr<processor::Embedding> {
              // Convert from processor::EmbeddingResult to
-             // vision::EmbeddingResult as the later is used in the C++ API.
+             // vision::EmbeddingResult as the latter is used in the C++ API.
              EmbeddingResult vision_embedding_result;
              vision_embedding_result.ParseFromString(
                  embedding_result.SerializeAsString());
-             return self.GetEmbeddingByIndex(vision_embedding_result, index);
+
+             vision::Embedding vision_embedding {
+                 self.GetEmbeddingByIndex(vision_embedding_result, index)};
+             // Convert from vision::Embedding to
+             // processor::Embedding
+             processor::Embedding embedding;
+               embedding.ParseFromString(
+                     vision_embedding.SerializeAsString());
+             return embedding;
            })
       .def("get_number_of_output_layers",
            &ImageEmbedder::GetNumberOfOutputLayers)
       .def("get_embedding_dimension", &ImageEmbedder::GetEmbeddingDimension)
+      .def_static(
+          "cosine_similarity",
+          [](const FeatureVector& u, const FeatureVector& v) {
+              return static_cast<tflite::support::StatusOr<float>>(
+                      ImageEmbedder::CosineSimilarity(u, v));
+          })
       .def_static("cosine_similarity", &ImageEmbedder::CosineSimilarity);
 }
 
