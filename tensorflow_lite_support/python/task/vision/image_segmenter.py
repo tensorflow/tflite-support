@@ -19,7 +19,7 @@ from typing import List, Tuple, Optional
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentation_options_pb2
-from tensorflow_lite_support.python.task.vision.proto import segmentations_pb2
+from tensorflow_lite_support.python.task.processor.proto import segmentations_pb2
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_segmenter
