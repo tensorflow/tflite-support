@@ -73,6 +73,7 @@ pybind_extension(
     module_name = "_pywrap_image_segmenter",
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/processor/proto:segmentations_cc_proto",
         "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_cc_proto",
         "//tensorflow_lite_support/cc/task/vision:image_segmenter",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
