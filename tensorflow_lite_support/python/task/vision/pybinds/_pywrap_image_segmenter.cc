@@ -71,10 +71,10 @@ PYBIND11_MODULE(_pywrap_image_segmenter, m) {
 
              // Convert from vision::SegmentationResult to
              // processor::SegmentationResult
-             processor::SegmentationResult segmetation_result;
+             processor::SegmentationResult segmentation_result;
              segmetation_result.ParseFromString(
                      vision_segmentation_result.SerializeAsString());
-             return segmetation_result;
+             return segmentation_result;
            });
 }
 
