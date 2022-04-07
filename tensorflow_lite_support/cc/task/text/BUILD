@@ -92,6 +92,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/core:base_task_api",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
+        "//tensorflow_lite_support/cc/task/text/utils:universal_sentence_encoder_utils",
     ],
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
