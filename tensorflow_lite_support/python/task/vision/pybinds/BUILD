@@ -17,7 +17,6 @@ pybind_extension(
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/processor/proto:bounding_box_cc_proto",
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_cc_proto",
-        "//tensorflow_lite_support/cc/task/vision/proto:embeddings_cc_proto",
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_cc_proto",
         "//tensorflow_lite_support/cc/task/vision:image_embedder",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
