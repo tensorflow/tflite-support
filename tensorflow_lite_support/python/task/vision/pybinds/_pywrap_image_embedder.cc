@@ -135,7 +135,7 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
           [](const processor::FeatureVector& u,
              const processor::FeatureVector& v) {
               // Convert from processor::FeatureVector to vision::FeatureVector
-              // as the later is used in the C++ layer.
+              // as the latter is used in the C++ layer.
               FeatureVector vision_feature_vector_u;
               vision_feature_vector_u.ParseFromString(
                       u.SerializeAsString());
