@@ -15,6 +15,8 @@ pybind_extension(
     module_name = "_pywrap_image_embedder",
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/processor/proto:bounding_box_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_cc_proto",
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_cc_proto",
         "//tensorflow_lite_support/cc/task/vision:image_embedder",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
@@ -33,6 +35,7 @@ pybind_extension(
     module_name = "_pywrap_image_classifier",
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/processor/proto:bounding_box_cc_proto",
         "//tensorflow_lite_support/cc/task/processor/proto:classification_options_cc_proto",
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
@@ -52,6 +55,7 @@ pybind_extension(
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/processor/proto:detection_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:detections_cc_proto",
         "//tensorflow_lite_support/cc/task/vision:object_detector",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
         "//tensorflow_lite_support/python/task/core/pybinds:task_utils",

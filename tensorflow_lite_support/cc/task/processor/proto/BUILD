@@ -8,6 +8,25 @@ package(
 )
 
 proto_library(
+    name = "bounding_box_proto",
+    srcs = ["bounding_box.proto"],
+)
+
+cc_proto_library(
+    name = "bounding_box_cc_proto",
+    deps = [
+        ":bounding_box_proto",
+    ],
+)
+
+support_py_proto_library(
+    name = "bounding_box_py_pb2",
+    srcs = ["bounding_box.proto"],
+    api_version = 2,
+    proto_deps = [":bounding_box_proto"],
+)
+
+proto_library(
     name = "classifications_proto",
     srcs = ["classifications.proto"],
     deps = [":class_proto"],
@@ -18,6 +37,13 @@ cc_proto_library(
     deps = [
         ":classifications_proto",
     ],
+)
+
+support_py_proto_library(
+    name = "classifications_py_pb2",
+    srcs = ["classifications.proto"],
+    api_version = 2,
+    proto_deps = [":classifications_proto"],
 )
 
 proto_library(
@@ -32,6 +58,13 @@ cc_proto_library(
     ],
 )
 
+support_py_proto_library(
+    name = "class_py_pb2",
+    srcs = ["class.proto"],
+    api_version = 2,
+    proto_deps = [":class_proto"],
+)
+
 proto_library(
     name = "embedding_proto",
     srcs = ["embedding.proto"],
@@ -42,6 +75,13 @@ cc_proto_library(
     deps = [
         ":embedding_proto",
     ],
+)
+
+support_py_proto_library(
+    name = "embedding_py_pb2",
+    srcs = ["embedding.proto"],
+    api_version = 2,
+    proto_deps = [":embedding_proto"],
 )
 
 proto_library(
@@ -90,6 +130,33 @@ java_lite_proto_library(
 java_lite_proto_library(
     name = "embedding_options_java_proto_lite",
     deps = [":embedding_options_proto"],
+)
+
+proto_library(
+    name = "detections_proto",
+    srcs = ["detections.proto"],
+    deps = [
+        ":bounding_box_proto",
+        ":class_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "detections_cc_proto",
+    deps = [
+        ":detections_proto",
+    ],
+)
+
+support_py_proto_library(
+    name = "detections_py_pb2",
+    srcs = ["detections.proto"],
+    api_version = 2,
+    proto_deps = [":detections_proto"],
+    py_proto_deps = [
+        ":class_py_pb2",
+        ":bounding_box_py_pb2",
+    ],
 )
 
 proto_library(

@@ -13,8 +13,8 @@
 # limitations under the License.
 """Embedding result protobuf."""
 
-from tensorflow_lite_support.cc.task.vision.proto import embeddings_pb2
+from tensorflow_lite_support.cc.task.processor.proto import embedding_pb2
 
-FeatureVector = embeddings_pb2.FeatureVector
-Embedding = embeddings_pb2.Embedding
-EmbeddingResult = embeddings_pb2.EmbeddingResult
+FeatureVector = embedding_pb2.FeatureVector
+Embedding = embedding_pb2.Embedding
+EmbeddingResult = embedding_pb2.EmbeddingResult

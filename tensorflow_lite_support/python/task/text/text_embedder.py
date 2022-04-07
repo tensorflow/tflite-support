@@ -17,7 +17,7 @@ import dataclasses
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import embeddings_pb2
+from tensorflow_lite_support.python.task.processor.proto import embedding_pb2
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_text_embedder
 
 _CppTextEmbedder = _pywrap_text_embedder.TextEmbedder
@@ -84,7 +84,7 @@ class TextEmbedder(object):
                                                     options.embedding_options)
     return cls(options, embedder)
 
-  def embed(self, text: str) -> embeddings_pb2.EmbeddingResult:
+  def embed(self, text: str) -> embedding_pb2.EmbeddingResult:
     """Performs actual feature vector extraction on the provided text.
 
     Args:
@@ -102,8 +102,8 @@ class TextEmbedder(object):
     # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     return self._embedder.embed(text)
 
-  def cosine_similarity(self, u: embeddings_pb2.FeatureVector,
-                        v: embeddings_pb2.FeatureVector) -> float:
+  def cosine_similarity(self, u: embedding_pb2.FeatureVector,
+                        v: embedding_pb2.FeatureVector) -> float:
     """Computes cosine similarity [1] between two feature vectors."""
     return self._embedder.cosine_similarity(u, v)
 

@@ -17,6 +17,7 @@ limitations under the License.
 #include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/bounding_box.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/classification_options.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
@@ -75,11 +76,16 @@ PYBIND11_MODULE(_pywrap_image_classifier, m) {
            })
       .def("classify",
            [](ImageClassifier& self, const ImageData& image_data,
-              const BoundingBox& bounding_box)
+              const processor::BoundingBox& bounding_box)
                -> tflite::support::StatusOr<ClassificationResult> {
+             // Convert from processor::BoundingBox to vision::BoundingBox as
+             // the later is used in the C++ layer.
+             BoundingBox vision_bounding_box;
+             vision_bounding_box.ParseFromString(
+                 bounding_box.SerializeAsString());
              ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
                               CreateFrameBufferFromImageData(image_data));
-             return self.Classify(*frame_buffer, bounding_box);
+             return self.Classify(*frame_buffer, vision_bounding_box);
            });
 }
 

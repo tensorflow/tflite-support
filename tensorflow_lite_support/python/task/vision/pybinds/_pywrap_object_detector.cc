@@ -18,6 +18,7 @@ limitations under the License.
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/detection_options.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/detections.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/object_detector.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
@@ -67,10 +68,18 @@ PYBIND11_MODULE(_pywrap_object_detector, m) {
           })
       .def("detect",
            [](ObjectDetector& self, const ImageData& image_data)
-               -> tflite::support::StatusOr<DetectionResult> {
+               -> tflite::support::StatusOr<processor::DetectionResult> {
              ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
                               CreateFrameBufferFromImageData(image_data));
-             return self.Detect(*frame_buffer);
+             ASSIGN_OR_RETURN(DetectionResult vision_detection_result,
+                              self.Detect(*frame_buffer));
+
+             // Convert from vision::DetectionResult to
+             // processor::DetectionResult
+             processor::DetectionResult detection_result;
+             detection_result.ParseFromString(
+                 vision_detection_result.SerializeAsString());
+             return detection_result;
            });
 }
 

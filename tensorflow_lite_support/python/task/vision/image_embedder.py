@@ -19,7 +19,7 @@ from typing import Optional
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import embeddings_pb2
+from tensorflow_lite_support.python.task.processor.proto import embedding_pb2
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_embedder
@@ -91,7 +91,7 @@ class ImageEmbedder(object):
       self,
       image: tensor_image.TensorImage,
       bounding_box: Optional[bounding_box_pb2.BoundingBox] = None
-  ) -> embeddings_pb2.EmbeddingResult:
+  ) -> embedding_pb2.EmbeddingResult:
     """Performs actual feature vector extraction on the provided TensorImage.
 
     Args:
@@ -116,8 +116,8 @@ class ImageEmbedder(object):
 
     return self._embedder.embed(image_data, bounding_box)
 
-  def get_embedding_by_index(self, result: embeddings_pb2.EmbeddingResult,
-                             output_index: int) -> embeddings_pb2.Embedding:
+  def get_embedding_by_index(self, result: embedding_pb2.EmbeddingResult,
+                             output_index: int) -> embedding_pb2.Embedding:
     """Gets the embedding in the embedding result by `output_index`.
 
     Args:
@@ -137,8 +137,8 @@ class ImageEmbedder(object):
     embedding = self._embedder.get_embedding_by_index(result, output_index)
     return embedding
 
-  def cosine_similarity(self, u: embeddings_pb2.FeatureVector,
-                        v: embeddings_pb2.FeatureVector) -> float:
+  def cosine_similarity(self, u: embedding_pb2.FeatureVector,
+                        v: embedding_pb2.FeatureVector) -> float:
     """Computes cosine similarity [1] between two feature vectors."""
     return self._embedder.cosine_similarity(u, v)
 
