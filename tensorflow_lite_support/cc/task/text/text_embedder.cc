@@ -22,6 +22,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/task_api_factory.h"
 #include "tensorflow_lite_support/cc/task/processor/bert_preprocessor.h"
 #include "tensorflow_lite_support/cc/task/processor/regex_preprocessor.h"
+#include "tensorflow_lite_support/cc/task/text/utils/bert_utils.h"
 
 namespace tflite {
 namespace task {
@@ -82,8 +83,12 @@ absl::Status TextEmbedder::Init(std::unique_ptr<TextEmbedderOptions> options) {
     ASSIGN_OR_RETURN(preprocessor_, processor::RegexPreprocessor::Create(
                                         GetTfLiteEngine(), 0));
   } else if (input_count == 3) {
-    ASSIGN_OR_RETURN(preprocessor_, processor::BertPreprocessor::Create(
-                                        GetTfLiteEngine(), {0, 1, 2}));
+    ASSIGN_OR_RETURN(auto input_indices,
+                     GetBertInputTensorIndices(GetTfLiteEngine()));
+    ASSIGN_OR_RETURN(preprocessor_,
+                     processor::BertPreprocessor::Create(
+                         GetTfLiteEngine(), {input_indices[0], input_indices[1],
+                                             input_indices[2]}));
   } else {
     return support::CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
