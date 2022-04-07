@@ -15,9 +15,9 @@
 
 import enum
 
+import unittest
 from absl.testing import parameterized
 
-import tensorflow as tf
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
@@ -36,7 +36,7 @@ class ModelFileType(enum.Enum):
   FILE_NAME = 2
 
 
-class ImageEmbedderTest(parameterized.TestCase, tf.test.TestCase):
+class ImageEmbedderTest(parameterized.TestCase, unittest.TestCase):
 
   def setUp(self):
     super().setUp()
@@ -165,5 +165,5 @@ class ImageEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     self.assertEqual(embedder.number_of_output_layers, 1)
 
 
-if __name__ == "__main__":
-  tf.test.main()
+if __name__ == '__main__':
+  unittest.main()
