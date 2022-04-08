@@ -55,7 +55,7 @@ class ObjectDetector(object):
       `ObjectDetector` object that's created from the model file.
     Raises:
       RuntimeError if failed to create `ObjectDetector` object from the provided
-        file such as invalid file.
+      file such as invalid file.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = ObjectDetectorOptions(base_options=base_options)
@@ -73,7 +73,7 @@ class ObjectDetector(object):
       `ObjectDetector` object that's created from `options`.
     Raises:
       RuntimeError if failed to create `ObjectDetector` object from
-        `ObjectDetectorOptions` such as missing the model.
+      `ObjectDetectorOptions` such as missing the model.
     """
     detector = _CppObjectDetector.create_from_options(options.base_options,
                                                       options.detection_options)

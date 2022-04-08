@@ -58,7 +58,7 @@ class AudioEmbedder(object):
 
     Raises:
       RuntimeError if failed to create `AudioEmbedder` object from the provided
-        file such as invalid file.
+      file such as invalid file.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = AudioEmbedderOptions(base_options=base_options)
@@ -77,7 +77,7 @@ class AudioEmbedder(object):
 
     Raises:
       RuntimeError if failed to create `AudioEmbedder` object from
-        `AudioEmbedderOptions` such as missing the model.
+      `AudioEmbedderOptions` such as missing the model.
     """
     embedder = _CppAudioEmbedder.create_from_options(options.base_options,
                                                      options.embedding_options)

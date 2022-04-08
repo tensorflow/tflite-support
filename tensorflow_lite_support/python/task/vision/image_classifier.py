@@ -56,7 +56,7 @@ class ImageClassifier(object):
       `ImageClassifier` object that's created from the model file.
     Raises:
       RuntimeError if failed to create `ImageClassifier` object from the provided
-        file such as invalid file.
+      file such as invalid file.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = ImageClassifierOptions(base_options=base_options)
@@ -73,7 +73,7 @@ class ImageClassifier(object):
       `ImageClassifier` object that's created from `options`.
     Raises:
       RuntimeError if failed to create `ImageClassifier` object from
-        `ImageClassifierOptions` such as missing the model.
+      `ImageClassifierOptions` such as missing the model.
     """
     classifier = _CppImageClassifier.create_from_options(
         options.base_options, options.classification_options)
