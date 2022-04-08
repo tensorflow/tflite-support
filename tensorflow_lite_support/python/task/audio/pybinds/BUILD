@@ -15,12 +15,12 @@ pybind_extension(
     module_name = "_pywrap_audio_embedder",
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_cc_proto",
         "//tensorflow_lite_support/cc/task/audio:audio_embedder",
         "//tensorflow_lite_support/cc/task/audio/core:audio_buffer",
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_cc_proto",
         "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
         "@pybind11",
-        "@pybind11_abseil//pybind11_abseil:status_casters",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
