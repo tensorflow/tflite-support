@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return An instance of TFLObjectDetectorOptions set to the specified
  * modelPath.
  */
-- (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath;
+- (nullable instancetype)initWithModelPath:(NSString *)modelPath;
 
 @end
 
@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A TFLObjectDetector instance.
  */
-+ (nullable instancetype)objectDetectorWithOptions:(nonnull TFLObjectDetectorOptions *)options
++ (nullable instancetype)objectDetectorWithOptions:(TFLObjectDetectorOptions *)options
                                              error:(NSError **)error
     NS_SWIFT_NAME(objectDetector(options:));
 

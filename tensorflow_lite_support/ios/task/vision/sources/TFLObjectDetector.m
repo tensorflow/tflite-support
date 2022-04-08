@@ -39,7 +39,7 @@
   return self;
 }
 
-- (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath {
+- (nullable instancetype)initWithModelPath:(NSString *)modelPath {
   self = [self init];
   if (self) {
     self.baseOptions.modelFile.filePath = modelPath;
@@ -62,7 +62,7 @@
   return self;
 }
 
-+ (nullable instancetype)objectDetectorWithOptions:(nonnull TFLObjectDetectorOptions *)options
++ (nullable instancetype)objectDetectorWithOptions:(TFLObjectDetectorOptions *)options
                                              error:(NSError **)error {
   TfLiteObjectDetectorOptions cOptions = TfLiteObjectDetectorOptionsCreate();
   if (![options.classificationOptions

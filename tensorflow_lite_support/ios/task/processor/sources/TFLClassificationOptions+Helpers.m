@@ -25,7 +25,7 @@
           customErrorWithCode:TFLSupportErrorCodeInvalidArgumentError
                   description:@"Invalid length of strings found for list type options."];
     }
-    return NULL;
+    return nil;
   }
 
   char **cStrings = (char **)calloc(strings.count, sizeof(char *));
