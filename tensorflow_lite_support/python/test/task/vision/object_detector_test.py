@@ -139,10 +139,9 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
-        Exception,
-        r'INVALID_ARGUMENT: ExternalFile must specify at least one of '
-        r"'file_content', 'file_name' or 'file_descriptor_meta'. "
-        r"\[tflite::support::TfLiteSupportStatus='2']"):
+        RuntimeError,
+        r"ExternalFile must specify at least one of 'file_content', "
+        r"'file_name' or 'file_descriptor_meta'."):
       base_options = _BaseOptions(file_name='')
       options = _ObjectDetectorOptions(base_options=base_options)
       _ObjectDetector.create_from_options(options)
@@ -272,9 +271,8 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
     # Fails with combined allowlist and denylist
     with self.assertRaisesRegex(
         Exception,
-        r'INVALID_ARGUMENT: `class_name_whitelist` and `class_name_blacklist` '
-        r'are mutually exclusive options. '
-        r"\[tflite::support::TfLiteSupportStatus='2'\]"):
+        r'`class_name_whitelist` and `class_name_blacklist` are mutually '
+        r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
       detection_options = detection_options_pb2.DetectionOptions(
           class_name_allowlist=['foo'], class_name_denylist=['bar'])
