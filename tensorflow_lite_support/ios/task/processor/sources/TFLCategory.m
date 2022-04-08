@@ -14,9 +14,25 @@
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLCategory.h"
 
-@implementation TFLCategory
-@synthesize displayName;
-@synthesize label;
-@synthesize score;
-@synthesize classIndex;
+@implementation TFLCategory {
+  NSString *_displayName;
+  NSString *_label;
+  float _score;
+  NSInteger _index;
+}
+
+- (instancetype)initWithIndex:(NSInteger)index
+                        score:(float)score
+                        label:(NSString *)label
+                  displayName:(NSString *)displayName {
+  self = [super init];
+  if (self) {
+    _index = index;
+    _score = score;
+    _label = label;
+    _displayName = displayName;
+  }
+  return self;
+}
+
 @end

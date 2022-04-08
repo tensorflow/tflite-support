@@ -50,7 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
  * @return An instance of TFLImageClassifierOptions set to the specified
  * modelPath.
  */
-- (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath;
+- (nullable instancetype)initWithModelPath:(NSString *)modelPath;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
@@ -67,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A TFLImageClassifier instance.
  */
-+ (nullable instancetype)imageClassifierWithOptions:(nonnull TFLImageClassifierOptions *)options
++ (nullable instancetype)imageClassifierWithOptions:(TFLImageClassifierOptions *)options
                                               error:(NSError **)error
     NS_SWIFT_NAME(imageClassifier(options:));
 

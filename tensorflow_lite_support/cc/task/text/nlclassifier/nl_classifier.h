@@ -133,8 +133,13 @@ class NLClassifier : public core::BaseTaskApi<std::vector<core::Category>,
       std::unique_ptr<tflite::OpResolver> resolver =
           absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 
-  // Performs classification on a string input, returns classified results.
+  ABSL_DEPRECATED("Prefer using `ClassifyText`")
   std::vector<core::Category> Classify(const std::string& text);
+
+  // Performs classification on a string input, returns classified results or an
+  // error.
+  tflite::support::StatusOr<std::vector<core::Category>> ClassifyText(
+      const std::string& text);
 
  protected:
   static constexpr int kOutputTensorIndex = 0;
