@@ -15,7 +15,6 @@ limitations under the License.
 
 #include "pybind11/pybind11.h"
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
-#include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/detection_options.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/detections.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/object_detector.h"

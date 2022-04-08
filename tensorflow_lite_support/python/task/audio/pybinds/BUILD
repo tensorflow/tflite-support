@@ -14,7 +14,6 @@ pybind_extension(
     ],
     module_name = "_pywrap_audio_embedder",
     deps = [
-        "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_cc_proto",
         "//tensorflow_lite_support/cc/task/audio:audio_embedder",
         "//tensorflow_lite_support/cc/task/audio/core:audio_buffer",
