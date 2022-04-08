@@ -28,7 +28,7 @@ namespace processor {
 // Requirements for the input tensors:
 //   Exactly 3 int32 input tensors of type, kTfLiteInt32: contains respectively
 //   the ids, segment ids and mask. A WordPiece or Sentencepiece Tokenizer needs
-//   to be setup in the ids tensor's metadata.
+//   to be setup in the subgraph's metadata.
 //
 // Utils to help locate the 3 input tensors for models conforming to certain
 // metadata requirements are available in:

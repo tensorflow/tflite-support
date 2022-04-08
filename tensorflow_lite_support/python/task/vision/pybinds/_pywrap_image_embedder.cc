@@ -17,7 +17,6 @@ limitations under the License.
 
 #include "pybind11/pybind11.h"
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
-#include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/bounding_box.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/embedding.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_embedder.h"
@@ -72,14 +71,21 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
           })
       .def("embed",
            [](ImageEmbedder& self,
-              const ImageData& image_data) -> EmbeddingResult {
+              const ImageData& image_data) -> processor::EmbeddingResult {
              auto frame_buffer = CreateFrameBufferFromImageData(image_data);
-             auto embedding_result = self.Embed(*core::get_value(frame_buffer));
-             return core::get_value(embedding_result);
+             auto vision_embedding_result =
+                 self.Embed(*core::get_value(frame_buffer));
+             // Convert from vision::EmbeddingResult to
+             // processor::EmbeddingResult
+             processor::EmbeddingResult embedding_result;
+             embedding_result.ParseFromString(
+                 core::get_value(vision_embedding_result).SerializeAsString());
+             return embedding_result;
            })
       .def("embed",
            [](ImageEmbedder& self, const ImageData& image_data,
-              const processor::BoundingBox& bounding_box) -> EmbeddingResult {
+              const processor::BoundingBox& bounding_box)
+               -> processor::EmbeddingResult {
              // Convert from processor::BoundingBox to vision::BoundingBox as
              // the later is used in the C++ layer.
              BoundingBox vision_bounding_box;
@@ -87,29 +93,51 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
                  bounding_box.SerializeAsString());
 
              auto frame_buffer = CreateFrameBufferFromImageData(image_data);
-             auto embedding_result = self.Embed(*core::get_value(frame_buffer),
-                                                vision_bounding_box);
-             return core::get_value(embedding_result);
+             auto vision_embedding_result = self.Embed(
+                 *core::get_value(frame_buffer), vision_bounding_box);
+             // Convert from vision::EmbeddingResult to
+             // processor::EmbeddingResult as required by the Python layer.
+             processor::EmbeddingResult embedding_result;
+             embedding_result.ParseFromString(
+                 core::get_value(vision_embedding_result).SerializeAsString());
+             return embedding_result;
            })
       .def("get_embedding_by_index",
            [](ImageEmbedder& self,
               const processor::EmbeddingResult& embedding_result,
-              const int index) -> Embedding {
+              const int index) -> processor::Embedding {
              // Convert from processor::EmbeddingResult to
-             // vision::EmbeddingResult as the later is used in the C++ API.
+             // vision::EmbeddingResult as the latter is used in the C++ API.
              EmbeddingResult vision_embedding_result;
              vision_embedding_result.ParseFromString(
                  embedding_result.SerializeAsString());
-             return self.GetEmbeddingByIndex(vision_embedding_result, index);
+
+             Embedding vision_embedding{
+                 self.GetEmbeddingByIndex(vision_embedding_result, index)};
+             // Convert from vision::Embedding to processor::Embedding
+             // as required by the Python layer.
+             processor::Embedding embedding;
+             embedding.ParseFromString(vision_embedding.SerializeAsString());
+             return embedding;
            })
       .def("get_number_of_output_layers",
            &ImageEmbedder::GetNumberOfOutputLayers)
       .def("get_embedding_dimension", &ImageEmbedder::GetEmbeddingDimension)
-      .def_static("cosine_similarity",
-                  [](const FeatureVector& u, const FeatureVector& v) -> double {
-                    auto similarity = ImageEmbedder::CosineSimilarity(u, v);
-                    return core::get_value(similarity);
-                  });
+      .def_static(
+          "cosine_similarity",
+          [](const processor::FeatureVector& u,
+             const processor::FeatureVector& v) -> double {
+            // Convert from processor::FeatureVector to
+            // vision::FeatureVector as the latter is used in the C++
+            // layer.
+            FeatureVector vision_feature_vector_u;
+            vision_feature_vector_u.ParseFromString(u.SerializeAsString());
+            FeatureVector vision_feature_vector_v;
+            vision_feature_vector_v.ParseFromString(v.SerializeAsString());
+            auto similarity = ImageEmbedder::CosineSimilarity(
+                vision_feature_vector_u, vision_feature_vector_v);
+            return core::get_value(similarity);
+          });
 }
 
 }  // namespace vision
