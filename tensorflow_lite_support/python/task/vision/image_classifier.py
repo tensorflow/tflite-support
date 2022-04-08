@@ -55,8 +55,8 @@ class ImageClassifier(object):
     Returns:
       `ImageClassifier` object that's created from the model file.
     Raises:
-      status.StatusNotOk if failed to create `ImageClassifier` object from the
-      provided file such as invalid file.
+      RuntimeError if failed to create `ImageClassifier` object from the provided
+        file such as invalid file.
     """
     # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
     # Need to import the module to catch this error:
@@ -76,8 +76,8 @@ class ImageClassifier(object):
     Returns:
       `ImageClassifier` object that's created from `options`.
     Raises:
-      status.StatusNotOk if failed to create `ImageClassifier` object from
-      `ImageClassifierOptions` such as missing the model.
+      RuntimeError if failed to create `ImageClassifier` object from
+        `ImageClassifierOptions` such as missing the model.
     """
     # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
     # Need to import the module to catch this error:
@@ -103,10 +103,7 @@ class ImageClassifier(object):
     Returns:
       classification result.
     Raises:
-      status.StatusNotOk if failed to get the feature vector. Need to import the
-        module to catch this error: `from pybind11_abseil
-        import status`, see
-        https://github.com/pybind/pybind11_abseil#abslstatusor.
+      RuntimeError if failed to get the feature vector.
     """
     image_data = image_utils.ImageData(image.buffer)
     if bounding_box is None:
