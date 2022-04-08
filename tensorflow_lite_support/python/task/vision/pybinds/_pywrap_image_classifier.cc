@@ -19,6 +19,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/bounding_box.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/classification_options.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/classifications.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
@@ -69,23 +70,40 @@ PYBIND11_MODULE(_pywrap_image_classifier, m) {
           })
       .def("classify",
            [](ImageClassifier& self, const ImageData& image_data)
-               -> tflite::support::StatusOr<ClassificationResult> {
+               -> tflite::support::StatusOr<processor::ClassificationResult> {
              ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
                               CreateFrameBufferFromImageData(image_data));
-             return self.Classify(*frame_buffer);
+             ASSIGN_OR_RETURN(ClassificationResult vision_classification_result,
+                              self.Classify(*frame_buffer));
+
+             // Convert from vision::ClassificationResult to
+             // processor::ClassificationResult as required by the Python layer.
+             processor::ClassificationResult classification_result;
+             classification_result.ParseFromString(
+                 vision_classification_result.SerializeAsString());
+             return classification_result;
            })
       .def("classify",
            [](ImageClassifier& self, const ImageData& image_data,
               const processor::BoundingBox& bounding_box)
-               -> tflite::support::StatusOr<ClassificationResult> {
+               -> tflite::support::StatusOr<processor::ClassificationResult> {
              // Convert from processor::BoundingBox to vision::BoundingBox as
-             // the later is used in the C++ layer.
+             // the latter is used in the C++ layer.
              BoundingBox vision_bounding_box;
              vision_bounding_box.ParseFromString(
                  bounding_box.SerializeAsString());
              ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
                               CreateFrameBufferFromImageData(image_data));
-             return self.Classify(*frame_buffer, vision_bounding_box);
+             ASSIGN_OR_RETURN(
+                 ClassificationResult vision_classification_result,
+                 self.Classify(*frame_buffer, vision_bounding_box));
+
+             // Convert from vision::ClassificationResult to
+             // processor::ClassificationResult as required by the Python layer.
+             processor::ClassificationResult classification_result;
+             classification_result.ParseFromString(
+                 vision_classification_result.SerializeAsString());
+             return classification_result;
            });
 }
 
