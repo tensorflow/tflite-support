@@ -53,12 +53,14 @@ pybind_extension(
     ],
     module_name = "_pywrap_object_detector",
     deps = [
+        "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/processor/proto:detection_options_cc_proto",
         "//tensorflow_lite_support/cc/task/processor/proto:detections_cc_proto",
         "//tensorflow_lite_support/cc/task/vision:object_detector",
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
         "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
         "@pybind11",
+        "@pybind11_abseil//pybind11_abseil:status_casters",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
@@ -70,7 +72,6 @@ pybind_extension(
     ],
     module_name = "_pywrap_image_segmenter",
     deps = [
-        "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/processor/proto:segmentations_cc_proto",
         "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_cc_proto",
         "//tensorflow_lite_support/cc/task/vision:image_segmenter",
