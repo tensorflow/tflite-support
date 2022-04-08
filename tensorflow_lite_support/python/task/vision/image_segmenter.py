@@ -83,8 +83,8 @@ class ImageSegmenter(object):
     Returns:
       `ImageSegmenter` object that's created from `options`.
     Raises:
-      status.StatusNotOk if failed to create `ImageSegmenter` object from the
-      provided file such as invalid file.
+      RuntimeError if failed to create `ImageSegmenter` object from the provided
+        file such as invalid file.
     """
     # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
     # Need to import the module to catch this error:
@@ -104,8 +104,8 @@ class ImageSegmenter(object):
     Returns:
       `ImageSegmenter` object that's created from `options`.
     Raises:
-      status.StatusNotOk if failed to create `ImageSegmenter` object from
-      `ImageSegmenterOptions` such as missing the model.
+      RuntimeError if failed to create `ImageSegmenter` object from
+        `ImageSegmenterOptions` such as missing the model.
     """
     # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
     # Need to import the module to catch this error:
@@ -127,10 +127,7 @@ class ImageSegmenter(object):
     Returns:
       segmentation output.
     Raises:
-      status.StatusNotOk if failed to get the feature vector. Need to import the
-        module to catch this error: `from pybind11_abseil
-        import status`, see
-        https://github.com/pybind/pybind11_abseil#abslstatusor.
+      RuntimeError if failed to get the segmentation result.
     """
     image_data = image_utils.ImageData(image.buffer)
     segmentation_result = self._segmenter.segment(image_data)

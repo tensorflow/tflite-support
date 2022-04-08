@@ -14,7 +14,6 @@ limitations under the License.
 ==============================================================================*/
 
 #include "pybind11/pybind11.h"
-#include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/segmentations.pb.h"
@@ -36,7 +35,6 @@ using CppBaseOptions = ::tflite::task::core::BaseOptions;
 PYBIND11_MODULE(_pywrap_image_segmenter, m) {
   // python wrapper for C++ ImageSegmenter class which shouldn't be directly
   // used by the users.
-  pybind11::google::ImportStatusModule();
   pybind11_protobuf::ImportNativeProtoCasters();
 
   py::class_<ImageSegmenter>(m, "ImageSegmenter")
@@ -59,21 +57,20 @@ PYBIND11_MODULE(_pywrap_image_segmenter, m) {
                           segmentation_options.output_type()));
             }
 
-            return ImageSegmenter::CreateFromOptions(options);
+            auto segmenter = ImageSegmenter::CreateFromOptions(options);
+            return core::get_value(segmenter);
           })
       .def("segment",
            [](ImageSegmenter& self, const ImageData& image_data)
-               -> tflite::support::StatusOr<processor::SegmentationResult> {
-             ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
-                              CreateFrameBufferFromImageData(image_data));
-             ASSIGN_OR_RETURN(SegmentationResult vision_segmentation_result,
-                              self.Segment(*frame_buffer));
-
+               -> processor::SegmentationResult {
+             auto frame_buffer = CreateFrameBufferFromImageData(image_data);
+             auto vision_segmentation_result = self.Segment(
+                     *core::get_value(frame_buffer));
              // Convert from vision::SegmentationResult to
              // processor::SegmentationResult
              processor::SegmentationResult segmentation_result;
-             segmetation_result.ParseFromString(
-                     vision_segmentation_result.SerializeAsString());
+             segmentation_result.ParseFromString(
+               core::get_value(vision_segmentation_result).SerializeAsString());
              return segmentation_result;
            });
 }

@@ -79,7 +79,6 @@ pybind_extension(
         "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
         "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
         "@pybind11",
-        "@pybind11_abseil//pybind11_abseil:status_casters",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
