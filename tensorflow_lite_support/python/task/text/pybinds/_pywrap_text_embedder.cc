@@ -14,7 +14,6 @@ limitations under the License.
 ==============================================================================*/
 
 #include "pybind11/pybind11.h"
-#include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/task/text/text_embedder.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
@@ -31,8 +30,6 @@ using CppBaseOptions = ::tflite::task::core::BaseOptions;
 PYBIND11_MODULE(_pywrap_text_embedder, m) {
   // python wrapper for C++ TextEmbeder class which shouldn't be directly used
   // by the users.
-
-  pybind11::google::ImportStatusModule();
   pybind11_protobuf::ImportNativeProtoCasters();
 
   pybind11::class_<TextEmbedder>(m, "TextEmbedder")
@@ -46,13 +43,24 @@ PYBIND11_MODULE(_pywrap_text_embedder, m) {
 
             options.set_allocated_base_options(cpp_base_options.release());
             options.add_embedding_options()->CopyFrom(embedding_options);
-            return TextEmbedder::CreateFromOptions(options);
+            auto embedder = TextEmbedder::CreateFromOptions(options);
+            return core::get_value(embedder);
           })
-      .def("embed", &TextEmbedder::Embed)
+      .def("embed",
+           [](TextEmbedder& self,
+              const std::string& text) -> processor::EmbeddingResult {
+             auto embedding_result = self.Embed(text);
+             return core::get_value(embedding_result);
+           })
       .def("get_embedding_dimension", &TextEmbedder::GetEmbeddingDimension)
       .def("get_number_of_output_layers",
            &TextEmbedder::GetNumberOfOutputLayers)
-      .def_static("cosine_similarity", &TextEmbedder::CosineSimilarity);
+      .def_static("cosine_similarity",
+                  [](const processor::FeatureVector& u,
+                     const processor::FeatureVector& v) -> double {
+                    auto similarity = TextEmbedder::CosineSimilarity(u, v);
+                    return core::get_value(similarity);
+                  });
 }
 
 }  // namespace text
