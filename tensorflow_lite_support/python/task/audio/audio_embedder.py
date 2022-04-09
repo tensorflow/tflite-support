@@ -57,13 +57,9 @@ class AudioEmbedder(object):
       `AudioEmbedder` object that's created from `options`.
 
     Raises:
-      status.StatusNotOk if failed to create `AudioEmbedder` object from the
-      provided file such as invalid file.
+      RuntimeError if failed to create `AudioEmbedder` object from the provided
+      file such as invalid file.
     """
-    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
-    # Need to import the module to catch this error:
-    # `from pybind11_abseil import status`
-    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     base_options = _BaseOptions(file_name=file_path)
     options = AudioEmbedderOptions(base_options=base_options)
     return cls.create_from_options(options)
@@ -80,13 +76,9 @@ class AudioEmbedder(object):
       `AudioEmbedder` object that's created from `options`.
 
     Raises:
-      status.StatusNotOk if failed to create `AudioEmbedder` object from
+      RuntimeError if failed to create `AudioEmbedder` object from
       `AudioEmbedderOptions` such as missing the model.
     """
-    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
-    # Need to import the module to catch this error:
-    # `from pybind11_abseil import status`
-    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     embedder = _CppAudioEmbedder.create_from_options(options.base_options,
                                                      options.embedding_options)
     return cls(options, embedder)
@@ -122,13 +114,8 @@ class AudioEmbedder(object):
       embedding result.
 
     Raises:
-      status.StatusNotOk if failed to get the embedding vector.
+      RuntimeError if failed to get the embedding vector.
     """
-    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
-    # Need to import the module to catch this error:
-    # `from pybind11_abseil import status`
-    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
-
     return self._embedder.embed(
         _CppAudioBuffer(audio.buffer, audio.buffer_size, audio.format))
 
