@@ -77,13 +77,13 @@ _MULTIHEAD_MODEL_CLASSIFICATIONS = {
         'score': 0.93399656,
         'class_name': 'Chestnut-crowned Antpitta'
     }, {
-      'index': 1,
-      'score': 0.065934494,
-      'class_name': 'White-breasted Wood-Wren'
+        'index': 1,
+        'score': 0.065934494,
+        'class_name': 'White-breasted Wood-Wren'
     }, {
-      'index': 0,
-      'score': 6.1469495e-05,
-      'class_name': 'Red Crossbill'
+        'index': 0,
+        'score': 6.1469495e-05,
+        'class_name': 'Red Crossbill'
     }]
 }
 
