@@ -329,7 +329,7 @@ class AudioClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_combined_allowlist_and_denylist(self):
     # Fails with combined allowlist and denylist
     with self.assertRaisesRegex(
-        Exception,
+        RuntimeError,
         r'`class_name_allowlist` and `class_name_denylist` are mutually '
         r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
