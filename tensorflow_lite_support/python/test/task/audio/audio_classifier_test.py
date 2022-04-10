@@ -98,7 +98,7 @@ _ALLOW_LIST = ['Speech', 'Inside, small room']
 _DENY_LIST = ['Speech']
 _SCORE_THRESHOLD = 0.5
 _MAX_RESULTS = 3
-_ACCEPTABLE_ERROR_RANGE = 0.000001
+_ACCEPTABLE_ERROR_RANGE = 0.005
 
 
 class ModelFileType(enum.Enum):
