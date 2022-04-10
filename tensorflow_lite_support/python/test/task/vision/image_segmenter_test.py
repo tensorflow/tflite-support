@@ -63,6 +63,56 @@ _MATCH_PIXELS_THRESHOLD = 0.01
 _ACCEPTABLE_ERROR_RANGE = 0.000001
 
 
+def _create_segmenter_from_options(base_options, **segmentation_options):
+  segmentation_options = segmentation_options_pb2.SegmentationOptions(
+    **segmentation_options)
+  options = _ImageSegmenterOptions(
+    base_options=base_options,
+    segmentation_options=segmentation_options)
+  segmenter = _ImageSegmenter.create_from_options(options)
+  return segmenter
+
+
+def _segmentation_map_to_image(segmentation: image_segmenter.Segmentation):
+  """Convert the segmentation into a RGB image.
+    Args:
+      segmentation: An output of a image segmentation model.
+    Returns:
+      seg_map_img: The visualized segmentation result as an RGB image.
+      found_colored_labels: The list of ColoredLabels found in the image.
+  """
+  # Get the category mask array.
+  masks = segmentation.masks
+  colored_labels = segmentation.colored_labels
+
+  # Get the list of unique labels from the model output.
+  found_label_indices, inverse_map, counts = np.unique(
+    masks, return_inverse=True, return_counts=True)
+  count_dict = dict(zip(found_label_indices, counts))
+
+  # Sort the list of unique label so that the class with the most pixel will
+  # come first.
+  sorted_label_indices = sorted(
+    found_label_indices, key=lambda index: count_dict[index], reverse=True)
+  found_colored_labels = [
+    colored_labels[idx].label for idx in sorted_label_indices
+  ]
+
+  # Convert segmentation map into RGB image of the same size as the input
+  # image. Note: We use the inverse map to avoid running the heavy loop in
+  # Python and pass it over to Numpy's C++ implementation to improve
+  # performance.
+  found_colors = [
+    segmentation.colored_labels[idx].color for idx in found_label_indices
+  ]
+  output_shape = [segmentation.width, segmentation.height, 3]
+  seg_map_img = np.array(found_colors)[inverse_map] \
+    .reshape(output_shape) \
+    .astype(np.uint8)
+
+  return seg_map_img, found_colored_labels
+
+
 class ModelFileType(enum.Enum):
   FILE_CONTENT = 1
   FILE_NAME = 2
@@ -75,56 +125,6 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     self.test_image_path = test_util.get_test_data_path(_IMAGE_FILE)
     self.test_seg_path = test_util.get_test_data_path(_SEGMENTATION_FILE)
     self.model_path = test_util.get_test_data_path(_MODEL_FILE)
-
-  @staticmethod
-  def create_segmenter_from_options(base_options, **segmentation_options):
-    segmentation_options = segmentation_options_pb2.SegmentationOptions(
-        **segmentation_options)
-    options = _ImageSegmenterOptions(
-        base_options=base_options,
-        segmentation_options=segmentation_options)
-    segmenter = _ImageSegmenter.create_from_options(options)
-    return segmenter
-
-  @staticmethod
-  def segmentation_map_to_image(segmentation: image_segmenter.Segmentation):
-    """Convert the segmentation into a RGB image.
-      Params:
-        segmentation: An output of a image segmentation model.
-      Returns:
-        seg_map_img: The visualized segmentation result as an RGB image.
-        found_colored_labels: The list of ColoredLabels found in the image.
-    """
-    # Get the category mask array.
-    masks = segmentation.masks
-    colored_labels = segmentation.colored_labels
-
-    # Get the list of unique labels from the model output.
-    found_label_indices, inverse_map, counts = np.unique(
-      masks, return_inverse=True, return_counts=True)
-    count_dict = dict(zip(found_label_indices, counts))
-
-    # Sort the list of unique label so that the class with the most pixel will
-    # come first.
-    sorted_label_indices = sorted(
-      found_label_indices, key=lambda index: count_dict[index], reverse=True)
-    found_colored_labels = [
-      colored_labels[idx].label for idx in sorted_label_indices
-    ]
-
-    # Convert segmentation map into RGB image of the same size as the input
-    # image. Note: We use the inverse map to avoid running the heavy loop in
-    # Python and pass it over to Numpy's C++ implementation to improve
-    # performance.
-    found_colors = [
-      segmentation.colored_labels[idx].color for idx in found_label_indices
-    ]
-    output_shape = [segmentation.width, segmentation.height, 3]
-    seg_map_img = np.array(found_colors)[inverse_map] \
-                    .reshape(output_shape) \
-                    .astype(np.uint8)
-
-    return seg_map_img, found_colored_labels
 
   @parameterized.parameters(
     (ModelFileType.FILE_NAME, _EXPECTED_COLORED_LABELS),
@@ -141,7 +141,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
       # Should never happen
       raise ValueError("model_file_type is invalid.")
 
-    segmenter = self.create_segmenter_from_options(base_options)
+    segmenter = _create_segmenter_from_options(base_options)
 
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
@@ -163,7 +163,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     """Check if category mask match with ground truth."""
     # Creates segmenter.
     base_options = _BaseOptions(file_name=self.model_path)
-    segmenter = self.create_segmenter_from_options(
+    segmenter = _create_segmenter_from_options(
       base_options, output_type=_OutputType.CATEGORY_MASK)
 
     # Loads image.
@@ -173,7 +173,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     segmentation = segmenter.segment(image)[0]
 
     # Convert the segmentation result into RGB image.
-    seg_map_img, found_labels = self.segmentation_map_to_image(segmentation)
+    seg_map_img, found_labels = _segmentation_map_to_image(segmentation)
     result_pixels = seg_map_img.flatten()
 
     # Loads ground truth segmentation file.
@@ -204,7 +204,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Run segmentation on the model in CATEGORY_MASK mode.
-    segmenter = self.create_segmenter_from_options(
+    segmenter = _create_segmenter_from_options(
       base_options, output_type=_OutputType.CATEGORY_MASK)
 
     # Performs image segmentation on the input and gets the category mask.
@@ -212,7 +212,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     category_mask = segmentation.masks
 
     # Run segmentation on the model in CATEGORY_MASK mode.
-    segmenter = self.create_segmenter_from_options(
+    segmenter = _create_segmenter_from_options(
       base_options, output_type=_OutputType.CONFIDENCE_MASK)
 
     # Performs image segmentation on the input again.
