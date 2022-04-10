@@ -71,8 +71,7 @@ _MULTIHEAD_MODEL_CLASSIFICATIONS = {
         'index': 106,
         'score': 0.25613675,
         'class_name': 'Bird'
-    }
-  ],
+    }],
   'bird_classification': [{
         'index': 4,
         'score': 0.93399656,
