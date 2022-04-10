@@ -59,39 +59,33 @@ _FIXED_INPUT_SIZE_MODEL_CLASSIFICATIONS = {
 _MULTIHEAD_MODEL_FILE = 'two_heads.tflite'
 _TWO_HEADS_AUDIO_FILE = 'two_heads.wav'
 _MULTIHEAD_MODEL_CLASSIFICATIONS = {
-  'yamnet_classification': [
-    {
-      'index': 508,
-      'score': 0.5486158,
-      'class_name': 'Environmental noise'
-    },
-    {
-      'index': 507,
-      'score': 0.38086897,
-      'class_name': 'Noise'
-    },
-    {
-      'index': 106,
-      'score': 0.25613675,
-      'class_name': 'Bird'
+  'yamnet_classification': [{
+        'index': 508,
+        'score': 0.5486158,
+        'class_name': 'Environmental noise'
+    }, {
+        'index': 507,
+        'score': 0.38086897,
+        'class_name': 'Noise'
+    }, {
+        'index': 106,
+        'score': 0.25613675,
+        'class_name': 'Bird'
     }
   ],
-  'bird_classification': [
-    {
-      'index': 4,
-      'score': 0.93399656,
-      'class_name': 'Chestnut-crowned Antpitta'
-    },
-    {
+  'bird_classification': [{
+        'index': 4,
+        'score': 0.93399656,
+        'class_name': 'Chestnut-crowned Antpitta'
+    }, {
       'index': 1,
       'score': 0.065934494,
-      'class_name': 'White-breasted Wood-Wren'},
-    {
+      'class_name': 'White-breasted Wood-Wren'
+    }, {
       'index': 0,
       'score': 6.1469495e-05,
       'class_name': 'Red Crossbill'
-    }
-  ]
+    }]
 }
 
 _ALLOW_LIST = ['Speech', 'Inside, small room']
