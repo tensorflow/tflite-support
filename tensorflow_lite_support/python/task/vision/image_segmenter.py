@@ -14,8 +14,7 @@
 """Image segmenter task."""
 
 import dataclasses
-import numpy as np
-from typing import List, Tuple, Optional
+from typing import Optional
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentation_options_pb2
@@ -27,33 +26,6 @@ from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_seg
 _OutputType = segmentation_options_pb2.OutputType
 _CppImageSegmenter = _pywrap_image_segmenter.ImageSegmenter
 _BaseOptions = base_options_pb2.BaseOptions
-
-
-@dataclasses.dataclass
-class ColoredLabel:
-  label: str
-  """The label name."""
-
-  color: Tuple[int, int, int]
-  """The RGB representation of the label's color."""
-
-
-@dataclasses.dataclass
-class Segmentation:
-  colored_labels: List[ColoredLabel]
-  """The map between RGB color and label name."""
-
-  masks: np.ndarray
-  """The pixel mask representing the segmentation result."""
-
-  output_type: _OutputType
-  """The format of the model output."""
-
-  width: int
-  """Width of the mask."""
-
-  height: int
-  """Height of the mask."""
 
 
 @dataclasses.dataclass
@@ -110,47 +82,15 @@ class ImageSegmenter(object):
   def segment(
       self,
       image: tensor_image.TensorImage
-  ) -> List[Segmentation]:
-    """Performs segmentation on the provided TensorImage and postprocesses
-    the segmentation result.
+  ) -> segmentations_pb2.SegmentationResult:
+    """Performs segmentation on the provided TensorImage.
 
     Args:
       image: Tensor image, used to extract the feature vectors.
     Returns:
-      segmentation output.
+      segmentation result.
     Raises:
       RuntimeError if failed to get the segmentation result.
     """
     image_data = image_utils.ImageData(image.buffer)
-    segmentation_result = self._segmenter.segment(image_data)
-    return [self._postprocess(segmentation_result)]
-
-  def _postprocess(
-      self,
-      segmentation_result: segmentations_pb2.SegmentationResult
-  ) -> Segmentation:
-    """Post-process the output segmentation result into segmentation output.
-
-    Args:
-      segmentation_result: segmentation result, used for post-processing.
-    Returns:
-      segmentation output.
-    """
-    segmentation = segmentation_result.segmentation[0]
-    output_type = self._options.segmentation_options.output_type
-
-    if output_type == _OutputType.CATEGORY_MASK:
-      masks = np.array(bytearray(segmentation.category_mask))
-    elif output_type == _OutputType.CONFIDENCE_MASK:
-      confidence_masks = segmentation.confidence_masks.confidence_mask
-      masks = np.array([confidence_masks[index].value
-                        for index in range(len(confidence_masks))])
-
-    colored_labels = [
-      ColoredLabel(colored_label.class_name,
-                   (colored_label.r, colored_label.g, colored_label.b))
-      for colored_label in segmentation.colored_labels]
-
-    return Segmentation(
-      colored_labels=colored_labels, masks=masks, output_type=output_type,
-      width=segmentation.width, height=segmentation.height)
+    return self._segmenter.segment(image_data)

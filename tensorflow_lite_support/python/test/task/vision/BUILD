@@ -56,12 +56,14 @@ py_test(
     ],
     deps = [
         "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:segmentations_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:segmentation_options_pb2",
         "//tensorflow_lite_support/python/task/vision:image_segmenter",
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
         "//tensorflow_lite_support/python/test:base_test",
         "//tensorflow_lite_support/python/test:test_util",
         "@absl_py//absl/testing:parameterized",
+        "@com_google_protobuf//:protobuf_python",
     ],
 )
 
