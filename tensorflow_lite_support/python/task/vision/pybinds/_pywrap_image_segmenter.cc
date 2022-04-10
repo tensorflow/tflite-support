@@ -66,7 +66,7 @@ PYBIND11_MODULE(_pywrap_image_segmenter, m) {
              auto vision_segmentation_result = self.Segment(
                      *core::get_value(frame_buffer));
              // Convert from vision::SegmentationResult to
-             // processor::SegmentationResult
+             // processor::SegmentationResult as required by the Python layer.
              processor::SegmentationResult segmentation_result;
              segmentation_result.ParseFromString(
                core::get_value(vision_segmentation_result).SerializeAsString());

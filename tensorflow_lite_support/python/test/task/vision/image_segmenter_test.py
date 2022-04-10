@@ -59,29 +59,6 @@ _EXPECTED_COLORED_LABELS = [
   {'color': (0, 64, 128), 'label': 'tv'}
 ]
 _EXPECTED_LABELS = ['background', 'person', 'horse']
-_EXPECTED_CONFIDENCE_SCORES = [
-  26.507366,  # background
-  0.485706,   # aeroplane
-  6.271478,   # bicycle
-  4.955750,   # bird
-  5.547837,   # boat
-  4.219896,   # bottle
-  6.324943,   # bus
-  11.343983,  # car
-  3.380705,   # cat
-  11.234914,  # chair
-  6.232298,   # cow
-  0.048281,   # dining table
-  4.541492,   # dog
-  16.816034,  # horse
-  6.126998,   # motorbike
-  15.339876,  # person
-  14.327930,  # potted plant
-  2.027244,   # sheep
-  9.419443,   # sofa
-  5.105732,   # train
-  1.544247,   # tv
-]
 _MATCH_PIXELS_THRESHOLD = 0.01
 _ACCEPTABLE_ERROR_RANGE = 0.000001
 
@@ -170,7 +147,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs image segmentation on the input.
-    segmentation = segmenter.segment(image)
+    segmentation = segmenter.segment(image)[0]
 
     # Build test data.
     expected_colored_labels = [
@@ -193,7 +170,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs image segmentation on the input.
-    segmentation = segmenter.segment(image)
+    segmentation = segmenter.segment(image)[0]
 
     # Convert the segmentation result into RGB image.
     seg_map_img, found_labels = self.segmentation_map_to_image(segmentation)
@@ -231,7 +208,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
       base_options, output_type=_OutputType.CATEGORY_MASK)
 
     # Performs image segmentation on the input and gets the category mask.
-    segmentation = segmenter.segment(image)
+    segmentation = segmenter.segment(image)[0]
     category_mask = segmentation.masks
 
     # Run segmentation on the model in CATEGORY_MASK mode.
@@ -239,7 +216,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
       base_options, output_type=_OutputType.CONFIDENCE_MASK)
 
     # Performs image segmentation on the input again.
-    segmentation = segmenter.segment(image)
+    segmentation = segmenter.segment(image)[0]
 
     # Gets the list of confidence masks and colored_labels.
     confidence_masks = segmentation.masks
@@ -249,13 +226,6 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
     self.assertEqual(len(confidence_masks), len(colored_labels),
                      'Number of confidence masks must match with number of '
                      'categories.')
-
-    for index in range(len(confidence_masks)):
-      confidence_mask = confidence_masks[index]
-      # Check top-left corner has expected confidences.
-      self.assertAlmostEqual(confidence_mask[0],
-                             _EXPECTED_CONFIDENCE_SCORES[index],
-                             delta=_ACCEPTABLE_ERROR_RANGE)
 
     # Compute the category mask from the created confidence mask.
     calculated_category_mask = np.argmax(np.array(confidence_masks), axis=0)

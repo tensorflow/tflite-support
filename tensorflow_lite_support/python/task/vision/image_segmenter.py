@@ -110,7 +110,7 @@ class ImageSegmenter(object):
   def segment(
       self,
       image: tensor_image.TensorImage
-  ) -> Segmentation:
+  ) -> List[Segmentation]:
     """Performs segmentation on the provided TensorImage and postprocesses
     the segmentation result.
 
@@ -123,7 +123,7 @@ class ImageSegmenter(object):
     """
     image_data = image_utils.ImageData(image.buffer)
     segmentation_result = self._segmenter.segment(image_data)
-    return self._postprocess(segmentation_result)
+    return [self._postprocess(segmentation_result)]
 
   def _postprocess(
       self,
