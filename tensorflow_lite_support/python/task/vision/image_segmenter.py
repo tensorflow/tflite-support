@@ -23,7 +23,6 @@ from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_segmenter
 
-_OutputType = segmentation_options_pb2.OutputType
 _CppImageSegmenter = _pywrap_image_segmenter.ImageSegmenter
 _BaseOptions = base_options_pb2.BaseOptions
 
