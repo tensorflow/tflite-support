@@ -53,8 +53,8 @@ class TensorAudioTest(parameterized.TestCase, unittest.TestCase):
   def test_create_from_wav_file_fails_with_empty_file_path(self):
     # Fails loading TensorAudio object from WAV file.
     with self.assertRaisesRegex(
-        Exception,
-        "INVALID_ARGUMENT: Data too short when trying to read string"):
+        RuntimeError,
+        "Data too short when trying to read string"):
       tensor_audio.TensorAudio.create_from_wav_file("", _BUFFER_SIZE)
 
   def test_load_from_array_succeeds_with_input_size_matches_buffer_size(self):

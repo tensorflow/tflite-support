@@ -33,6 +33,7 @@ using ::tflite::support::text::tokenizer::CreateTokenizerFromProcessUnit;
 using ::tflite::support::text::tokenizer::TokenizerResult;
 using ::tflite::task::core::PopulateTensor;
 
+constexpr int kTokenizerProcessUnitIndex = 0;
 constexpr int kIdsTensorIndex = 0;
 constexpr int kSegmentIdsTensorIndex = 1;
 constexpr int kMaskTensorIndex = 2;
@@ -53,11 +54,9 @@ StatusOr<std::unique_ptr<BertPreprocessor>> BertPreprocessor::Create(
 
 absl::Status BertPreprocessor::Init() {
   // Try if RegexTokenzier can be found.
-  // BertTokenzier is packed in the processing unit of the InputTensors in
-  // SubgraphMetadata.
+  // BertTokenzier is packed in the processing unit SubgraphMetadata.
   const tflite::ProcessUnit* tokenizer_metadata =
-      GetMetadataExtractor()->GetInputProcessUnit(
-          tensor_indices_[kIdsTensorIndex]);
+      GetMetadataExtractor()->GetInputProcessUnit(kTokenizerProcessUnitIndex);
   ASSIGN_OR_RETURN(tokenizer_, CreateTokenizerFromProcessUnit(
                                    tokenizer_metadata, GetMetadataExtractor()));
 

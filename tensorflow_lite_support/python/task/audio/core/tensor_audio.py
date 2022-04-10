@@ -58,12 +58,8 @@ class TensorAudio(object):
       `TensorAudio` object.
 
     Raises:
-      status.StatusNotOk if the audio file can't be decoded.
+      RuntimeError if the audio file can't be decoded.
     """
-    # TODO(b/220931229): Raise RuntimeError instead of status.StatusNotOk.
-    # Need to import the module to catch this error:
-    # `from pybind11_abseil import status`
-    # see https://github.com/pybind/pybind11_abseil#abslstatusor.
     audio = _LoadAudioBufferFromFile(file_name, sample_count,
                                      np.zeros([sample_count]))
     tensor = TensorAudio(audio.audio_format, audio.buffer_size)
