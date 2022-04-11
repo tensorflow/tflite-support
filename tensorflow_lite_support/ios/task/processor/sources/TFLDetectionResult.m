@@ -14,10 +14,7 @@ limitations under the License.
 ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult.h"
 
-@implementation TFLDetection {
-  CGRect _boundingBox;
-  NSArray<TFLCategory *> *_categories;
-}
+@implementation TFLDetection
 
 - (instancetype)initWithBoundingBox:(CGRect)boundingBox
                          categories:(NSArray<TFLCategory *> *)categories {
@@ -31,9 +28,7 @@ limitations under the License.
 
 @end
 
-@implementation TFLDetectionResult {
-  NSArray<TFLDetection *> *_detections; 
-}
+@implementation TFLDetectionResult
 
 - (instancetype)initWithDetections:(NSArray<TFLDetection *> *)detections {
   self = [super init];
