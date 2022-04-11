@@ -28,7 +28,9 @@
 
   char **cStrings = [TFLCommonUtils mallocWithSize:strings.count * sizeof(char *)
                                                       error:error];
-
+  if (!cStrings)
+    return NULL;
+    
   for (NSInteger i = 0; i < strings.count; i++) {
     cStrings[i] = (char *)[TFLCommonUtils
         mallocWithSize:([strings[i] lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1) *
