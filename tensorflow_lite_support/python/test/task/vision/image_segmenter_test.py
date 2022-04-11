@@ -36,8 +36,8 @@ _ImageSegmenter = image_segmenter.ImageSegmenter
 _ImageSegmenterOptions = image_segmenter.ImageSegmenterOptions
 
 _MODEL_FILE = 'deeplabv3.tflite'
-_IMAGE_FILE = 'segmentation_input_image.jpg'
-_SEGMENTATION_FILE = 'segmentation_ground_truth_image.png'
+_IMAGE_FILE = 'segmentation_input_rotation0.jpg'
+_SEGMENTATION_FILE = 'segmentation_golden_rotation0.png'
 _EXPECTED_COLORED_LABELS = [
   {'r': 0, 'g': 0, 'b': 0, 'className': 'background'},
   {'r': 128, 'g': 0, 'b': 0, 'className': 'aeroplane'},
@@ -61,7 +61,7 @@ _EXPECTED_COLORED_LABELS = [
   {'r': 128, 'g': 192, 'b': 0, 'className': 'train'},
   {'r': 0, 'g': 64, 'b': 128, 'className': 'tv'}
 ]
-_EXPECTED_LABELS = ['background', 'person', 'horse']
+_MASK_MAGNIFICATION_FACTOR = 10
 _MATCH_PIXELS_THRESHOLD = 0.01
 _ACCEPTABLE_ERROR_RANGE = 0.000001
 
@@ -74,47 +74,6 @@ def _create_segmenter_from_options(base_options, **segmentation_options):
     segmentation_options=segmentation_options)
   segmenter = _ImageSegmenter.create_from_options(options)
   return segmenter
-
-
-def _segmentation_map_to_image(segmentation: segmentations_pb2.Segmentation):
-  """Convert the segmentation into a RGB image.
-    Args:
-      segmentation: An output of a image segmentation model.
-    Returns:
-      seg_map_img: The visualized segmentation result as an RGB image.
-      found_colored_labels: The list of ColoredLabels found in the image.
-  """
-  # Get the category mask array.
-  category_mask = np.array(bytearray(segmentation.category_mask))
-  colored_labels = segmentation.colored_labels
-
-  # Get the list of unique labels from the model output.
-  found_label_indices, inverse_map, counts = np.unique(
-    category_mask, return_inverse=True, return_counts=True)
-  count_dict = dict(zip(found_label_indices, counts))
-
-  # Sort the list of unique label so that the class with the most pixel will
-  # come first.
-  sorted_label_indices = sorted(
-    found_label_indices, key=lambda index: count_dict[index], reverse=True)
-  found_colored_labels = [
-    colored_labels[idx].class_name for idx in sorted_label_indices
-  ]
-
-  # Convert segmentation map into RGB image of the same size as the input
-  # image. Note: We use the inverse map to avoid running the heavy loop in
-  # Python and pass it over to Numpy's C++ implementation to improve
-  # performance.
-  found_colors = [
-    (colored_labels[idx].r, colored_labels[idx].g, colored_labels[idx].b)
-    for idx in found_label_indices
-  ]
-  output_shape = [segmentation.width, segmentation.height, 3]
-  seg_map_img = np.array(found_colors)[inverse_map] \
-                  .reshape(output_shape) \
-                  .astype(np.uint8)
-
-  return seg_map_img, found_colored_labels
 
 
 class ModelFileType(enum.Enum):
@@ -171,28 +130,26 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
 
     # Performs image segmentation on the input.
     segmentation = segmenter.segment(image).segmentation[0]
-
-    # Convert the segmentation result into RGB image.
-    seg_map_img, found_labels = _segmentation_map_to_image(segmentation)
-    result_pixels = seg_map_img.flatten()
+    result_pixels = np.array(bytearray(segmentation.category_mask))
 
     # Loads ground truth segmentation file.
     gt_segmentation = tensor_image.TensorImage.create_from_file(
       self.test_seg_path)
-    ground_truth_pixels = gt_segmentation.buffer.flatten()
+    gt_segmentation_array = gt_segmentation.buffer
+    gt_segmentation_shape = gt_segmentation_array.shape
+    num_pixels = gt_segmentation_shape[0] * gt_segmentation_shape[1]
+    ground_truth_pixels = gt_segmentation_array.flatten()
 
-    self.assertEqual(
-      len(result_pixels), len(ground_truth_pixels),
-      "Segmentation mask must have the same size as ground truth.")
+    inconsistent_pixels = 0
 
-    inconsistent_pixels = [1 for idx in range(len(result_pixels))
-                           if result_pixels[idx] != ground_truth_pixels[idx]]
+    for index in range(num_pixels):
+      inconsistent_pixels += (
+        result_pixels[index] * _MASK_MAGNIFICATION_FACTOR !=
+        ground_truth_pixels[index])
 
-    self.assertLessEqual(
-      len(inconsistent_pixels) / len(result_pixels), _MATCH_PIXELS_THRESHOLD,
+    self.assertLessEqual(inconsistent_pixels / num_pixels,
+                         _MATCH_PIXELS_THRESHOLD,
       "Segmentation mask value must be the same size as ground truth.")
-
-    self.assertEqual(found_labels, _EXPECTED_LABELS, "Labels do not match.")
 
   def test_segmentation_confidence_mask(self):
     """Check if top-left corner has expected confidences and also verify if the
