@@ -36,7 +36,7 @@
         mallocWithSize:([strings[i] lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1) *
                        sizeof(char)
                  error:error];
-    if (!cStrings[i]) return nil;
+    if (!cStrings[i]) return NULL;
 
     strcpy(cStrings[i], strings[i].UTF8String);
   }
