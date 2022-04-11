@@ -14,9 +14,9 @@ limitations under the License.
 ==============================================================================*/
 
 #include "pybind11/pybind11.h"
-#include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
-#include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/bounding_box.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/classifications.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/classification_options.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
@@ -35,7 +35,6 @@ using CppBaseOptions = ::tflite::task::core::BaseOptions;
 PYBIND11_MODULE(_pywrap_image_classifier, m) {
   // python wrapper for C++ ImageClassifier class which shouldn't be directly
   // used by the users.
-  pybind11::google::ImportStatusModule();
   pybind11_protobuf::ImportNativeProtoCasters();
 
   py::class_<ImageClassifier>(m, "ImageClassifier")
@@ -64,22 +63,43 @@ PYBIND11_MODULE(_pywrap_image_classifier, m) {
             options.mutable_class_name_blacklist()->CopyFrom(
                 classification_options.class_name_denylist());
 
-            return ImageClassifier::CreateFromOptions(options);
+            auto classifier = ImageClassifier::CreateFromOptions(options);
+            return core::get_value(classifier);
           })
       .def("classify",
            [](ImageClassifier& self, const ImageData& image_data)
-               -> tflite::support::StatusOr<ClassificationResult> {
-             ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
-                              CreateFrameBufferFromImageData(image_data));
-             return self.Classify(*frame_buffer);
+               -> processor::ClassificationResult {
+             auto frame_buffer = CreateFrameBufferFromImageData(image_data);
+             auto vision_classification_result = self.Classify(
+                     *core::get_value(frame_buffer));
+             // Convert from vision::ClassificationResult to
+             // processor::ClassificationResult as required by the Python layer.
+             processor::ClassificationResult classification_result;
+               classification_result.ParseFromString(
+                 core::get_value(vision_classification_result)
+                 .SerializeAsString());
+             return classification_result;
            })
       .def("classify",
            [](ImageClassifier& self, const ImageData& image_data,
-              const BoundingBox& bounding_box)
-               -> tflite::support::StatusOr<ClassificationResult> {
-             ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
-                              CreateFrameBufferFromImageData(image_data));
-             return self.Classify(*frame_buffer, bounding_box);
+              const processor::BoundingBox& bounding_box)
+               -> processor::ClassificationResult {
+             // Convert from processor::BoundingBox to vision::BoundingBox as
+             // the latter is used in the C++ layer.
+             BoundingBox vision_bounding_box;
+             vision_bounding_box.ParseFromString(
+                 bounding_box.SerializeAsString());
+
+             auto frame_buffer = CreateFrameBufferFromImageData(image_data);
+             auto vision_classification_result = self.Classify(
+                 *core::get_value(frame_buffer), vision_bounding_box);
+             // Convert from vision::ClassificationResult to
+             // processor::ClassificationResult as required by the Python layer.
+             processor::ClassificationResult classification_result;
+               classification_result.ParseFromString(
+                 core::get_value(vision_classification_result)
+                 .SerializeAsString());
+             return classification_result;
            });
 }
 

@@ -13,10 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
+#include <stdexcept>
+
 #include "pybind11/pybind11.h"
-#include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
-#include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/bounding_box.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/embedding.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_embedder.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
@@ -34,7 +36,6 @@ using CppBaseOptions = ::tflite::task::core::BaseOptions;
 PYBIND11_MODULE(_pywrap_image_embedder, m) {
   // python wrapper for C++ ImageEmbeder class which shouldn't be directly used
   // by the users.
-  pybind11::google::ImportStatusModule();
   pybind11_protobuf::ImportNativeProtoCasters();
 
   py::class_<ImageEmbedder>(m, "ImageEmbedder")
@@ -65,28 +66,78 @@ PYBIND11_MODULE(_pywrap_image_embedder, m) {
             if (embedding_options.has_quantize()) {
               options.set_quantize(embedding_options.quantize());
             }
-            return ImageEmbedder::CreateFromOptions(options);
+            auto embedder = ImageEmbedder::CreateFromOptions(options);
+            return get_value(embedder);
           })
       .def("embed",
-           [](ImageEmbedder& self, const ImageData& image_data)
-               -> tflite::support::StatusOr<EmbeddingResult> {
-             ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
-                              CreateFrameBufferFromImageData(image_data));
-             return self.Embed(*frame_buffer);
+           [](ImageEmbedder& self,
+              const ImageData& image_data) -> processor::EmbeddingResult {
+             auto frame_buffer = CreateFrameBufferFromImageData(image_data);
+             auto vision_embedding_result =
+                 self.Embed(*core::get_value(frame_buffer));
+             // Convert from vision::EmbeddingResult to
+             // processor::EmbeddingResult
+             processor::EmbeddingResult embedding_result;
+             embedding_result.ParseFromString(
+                 core::get_value(vision_embedding_result).SerializeAsString());
+             return embedding_result;
            })
       .def("embed",
            [](ImageEmbedder& self, const ImageData& image_data,
-              const BoundingBox& bounding_box)
-               -> tflite::support::StatusOr<EmbeddingResult> {
-             ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
-                              CreateFrameBufferFromImageData(image_data));
-             return self.Embed(*frame_buffer, bounding_box);
+              const processor::BoundingBox& bounding_box)
+               -> processor::EmbeddingResult {
+             // Convert from processor::BoundingBox to vision::BoundingBox as
+             // the later is used in the C++ layer.
+             BoundingBox vision_bounding_box;
+             vision_bounding_box.ParseFromString(
+                 bounding_box.SerializeAsString());
+
+             auto frame_buffer = CreateFrameBufferFromImageData(image_data);
+             auto vision_embedding_result = self.Embed(
+                 *core::get_value(frame_buffer), vision_bounding_box);
+             // Convert from vision::EmbeddingResult to
+             // processor::EmbeddingResult as required by the Python layer.
+             processor::EmbeddingResult embedding_result;
+             embedding_result.ParseFromString(
+                 core::get_value(vision_embedding_result).SerializeAsString());
+             return embedding_result;
            })
-      .def("get_embedding_by_index", &ImageEmbedder::GetEmbeddingByIndex)
+      .def("get_embedding_by_index",
+           [](ImageEmbedder& self,
+              const processor::EmbeddingResult& embedding_result,
+              const int index) -> processor::Embedding {
+             // Convert from processor::EmbeddingResult to
+             // vision::EmbeddingResult as the latter is used in the C++ API.
+             EmbeddingResult vision_embedding_result;
+             vision_embedding_result.ParseFromString(
+                 embedding_result.SerializeAsString());
+
+             Embedding vision_embedding{
+                 self.GetEmbeddingByIndex(vision_embedding_result, index)};
+             // Convert from vision::Embedding to processor::Embedding
+             // as required by the Python layer.
+             processor::Embedding embedding;
+             embedding.ParseFromString(vision_embedding.SerializeAsString());
+             return embedding;
+           })
       .def("get_number_of_output_layers",
            &ImageEmbedder::GetNumberOfOutputLayers)
       .def("get_embedding_dimension", &ImageEmbedder::GetEmbeddingDimension)
-      .def_static("cosine_similarity", &ImageEmbedder::CosineSimilarity);
+      .def_static(
+          "cosine_similarity",
+          [](const processor::FeatureVector& u,
+             const processor::FeatureVector& v) -> double {
+            // Convert from processor::FeatureVector to
+            // vision::FeatureVector as the latter is used in the C++
+            // layer.
+            FeatureVector vision_feature_vector_u;
+            vision_feature_vector_u.ParseFromString(u.SerializeAsString());
+            FeatureVector vision_feature_vector_v;
+            vision_feature_vector_v.ParseFromString(v.SerializeAsString());
+            auto similarity = ImageEmbedder::CosineSimilarity(
+                vision_feature_vector_u, vision_feature_vector_v);
+            return core::get_value(similarity);
+          });
 }
 
 }  // namespace vision

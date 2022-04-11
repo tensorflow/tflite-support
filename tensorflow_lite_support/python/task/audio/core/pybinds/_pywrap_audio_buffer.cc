@@ -14,10 +14,9 @@ limitations under the License.
 ==============================================================================*/
 #include "pybind11/numpy.h"
 #include "pybind11/pybind11.h"
-#include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
-#include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
 #include "tensorflow_lite_support/cc/task/audio/utils/audio_utils.h"
+#include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
 namespace task {
@@ -40,15 +39,16 @@ PYBIND11_MODULE(_pywrap_audio_buffer, m) {
       .def_readonly("sample_rate", &AudioBuffer::AudioFormat::sample_rate);
 
   py::class_<AudioBuffer>(m, "AudioBuffer", py::buffer_protocol())
-      .def(py::init([](py::buffer buffer, const int sample_count,
-                       const AudioBuffer::AudioFormat& audio_format) {
-        py::buffer_info info = buffer.request();
+      .def(py::init([](
+            py::buffer buffer, const int sample_count,
+            const AudioBuffer::AudioFormat& audio_format)
+            -> std::unique_ptr<AudioBuffer> {
+              py::buffer_info info = buffer.request();
 
-        // TODO(b/220931229): Change this initializer to use AudioBuffer::Create
-        // and raise RuntimeError if initialization failed.
-        return absl::make_unique<AudioBuffer>(static_cast<float*>(info.ptr),
-                                              sample_count, audio_format);
-      }))
+              auto audio_buffer = AudioBuffer::Create(
+                  static_cast<float*>(info.ptr), sample_count, audio_format);
+              return core::get_value(audio_buffer);
+          }))
       .def_property_readonly("audio_format", &AudioBuffer::GetAudioFormat)
       .def_property_readonly("buffer_size", &AudioBuffer::GetBufferSize)
       .def_property_readonly("float_buffer", [](AudioBuffer& self) {
@@ -62,12 +62,13 @@ PYBIND11_MODULE(_pywrap_audio_buffer, m) {
 
   m.def("LoadAudioBufferFromFile",
         [](const std::string& wav_file, int buffer_size,
-           py::buffer buffer) -> tflite::support::StatusOr<AudioBuffer> {
+           py::buffer buffer) -> AudioBuffer {
           py::buffer_info info = buffer.request();
 
-          return LoadAudioBufferFromFile(
+          auto audio_buffer = LoadAudioBufferFromFile(
               wav_file, buffer_size,
               static_cast<std::vector<float>*>(info.ptr));
+          return core::get_value(audio_buffer);
         });
 }
 

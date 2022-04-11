@@ -21,7 +21,7 @@ import tensorflow as tf
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import embeddings_pb2
+from tensorflow_lite_support.python.task.processor.proto import embedding_pb2
 from tensorflow_lite_support.python.task.vision import image_embedder
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
@@ -58,10 +58,9 @@ class ImageEmbedderTest(parameterized.TestCase, tf.test.TestCase):
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
-        Exception,
-        r"INVALID_ARGUMENT: ExternalFile must specify at least one of "
-        r"'file_content', 'file_name' or 'file_descriptor_meta'. "
-        r"\[tflite::support::TfLiteSupportStatus='2']"):
+        RuntimeError,
+        r"ExternalFile must specify at least one of 'file_content', "
+        r"'file_name' or 'file_descriptor_meta'."):
       base_options = _BaseOptions(file_name="")
       options = _ImageEmbedderOptions(base_options=base_options)
       _ImageEmbedder.create_from_options(options)
@@ -138,10 +137,10 @@ class ImageEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     embedder = _ImageEmbedder.create_from_options(options)
 
     # Builds test data.
-    embedding = embeddings_pb2.Embedding(output_index=0)
+    embedding = embedding_pb2.Embedding(output_index=0)
     embedding.feature_vector.value_float.append(1.0)
     embedding.feature_vector.value_float.append(0.0)
-    embedding_result = embeddings_pb2.EmbeddingResult()
+    embedding_result = embedding_pb2.EmbeddingResult()
     embedding_result.embeddings.append(embedding)
 
     result0 = embedder.get_embedding_by_index(embedding_result, 0)

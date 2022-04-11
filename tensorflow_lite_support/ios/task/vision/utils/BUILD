@@ -11,6 +11,7 @@ objc_library(
     hdrs = [
         "sources/GMLImage+Utils.h",
     ],
+    features = ["-layering_check"],
     module_name = "GMLImageUtils",
     sdk_frameworks = ["Accelerate"],
     deps = [

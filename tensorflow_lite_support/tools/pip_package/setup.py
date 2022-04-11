@@ -54,6 +54,7 @@ REQUIRED_PACKAGES = [
     # TODO(b/187981032): remove the constraint for 2.0 once the incompatibile
     # issue is resolved.
     'flatbuffers >= 1.12, <2',
+    'protobuf >= 3.18.0',
 ] + SETUP_PACKAGES
 
 project_name = 'tflite-support'

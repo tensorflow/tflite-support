@@ -16,6 +16,8 @@
 import enum
 
 from absl.testing import parameterized
+# TODO(b/220067158): Change to import tensorflow and leverage tf.test once
+# fixed the dependency issue.
 import unittest
 
 from tensorflow_lite_support.python.task.audio import audio_embedder
@@ -24,9 +26,6 @@ from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
-
-# TODO(b/220067158): Change to import tensorflow and leverage tf.test once
-# fixed the dependency issue.
 
 _BaseOptions = base_options_pb2.BaseOptions
 _AudioEmbedder = audio_embedder.AudioEmbedder
@@ -60,10 +59,9 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
-        Exception,
-        r"INVALID_ARGUMENT: ExternalFile must specify at least one of "
-        r"'file_content', 'file_name' or 'file_descriptor_meta'. "
-        r"\[tflite::support::TfLiteSupportStatus='2']"):
+        RuntimeError,
+        r"ExternalFile must specify at least one of 'file_content', "
+        r"'file_name' or 'file_descriptor_meta'."):
       options = _AudioEmbedderOptions(_BaseOptions(file_name=""))
       _AudioEmbedder.create_from_options(options)
 

@@ -14,10 +14,9 @@ limitations under the License.
 ==============================================================================*/
 
 #include "pybind11/pybind11.h"
-#include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
-#include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/detection_options.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/detections.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/object_detector.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
@@ -35,7 +34,6 @@ using CppBaseOptions = ::tflite::task::core::BaseOptions;
 PYBIND11_MODULE(_pywrap_object_detector, m) {
   // python wrapper for C++ ObjectDetector class which shouldn't be directly
   // used by the users.
-  pybind11::google::ImportStatusModule();
   pybind11_protobuf::ImportNativeProtoCasters();
 
   py::class_<ObjectDetector>(m, "ObjectDetector")
@@ -63,14 +61,22 @@ PYBIND11_MODULE(_pywrap_object_detector, m) {
             options.mutable_class_name_blacklist()->CopyFrom(
                 detection_options.class_name_denylist());
 
-            return ObjectDetector::CreateFromOptions(options);
+            auto detector = ObjectDetector::CreateFromOptions(options);
+            return core::get_value(detector);
           })
       .def("detect",
            [](ObjectDetector& self, const ImageData& image_data)
-               -> tflite::support::StatusOr<DetectionResult> {
-             ASSIGN_OR_RETURN(std::unique_ptr<FrameBuffer> frame_buffer,
-                              CreateFrameBufferFromImageData(image_data));
-             return self.Detect(*frame_buffer);
+               -> processor::DetectionResult {
+             auto frame_buffer = CreateFrameBufferFromImageData(image_data);
+             auto vision_detection_result = self.Detect(
+                   *core::get_value(frame_buffer));
+             // Convert from vision::DetectionResult to
+             // processor::DetectionResult as required by the Python layer.
+             processor::DetectionResult detection_result;
+               detection_result.ParseFromString(
+                 core::get_value(vision_detection_result)
+                 .SerializeAsString());
+             return detection_result;
            });
 }
 

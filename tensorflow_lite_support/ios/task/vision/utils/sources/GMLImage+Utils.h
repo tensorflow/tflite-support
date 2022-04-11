@@ -55,8 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param classObject The specified class associated with the bundle containing
  * the file to be loaded.
- * @param fileName Name of the image file.
- * @param ofType Extenstion of the image file.
+ * @param name Name of the image file.
+ * @param type Extenstion of the image file.
  *
  * @return The GMLImage object contains the loaded image. This method returns
  * nil if it cannot load the image.

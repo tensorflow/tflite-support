@@ -105,7 +105,7 @@ cc_library_with_tflite(
     srcs = ["regex_preprocessor.cc"],
     hdrs = ["regex_preprocessor.h"],
     tflite_deps = [
-        ":text_preprocessor_header",
+        ":text_preprocessor",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",
@@ -122,7 +122,7 @@ cc_library_with_tflite(
     srcs = ["bert_preprocessor.cc"],
     hdrs = ["bert_preprocessor.h"],
     tflite_deps = [
-        ":text_preprocessor_header",
+        ":text_preprocessor",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",
@@ -138,32 +138,32 @@ cc_library_with_tflite(
 )
 
 cc_library_with_tflite(
-    name = "text_preprocessor_header",
-    hdrs = ["text_preprocessor.h"],
+    name = "universal_sentence_encoder_preprocessor",
+    srcs = ["universal_sentence_encoder_preprocessor.cc"],
+    hdrs = ["universal_sentence_encoder_preprocessor.h"],
     tflite_deps = [
         ":processor",
+        ":text_preprocessor",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
     ],
     deps = [
+        "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core:task_utils",
         "@com_google_absl//absl/status",
     ],
 )
 
 cc_library_with_tflite(
     name = "text_preprocessor",
-    srcs = ["text_preprocessor.cc"],
     hdrs = ["text_preprocessor.h"],
     tflite_deps = [
         ":processor",
-        ":bert_preprocessor",
-        ":regex_preprocessor",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
     ],
     deps = [
-        "//tensorflow_lite_support/cc:common",
-        "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/core:task_utils",
         "@com_google_absl//absl/status",
     ],
 )
