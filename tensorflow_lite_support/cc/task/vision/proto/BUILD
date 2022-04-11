@@ -251,13 +251,6 @@ cc_proto_library(
     ],
 )
 
-support_py_proto_library(
-    name = "segmentations_py_pb2",
-    srcs = ["segmentations.proto"],
-    api_version = 2,
-    proto_deps = [":segmentations_proto"],
-)
-
 cc_library(
     name = "segmentations_proto_inc",
     hdrs = ["segmentations_proto_inc.h"],
