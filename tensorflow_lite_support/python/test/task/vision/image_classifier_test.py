@@ -44,6 +44,26 @@ _MAX_RESULTS = 3
 _ACCEPTABLE_ERROR_RANGE = 0.000001
 
 
+def _create_classifier_from_options(base_options, **classification_options):
+  classification_options = classification_options_pb2.ClassificationOptions(
+      **classification_options)
+  options = _ImageClassifierOptions(
+      base_options=base_options, classification_options=classification_options)
+  classifier = _ImageClassifier.create_from_options(options)
+  return classifier
+
+
+def _build_test_data(expected_categories):
+  classifications = classifications_pb2.Classifications(head_index=0)
+  classifications.classes.extend(
+      [class_pb2.Category(**args) for args in expected_categories])
+  expected_result = classifications_pb2.ClassificationResult()
+  expected_result.classifications.append(classifications)
+  expected_result_dict = json.loads(json_format.MessageToJson(expected_result))
+
+  return expected_result_dict
+
+
 class ModelFileType(enum.Enum):
   FILE_CONTENT = 1
   FILE_NAME = 2
@@ -55,28 +75,6 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     super().setUp()
     self.test_image_path = test_util.get_test_data_path(_IMAGE_FILE)
     self.model_path = test_util.get_test_data_path(_MODEL_FILE)
-
-  @staticmethod
-  def create_classifier_from_options(base_options, **classification_options):
-    classification_options = classification_options_pb2.ClassificationOptions(
-        **classification_options)
-    options = _ImageClassifierOptions(
-        base_options=base_options,
-        classification_options=classification_options)
-    classifier = _ImageClassifier.create_from_options(options)
-    return classifier
-
-  @staticmethod
-  def build_test_data(expected_categories):
-    classifications = classifications_pb2.Classifications(head_index=0)
-    classifications.classes.extend(
-        [class_pb2.Category(**args) for args in expected_categories])
-    expected_result = classifications_pb2.ClassificationResult()
-    expected_result.classifications.append(classifications)
-    expected_result_dict = json.loads(
-        json_format.MessageToJson(expected_result))
-
-    return expected_result_dict
 
   def test_create_from_file_succeeds_with_valid_model_path(self):
     # Creates with default option and valid model file successfully.
@@ -93,10 +91,9 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
-        Exception,
-        r'INVALID_ARGUMENT: ExternalFile must specify at least one of '
-        r"'file_content', 'file_name' or 'file_descriptor_meta'. "
-        r"\[tflite::support::TfLiteSupportStatus='2']"):
+        RuntimeError,
+        r"ExternalFile must specify at least one of 'file_content', "
+        r"'file_name' or 'file_descriptor_meta'."):
       base_options = _BaseOptions(file_name='')
       options = _ImageClassifierOptions(base_options=base_options)
       _ImageClassifier.create_from_options(options)
@@ -147,7 +144,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
       # Should never happen
       raise ValueError('model_file_type is invalid.')
 
-    classifier = self.create_classifier_from_options(
+    classifier = _create_classifier_from_options(
         base_options, max_results=max_results)
 
     # Loads image.
@@ -158,7 +155,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
     # Builds test data.
-    expected_result_dict = self.build_test_data(expected_categories)
+    expected_result_dict = _build_test_data(expected_categories)
 
     # Comparing results (classification w/o bounding box).
     self.assertDeepAlmostEqual(
@@ -168,8 +165,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Creates classifier.
     base_options = _BaseOptions(file_name=self.model_path)
 
-    classifier = self.create_classifier_from_options(
-        base_options, max_results=3)
+    classifier = _create_classifier_from_options(base_options, max_results=3)
 
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
@@ -198,7 +194,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     }]
 
     # Builds test data.
-    expected_result_dict = self.build_test_data(expected_categories)
+    expected_result_dict = _build_test_data(expected_categories)
 
     # Comparing results (classification w/ bounding box).
     self.assertDeepAlmostEqual(
@@ -208,7 +204,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Creates classifier.
     base_options = _BaseOptions(file_name=self.model_path)
 
-    classifier = self.create_classifier_from_options(
+    classifier = _create_classifier_from_options(
         base_options, max_results=_MAX_RESULTS)
 
     # Loads image.
@@ -227,7 +223,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Creates classifier.
     base_options = _BaseOptions(file_name=self.model_path)
 
-    classifier = self.create_classifier_from_options(
+    classifier = _create_classifier_from_options(
         base_options, score_threshold=_SCORE_THRESHOLD)
 
     # Loads image.
@@ -250,7 +246,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Creates classifier.
     base_options = _BaseOptions(file_name=self.model_path)
 
-    classifier = self.create_classifier_from_options(
+    classifier = _create_classifier_from_options(
         base_options, class_name_allowlist=_ALLOW_LIST)
 
     # Loads image.
@@ -272,7 +268,7 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     # Creates classifier.
     base_options = _BaseOptions(file_name=self.model_path)
 
-    classifier = self.create_classifier_from_options(
+    classifier = _create_classifier_from_options(
         base_options, score_threshold=0.01, class_name_denylist=_DENY_LIST)
 
     # Loads image
@@ -292,10 +288,9 @@ class ImageClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_combined_allowlist_and_denylist(self):
     # Fails with combined allowlist and denylist
     with self.assertRaisesRegex(
-        Exception,
-        r'INVALID_ARGUMENT: `class_name_whitelist` and `class_name_blacklist` '
-        r'are mutually exclusive options. '
-        r"\[tflite::support::TfLiteSupportStatus='2'\]"):
+        RuntimeError,
+        r'`class_name_whitelist` and `class_name_blacklist` are mutually '
+        r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
       classification_options = classification_options_pb2.ClassificationOptions(
           class_name_allowlist=['foo'], class_name_denylist=['bar'])

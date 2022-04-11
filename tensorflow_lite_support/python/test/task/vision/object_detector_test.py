@@ -91,38 +91,37 @@ class ModelFileType(enum.Enum):
   FILE_NAME = 2
 
 
+def _create_detector_from_options(base_options, **detection_options):
+  detection_options = detection_options_pb2.DetectionOptions(
+      **detection_options)
+  options = _ObjectDetectorOptions(
+      base_options=base_options, detection_options=detection_options)
+  detector = _ObjectDetector.create_from_options(options)
+  return detector
+
+
+def _build_test_data(expected_detections):
+  expected_result = detections_pb2.DetectionResult()
+
+  for index in range(len(expected_detections)):
+    bounding_box, category = expected_detections[index]
+    detection = detections_pb2.Detection()
+    detection.bounding_box.CopyFrom(
+        bounding_box_pb2.BoundingBox(**bounding_box))
+    detection.classes.append(class_pb2.Category(**category))
+    expected_result.detections.append(detection)
+
+  expected_result_dict = json.loads(json_format.MessageToJson(expected_result))
+
+  return expected_result_dict
+
+
 class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
   def setUp(self):
     super().setUp()
     self.test_image_path = test_util.get_test_data_path(_IMAGE_FILE)
     self.model_path = test_util.get_test_data_path(_MODEL_FILE)
-
-  @classmethod
-  def create_detector_from_options(cls, base_options, **detection_options):
-    detection_options = detection_options_pb2.DetectionOptions(
-        **detection_options)
-    options = _ObjectDetectorOptions(
-        base_options=base_options, detection_options=detection_options)
-    detector = _ObjectDetector.create_from_options(options)
-    return detector
-
-  @classmethod
-  def build_test_data(cls, expected_detections):
-    expected_result = detections_pb2.DetectionResult()
-
-    for index in range(len(expected_detections)):
-      bounding_box, category = expected_detections[index]
-      detection = detections_pb2.Detection()
-      detection.bounding_box.CopyFrom(
-          bounding_box_pb2.BoundingBox(**bounding_box))
-      detection.classes.append(class_pb2.Category(**category))
-      expected_result.detections.append(detection)
-
-    expected_result_dict = json.loads(
-        json_format.MessageToJson(expected_result))
-
-    return expected_result_dict
 
   def test_create_from_file_succeeds_with_valid_model_path(self):
     # Creates with default option and valid model file successfully.
@@ -139,10 +138,9 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
-        Exception,
-        r'INVALID_ARGUMENT: ExternalFile must specify at least one of '
-        r"'file_content', 'file_name' or 'file_descriptor_meta'. "
-        r"\[tflite::support::TfLiteSupportStatus='2']"):
+        RuntimeError,
+        r"ExternalFile must specify at least one of 'file_content', "
+        r"'file_name' or 'file_descriptor_meta'."):
       base_options = _BaseOptions(file_name='')
       options = _ObjectDetectorOptions(base_options=base_options)
       _ObjectDetector.create_from_options(options)
@@ -171,7 +169,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
       # Should never happen
       raise ValueError('model_file_type is invalid.')
 
-    detector = self.create_detector_from_options(
+    detector = _create_detector_from_options(
         base_options, max_results=max_results)
 
     # Loads image.
@@ -182,7 +180,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
     image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
     # Builds test data.
-    expected_result_dict = self.build_test_data(expected_detections)
+    expected_result_dict = _build_test_data(expected_detections)
 
     # Comparing results.
     self.assertDeepAlmostEqual(
@@ -191,7 +189,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_score_threshold_option(self):
     # Creates detector.
     base_options = _BaseOptions(file_name=self.model_path)
-    detector = self.create_detector_from_options(
+    detector = _create_detector_from_options(
         base_options, score_threshold=_SCORE_THRESHOLD)
 
     # Loads image.
@@ -213,7 +211,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_max_results_option(self):
     # Creates detector.
     base_options = _BaseOptions(file_name=self.model_path)
-    detector = self.create_detector_from_options(
+    detector = _create_detector_from_options(
         base_options, max_results=_MAX_RESULTS)
 
     # Loads image.
@@ -230,7 +228,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_allow_list_option(self):
     # Creates detector.
     base_options = _BaseOptions(file_name=self.model_path)
-    detector = self.create_detector_from_options(
+    detector = _create_detector_from_options(
         base_options, class_name_allowlist=_ALLOW_LIST)
 
     # Loads image.
@@ -251,7 +249,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_deny_list_option(self):
     # Creates detector.
     base_options = _BaseOptions(file_name=self.model_path)
-    detector = self.create_detector_from_options(
+    detector = _create_detector_from_options(
         base_options, class_name_denylist=_DENY_LIST)
 
     # Loads image.
@@ -271,10 +269,9 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_combined_allowlist_and_denylist(self):
     # Fails with combined allowlist and denylist
     with self.assertRaisesRegex(
-        Exception,
-        r'INVALID_ARGUMENT: `class_name_whitelist` and `class_name_blacklist` '
-        r'are mutually exclusive options. '
-        r"\[tflite::support::TfLiteSupportStatus='2'\]"):
+        RuntimeError,
+        r'`class_name_whitelist` and `class_name_blacklist` are mutually '
+        r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
       detection_options = detection_options_pb2.DetectionOptions(
           class_name_allowlist=['foo'], class_name_denylist=['bar'])

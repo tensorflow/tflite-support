@@ -80,7 +80,10 @@ class TensorImage(object):
 
   def __del__(self) -> None:
     """Destructor to free the storage of ImageData if loaded from the file."""
-    if self._is_from_file:
+    if self._is_from_file and image_utils:
+      # __del__ can be executed during interpreter shutdown, therefore
+      # image_utils may not be available.
+      # See https://docs.python.org/3/reference/datamodel.html#object.__del__
       image_utils.ImageDataFree(self._image_data)
 
   @property
