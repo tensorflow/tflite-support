@@ -78,7 +78,17 @@
   }
 
   if (self.displayNamesLocale) {
-    cClassificationOptions->display_names_local = (char *)self.displayNamesLocale.UTF8String;
+    char *cDsiplayNamesLocale = self.displayNamesLocale.UTF8String;
+    if (self.displayNamesLocale.UTF8String) {
+      cClassificationOptions->display_names_local = strdup(self.displayNamesLocale.UTF8String);
+      if (!cClassificationOptions->display_names_local)
+        exit(-1); // Memory Allocation Failed.
+    }
+    else {
+      [TFLCommonUtils createCustomError: error withCode:TFLSupportErrorCodeInvalidArgumentError
+                          description:@"Could not convert (NSString *) to (char *)."];
+      return NO;
+    }    
   }
 
   return YES;
