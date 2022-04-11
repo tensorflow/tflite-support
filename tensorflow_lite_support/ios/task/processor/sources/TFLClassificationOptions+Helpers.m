@@ -26,7 +26,7 @@
     return nil;
   }
 
-  char **cStrings = (char **)[TFLCommonUtils mallocWithSize:strings.count * sizeof(char *)
+  char **cStrings = [TFLCommonUtils mallocWithSize:strings.count * sizeof(char *)
                                                       error:error];
 
   for (NSInteger i = 0; i < strings.count; i++) {
