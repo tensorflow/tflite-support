@@ -152,8 +152,7 @@ class ImageSegmenterTest(parameterized.TestCase, base_test.BaseTestCase):
       "Segmentation mask value must be the same size as ground truth.")
 
   def test_segmentation_confidence_mask(self):
-    """Check if top-left corner has expected confidences and also verify if the
-     confidence mask matches with the category mask."""
+    """Check if the confidence mask matches with the category mask."""
     # Create BaseOptions from model file.
     base_options = _BaseOptions(file_name=self.model_path)
 
