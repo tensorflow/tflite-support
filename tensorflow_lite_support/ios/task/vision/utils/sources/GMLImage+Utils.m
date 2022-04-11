@@ -220,7 +220,7 @@
   // Hence setting it to the value of channelCount*width.
   CGContextRef context =
       CGBitmapContextCreate(nil, width, height, bitsPerComponent, channelCount * width, colorSpace,
-                            kCGImageAlphaNoneSkipLast);
+                            kCGImageAlphaNoneSkipLast|kCGBitmapByteOrder32Big);
 
   if (context) {
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), cgImage);
