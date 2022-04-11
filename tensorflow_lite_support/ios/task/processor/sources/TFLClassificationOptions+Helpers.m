@@ -32,7 +32,7 @@
     return NULL;
     
   for (NSInteger i = 0; i < strings.count; i++) {
-    cStrings[i] = (char *)[TFLCommonUtils
+    cStrings[i] = [TFLCommonUtils
         mallocWithSize:([strings[i] lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1) *
                        sizeof(char)
                  error:error];
