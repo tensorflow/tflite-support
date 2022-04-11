@@ -23,7 +23,7 @@
 #import <CoreImage/CoreImage.h>
 #import <CoreVideo/CoreVideo.h>
 
-@interface TFLCVPixelBufferUtils : NSObject 
+@interface TFLCVPixelBufferUtils : NSObject
 
 + (TfLiteFrameBuffer *)cFrameBufferWithWidth:(int)width
                                       height:(int)height
@@ -220,7 +220,7 @@
   // Hence setting it to the value of channelCount*width.
   CGContextRef context =
       CGBitmapContextCreate(nil, width, height, bitsPerComponent, channelCount * width, colorSpace,
-                            kCGImageAlphaNoneSkipLast|kCGBitmapByteOrder32Big);
+                            kCGImageAlphaNoneSkipLast | kCGBitmapByteOrder32Big);
 
   if (context) {
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), cgImage);
@@ -308,10 +308,10 @@
   }
 
   return [TFLCVPixelBufferUtils cFrameBufferWithWidth:width
-                              height:height
-                   frameBufferFormat:kRGBA
-                              buffer:buffer
-                               error:error];
+                                               height:height
+                                    frameBufferFormat:kRGBA
+                                               buffer:buffer
+                                                error:error];
 }
 
 @end
