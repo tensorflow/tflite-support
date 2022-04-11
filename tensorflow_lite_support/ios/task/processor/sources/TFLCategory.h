@@ -49,8 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithIndex:(NSInteger)index
                         score:(float)score
-                        label:(NSString *)label
-                  displayName:(NSString *)displayName;
+                        label:(nullable NSString *)label
+                  displayName:(nullable NSString *)displayName;
 
 @end
 

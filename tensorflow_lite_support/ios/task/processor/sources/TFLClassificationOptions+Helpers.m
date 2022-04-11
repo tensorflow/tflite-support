@@ -26,15 +26,17 @@
     return nil;
   }
 
-  char **cStrings = (char **)[TFLCommonUtils mallocWithSize:strings.count * sizeof(char *)
+  char **cStrings = [TFLCommonUtils mallocWithSize:strings.count * sizeof(char *)
                                                       error:error];
-
+  if (!cStrings)
+    return NULL;
+    
   for (NSInteger i = 0; i < strings.count; i++) {
-    cStrings[i] = (char *)[TFLCommonUtils
+    cStrings[i] = [TFLCommonUtils
         mallocWithSize:([strings[i] lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1) *
                        sizeof(char)
                  error:error];
-    if (!cStrings[i]) return nil;
+    if (!cStrings[i]) return NULL;
 
     strcpy(cStrings[i], strings[i].UTF8String);
   }
@@ -76,7 +78,17 @@
   }
 
   if (self.displayNamesLocale) {
-    cClassificationOptions->display_names_local = (char *)self.displayNamesLocale.UTF8String;
+    char *cDsiplayNamesLocale = self.displayNamesLocale.UTF8String;
+    if (self.displayNamesLocale.UTF8String) {
+      cClassificationOptions->display_names_local = strdup(self.displayNamesLocale.UTF8String);
+      if (!cClassificationOptions->display_names_local)
+        exit(-1); // Memory Allocation Failed.
+    }
+    else {
+      [TFLCommonUtils createCustomError: error withCode:TFLSupportErrorCodeInvalidArgumentError
+                          description:@"Could not convert (NSString *) to (char *)."];
+      return NO;
+    }    
   }
 
   return YES;

@@ -45,12 +45,12 @@ static NSString *const TFLSupportTaskErrorDomain = @"org.tensorflow.lite.tasks";
   if (!memSize) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
-                          description:@"Invalid memory size passed for allocation of object."];
-    return nil;
+                          description:@"memSize cannot be NULL."];
+    return NULL;
   }
 
   void *allocedMemory = malloc(memSize);
-  if (!allocedMemory && memSize) {
+  if (!allocedMemory) {
     exit(-1);
   }
 

@@ -14,13 +14,10 @@ limitations under the License.
 ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult.h"
 
-@implementation TFLClassifications {
-  NSInteger _headIndex;
-  NSArray<TFLCategory *> *_categories;
-}
+@implementation TFLClassifications
 
 - (instancetype)initWithHeadIndex:(NSInteger)headIndex
-                       categories:(nonnull NSArray<TFLCategory *> *)categories {
+                       categories:(NSArray<TFLCategory *> *)categories {
   self = [super init];
   if (self) {
     _headIndex = headIndex;
