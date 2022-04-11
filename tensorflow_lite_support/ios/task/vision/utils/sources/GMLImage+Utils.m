@@ -91,7 +91,9 @@
     default: {
       [TFLCommonUtils createCustomError:error
                                withCode:TFLSupportErrorCodeInvalidArgumentError
-                            description:@"Unsupported pixel format for TfLiteFrameBufferFormat."];
+                            description:@"Unsupported pixel format for CVPixelBuffer. Supported "
+                                        @"pixel format types are kCVPixelFormatType_32RGBA, "
+                                        @"kCVPixelFormatType_32BGRA, kCVPixelFormatType_24RGB"];
     }
   }
 
@@ -129,8 +131,8 @@
 
   uint8_t *pixelBufferBaseAddress = (uint8_t *)CVPixelBufferGetBaseAddress(pixelBuffer);
 
-  uint8_t *destPixelBufferAddress = [TFLCommonUtils mallocWithSize:sizeof(uint8_t) * height * destinationBytesPerRow
-                                                             error:error];
+  uint8_t *destPixelBufferAddress =
+      [TFLCommonUtils mallocWithSize:sizeof(uint8_t) * height * destinationBytesPerRow error:error];
 
   if (!destPixelBufferAddress) {
     return NULL;
@@ -275,10 +277,10 @@
   }
 
   return [TFLCVPixelBufferUtils cFrameBufferWithWidth:(int)CGImageGetWidth(cgImage)
-                              height:(int)CGImageGetHeight(cgImage)
-                   frameBufferFormat:kRGB
-                              buffer:buffer
-                               error:error];
+                                               height:(int)CGImageGetHeight(cgImage)
+                                    frameBufferFormat:kRGB
+                                               buffer:buffer
+                                                error:error];
 }
 
 - (TfLiteFrameBuffer *)frameBufferFromCIImage:(CIImage *)ciImage error:(NSError **)error {
