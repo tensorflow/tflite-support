@@ -182,25 +182,6 @@ java_lite_proto_library(
 )
 
 proto_library(
-    name = "segmentations_proto",
-    srcs = ["segmentations.proto"],
-)
-
-cc_proto_library(
-    name = "segmentations_cc_proto",
-    deps = [
-        ":segmentations_proto",
-    ],
-)
-
-support_py_proto_library(
-    name = "segmentations_py_pb2",
-    srcs = ["segmentations.proto"],
-    api_version = 2,
-    proto_deps = [":segmentations_proto"],
-)
-
-proto_library(
     name = "segmentation_options_proto",
     srcs = ["segmentation_options.proto"],
 )

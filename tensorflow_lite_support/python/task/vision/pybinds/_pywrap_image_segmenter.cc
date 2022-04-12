@@ -15,7 +15,6 @@ limitations under the License.
 
 #include "pybind11/pybind11.h"
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
-#include "tensorflow_lite_support/cc/task/processor/proto/segmentations.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/segmentation_options.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_segmenter.h"
 #include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
@@ -61,16 +60,11 @@ PYBIND11_MODULE(_pywrap_image_segmenter, m) {
           })
       .def("segment",
            [](ImageSegmenter& self, const ImageData& image_data)
-               -> processor::SegmentationResult {
+               -> SegmentationResult {
              auto frame_buffer = CreateFrameBufferFromImageData(image_data);
              auto vision_segmentation_result = self.Segment(
                      *core::get_value(frame_buffer));
-             // Convert from vision::SegmentationResult to
-             // processor::SegmentationResult as required by the Python layer.
-             processor::SegmentationResult segmentation_result;
-             segmentation_result.ParseFromString(
-               core::get_value(vision_segmentation_result).SerializeAsString());
-             return segmentation_result;
+             return core::get_value(vision_segmentation_result);
            });
 }
 

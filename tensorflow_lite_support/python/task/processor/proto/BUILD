@@ -73,7 +73,7 @@ py_library(
     name = "segmentations_pb2",
     srcs = ["segmentations_pb2.py"],
     deps = [
-        "//tensorflow_lite_support/cc/task/processor/proto:segmentations_py_pb2",
+        "//tensorflow_lite_support/cc/task/vision/proto:segmentations_py_pb2",
     ],
 )
 
