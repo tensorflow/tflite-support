@@ -58,7 +58,8 @@ class TensorAudio(object):
       `TensorAudio` object.
 
     Raises:
-      RuntimeError if the audio file can't be decoded.
+      ValueError: If the audio file is invalid.
+      RuntimeError: If other types of error occurred.
     """
     audio = _LoadAudioBufferFromFile(file_name, sample_count,
                                      np.zeros([sample_count]))
@@ -74,6 +75,7 @@ class TensorAudio(object):
 
     Raises:
       ValueError: Raised if the audio record's config is invalid.
+      RuntimeError: Raised if other types of error occurred.
     """
     if record.buffer_size < self._buffer_size:
       raise ValueError(
@@ -106,8 +108,8 @@ class TensorAudio(object):
         from the `src` array.
 
     Raises:
-      ValueError: Raised if the input array has an incorrect shape or if
-      `offset` + `size` exceeds the length of the `src` array.
+      ValueError: If the input array has an incorrect shape or if
+        `offset` + `size` exceeds the length of the `src` array.
     """
     if src.shape[1] != self._format.channels:
       raise ValueError(f"Input audio contains an invalid number of channels. "
