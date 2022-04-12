@@ -122,7 +122,9 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/processor:text_preprocessor",
         "//tensorflow_lite_support/cc/task/processor:bert_preprocessor",
         "//tensorflow_lite_support/cc/task/processor:regex_preprocessor",
+        "//tensorflow_lite_support/cc/task/processor:universal_sentence_encoder_preprocessor",
         "//tensorflow_lite_support/cc/task/text/utils:bert_utils",
+        "//tensorflow_lite_support/cc/task/text/utils:universal_sentence_encoder_utils",
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",

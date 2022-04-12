@@ -16,6 +16,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_PYTHON_TASK_CORE_PYBINDS_TASK_UTILS_H_
 #define TENSORFLOW_LITE_SUPPORT_PYTHON_TASK_CORE_PYBINDS_TASK_UTILS_H_
 
+#include <stdexcept>
+
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/python/task/core/proto/base_options.pb.h"
@@ -36,6 +38,9 @@ template <typename T>
 inline T get_value(tflite::support::StatusOr<T>& status_or_object) {
   if (status_or_object.ok()) {
     return std::move(status_or_object.value());
+  } else if (absl::IsInvalidArgument(status_or_object.status())) {
+    throw std::invalid_argument(
+        std::string(status_or_object.status().message()));
   } else {
     throw std::runtime_error(std::string(status_or_object.status().message()));
   }
