@@ -80,20 +80,20 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLColoredLabel : NSObject
 
 /** The RGB color components for the label, in the [0, 255] range. */
-@property(nonatomic, assign) NSUInteger r;
-@property(nonatomic, assign) NSUInteger g;
-@property(nonatomic, assign) NSUInteger b;
+@property(nonatomic, assign, readonly) NSUInteger r;
+@property(nonatomic, assign, readonly) NSUInteger g;
+@property(nonatomic, assign, readonly) NSUInteger b;
 
 /** The class name, as provided in the label map packed in the TFLite Model
  * Metadata.
  */
-@property(nonatomic, copy) NSString *label;
+@property(nonatomic, copy, readonly) NSString *label;
 
 /** The display name, as provided in the label map (if available) packed in
  * the TFLite Model Metadata. See `display_names_locale` field in
  * ImageSegmenterOptions.
  */
-@property(nonatomic, copy) NSString *displayName;
+@property(nonatomic, copy, readonly) NSString *displayName;
 
 @end
 
@@ -107,14 +107,14 @@ NS_ASSUME_NONNULL_BEGIN
  * this particular class.
  * This property is mutually exclusive with `categoryMask`.
  */
-@property(nonatomic, strong, nullable) NSArray<TFLConfidenceMask *> *confidenceMasks;
+@property(nonatomic, strong, nullable, readonly) NSArray<TFLConfidenceMask *> *confidenceMasks;
 
 /** Holds the category mask.
  * The value of each pixel in this mask represents the class to which the
  * pixel belongs.
  * This property is mutually exclusive with `confidenceMasks`.
  */
-@property(nonatomic, strong, nullable) TFLCategoryMask *categoryMask;
+@property(nonatomic, strong, nullable, readonly) TFLCategoryMask *categoryMask;
 
 /**
  * The list of colored labels for all the supported categories (classes).
@@ -123,7 +123,7 @@ NS_ASSUME_NONNULL_BEGIN
  * `colored_labels[i]`, `confidence_masks` indices, i.e. `confidence_masks[i]`
  * is associated with `colored_labels[i]`.
  */
-@property(nonatomic, strong) NSArray<TFLColoredLabel *> *coloredLabels;
+@property(nonatomic, strong, readonly) NSArray<TFLColoredLabel *> *coloredLabels;
 
 @end
 
@@ -136,7 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
  * e.g. instance segmentation models, which may return one segmentation per
  * object.
  */
-@property(nonatomic, strong) NSArray<TFLSegmentation *> *segmentations;
+@property(nonatomic, strong, readonly) NSArray<TFLSegmentation *> *segmentations;
 
 @end
 

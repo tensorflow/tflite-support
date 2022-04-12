@@ -14,11 +14,7 @@
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSegmentationResult.h"
 
-@implementation TFLCategoryMask {
-  NSInteger _width;
-  NSInteger _height;
-  UInt8 *_mask;
-}
+@implementation TFLCategoryMask
 
 - (instancetype)initWithWidth:(NSInteger)width height:(NSInteger)height mask:(UInt8 *)mask {
   self = [super init];
@@ -45,11 +41,7 @@
 
 @end
 
-@implementation TFLConfidenceMask {
-  NSInteger _width;
-  NSInteger _height;
-  float *_mask;
-}
+@implementation TFLConfidenceMask
 
 - (instancetype)initWithWidth:(NSInteger)width height:(NSInteger)height mask:(float *)mask {
   self = [super init];
