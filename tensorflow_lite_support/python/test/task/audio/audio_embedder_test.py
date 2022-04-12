@@ -75,7 +75,7 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
       self.assertIsInstance(embedder, _AudioEmbedder)
 
   def test_create_input_tensor_audio_from_embedder_succeeds(self):
-    # Creates TensorAudio instance using the classifier successfully.
+    # Creates TensorAudio instance using the embedder successfully.
     base_options = _BaseOptions(file_name=self.model_path)
     options = _AudioEmbedderOptions(base_options=base_options)
     embedder = _AudioEmbedder.create_from_options(options)
@@ -88,7 +88,7 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
 
   @_mock.patch("sounddevice.InputStream", return_value=_mock.MagicMock())
   def test_create_audio_record_from_embedder_succeeds(self, _):
-    # Creates AudioRecord instance using the classifier successfully.
+    # Creates AudioRecord instance using the embedder successfully.
     base_options = _BaseOptions(file_name=self.model_path)
     options = _AudioEmbedderOptions(base_options=base_options)
     embedder = _AudioEmbedder.create_from_options(options)
