@@ -54,8 +54,9 @@ class ImageSegmenter(object):
     Returns:
       `ImageSegmenter` object that's created from `options`.
     Raises:
-      RuntimeError if failed to create `ImageSegmenter` object from the provided
-        file such as invalid file.
+      ValueError: If failed to create `ImageSegmenter` object from the
+        provided file such as invalid file.
+      RuntimeError: If other types of error occurred.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = ImageSegmenterOptions(base_options=base_options)
@@ -71,8 +72,9 @@ class ImageSegmenter(object):
     Returns:
       `ImageSegmenter` object that's created from `options`.
     Raises:
-      RuntimeError if failed to create `ImageSegmenter` object from
+      ValueError: If failed to create `ImageSegmenter` object from
         `ImageSegmenterOptions` such as missing the model.
+      RuntimeError: If other types of error occurred.
     """
     segmenter = _CppImageSegmenter.create_from_options(
         options.base_options, options.segmentation_options)
@@ -89,7 +91,8 @@ class ImageSegmenter(object):
     Returns:
       segmentation result.
     Raises:
-      RuntimeError if failed to get the segmentation result.
+      ValueError: If any of the input arguments is invalid.
+      RuntimeError: If failed to run segmentation.
     """
     image_data = image_utils.ImageData(image.buffer)
     return self._segmenter.segment(image_data)
