@@ -160,14 +160,6 @@ class AudioClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
       classifier = _AudioClassifier.create_from_options(options)
       self.assertIsInstance(classifier, _AudioClassifier)
 
-  def test_create_from_options_succeeds_with_valid_model_content(self):
-    # Creates with options containing model content successfully.
-    with open(self.model_path, 'rb') as f:
-      base_options = _BaseOptions(file_content=f.read())
-      options = _AudioClassifierOptions(base_options=base_options)
-      classifier = _AudioClassifier.create_from_options(options)
-      self.assertIsInstance(classifier, _AudioClassifier)
-
   def test_create_input_tensor_audio_from_classifier_succeeds(self):
     # Creates TensorAudio instance using the classifier successfully.
     base_options = _BaseOptions(file_name=self.model_path)
