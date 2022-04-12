@@ -57,8 +57,9 @@ class AudioEmbedder(object):
       `AudioEmbedder` object that's created from `options`.
 
     Raises:
-      RuntimeError if failed to create `AudioEmbedder` object from the provided
-      file such as invalid file.
+      ValueError: If failed to create `AudioEmbedder` object from the provided
+        file such as invalid file.
+      RuntimeError: If other types of error occurred.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = AudioEmbedderOptions(base_options=base_options)
@@ -76,8 +77,9 @@ class AudioEmbedder(object):
       `AudioEmbedder` object that's created from `options`.
 
     Raises:
-      RuntimeError if failed to create `AudioEmbedder` object from
+      ValueError: If failed to create `AudioEmbedder` object from
       `AudioEmbedderOptions` such as missing the model.
+      RuntimeError: If other types of error occurred.
     """
     embedder = _CppAudioEmbedder.create_from_options(options.base_options,
                                                      options.embedding_options)
@@ -87,7 +89,7 @@ class AudioEmbedder(object):
     """Creates a TensorAudio instance to store the audio input.
 
     Returns:
-        A TensorAudio instance.
+      A TensorAudio instance.
     """
     return tensor_audio.TensorAudio(
         audio_format=self.required_audio_format,
@@ -97,7 +99,7 @@ class AudioEmbedder(object):
     """Creates an AudioRecord instance to record audio.
 
     Returns:
-        An AudioRecord instance.
+      An AudioRecord instance.
     """
     return audio_record.AudioRecord(self.required_audio_format.channels,
                                     self.required_audio_format.sample_rate,
@@ -114,7 +116,8 @@ class AudioEmbedder(object):
       embedding result.
 
     Raises:
-      RuntimeError if failed to get the embedding vector.
+      ValueError: If any of the input arguments is invalid.
+      RuntimeError: If failed to calculate the embedding vector.
     """
     return self._embedder.embed(
         _CppAudioBuffer(audio.buffer, audio.buffer_size, audio.format))

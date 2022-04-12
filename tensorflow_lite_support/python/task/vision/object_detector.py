@@ -53,9 +53,11 @@ class ObjectDetector(object):
 
     Returns:
       `ObjectDetector` object that's created from the model file.
+
     Raises:
-      RuntimeError if failed to create `ObjectDetector` object from the provided
-      file such as invalid file.
+      ValueError: if failed to create `ObjectDetector` object from the provided
+        file such as invalid file.
+      RuntimeError: If other types of error occurred.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = ObjectDetectorOptions(base_options=base_options)
@@ -71,9 +73,11 @@ class ObjectDetector(object):
 
     Returns:
       `ObjectDetector` object that's created from `options`.
+
     Raises:
-      RuntimeError if failed to create `ObjectDetector` object from
-      `ObjectDetectorOptions` such as missing the model.
+      ValueError: If failed to create `ObjectDetector` object from
+        `ObjectDetectorOptions` such as missing the model.
+      RuntimeError: If other types of error occurred.
     """
     detector = _CppObjectDetector.create_from_options(options.base_options,
                                                       options.detection_options)
@@ -88,8 +92,10 @@ class ObjectDetector(object):
 
     Returns:
       detection result.
+
     Raises:
-      RuntimeError if failed to get the feature vector.
+      ValueError: If any of the input arguments is invalid.
+      RuntimeError: If object detection failed to run.
     """
     image_data = image_utils.ImageData(image.buffer)
 

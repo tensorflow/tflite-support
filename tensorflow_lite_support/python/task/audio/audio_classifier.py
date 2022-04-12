@@ -58,8 +58,9 @@ class AudioClassifier(object):
       `AudioClassifier` object that's created from `options`.
 
     Raises:
-      RuntimeError if failed to create `AudioClassifier` object from the
-      provided file such as invalid file.
+      ValueError: If failed to create `AudioClassifier` object from the provided
+        file such as invalid file.
+      RuntimeError: If other types of error occurred.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = AudioClassifierOptions(base_options=base_options)
@@ -77,8 +78,9 @@ class AudioClassifier(object):
       `AudioClassifier` object that's created from `options`.
 
     Raises:
-      RuntimeError if failed to create `AudioClassifier` object from
-      `AudioClassifierOptions` such as missing the model.
+      ValueError: If failed to create `AudioClassifier` object from
+        `AudioClassifierOptions` such as missing the model.
+      RuntimeError: If other types of error occurred.
     """
     classifier = _CppAudioClassifier.create_from_options(
         options.base_options, options.classification_options)
@@ -88,7 +90,7 @@ class AudioClassifier(object):
     """Creates a TensorAudio instance to store the audio input.
 
     Returns:
-        A TensorAudio instance.
+      A TensorAudio instance.
     """
     return tensor_audio.TensorAudio(
         audio_format=self.required_audio_format,
@@ -98,7 +100,7 @@ class AudioClassifier(object):
     """Creates an AudioRecord instance to record audio.
 
     Returns:
-        An AudioRecord instance.
+      An AudioRecord instance.
     """
     return audio_record.AudioRecord(self.required_audio_format.channels,
                                     self.required_audio_format.sample_rate,
@@ -117,7 +119,8 @@ class AudioClassifier(object):
       classification result.
 
     Raises:
-      RuntimeError if failed to get the feature vector.
+      ValueError: If any of the input arguments is invalid.
+      RuntimeError: If failed to run audio classification.
     """
     return self._classifier.classify(
         _CppAudioBuffer(audio.buffer, audio.buffer_size, audio.format))
