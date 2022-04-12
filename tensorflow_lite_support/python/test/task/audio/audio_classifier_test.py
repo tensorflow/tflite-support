@@ -145,7 +145,7 @@ class AudioClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
-        RuntimeError,
+        ValueError,
         r"ExternalFile must specify at least one of 'file_content', "
         r"'file_name' or 'file_descriptor_meta'."):
       base_options = _BaseOptions(file_name='')
@@ -322,7 +322,7 @@ class AudioClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_combined_allowlist_and_denylist(self):
     # Fails with combined allowlist and denylist
     with self.assertRaisesRegex(
-        RuntimeError,
+        ValueError,
         r'`class_name_allowlist` and `class_name_denylist` are mutually '
         r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
