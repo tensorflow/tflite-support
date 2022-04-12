@@ -176,6 +176,9 @@ class AudioClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     self.assertIsInstance(classifier, _AudioClassifier)
     tensor = classifier.create_input_tensor_audio()
     self.assertIsInstance(tensor, tensor_audio.TensorAudio)
+    self.assertEqual(tensor.format.channels, 1)
+    self.assertEqual(tensor.format.sample_rate, 16000)
+    self.assertEqual(tensor.buffer_size, 15600)
 
   @_mock.patch("sounddevice.InputStream", return_value=_mock.MagicMock())
   def test_create_audio_record_from_classifier_succeeds(self, _):
@@ -186,6 +189,9 @@ class AudioClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
     self.assertIsInstance(classifier, _AudioClassifier)
     record = classifier.create_audio_record()
     self.assertIsInstance(record, audio_record.AudioRecord)
+    self.assertEqual(record.channels, 1)
+    self.assertEqual(record.sampling_rate, 16000)
+    self.assertEqual(record.buffer_size, 15600)
 
   @parameterized.parameters(
       (_FIXED_INPUT_SIZE_MODEL_FILE, ModelFileType.FILE_NAME,
