@@ -34,7 +34,7 @@
   return self;
 }
 
-- (instancetype)initWithModelPath:(nonnull NSString *)modelPath {
+- (instancetype)initWithModelPath:(NSString *)modelPath {
   self = [self init];
   if (self) {
     self.baseOptions.modelFile.filePath = modelPath;

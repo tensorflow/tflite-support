@@ -60,7 +60,7 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
  * of the image segmentation operation.
  * @seealso TFLOutputType
  */
-@property(nonatomic, assign) TFLOutputType outputType;
+@property(nonatomic) TFLOutputType outputType;
 
 /** Display names local for display names*/
 @property(nonatomic, copy) NSString *displayNamesLocale;
@@ -79,7 +79,7 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
  * @return An instance of TFLImageSegmenterOptions set to the specified
  * modelPath.
  */
-- (instancetype)initWithModelPath:(nonnull NSString *)modelPath;
+- (instancetype)initWithModelPath:(NSString *)modelPath;
 
 @end
 
