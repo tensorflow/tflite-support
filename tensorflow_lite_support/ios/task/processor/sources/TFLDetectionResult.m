@@ -21,7 +21,7 @@ limitations under the License.
   self = [super init];
   if (self) {
     _boundingBox = boundingBox;
-    _categories = categories;
+    _categories = [categories copy];
   }
   return self;
 }
@@ -33,7 +33,7 @@ limitations under the License.
 - (instancetype)initWithDetections:(NSArray<TFLDetection *> *)detections {
   self = [super init];
   if (self) {
-    _detections = detections;
+    _detections = [detections copy];
   }
   return self;
 }
