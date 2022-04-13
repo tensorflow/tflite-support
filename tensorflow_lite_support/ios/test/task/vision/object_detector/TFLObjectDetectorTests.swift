@@ -85,7 +85,7 @@ class TFLObjectDetectorTests: XCTestCase {
     let objectDetectorOptions = TFLObjectDetectorOptions(modelPath: modelPath)
 
     let objectDetector =
-      try TFLObjectDetector.objectDetector(options: objectDetectorOptions!)
+      try TFLObjectDetector.objectDetector(options: objectDetectorOptions)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
