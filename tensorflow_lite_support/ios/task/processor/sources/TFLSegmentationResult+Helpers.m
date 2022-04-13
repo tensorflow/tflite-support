@@ -30,12 +30,12 @@
       NSString *label;
       NSString *displayName;
       if (cColoredLabel.display_name != nil) {
-        displayName = [NSMutableString stringWithCString:cColoredLabel.display_name
+        displayName = [NSString stringWithCString:cColoredLabel.display_name
                                                       encoding:NSUTF8StringEncoding];
       }
 
       if (cColoredLabel.label != nil) {
-        label = [NSMutableString stringWithCString:cColoredLabel.label
+        label = [NSString stringWithCString:cColoredLabel.label
                                                 encoding:NSUTF8StringEncoding];
       }
 
