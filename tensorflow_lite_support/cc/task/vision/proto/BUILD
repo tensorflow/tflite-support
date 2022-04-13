@@ -326,3 +326,20 @@ cc_library(
     hdrs = ["embeddings_proto_inc.h"],
     deps = [":embeddings_cc_proto"],
 )
+
+proto_library(
+    name = "image_searcher_options_proto",
+    srcs = ["image_searcher_options.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:search_options_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "image_searcher_options_cc_proto",
+    deps = [
+        ":image_searcher_options_proto",
+    ],
+)
