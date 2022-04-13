@@ -43,6 +43,10 @@ NS_ASSUME_NONNULL_BEGIN
                        height:(NSInteger)height
                          mask:(float * _Nullable)mask;
 
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;                        
+
 @end
 
 /** Holds category mask and its metadata. */
@@ -68,11 +72,23 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) NSInteger height;
 
 /**
- *  Initializes a category mask.
+ * Initializes a TFLCategoryMask mask.
+ *
+ * @param width Width of the mask.
+ * @param height Height of the mask.
+ * @param mask Flattened 2D-array of size `width` x `height`, in row major order.
+ * The value of each pixel in this mask represents the class to which the
+ * pixel belongs.
+ *
+ * @return An instance of TFLCategoryMask initialized to the specified values.
  */
 - (instancetype)initWithWidth:(NSInteger)width
                        height:(NSInteger)height
                          mask:(UInt8 * _Nullable)mask;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
@@ -90,12 +106,26 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) NSString *label;
 
 /** The display name, as provided in the label map (if available) packed in
- * the TFLite Model Metadata. See `display_names_locale` field in
- * ImageSegmenterOptions.
+ * the TFLite Model Metadata. See displayNamesLocale in TFLClassificationOptions.
  */
 @property(nonatomic, readonly) NSString *displayName;
 
+/**
+ * Initializes a TFLColoredLabel.
+ *
+ * @param r Red component of the RGB color components.
+ * @param g Green component of the RGB color components.
+ * @param b Blue component of the RGB color components.
+ * @param label Class name.
+ * @param displayName Display name.
+ *
+ * @return An instance of TFLColoredLabel initialized to the values passed as arguments.
+ */
 - (instancetype)initWithRed:(NSUInteger)r green:(NSUInteger)g blue:(NSUInteger)b label:(NSString *)label displayName:(NSString *)displayName;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
@@ -127,8 +157,29 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property(nonatomic, readonly) NSArray<TFLColoredLabel *> *coloredLabels;
 
+/**
+ * Initializes a TFLSegmentation.
+ * This method initialises `categoryMask` to nil by default.
+ * @param confidenceMasks Array of TFLConfidenceMask objects.
+ * @param coloredLabels Array of TFLColoredLabel objects.
+ *
+ * @return An instance of TFLSegmentation initialized to the values passed as arguments.
+ */
 - (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
+
+/**
+ * Initializes a TFLSegmentation.
+ * This method initialises `categoryMask` to nil by default.
+ * @param categoryMask A TFLCategoryMask object.
+ * @param coloredLabels Array of TFLColoredLabel objects.
+ *
+ * @return An instance of TFLSegmentation initialized to the values passed as arguments.
+ */
 - (instancetype)initWithCategoryMask:(TFLCategoryMask *)categoryMask  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
@@ -143,7 +194,18 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property(nonatomic, readonly) NSArray<TFLSegmentation *> *segmentations;
 
+/**
+ * Initializes a TFLSegmentationResult.
+ * This method initialises `categoryMask` to nil by default.
+ * @param segmentations Array of TFLSegmentation objects.
+ *
+ * @return An instance of TFLSegmentationResult initialized to the values passed as arguments.
+ */
 - (instancetype)initWithSegmentations:(NSArray<TFLSegmentation *> *)segmentations;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
