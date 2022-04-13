@@ -20,6 +20,7 @@ limitations under the License.
 NS_ASSUME_NONNULL_BEGIN
 
 /** Encapsulates list of predicted classes (aka labels) and bounding box for a detected object. */
+NS_SWIFT_NAME(Detection)
 @interface TFLDetection : NSObject
 
 /**
@@ -44,9 +45,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBoundingBox:(CGRect)boundingBox
                          categories:(NSArray<TFLCategory *> *)categories;
 
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /** Encapsulates results of any object detection task. */
+NS_SWIFT_NAME(DetectionResult)
 @interface TFLDetectionResult : NSObject
 
 @property(nonatomic, readonly) NSArray<TFLDetection *> *detections;
@@ -59,6 +66,10 @@ NS_ASSUME_NONNULL_BEGIN
  * @return An instance of TFLDetectionResult initialized to the specified values.
  */
 - (instancetype)initWithDetections:(NSArray<TFLDetection *> *)detections;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

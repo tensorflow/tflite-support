@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Options to configure TFLObjectDetector.
  */
+NS_SWIFT_NAME(ObjectDetectorOptions)
 @interface TFLObjectDetectorOptions : NSObject
 
 /**
@@ -53,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+NS_SWIFT_NAME(ObjectDetector)
 @interface TFLObjectDetector : NSObject
 
 /**
