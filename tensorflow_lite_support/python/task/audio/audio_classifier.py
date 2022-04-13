@@ -132,5 +132,9 @@ class AudioClassifier(object):
 
   @property
   def required_audio_format(self) -> _CppAudioFormat:
-    """Gets the required audio format for the model."""
+    """Gets the required audio format for the model.
+
+    Raises:
+      RuntimeError: If failed to get the required audio format.
+    """
     return self._classifier.get_required_audio_format()
