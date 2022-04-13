@@ -48,6 +48,25 @@ py_test(
 )
 
 py_test(
+    name = "image_segmenter_test",
+    srcs = ["image_segmenter_test.py"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
+    ],
+    deps = [
+        # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:segmentation_options_pb2",
+        "//tensorflow_lite_support/python/task/vision:image_segmenter",
+        "//tensorflow_lite_support/python/task/vision/core:tensor_image",
+        "//tensorflow_lite_support/python/test:base_test",
+        "//tensorflow_lite_support/python/test:test_util",
+        "@absl_py//absl/testing:parameterized",
+    ],
+)
+
+py_test(
     name = "object_detector_test",
     srcs = ["object_detector_test.py"],
     data = [

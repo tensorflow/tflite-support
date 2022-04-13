@@ -64,7 +64,11 @@ PYBIND11_MODULE(_pywrap_audio_embedder, m) {
       .def("get_embedding_dimension", &AudioEmbedder::GetEmbeddingDimension)
       .def("get_number_of_output_layers",
            &AudioEmbedder::GetNumberOfOutputLayers)
-      .def("get_required_audio_format", &AudioEmbedder::GetRequiredAudioFormat)
+      .def("get_required_audio_format",
+           [](AudioEmbedder& self) -> AudioBuffer::AudioFormat {
+             auto audio_format = self.GetRequiredAudioFormat();
+             return core::get_value(audio_format);
+           })
       .def("get_required_input_buffer_size",
            &AudioEmbedder::GetRequiredInputBufferSize);
 }
