@@ -17,7 +17,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** Holds a confidence mask belonging to a single class and its meta data. */
-@interface TFLConfidenceMask : NSObject <NSCopying>
+@interface TFLConfidenceMask : NSObject
 
 /**
  * Confidence masks of size `width` x `height` for any one class.
@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /** Holds category mask and its metadata. */
-@interface TFLCategoryMask : NSObject <NSCopying>
+@interface TFLCategoryMask : NSObject
 
 /**
  * Flattened 2D-array of size `width` x `height`, in row major order.
@@ -80,20 +80,20 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLColoredLabel : NSObject
 
 /** The RGB color components for the label, in the [0, 255] range. */
-@property(nonatomic, assign, readonly) NSUInteger r;
-@property(nonatomic, assign, readonly) NSUInteger g;
-@property(nonatomic, assign, readonly) NSUInteger b;
+@property(nonatomic, readonly) NSUInteger r;
+@property(nonatomic, readonly) NSUInteger g;
+@property(nonatomic, readonly) NSUInteger b;
 
 /** The class name, as provided in the label map packed in the TFLite Model
  * Metadata.
  */
-@property(nonatomic, copy, readonly) NSString *label;
+@property(nonatomic, readonly) NSString *label;
 
 /** The display name, as provided in the label map (if available) packed in
  * the TFLite Model Metadata. See `display_names_locale` field in
  * ImageSegmenterOptions.
  */
-@property(nonatomic, copy, readonly) NSString *displayName;
+@property(nonatomic, readonly) NSString *displayName;
 
 - (instancetype)initWithRed:(NSUInteger)r green:(NSUInteger)g blue:(NSUInteger)b label:(NSString *)label displayName:(NSString *)displayName;
 
@@ -109,14 +109,14 @@ NS_ASSUME_NONNULL_BEGIN
  * this particular class.
  * This property is mutually exclusive with `categoryMask`.
  */
-@property(nonatomic, strong, nullable, readonly) NSArray<TFLConfidenceMask *> *confidenceMasks;
+@property(nonatomic, nullable, readonly) NSArray<TFLConfidenceMask *> *confidenceMasks;
 
 /** Holds the category mask.
  * The value of each pixel in this mask represents the class to which the
  * pixel belongs.
  * This property is mutually exclusive with `confidenceMasks`.
  */
-@property(nonatomic, strong, nullable, readonly) TFLCategoryMask *categoryMask;
+@property(nonatomic, nullable, readonly) TFLCategoryMask *categoryMask;
 
 /**
  * The list of colored labels for all the supported categories (classes).
@@ -125,7 +125,7 @@ NS_ASSUME_NONNULL_BEGIN
  * `colored_labels[i]`, `confidence_masks` indices, i.e. `confidence_masks[i]`
  * is associated with `colored_labels[i]`.
  */
-@property(nonatomic, strong, readonly) NSArray<TFLColoredLabel *> *coloredLabels;
+@property(nonatomic, readonly) NSArray<TFLColoredLabel *> *coloredLabels;
 
 - (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
 - (instancetype)initWithCategoryMask:(TFLCategoryMask *)categoryMask  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
@@ -141,7 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
  * e.g. instance segmentation models, which may return one segmentation per
  * object.
  */
-@property(nonatomic, strong, readonly) NSArray<TFLSegmentation *> *segmentations;
+@property(nonatomic, readonly) NSArray<TFLSegmentation *> *segmentations;
 
 - (instancetype)initWithSegmentations:(NSArray<TFLSegmentation *> *)segmentations;
 
