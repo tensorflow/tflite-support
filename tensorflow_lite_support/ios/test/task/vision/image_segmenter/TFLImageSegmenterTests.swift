@@ -22,7 +22,7 @@ class ImageSegmenterTests: XCTestCase {
   static let bundle = Bundle(for: ImageSegmenterTests.self)
   static let modelPath = bundle.path(
     forResource: "deeplabv3",
-    ofType: "tflite")!
+    ofType: "tflite")
 
   // The maximum fraction of pixels in the candidate mask that can have a
   // different class than the golden mask for the test to pass.
@@ -213,7 +213,7 @@ class ImageSegmenterTests: XCTestCase {
 
     let modelPath = try XCTUnwrap(ImageSegmenterTests.modelPath)
 
-    let imageSegmenterOptions = try XCTUnwrap(ImageSegmenterOptions(modelPath: modelPath))
+    let imageSegmenterOptions = ImageSegmenterOptions(modelPath: modelPath)
 
     let imageSegmenter =
       try ImageSegmenter.imageSegmenter(options: imageSegmenterOptions)
