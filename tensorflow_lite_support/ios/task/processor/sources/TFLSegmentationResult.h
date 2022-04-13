@@ -17,6 +17,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** Holds a confidence mask belonging to a single class and its meta data. */
+NS_SWIFT_NAME(ConfidenceMask)
 @interface TFLConfidenceMask : NSObject
 
 /**
@@ -50,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /** Holds category mask and its metadata. */
+NS_SWIFT_NAME(CategoryMask)
 @interface TFLCategoryMask : NSObject
 
 /**
@@ -93,6 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /** Holds a label associated with an RGB color, for display purposes. */
+NS_SWIFT_NAME(ColoredLabel)
 @interface TFLColoredLabel : NSObject
 
 /** The RGB color components for the label, in the [0, 255] range. */
@@ -130,6 +133,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /** Encapsulates a resulting segmentation mask and associated metadata. */
+NS_SWIFT_NAME(Segmentation)
 @interface TFLSegmentation : NSObject
 
 /**
@@ -184,6 +188,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /** Encapsulates results of any image segmentation task. */
+NS_SWIFT_NAME(SegmentationResult)
 @interface TFLSegmentationResult : NSObject
 
 /** Array of segmentations returned after inference by model.
