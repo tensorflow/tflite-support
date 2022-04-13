@@ -95,6 +95,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property(nonatomic, copy, readonly) NSString *displayName;
 
+- (instancetype)initWithRed:(NSUInteger)r green:(NSUInteger)g blue:(NSUInteger)b label:(NSString *)label displayName:(NSString *)displayName;
+
 @end
 
 /** Encapsulates a resulting segmentation mask and associated metadata. */
@@ -124,6 +126,10 @@ NS_ASSUME_NONNULL_BEGIN
  * is associated with `colored_labels[i]`.
  */
 @property(nonatomic, strong, readonly) NSArray<TFLColoredLabel *> *coloredLabels;
+
+- (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
+- (instancetype)initWithCategoryMasks:(NSArray<TFLCategoryMask *> *)categoryMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
+
 
 @end
 

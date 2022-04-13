@@ -69,18 +69,40 @@
 @end
 
 @implementation TFLColoredLabel
-@synthesize r;
-@synthesize g;
-@synthesize b;
-@synthesize label;
-@synthesize displayName;
+
+- (instancetype)initWithRed:(NSUInteger)r green:(NSUInteger)g blue:(NSUInteger)b label:(NSString *)label displayName:(NSString *)displayName {
+  self = [super init];
+  if (self) {
+    _r = r;
+    _g = g;
+    _b = b;
+    _label = label;
+    _displayName = displayName;
+  }
+  return self;
+}
 
 @end
 
 @implementation TFLSegmentation
-@synthesize confidenceMasks;
-@synthesize categoryMask;
-@synthesize coloredLabels;
+
+- (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
+  return [self initWithConfidenceMasks:confidenceMasks categoryMasks:nil coloredLabels:coloredLabels];
+}
+
+- (instancetype)initWithCategoryMasks:(NSArray<TFLCategoryMask *> *)categoryMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
+  return [self initWithConfidenceMasks:nil categoryMasks:categoryMasks coloredLabels:coloredLabels];self;
+}
+
+- (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks categoryMasks:(NSArray<TFLCategoryMask *> *)categoryMasks coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
+  self = [super init];
+  if (self) {
+    _confidenceMasks = confidenceMasks;
+    _categoryMasks = categoryMasks;
+    _coloredLabels = coloredLabels;
+  }
+  return self;
+}
 
 @end
 
