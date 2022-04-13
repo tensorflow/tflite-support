@@ -80,6 +80,14 @@
 
 - (nullable TFLSegmentationResult *)segmentWithGMLImage:(GMLImage *)image
                                                   error:(NSError *_Nullable *)error {
+
+  if (!image) {
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeInvalidArgumentError
+                          description:@"GMLImage argument cannot be nil."];
+    return nil;
+  }
+                                                    
   TfLiteFrameBuffer *cFrameBuffer = [image cFrameBufferWithError:error];
 
   if (!cFrameBuffer) {
