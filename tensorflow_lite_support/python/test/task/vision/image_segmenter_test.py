@@ -280,7 +280,7 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
     segmentation = segmenter.segment(image).segmentation[0]
     category_mask = np.array(bytearray(segmentation.category_mask))
 
-    # Run segmentation on the model in CATEGORY_MASK mode.
+    # Run segmentation on the model in CONFIDENCE_MASK mode.
     segmenter = _create_segmenter_from_options(
       base_options, output_type=_OutputType.CONFIDENCE_MASK)
 
