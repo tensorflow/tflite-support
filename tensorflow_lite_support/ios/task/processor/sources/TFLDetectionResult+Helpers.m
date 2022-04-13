@@ -18,7 +18,7 @@
 @implementation TFLDetectionResult (Helpers)
 
 + (TFLDetectionResult *)detectionResultWithCResult:(TfLiteDetectionResult *)cDetectionResult {
-  if (cDetectionResult == nil) return nil;
+  if (!cDetectionResult) return nil;
 
   NSMutableArray *detections = [[NSMutableArray alloc] init];
   for (int i = 0; i < cDetectionResult->size; i++) {
