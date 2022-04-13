@@ -83,7 +83,6 @@ class TFLObjectDetectorTests: XCTestCase {
     let modelPath = try XCTUnwrap(TFLObjectDetectorTests.modelPath)
 
     let objectDetectorOptions = TFLObjectDetectorOptions(modelPath: modelPath)
-    XCTAssertNotNil(objectDetectorOptions)
 
     let objectDetector =
       try TFLObjectDetector.objectDetector(options: objectDetectorOptions!)
@@ -103,7 +102,7 @@ class TFLObjectDetectorTests: XCTestCase {
 
     let modelPath = try XCTUnwrap(TFLObjectDetectorTests.modelPath)
 
-    let objectDetectorOptions = try XCTUnwrap(TFLObjectDetectorOptions(modelPath: modelPath))
+    let objectDetectorOptions = TFLObjectDetectorOptions(modelPath: modelPath)
 
     let maxResults = 3
     objectDetectorOptions.classificationOptions.maxResults = maxResults
