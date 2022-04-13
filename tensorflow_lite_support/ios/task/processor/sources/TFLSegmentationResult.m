@@ -13,6 +13,7 @@
  limitations under the License.
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSegmentationResult.h"
+#import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 
 @implementation TFLCategoryMask
 
@@ -22,8 +23,10 @@
     _width = width;
     _height = height;
     if (mask != NULL) {
-      _mask = malloc(width * height * sizeof(UInt8));
-      memcpy(_mask, mask, width * height * sizeof(UInt8));
+      _mask = [TFLCommonUtils mallocWithSize:width * height * sizeof(UInt8) error:nil];
+      if (_mask) {
+        memcpy(_mask, mask, width * height * sizeof(UInt8));
+      }
     }
   }
   return self;
@@ -49,8 +52,10 @@
     _width = width;
     _height = height;
     if (mask != NULL) {
-      _mask = malloc(width * height * sizeof(float));
-      memcpy(_mask, mask, width * height * sizeof(float));
+      _mask = [TFLCommonUtils mallocWithSize:width * height * sizeof(float) error:nil];
+      if (_mask) {
+        memcpy(_mask, mask, width * height * sizeof(float));
+      }
     }
   }
   return self;
