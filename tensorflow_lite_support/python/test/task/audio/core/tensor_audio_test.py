@@ -132,8 +132,7 @@ class TensorAudioTest(parameterized.TestCase, tf.test.TestCase):
     self.assertEqual(audio_format.sample_rate, _SAMPLE_RATE)
     self.assertEqual(self.test_tensor_audio.buffer_size, _BUFFER_SIZE)
     self.assertIsInstance(audio_buffer, np.ndarray)
-    self.assertAllClose(audio_buffer[-size:],
-                                array[offset:offset + size])
+    self.assertAllClose(audio_buffer[-size:], array[offset:offset + size])
 
   @parameterized.parameters((7800, 15600), (0, 20000))
   def test_load_from_array_fails_with_invalid_offset_size(self, offset, size):
