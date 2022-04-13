@@ -32,12 +32,6 @@
   return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
-  return [[TFLCategoryMask alloc] initWithWidth:self.width
-                                         height:self.height
-                                           mask:self.mask];
-}
-
 - (void)dealloc {
   free(self.mask);
 }
@@ -59,12 +53,6 @@
     }
   }
   return self;
-}
-
-- (id)copyWithZone:(NSZone *)zone {
-  return [[TFLConfidenceMask alloc] initWithWidth:self.width
-                                           height:self.height
-                                             mask:self.mask];
 }
 
 - (void)dealloc {
@@ -103,7 +91,7 @@
   self = [super init];
   if (self) {
     _confidenceMasks = [confidenceMasks copy];
-    _categoryMask = [categoryMask cop];
+    _categoryMask = categoryMask; // Not copying since not an array and all properties are readonly.
     _coloredLabels = [coloredLabels copy];
   }
   return self;
