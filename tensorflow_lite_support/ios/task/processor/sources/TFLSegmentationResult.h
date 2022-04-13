@@ -17,7 +17,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** Holds a confidence mask belonging to a single class and its meta data. */
-@interface TFLConfidenceMask : NSObject
+@interface TFLConfidenceMask : NSObject <NSCopying>
 
 /**
  * Confidence masks of size `width` x `height` for any one class.
@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /** Holds category mask and its metadata. */
-@interface TFLCategoryMask : NSObject
+@interface TFLCategoryMask : NSObject <NSCopying>
 
 /**
  * Flattened 2D-array of size `width` x `height`, in row major order.
