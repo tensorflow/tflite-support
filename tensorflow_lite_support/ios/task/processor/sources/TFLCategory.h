@@ -21,16 +21,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Index of the class in the corresponding label map, usually packed in the TFLite Model
  * Metadata. */
-@property(nonatomic, assign, readonly) NSInteger index;
+@property(nonatomic, readonly) NSInteger index;
 
 /** Confidence score for this class . */
-@property(nonatomic, assign, readonly) float score;
+@property(nonatomic, readonly) float score;
 
 /** Class name of the class. */
-@property(nonatomic, strong, readonly, nullable) NSString *label;
+@property(nonatomic, readonly, nullable) NSString *label;
 
 /** Display name of the class. */
-@property(nonatomic, strong, readonly, nullable) NSString *displayName;
+@property(nonatomic, readonly, nullable) NSString *displayName;
 
 /**
  * Initializes TFLCategory.
