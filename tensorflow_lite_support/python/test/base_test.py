@@ -13,12 +13,12 @@
 # limitations under the License.
 """Base TestCase for the unit tests."""
 
-import unittest
+import tensorflow as tf
 
 __unittest = True  # Allows shorter stack trace for .assertDeepAlmostEqual  pylint: disable=invalid-name
 
 
-class BaseTestCase(unittest.TestCase):
+class BaseTestCase(tf.test.TestCase):
   """Base test case."""
 
   def assertDeepAlmostEqual(self, expected, actual, **kwargs):

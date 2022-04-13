@@ -10,6 +10,9 @@ py_library(
     testonly = 1,
     srcs = ["base_test.py"],
     srcs_version = "PY3",
+    deps = [
+        # build rule placeholder: tensorflow dep,
+    ],
 )
 
 py_library(

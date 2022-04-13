@@ -15,11 +15,11 @@
 
 import enum
 import json
+import tensorflow as tf
 
 from absl.testing import parameterized
-
 from google.protobuf import json_format
-import unittest
+from tensorflow.python.platform import test
 from tensorflow_lite_support.python.task.audio import audio_classifier
 from tensorflow_lite_support.python.task.audio.core import audio_record
 from tensorflow_lite_support.python.task.audio.core import tensor_audio
@@ -30,10 +30,7 @@ from tensorflow_lite_support.python.task.processor.proto import classifications_
 from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
 
-# TODO(b/220067158): Change to import tensorflow and leverage tf.test once
-# fixed the dependency issue.
-
-_mock = unittest.mock
+_mock = test.mock
 _BaseOptions = base_options_pb2.BaseOptions
 _AudioClassifier = audio_classifier.AudioClassifier
 _AudioClassifierOptions = audio_classifier.AudioClassifierOptions
@@ -332,4 +329,4 @@ class AudioClassifierTest(parameterized.TestCase, base_test.BaseTestCase):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  tf.test.main()

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for tensor_audio."""
-from absl.testing import parameterized
 import numpy as np
-
 import tensorflow as tf
+
+from absl.testing import parameterized
 from tensorflow.python.platform import test
 from tensorflow_lite_support.python.task.audio.core import audio_record
 from tensorflow_lite_support.python.task.audio.core import tensor_audio

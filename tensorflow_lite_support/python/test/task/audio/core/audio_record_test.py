@@ -14,8 +14,8 @@
 """Tests for audio_record."""
 
 import numpy as np
-
 import tensorflow as tf
+
 from tensorflow.python.platform import test
 from tensorflow_lite_support.python.task.audio.core import audio_record
 

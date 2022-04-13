@@ -14,12 +14,10 @@
 """Tests for audio_embedder."""
 
 import enum
+import tensorflow as tf
 
 from absl.testing import parameterized
-# TODO(b/220067158): Change to import tensorflow and leverage tf.test once
-# fixed the dependency issue.
-import unittest
-
+from tensorflow.python.platform import test
 from tensorflow_lite_support.python.task.audio import audio_embedder
 from tensorflow_lite_support.python.task.audio.core import audio_record
 from tensorflow_lite_support.python.task.audio.core import tensor_audio
@@ -28,7 +26,7 @@ from tensorflow_lite_support.python.task.processor.proto import embedding_option
 from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
 
-_mock = unittest.mock
+_mock = test.mock
 _BaseOptions = base_options_pb2.BaseOptions
 _AudioEmbedder = audio_embedder.AudioEmbedder
 _AudioEmbedderOptions = audio_embedder.AudioEmbedderOptions
@@ -176,4 +174,4 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  tf.test.main()

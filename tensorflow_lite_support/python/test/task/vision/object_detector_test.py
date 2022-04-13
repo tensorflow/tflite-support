@@ -15,12 +15,10 @@
 
 import enum
 import json
+import tensorflow as tf
 
 from absl.testing import parameterized
-# TODO(b/220067158): Change to import tensorflow and leverage tf.test once
-# fixed the dependency issue.
 from google.protobuf import json_format
-import unittest
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import class_pb2
@@ -167,7 +165,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
       base_options = _BaseOptions(file_content=model_content)
     else:
       # Should never happen
-      raise ValueError('model_file_type is invalid.')
+      raise ValueError("model_file_type is invalid.")
 
     detector = _create_detector_from_options(
         base_options, max_results=max_results)
@@ -205,8 +203,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
       score = category['classes'][0]['score']
       self.assertGreaterEqual(
           score, _SCORE_THRESHOLD,
-          'Classification with score lower than threshold found. {0}'.format(
-              category))
+          f"Classification with score lower than threshold found. {category}")
 
   def test_max_results_option(self):
     # Creates detector.
@@ -223,7 +220,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
     detections = image_result_dict['detections']
 
     self.assertLessEqual(
-        len(detections), _MAX_RESULTS, 'Too many results returned.')
+        len(detections), _MAX_RESULTS, "Too many results returned.")
 
   def test_allow_list_option(self):
     # Creates detector.
@@ -244,7 +241,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
       label = category['classes'][0]['className']
       self.assertIn(
           label, _ALLOW_LIST,
-          'Label "{0}" found but not in label allow list'.format(label))
+          f"Label {label} found but not in label allow list")
 
   def test_deny_list_option(self):
     # Creates detector.
@@ -264,14 +261,14 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
     for category in categories:
       label = category['classes'][0]['className']
       self.assertNotIn(label, _DENY_LIST,
-                       'Label "{0}" found but in deny list.'.format(label))
+                       f"Label {label} found but in deny list.")
 
   def test_combined_allowlist_and_denylist(self):
     # Fails with combined allowlist and denylist
     with self.assertRaisesRegex(
         ValueError,
-        r'`class_name_whitelist` and `class_name_blacklist` are mutually '
-        r'exclusive options.'):
+        r"`class_name_whitelist` and `class_name_blacklist` are mutually "
+        r"exclusive options."):
       base_options = _BaseOptions(file_name=self.model_path)
       detection_options = detection_options_pb2.DetectionOptions(
           class_name_allowlist=['foo'], class_name_denylist=['bar'])
@@ -281,4 +278,4 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  tf.test.main()

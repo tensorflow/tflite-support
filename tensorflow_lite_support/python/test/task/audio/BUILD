@@ -13,6 +13,7 @@ py_test(
         "//tensorflow_lite_support/cc/test/testdata/task/audio:test_models",
     ],
     deps = [
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/python/task/audio:audio_embedder",
         "//tensorflow_lite_support/python/task/audio/core:audio_record",
         "//tensorflow_lite_support/python/task/audio/core:tensor_audio",
@@ -32,6 +33,7 @@ py_test(
         "//tensorflow_lite_support/cc/test/testdata/task/audio:test_models",
     ],
     deps = [
+        # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/python/task/audio:audio_classifier",
         "//tensorflow_lite_support/python/task/audio/core:audio_record",
         "//tensorflow_lite_support/python/task/audio/core:tensor_audio",
