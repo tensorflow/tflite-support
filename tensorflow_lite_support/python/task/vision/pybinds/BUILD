@@ -44,6 +44,22 @@ pybind_extension(
 )
 
 pybind_extension(
+    name = "_pywrap_image_segmenter",
+    srcs = [
+        "_pywrap_image_segmenter.cc",
+    ],
+    module_name = "_pywrap_image_segmenter",
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/vision:image_segmenter",
+        "//tensorflow_lite_support/examples/task/vision/desktop/utils:image_utils",
+        "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
+        "@pybind11",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)
+
+pybind_extension(
     name = "_pywrap_object_detector",
     srcs = [
         "_pywrap_object_detector.cc",
