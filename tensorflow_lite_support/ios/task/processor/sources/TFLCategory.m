@@ -24,8 +24,8 @@
   if (self) {
     _index = index;
     _score = score;
-    _label = label;
-    _displayName = displayName;
+    _label = [label copy];
+    _displayName = [displayName copy];
   }
   return self;
 }
