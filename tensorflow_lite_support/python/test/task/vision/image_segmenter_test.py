@@ -253,6 +253,10 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
     num_pixels = gt_segmentation_shape[0] * gt_segmentation_shape[1]
     ground_truth_pixels = gt_segmentation_array.flatten()
 
+    self.assertEqual(
+      len(result_pixels), len(ground_truth_pixels),
+      "Segmentation mask size does not match the ground truth mask size.")
+
     inconsistent_pixels = 0
 
     for index in range(num_pixels):
@@ -260,9 +264,10 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
           result_pixels[index] * _MASK_MAGNIFICATION_FACTOR !=
           ground_truth_pixels[index])
 
-    self.assertLessEqual(inconsistent_pixels / num_pixels,
-                         _MATCH_PIXELS_THRESHOLD,
-                         "Segmentation mask value must be the same size as ground truth.")
+    self.assertLessEqual(
+      inconsistent_pixels / num_pixels, _MATCH_PIXELS_THRESHOLD,
+      f"Number of pixels in the candidate mask differing from that of the "
+      f"ground truth mask exceeds {_MATCH_PIXELS_THRESHOLD}.")
 
   def test_segmentation_confidence_mask_matches_category_mask(self):
     """Check if the confidence mask matches with the category mask."""
