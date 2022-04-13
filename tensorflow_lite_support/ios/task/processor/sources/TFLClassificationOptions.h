@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Holds settings for any single classification task.
  */
+NS_SWIFT_NAME(ClassificationOptions)
 @interface TFLClassificationOptions : NSObject <NSCopying>
 
 /** If set, all classes  in this list will be filtered out from the results . */

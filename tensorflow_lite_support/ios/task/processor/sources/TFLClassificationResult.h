@@ -18,6 +18,7 @@ limitations under the License.
 NS_ASSUME_NONNULL_BEGIN
 
 /** Encapsulates list of predicted classes (aka labels) for a given image classifier head. */
+NS_SWIFT_NAME(Classifications)
 @interface TFLClassifications : NSObject
 
 /**
@@ -46,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /** Encapsulates results of any classification task. */
+NS_SWIFT_NAME(ClassificationResult)
 @interface TFLClassificationResult : NSObject
 
 /** Array of TFLClassifications objects containing image classifier predictions per image classifier

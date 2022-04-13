@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Options to configure TFLImageClassifier.
  */
+NS_SWIFT_NAME(ImageClassifierOptions)
 @interface TFLImageClassifierOptions : NSObject
 
 /**
@@ -61,6 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A TensorFlow Lite Task Image Classifiier.
  */
+NS_SWIFT_NAME(ImageClassifier)
 @interface TFLImageClassifier : NSObject
 
 /**
