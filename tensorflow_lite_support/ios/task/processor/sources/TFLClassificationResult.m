@@ -21,7 +21,7 @@ limitations under the License.
   self = [super init];
   if (self) {
     _headIndex = headIndex;
-    _categories = categories;
+    _categories = [categories copy];
   }
   return self;
 }
@@ -35,7 +35,7 @@ limitations under the License.
 - (instancetype)initWithClassifications:(NSArray<TFLClassifications *> *)classifications {
   self = [super init];
   if (self) {
-    _classifications = classifications;
+    _classifications = [classifications copy];
   }
   return self;
 }
