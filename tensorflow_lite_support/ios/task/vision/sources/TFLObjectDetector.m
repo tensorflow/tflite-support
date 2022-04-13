@@ -65,6 +65,14 @@
 
 + (nullable instancetype)objectDetectorWithOptions:(TFLObjectDetectorOptions *)options
                                              error:(NSError **)error {
+
+  if (!options) {
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeInvalidArgumentError
+                          description:@"TFLObjectDetectorOptions argument cannot be nil."];
+    return nil;
+  }
+
   TfLiteObjectDetectorOptions cOptions = TfLiteObjectDetectorOptionsCreate();
   if (!
       [options.classificationOptions copyToCOptions:&(cOptions.classification_options) error:error])
