@@ -18,7 +18,7 @@
 
 + (TFLSegmentationResult *)segmentationResultWithCResult:
     (TfLiteSegmentationResult *)cSegmentationResult {
-  if (cSegmentationResult == nil) return nil;
+  if (!cSegmentationResult) return nil;
 
   NSMutableArray *segmentations = [[NSMutableArray alloc] init];
   for (int i = 0; i < cSegmentationResult->size; i++) {
