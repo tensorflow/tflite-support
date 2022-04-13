@@ -21,12 +21,14 @@ from absl.testing import parameterized
 import unittest
 
 from tensorflow_lite_support.python.task.audio import audio_embedder
+from tensorflow_lite_support.python.task.audio.core import audio_record
 from tensorflow_lite_support.python.task.audio.core import tensor_audio
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
 
+_mock = unittest.mock
 _BaseOptions = base_options_pb2.BaseOptions
 _AudioEmbedder = audio_embedder.AudioEmbedder
 _AudioEmbedderOptions = audio_embedder.AudioEmbedderOptions
@@ -59,7 +61,7 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
-        RuntimeError,
+        ValueError,
         r"ExternalFile must specify at least one of 'file_content', "
         r"'file_name' or 'file_descriptor_meta'."):
       options = _AudioEmbedderOptions(_BaseOptions(file_name=""))
@@ -71,6 +73,31 @@ class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
       options = _AudioEmbedderOptions(_BaseOptions(file_content=f.read()))
       embedder = _AudioEmbedder.create_from_options(options)
       self.assertIsInstance(embedder, _AudioEmbedder)
+
+  def test_create_input_tensor_audio_from_embedder_succeeds(self):
+    # Creates TensorAudio instance using the embedder successfully.
+    base_options = _BaseOptions(file_name=self.model_path)
+    options = _AudioEmbedderOptions(base_options=base_options)
+    embedder = _AudioEmbedder.create_from_options(options)
+    self.assertIsInstance(embedder, _AudioEmbedder)
+    tensor = embedder.create_input_tensor_audio()
+    self.assertIsInstance(tensor, tensor_audio.TensorAudio)
+    self.assertEqual(tensor.format.channels, 1)
+    self.assertEqual(tensor.format.sample_rate, 16000)
+    self.assertEqual(tensor.buffer_size, 15600)
+
+  @_mock.patch("sounddevice.InputStream", return_value=_mock.MagicMock())
+  def test_create_audio_record_from_embedder_succeeds(self, _):
+    # Creates AudioRecord instance using the embedder successfully.
+    base_options = _BaseOptions(file_name=self.model_path)
+    options = _AudioEmbedderOptions(base_options=base_options)
+    embedder = _AudioEmbedder.create_from_options(options)
+    self.assertIsInstance(embedder, _AudioEmbedder)
+    record = embedder.create_audio_record()
+    self.assertIsInstance(record, audio_record.AudioRecord)
+    self.assertEqual(record.channels, 1)
+    self.assertEqual(record.sampling_rate, 16000)
+    self.assertEqual(record.buffer_size, 15600)
 
   @parameterized.parameters((_YAMNET_EMBEDDING_MODEL_FILE, False, False,
                              ModelFileType.FILE_NAME, 1024, 0.091439),

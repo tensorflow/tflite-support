@@ -55,8 +55,9 @@ class ImageClassifier(object):
     Returns:
       `ImageClassifier` object that's created from the model file.
     Raises:
-      RuntimeError if failed to create `ImageClassifier` object from the
-      provided file such as invalid file.
+      ValueError: If failed to create `ImageClassifier` object from the
+        provided file such as invalid file.
+      RuntimeError: If other types of error occurred.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = ImageClassifierOptions(base_options=base_options)
@@ -72,8 +73,9 @@ class ImageClassifier(object):
     Returns:
       `ImageClassifier` object that's created from `options`.
     Raises:
-      RuntimeError if failed to create `ImageClassifier` object from
-      `ImageClassifierOptions` such as missing the model.
+      ValueError: If failed to create `ImageClassifier` object from
+        `ImageClassifierOptions` such as missing the model.
+      RuntimeError: If other types of error occurred.
     """
     classifier = _CppImageClassifier.create_from_options(
         options.base_options, options.classification_options)
@@ -92,10 +94,13 @@ class ImageClassifier(object):
         extraction only on the provided region of interest. Note that the region
         of interest is not clamped, so this method will fail if the region is
         out of bounds of the input image.
+
     Returns:
       classification result.
+
     Raises:
-      RuntimeError if failed to get the feature vector.
+      ValueError: If any of the input arguments is invalid.
+      RuntimeError: If failed to run classification.
     """
     image_data = image_utils.ImageData(image.buffer)
     if bounding_box is None:

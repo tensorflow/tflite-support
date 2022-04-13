@@ -251,6 +251,13 @@ cc_proto_library(
     ],
 )
 
+support_py_proto_library(
+    name = "segmentations_py_pb2",
+    srcs = ["segmentations.proto"],
+    api_version = 2,
+    proto_deps = [":segmentations_proto"],
+)
+
 cc_library(
     name = "segmentations_proto_inc",
     hdrs = ["segmentations_proto_inc.h"],
@@ -318,4 +325,21 @@ cc_library(
     name = "embeddings_proto_inc",
     hdrs = ["embeddings_proto_inc.h"],
     deps = [":embeddings_cc_proto"],
+)
+
+proto_library(
+    name = "image_searcher_options_proto",
+    srcs = ["image_searcher_options.proto"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:search_options_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "image_searcher_options_cc_proto",
+    deps = [
+        ":image_searcher_options_proto",
+    ],
 )

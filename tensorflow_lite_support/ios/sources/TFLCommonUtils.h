@@ -21,36 +21,37 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLCommonUtils : NSObject
 
 /**
- * Creates and saves an error originating from the task library with the given error code and
- * description.
+ * Creates and saves an NSError with the given code and description.
  *
  * @param code Error code.
  * @param description Error description.
- * @return A NSError instance.
+ * @param error Pointer to the memory location where the created error should be saved. If `nil`,
+ * no error will be saved.
  */
-+ (NSError *)customErrorWithCode:(NSInteger)code
-                description:(NSString *)description;
++ (void)createCustomError:(NSError **)error
+                 withCode:(NSInteger)code
+              description:(NSString *)description;
 
 /**
- * Creates and saves an error originating from the task library from a C library error,
- * TfLiteSupportError .
+ * Converts a C library error, TfLiteSupportError to an NSError.
  *
  * @param supportError C library error.
- * @return A NSError instance.
+ * @param error Pointer to the memory location where the created error should be saved. If `nil`,
+ * no error will be saved.
  */
-+ (NSError *)errorWithCError:(TfLiteSupportError *)supportError;
++ (BOOL)checkCError:(TfLiteSupportError *)supportError toError:(NSError **)error;
 
 /**
- * Allocates a block of memory with the specified size and returns a pointer to it. If memory cannot
- * be allocated because of an invalid memSize, it saves an error. In other cases, it terminates
- * program execution.
+ * Allocates a block of memory with the specified size and returns a pointer to it. If memory
+ * cannot be allocated because of an invalid memSize, it saves an error. In other cases, it
+ * terminates program execution.
  *
  * @param memSize size of memory to be allocated
  * @param error Pointer to the memory location where errors if any should be saved. If `nil`, no
  * error will be saved.
  *
- * @return Pointer to the allocated block of memory on successfull allocation. nil in case as error
- * is encountered because of invalid memSize. If failure is due to any other reason, method
+ * @return Pointer to the allocated block of memory on successfull allocation. nil in case as
+ * error is encountered because of invalid memSize. If failure is due to any other reason, method
  * terminates program execution.
  */
 + (void *)mallocWithSize:(size_t)memSize error:(NSError **)error;
