@@ -51,7 +51,7 @@ class TensorImageTest(tf.test.TestCase, parameterized.TestCase):
     self.assertEqual(image.width, width)
     self.assertEqual(image.color_space_type, color_type)
     self.assertIsInstance(image.buffer, np.ndarray)
-    self.assertAllEqual(image.buffer, array)
+    self.assertAllClose(image.buffer, array)
 
 
 if __name__ == '__main__':
