@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** The array of predicted classes, usually sorted by descending scores (e.g.from high to low
  * probability). */
-@property(nonatomic, readonly) NSArray<TFLCategory *> *categories;
+@property(nonatomic, strong, readonly) NSArray<TFLCategory *> *categories;
 
 /**
  * Initializes TFLClassifications.
@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** Array of TFLClassifications objects containing image classifier predictions per image classifier
  * head.
  */
-@property(nonatomic, readonly) NSArray<TFLClassifications *> *classifications;
+@property(nonatomic, strong, readonly) NSArray<TFLClassifications *> *classifications;
 
 /**
  * Initializes TFLClassificationResult.

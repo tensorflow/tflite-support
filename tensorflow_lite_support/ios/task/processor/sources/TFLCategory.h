@@ -27,10 +27,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign, readonly) float score;
 
 /** Class name of the class. */
-@property(nonatomic, readonly, nullable) NSString *label;
+@property(nonatomic, strong, readonly, nullable) NSString *label;
 
 /** Display name of the class. */
-@property(nonatomic, readonly, nullable) NSString *displayName;
+@property(nonatomic, strong, readonly, nullable) NSString *displayName;
 
 /**
  * Initializes TFLCategory.

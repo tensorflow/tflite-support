@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** The array of predicted classes, usually sorted by descending scores (e.g.from high to low
  * probability). */
-@property(nonatomic, readonly) NSArray<TFLCategory *> *categories;
+@property(nonatomic, strong, readonly) NSArray<TFLCategory *> *categories;
 
 /**
  * Initializes TFLDetection.
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** Encapsulates results of any object detection task. */
 @interface TFLDetectionResult : NSObject
 
-@property(nonatomic, readonly) NSArray<TFLDetection *> *detections;
+@property(nonatomic, strong, readonly) NSArray<TFLDetection *> *detections;
 
 /**
  * Initializes TFLDetectionResult.
