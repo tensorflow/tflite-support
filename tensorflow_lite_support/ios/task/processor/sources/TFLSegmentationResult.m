@@ -76,8 +76,8 @@
     _r = r;
     _g = g;
     _b = b;
-    _label = label;
-    _displayName = displayName;
+    _label = [label copy];
+    _displayName = [displayName copy];
   }
   return self;
 }
@@ -97,9 +97,9 @@
 - (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks categoryMask:(TFLCategoryMask *)categoryMask coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
   self = [super init];
   if (self) {
-    _confidenceMasks = confidenceMasks;
-    _categoryMask = categoryMask;
-    _coloredLabels = coloredLabels;
+    _confidenceMasks = [confidenceMasks copy];
+    _categoryMask = [categoryMask cop];
+    _coloredLabels = [coloredLabels copy];
   }
   return self;
 }
@@ -110,7 +110,7 @@
 - (instancetype)initWithSegmentations:(NSArray<TFLSegmentation *> *)segmentations {
   self = [super init];
   if (self) {
-    _segmentations = segmentations;
+    _segmentations = [segmentations copy];
   }
 
   return self;
