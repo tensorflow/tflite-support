@@ -79,7 +79,7 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
  * @return An instance of TFLImageSegmenterOptions set to the specified
  * modelPath.
  */
-- (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath;
+- (instancetype)initWithModelPath:(nonnull NSString *)modelPath;
 
 @end
 
