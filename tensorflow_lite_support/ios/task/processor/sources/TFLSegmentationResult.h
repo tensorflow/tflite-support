@@ -128,8 +128,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, readonly) NSArray<TFLColoredLabel *> *coloredLabels;
 
 - (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
-- (instancetype)initWithCategoryMasks:(NSArray<TFLCategoryMask *> *)categoryMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
-
+- (instancetype)initWithCategoryMask:(TFLCategoryMask *)categoryMask  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
 
 @end
 
@@ -143,6 +142,8 @@ NS_ASSUME_NONNULL_BEGIN
  * object.
  */
 @property(nonatomic, strong, readonly) NSArray<TFLSegmentation *> *segmentations;
+
+- (instancetype)initWithSegmentations:(NSArray<TFLSegmentation *> *)segmentations;
 
 @end
 

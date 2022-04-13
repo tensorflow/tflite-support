@@ -45,7 +45,6 @@
     }
 
     TFLSegmentation *segmentation;
-    segmentation.coloredLabels = coloredLabels;
 
     if (cSegmentation.confidence_masks) {
       NSMutableArray *confidenceMasks = [[NSMutableArray alloc] init];
@@ -62,15 +61,13 @@
       TFLCategoryMask *categoryMask = [[TFLCategoryMask alloc] initWithWidth:(NSInteger)cSegmentation.width
                                           height:(NSInteger)cSegmentation.height
                                             mask:cSegmentation.category_mask];
-    }
-      segmentation = [[TFLSegmentation alloc] initWithCategoryMasks:categoryMask coloredLabels:coloredLabels];
+      segmentation = [[TFLSegmentation alloc] initWithCategoryMask:categoryMask coloredLabels:coloredLabels];
     }
 
     [segmentations addObject:segmentation];
   }
 
-  TFLSegmentationResult *segmentationResult = [[TFLSegmentationResult alloc] init];
-  segmentationResult.segmentations = segmentations;
-  return segmentationResult;
+  return [[TFLSegmentationResult alloc] initWithSegmentations:segmentations];
 }
+
 @end

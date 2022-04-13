@@ -87,18 +87,18 @@
 @implementation TFLSegmentation
 
 - (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
-  return [self initWithConfidenceMasks:confidenceMasks categoryMasks:nil coloredLabels:coloredLabels];
+  return [self initWithConfidenceMasks:confidenceMasks categoryMask:nil coloredLabels:coloredLabels];
 }
 
-- (instancetype)initWithCategoryMasks:(NSArray<TFLCategoryMask *> *)categoryMasks  coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
-  return [self initWithConfidenceMasks:nil categoryMasks:categoryMasks coloredLabels:coloredLabels];self;
+- (instancetype)initWithCategoryMask:(TFLCategoryMask *)categoryMask coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
+  return [self initWithConfidenceMasks:nil categoryMask:categoryMask coloredLabels:coloredLabels];
 }
 
-- (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks categoryMasks:(NSArray<TFLCategoryMask *> *)categoryMasks coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
+- (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks categoryMask:(TFLCategoryMask *)categoryMask coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels {
   self = [super init];
   if (self) {
     _confidenceMasks = confidenceMasks;
-    _categoryMasks = categoryMasks;
+    _categoryMask = categoryMask;
     _coloredLabels = coloredLabels;
   }
   return self;
@@ -107,6 +107,12 @@
 @end
 
 @implementation TFLSegmentationResult
-@synthesize segmentations;
+- (instancetype)initWithSegmentations:(NSArray<TFLSegmentation *> *)segmentations {
+  self = [super init];
+  if (self) {
+    _segmentations = segmentations;
+  }
 
+  return self;
+}
 @end
