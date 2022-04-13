@@ -157,7 +157,7 @@ class ModelFileType(enum.Enum):
   FILE_NAME = 2
 
 
-class ImageSegmenterTest(parameterized.TestCase, unittest.TestCase):
+class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
 
   def setUp(self):
     super().setUp()
