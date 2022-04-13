@@ -29,10 +29,9 @@ class TFLImageClassifierTests: XCTestCase {
     let modelPath = try XCTUnwrap(TFLImageClassifierTests.modelPath)
 
     let imageClassifierOptions = TFLImageClassifierOptions(modelPath: modelPath)
-    XCTAssertNotNil(imageClassifierOptions)
 
     let imageClassifier =
-      try TFLImageClassifier.imageClassifier(options: imageClassifierOptions!)
+      try TFLImageClassifier.imageClassifier(options: imageClassifierOptions)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -59,7 +58,7 @@ class TFLImageClassifierTests: XCTestCase {
     let imageClassifierOptions = TFLImageClassifierOptions(modelPath: modelPath)
 
     let maxResults = 3
-    imageClassifierOptions!.classificationOptions.maxResults = maxResults
+    imageClassifierOptions.classificationOptions.maxResults = maxResults
 
     let imageClassifier =
       try TFLImageClassifier.imageClassifier(options: imageClassifierOptions)
