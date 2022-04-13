@@ -208,7 +208,7 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
       base_options = _BaseOptions(file_content=model_content)
     else:
       # Should never happen
-      raise ValueError('model_file_type is invalid.')
+      raise ValueError("model_file_type is invalid.")
 
     segmenter = _create_segmenter_from_options(base_options)
 
@@ -222,7 +222,7 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
     # Check if the sizes of the result and expected colored labels are the same.
     self.assertEqual(
         len(colored_labels), len(expected_colored_labels),
-        'Number of colored labels do not match.')
+        "Number of colored labels do not match.")
 
     # Comparing results.
     for index in range(len(expected_colored_labels)):
@@ -297,9 +297,9 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
     colored_labels = segmentation.colored_labels
 
     # Check if confidence mask shape is correct.
-    self.assertEqual(len(confidence_masks), len(colored_labels),
-                     'Number of confidence masks must match with number of '
-                     'categories.')
+    self.assertEqual(
+      len(confidence_masks), len(colored_labels),
+      "Number of confidence masks must match with number of categories.")
 
     # Gather the confidence masks in a single array `confidence_mask_array`.
     confidence_mask_array = np.array([
@@ -307,8 +307,9 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
 
     # Compute the category mask from the created confidence mask.
     calculated_category_mask = np.argmax(confidence_mask_array, axis=0)
-    self.assertListEqual(calculated_category_mask.tolist(),
-                         category_mask.tolist())
+    self.assertListEqual(
+      calculated_category_mask.tolist(), category_mask.tolist(),
+      "Confidence mask does not match with the category mask.")
 
 
 if __name__ == '__main__':
