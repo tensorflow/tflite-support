@@ -29,19 +29,18 @@
       
       NSString *label;
       NSString *displayName;
-      if (cColoredLabel.display_name != nil) {
+      if (cColoredLabel.display_name) {
         displayName = [NSString stringWithCString:cColoredLabel.display_name
-                                                      encoding:NSUTF8StringEncoding];
+                                                      encoding:NSUTF8StringEncoding];                                             
       }
 
-      if (cColoredLabel.label != nil) {
+      if (cColoredLabel.label) {
         label = [NSString stringWithCString:cColoredLabel.label
                                                 encoding:NSUTF8StringEncoding];
       }
-
+            
       TFLColoredLabel *coloredLabel = [[TFLColoredLabel alloc] initWithRed:(NSUInteger)cColoredLabel.r green:(NSUInteger)cColoredLabel.g blue:(NSUInteger)cColoredLabel.b label:label displayName:displayName];
       [coloredLabels addObject:coloredLabel];
-
     }
 
     TFLSegmentation *segmentation;
