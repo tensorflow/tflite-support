@@ -30,7 +30,7 @@
       [categories addObject:[TFLCategory categoryWithCCategory:&cCategory]];
     }
     TFLClassifications *classifications = [[TFLClassifications alloc] initWithHeadIndex:i
-                                                                      categories:categories];
+                                                                             categories:categories];
 
     [classificationHeads addObject:classifications];
   }

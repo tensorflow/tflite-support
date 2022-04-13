@@ -301,8 +301,7 @@
   } else {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
-                          description:@"CIImage should have CGImage or "
-                                       "CVPixelBuffer info."];
+                          description:@"CIImage should have CGImage or CVPixelBuffer info."];
   }
 
   if (buffer == NULL) {

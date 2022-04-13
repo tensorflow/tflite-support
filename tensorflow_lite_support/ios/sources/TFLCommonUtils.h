@@ -25,12 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param code Error code.
  * @param description Error description.
- *  @param error Pointer to the memory location where the created error should be saved. If `nil`,
+ * @param error Pointer to the memory location where the created error should be saved. If `nil`,
  * no error will be saved.
  */
 + (void)createCustomError:(NSError **)error
                  withCode:(NSInteger)code
               description:(NSString *)description;
+
 /**
  * Converts a C library error, TfLiteSupportError to an NSError.
  *
@@ -38,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param error Pointer to the memory location where the created error should be saved. If `nil`,
  * no error will be saved.
  */
-+ (void)convertCError:(TfLiteSupportError *)supportError toError:(NSError **)error;
++ (BOOL)checkCError:(TfLiteSupportError *)supportError toError:(NSError **)error;
 
 /**
  * Allocates a block of memory with the specified size and returns a pointer to it. If memory

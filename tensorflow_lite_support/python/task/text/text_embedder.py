@@ -52,8 +52,9 @@ class TextEmbedder(object):
     Returns:
       `TextEmbedder` object that's created from the model file.
     Raises:
-      RuntimeError if failed to create `TextEmbedder` object from the provided
+      ValueError: If failed to create `TextEmbedder` object from the provided
         file such as invalid file.
+      RuntimeError: If other types of error occurred.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = TextEmbedderOptions(base_options=base_options)
@@ -69,8 +70,9 @@ class TextEmbedder(object):
     Returns:
       `TextEmbedder` object that's created from `options`.
     Raises:
-      RuntimeError if failed to create `TextEmbdder` object from
+      ValueError: If failed to create `TextEmbedder` object from
         `TextEmbedderOptions` such as missing the model.
+      RuntimeError: If other types of error occurred.
     """
     embedder = _CppTextEmbedder.create_from_options(options.base_options,
                                                     options.embedding_options)
@@ -86,7 +88,8 @@ class TextEmbedder(object):
       embedding result.
 
     Raises:
-      RuntimeError if failed to get the embedding vector.
+      ValueError: If any of the input arguments is invalid.
+      RuntimeError: If failed to calculate the embedding vector.
     """
     return self._embedder.embed(text)
 

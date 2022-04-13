@@ -180,3 +180,20 @@ java_lite_proto_library(
     name = "detection_options_java_proto_lite",
     deps = [":detection_options_proto"],
 )
+
+proto_library(
+    name = "segmentation_options_proto",
+    srcs = ["segmentation_options.proto"],
+)
+
+cc_proto_library(
+    name = "segmentation_options_cc_proto",
+    deps = [":segmentation_options_proto"],
+)
+
+support_py_proto_library(
+    name = "segmentation_options_py_pb2",
+    srcs = ["segmentation_options.proto"],
+    api_version = 2,
+    proto_deps = [":segmentation_options_proto"],
+)

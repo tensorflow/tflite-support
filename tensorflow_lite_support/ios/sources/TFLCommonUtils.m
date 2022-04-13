@@ -23,29 +23,28 @@ static NSString *const TFLSupportTaskErrorDomain = @"org.tensorflow.lite.tasks";
 + (void)createCustomError:(NSError **)error
                  withCode:(NSInteger)code
               description:(NSString *)description {
-  if (error)
+  if (error) {
     *error = [NSError errorWithDomain:TFLSupportTaskErrorDomain
                                  code:code
                              userInfo:@{NSLocalizedDescriptionKey : description}];
+  }
 }
 
-+ (void)convertCError:(TfLiteSupportError *)supportError toError:(NSError **)error {
-  if (supportError && error) {
-    *error = [NSError
-        errorWithDomain:TFLSupportTaskErrorDomain
-                   code:supportError->code
-               userInfo:@{
-                 NSLocalizedDescriptionKey : [NSString stringWithCString:supportError->message
-                                                                encoding:NSUTF8StringEncoding]
-               }];
++ (BOOL)checkCError:(TfLiteSupportError *)supportError toError:(NSError **)error {
+  if (!supportError) {
+    return YES;
   }
+  NSString *description = [NSString stringWithCString:supportError->message
+                                             encoding:NSUTF8StringEncoding];
+  [self createCustomError:error withCode:supportError->code description:description];
+  return NO;
 }
 
 + (void *)mallocWithSize:(size_t)memSize error:(NSError **)error {
   if (!memSize) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
-                          description:@"memSize cannot be NULL."];
+                          description:@"memSize cannot be zero."];
     return NULL;
   }
 

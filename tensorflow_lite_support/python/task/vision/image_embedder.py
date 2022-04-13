@@ -52,11 +52,14 @@ class ImageEmbedder(object):
 
     Args:
       file_path: Path to the model.
+
     Returns:
       `ImageEmbedder` object that's created from the model file.
+
     Raises:
-      RuntimeError if failed to create `ImageEmbedder` object from the provided
+      ValueError: If failed to create `ImageEmbedder` object from the provided
         file such as invalid file.
+      RuntimeError: If other types of error occurred.
     """
     base_options = _BaseOptions(file_name=file_path)
     options = ImageEmbedderOptions(base_options=base_options)
@@ -69,11 +72,14 @@ class ImageEmbedder(object):
 
     Args:
       options: Options for the image embedder task.
+
     Returns:
       `ImageEmbedder` object that's created from `options`.
+
     Raises:
-      RuntimeError if failed to create `ImageEmbdder` object from
+      ValueError: If failed to create `ImageEmbdder` object from
         `ImageEmbedderOptions` such as missing the model.
+      RuntimeError: If other types of error occurred.
     """
     embedder = _CppImageEmbedder.create_from_options(options.base_options,
                                                      options.embedding_options)
@@ -94,10 +100,11 @@ class ImageEmbedder(object):
         out of bounds of the input image.
 
     Returns:
-      embedding result.
+      The embedding result.
 
     Raises:
-      RuntimeError if failed to get the embedding vector.
+      ValueError: If any of the input arguments is invalid.
+      RuntimeError: If failed to calculate the embedding vector.
     """
     image_data = image_utils.ImageData(image.buffer)
     if bounding_box is None:

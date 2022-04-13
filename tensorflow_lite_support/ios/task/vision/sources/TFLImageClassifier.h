@@ -81,11 +81,12 @@ NS_ASSUME_NONNULL_BEGIN
  * TFLClass objects for each classification head.
  * This method currently supports inference on only following type of images:
  * 1. RGB and RGBA images for GMLImageSourceTypeImage.
- * 2. kCVPixelFormatType_32RGBA, kCVPixelFormatType_32BGRA, kCVPixelFormatType_24RGB  
- *    for GMLImageSourceTypePixelBuffer and GMLImageSourceTypeSampleBuffer. If 
- *    you are using AVCaptureSession to setup camera and get the frames for inference,
- *    you must request for one of these supported formats from AVCaptureVideoDataOutput.
- *    For a sample code snippet, please refer to:
+ * 2. kCVPixelFormatType_32RGBA, kCVPixelFormatType_32BGRA,
+ *    kCVPixelFormatType_24RGB for GMLImageSourceTypePixelBuffer and
+ *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ *    camera and get the frames for inference, you must request for one of these
+ *    supported formats from AVCaptureVideoDataOutput. For a sample code
+ *    snippet, please refer to:
  *       https://github.com/tensorflow/examples/blob/master/lite/examples/image_classification/ios/ImageClassification/Camera%20Feed/CameraFeedManager.swift#L253
  *
  * @param image input to the model.

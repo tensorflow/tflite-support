@@ -55,7 +55,7 @@ class TextEmbedderTest(parameterized.TestCase, tf.test.TestCase):
   def test_create_from_options_fails_with_invalid_model_path(self):
     # Invalid empty model path.
     with self.assertRaisesRegex(
-        RuntimeError,
+        ValueError,
         r"ExternalFile must specify at least one of 'file_content', "
         r"'file_name' or 'file_descriptor_meta'."):
       options = _TextEmbedderOptions(_BaseOptions(file_name=""))
