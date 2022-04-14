@@ -48,4 +48,6 @@ tensorflow_lite_support/tools/pip_package/simple_console_for_windows.py:
 tensorflow_lite_support/tools/pip_package/task_core.__init__.py:
 tensorflow_lite_support/tools/pip_package/task_processor.__init__.py:
 tensorflow_lite_support/tools/pip_package/task_vision.__init__.py:
+tensorflow_lite_support/tools/pip_package/task_text.__init__.py:
+tensorflow_lite_support/tools/pip_package/task_audio.__init__.py:
 tensorflow_lite_support/tools/pip_package/tflite_support.__init__.py:
