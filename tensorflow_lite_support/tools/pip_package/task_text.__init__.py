@@ -18,4 +18,3 @@ from tensorflow_lite_support.python.task.text import text_embedder
 
 TextEmbedder = text_embedder.TextEmbedder
 TextEmbedderOptions = text_embedder.TextEmbedderOptions
-
