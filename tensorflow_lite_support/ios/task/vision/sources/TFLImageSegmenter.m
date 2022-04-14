@@ -117,7 +117,7 @@
   
   // Return nil if C result evaluates to nil. If an error was generted by the C layer, it has
   // already been populated to an NSError and deleted before returning from the method.
-  if(!cDetectionResult) {
+  if(!cSegmentationResult) {
     return nil;
   }
 
