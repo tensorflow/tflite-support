@@ -87,11 +87,6 @@
   [options.classificationOptions
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
-  if (![TFLCommonUtils checkCError:createObjectDetectorError toError:error] || !objectDetector) {
-    TfLiteSupportErrorDelete(createObjectDetectorError);
-    return nil;
-  }
-  
   if(![TFLCommonUtils checkCError:createObjectDetectorError toError:error]) {
     TfLiteSupportErrorDelete(createObjectDetectorError);
   }
