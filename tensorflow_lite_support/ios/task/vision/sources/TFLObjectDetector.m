@@ -91,6 +91,14 @@
     TfLiteSupportErrorDelete(createObjectDetectorError);
     return nil;
   }
+  
+  if(![TFLCommonUtils checkCError:createObjectDetectorError toError:error]) {
+    TfLiteSupportErrorDelete(createObjectDetectorError);
+  }
+  
+  if(!objectDetector) {
+    return nil;
+  }
 
   return [[TFLObjectDetector alloc] initWithObjectDetector:objectDetector];
 }

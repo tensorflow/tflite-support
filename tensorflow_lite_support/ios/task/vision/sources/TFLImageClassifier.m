@@ -87,8 +87,11 @@
   [options.classificationOptions
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
-  if (![TFLCommonUtils checkCError:createClassifierError toError:error] || !imageClassifier) {
+  if (![TFLCommonUtils checkCError:createClassifierError toError:error]) {
     TfLiteSupportErrorDelete(createClassifierError);
+  }
+
+  if (!imageClassifier) {
     return nil;
   }
 
