@@ -80,22 +80,25 @@
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
 
-  TfLiteSupportError *createObjectDetectorError = nil;
-  TfLiteObjectDetector *objectDetector =
-      TfLiteObjectDetectorFromOptions(&cOptions, &createObjectDetectorError);
+  TfLiteSupportError *cCreateObjectDetectorError = nil;
+  TfLiteObjectDetector *cObjectDetector =
+      TfLiteObjectDetectorFromOptions(&cOptions, &cCreateObjectDetectorError);
 
   [options.classificationOptions
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
-  if(![TFLCommonUtils checkCError:createObjectDetectorError toError:error]) {
-    TfLiteSupportErrorDelete(createObjectDetectorError);
+  // Populate iOS error if TfliteSupportError is not null and afterwards delete  it.
+  if(![TFLCommonUtils checkCError:cCreateObjectDetectorError toError:error]) {
+    TfLiteSupportErrorDelete(cCreateObjectDetectorError);
   }
 
-  if(!objectDetector) {
+ // Return nil if C object detector evaluates to nil. If an error was generted by the C layer, it has
+ // already been populated to an NSError and deleted before returning from the method.
+  if(!cObjectDetector) {
     return nil;
   }
 
-  return [[TFLObjectDetector alloc] initWithObjectDetector:objectDetector];
+  return [[TFLObjectDetector alloc] initWithObjectDetector:cObjectDetector];
 }
 
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
@@ -114,9 +117,9 @@
     return nil;
   }
 
-  TfLiteSupportError *detectError = nil;
+  TfLiteSupportError *cDetectError = nil;
   TfLiteDetectionResult *cDetectionResult =
-      TfLiteObjectDetectorDetect(_objectDetector, cFrameBuffer, &detectError);
+      TfLiteObjectDetectorDetect(_objectDetector, cFrameBuffer, &cDetectError);
 
   free(cFrameBuffer->buffer);
   cFrameBuffer->buffer = nil;
@@ -124,10 +127,13 @@
   free(cFrameBuffer);
   cFrameBuffer = nil;
 
-  if (![TFLCommonUtils checkCError:detectError toError:error]) {
-    TfLiteSupportErrorDelete(detectError);
+  // Populate iOS error if C Error is not null and afterwards delete it.
+  if (![TFLCommonUtils checkCError:cDetectError toError:error]) {
+    TfLiteSupportErrorDelete(cDetectError);
   }
-
+  
+  // Return nil if C result evaluates to nil. If an error was generted by the C layer, it has
+  // already been populated to an NSError and deleted before returning from the method.
   if(!cDetectionResult) {
     return nil;
   }
