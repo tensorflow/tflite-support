@@ -67,4 +67,5 @@ py_binary(
     srcs = ["simple_console_for_windows.py"],
     data = COMMON_PIP_DEPS,
     srcs_version = "PY2AND3",
+    deps = [],
 )
