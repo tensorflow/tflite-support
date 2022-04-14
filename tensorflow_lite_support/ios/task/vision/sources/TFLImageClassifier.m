@@ -87,7 +87,7 @@
   [options.classificationOptions
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
-  if (!imageClassifier || ![TFLCommonUtils checkCError:createClassifierError toError:error]) {
+  if (![TFLCommonUtils checkCError:createClassifierError toError:error] || !imageClassifier) {
     TfLiteSupportErrorDelete(createClassifierError);
     return nil;
   }
@@ -133,7 +133,7 @@
   free(cFrameBuffer);
   cFrameBuffer = nil;
 
-  if (!cClassificationResult || ![TFLCommonUtils checkCError:classifyError toError:error]) {
+  if (![TFLCommonUtils checkCError:classifyError toError:error] || !cClassificationResult) {
     TfLiteSupportErrorDelete(classifyError);
     return nil;
   }
