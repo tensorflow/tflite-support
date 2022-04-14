@@ -95,7 +95,7 @@
   if(![TFLCommonUtils checkCError:createObjectDetectorError toError:error]) {
     TfLiteSupportErrorDelete(createObjectDetectorError);
   }
-  
+
   if(!objectDetector) {
     return nil;
   }
@@ -129,8 +129,11 @@
   free(cFrameBuffer);
   cFrameBuffer = nil;
 
-  if (![TFLCommonUtils checkCError:detectError toError:error] || !cDetectionResult) {
+  if (![TFLCommonUtils checkCError:detectError toError:error]) {
     TfLiteSupportErrorDelete(detectError);
+  }
+
+  if(!cDetectionResult) {
     return nil;
   }
 

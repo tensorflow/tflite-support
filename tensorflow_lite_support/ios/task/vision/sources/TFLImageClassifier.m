@@ -136,8 +136,11 @@
   free(cFrameBuffer);
   cFrameBuffer = nil;
 
-  if (![TFLCommonUtils checkCError:classifyError toError:error] || !cClassificationResult) {
+  if (![TFLCommonUtils checkCError:classifyError toError:error]) {
     TfLiteSupportErrorDelete(classifyError);
+  }
+
+  if (!cClassificationResult) {
     return nil;
   }
 
