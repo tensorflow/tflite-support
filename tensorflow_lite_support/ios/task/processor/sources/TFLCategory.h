@@ -17,7 +17,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** Encapsulates information about a class in the classification results. */
-NS_SWIFT_NAME(Category)
+NS_SWIFT_NAME(ClassificationCategory)
 @interface TFLCategory : NSObject
 
 /** Index of the class in the corresponding label map, usually packed in the TFLite Model
