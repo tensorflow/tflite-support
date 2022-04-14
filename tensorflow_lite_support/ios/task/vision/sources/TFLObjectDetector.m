@@ -87,7 +87,7 @@
   [options.classificationOptions
       deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
 
-  if (!objectDetector || ![TFLCommonUtils checkCError:createObjectDetectorError toError:error]) {
+  if (![TFLCommonUtils checkCError:createObjectDetectorError toError:error] || !objectDetector) {
     TfLiteSupportErrorDelete(createObjectDetectorError);
     return nil;
   }
@@ -121,7 +121,7 @@
   free(cFrameBuffer);
   cFrameBuffer = nil;
 
-  if (!cDetectionResult || ![TFLCommonUtils checkCError:detectError toError:error]) {
+  if (![TFLCommonUtils checkCError:detectError toError:error] || !cDetectionResult) {
     TfLiteSupportErrorDelete(detectError);
     return nil;
   }
