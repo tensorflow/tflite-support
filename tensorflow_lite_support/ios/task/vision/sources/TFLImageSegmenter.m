@@ -67,16 +67,21 @@
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
 
-  TfLiteSupportError *createImageSegmenterError = nil;
-  TfLiteImageSegmenter *imageSegmenter =
-      TfLiteImageSegmenterFromOptions(&cOptions, &createImageSegmenterError);
+  TfLiteSupportError *cCreateImageSegmenterError = nil;
+  TfLiteImageSegmenter *cImageSegmenter =
+      TfLiteImageSegmenterFromOptions(&cOptions, &cCreateImageSegmenterError);
 
-  if (!imageSegmenter || ![TFLCommonUtils checkCError:createImageSegmenterError toError:error]) {
-    TfLiteSupportErrorDelete(createImageSegmenterError);
-    return nil;
+  // Populate iOS error if TfliteSupportError is not null and afterwards delete  it.
+  if(![TFLCommonUtils checkCError:cCreateImageSegmenterError toError:error]) {
+    TfLiteSupportErrorDelete(cCreateImageSegmenterError);
   }
 
-  return [[TFLImageSegmenter alloc] initWithImageSegmenter:imageSegmenter];
+ // Return nil if C object detector evaluates to nil. If an error was generted by the C layer, it has
+ // already been populated to an NSError and deleted before returning from the method.
+  if(!cImageSegmenter) {
+    return nil;
+  }
+  return [[TFLImageSegmenter alloc] initWithImageSegmenter:cImageSegmenter];
 }
 
 - (nullable TFLSegmentationResult *)segmentWithGMLImage:(GMLImage *)image
@@ -95,9 +100,9 @@
     return nil;
   }
 
-  TfLiteSupportError *segmentError = nil;
+  TfLiteSupportError *cSegmentError = nil;
   TfLiteSegmentationResult *cSegmentationResult =
-      TfLiteImageSegmenterSegment(_imageSegmenter, cFrameBuffer, &segmentError);
+      TfLiteImageSegmenterSegment(_imageSegmenter, cFrameBuffer, &cSegmentError);
 
   free(cFrameBuffer->buffer);
   cFrameBuffer->buffer = nil;
@@ -105,8 +110,14 @@
   free(cFrameBuffer);
   cFrameBuffer = nil;
 
-  if (!cSegmentationResult || ![TFLCommonUtils checkCError:segmentError toError:error]) {
-    TfLiteSupportErrorDelete(segmentError);
+  // Populate iOS error if C Error is not null and afterwards delete it.
+  if (![TFLCommonUtils checkCError:cSegmentError toError:error]) {
+    TfLiteSupportErrorDelete(cSegmentError);
+  }
+  
+  // Return nil if C result evaluates to nil. If an error was generted by the C layer, it has
+  // already been populated to an NSError and deleted before returning from the method.
+  if(!cDetectionResult) {
     return nil;
   }
 
