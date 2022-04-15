@@ -55,6 +55,7 @@ REQUIRED_PACKAGES = [
     # issue is resolved.
     'flatbuffers >= 1.12, <2',
     'protobuf >= 3.18.0',
+    'sounddevice >= 0.4.4',
 ] + SETUP_PACKAGES
 
 project_name = 'tflite-support'
