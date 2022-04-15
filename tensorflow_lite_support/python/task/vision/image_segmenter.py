@@ -14,7 +14,6 @@
 """Image segmenter task."""
 
 import dataclasses
-from typing import Optional
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentation_options_pb2
