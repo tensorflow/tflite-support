@@ -14,7 +14,6 @@
 """Image segmenter task."""
 
 import dataclasses
-from typing import Optional
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentation_options_pb2
@@ -24,6 +23,7 @@ from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_segmenter
 
 _CppImageSegmenter = _pywrap_image_segmenter.ImageSegmenter
+_SegmentationOptions = segmentation_options_pb2.SegmentationOptions
 _BaseOptions = base_options_pb2.BaseOptions
 
 
@@ -31,8 +31,7 @@ _BaseOptions = base_options_pb2.BaseOptions
 class ImageSegmenterOptions:
   """Options for the image segmenter task."""
   base_options: _BaseOptions
-  segmentation_options: Optional[
-      segmentation_options_pb2.SegmentationOptions] = None
+  segmentation_options: _SegmentationOptions = _SegmentationOptions()
 
 
 class ImageSegmenter(object):
