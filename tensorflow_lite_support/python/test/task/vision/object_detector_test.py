@@ -17,10 +17,9 @@ import enum
 import json
 
 from absl.testing import parameterized
-# TODO(b/220067158): Change to import tensorflow and leverage tf.test once
-# fixed the dependency issue.
+import tensorflow as tf
+
 from google.protobuf import json_format
-import unittest
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import class_pb2
@@ -205,8 +204,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
       score = category['classes'][0]['score']
       self.assertGreaterEqual(
           score, _SCORE_THRESHOLD,
-          'Classification with score lower than threshold found. {0}'.format(
-              category))
+          f'Classification with score lower than threshold found. {category}')
 
   def test_max_results_option(self):
     # Creates detector.
@@ -242,9 +240,8 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
     for category in categories:
       label = category['classes'][0]['className']
-      self.assertIn(
-          label, _ALLOW_LIST,
-          'Label "{0}" found but not in label allow list'.format(label))
+      self.assertIn(label, _ALLOW_LIST,
+                    f'Label {label} found but not in label allow list')
 
   def test_deny_list_option(self):
     # Creates detector.
@@ -264,7 +261,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
     for category in categories:
       label = category['classes'][0]['className']
       self.assertNotIn(label, _DENY_LIST,
-                       'Label "{0}" found but in deny list.'.format(label))
+                       f'Label {label} found but in deny list.')
 
   def test_combined_allowlist_and_denylist(self):
     # Fails with combined allowlist and denylist
@@ -281,4 +278,4 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  tf.test.main()
