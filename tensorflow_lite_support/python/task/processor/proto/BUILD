@@ -84,3 +84,19 @@ py_library(
         "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_py_pb2",
     ],
 )
+
+py_library(
+    name = "search_options_pb2",
+    srcs = ["search_options_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:search_options_py_pb2",
+    ],
+)
+
+py_library(
+    name = "search_result_pb2",
+    srcs = ["search_result_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:search_result_py_pb2",
+    ],
+)

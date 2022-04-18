@@ -213,6 +213,16 @@ cc_proto_library(
     ],
 )
 
+support_py_proto_library(
+    name = "search_options_py_pb2",
+    srcs = ["search_options.proto"],
+    api_version = 2,
+    proto_deps = [":search_options_proto"],
+    py_proto_deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:external_file_py_pb2",
+    ],
+)
+
 proto_library(
     name = "search_result_proto",
     srcs = ["search_result.proto"],
@@ -221,4 +231,11 @@ proto_library(
 cc_proto_library(
     name = "search_result_cc_proto",
     deps = [":search_result_proto"],
+)
+
+support_py_proto_library(
+    name = "search_result_py_pb2",
+    srcs = ["search_result.proto"],
+    api_version = 2,
+    proto_deps = [":search_result_proto"],
 )
