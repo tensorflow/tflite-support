@@ -87,6 +87,12 @@ CreateEmbeddingPostprocessor(TfLiteEngine* engine,
 }
 
 absl::Status SanityCheckOptions(const SearchOptions& options) {
+  if (!options.has_index_file()) {
+    return CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        "Missing mandatory `index_file` field in `search_options`.",
+        TfLiteSupportStatus::kInvalidArgumentError);
+  }
   if (options.num_results() < 1) {
     return CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
