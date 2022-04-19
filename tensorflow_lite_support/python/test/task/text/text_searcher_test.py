@@ -194,7 +194,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     self.assertProtoEquals(actual_search_result, expected_search_result)
 
     # Get user info and compare values.
-    self.assertEqual(searcher.get_user_info(), 'userinfo')
+    self.assertEqual(searcher.get_user_info(), "userinfo")
 
 
 if __name__ == "__main__":
