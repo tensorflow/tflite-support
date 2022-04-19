@@ -12,5 +12,6 @@ py_library(
     srcs_version = "PY3",
     deps = [
         "@absl_py//absl/flags",
+        "@com_google_protobuf//:protobuf_python",
     ],
 )

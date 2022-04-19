@@ -19,8 +19,6 @@ from absl.testing import parameterized
 import tensorflow as tf
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
-from tensorflow_lite_support.python.task.processor.proto import class_pb2
 from tensorflow_lite_support.python.task.processor.proto import detection_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import detections_pb2
 from tensorflow_lite_support.python.task.vision import object_detector
@@ -33,48 +31,24 @@ _ObjectDetectorOptions = object_detector.ObjectDetectorOptions
 
 _MODEL_FILE = 'coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.tflite'
 _IMAGE_FILE = 'cats_and_dogs.jpg'
-_EXPECTED_DETECTIONS = [
-    ({
-        'origin_x': 54,
-        'origin_y': 396,
-        'width': 393,
-        'height': 196
-    }, {
-        'index': 16,
-        'score': 0.64453125,
-        'class_name': 'cat'
-    }),
-    ({
-        'origin_x': 602,
-        'origin_y': 157,
-        'width': 394,
-        'height': 447
-    }, {
-        'index': 16,
-        'score': 0.59765625,
-        'class_name': 'cat'
-    }),
-    ({
-        'origin_x': 261,
-        'origin_y': 394,
-        'width': 179,
-        'height': 209
-    }, {
-        'index': 16,
-        'score': 0.5625,
-        'class_name': 'cat'
-    }),
-    ({
-        'origin_x': 389,
-        'origin_y': 197,
-        'width': 276,
-        'height': 409
-    }, {
-        'index': 17,
-        'score': 0.51171875,
-        'class_name': 'dog'
-    })
-]
+_EXPECTED_DETECTIONS = """
+detections {
+  bounding_box { origin_x: 54 origin_y: 396 width: 393 height: 196 }
+  classes { index: 16 score: 0.64453125 class_name: "cat" }
+}
+detections {
+  bounding_box { origin_x: 602 origin_y: 157 width: 394 height: 447 }
+  classes { index: 16 score: 0.59765625 class_name: "cat" }
+}
+detections {
+   bounding_box { origin_x: 261 origin_y: 394 width: 179 height: 209 }
+   classes { index: 16 score: 0.5625 class_name: "cat" }
+}
+detections {
+   bounding_box { origin_x: 389 origin_y: 197 width: 276 height: 409 }
+   classes { index: 17 score: 0.51171875 class_name: "dog" }
+}
+"""
 _ALLOW_LIST = ['cat', 'dog']
 _DENY_LIST = ['cat']
 _SCORE_THRESHOLD = 0.3
@@ -94,20 +68,6 @@ def _create_detector_from_options(base_options, **detection_options):
       base_options=base_options, detection_options=detection_options)
   detector = _ObjectDetector.create_from_options(options)
   return detector
-
-
-def _build_test_data(expected_detections):
-  expected_result = detections_pb2.DetectionResult()
-
-  for index in range(len(expected_detections)):
-    bounding_box, category = expected_detections[index]
-    detection = detections_pb2.Detection()
-    detection.bounding_box.CopyFrom(
-        bounding_box_pb2.BoundingBox(**bounding_box))
-    detection.classes.append(class_pb2.Category(**category))
-    expected_result.detections.append(detection)
-
-  return expected_result
 
 
 class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
@@ -172,10 +132,9 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     # Performs object detection on the input.
     image_result = detector.detect(image)
 
-    # Builds test data.
-    expected_result = _build_test_data(expected_detections)
-
     # Comparing results.
+    expected_result = detections_pb2.DetectionResult()
+    test_util.parse_text_proto(expected_detections, expected_result)
     detection_result = detections_pb2.DetectionResult()
     detection_result.ParseFromString(image_result.SerializeToString())
     self.assertProtoEquals(detection_result, expected_result)
@@ -267,3 +226,4 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
 
 if __name__ == '__main__':
   tf.test.main()
+

@@ -41,7 +41,6 @@ py_test(
         "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classification_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
-        "//tensorflow_lite_support/python/test:base_test",
         "//tensorflow_lite_support/python/test:test_util",
         "@absl_py//absl/testing:parameterized",
     ],
