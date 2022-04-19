@@ -153,8 +153,12 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
   @parameterized.parameters(
     (_REGEX_MODEL, _REGEX_INDEX, True, False, ModelFileType.FILE_NAME,
      _EXPECTED_REGEX_SEARCH_PARAMS),
+    (_REGEX_MODEL, _REGEX_INDEX, True, False, ModelFileType.FILE_CONTENT,
+     _EXPECTED_REGEX_SEARCH_PARAMS),
     (_BERT_MODEL, _BERT_INDEX, True, False, ModelFileType.FILE_NAME,
      _EXPECTED_BERT_SEARCH_PARAMS),
+    (_BERT_MODEL, _BERT_INDEX, True, False, ModelFileType.FILE_CONTENT,
+     _EXPECTED_BERT_SEARCH_PARAMS)
   )
   def test_search(self, model_name, index_name, l2_normalize, quantize,
                   model_file_type, expected_search_params):
