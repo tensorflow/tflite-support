@@ -111,7 +111,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
       (ModelFileType.FILE_NAME, 4, _EXPECTED_DETECTIONS),
       (ModelFileType.FILE_CONTENT, 4, _EXPECTED_DETECTIONS))
   def test_detect_model(self, model_file_type, max_results,
-                        expected_detections):
+                        expected_result_text_proto):
     # Creates detector.
     if model_file_type is ModelFileType.FILE_NAME:
       base_options = _BaseOptions(file_name=self.model_path)
@@ -134,7 +134,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
 
     # Comparing results.
     expected_result = detections_pb2.DetectionResult()
-    test_util.parse_text_proto(expected_detections, expected_result)
+    test_util.parse_text_proto(expected_result_text_proto, expected_result)
     detection_result = detections_pb2.DetectionResult()
     detection_result.ParseFromString(image_result.SerializeToString())
     self.assertProtoEquals(detection_result, expected_result)
