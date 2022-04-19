@@ -15,7 +15,6 @@
 
 import os
 from absl import flags
-from google.protobuf import text_format
 
 FLAGS = flags.FLAGS
 
@@ -37,8 +36,3 @@ def get_test_data_path(file_or_dirname: str) -> str:
       if f.endswith(file_or_dirname):
         return os.path.join(directory, f)
   raise ValueError("No %s in test directory" % file_or_dirname)
-
-
-def parse_text_proto(text_proto, message):
-  """Parses a text representation of a protocol message into a message."""
-  text_format.Merge(text_proto, message)

@@ -151,11 +151,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     image_result = classifier.classify(image, bounding_box=None)
 
     # Comparing results (classification w/o bounding box).
-    expected_result = classifications_pb2.ClassificationResult()
-    test_util.parse_text_proto(expected_result_text_proto, expected_result)
-    classification_result = classifications_pb2.ClassificationResult()
-    classification_result.ParseFromString(image_result.SerializeToString())
-    self.assertProtoEquals(classification_result, expected_result)
+    self.assertProtoEquals(expected_result_text_proto, image_result)
 
   def test_classify_model_with_bounding_box(self):
     # Creates classifier.
