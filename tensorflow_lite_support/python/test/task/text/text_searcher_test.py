@@ -188,13 +188,10 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     self.assertEqual(len(text_search_result.nearest_neighbors),
                      len(expected_search_result.nearest_neighbors))
 
-    print(text_search_result)
-
     # Comparing results.
     actual_search_result = search_result_pb2.SearchResult()
     actual_search_result.ParseFromString(text_search_result.SerializeToString())
     self.assertProtoEquals(actual_search_result, expected_search_result)
-
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
