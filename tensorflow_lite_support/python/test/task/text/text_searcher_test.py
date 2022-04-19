@@ -34,9 +34,7 @@ _TextSearcherOptions = text_searcher.TextSearcherOptions
 
 _REGEX_MODEL = 'regex_one_embedding_with_metadata.tflite'
 _REGEX_INDEX = 'regex_index.ldb'
-_BERT_MODEL = 'regex_one_embedding_with_metadata.tflite'
-_BERT_INDEX = 'regex_index.ldb'
-_EXPECTED_SEARCH_PARAMS = [
+_EXPECTED_REGEX_SEARCH_PARAMS = [
   {
     'metadata': 'The weather was excellent.',
     'distance': 0.0
@@ -52,6 +50,27 @@ _EXPECTED_SEARCH_PARAMS = [
   }, {
     'metadata': 'He was very happy with his newly bought car.',
     'distance': 0.000119
+  }
+]
+
+_BERT_MODEL = 'mobilebert_embedding_with_metadata.tflite'
+_BERT_INDEX = 'mobilebert_index.ldb'
+_EXPECTED_BERT_SEARCH_PARAMS = [
+  {
+    'metadata': 'The weather was excellent.',
+    'distance': 0.007773
+  }, {
+    'metadata': 'It was a sunny day.',
+    'distance': 0.081911
+  }, {
+    'metadata': 'The sun was shining on that day.',
+    'distance': 0.191735
+  }, {
+    'metadata': 'He was very happy with his newly bought car.',
+    'distance': 0.280981
+  }, {
+    'metadata': 'The cat is chasing after the mouse.',
+    'distance': 0.919612
   }
 ]
 
@@ -133,9 +152,9 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
 
   @parameterized.parameters(
     (_REGEX_MODEL, _REGEX_INDEX, True, False, ModelFileType.FILE_NAME,
-     _EXPECTED_SEARCH_PARAMS),
+     _EXPECTED_REGEX_SEARCH_PARAMS),
     (_BERT_MODEL, _BERT_INDEX, True, False, ModelFileType.FILE_NAME,
-     _EXPECTED_SEARCH_PARAMS),
+     _EXPECTED_BERT_SEARCH_PARAMS),
   )
   def test_search(self, model_name, index_name, l2_normalize, quantize,
                   model_file_type, expected_search_params):
@@ -169,10 +188,13 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     self.assertEqual(len(text_search_result.nearest_neighbors),
                      len(expected_search_result.nearest_neighbors))
 
+    print(text_search_result)
+
     # Comparing results.
     actual_search_result = search_result_pb2.SearchResult()
     actual_search_result.ParseFromString(text_search_result.SerializeToString())
     self.assertProtoEquals(actual_search_result, expected_search_result)
+
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
