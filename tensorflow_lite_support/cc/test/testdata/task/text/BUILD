@@ -91,3 +91,10 @@ tflite_file(
     name = "30k-clean",
     extension = "model",
 )
+
+filegroup(
+    name = "test_indices",
+    srcs = glob([
+        "*.ldb",
+    ]),
+)
