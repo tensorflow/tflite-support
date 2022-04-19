@@ -23,6 +23,7 @@ namespace task {
 namespace text {
 
 namespace {
+namespace py = ::pybind11;
 using PythonBaseOptions = ::tflite::python::task::core::BaseOptions;
 using CppBaseOptions = ::tflite::task::core::BaseOptions;
 using CppEmbeddingOptions = ::tflite::task::processor::EmbeddingOptions;
@@ -63,8 +64,7 @@ PYBIND11_MODULE(_pywrap_text_searcher, m) {
               const std::string& text) -> processor::SearchResult {
              auto search_result = self.Search(text);
              return core::get_value(search_result);
-           })
-      .def("get_user_info", &TextSearcher::GetUserInfo);
+           });
 }
 
 }  // namespace text
