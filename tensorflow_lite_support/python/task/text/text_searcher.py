@@ -47,24 +47,6 @@ class TextSearcher(object):
     self._searcher = cpp_searcher
 
   @classmethod
-  def create_from_file(cls, file_path: str) -> "TextSearcher":
-    """Creates the `TextSearcher` object from a TensorFlow Lite model.
-
-    Args:
-      file_path: Path to the model.
-
-    Returns:
-      `TextSearcher` object that's created from the model file.
-    Raises:
-      ValueError: If failed to create `TextSearcher` object from the provided
-        file such as invalid file.
-      RuntimeError: If other types of error occurred.
-    """
-    base_options = _BaseOptions(file_name=file_path)
-    options = TextSearcherOptions(base_options=base_options)
-    return cls.create_from_options(options)
-
-  @classmethod
   def create_from_options(cls, options: TextSearcherOptions) -> "TextSearcher":
     """Creates the `TextSearcher` object from text searcher options.
 

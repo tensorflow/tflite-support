@@ -27,6 +27,8 @@ from tensorflow_lite_support.python.task.text import text_searcher
 from tensorflow_lite_support.python.test import test_util
 
 _BaseOptions = base_options_pb2.BaseOptions
+_EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
+_SearchOptions = search_options_pb2.SearchOptions
 _TextSearcher = text_searcher.TextSearcher
 _TextSearcherOptions = text_searcher.TextSearcherOptions
 
@@ -73,6 +75,59 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
   def setUp(self):
     super().setUp()
     self.model_path = test_util.get_test_data_path(_REGEX_MODEL)
+    self.index_path = test_util.get_test_data_path(_REGEX_INDEX)
+
+  def test_create_from_options_succeeds_with_valid_model_path(self):
+    index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
+    options = _TextSearcherOptions(
+      base_options=_BaseOptions(file_name=self.model_path),
+      search_options=_SearchOptions(index_file=index_file))
+    searcher = _TextSearcher.create_from_options(options)
+    self.assertIsInstance(searcher, _TextSearcher)
+
+  def test_create_from_options_succeeds_with_valid_model_content(self):
+    # Creates with options containing model content successfully.
+    with open(self.model_path, "rb") as f:
+      index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
+      options = _TextSearcherOptions(
+        base_options=_BaseOptions(file_content=f.read()),
+        search_options=_SearchOptions(index_file=index_file))
+      searcher = _TextSearcher.create_from_options(options)
+      self.assertIsInstance(searcher, _TextSearcher)
+
+  def test_create_from_options_fails_with_invalid_index_path(self):
+    # Invalid index path.
+    with self.assertRaisesRegex(
+        ValueError,
+        r"Missing mandatory `index_file` field in `search_options`"):
+      options = _TextSearcherOptions(
+        base_options=_BaseOptions(file_name=self.model_path))
+      _TextSearcher.create_from_options(options)
+
+  def test_create_from_options_fails_with_invalid_model_path(self):
+    # Invalid empty model path.
+    with self.assertRaisesRegex(
+        ValueError,
+        r"ExternalFile must specify at least one of 'file_content', "
+        r"'file_name' or 'file_descriptor_meta'."):
+      index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
+      options = _TextSearcherOptions(
+        base_options=_BaseOptions(file_name=""),
+        search_options=_SearchOptions(index_file=index_file))
+      _TextSearcher.create_from_options(options)
+
+  def test_create_from_options_fails_with_invalid_quantization(self):
+    # Invalid quantization option.
+    with self.assertRaisesRegex(
+        ValueError,
+        r"Setting EmbeddingOptions.normalize = true is not allowed in "
+        r"searchers."):
+      index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
+      options = _TextSearcherOptions(
+        base_options=_BaseOptions(file_name=self.model_path),
+        embedding_options=_EmbeddingOptions(quantize=True),
+        search_options=_SearchOptions(index_file=index_file))
+      _TextSearcher.create_from_options(options)
 
   @parameterized.parameters(
     (_REGEX_MODEL, _REGEX_INDEX, True, False, ModelFileType.FILE_NAME,
@@ -95,10 +150,9 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     index_file_name = test_util.get_test_data_path(index_name)
     index_file = external_file_pb2.ExternalFile(file_name=index_file_name)
     options = _TextSearcherOptions(
-        base_options,
-        embedding_options_pb2.EmbeddingOptions(l2_normalize=l2_normalize,
-                                               quantize=quantize),
-        search_options_pb2.SearchOptions(index_file=index_file))
+      base_options,
+      _EmbeddingOptions(l2_normalize=l2_normalize, quantize=quantize),
+      _SearchOptions(index_file=index_file))
     searcher = _TextSearcher.create_from_options(options)
 
     # Perform text search.
