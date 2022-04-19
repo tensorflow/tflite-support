@@ -53,7 +53,6 @@ _ALLOW_LIST = ['cat', 'dog']
 _DENY_LIST = ['cat']
 _SCORE_THRESHOLD = 0.3
 _MAX_RESULTS = 3
-_ACCEPTABLE_ERROR_RANGE = 0.000001
 
 
 class ModelFileType(enum.Enum):

@@ -36,7 +36,6 @@ _ALLOW_LIST = ['cheeseburger', 'guacamole']
 _DENY_LIST = ['cheeseburger']
 _SCORE_THRESHOLD = 0.5
 _MAX_RESULTS = 3
-_ACCEPTABLE_ERROR_RANGE = 0.000001
 
 
 def _create_classifier_from_options(base_options, **classification_options):
