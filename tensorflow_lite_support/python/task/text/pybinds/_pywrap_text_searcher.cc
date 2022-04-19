@@ -64,7 +64,11 @@ PYBIND11_MODULE(_pywrap_text_searcher, m) {
               const std::string& text) -> processor::SearchResult {
              auto search_result = self.Search(text);
              return core::get_value(search_result);
-           });
+           })
+      .def("get_user_info",
+           [](TextSearcher& self) -> py::str {
+             return py::str(self.GetUserInfo()->data());
+      });
 }
 
 }  // namespace text
