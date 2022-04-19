@@ -78,10 +78,10 @@ class TextSearcher(object):
         `TextSearcherOptions` such as missing the model.
       RuntimeError: If other types of error occurred.
     """
-    embedder = _CppTextSearcher.create_from_options(options.base_options,
+    searcher = _CppTextSearcher.create_from_options(options.base_options,
                                                     options.embedding_options,
                                                     options.search_options)
-    return cls(options, embedder)
+    return cls(options, searcher)
 
   def search(self, text: str) -> search_result_pb2.SearchResult:
     """Performs actual feature extraction on the provided text input,

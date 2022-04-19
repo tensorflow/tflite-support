@@ -16,3 +16,4 @@
 from tensorflow_lite_support.cc.task.processor.proto import search_result_pb2
 
 SearchResult = search_result_pb2.SearchResult
+NearestNeighbor = search_result_pb2.NearestNeighbor

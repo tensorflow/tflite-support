@@ -22,6 +22,7 @@ from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.core.proto import external_file_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_options_pb2
+from tensorflow_lite_support.python.task.processor.proto import search_result_pb2
 from tensorflow_lite_support.python.task.text import text_searcher
 from tensorflow_lite_support.python.test import test_util
 
@@ -29,8 +30,37 @@ _BaseOptions = base_options_pb2.BaseOptions
 _TextSearcher = text_searcher.TextSearcher
 _TextSearcherOptions = text_searcher.TextSearcherOptions
 
-_REGEX_MODEL = "regex_one_embedding_with_metadata.tflite"
-_BERT_MODEL = "mobilebert_embedding_with_metadata.tflite"
+_REGEX_MODEL = 'regex_one_embedding_with_metadata.tflite'
+_REGEX_INDEX = 'regex_index.ldb'
+_EXPECTED_REGEX_SEARCH_PARAMS = [
+  {
+    'metadata': 'The weather was excellent.',
+    'distance': 0.0
+  }, {
+    'metadata': 'The sun was shining on that day.',
+    'distance': 5.7e-5
+  }, {
+    'metadata': 'The cat is chasing after the mouse.',
+    'distance': 8.9e-5
+  }, {
+    'metadata': 'It was a sunny day.',
+    'distance': 0.000113
+  }, {
+    'metadata': 'He was very happy with his newly bought car.',
+    'distance': 0.000119
+  }
+]
+
+
+def _build_test_data(expected_nearest_neighbors):
+  expected_search_result = search_result_pb2.SearchResult()
+  expected_search_result.nearest_neighbors.extend(
+    [search_result_pb2.NearestNeighbor(
+      metadata=nearest_neighbor['metadata'].encode(),
+      distance=nearest_neighbor['distance'])
+     for nearest_neighbor in expected_nearest_neighbors])
+
+  return expected_search_result
 
 
 class ModelFileType(enum.Enum):
@@ -38,16 +68,18 @@ class ModelFileType(enum.Enum):
   FILE_NAME = 2
 
 
-class TextEmbedderTest(parameterized.TestCase, tf.test.TestCase):
+class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
 
   def setUp(self):
     super().setUp()
     self.model_path = test_util.get_test_data_path(_REGEX_MODEL)
 
   @parameterized.parameters(
-      (_REGEX_MODEL, False, False, ModelFileType.FILE_NAME),
+    (_REGEX_MODEL, _REGEX_INDEX, True, False, ModelFileType.FILE_NAME,
+     _EXPECTED_REGEX_SEARCH_PARAMS),
   )
-  def test_search(self, model_name, l2_normalize, quantize, model_file_type):
+  def test_search(self, model_name, index_name, l2_normalize, quantize,
+                  model_file_type, expected_search_params):
     # Create embedder.
     model_path = test_util.get_test_data_path(model_name)
     if model_file_type is ModelFileType.FILE_NAME:
@@ -60,18 +92,28 @@ class TextEmbedderTest(parameterized.TestCase, tf.test.TestCase):
       # Should never happen
       raise ValueError("model_file_type is invalid.")
 
-    index_file = external_file_pb2.ExternalFile(
-      file_name='/path/to/index_file.ldb')
+    index_file_name = test_util.get_test_data_path(index_name)
+    index_file = external_file_pb2.ExternalFile(file_name=index_file_name)
     options = _TextSearcherOptions(
         base_options,
-        embedding_options_pb2.EmbeddingOptions(
-            l2_normalize=l2_normalize, quantize=quantize),
-       search_options_pb2.SearchOptions(
-            index_file=index_file))
+        embedding_options_pb2.EmbeddingOptions(l2_normalize=l2_normalize,
+                                               quantize=quantize),
+        search_options_pb2.SearchOptions(index_file=index_file))
     searcher = _TextSearcher.create_from_options(options)
 
     # Perform text search.
-    result = searcher.search("testing")
+    text_search_result = searcher.search("The weather was excellent.")
+
+    # Build test data.
+    expected_search_result = _build_test_data(expected_search_params)
+
+    # Check nearest-neighbour sizes for the actual and expected results.
+    self.assertEqual(len(text_search_result.nearest_neighbors),
+                     len(expected_search_result.nearest_neighbors))
+
+    actual_search_result = search_result_pb2.SearchResult()
+    actual_search_result.ParseFromString(text_search_result.SerializeToString())
+    self.assertProtoEquals(actual_search_result, expected_search_result)
 
 
 if __name__ == "__main__":
