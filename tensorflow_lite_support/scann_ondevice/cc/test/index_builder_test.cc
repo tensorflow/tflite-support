@@ -79,7 +79,8 @@ constexpr size_t kDimensions = 2;
 constexpr size_t kNumEmbeddings = 24;
 constexpr size_t kNumPartitions = 12;
 
-IndexConfig CreateExpectedConfig(IndexConfig::Type embedding_type) {
+IndexConfig CreateExpectedConfigWithPartitioner(
+    IndexConfig::Type embedding_type) {
   IndexConfig config = ParseTextProtoOrDie<IndexConfig>(R"pb(
     scann_config {
       partitioner {
@@ -116,9 +117,20 @@ IndexConfig CreateExpectedConfig(IndexConfig::Type embedding_type) {
   return config;
 }
 
+IndexConfig CreateExpectedConfigWithoutPartitioner(
+    IndexConfig::Type embedding_type) {
+  IndexConfig config = ParseTextProtoOrDie<IndexConfig>(R"pb(
+    scann_config { query_distance: SQUARED_L2_DISTANCE }
+    embedding_dim: 2
+    global_partition_offsets: 0
+  )pb");
+  config.set_embedding_type(embedding_type);
+  return config;
+}
+
 class PopulateIndexFileTest : public TestWithParam<bool /*compression*/> {};
 
-TEST_P(PopulateIndexFileTest, WritesHashedDatabase) {
+TEST_P(PopulateIndexFileTest, WritesHashedDatabaseWithPartitioner) {
   const std::string db_path =
       tflite::task::JoinPath(getenv("TEST_TMPDIR"), "hashed");
   const bool compression = GetParam();
@@ -194,8 +206,9 @@ TEST_P(PopulateIndexFileTest, WritesHashedDatabase) {
                        LookupKey(hashed_table_iterator.get(), "INDEX_CONFIG"));
   IndexConfig index_config;
   EXPECT_TRUE(index_config.ParseFromString(serialized_config));
-  EXPECT_THAT(index_config,
-              EqualsProto(CreateExpectedConfig(IndexConfig::UINT8)));
+  EXPECT_THAT(
+      index_config,
+      EqualsProto(CreateExpectedConfigWithPartitioner(IndexConfig::UINT8)));
 
   SUPPORT_ASSERT_OK_AND_ASSIGN(std::string userinfo,
                        LookupKey(hashed_table_iterator.get(), "USER_INFO"));
@@ -233,7 +246,96 @@ TEST_P(PopulateIndexFileTest, WritesHashedDatabase) {
   }
 }
 
-TEST_P(PopulateIndexFileTest, WritesFloatDatabase) {
+TEST_P(PopulateIndexFileTest, WritesHashedDatabaseWithoutPartitioner) {
+  const std::string db_path =
+      tflite::task::JoinPath(getenv("TEST_TMPDIR"), "float");
+  const bool compression = GetParam();
+
+  {
+    tflite::scann_ondevice::core::ScannOnDeviceConfig config =
+        ParseTextProtoOrDie<tflite::scann_ondevice::core::ScannOnDeviceConfig>(R"pb(
+          query_distance: SQUARED_L2_DISTANCE
+        )pb");
+    std::vector<uint8_t> hashed_database;
+    hashed_database.reserve(kNumEmbeddings * kDimensions);
+    for (int i = 0; i < kNumEmbeddings; ++i) {
+      for (int j = 0; j < kDimensions; ++j) {
+        hashed_database.push_back(i);
+      }
+    }
+    std::vector<std::string> metadata;
+    metadata.reserve(kNumEmbeddings);
+    for (int i = 0; i < kNumEmbeddings; ++i) {
+      metadata.push_back(absl::StrFormat("%d", i));
+    }
+    SUPPORT_ASSERT_OK_AND_ASSIGN(
+        const std::string buffer,
+        CreateIndexBuffer(
+            {.config = config,
+             .embedding_dim = kDimensions,
+             .hashed_database = absl::Span<uint8_t>(hashed_database),
+             .metadata = absl::Span<std::string>(metadata),
+             .userinfo = "hashed_userinfo"},
+            compression));
+    SUPPORT_ASSERT_OK(SetContents(db_path, buffer));
+  }
+
+  auto* env = leveldb::Env::Default();
+  leveldb::RandomAccessFile* float_file;
+  size_t float_file_size;
+  ASSERT_TRUE(env->NewRandomAccessFile(db_path, &float_file).ok());
+  auto float_file_unique = absl::WrapUnique(float_file);
+  ASSERT_TRUE(env->GetFileSize(db_path, &float_file_size).ok());
+
+  leveldb::Options options;
+  options.compression =
+      compression ? leveldb::kSnappyCompression : leveldb::kNoCompression;
+
+  leveldb::Table* float_table;
+  ASSERT_TRUE(
+      leveldb::Table::Open(options, float_file, float_file_size, &float_table)
+          .ok());
+  auto float_table_unique = absl::WrapUnique(float_table);
+  auto float_table_iterator =
+      absl::WrapUnique(float_table->NewIterator(leveldb::ReadOptions()));
+
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::string serialized_config,
+                       LookupKey(float_table_iterator.get(), "INDEX_CONFIG"));
+  IndexConfig index_config;
+  EXPECT_TRUE(index_config.ParseFromString(serialized_config));
+  EXPECT_THAT(
+      index_config,
+      EqualsProto(CreateExpectedConfigWithoutPartitioner(IndexConfig::UINT8)));
+
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::string userinfo,
+                       LookupKey(float_table_iterator.get(), "USER_INFO"));
+  EXPECT_EQ(userinfo, "hashed_userinfo");
+
+  // Check that the unique embedding partition has the exact same contents as
+  // the database used at construction time.
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::string raw_partition_hashed,
+                       LookupKey(float_table_iterator.get(), "E_0"));
+  std::vector<char> hashed_partition(raw_partition_hashed.begin(),
+                                     raw_partition_hashed.end());
+  std::vector<char> expected;
+  expected.reserve(kNumEmbeddings * kDimensions);
+  for (int i = 0; i < kNumEmbeddings; ++i) {
+    for (int j = 0; j < kDimensions; ++j) {
+      expected.push_back(i);
+    }
+  }
+  EXPECT_THAT(hashed_partition, ElementsAreArray(expected));
+
+  // Check metadata.
+  for (int i = 0; i < kNumEmbeddings; ++i) {
+    SUPPORT_ASSERT_OK_AND_ASSIGN(
+        std::string metadata,
+        LookupKey(float_table_iterator.get(), absl::StrFormat("M_%d", i)));
+    EXPECT_EQ(metadata, absl::StrFormat("%d", i));
+  }
+}
+
+TEST_P(PopulateIndexFileTest, WritesFloatDatabaseWithPartitioner) {
   const std::string db_path =
       tflite::task::JoinPath(getenv("TEST_TMPDIR"), "float");
   const bool compression = GetParam();
@@ -309,8 +411,9 @@ TEST_P(PopulateIndexFileTest, WritesFloatDatabase) {
                        LookupKey(float_table_iterator.get(), "INDEX_CONFIG"));
   IndexConfig index_config;
   EXPECT_TRUE(index_config.ParseFromString(serialized_config));
-  EXPECT_THAT(index_config,
-              EqualsProto(CreateExpectedConfig(IndexConfig::FLOAT)));
+  EXPECT_THAT(
+      index_config,
+      EqualsProto(CreateExpectedConfigWithPartitioner(IndexConfig::FLOAT)));
 
   SUPPORT_ASSERT_OK_AND_ASSIGN(std::string userinfo,
                        LookupKey(float_table_iterator.get(), "USER_INFO"));
@@ -348,6 +451,97 @@ TEST_P(PopulateIndexFileTest, WritesFloatDatabase) {
         LookupKey(float_table_iterator.get(), absl::StrFormat("M_%d", i)));
     EXPECT_EQ(metadata,
               absl::StrFormat("%d", i / 2 + (i % 2 ? kNumPartitions : 0)));
+  }
+}
+
+TEST_P(PopulateIndexFileTest, WritesFloatDatabaseWithoutPartitioner) {
+  const std::string db_path =
+      tflite::task::JoinPath(getenv("TEST_TMPDIR"), "float");
+  const bool compression = GetParam();
+
+  {
+    tflite::scann_ondevice::core::ScannOnDeviceConfig config =
+        ParseTextProtoOrDie<tflite::scann_ondevice::core::ScannOnDeviceConfig>(R"pb(
+          query_distance: SQUARED_L2_DISTANCE
+        )pb");
+    std::vector<float> float_database;
+    float_database.reserve(kNumEmbeddings * kDimensions);
+    for (int i = 0; i < kNumEmbeddings; ++i) {
+      for (int j = 0; j < kDimensions; ++j) {
+        float_database.push_back(i);
+      }
+    }
+    std::vector<std::string> metadata;
+    metadata.reserve(kNumEmbeddings);
+    for (int i = 0; i < kNumEmbeddings; ++i) {
+      metadata.push_back(absl::StrFormat("%d", i));
+    }
+    SUPPORT_ASSERT_OK_AND_ASSIGN(
+        const std::string buffer,
+        CreateIndexBuffer({.config = config,
+                           .embedding_dim = kDimensions,
+                           .float_database = absl::Span<float>(float_database),
+                           .metadata = absl::Span<std::string>(metadata),
+                           .userinfo = "float_userinfo"},
+                          compression));
+    SUPPORT_ASSERT_OK(SetContents(db_path, buffer));
+  }
+
+  auto* env = leveldb::Env::Default();
+  leveldb::RandomAccessFile* float_file;
+  size_t float_file_size;
+  ASSERT_TRUE(env->NewRandomAccessFile(db_path, &float_file).ok());
+  auto float_file_unique = absl::WrapUnique(float_file);
+  ASSERT_TRUE(env->GetFileSize(db_path, &float_file_size).ok());
+
+  leveldb::Options options;
+  options.compression =
+      compression ? leveldb::kSnappyCompression : leveldb::kNoCompression;
+
+  leveldb::Table* float_table;
+  ASSERT_TRUE(
+      leveldb::Table::Open(options, float_file, float_file_size, &float_table)
+          .ok());
+  auto float_table_unique = absl::WrapUnique(float_table);
+  auto float_table_iterator =
+      absl::WrapUnique(float_table->NewIterator(leveldb::ReadOptions()));
+
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::string serialized_config,
+                       LookupKey(float_table_iterator.get(), "INDEX_CONFIG"));
+  IndexConfig index_config;
+  EXPECT_TRUE(index_config.ParseFromString(serialized_config));
+  EXPECT_THAT(
+      index_config,
+      EqualsProto(CreateExpectedConfigWithoutPartitioner(IndexConfig::FLOAT)));
+
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::string userinfo,
+                       LookupKey(float_table_iterator.get(), "USER_INFO"));
+  EXPECT_EQ(userinfo, "float_userinfo");
+
+  // Check that the unique embedding partition has the exact same contents as
+  // the database used at construction time.
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::string raw_partition_float,
+                       LookupKey(float_table_iterator.get(), "E_0"));
+  const float* raw_partition_float_ptr =
+      reinterpret_cast<const float*>(raw_partition_float.data());
+  std::vector<float> float_partition(
+      raw_partition_float_ptr,
+      raw_partition_float_ptr + raw_partition_float.size() / sizeof(float));
+  std::vector<float> expected;
+  expected.reserve(kNumEmbeddings * kDimensions);
+  for (int i = 0; i < kNumEmbeddings; ++i) {
+    for (int j = 0; j < kDimensions; ++j) {
+      expected.push_back(i);
+    }
+  }
+  EXPECT_THAT(float_partition, ElementsAreArray(expected));
+
+  // Check metadata.
+  for (int i = 0; i < kNumEmbeddings; ++i) {
+    SUPPORT_ASSERT_OK_AND_ASSIGN(
+        std::string metadata,
+        LookupKey(float_table_iterator.get(), absl::StrFormat("M_%d", i)));
+    EXPECT_EQ(metadata, absl::StrFormat("%d", i));
   }
 }
 
