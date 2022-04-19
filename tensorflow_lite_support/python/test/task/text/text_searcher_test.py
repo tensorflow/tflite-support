@@ -34,7 +34,9 @@ _TextSearcherOptions = text_searcher.TextSearcherOptions
 
 _REGEX_MODEL = 'regex_one_embedding_with_metadata.tflite'
 _REGEX_INDEX = 'regex_index.ldb'
-_EXPECTED_REGEX_SEARCH_PARAMS = [
+_BERT_MODEL = 'regex_one_embedding_with_metadata.tflite'
+_BERT_INDEX = 'regex_index.ldb'
+_EXPECTED_SEARCH_PARAMS = [
   {
     'metadata': 'The weather was excellent.',
     'distance': 0.0
@@ -131,7 +133,9 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
 
   @parameterized.parameters(
     (_REGEX_MODEL, _REGEX_INDEX, True, False, ModelFileType.FILE_NAME,
-     _EXPECTED_REGEX_SEARCH_PARAMS),
+     _EXPECTED_SEARCH_PARAMS),
+    (_BERT_MODEL, _BERT_INDEX, True, False, ModelFileType.FILE_NAME,
+     _EXPECTED_SEARCH_PARAMS),
   )
   def test_search(self, model_name, index_name, l2_normalize, quantize,
                   model_file_type, expected_search_params):
