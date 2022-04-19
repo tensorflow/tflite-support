@@ -56,6 +56,7 @@ REQUIRED_PACKAGES = [
     'flatbuffers >= 1.12, <2',
     # The Protobuf version needs to be the same as the one in WORKSPACE.
     'protobuf == 3.18.0',
+    'sounddevice >= 0.4.4',
 ] + SETUP_PACKAGES
 
 project_name = 'tflite-support'

@@ -26,7 +26,11 @@ COMMON_PIP_DEPS = [
 TASK_PIP_DEPS = [
     "//tensorflow_lite_support/python/task/vision:image_classifier",
     "//tensorflow_lite_support/python/task/vision:image_embedder",
+    "//tensorflow_lite_support/python/task/vision:image_segmenter",
     "//tensorflow_lite_support/python/task/vision:object_detector",
+    "//tensorflow_lite_support/python/task/text:text_embedder",
+    "//tensorflow_lite_support/python/task/audio:audio_classifier",
+    "//tensorflow_lite_support/python/task/audio:audio_embedder",
 ]
 
 filegroup(

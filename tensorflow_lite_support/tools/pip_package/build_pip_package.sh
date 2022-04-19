@@ -101,6 +101,10 @@ function prepare_src() {
     cp tensorflow_lite_support/tools/pip_package/task_core.__init__.py ${TMPDIR}/tflite_support/task/core/__init__.py
     mkdir ${TMPDIR}/tflite_support/task/vision
     cp tensorflow_lite_support/tools/pip_package/task_vision.__init__.py ${TMPDIR}/tflite_support/task/vision/__init__.py
+    mkdir ${TMPDIR}/tflite_support/task/text
+    cp tensorflow_lite_support/tools/pip_package/task_text.__init__.py ${TMPDIR}/tflite_support/task/text/__init__.py
+    mkdir ${TMPDIR}/tflite_support/task/audio
+    cp tensorflow_lite_support/tools/pip_package/task_audio.__init__.py ${TMPDIR}/tflite_support/task/audio/__init__.py
     mkdir ${TMPDIR}/tflite_support/task/processor
     cp tensorflow_lite_support/tools/pip_package/task_processor.__init__.py ${TMPDIR}/tflite_support/task/processor/__init__.py
   fi
