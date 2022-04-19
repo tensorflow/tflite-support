@@ -16,6 +16,7 @@
 
 from tensorflow_lite_support.python.task.vision import image_classifier
 from tensorflow_lite_support.python.task.vision import image_embedder
+from tensorflow_lite_support.python.task.vision import image_segmenter
 from tensorflow_lite_support.python.task.vision import object_detector
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 
@@ -25,4 +26,6 @@ ObjectDetector = object_detector.ObjectDetector
 ObjectDetectorOptions = object_detector.ObjectDetectorOptions
 ImageEmbedder = image_embedder.ImageEmbedder
 ImageEmbedderOptions = image_embedder.ImageEmbedderOptions
+ImageSegmenter = image_segmenter.ImageSegmenter
+ImageSegmenterOptions = image_segmenter.ImageSegmenterOptions
 TensorImage = tensor_image.TensorImage

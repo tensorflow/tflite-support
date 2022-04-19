@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "tensorflow_lite_support/scann_ondevice/cc/index_builder.h"
 
+#include <cstdint>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -54,12 +55,16 @@ absl::Status LevelDBStatusToAbsl(leveldb::Status leveldb_status) {
 template <typename T>
 absl::StatusOr<std::string> CreateIndexBufferImpl(
     absl::Span<const T> database,
-    absl::Span<const uint32_t> partition_assignment,
+    absl::optional<absl::Span<const uint32_t>> partition_assignment,
     absl::Span<const std::string> metadata, const std::string& userinfo,
     IndexConfig index_config, bool compression) {
-  if (partition_assignment.size() != metadata.size()) {
-    return absl::InvalidArgumentError(
-        "Size of partition assignment and metadata mismatch");
+  size_t num_partitions = 1;
+  if (partition_assignment) {
+    if (partition_assignment->size() != metadata.size()) {
+      return absl::InvalidArgumentError(
+          "Size of partition assignment and metadata mismatch");
+    }
+    num_partitions = index_config.scann_config().partitioner().leaf_size();
   }
 
   if (database.size() / index_config.embedding_dim() != metadata.size()) {
@@ -67,16 +72,14 @@ absl::StatusOr<std::string> CreateIndexBufferImpl(
         "Number of embeddings differs from number of metadata");
   }
 
-  const size_t num_partitions =
-      index_config.scann_config().partitioner().leaf_size();
-
   std::vector<std::vector<char>> partition_bytes(num_partitions);
   std::vector<std::vector<std::string>> partition_metadata(num_partitions);
 
   const size_t per_embedding_bytes = sizeof(T) * index_config.embedding_dim();
   const char* database_bytes = reinterpret_cast<const char*>(database.data());
-  for (size_t i = 0; i < partition_assignment.size(); ++i) {
-    const size_t partition_idx = partition_assignment[i];
+  for (size_t i = 0; i < metadata.size(); ++i) {
+    const size_t partition_idx =
+        partition_assignment ? (*partition_assignment)[i] : 0;
     if (partition_idx >= num_partitions) {
       return absl::InvalidArgumentError(absl::StrFormat(
           "Partition index %d is larger than number of partitions: %d",

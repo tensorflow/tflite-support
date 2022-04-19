@@ -44,12 +44,13 @@ struct IndexedArtifacts {
   absl::optional<absl::Span<const uint8_t>> hashed_database;
   absl::optional<absl::Span<const float>> float_database;
 
-  // The partition each of the database point belongs to. The size should be the
-  // same as how many database points there are.
-  absl::Span<const uint32_t> partition_assignment;
+  // The partition each of the database point belongs to, if the index uses a
+  // partitioner. The size should be the same as how many database points there
+  // are.
+  absl::optional<absl::Span<const uint32_t>> partition_assignment;
 
-  // The metadata (label) for each database point. It should have the same size
-  // as partition_assignment.
+  // The metadata (label) for each database point.The size should be the same as
+  // how many database points there are.
   absl::Span<const std::string> metadata;
 
   // An arbitrary user supplied string for storing custom information.
