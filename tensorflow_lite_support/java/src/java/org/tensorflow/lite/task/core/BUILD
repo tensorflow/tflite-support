@@ -7,7 +7,9 @@ package(
 
 android_library(
     name = "base-task-api",
-    srcs = glob(["**/*.java"]),
+    srcs = glob(["**/*.java"]) + [
+        "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/processor:task_processor_src",
+    ],
     javacopts = ["-source 7 -target 7"],
     visibility = ["//visibility:public"],
     # LINT.IfChange(dep)
