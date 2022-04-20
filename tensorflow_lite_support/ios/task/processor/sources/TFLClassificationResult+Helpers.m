@@ -19,7 +19,7 @@
 
 + (TFLClassificationResult *)classificationResultWithCResult:
     (TfLiteClassificationResult *)cClassificationResult {
-  if (cClassificationResult == nil) return nil;
+  if (!cClassificationResult) return nil;
 
   NSMutableArray *classificationHeads = [[NSMutableArray alloc] init];
   for (int i = 0; i < cClassificationResult->size; i++) {
