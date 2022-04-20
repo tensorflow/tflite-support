@@ -82,6 +82,8 @@ nearest_neighbors {
 
 """
 
+_NUM_RESULTS = 2
+
 
 class ModelFileType(enum.Enum):
   FILE_CONTENT = 1
@@ -105,7 +107,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
 
   def test_create_from_options_succeeds_with_valid_model_content(self):
     # Creates with options containing model content successfully.
-    with open(self.model_path, "rb") as f:
+    with open(self.model_path, 'rb') as f:
       index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
       options = _TextSearcherOptions(
         base_options=_BaseOptions(file_content=f.read()),
@@ -138,13 +140,24 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     # Invalid quantization option.
     with self.assertRaisesRegex(
         ValueError,
-        r"Setting EmbeddingOptions.normalize = true is not allowed in "
-        r"searchers."):
+        r'Setting EmbeddingOptions.normalize = true is not allowed in '
+        r'searchers.'):
       index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
       options = _TextSearcherOptions(
         base_options=_BaseOptions(file_name=self.model_path),
         embedding_options=_EmbeddingOptions(quantize=True),
         search_options=_SearchOptions(index_file=index_file))
+      _TextSearcher.create_from_options(options)
+
+  def test_create_from_options_fails_with_invalid_num_results(self):
+    # Invalid num results option.
+    with self.assertRaisesRegex(
+        ValueError,
+        r'SearchOptions.num_results must be > 0, found -1.'):
+      index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
+      options = _TextSearcherOptions(
+        base_options=_BaseOptions(file_name=self.model_path),
+        search_options=_SearchOptions(index_file=index_file, num_results=-1))
       _TextSearcher.create_from_options(options)
 
   @parameterized.parameters(
@@ -159,17 +172,17 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
   )
   def test_search(self, model_name, index_name, l2_normalize, quantize,
                   model_file_type, expected_result_text_proto):
-    # Create embedder.
+    # Create searcher.
     model_path = test_util.get_test_data_path(model_name)
     if model_file_type is ModelFileType.FILE_NAME:
       base_options = _BaseOptions(file_name=model_path)
     elif model_file_type is ModelFileType.FILE_CONTENT:
-      with open(model_path, "rb") as f:
+      with open(model_path, 'rb') as f:
         model_content = f.read()
       base_options = _BaseOptions(file_content=model_content)
     else:
       # Should never happen
-      raise ValueError("model_file_type is invalid.")
+      raise ValueError('model_file_type is invalid.')
 
     index_file_name = test_util.get_test_data_path(index_name)
     index_file = external_file_pb2.ExternalFile(file_name=index_file_name)
@@ -180,13 +193,13 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     searcher = _TextSearcher.create_from_options(options)
 
     # Perform text search.
-    text_search_result = searcher.search("The weather was excellent.")
+    text_search_result = searcher.search('The weather was excellent.')
 
     # Comparing results.
     self.assertProtoEquals(expected_result_text_proto, text_search_result)
 
     # Get user info and compare values.
-    self.assertEqual(searcher.get_user_info(), "userinfo")
+    self.assertEqual(searcher.get_user_info(), 'userinfo')
 
 
 if __name__ == "__main__":
