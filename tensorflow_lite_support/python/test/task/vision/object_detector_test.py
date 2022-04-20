@@ -14,12 +14,10 @@
 """Tests for object detector."""
 
 import enum
-import json
 
 from absl.testing import parameterized
 import tensorflow as tf
 
-from google.protobuf import json_format
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import class_pb2
@@ -27,7 +25,6 @@ from tensorflow_lite_support.python.task.processor.proto import detection_option
 from tensorflow_lite_support.python.task.processor.proto import detections_pb2
 from tensorflow_lite_support.python.task.vision import object_detector
 from tensorflow_lite_support.python.task.vision.core import tensor_image
-from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
 
 _BaseOptions = base_options_pb2.BaseOptions
@@ -110,12 +107,10 @@ def _build_test_data(expected_detections):
     detection.classes.append(class_pb2.Category(**category))
     expected_result.detections.append(detection)
 
-  expected_result_dict = json.loads(json_format.MessageToJson(expected_result))
-
-  return expected_result_dict
+  return expected_result
 
 
-class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
+class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
 
   def setUp(self):
     super().setUp()
@@ -176,14 +171,14 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
-    image_result_dict = json.loads(json_format.MessageToJson(image_result))
 
     # Builds test data.
-    expected_result_dict = _build_test_data(expected_detections)
+    expected_result = _build_test_data(expected_detections)
 
     # Comparing results.
-    self.assertDeepAlmostEqual(
-        image_result_dict, expected_result_dict, delta=_ACCEPTABLE_ERROR_RANGE)
+    detection_result = detections_pb2.DetectionResult()
+    detection_result.ParseFromString(image_result.SerializeToString())
+    self.assertProtoEquals(detection_result, expected_result)
 
   def test_score_threshold_option(self):
     # Creates detector.
@@ -196,15 +191,13 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
-    image_result_dict = json.loads(json_format.MessageToJson(image_result))
+    detections = image_result.detections
 
-    categories = image_result_dict['detections']
-
-    for category in categories:
-      score = category['classes'][0]['score']
+    for detection in detections:
+      score = detection.classes[0].score
       self.assertGreaterEqual(
           score, _SCORE_THRESHOLD,
-          f'Classification with score lower than threshold found. {category}')
+          f'Detection with score lower than threshold found. {detection}')
 
   def test_max_results_option(self):
     # Creates detector.
@@ -217,8 +210,7 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
-    image_result_dict = json.loads(json_format.MessageToJson(image_result))
-    detections = image_result_dict['detections']
+    detections = image_result.detections
 
     self.assertLessEqual(
         len(detections), _MAX_RESULTS, 'Too many results returned.')
@@ -234,12 +226,10 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
-    image_result_dict = json.loads(json_format.MessageToJson(image_result))
+    detections = image_result.detections
 
-    categories = image_result_dict['detections']
-
-    for category in categories:
-      label = category['classes'][0]['className']
+    for detection in detections:
+      label = detection.classes[0].class_name
       self.assertIn(label, _ALLOW_LIST,
                     f'Label {label} found but not in label allow list')
 
@@ -254,12 +244,10 @@ class ObjectDetectorTest(parameterized.TestCase, base_test.BaseTestCase):
 
     # Performs object detection on the input.
     image_result = detector.detect(image)
-    image_result_dict = json.loads(json_format.MessageToJson(image_result))
+    detections = image_result.detections
 
-    categories = image_result_dict['detections']
-
-    for category in categories:
-      label = category['classes'][0]['className']
+    for detection in detections:
+      label = detection.classes[0].class_name
       self.assertNotIn(label, _DENY_LIST,
                        f'Label {label} found but in deny list.')
 
