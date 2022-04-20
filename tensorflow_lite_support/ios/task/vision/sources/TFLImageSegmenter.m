@@ -73,7 +73,7 @@
     if (options.displayNamesLocale.UTF8String) {
       // strdup is not needed as C layer handles copying (C++ options are protobufs).
       // Hence setting char* values in protobuf leads to copying.
-      cOptions.display_names_locale = options.displayNamesLocale.UTF8String; 
+      cOptions.display_names_locale = strdup(options.displayNamesLocale.UTF8String); 
     }
     else {
       [TFLCommonUtils createCustomError:error
@@ -86,6 +86,9 @@
   TfLiteSupportError *createImageSegmenterError = nil;
   TfLiteImageSegmenter *imageSegmenter =
       TfLiteImageSegmenterFromOptions(&cOptions, &createImageSegmenterError);
+
+  // Freeing memory of allocated string.
+  free(cOptions.display_names_locale)
 
   if (!imageSegmenter || ![TFLCommonUtils checkCError:createImageSegmenterError toError:error]) {
     TfLiteSupportErrorDelete(createImageSegmenterError);

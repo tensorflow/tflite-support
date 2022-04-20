@@ -76,7 +76,7 @@
       TfLiteObjectDetectorFromOptions(&cOptions, &createObjectDetectorError);
 
   [options.classificationOptions
-      deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
+      deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
 
   if (!objectDetector || ![TFLCommonUtils checkCError:createObjectDetectorError toError:error]) {
     TfLiteSupportErrorDelete(createObjectDetectorError);

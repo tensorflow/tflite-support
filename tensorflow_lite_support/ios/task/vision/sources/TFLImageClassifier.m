@@ -77,7 +77,7 @@
       TfLiteImageClassifierFromOptions(&cOptions, &createClassifierError);
 
   [options.classificationOptions
-      deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
+      deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
 
   if (!imageClassifier || ![TFLCommonUtils checkCError:createClassifierError toError:error]) {
     TfLiteSupportErrorDelete(createClassifierError);
