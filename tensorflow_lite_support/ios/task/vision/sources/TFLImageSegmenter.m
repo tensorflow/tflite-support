@@ -29,6 +29,7 @@
   self = [super init];
   if (self) {
     self.baseOptions = [[TFLBaseOptions alloc] init];
+    self.outputType = TFLOutputTypeCategoryMask;
   }
   return self;
 }
@@ -65,6 +66,7 @@
   TfLiteImageSegmenterOptions cOptions = TfLiteImageSegmenterOptionsCreate();
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
+  cOptions.output_type = (TfLiteImageSegmenterOutputType)options.outputType;
 
   TfLiteSupportError *createImageSegmenterError = nil;
   TfLiteImageSegmenter *imageSegmenter =
