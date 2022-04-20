@@ -68,7 +68,7 @@
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
   cOptions.output_type = (TfLiteImageSegmenterOutputType)options.outputType;
-  
+  options.displayNamesLocale = @"Hello";
   if (options.displayNamesLocale) {
     if (options.displayNamesLocale.UTF8String) {
       cOptions.display_names_locale = strdup(options.displayNamesLocale.UTF8String); 
@@ -86,7 +86,7 @@
       TfLiteImageSegmenterFromOptions(&cOptions, &createImageSegmenterError);
 
   // Freeing memory of allocated string.
-  free(cOptions.display_names_locale)
+  free(cOptions.display_names_locale);
 
   if (!imageSegmenter || ![TFLCommonUtils checkCError:createImageSegmenterError toError:error]) {
     TfLiteSupportErrorDelete(createImageSegmenterError);
