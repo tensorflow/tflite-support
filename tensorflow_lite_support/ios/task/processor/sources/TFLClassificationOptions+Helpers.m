@@ -79,8 +79,8 @@
     if (self.displayNamesLocale.UTF8String) {
       cClassificationOptions->display_names_local = strdup(self.displayNamesLocale.UTF8String);
       if (!cClassificationOptions->display_names_local) {
-         exit(-1);  // Memory Allocation Failed.
-       }
+        exit(-1);  // Memory Allocation Failed.
+      }
     } else {
       [TFLCommonUtils createCustomError:error
                                withCode:TFLSupportErrorCodeInvalidArgumentError
