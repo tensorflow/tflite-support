@@ -132,8 +132,6 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     image_result = detector.detect(image)
 
     # Comparing results.
-    detection_result = detections_pb2.DetectionResult()
-    detection_result.ParseFromString(image_result.SerializeToString())
     self.assertProtoEquals(expected_result_text_proto, image_result)
 
   def test_score_threshold_option(self):

@@ -216,8 +216,6 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
     audio_result = classifier.classify(tensor)
 
     # Comparing results.
-    classification_result = classifications_pb2.ClassificationResult()
-    classification_result.ParseFromString(audio_result.SerializeToString())
     self.assertProtoEquals(expected_result_text_proto, audio_result)
 
   def test_max_results_option(self):
