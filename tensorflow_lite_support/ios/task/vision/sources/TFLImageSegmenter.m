@@ -72,6 +72,10 @@
   if (options.displayNamesLocale) {
     if (options.displayNamesLocale.UTF8String) {
       cOptions.display_names_locale = strdup(options.displayNamesLocale.UTF8String);
+      if (!cOptions.display_names_locale) {
+        NSLog(@"Exit prog");
+         exit(-1);  // Memory Allocation Failed.
+       }
     } else {
       [TFLCommonUtils createCustomError:error
                                withCode:TFLSupportErrorCodeInvalidArgumentError
@@ -79,7 +83,7 @@
       return nil;
     }
   }
-
+ 
   TfLiteSupportError *createImageSegmenterError = nil;
   TfLiteImageSegmenter *imageSegmenter =
       TfLiteImageSegmenterFromOptions(&cOptions, &createImageSegmenterError);
