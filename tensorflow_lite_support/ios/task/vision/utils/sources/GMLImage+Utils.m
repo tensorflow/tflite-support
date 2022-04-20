@@ -48,9 +48,14 @@
                            frameBufferFormat:(enum TfLiteFrameBufferFormat)frameBufferFormat
                                       buffer:(uint8_t *)buffer
                                        error:(NSError **)error {
+
+  if (!buffer) {
+    return NULL;
+  }
+
   TfLiteFrameBuffer *cFrameBuffer = [TFLCommonUtils mallocWithSize:sizeof(TfLiteFrameBuffer)
                                                              error:error];
-
+  
   if (cFrameBuffer) {
     cFrameBuffer->dimension.width = width;
     cFrameBuffer->dimension.height = height;
@@ -124,6 +129,7 @@
   switch (pixelBufferFormat) {
     case kCVPixelFormatType_32BGRA: {
       cPixelFormat = kRGB;
+
       buffer =  [TFLCVPixelBufferUtils
       createRGBImageDatafromImageData:CVPixelBufferGetBaseAddress(pixelBuffer)
                              withWidth:CVPixelBufferGetWidth(pixelBuffer)
@@ -143,54 +149,12 @@
 
   CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
 
-  if (!buffer) {
-    return NULL;
-  }
 
   return [self cFrameBufferWithWidth:(int)CVPixelBufferGetWidth(pixelBuffer)
                               height:(int)CVPixelBufferGetHeight(pixelBuffer)
                    frameBufferFormat:cPixelFormat
                               buffer:buffer
                                error:error];
-}
-
-+ (uint8_t *)convertBGRAtoRGBforPixelBufferBaseAddress:(CVPixelBufferRef)pixelBuffer
-                                                 error:(NSError **)error {
-  size_t width = CVPixelBufferGetWidth(pixelBuffer);
-  size_t height = CVPixelBufferGetHeight(pixelBuffer);
-  size_t stride = CVPixelBufferGetBytesPerRow(pixelBuffer);
-
-  int destinationChannelCount = 3;
-  size_t destinationBytesPerRow = destinationChannelCount * width;
-
-  uint8_t *pixelBufferBaseAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
-
-  uint8_t *destPixelBufferAddress =
-      [TFLCommonUtils mallocWithSize:sizeof(uint8_t) * height * destinationBytesPerRow error:error];
-
-  if (!destPixelBufferAddress) {
-    return NULL;
-  }
-
-  vImage_Buffer srcBuffer = {
-      .data = pixelBufferBaseAddress, .height = height, .width = width, .rowBytes = stride};
-
-  vImage_Buffer destBuffer = {.data = destPixelBufferAddress,
-                              .height = height,
-                              .width = width,
-                              .rowBytes = destinationBytesPerRow};
-
-  vImage_Error convertError = kvImageNoError;
-  convertError = vImageConvert_BGRA8888toRGB888(&srcBuffer, &destBuffer, kvImageNoFlags);
-
-  if (convertError != kvImageNoError) {
-    [TFLCommonUtils createCustomError:error
-                             withCode:TFLSupportErrorCodeImageProcessingError
-                          description:@"Image format conversion failed."];
-    return NULL;
-  }
-
-  return destPixelBufferAddress;
 }
 
 @end
@@ -290,10 +254,6 @@
 - (TfLiteFrameBuffer *)frameBufferFromCGImage:(CGImageRef)cgImage error:(NSError **)error {
   UInt8 *buffer = [UIImage pixelDataFromCGImage:cgImage error:error];
 
-  if (buffer == NULL) {
-    return NULL;
-  }
-
   return [TFLCVPixelBufferUtils cFrameBufferWithWidth:(int)CGImageGetWidth(cgImage)
                                                height:(int)CGImageGetHeight(cgImage)
                                     frameBufferFormat:kRGB
@@ -329,10 +289,6 @@
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
                           description:@"CIImage should have CGImage or CVPixelBuffer info."];
-  }
-
-  if (buffer == NULL) {
-    return NULL;
   }
 
   return [TFLCVPixelBufferUtils cFrameBufferWithWidth:width
