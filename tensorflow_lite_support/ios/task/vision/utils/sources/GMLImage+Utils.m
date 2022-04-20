@@ -286,7 +286,6 @@
     width = (int)CVPixelBufferGetWidth(ciImage.pixelBuffer);
     height = (int)CVPixelBufferGetHeight(ciImage.pixelBuffer);
     NSInteger channelCount = 4;
-    size_t bytesPerRow = width * channelCount;
 
     buffer = [TFLCVPixelBufferUtils createRGBImageDatafromCVPixelBuffer:ciImage.pixelBuffer
                                                                   error:error];
