@@ -44,6 +44,9 @@ support_py_proto_library(
     srcs = ["classifications.proto"],
     api_version = 2,
     proto_deps = [":classifications_proto"],
+    py_proto_deps = [
+        ":class_py_pb2",
+    ],
 )
 
 proto_library(
