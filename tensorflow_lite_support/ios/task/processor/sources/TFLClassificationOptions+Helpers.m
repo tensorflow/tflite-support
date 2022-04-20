@@ -77,8 +77,6 @@
 
   if (self.displayNamesLocale) {
     if (self.displayNamesLocale.UTF8String) {
-      // strdup is not needed as C layer handles copying (C++ options are protobufs).
-      // Hence setting char* values in protobuf leads to copying.
       cClassificationOptions->display_names_local = strdup(self.displayNamesLocale.UTF8String); 
     }
     else {
