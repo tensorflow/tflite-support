@@ -23,7 +23,6 @@ from tensorflow_lite_support.python.task.audio.core import audio_record
 from tensorflow_lite_support.python.task.audio.core import tensor_audio
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
-from tensorflow_lite_support.python.test import base_test
 from tensorflow_lite_support.python.test import test_util
 
 _mock = unittest.mock
@@ -39,7 +38,7 @@ class ModelFileType(enum.Enum):
   FILE_NAME = 2
 
 
-class AudioEmbedderTest(parameterized.TestCase, base_test.BaseTestCase):
+class AudioEmbedderTest(parameterized.TestCase, tf.test.TestCase):
 
   def setUp(self):
     super().setUp()
