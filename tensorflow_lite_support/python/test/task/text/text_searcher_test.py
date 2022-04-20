@@ -22,7 +22,6 @@ from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.core.proto import external_file_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import search_result_pb2
 from tensorflow_lite_support.python.task.text import text_searcher
 from tensorflow_lite_support.python.test import test_util
 
@@ -34,56 +33,54 @@ _TextSearcherOptions = text_searcher.TextSearcherOptions
 
 _REGEX_MODEL = 'regex_one_embedding_with_metadata.tflite'
 _REGEX_INDEX = 'regex_index.ldb'
-_EXPECTED_REGEX_SEARCH_PARAMS = [
-  {
-    'metadata': 'The weather was excellent.',
-    'distance': 0.0
-  }, {
-    'metadata': 'The sun was shining on that day.',
-    'distance': 5.7e-5
-  }, {
-    'metadata': 'The cat is chasing after the mouse.',
-    'distance': 8.9e-5
-  }, {
-    'metadata': 'It was a sunny day.',
-    'distance': 0.000113
-  }, {
-    'metadata': 'He was very happy with his newly bought car.',
-    'distance': 0.000119
-  }
-]
+_EXPECTED_REGEX_SEARCH_PARAMS = """
+nearest_neighbors {
+  metadata: "The weather was excellent."
+  distance: 0.0
+}
+nearest_neighbors {
+  metadata: "The sun was shining on that day."
+  distance: 5.7e-5
+}
+nearest_neighbors {
+  metadata: "The cat is chasing after the mouse."
+  distance: 8.9e-5
+}
+nearest_neighbors {
+  metadata: "It was a sunny day."
+  distance: 0.000113
+}
+nearest_neighbors {
+  metadata: "He was very happy with his newly bought car."
+  distance: 0.000119
+}
+"""
 
 _BERT_MODEL = 'mobilebert_embedding_with_metadata.tflite'
 _BERT_INDEX = 'mobilebert_index.ldb'
-_EXPECTED_BERT_SEARCH_PARAMS = [
-  {
-    'metadata': 'The weather was excellent.',
-    'distance': 0.007773
-  }, {
-    'metadata': 'It was a sunny day.',
-    'distance': 0.081911
-  }, {
-    'metadata': 'The sun was shining on that day.',
-    'distance': 0.191735
-  }, {
-    'metadata': 'He was very happy with his newly bought car.',
-    'distance': 0.280981
-  }, {
-    'metadata': 'The cat is chasing after the mouse.',
-    'distance': 0.919612
-  }
-]
+_EXPECTED_BERT_SEARCH_PARAMS = """
+nearest_neighbors {
+  metadata: "The weather was excellent."
+  distance: 0.007773
+}
+nearest_neighbors {
+  metadata: "It was a sunny day."
+  distance: 0.081911
+}
+nearest_neighbors {
+  metadata: "The sun was shining on that day."
+  distance: 0.191735
+}
+nearest_neighbors {
+  metadata: "He was very happy with his newly bought car."
+  distance: 0.280981
+}
+nearest_neighbors {
+  metadata: "The cat is chasing after the mouse."
+  distance: 0.919612
+}
 
-
-def _build_test_data(expected_nearest_neighbors):
-  expected_search_result = search_result_pb2.SearchResult()
-  expected_search_result.nearest_neighbors.extend(
-    [search_result_pb2.NearestNeighbor(
-      metadata=nearest_neighbor['metadata'].encode(),
-      distance=nearest_neighbor['distance'])
-     for nearest_neighbor in expected_nearest_neighbors])
-
-  return expected_search_result
+"""
 
 
 class ModelFileType(enum.Enum):
@@ -161,7 +158,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
      _EXPECTED_BERT_SEARCH_PARAMS)
   )
   def test_search(self, model_name, index_name, l2_normalize, quantize,
-                  model_file_type, expected_search_params):
+                  model_file_type, expected_result_text_proto):
     # Create embedder.
     model_path = test_util.get_test_data_path(model_name)
     if model_file_type is ModelFileType.FILE_NAME:
@@ -185,17 +182,8 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     # Perform text search.
     text_search_result = searcher.search("The weather was excellent.")
 
-    # Build test data.
-    expected_search_result = _build_test_data(expected_search_params)
-
-    # Check nearest-neighbour sizes for the actual and expected results.
-    self.assertEqual(len(text_search_result.nearest_neighbors),
-                     len(expected_search_result.nearest_neighbors))
-
     # Comparing results.
-    actual_search_result = search_result_pb2.SearchResult()
-    actual_search_result.ParseFromString(text_search_result.SerializeToString())
-    self.assertProtoEquals(actual_search_result, expected_search_result)
+    self.assertProtoEquals(expected_result_text_proto, text_search_result)
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), "userinfo")
