@@ -65,9 +65,13 @@
 + (nullable instancetype)objectDetectorWithOptions:(nonnull TFLObjectDetectorOptions *)options
                                              error:(NSError **)error {
   TfLiteObjectDetectorOptions cOptions = TfLiteObjectDetectorOptionsCreate();
-  if (!
-      [options.classificationOptions copyToCOptions:&(cOptions.classification_options) error:error])
+  if (![options.classificationOptions copyToCOptions:&(cOptions.classification_options)
+                                               error:error]) {
+    // Deallocating any allocated memory on failure.
+    [options.classificationOptions
+        deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
     return nil;
+  }
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
 

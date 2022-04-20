@@ -66,9 +66,13 @@
 + (nullable instancetype)imageClassifierWithOptions:(TFLImageClassifierOptions *)options
                                               error:(NSError **)error {
   TfLiteImageClassifierOptions cOptions = TfLiteImageClassifierOptionsCreate();
-  if (!
-      [options.classificationOptions copyToCOptions:&(cOptions.classification_options) error:error])
+
+  if (![options.classificationOptions copyToCOptions:&(cOptions.classification_options)
+                                               error:error]) {
+    [options.classificationOptions
+        deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
     return nil;
+  }
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
 
