@@ -194,8 +194,6 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     """
 
     # Comparing results (classification w/ bounding box).
-    classification_result = classifications_pb2.ClassificationResult()
-    classification_result.ParseFromString(image_result.SerializeToString())
     self.assertProtoEquals(expected_result_text_proto, image_result)
 
   def test_max_results_option(self):
