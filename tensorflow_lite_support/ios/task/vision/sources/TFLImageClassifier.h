@@ -81,13 +81,11 @@ NS_ASSUME_NONNULL_BEGIN
  * TFLClass objects for each classification head.
  * This method currently supports inference on only following type of images:
  * 1. RGB and RGBA images for GMLImageSourceTypeImage.
- * 2. kCVPixelFormatType_32RGBA, kCVPixelFormatType_32BGRA,
- *    kCVPixelFormatType_24RGB for GMLImageSourceTypePixelBuffer and
+ * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
  *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
- *    camera and get the frames for inference, you must request for one of these
- *    supported formats from AVCaptureVideoDataOutput. For a sample code
- *    snippet, please refer to:
- *       https://github.com/tensorflow/examples/blob/master/lite/examples/image_classification/ios/ImageClassification/Camera%20Feed/CameraFeedManager.swift#L253
+ *    camera and get the frames for inference, you must request for this format
+ *    from AVCaptureVideoDataOutput. Otherwise your classification 
+ *    results will be wrong.
  *
  * @param image input to the model.
  * @return An NSArray<NSArray<TFLClass *>*> * of classification results.
@@ -101,6 +99,13 @@ NS_ASSUME_NONNULL_BEGIN
  * specified bounding box, returns an array of categorization results
  * where each member in the array is an array of TFLClass objects for
  * each classification head.
+ * This method currently supports inference on only following type of images:
+ * 1. RGB and RGBA images for GMLImageSourceTypeImage.
+ * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
+ *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ *    camera and get the frames for inference, you must request for this format
+ *    from AVCaptureVideoDataOutput. Otherwise your classification 
+ *    results will be wrong.
  *
  * @param image input to the model.
  * @param roi CGRect specifying region of interest in image.

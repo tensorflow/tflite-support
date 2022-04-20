@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Creates TFLObjectDetector from a model file and specified options .
- *
+ * 
  * @param options TFLObjectDetectorOptions instance with the necessary
  * properties set.
  *
@@ -69,7 +69,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Performs object detection on a GMLImage input, returns the detected objects in the image.
- *
+ * This method currently supports inference on only following type of images:
+ * 1. RGB and RGBA images for GMLImageSourceTypeImage.
+ * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
+ *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ *    camera and get the frames for inference, you must request for this format
+ *    from AVCaptureVideoDataOutput. Otherwise your classification 
+ *    results will be wrong.
+ * 
  * @param image input to the model.
  * @return Detection Result of type TFLDetectionResult an array of
  * detected objeects  where each detected object has a bounding box and an array of TFLCategory

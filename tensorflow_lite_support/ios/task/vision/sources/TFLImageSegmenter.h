@@ -100,6 +100,13 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
 /**
  * Performs image segmentation on a GMLImage input, returns the segmentation 
  * results.
+ * This method currently supports inference on only following type of images:
+ * 1. RGB and RGBA images for GMLImageSourceTypeImage.
+ * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
+ *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ *    camera and get the frames for inference, you must request for this format
+ *    from AVCaptureVideoDataOutput. Otherwise your classification 
+ *    results will be wrong.
  *
  * @param image input to the model.
  * 
