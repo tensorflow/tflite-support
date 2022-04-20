@@ -68,7 +68,7 @@
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
   cOptions.output_type = (TfLiteImageSegmenterOutputType)options.outputType;
-  options.displayNamesLocale = @"Hello";
+
   if (options.displayNamesLocale) {
     if (options.displayNamesLocale.UTF8String) {
       cOptions.display_names_locale = strdup(options.displayNamesLocale.UTF8String); 
