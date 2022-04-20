@@ -71,9 +71,8 @@
 
   if (options.displayNamesLocale) {
     if (options.displayNamesLocale.UTF8String) {
-      cOptions.display_names_locale = strdup(options.displayNamesLocale.UTF8String); 
-    }
-    else {
+      cOptions.display_names_locale = strdup(options.displayNamesLocale.UTF8String);
+    } else {
       [TFLCommonUtils createCustomError:error
                                withCode:TFLSupportErrorCodeInvalidArgumentError
                             description:@"Could not convert (NSString *) to (char *)."];

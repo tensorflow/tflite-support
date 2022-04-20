@@ -77,9 +77,8 @@
 
   if (self.displayNamesLocale) {
     if (self.displayNamesLocale.UTF8String) {
-      cClassificationOptions->display_names_local = strdup(self.displayNamesLocale.UTF8String); 
-    }
-    else {
+      cClassificationOptions->display_names_local = strdup(self.displayNamesLocale.UTF8String);
+    } else {
       [TFLCommonUtils createCustomError:error
                                withCode:TFLSupportErrorCodeInvalidArgumentError
                             description:@"Could not convert (NSString *) to (char *)."];
@@ -103,6 +102,6 @@
   }
 
   free(cClassificationOptions->display_names_local);
-
 }
+
 @end
