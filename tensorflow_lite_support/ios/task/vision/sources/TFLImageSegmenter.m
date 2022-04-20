@@ -67,6 +67,20 @@
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
   cOptions.output_type = (TfLiteImageSegmenterOutputType)options.outputType;
+  
+  if (options.displayNamesLocale) {
+    if (options.displayNamesLocale.UTF8String) {
+      // strdup is not needed as C layer handles copying (C++ options are protobufs).
+      // Hence setting char* values in protobuf leads to copying.
+      cOptions.display_names_locale = options.displayNamesLocale.UTF8String; 
+    }
+    else {
+      [TFLCommonUtils createCustomError:error
+                               withCode:TFLSupportErrorCodeInvalidArgumentError
+                            description:@"Could not convert (NSString *) to (char *)."];
+      return nil;
+    }
+  }
 
   TfLiteSupportError *createImageSegmenterError = nil;
   TfLiteImageSegmenter *imageSegmenter =
