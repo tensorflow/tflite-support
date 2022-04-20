@@ -102,13 +102,26 @@
       convertError = vImageConvert_BGRA8888toRGB888(&srcBuffer, &destBuffer, kvImageNoFlags);
       break;
     }
-    default:
+    default: {
       [TFLCommonUtils createCustomError:error
                                withCode:TFLSupportErrorCodeInvalidArgumentError
                             description:@"Invalid source pixel buffer format. Expecting one of "
                                         @"kCVPixelFormatType_32RGBA, kCVPixelFormatType_32BGRA, "
                                         @"kCVPixelFormatType_32ARGB"];
+                                       
+      free(destPixelBufferAddress);
       return NULL;
+    }
+  }
+  
+
+  if (convertError != kvImageNoError) {
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeImageProcessingError
+                          description:@"Image format conversion failed."];
+    
+    free(destPixelBufferAddress);
+    return NULL;
   }
 
   return destPixelBufferAddress;
