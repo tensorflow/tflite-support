@@ -16,6 +16,7 @@
 import dataclasses
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core.proto import external_file_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_result_pb2
@@ -23,6 +24,7 @@ from tensorflow_lite_support.python.task.text.pybinds import _pywrap_text_search
 
 _CppTextSearcher = _pywrap_text_searcher.TextSearcher
 _BaseOptions = base_options_pb2.BaseOptions
+_ExternalFile = external_file_pb2.ExternalFile
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 _SearchOptions = search_options_pb2.SearchOptions
 
@@ -45,6 +47,30 @@ class TextSearcher(object):
     # Creates the object of C++ TextSearcher class.
     self._options = options
     self._searcher = cpp_searcher
+
+  @classmethod
+  def create_from_file(cls, model_file_path: str,
+                       index_file_path: str) -> "TextSearcher":
+    """Creates the `AudioClassifier` object from a TensorFlow Lite model.
+
+    Args:
+      model_file_path: Path to the model.
+      index_file_path: Path to the index.
+
+    Returns:
+      `TextSearcher` object that's created from `options`.
+
+    Raises:
+      ValueError: If failed to create `TextSearcher` object from the provided
+        file such as invalid file.
+      RuntimeError: If other types of error occurred.
+    """
+    index_file = _ExternalFile(file_name=index_file_path)
+    options = TextSearcherOptions(
+      base_options=_BaseOptions(file_name=model_file_path),
+      embedding_options=_EmbeddingOptions(l2_normalize=True),
+      search_options=_SearchOptions(index_file=index_file))
+    return cls.create_from_options(options)
 
   @classmethod
   def create_from_options(cls, options: TextSearcherOptions) -> "TextSearcher":

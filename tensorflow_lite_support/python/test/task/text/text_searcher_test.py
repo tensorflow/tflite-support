@@ -26,6 +26,7 @@ from tensorflow_lite_support.python.task.text import text_searcher
 from tensorflow_lite_support.python.test import test_util
 
 _BaseOptions = base_options_pb2.BaseOptions
+_ExternalFile = external_file_pb2.ExternalFile
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 _SearchOptions = search_options_pb2.SearchOptions
 _TextSearcher = text_searcher.TextSearcher
@@ -97,8 +98,14 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     self.model_path = test_util.get_test_data_path(_REGEX_MODEL)
     self.index_path = test_util.get_test_data_path(_REGEX_INDEX)
 
+  def test_create_from_file_succeeds_with_valid_model_path(self):
+    # Creates with default option and valid model and index files successfully.
+    searcher = _TextSearcher.create_from_file(
+      self.model_path, self.index_path)
+    self.assertIsInstance(searcher, _TextSearcher)
+
   def test_create_from_options_succeeds_with_valid_model_path(self):
-    index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
+    index_file = _ExternalFile(file_name=self.index_path)
     options = _TextSearcherOptions(
       base_options=_BaseOptions(file_name=self.model_path),
       search_options=_SearchOptions(index_file=index_file))
@@ -130,7 +137,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
         ValueError,
         r"ExternalFile must specify at least one of 'file_content', "
         r"'file_name' or 'file_descriptor_meta'."):
-      index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
+      index_file = _ExternalFile(file_name=self.index_path)
       options = _TextSearcherOptions(
         base_options=_BaseOptions(file_name=""),
         search_options=_SearchOptions(index_file=index_file))
@@ -142,7 +149,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
         ValueError,
         r'Setting EmbeddingOptions.normalize = true is not allowed in '
         r'searchers.'):
-      index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
+      index_file = _ExternalFile(file_name=self.index_path)
       options = _TextSearcherOptions(
         base_options=_BaseOptions(file_name=self.model_path),
         embedding_options=_EmbeddingOptions(quantize=True),
@@ -154,7 +161,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     with self.assertRaisesRegex(
         ValueError,
         r'SearchOptions.num_results must be > 0, found -1.'):
-      index_file = external_file_pb2.ExternalFile(file_name=self.index_path)
+      index_file = _ExternalFile(file_name=self.index_path)
       options = _TextSearcherOptions(
         base_options=_BaseOptions(file_name=self.model_path),
         search_options=_SearchOptions(index_file=index_file, num_results=-1))
@@ -185,7 +192,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
       raise ValueError('model_file_type is invalid.')
 
     index_file_name = test_util.get_test_data_path(index_name)
-    index_file = external_file_pb2.ExternalFile(file_name=index_file_name)
+    index_file = _ExternalFile(file_name=index_file_name)
     options = _TextSearcherOptions(
       base_options,
       _EmbeddingOptions(l2_normalize=l2_normalize, quantize=quantize),
