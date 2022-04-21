@@ -18,9 +18,8 @@
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLObjectDetector.h"
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
-
 #define VerifyDetection(detection, expectedBoundingBox, expectedFirstScore, expectedFirstLabel) \
-  XCTAssertGreaterThan([detection.categories count], 0);                                        \
+  XCTAssertGreaterThan(detection.categories.count, 0);                                          \
   NSLog(@"Detected %f", detection.categories[0].score);                                         \
   NSLog(@"Expected %f", expectedFirstScore);                                                    \
   XCTAssertEqual(detection.boundingBox.origin.x, expectedBoundingBox.origin.x);                 \
@@ -40,14 +39,14 @@
   // Put setup code here. This method is called before the invocation of each test method in the
   // class.
   [super setUp];
-  self.modelPath = [[NSBundle bundleForClass:[self class]]
+  self.modelPath = [[NSBundle bundleForClass:self.class]
       pathForResource:@"coco_ssd_mobilenet_v1_1.0_quant_2018_06_29"
                ofType:@"tflite"];
   XCTAssertNotNil(self.modelPath);
 }
 
 - (void)verifyResults:(TFLDetectionResult *)detectionResult {
-  XCTAssertGreaterThan([detectionResult.detections count], 0);
+  XCTAssertGreaterThan(detectionResult.detections.count, 0);
   VerifyDetection(detectionResult.detections[0],
                   CGRectMake(54, 396, 393, 199),  // expectedBoundingBox
                   0.632812,                       // expectedFirstScore
@@ -78,9 +77,8 @@
       [TFLObjectDetector objectDetectorWithOptions:objectDetectorOptions error:nil];
   XCTAssertNotNil(objectDetector);
 
-  GMLImage *gmlImage = [GMLImage imageFromBundleWithClass:[self class]
-                                                 fileName:@"cats_and_dogs"
-                                                   ofType:@"jpg"];
+  GMLImage *gmlImage =
+      [GMLImage imageFromBundleWithClass:self.class fileName:@"cats_and_dogs" ofType:@"jpg"];
   XCTAssertNotNil(gmlImage);
 
   TFLDetectionResult *detectionResults = [objectDetector detectWithGMLImage:gmlImage error:nil];
@@ -97,14 +95,13 @@
       [TFLObjectDetector objectDetectorWithOptions:objectDetectorOptions error:nil];
   XCTAssertNotNil(objectDetector);
 
-  GMLImage *gmlImage = [GMLImage imageFromBundleWithClass:[self class]
-                                                 fileName:@"cats_and_dogs"
-                                                   ofType:@"jpg"];
+  GMLImage *gmlImage =
+      [GMLImage imageFromBundleWithClass:self.class fileName:@"cats_and_dogs" ofType:@"jpg"];
   XCTAssertNotNil(gmlImage);
 
   TFLDetectionResult *detectionResult = [objectDetector detectWithGMLImage:gmlImage error:nil];
 
-  XCTAssertLessThanOrEqual([detectionResult.detections count], maxResults);
+  XCTAssertLessThanOrEqual(detectionResult.detections.count, maxResults);
   VerifyDetection(detectionResult.detections[0],
                   CGRectMake(54, 396, 393, 199),  // expectedBoundingBox
                   0.632812,                       // expectedFirstScore

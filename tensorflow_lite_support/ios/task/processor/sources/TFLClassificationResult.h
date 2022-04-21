@@ -18,17 +18,18 @@ limitations under the License.
 NS_ASSUME_NONNULL_BEGIN
 
 /** Encapsulates list of predicted classes (aka labels) for a given image classifier head. */
+NS_SWIFT_NAME(Classifications)
 @interface TFLClassifications : NSObject
 
 /**
  * The index of the image classifier head these classes refer to. This is useful for multi-head
  * models.
  */
-@property(nonatomic, assign, readonly) NSInteger headIndex;
+@property(nonatomic, readonly) NSInteger headIndex;
 
 /** The array of predicted classes, usually sorted by descending scores (e.g.from high to low
  * probability). */
-@property(nonatomic, copy, readonly) NSArray<TFLCategory *> *categories;
+@property(nonatomic, readonly) NSArray<TFLCategory *> *categories;
 
 /**
  * Initializes TFLClassifications.
@@ -46,12 +47,13 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /** Encapsulates results of any classification task. */
+NS_SWIFT_NAME(ClassificationResult)
 @interface TFLClassificationResult : NSObject
 
 /** Array of TFLClassifications objects containing image classifier predictions per image classifier
  * head.
  */
-@property(nonatomic, copy, readonly) NSArray<TFLClassifications *> *classifications;
+@property(nonatomic, readonly) NSArray<TFLClassifications *> *classifications;
 
 /**
  * Initializes TFLClassificationResult.

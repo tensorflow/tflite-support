@@ -20,24 +20,55 @@ limitations under the License.
 NS_ASSUME_NONNULL_BEGIN
 
 /** Encapsulates list of predicted classes (aka labels) and bounding box for a detected object. */
+NS_SWIFT_NAME(Detection)
 @interface TFLDetection : NSObject
 
 /**
  * The index of the image classifier head these classes refer to. This is useful for multi-head
  * models.
  */
-@property(nonatomic, assign) CGRect boundingBox;
+@property(nonatomic, readonly) CGRect boundingBox;
 
 /** The array of predicted classes, usually sorted by descending scores (e.g.from high to low
  * probability). */
-@property(nonatomic, copy) NSArray<TFLCategory *> *categories;
+@property(nonatomic, readonly) NSArray<TFLCategory *> *categories;
+
+/**
+ * Initializes TFLDetection.
+ *
+ * @param boundingBox CGRect specifying the bounds of the object represented by this detection.
+ * @param categories Array of predicted classes, usually sorted by descending scores (e.g.from high
+ * to low probability).
+ *
+ * @return An instance of TFLDetection initialized to the specified values.
+ */
+- (instancetype)initWithBoundingBox:(CGRect)boundingBox
+                         categories:(NSArray<TFLCategory *> *)categories;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
 /** Encapsulates results of any object detection task. */
+NS_SWIFT_NAME(DetectionResult)
 @interface TFLDetectionResult : NSObject
 
-@property(nonatomic, copy) NSArray<TFLDetection *> *detections;
+@property(nonatomic, readonly) NSArray<TFLDetection *> *detections;
+
+/**
+ * Initializes TFLDetectionResult.
+ *
+ * @param detections Array of detected objects of type TFLDetection.
+ *
+ * @return An instance of TFLDetectionResult initialized to the specified values.
+ */
+- (instancetype)initWithDetections:(NSArray<TFLDetection *> *)detections;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
