@@ -73,9 +73,13 @@
   }
 
   TfLiteImageClassifierOptions cOptions = TfLiteImageClassifierOptionsCreate();
-  if (!
-      [options.classificationOptions copyToCOptions:&(cOptions.classification_options) error:error])
+
+  if (![options.classificationOptions copyToCOptions:&(cOptions.classification_options)
+                                               error:error]) {
+    [options.classificationOptions
+        deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
     return nil;
+  }
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
 
@@ -84,7 +88,7 @@
       TfLiteImageClassifierFromOptions(&cOptions, &cCreateClassifierError);
 
   [options.classificationOptions
-      deleteCStringArraysOfClassificationOptions:&(cOptions.classification_options)];
+      deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
 
   // Populate iOS error if TfliteSupportError is not null and afterwards delete it.
   if (![TFLCommonUtils checkCError:cCreateClassifierError toError:error]) {

@@ -69,8 +69,17 @@ NS_SWIFT_NAME(ObjectDetector)
                                              error:(NSError **)error
     NS_SWIFT_NAME(objectDetector(options:));
 
++ (instancetype)new NS_UNAVAILABLE;
+
 /**
  * Performs object detection on a GMLImage input, returns the detected objects in the image.
+ * This method currently supports inference on only following type of images:
+ * 1. RGB and RGBA images for GMLImageSourceTypeImage.
+ * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
+ *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ *    camera and get the frames for inference, you must request for this format
+ *    from AVCaptureVideoDataOutput. Otherwise your classification
+ *    results will be wrong.
  *
  * @param image input to the model.
  * @return Detection Result of type TFLDetectionResult an array of
@@ -82,8 +91,6 @@ NS_SWIFT_NAME(ObjectDetector)
     NS_SWIFT_NAME(detect(gmlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

@@ -28,19 +28,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef NS_ENUM(NSUInteger, TFLOutputType) {
   /** Unspecified output type. */
-  TFLUnspecifiedOutputType,
+  TFLOutputTypeUnspecified,
 
   /**
    * Gives a single output mask where each pixel represents the class which
    * the pixel in the original image was predicted to belong to.
    */
-  TFLCategoryMaskOutputType,
+  TFLOutputTypeCategoryMask,
 
   /**
    * Gives a list of output masks where, for each mask, each pixel represents
    * the prediction confidence, usually in the [0, 1] range.
    */
-  TFLConfidenceMasksOutputType,
+  TFLOutputTypeConfidenceMasks,
 
 } NS_SWIFT_NAME(OutputType);
 
@@ -104,6 +104,13 @@ NS_SWIFT_NAME(ImageSegmenter)
 /**
  * Performs image segmentation on a GMLImage input, returns the segmentation
  * results.
+ * This method currently supports inference on only following type of images:
+ * 1. RGB and RGBA images for GMLImageSourceTypeImage.
+ * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
+ *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ *    camera and get the frames for inference, you must request for this format
+ *    from AVCaptureVideoDataOutput. Otherwise your classification
+ *    results will be wrong.
  *
  * @param image input to the model.
  *

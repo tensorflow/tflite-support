@@ -30,6 +30,7 @@
   self = [super init];
   if (self) {
     self.baseOptions = [[TFLBaseOptions alloc] init];
+    self.outputType = TFLOutputTypeCategoryMask;
   }
   return self;
 }
@@ -66,12 +67,29 @@
   TfLiteImageSegmenterOptions cOptions = TfLiteImageSegmenterOptionsCreate();
 
   [options.baseOptions copyToCOptions:&(cOptions.base_options)];
+  cOptions.output_type = (TfLiteImageSegmenterOutputType)options.outputType;
+
+  if (options.displayNamesLocale) {
+    if (options.displayNamesLocale.UTF8String) {
+      cOptions.display_names_locale = strdup(options.displayNamesLocale.UTF8String);
+      if (!cOptions.display_names_locale) {
+        exit(-1);  // Memory Allocation Failed.
+      }
+    } else {
+      [TFLCommonUtils createCustomError:error
+                               withCode:TFLSupportErrorCodeInvalidArgumentError
+                            description:@"Could not convert (NSString *) to (char *)."];
+      return nil;
+    }
+  }
 
   TfLiteSupportError *cCreateImageSegmenterError = nil;
   TfLiteImageSegmenter *cImageSegmenter =
       TfLiteImageSegmenterFromOptions(&cOptions, &cCreateImageSegmenterError);
 
-  // Populate iOS error if TfliteSupportError is not null and afterwards delete  it.
+  // Freeing memory of allocated string.
+  free(cOptions.display_names_locale);
+
   if (![TFLCommonUtils checkCError:cCreateImageSegmenterError toError:error]) {
     TfLiteSupportErrorDelete(cCreateImageSegmenterError);
   }
