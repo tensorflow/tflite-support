@@ -287,6 +287,33 @@ INSTANTIATE_TEST_SUITE_P(
     SearchTest, SearchTest,
     Values(
         SearchParams{
+            .name = "Bert",
+            .model_name = kMobileBert,
+            .is_universal_sentence_encoder = false,
+            .index_name = kMobileBertIndex,
+            .expected_result = R"pb(
+              nearest_neighbors {
+                metadata: "The weather was excellent."
+                distance: 0.0
+              }
+              nearest_neighbors {
+                metadata: "It was a sunny day."
+                distance: 0.11537
+              }
+              nearest_neighbors {
+                metadata: "The sun was shining on that day."
+                distance: 0.23002
+              }
+              nearest_neighbors {
+                metadata: "He was very happy with his newly bought car."
+                distance: 0.32456
+              }
+              nearest_neighbors {
+                metadata: "The cat is chasing after the mouse."
+                distance: 0.96693
+              }
+            )pb"},
+        SearchParams{
             .name = "Regex",
             .model_name = kRegexModel,
             .is_universal_sentence_encoder = false,

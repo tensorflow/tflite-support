@@ -101,9 +101,9 @@ http_archive(
     ],
 )
 
-# TF on 2022-04-18.
-TENSORFLOW_COMMIT = "f41fbaf256122d59ca98fd44ced485bd1bb3c7dc"
-TENSORFLOW_SHA256 = "c2664db938f3cee10f9df8a6e4ac074065f0da1e0ac4abd876fcee0635a15907"
+# TF on 2022-04-20.
+TENSORFLOW_COMMIT = "314479be97046e0db0ff7662b1fbdb17af2ef4b4"
+TENSORFLOW_SHA256 = "b3c439aa7da6780956780e0cb312011416fcd476201f8033f90b3c4fc1cff7a0"
 http_archive(
     name = "org_tensorflow",
     sha256 = TENSORFLOW_SHA256,

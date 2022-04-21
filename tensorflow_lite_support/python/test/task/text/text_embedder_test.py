@@ -110,6 +110,12 @@ class TextEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     _check_embedding_size(result0)
     _check_embedding_size(result1)
 
+    # Checks cosine similarity.
+    similarity = embedder.cosine_similarity(
+        result0.embeddings[0].feature_vector,
+        result1.embeddings[0].feature_vector)
+    self.assertAlmostEqual(similarity, expected_similarity, places=4)
+
   def test_get_embedding_dimension(self):
     options = _TextEmbedderOptions(_BaseOptions(file_name=self.model_path))
     embedder = _TextEmbedder.create_from_options(options)

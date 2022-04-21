@@ -49,7 +49,7 @@ _FIXED_INPUT_SIZE_MODEL_CLASSIFICATIONS = {
         },
         {
             'index': 494,
-            'score': 0.015625,
+            'score': 0.011719,
             'class_name': 'Silence'
         }
     ]
