@@ -138,9 +138,8 @@ third_party_http_archive(
     build_file = "@pybind11_bazel//:pybind11.BUILD",
 )
 
-# TODO(b/211393391): Updates the commit number once the new change is ready.
-PP_COMMIT = "30f02dd9ccd2fc7046c36ed913ed510fd1aa7301"
-PP_SHA256 = "178bcd587956b0f449fff2f46e663dc10baa6d4951a0a7f48cddfeef57d593a8"
+PP_COMMIT = "3594106f2df3d725e65015ffb4c7886d6eeee683"
+PP_SHA256 = "baa1f53568283630a5055c85f0898b8810f7a6431bd01bbaedd32b4c1defbcb1"
 http_archive(
     name = "pybind11_protobuf",
     sha256 = PP_SHA256,

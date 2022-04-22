@@ -33,7 +33,9 @@ pybind_extension(
     deps = [
         "//tensorflow_lite_support/cc/task/audio:audio_classifier",
         "//tensorflow_lite_support/cc/task/audio/core:audio_buffer",
+        "//tensorflow_lite_support/cc/task/audio/proto:classifications_proto_inc",
         "//tensorflow_lite_support/cc/task/processor/proto:classification_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:classifications_cc_proto",
         "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
         "@pybind11",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
