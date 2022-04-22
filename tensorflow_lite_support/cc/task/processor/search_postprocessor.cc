@@ -93,11 +93,11 @@ absl::Status SanityCheckOptions(const SearchOptions& options) {
         "Missing mandatory `index_file` field in `search_options`.",
         TfLiteSupportStatus::kInvalidArgumentError);
   }
-  if (options.num_results() < 1) {
+  if (options.max_results() < 1) {
     return CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("SearchOptions.num_results must be > 0, found %d.",
-                        options.num_results()),
+        absl::StrFormat("SearchOptions.max_results must be > 0, found %d.",
+                        options.max_results()),
         TfLiteSupportStatus::kInvalidArgumentError);
   }
   return absl::OkStatus();
@@ -234,7 +234,7 @@ StatusOr<SearchResult> SearchPostprocessor::Postprocess() {
   // Prepare search results.
   std::vector<TopN> top_n;
   top_n.emplace_back(
-      options_->num_results(),
+      options_->max_results(),
       std::make_pair(std::numeric_limits<float>::max(), kNoNeighborId));
   // Perform search.
   if (quantizer_) {

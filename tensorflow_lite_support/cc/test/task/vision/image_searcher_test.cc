@@ -152,14 +152,14 @@ TEST_F(CreateFromOptionsTest, FailsWithQuantization) {
                   absl::StrCat(TfLiteSupportStatus::kInvalidArgumentError))));
 }
 
-TEST_F(CreateFromOptionsTest, FailsWithInvalidNumResults) {
+TEST_F(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
   ImageSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(JoinPath(
       "./" /*test src dir*/, kTestDataDirectory, kMobileNetV3));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory, kIndex));
-  options.mutable_search_options()->set_num_results(-1);
+  options.mutable_search_options()->set_max_results(-1);
 
   StatusOr<std::unique_ptr<ImageSearcher>> image_searcher_or =
       ImageSearcher::CreateFromOptions(options);
@@ -167,7 +167,7 @@ TEST_F(CreateFromOptionsTest, FailsWithInvalidNumResults) {
   EXPECT_EQ(image_searcher_or.status().code(),
             absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(image_searcher_or.status().message(),
-              HasSubstr("SearchOptions.num_results must be > 0, found -1"));
+              HasSubstr("SearchOptions.max_results must be > 0, found -1"));
   EXPECT_THAT(image_searcher_or.status().GetPayload(kTfLiteSupportPayload),
               Optional(absl::Cord(
                   absl::StrCat(TfLiteSupportStatus::kInvalidArgumentError))));
@@ -204,7 +204,7 @@ TEST(SearchTest, Succeeds) {
       )pb"));
 }
 
-TEST(SearchTest, SucceedsWithNumResults) {
+TEST(SearchTest, SucceedsWithMaxResults) {
   // Create Searcher.
   ImageSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(JoinPath(
@@ -212,7 +212,7 @@ TEST(SearchTest, SucceedsWithNumResults) {
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory, kIndex));
-  options.mutable_search_options()->set_num_results(2);
+  options.mutable_search_options()->set_max_results(2);
   SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageSearcher> searcher,
                        ImageSearcher::CreateFromOptions(options));
   // Load image.

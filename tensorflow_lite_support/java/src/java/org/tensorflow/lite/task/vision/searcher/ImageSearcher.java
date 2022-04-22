@@ -152,7 +152,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
                     options.getL2Normalize(),
                     options.getQuantize(),
                     indexFd,
-                    options.getNumResults());
+                    options.getMaxResults());
               }
             },
             IMAGE_SEARCHER_NATIVE_LIB));
@@ -172,7 +172,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
   public abstract static class ImageSearcherOptions {
     private static final boolean DEFAULT_L2_NORMALIZE = false;
     private static final boolean DEFAULT_QUANTIZE = false;
-    private static final int DEFAULT_NUM_RESULTS = 5;
+    private static final int DEFAULT_MAX_RESULTS = 5;
 
     abstract BaseOptions getBaseOptions();
 
@@ -183,7 +183,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
     @Nullable
     abstract File getIndexFile();
 
-    abstract int getNumResults();
+    abstract int getMaxResults();
 
     public static Builder builder() {
       return new AutoValue_ImageSearcher_ImageSearcherOptions.Builder()
@@ -191,7 +191,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
           .setL2Normalize(DEFAULT_L2_NORMALIZE)
           .setQuantize(DEFAULT_QUANTIZE)
           .setIndexFile(null)
-          .setNumResults(DEFAULT_NUM_RESULTS);
+          .setMaxResults(DEFAULT_MAX_RESULTS);
     }
 
     /** Builder for {@link ImageSearcherOptions}. */
@@ -227,8 +227,8 @@ public final class ImageSearcher extends BaseVisionTaskApi {
        */
       public abstract Builder setIndexFile(@Nullable File indexFile);
 
-      /** Sets the number of nearest neighbor results to return. Defaults to {@code 5} */
-      public abstract Builder setNumResults(int numResults);
+      /** Sets the maximum number of nearest neighbor results to return. Defaults to {@code 5} */
+      public abstract Builder setMaxResults(int maxResults);
 
       public abstract ImageSearcherOptions build();
     }
@@ -385,7 +385,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
                     options.getL2Normalize(),
                     options.getQuantize(),
                     indexFd,
-                    options.getNumResults());
+                    options.getMaxResults());
               }
             },
             IMAGE_SEARCHER_NATIVE_LIB);
@@ -400,7 +400,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
       boolean l2Normalize,
       boolean quantize,
       int indexDescriptor,
-      int numResults);
+      int maxResults);
 
   private static native long initJniWithByteBuffer(
       ByteBuffer modelBuffer,
@@ -408,7 +408,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
       boolean l2Normalize,
       boolean quantize,
       int indexFileDescriptor,
-      int numResults);
+      int maxResults);
 
   /**
    * The native method to search an image based on the ROI specified.

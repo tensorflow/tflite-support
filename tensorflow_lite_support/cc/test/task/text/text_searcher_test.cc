@@ -176,7 +176,7 @@ TEST_P(CreateFromOptionsTest, FailsWithQuantization) {
                   absl::StrCat(TfLiteSupportStatus::kInvalidArgumentError))));
 }
 
-TEST_P(CreateFromOptionsTest, FailsWithInvalidNumResults) {
+TEST_P(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
   TextSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
@@ -185,7 +185,7 @@ TEST_P(CreateFromOptionsTest, FailsWithInvalidNumResults) {
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                GetParam().index_name));
-  options.mutable_search_options()->set_num_results(-1);
+  options.mutable_search_options()->set_max_results(-1);
 
   StatusOr<std::unique_ptr<TextSearcher>> image_searcher_or =
       TextSearcher::CreateFromOptions(
@@ -194,7 +194,7 @@ TEST_P(CreateFromOptionsTest, FailsWithInvalidNumResults) {
   EXPECT_EQ(image_searcher_or.status().code(),
             absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(image_searcher_or.status().message(),
-              HasSubstr("SearchOptions.num_results must be > 0, found -1"));
+              HasSubstr("SearchOptions.max_results must be > 0, found -1"));
   EXPECT_THAT(image_searcher_or.status().GetPayload(kTfLiteSupportPayload),
               Optional(absl::Cord(
                   absl::StrCat(TfLiteSupportStatus::kInvalidArgumentError))));
@@ -252,7 +252,7 @@ TEST_P(SearchTest, Succeeds) {
       result, ParseTextProtoOrDie<SearchResult>(GetParam().expected_result));
 }
 
-TEST_P(SearchTest, SucceedsWithNumResults) {
+TEST_P(SearchTest, SucceedsWithMaxResults) {
   // Create Searcher.
   TextSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
@@ -262,7 +262,7 @@ TEST_P(SearchTest, SucceedsWithNumResults) {
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                GetParam().index_name));
-  options.mutable_search_options()->set_num_results(2);
+  options.mutable_search_options()->set_max_results(2);
   SUPPORT_ASSERT_OK_AND_ASSIGN(
       std::unique_ptr<TextSearcher> searcher,
       TextSearcher::CreateFromOptions(

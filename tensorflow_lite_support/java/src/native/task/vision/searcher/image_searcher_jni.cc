@@ -54,7 +54,7 @@ using ::tflite::task::vision::ImageSearcherOptions;
 ImageSearcherOptions ConvertToProtoOptions(jlong base_options_handle,
                                            bool l2_normalize, bool quantize,
                                            int index_descriptor,
-                                           int num_results) {
+                                           int max_results) {
   ImageSearcherOptions proto_options;
 
   if (base_options_handle != kInvalidPointer) {
@@ -73,7 +73,7 @@ ImageSearcherOptions ConvertToProtoOptions(jlong base_options_handle,
         ->mutable_file_descriptor_meta()
         ->set_fd(index_descriptor);
   }
-  search_options->set_num_results(num_results);
+  search_options->set_max_results(max_results);
 
   return proto_options;
 }
@@ -136,10 +136,10 @@ Java_org_tensorflow_lite_task_vision_searcher_ImageSearcher_initJniWithModelFdAn
     JNIEnv* env, jclass thiz, jint model_descriptor,
     jlong model_descriptor_length, jlong model_descriptor_offset,
     jlong base_options_handle, bool l2_normalize, bool quantize,
-    jint index_descriptor, int num_results) {
+    jint index_descriptor, int max_results) {
   ImageSearcherOptions proto_options =
       ConvertToProtoOptions(base_options_handle, l2_normalize, quantize,
-                            index_descriptor, num_results);
+                            index_descriptor, max_results);
   auto file_descriptor_meta = proto_options.mutable_base_options()
                                   ->mutable_model_file()
                                   ->mutable_file_descriptor_meta();
@@ -157,10 +157,10 @@ Java_org_tensorflow_lite_task_vision_searcher_ImageSearcher_initJniWithModelFdAn
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_task_vision_searcher_ImageSearcher_initJniWithByteBuffer(
     JNIEnv* env, jclass thiz, jobject model_buffer, jlong base_options_handle,
-    bool l2_normalize, bool quantize, jlong index_descriptor, int num_results) {
+    bool l2_normalize, bool quantize, jlong index_descriptor, int max_results) {
   ImageSearcherOptions proto_options =
       ConvertToProtoOptions(base_options_handle, l2_normalize, quantize,
-                            index_descriptor, num_results);
+                            index_descriptor, max_results);
   proto_options.mutable_base_options()->mutable_model_file()->set_file_content(
       static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
       static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
