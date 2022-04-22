@@ -16,7 +16,7 @@
 # External `common.sh`
 
 # Keep in sync with tensorflow core and configure.py.
-LATEST_BAZEL_VERSION=4.2.2
+LATEST_BAZEL_VERSION=5.1.1
 
 # Run flaky functions with retries.
 # run_with_retry cmd

@@ -17,20 +17,21 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** Encapsulates information about a class in the classification results. */
+NS_SWIFT_NAME(ClassificationCategory)
 @interface TFLCategory : NSObject
 
 /** Index of the class in the corresponding label map, usually packed in the TFLite Model
  * Metadata. */
-@property(nonatomic, assign, readonly) NSInteger index;
+@property(nonatomic, readonly) NSInteger index;
 
 /** Confidence score for this class . */
-@property(nonatomic, assign, readonly) float score;
+@property(nonatomic, readonly) float score;
 
 /** Class name of the class. */
-@property(nonatomic, copy, readonly, nullable) NSString *label;
+@property(nonatomic, readonly, nullable) NSString *label;
 
 /** Display name of the class. */
-@property(nonatomic, copy, readonly, nullable) NSString *displayName;
+@property(nonatomic, readonly, nullable) NSString *displayName;
 
 /**
  * Initializes TFLCategory.
@@ -51,6 +52,10 @@ NS_ASSUME_NONNULL_BEGIN
                         score:(float)score
                         label:(nullable NSString *)label
                   displayName:(nullable NSString *)displayName;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

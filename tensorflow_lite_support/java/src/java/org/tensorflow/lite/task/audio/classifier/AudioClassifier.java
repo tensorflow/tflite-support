@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.tensorflow.lite.DataType;
-import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.audio.TensorAudio;
 import org.tensorflow.lite.support.audio.TensorAudio.TensorAudioFormat;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -39,6 +38,7 @@ import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.TaskJniUtils.FdAndOptionsHandleProvider;
+import org.tensorflow.lite.task.core.annotations.UsedByReflection;
 
 /**
  * Performs classification on audio waveforms.

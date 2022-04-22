@@ -20,9 +20,7 @@ import tensorflow as tf
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
-from tensorflow_lite_support.python.task.processor.proto import class_pb2
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.vision import image_classifier
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
@@ -37,7 +35,6 @@ _ALLOW_LIST = ['cheeseburger', 'guacamole']
 _DENY_LIST = ['cheeseburger']
 _SCORE_THRESHOLD = 0.5
 _MAX_RESULTS = 3
-_ACCEPTABLE_ERROR_RANGE = 0.000001
 
 
 def _create_classifier_from_options(base_options, **classification_options):
@@ -47,16 +44,6 @@ def _create_classifier_from_options(base_options, **classification_options):
       base_options=base_options, classification_options=classification_options)
   classifier = _ImageClassifier.create_from_options(options)
   return classifier
-
-
-def _build_test_data(expected_categories):
-  classifications = classifications_pb2.Classifications(head_index=0)
-  classifications.classes.extend(
-      [class_pb2.Category(**args) for args in expected_categories])
-  expected_result = classifications_pb2.ClassificationResult()
-  expected_result.classifications.append(classifications)
-
-  return expected_result
 
 
 class ModelFileType(enum.Enum):
@@ -101,33 +88,47 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
       classifier = _ImageClassifier.create_from_options(options)
       self.assertIsInstance(classifier, _ImageClassifier)
 
-  @parameterized.parameters((ModelFileType.FILE_NAME, 3, [{
-      'index': 934,
-      'score': 0.739974,
-      'class_name': 'cheeseburger'
-  }, {
-      'index': 925,
-      'score': 0.026929,
-      'class_name': 'guacamole'
-  }, {
-      'index': 932,
-      'score': 0.025737,
-      'class_name': 'bagel'
-  }]), (ModelFileType.FILE_CONTENT, 3, [{
-      'index': 934,
-      'score': 0.739974,
-      'class_name': 'cheeseburger'
-  }, {
-      'index': 925,
-      'score': 0.026929,
-      'class_name': 'guacamole'
-  }, {
-      'index': 932,
-      'score': 0.025737,
-      'class_name': 'bagel'
-  }]))
+  @parameterized.parameters((ModelFileType.FILE_NAME, 3, """
+  classifications {
+    classes {
+      index: 934
+      score: 0.739974
+      class_name: "cheeseburger"
+    }
+    classes {
+      index: 925
+      score: 0.026929
+      class_name: "guacamole"
+    }
+    classes { 
+      index: 932 
+      score: 0.025737 
+      class_name: "bagel" 
+    }
+    head_index: 0
+  }
+  """), (ModelFileType.FILE_CONTENT, 3, """
+  classifications {
+    classes {
+      index: 934
+      score: 0.739974
+      class_name: "cheeseburger"
+    }
+    classes {
+      index: 925
+      score: 0.026929
+      class_name: "guacamole"
+    }
+    classes { 
+      index: 932 
+      score: 0.025737 
+      class_name: "bagel" 
+    }
+    head_index: 0
+  }
+  """))
   def test_classify_model(self, model_file_type, max_results,
-                          expected_categories):
+                          expected_result_text_proto):
     # Creates classifier.
     if model_file_type is ModelFileType.FILE_NAME:
       base_options = _BaseOptions(file_name=self.model_path)
@@ -148,13 +149,8 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
 
-    # Builds test data.
-    expected_result = _build_test_data(expected_categories)
-
     # Comparing results (classification w/o bounding box).
-    classification_result = classifications_pb2.ClassificationResult()
-    classification_result.ParseFromString(image_result.SerializeToString())
-    self.assertProtoEquals(classification_result, expected_result)
+    self.assertProtoEquals(expected_result_text_proto, image_result)
 
   def test_classify_model_with_bounding_box(self):
     # Creates classifier.
@@ -173,27 +169,29 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     image_result = classifier.classify(image, bounding_box)
 
     # Expected results.
-    expected_categories = [{
-        'index': 934,
-        'score': 0.881507,
-        'class_name': 'cheeseburger'
-    }, {
-        'index': 925,
-        'score': 0.019457,
-        'class_name': 'guacamole'
-    }, {
-        'index': 932,
-        'score': 0.012489,
-        'class_name': 'bagel'
-    }]
-
-    # Builds test data.
-    expected_result = _build_test_data(expected_categories)
+    expected_result_text_proto = """
+    classifications {
+      classes {
+        index: 934
+        score: 0.881507
+        class_name: "cheeseburger"
+      }
+      classes {
+        index: 925
+        score: 0.019457
+        class_name: "guacamole"
+      }
+      classes { 
+        index: 932 
+        score: 0.012489 
+        class_name: "bagel" 
+      }
+      head_index: 0
+    }
+    """
 
     # Comparing results (classification w/ bounding box).
-    classification_result = classifications_pb2.ClassificationResult()
-    classification_result.ParseFromString(image_result.SerializeToString())
-    self.assertProtoEquals(classification_result, expected_result)
+    self.assertProtoEquals(expected_result_text_proto, image_result)
 
   def test_max_results_option(self):
     # Creates classifier.

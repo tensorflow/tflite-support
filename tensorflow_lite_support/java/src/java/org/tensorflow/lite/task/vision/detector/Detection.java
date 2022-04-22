@@ -20,8 +20,8 @@ import com.google.auto.value.AutoValue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.tensorflow.lite.annotations.UsedByReflection;
 import org.tensorflow.lite.support.label.Category;
+import org.tensorflow.lite.task.core.annotations.UsedByReflection;
 
 /** Represents one detected object in the results of a {@link ObjectDetector}. */
 @AutoValue

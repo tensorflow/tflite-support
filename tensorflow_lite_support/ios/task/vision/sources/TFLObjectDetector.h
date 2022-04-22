@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Options to configure TFLObjectDetector.
  */
+NS_SWIFT_NAME(ObjectDetectorOptions)
 @interface TFLObjectDetectorOptions : NSObject
 
 /**
@@ -49,10 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
  * @return An instance of TFLObjectDetectorOptions set to the specified
  * modelPath.
  */
-- (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath;
+- (instancetype)initWithModelPath:(NSString *)modelPath;
 
 @end
 
+NS_SWIFT_NAME(ObjectDetector)
 @interface TFLObjectDetector : NSObject
 
 /**
@@ -63,12 +65,21 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A TFLObjectDetector instance.
  */
-+ (nullable instancetype)objectDetectorWithOptions:(nonnull TFLObjectDetectorOptions *)options
++ (nullable instancetype)objectDetectorWithOptions:(TFLObjectDetectorOptions *)options
                                              error:(NSError **)error
     NS_SWIFT_NAME(objectDetector(options:));
 
++ (instancetype)new NS_UNAVAILABLE;
+
 /**
  * Performs object detection on a GMLImage input, returns the detected objects in the image.
+ * This method currently supports inference on only following type of images:
+ * 1. RGB and RGBA images for GMLImageSourceTypeImage.
+ * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
+ *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ *    camera and get the frames for inference, you must request for this format
+ *    from AVCaptureVideoDataOutput. Otherwise your classification
+ *    results will be wrong.
  *
  * @param image input to the model.
  * @return Detection Result of type TFLDetectionResult an array of
@@ -80,8 +91,6 @@ NS_ASSUME_NONNULL_BEGIN
     NS_SWIFT_NAME(detect(gmlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

@@ -86,24 +86,24 @@ http_archive(
 # https://github.com/bazelbuild/rules_apple/releases
 http_archive(
     name = "build_bazel_rules_apple",
-    sha256 = "0052d452af7742c8f3a4e0929763388a66403de363775db7e90adecb2ba4944b",
+    sha256 = "a5f00fd89eff67291f6cd3efdc8fad30f4727e6ebb90718f3f05bbf3c3dd5ed7",
     urls = [
-        "https://github.com/bazelbuild/rules_apple/releases/download/0.31.3/rules_apple.0.31.3.tar.gz",
+        "https://github.com/bazelbuild/rules_apple/releases/download/0.33.0/rules_apple.0.33.0.tar.gz",
     ],
 )
 
 # https://github.com/bazelbuild/rules_swift/releases
 http_archive(
     name = "build_bazel_rules_swift",
-    sha256 = "8407fa0fd04a7ce1d6bb95e90b216404466f809eda459c23cb57b5fa1ef9d639",
+    sha256 = "8a49da750560b185804a4bc95c82d3f9cc4c2caf788960b0e21945759155fdd9",
     urls = [
-        "https://github.com/bazelbuild/rules_swift/releases/download/0.21.0/rules_swift.0.21.0.tar.gz",
+        "https://github.com/bazelbuild/rules_swift/releases/download/0.25.0/rules_swift.0.25.0.tar.gz",
     ],
 )
 
-# TF on 2022-04-18.
-TENSORFLOW_COMMIT = "f41fbaf256122d59ca98fd44ced485bd1bb3c7dc"
-TENSORFLOW_SHA256 = "c2664db938f3cee10f9df8a6e4ac074065f0da1e0ac4abd876fcee0635a15907"
+# TF on 2022-04-20.
+TENSORFLOW_COMMIT = "314479be97046e0db0ff7662b1fbdb17af2ef4b4"
+TENSORFLOW_SHA256 = "b3c439aa7da6780956780e0cb312011416fcd476201f8033f90b3c4fc1cff7a0"
 http_archive(
     name = "org_tensorflow",
     sha256 = TENSORFLOW_SHA256,

@@ -20,33 +20,34 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Specifies the type of output segmentation mask to be returned as a result 
- * of the image segmentation operation. This allows specifying the type of 
- * post-processing to perform on the raw model results 
- * 
+ * Specifies the type of output segmentation mask to be returned as a result
+ * of the image segmentation operation. This allows specifying the type of
+ * post-processing to perform on the raw model results
+ *
  * @seealso TfLiteSegmentationResult for more.
  */
 typedef NS_ENUM(NSUInteger, TFLOutputType) {
   /** Unspecified output type. */
-  TFLUnspecifiedOutputType,
+  TFLOutputTypeUnspecified,
 
   /**
-   * Gives a single output mask where each pixel represents the class which 
+   * Gives a single output mask where each pixel represents the class which
    * the pixel in the original image was predicted to belong to.
    */
-  TFLCategoryMaskOutputType,
+  TFLOutputTypeCategoryMask,
 
   /**
-   * Gives a list of output masks where, for each mask, each pixel represents 
+   * Gives a list of output masks where, for each mask, each pixel represents
    * the prediction confidence, usually in the [0, 1] range.
    */
-  TFLConfidenceMasksOutputType,
+  TFLOutputTypeConfidenceMasks,
 
-};
+} NS_SWIFT_NAME(OutputType);
 
 /**
  * Options to configure TFLImageSegmenter.
  */
+NS_SWIFT_NAME(ImageSegmenterOptions)
 @interface TFLImageSegmenterOptions : NSObject
 
 /**
@@ -56,11 +57,11 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
 @property(nonatomic, copy) TFLBaseOptions *baseOptions;
 
 /**
- * Specifies the type of output segmentation mask to be returned as a result 
+ * Specifies the type of output segmentation mask to be returned as a result
  * of the image segmentation operation.
  * @seealso TFLOutputType
  */
-@property(nonatomic, assign) TFLOutputType outputType;
+@property(nonatomic) TFLOutputType outputType;
 
 /** Display names local for display names*/
 @property(nonatomic, copy) NSString *displayNamesLocale;
@@ -68,21 +69,22 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
 /**
  * Initializes TFLImageSegmenterOptions with the model path set to the specified
  * path to a model file.
- * @description The external model file, must be a single standalone TFLite 
- * file. It could be packed with TFLite Model Metadata[1] and associated files 
- * if exist. Fail to provide the necessary metadata and associated files might 
- * result in errors. Check the [documentation](https://www.tensorflow.org/lite/convert/metadata) 
+ * @description The external model file, must be a single standalone TFLite
+ * file. It could be packed with TFLite Model Metadata[1] and associated files
+ * if exist. Fail to provide the necessary metadata and associated files might
+ * result in errors. Check the [documentation](https://www.tensorflow.org/lite/convert/metadata)
  * for each task about the specific requirement.
- * 
+ *
  * @param modelPath Path to a TFLite model file.
- * 
+ *
  * @return An instance of TFLImageSegmenterOptions set to the specified
  * modelPath.
  */
-- (nullable instancetype)initWithModelPath:(nonnull NSString *)modelPath;
+- (instancetype)initWithModelPath:(NSString *)modelPath;
 
 @end
 
+NS_SWIFT_NAME(ImageSegmenter)
 @interface TFLImageSegmenter : NSObject
 
 /**
@@ -97,12 +99,21 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
                                              error:(NSError **)error
     NS_SWIFT_NAME(imageSegmenter(options:));
 
++ (instancetype)new NS_UNAVAILABLE;
+
 /**
- * Performs image segmentation on a GMLImage input, returns the segmentation 
+ * Performs image segmentation on a GMLImage input, returns the segmentation
  * results.
+ * This method currently supports inference on only following type of images:
+ * 1. RGB and RGBA images for GMLImageSourceTypeImage.
+ * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
+ *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ *    camera and get the frames for inference, you must request for this format
+ *    from AVCaptureVideoDataOutput. Otherwise your classification
+ *    results will be wrong.
  *
  * @param image input to the model.
- * 
+ *
  * @return Segmentation Result of type TFLSegmentationResult holds the
  * segmentation masks returned by the image segmentation task.
  */
@@ -111,8 +122,6 @@ typedef NS_ENUM(NSUInteger, TFLOutputType) {
     NS_SWIFT_NAME(segment(gmlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
