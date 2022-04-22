@@ -62,25 +62,24 @@ _BERT_INDEX = 'mobilebert_index.ldb'
 _EXPECTED_BERT_SEARCH_PARAMS = """
 nearest_neighbors {
   metadata: "The weather was excellent."
-  distance: 0.007773
+  distance: 0.0
 }
 nearest_neighbors {
   metadata: "It was a sunny day."
-  distance: 0.081911
+  distance: 0.115369
 }
 nearest_neighbors {
   metadata: "The sun was shining on that day."
-  distance: 0.191735
+  distance: 0.230017
 }
 nearest_neighbors {
   metadata: "He was very happy with his newly bought car."
-  distance: 0.280981
+  distance: 0.324563
 }
 nearest_neighbors {
   metadata: "The cat is chasing after the mouse."
-  distance: 0.919612
+  distance: 0.966928
 }
-
 """
 
 _NUM_RESULTS = 2
@@ -98,7 +97,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     self.model_path = test_util.get_test_data_path(_REGEX_MODEL)
     self.index_path = test_util.get_test_data_path(_REGEX_INDEX)
 
-  def test_create_from_file_succeeds_with_valid_model_path(self):
+  def test_create_from_file_succeeds_with_valid_model_and_index_paths(self):
     # Creates with default option and valid model and index files successfully.
     searcher = _TextSearcher.create_from_file(
       self.model_path, self.index_path)
@@ -126,7 +125,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     # Invalid index path.
     with self.assertRaisesRegex(
         ValueError,
-        r"Missing mandatory `index_file` field in `search_options`"):
+        r'Missing mandatory `index_file` field in `search_options`'):
       options = _TextSearcherOptions(
         base_options=_BaseOptions(file_name=self.model_path))
       _TextSearcher.create_from_options(options)
