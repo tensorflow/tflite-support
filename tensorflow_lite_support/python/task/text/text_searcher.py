@@ -51,7 +51,7 @@ class TextSearcher(object):
   @classmethod
   def create_from_file(cls, model_file_path: str,
                        index_file_path: str) -> "TextSearcher":
-    """Creates the `AudioClassifier` object from a TensorFlow Lite model.
+    """Creates the `TextSearcher` object from a TensorFlow Lite model.
 
     Args:
       model_file_path: Path to the model.
