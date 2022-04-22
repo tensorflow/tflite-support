@@ -36,7 +36,6 @@ py_test(
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
-        "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classification_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
         "//tensorflow_lite_support/python/task/vision:image_classifier",
@@ -75,8 +74,6 @@ py_test(
     deps = [
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
-        "//tensorflow_lite_support/python/task/processor/proto:bounding_box_pb2",
-        "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:detection_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:detections_pb2",
         "//tensorflow_lite_support/python/task/vision:object_detector",
