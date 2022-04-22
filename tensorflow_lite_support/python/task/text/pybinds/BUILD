@@ -35,4 +35,3 @@ pybind_extension(
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
-
