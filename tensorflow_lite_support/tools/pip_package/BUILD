@@ -19,8 +19,6 @@ COMMON_PIP_DEPS = [
     "//tensorflow_lite_support/metadata/python/metadata_writers:image_segmenter",
     "//tensorflow_lite_support/metadata/python/metadata_writers:audio_classifier",
     "//tensorflow_lite_support/metadata/python/metadata_writers:nl_classifier",
-    # For Model Maker Searcher API to build ScaNN index.
-    "//tensorflow_lite_support/scann_ondevice/cc/python:index_builder",
 ]
 
 TASK_PIP_DEPS = [
@@ -31,6 +29,8 @@ TASK_PIP_DEPS = [
     "//tensorflow_lite_support/python/task/text:text_embedder",
     "//tensorflow_lite_support/python/task/audio:audio_classifier",
     "//tensorflow_lite_support/python/task/audio:audio_embedder",
+    # For Model Maker Searcher API to build ScaNN index.
+    "//tensorflow_lite_support/scann_ondevice/cc/python:index_builder",
 ]
 
 filegroup(
