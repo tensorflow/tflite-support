@@ -40,6 +40,6 @@ message SearchOptions {
   // The index file contents as a byte array.
   optional bytes index_file_content = 2;
 
-  // Number of nearest neighbor results to return.
-  optional int32 num_results = 3 [default = 5];
+  // Maximum number of nearest neighbor results to return.
+  optional int32 max_results = 3 [default = 5];
 }

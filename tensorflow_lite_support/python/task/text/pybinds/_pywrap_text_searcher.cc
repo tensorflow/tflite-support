@@ -64,9 +64,9 @@ PYBIND11_MODULE(_pywrap_text_searcher, m) {
                 cpp_search_options->mutable_index_file()->set_file_name(
                     search_options.index_file_name());
             }
-            if (search_options.has_num_results()) {
-                cpp_search_options->set_num_results(
-                    search_options.num_results());
+            if (search_options.has_max_results()) {
+                cpp_search_options->set_max_results(
+                    search_options.max_results());
             }
 
             options.set_allocated_search_options(cpp_search_options.release());
