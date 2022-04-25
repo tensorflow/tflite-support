@@ -22,7 +22,7 @@ pybind_extension_may_pack_coral(
     ],
 )
 
-pybind_extension(
+pybind_extension_may_pack_coral(
     name = "_pywrap_text_searcher",
     srcs = [
         "_pywrap_text_searcher.cc",

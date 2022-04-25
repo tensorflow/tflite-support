@@ -83,11 +83,11 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
       # Should never happen
       raise ValueError('model_file_type is invalid.')
 
-    index_file_name = test_util.get_test_data_path(index_name)
+    index_file_path = test_util.get_test_data_path(index_name)
     options = _TextSearcherOptions(
       base_options,
       _EmbeddingOptions(l2_normalize=l2_normalize, quantize=quantize),
-      _SearchOptions(index_file_name=index_file_name))
+      _SearchOptions(index_file_name=index_file_path))
     searcher = _TextSearcher.create_from_options(options)
 
     # Perform text search.
