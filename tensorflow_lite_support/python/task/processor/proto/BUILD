@@ -1,3 +1,4 @@
+# Placeholder for internal Python strict library compatibility macro.
 load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_cc_proto_library", "support_py_proto_library")
 
 package(
