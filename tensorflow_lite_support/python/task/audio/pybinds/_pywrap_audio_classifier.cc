@@ -17,7 +17,10 @@ limitations under the License.
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/task/audio/audio_classifier.h"
 #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
+#include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/classification_options.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/classifications.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/classifications.pb.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
@@ -65,10 +68,16 @@ PYBIND11_MODULE(_pywrap_audio_classifier, m) {
             return core::get_value(classifier);
           })
       .def("classify",
-           [](AudioClassifier& self,
-              const AudioBuffer& audio_buffer) -> ClassificationResult {
-             auto classification_result = self.Classify(audio_buffer);
-             return core::get_value(classification_result);
+           [](AudioClassifier& self, const AudioBuffer& audio_buffer)
+               -> processor::ClassificationResult {
+             auto core_classification_result = self.Classify(audio_buffer);
+             // Convert from core::ClassificationResult to
+             // processor::ClassificationResult.
+             processor::ClassificationResult classification_result;
+             classification_result.ParseFromString(
+                 core::get_value(core_classification_result)
+                     .SerializeAsString());
+             return classification_result;
            })
       .def("get_required_audio_format",
            [](AudioClassifier& self) -> AudioBuffer::AudioFormat {

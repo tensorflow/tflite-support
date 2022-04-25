@@ -28,6 +28,6 @@ message SearchOptions {
   // The index file to search into.
   optional core.ExternalFile index_file = 1;
 
-  // Number of nearest neighbor results to return.
-  optional int32 num_results = 2 [default = 5];
+  // Maximum number of nearest neighbor results to return.
+  optional int32 max_results = 2 [default = 5];
 }

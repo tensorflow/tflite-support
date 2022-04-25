@@ -1,4 +1,4 @@
-/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,14 +13,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-// TODO(b/226312796): add this to the README file.
 // Example usage:
 // bazel run -c opt \
-//  tensorflow_lite_support/examples/task/vision/desktop:image_searcher_demo \
+//  tensorflow_lite_support/examples/task/text/desktop:text_searcher_demo \
 //  -- \
 //  --model_path=/path/to/model.tflite \
 //  --index_path=/path/to/index.ldb \
-//  --image_path=/path/to/image.jpg
+//  --input_sentence="your_input"
 
 #include <iostream>
 #include <memory>
@@ -29,29 +28,24 @@ limitations under the License.
 #include "absl/flags/parse.h"  // from @com_google_absl
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/str_format.h"  // from @com_google_absl
+#include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
-#include "tensorflow_lite_support/cc/port/statusor.h"
-#include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/core/proto/base_options.pb.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/embedding_options.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/search_options.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/search_result.pb.h"
-#include "tensorflow_lite_support/cc/task/vision/image_searcher.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/image_searcher_options.pb.h"
-#include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
-#include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include "tensorflow_lite_support/cc/task/text/proto/text_searcher_options.pb.h"
+#include "tensorflow_lite_support/cc/task/text/text_searcher.h"
 
 ABSL_FLAG(std::string, model_path, "",
-          "Absolute path to the '.tflite' image embedder model.");
+          "Absolute path to the '.tflite' text embedder model.");
 ABSL_FLAG(std::string, index_path, "",
           "Absolute path to the index to search into.");
-ABSL_FLAG(std::string, image_path, "",
-          "Absolute path to the image to search. The image must be RGB or "
-          "RGBA (grayscale is not supported). The image EXIF orientation "
-          "flag, if any, is NOT taken into account.");
+ABSL_FLAG(std::string, input_sentence, "",
+          "Input sentence whose nearest-neighbors to search for in the index.");
 ABSL_FLAG(int32, max_results, 5,
-          "Maximum number of nearest-neighbor results to display.");
+          "Maximum number of nearest-neghbors to display.");
 ABSL_FLAG(bool, l2_normalize, false,
           "If true, the raw feature vectors returned by the image embedder "
           "will be normalized with L2-norm. Generally only needed if the model "
@@ -62,15 +56,15 @@ ABSL_FLAG(bool, use_coral, false,
 
 namespace tflite {
 namespace task {
-namespace vision {
+namespace text {
 
 namespace {
 using std::chrono::microseconds;
 using std::chrono::steady_clock;
 }  // namespace
 
-ImageSearcherOptions BuildOptions() {
-  ImageSearcherOptions options;
+TextSearcherOptions BuildOptions() {
+  TextSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       absl::GetFlag(FLAGS_model_path));
   if (absl::GetFlag(FLAGS_l2_normalize)) {
@@ -89,7 +83,7 @@ ImageSearcherOptions BuildOptions() {
   return options;
 }
 
-void DisplayResult(const processor::SearchResult& result) {
+void DisplayResults(const processor::SearchResult& result) {
   std::cout << "Results:\n";
   for (int rank = 0; rank < result.nearest_neighbors_size(); ++rank) {
     const auto& neighbor = result.nearest_neighbors(rank);
@@ -100,48 +94,30 @@ void DisplayResult(const processor::SearchResult& result) {
 }
 
 absl::Status Search() {
-  // Build ImageSearcher.
-  const ImageSearcherOptions options = BuildOptions();
-  ASSIGN_OR_RETURN(std::unique_ptr<ImageSearcher> image_searcher,
-                   ImageSearcher::CreateFromOptions(options));
-
-  // Load image in a FrameBuffer.
-  ASSIGN_OR_RETURN(ImageData image,
-                   DecodeImageFromFile(absl::GetFlag(FLAGS_image_path)));
-  std::unique_ptr<FrameBuffer> frame_buffer;
-  if (image.channels == 3) {
-    frame_buffer =
-        CreateFromRgbRawBuffer(image.pixel_data, {image.width, image.height});
-  } else if (image.channels == 4) {
-    frame_buffer =
-        CreateFromRgbaRawBuffer(image.pixel_data, {image.width, image.height});
-  } else {
-    return absl::InvalidArgumentError(absl::StrFormat(
-        "Expected image with 3 (RGB) or 4 (RGBA) channels, found %d",
-        image.channels));
-  }
+  // Build TextSearcher.
+  const TextSearcherOptions options = BuildOptions();
+  ASSIGN_OR_RETURN(std::unique_ptr<TextSearcher> text_searcher,
+                   TextSearcher::CreateFromOptions(options));
 
   // Run search and display results.
   auto start_search = steady_clock::now();
   ASSIGN_OR_RETURN(processor::SearchResult result,
-                   image_searcher->Search(*frame_buffer));
+                   text_searcher->Search(absl::GetFlag(FLAGS_input_sentence)));
   auto end_search = steady_clock::now();
   std::string delegate =
       absl::GetFlag(FLAGS_use_coral) ? "Coral Edge TPU" : "CPU";
-  std::cout << "Time cost to search the input image on " << delegate << ": "
+  std::cout << "Time cost to search the input text on " << delegate << ": "
             << std::chrono::duration<float, std::milli>(end_search -
                                                         start_search)
                    .count()
             << " ms" << std::endl;
 
-  DisplayResult(result);
+  DisplayResults(result);
 
-  // Cleanup and return.
-  ImageDataFree(&image);
   return absl::OkStatus();
 }
 
-}  // namespace vision
+}  // namespace text
 }  // namespace task
 }  // namespace tflite
 
@@ -156,13 +132,13 @@ int main(int argc, char** argv) {
     std::cerr << "Missing mandatory 'index_path' argument.\n";
     return 1;
   }
-  if (absl::GetFlag(FLAGS_image_path).empty()) {
-    std::cerr << "Missing mandatory 'image_path' argument.\n";
+  if (absl::GetFlag(FLAGS_input_sentence).empty()) {
+    std::cerr << "Missing mandatory 'input_sentence' argument.\n";
     return 1;
   }
 
   // Run search.
-  absl::Status status = tflite::task::vision::Search();
+  absl::Status status = tflite::task::text::Search();
   if (status.ok()) {
     return 0;
   } else {
