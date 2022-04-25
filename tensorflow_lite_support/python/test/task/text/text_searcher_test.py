@@ -154,8 +154,8 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
         search_options=_SearchOptions(index_file_name=self.index_path))
       _TextSearcher.create_from_options(options)
 
-  def test_create_from_options_fails_with_invalid_num_results(self):
-    # Invalid num results option.
+  def test_create_from_options_fails_with_invalid_max_results(self):
+    # Invalid max results option.
     with self.assertRaisesRegex(
         ValueError,
         r'SearchOptions.max_results must be > 0, found -1.'):
