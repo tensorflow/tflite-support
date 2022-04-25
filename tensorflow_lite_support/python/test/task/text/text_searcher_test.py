@@ -122,6 +122,15 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
       searcher = _TextSearcher.create_from_options(options)
       self.assertIsInstance(searcher, _TextSearcher)
 
+  def test_create_from_options_succeeds_with_valid_index_content(self):
+    # Creates with options containing index content successfully.
+    with open(self.index_path, 'rb') as f:
+      options = _TextSearcherOptions(
+        base_options=_BaseOptions(file_name=self.model_path),
+        search_options=_SearchOptions(index_file_content=f.read()))
+      searcher = _TextSearcher.create_from_options(options)
+      self.assertIsInstance(searcher, _TextSearcher)
+
   def test_create_from_options_fails_with_invalid_index_path(self):
     # Invalid index path.
     with self.assertRaisesRegex(
