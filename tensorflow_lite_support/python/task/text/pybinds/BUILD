@@ -21,3 +21,18 @@ pybind_extension_may_pack_coral(
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
+
+pybind_extension_may_pack_coral(
+    name = "_pywrap_text_searcher",
+    srcs = [
+        "_pywrap_text_searcher.cc",
+    ],
+    module_name = "_pywrap_text_searcher",
+    deps = [
+        "//tensorflow_lite_support/cc/task/text:text_searcher",
+        "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
+        "//tensorflow_lite_support/python/task/processor/proto:search_options_cc_proto",
+        "@pybind11",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)
