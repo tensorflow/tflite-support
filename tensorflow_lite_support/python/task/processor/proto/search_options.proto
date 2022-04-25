@@ -29,8 +29,8 @@ message SearchOptions {
   // plain-text labels file). The files can be specified by one of the following
   // two ways:
   //
-  // (1) file contents loaded in `index_file_name`.
-  // (2) file path in `index_file_content`.
+  // (1) file contents loaded in `index_file_content`.
+  // (2) file path in `index_file_name`.
   //
   // If more than one field of these fields is provided, they are used in this
   // precedence order.
