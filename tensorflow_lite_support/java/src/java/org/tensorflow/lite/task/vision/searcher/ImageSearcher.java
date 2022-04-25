@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Rect;
 import android.os.ParcelFileDescriptor;
-import androidx.annotation.Nullable;
 import com.google.android.odml.image.MlImage;
 import com.google.auto.value.AutoValue;
 import java.io.File;
@@ -34,6 +33,7 @@ import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 import org.tensorflow.lite.task.processor.NearestNeighbor;
+import org.tensorflow.lite.task.processor.SearcherOptions;
 import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi;
 import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi.InferenceProvider;
 
@@ -129,9 +129,10 @@ public final class ImageSearcher extends BaseVisionTaskApi {
       throw new IllegalArgumentException(
           "The model buffer should be either a direct ByteBuffer or a MappedByteBuffer.");
     }
-    if (options.getIndexFile() != null) {
+    if (options.getSearcherOptions().getIndexFile() != null) {
       try (ParcelFileDescriptor indexDescriptor =
-          ParcelFileDescriptor.open(options.getIndexFile(), ParcelFileDescriptor.MODE_READ_ONLY)) {
+          ParcelFileDescriptor.open(
+              options.getSearcherOptions().getIndexFile(), ParcelFileDescriptor.MODE_READ_ONLY)) {
         return createFromBufferAndOptionsImpl(modelBuffer, options, indexDescriptor.getFd());
       }
     } else {
@@ -149,10 +150,10 @@ public final class ImageSearcher extends BaseVisionTaskApi {
                 return initJniWithByteBuffer(
                     modelBuffer,
                     TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()),
-                    options.getL2Normalize(),
-                    options.getQuantize(),
+                    options.getSearcherOptions().getL2Normalize(),
+                    options.getSearcherOptions().getQuantize(),
                     indexFd,
-                    options.getMaxResults());
+                    options.getSearcherOptions().getMaxResults());
               }
             },
             IMAGE_SEARCHER_NATIVE_LIB));
@@ -170,28 +171,15 @@ public final class ImageSearcher extends BaseVisionTaskApi {
   /** Options for setting up an ImageSearcher. */
   @AutoValue
   public abstract static class ImageSearcherOptions {
-    private static final boolean DEFAULT_L2_NORMALIZE = false;
-    private static final boolean DEFAULT_QUANTIZE = false;
-    private static final int DEFAULT_MAX_RESULTS = 5;
 
     abstract BaseOptions getBaseOptions();
 
-    abstract boolean getL2Normalize();
-
-    abstract boolean getQuantize();
-
-    @Nullable
-    abstract File getIndexFile();
-
-    abstract int getMaxResults();
+    abstract SearcherOptions getSearcherOptions();
 
     public static Builder builder() {
       return new AutoValue_ImageSearcher_ImageSearcherOptions.Builder()
           .setBaseOptions(BaseOptions.builder().build())
-          .setL2Normalize(DEFAULT_L2_NORMALIZE)
-          .setQuantize(DEFAULT_QUANTIZE)
-          .setIndexFile(null)
-          .setMaxResults(DEFAULT_MAX_RESULTS);
+          .setSearcherOptions(SearcherOptions.builder().build());
     }
 
     /** Builder for {@link ImageSearcherOptions}. */
@@ -200,35 +188,8 @@ public final class ImageSearcher extends BaseVisionTaskApi {
       /** Sets the general options to configure Task APIs, such as accelerators. */
       public abstract Builder setBaseOptions(BaseOptions baseOptions);
 
-      /**
-       * Sets whether to normalize the embedding feature vector with L2 norm. Defaults to false.
-       *
-       * <p>Use this option only if the model does not already contain a native L2_NORMALIZATION
-       * TFLite Op. In most cases, this is already the case and L2 norm is thus achieved through
-       * TFLite inference.
-       */
-      public abstract Builder setL2Normalize(boolean l2Normalize);
-
-      /**
-       * Sets whether the embedding should be quantized to bytes via scalar quantization. Defaults
-       * to false.
-       *
-       * <p>Embeddings are implicitly assumed to be unit-norm and therefore any dimension is
-       * guaranteed to have a value in {@code [-1.0, 1.0]}. Use the l2_normalize option if this is
-       * not the case.
-       */
-      public abstract Builder setQuantize(boolean quantize);
-
-      /**
-       * Sets the index file to search into.
-       *
-       * <p>Required if the model does not come with an index file inside. Otherwise, it can be
-       * ignore by setting to {@code null}.
-       */
-      public abstract Builder setIndexFile(@Nullable File indexFile);
-
-      /** Sets the maximum number of nearest neighbor results to return. Defaults to {@code 5} */
-      public abstract Builder setMaxResults(int maxResults);
+      /** Sets the options to configure Searcher API. */
+      public abstract Builder setSearcherOptions(SearcherOptions searcherOptions);
 
       public abstract ImageSearcherOptions build();
     }
@@ -347,11 +308,12 @@ public final class ImageSearcher extends BaseVisionTaskApi {
       final long modelDescriptorOffset,
       final ImageSearcherOptions options)
       throws IOException {
-    if (options.getIndexFile() != null) {
+    if (options.getSearcherOptions().getIndexFile() != null) {
       // indexDescriptor must be alive before ImageSearcher is initialized completely in the native
       // layer.
       try (ParcelFileDescriptor indexDescriptor =
-          ParcelFileDescriptor.open(options.getIndexFile(), ParcelFileDescriptor.MODE_READ_ONLY)) {
+          ParcelFileDescriptor.open(
+              options.getSearcherOptions().getIndexFile(), ParcelFileDescriptor.MODE_READ_ONLY)) {
         return createFromModelFdAndOptionsImpl(
             modelDescriptor,
             modelDescriptorLength,
@@ -382,10 +344,10 @@ public final class ImageSearcher extends BaseVisionTaskApi {
                     modelDescriptorLength,
                     modelDescriptorOffset,
                     TaskJniUtils.createProtoBaseOptionsHandle(options.getBaseOptions()),
-                    options.getL2Normalize(),
-                    options.getQuantize(),
+                    options.getSearcherOptions().getL2Normalize(),
+                    options.getSearcherOptions().getQuantize(),
                     indexFd,
-                    options.getMaxResults());
+                    options.getSearcherOptions().getMaxResults());
               }
             },
             IMAGE_SEARCHER_NATIVE_LIB);
