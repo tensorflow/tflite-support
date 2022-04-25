@@ -65,7 +65,7 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
        ModelFileType.FILE_CONTENT, _EXPECTED_MOBILENET_SEARCH_PARAMS),
   )
   def test_search_model(self, model_name, index_name, l2_normalize, quantize,
-                        model_file_type, expected_result_image_proto):
+                        model_file_type, expected_result_text_proto):
     # Create searcher.
     model_path = test_util.get_test_data_path(model_name)
     if model_file_type is ModelFileType.FILE_NAME:
@@ -92,7 +92,7 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     image_search_result = searcher.search(image)
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_image_proto, image_search_result)
+    self.assertProtoEquals(expected_result_text_proto, image_search_result)
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
@@ -112,7 +112,7 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     image_search_result = searcher.search(image, bounding_box)
 
     # Expected results.
-    expected_result_image_proto = """
+    expected_result_text_proto = """
     nearest_neighbors { metadata: "burger" distance: 0.134547 }
     nearest_neighbors { metadata: "car" distance: 1.819211 }
     nearest_neighbors { metadata: "bird" distance: 1.96461 }
@@ -121,7 +121,7 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     """
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_image_proto, image_search_result)
+    self.assertProtoEquals(expected_result_text_proto, image_search_result)
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
