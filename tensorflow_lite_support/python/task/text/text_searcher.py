@@ -16,7 +16,6 @@
 import dataclasses
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
-from tensorflow_lite_support.python.task.core.proto import external_file_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_result_pb2
@@ -24,7 +23,6 @@ from tensorflow_lite_support.python.task.text.pybinds import _pywrap_text_search
 
 _CppTextSearcher = _pywrap_text_searcher.TextSearcher
 _BaseOptions = base_options_pb2.BaseOptions
-_ExternalFile = external_file_pb2.ExternalFile
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 _SearchOptions = search_options_pb2.SearchOptions
 
@@ -65,11 +63,10 @@ class TextSearcher(object):
         file such as invalid file.
       RuntimeError: If other types of error occurred.
     """
-    index_file = _ExternalFile(file_name=index_file_path)
     options = TextSearcherOptions(
       base_options=_BaseOptions(file_name=model_file_path),
       embedding_options=_EmbeddingOptions(l2_normalize=True),
-      search_options=_SearchOptions(index_file=index_file))
+      search_options=_SearchOptions(file_name=index_file_path))
     return cls.create_from_options(options)
 
   @classmethod

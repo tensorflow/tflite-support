@@ -25,11 +25,3 @@ support_py_proto_library(
     api_version = 2,
     proto_deps = [":base_options_proto"],
 )
-
-py_library(
-    name = "external_file_pb2",
-    srcs = ["external_file_pb2.py"],
-    deps = [
-        "//tensorflow_lite_support/cc/task/core/proto:external_file_py_pb2",
-    ],
-)

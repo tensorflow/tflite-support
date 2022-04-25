@@ -19,14 +19,12 @@ from absl.testing import parameterized
 
 import tensorflow as tf
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
-from tensorflow_lite_support.python.task.core.proto import external_file_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_options_pb2
 from tensorflow_lite_support.python.task.text import text_searcher
 from tensorflow_lite_support.python.test import test_util
 
 _BaseOptions = base_options_pb2.BaseOptions
-_ExternalFile = external_file_pb2.ExternalFile
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 _SearchOptions = search_options_pb2.SearchOptions
 _TextSearcher = text_searcher.TextSearcher
@@ -86,11 +84,10 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
       raise ValueError('model_file_type is invalid.')
 
     index_file_name = test_util.get_test_data_path(index_name)
-    index_file = _ExternalFile(file_name=index_file_name)
     options = _TextSearcherOptions(
       base_options,
       _EmbeddingOptions(l2_normalize=l2_normalize, quantize=quantize),
-      _SearchOptions(index_file=index_file))
+      _SearchOptions(index_file_name=index_file_name))
     searcher = _TextSearcher.create_from_options(options)
 
     # Perform text search.

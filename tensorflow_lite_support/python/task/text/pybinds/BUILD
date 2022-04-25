@@ -29,6 +29,7 @@ pybind_extension(
     ],
     module_name = "_pywrap_text_searcher",
     deps = [
+        "//tensorflow_lite_support/python/task/processor/proto:search_options_cc_proto",
         "//tensorflow_lite_support/cc/task/text:text_searcher",
         "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
         "@pybind11",
