@@ -18,8 +18,8 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
-#include "tensorflow_lite_support/cc/task/processor/proto/search_result.proto.h"
-#include "tensorflow_lite_support/cc/task/text/proto/text_searcher_options.proto.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/search_result.pb.h"
+#include "tensorflow_lite_support/cc/task/text/proto/text_searcher_options.pb.h"
 #include "tensorflow_lite_support/cc/task/text/text_searcher.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 

@@ -18,10 +18,10 @@ limitations under the License.
 
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
-#include "tensorflow_lite_support/cc/task/processor/proto/search_result.proto.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/search_result.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/image_searcher.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/image_searcher_options.proto.h"
+#include "tensorflow_lite_support/cc/task/vision/proto/image_searcher_options.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 #include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
