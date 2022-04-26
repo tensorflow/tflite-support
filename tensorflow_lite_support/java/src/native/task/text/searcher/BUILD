@@ -19,8 +19,6 @@ jni_binary_with_tflite(
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     tflite_deps = [
         ":native_without_resolver",
-    ],
-    deps = [
         # Pack the universal_sentence_encoder_qa_op_resolver (built-in + USE custom ops)
         # to the Task Java Library by default.
         # Use `native_without_resolver` if a custom set of ops is preferred.
@@ -28,12 +26,12 @@ jni_binary_with_tflite(
     ],
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "universal_sentence_encoder_qa_op_register",
     srcs = [
         "universal_sentence_encoder_qa_op_register.cc",
     ],
-    deps = [
+    tflite_deps = [
         "//tensorflow_lite_support/examples/task/text/desktop:universal_sentence_encoder_qa_op_resolver",
     ],
 )
@@ -55,7 +53,6 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
         "//tensorflow_lite_support/cc/task/processor/proto:search_result_cc_proto",
         "//tensorflow_lite_support/cc/task/text/proto:text_searcher_options_cc_proto",
-        "//tensorflow_lite_support/examples/task/text/desktop:universal_sentence_encoder_qa_op_resolver",
         "//tensorflow_lite_support/java/jni",
     ],
 )
