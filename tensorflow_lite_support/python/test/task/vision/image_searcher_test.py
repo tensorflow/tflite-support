@@ -64,7 +64,7 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
       (_MOBILENET_MODEL, _MOBILENET_INDEX, True, False,
        ModelFileType.FILE_CONTENT, _EXPECTED_MOBILENET_SEARCH_PARAMS),
   )
-  def test_search_model(self, model_name, index_name, l2_normalize, quantize,
+  def test_search(self, model_name, index_name, l2_normalize, quantize,
                         model_file_type, expected_result_text_proto):
     # Create searcher.
     model_path = test_util.get_test_data_path(model_name)
@@ -97,7 +97,7 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
 
-  def test_search_model_with_bounding_box(self):
+  def test_search_with_bounding_box(self):
     # Create searcher.
     searcher = _ImageSearcher.create_from_file(self.model_path, self.index_path)
 
