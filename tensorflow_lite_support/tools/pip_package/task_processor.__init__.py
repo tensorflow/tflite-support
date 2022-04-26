@@ -23,6 +23,8 @@ from tensorflow_lite_support.python.task.processor.proto import embedding_option
 from tensorflow_lite_support.python.task.processor.proto import embedding_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentation_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentations_pb2
+from tensorflow_lite_support.python.task.processor.proto import search_options_pb2
+from tensorflow_lite_support.python.task.processor.proto import search_result_pb2
 
 BoundingBox = bounding_box_pb2.BoundingBox
 ClassificationOptions = classification_options_pb2.ClassificationOptions
@@ -33,3 +35,5 @@ EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 Embedding = embedding_pb2.Embedding
 SegmentationOptions = segmentation_options_pb2.SegmentationOptions
 Segmentation = segmentations_pb2.Segmentation
+SearchOptions = search_options_pb2.SearchOptions
+SearchResult = search_result_pb2.SearchResult

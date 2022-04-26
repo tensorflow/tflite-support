@@ -15,6 +15,9 @@
 """An import entry for Task Text Library."""
 
 from tensorflow_lite_support.python.task.text import text_embedder
+from tensorflow_lite_support.python.task.text import text_searcher
 
 TextEmbedder = text_embedder.TextEmbedder
 TextEmbedderOptions = text_embedder.TextEmbedderOptions
+TextSearcher = text_searcher.TextSearcher
+TextSearcherOptions = text_searcher.TextSearcherOptions
