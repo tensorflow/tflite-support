@@ -235,7 +235,7 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
-    # Perform text search.
+    # Perform image search.
     image_search_result = searcher.search(image)
     nearest_neighbors = image_search_result.nearest_neighbors
 
