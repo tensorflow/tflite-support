@@ -43,9 +43,15 @@ nearest_neighbors { metadata: "cat" distance: 2.075868 }
 """
 
 _IMAGE_FILE = 'burger.jpg'
+_MAX_RESULTS = 2
 
 
 class ModelFileType(enum.Enum):
+  FILE_CONTENT = 1
+  FILE_NAME = 2
+
+
+class IndexFileType(enum.Enum):
   FILE_CONTENT = 1
   FILE_NAME = 2
 
@@ -58,15 +64,93 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     self.model_path = test_util.get_test_data_path(_MOBILENET_MODEL)
     self.index_path = test_util.get_test_data_path(_MOBILENET_INDEX)
 
+  def test_create_from_file_succeeds_with_valid_model_and_index_paths(self):
+    # Creates with default option and valid model and index files successfully.
+    searcher = _ImageSearcher.create_from_file(self.model_path, self.index_path)
+    self.assertIsInstance(searcher, _ImageSearcher)
+
+  def test_create_from_options_succeeds_with_valid_model_and_index_paths(self):
+    options = _ImageSearcherOptions(
+      base_options=_BaseOptions(file_name=self.model_path),
+      search_options=_SearchOptions(index_file_name=self.index_path))
+    searcher = _ImageSearcher.create_from_options(options)
+    self.assertIsInstance(searcher, _ImageSearcher)
+
+  def test_create_from_options_succeeds_with_valid_model_content(self):
+    # Creates with options containing model content successfully.
+    with open(self.model_path, 'rb') as f:
+      options = _ImageSearcherOptions(
+        base_options=_BaseOptions(file_content=f.read()),
+        search_options=_SearchOptions(index_file_name=self.index_path))
+      searcher = _ImageSearcher.create_from_options(options)
+      self.assertIsInstance(searcher, _ImageSearcher)
+
+  def test_create_from_options_succeeds_with_valid_index_content(self):
+    # Creates with options containing index content successfully.
+    with open(self.index_path, 'rb') as f:
+      options = _ImageSearcherOptions(
+        base_options=_BaseOptions(file_name=self.model_path),
+        search_options=_SearchOptions(index_file_content=f.read()))
+      searcher = _ImageSearcher.create_from_options(options)
+      self.assertIsInstance(searcher, _ImageSearcher)
+
+  def test_create_from_options_fails_with_invalid_index_path(self):
+    # Invalid index path.
+    with self.assertRaisesRegex(
+        ValueError,
+        r'Missing mandatory `index_file` field in `search_options`'):
+      options = _ImageSearcherOptions(
+        base_options=_BaseOptions(file_name=self.model_path))
+      _ImageSearcher.create_from_options(options)
+
+  def test_create_from_options_fails_with_invalid_model_path(self):
+    # Invalid empty model path.
+    with self.assertRaisesRegex(
+        ValueError,
+        r"ExternalFile must specify at least one of 'file_content', "
+        r"'file_name' or 'file_descriptor_meta'."):
+      options = _ImageSearcherOptions(
+        base_options=_BaseOptions(file_name=''),
+        search_options=_SearchOptions(index_file_name=self.index_path))
+      _ImageSearcher.create_from_options(options)
+
+  def test_create_from_options_fails_with_invalid_quantization(self):
+    # Invalid quantization option.
+    with self.assertRaisesRegex(
+        ValueError,
+        r'Setting EmbeddingOptions.normalize = true is not allowed in '
+        r'searchers.'):
+      options = _ImageSearcherOptions(
+        base_options=_BaseOptions(file_name=self.model_path),
+        embedding_options=_EmbeddingOptions(quantize=True),
+        search_options=_SearchOptions(index_file_name=self.index_path))
+      _ImageSearcher.create_from_options(options)
+
+  def test_create_from_options_fails_with_invalid_max_results(self):
+    # Invalid max results option.
+    with self.assertRaisesRegex(
+        ValueError, r'SearchOptions.max_results must be > 0, found -1.'):
+      options = _ImageSearcherOptions(
+        base_options=_BaseOptions(file_name=self.model_path),
+        search_options=_SearchOptions(
+          index_file_name=self.index_path, max_results=-1))
+      _ImageSearcher.create_from_options(options)
+
   @parameterized.parameters(
       (_MOBILENET_MODEL, _MOBILENET_INDEX, True, False, ModelFileType.FILE_NAME,
-       _EXPECTED_MOBILENET_SEARCH_PARAMS),
+       IndexFileType.FILE_NAME, _EXPECTED_MOBILENET_SEARCH_PARAMS),
       (_MOBILENET_MODEL, _MOBILENET_INDEX, True, False,
-       ModelFileType.FILE_CONTENT, _EXPECTED_MOBILENET_SEARCH_PARAMS),
+       ModelFileType.FILE_CONTENT, IndexFileType.FILE_NAME,
+       _EXPECTED_MOBILENET_SEARCH_PARAMS),
+      (_MOBILENET_MODEL, _MOBILENET_INDEX, True, False, ModelFileType.FILE_NAME,
+       IndexFileType.FILE_CONTENT, _EXPECTED_MOBILENET_SEARCH_PARAMS),
+      (_MOBILENET_MODEL, _MOBILENET_INDEX, True, False,
+       ModelFileType.FILE_CONTENT, IndexFileType.FILE_CONTENT,
+       _EXPECTED_MOBILENET_SEARCH_PARAMS),
   )
   def test_search(self, model_name, index_name, l2_normalize, quantize,
-                  model_file_type, expected_result_text_proto):
-    # Create searcher.
+                  model_file_type, index_file_type, expected_result_text_proto):
+    # Create BaseOptions.
     model_path = test_util.get_test_data_path(model_name)
     if model_file_type is ModelFileType.FILE_NAME:
       base_options = _BaseOptions(file_name=model_path)
@@ -78,11 +162,23 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
       # Should never happen
       raise ValueError('model_file_type is invalid.')
 
+    # Create SearchOptions.
     index_path = test_util.get_test_data_path(index_name)
+    if index_file_type is IndexFileType.FILE_NAME:
+      search_options = _SearchOptions(index_file_name=index_path)
+    elif index_file_type is IndexFileType.FILE_CONTENT:
+      with open(index_path, 'rb') as f:
+        index_content = f.read()
+      search_options = _SearchOptions(index_file_content=index_content)
+    else:
+      # Should never happen
+      raise ValueError('index_file_type is invalid.')
+
+    # Create searcher.
     options = _ImageSearcherOptions(
         base_options,
         _EmbeddingOptions(l2_normalize=l2_normalize, quantize=quantize),
-        _SearchOptions(index_file_name=index_path))
+        search_options)
     searcher = _ImageSearcher.create_from_options(options)
 
     # Loads image.
@@ -125,6 +221,26 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
+
+  def test_max_results_option(self):
+    # Create searcher.
+    base_options = _BaseOptions(file_name=self.model_path)
+    search_options = _SearchOptions(
+      index_file_name=self.index_path, max_results=_MAX_RESULTS)
+    options = _ImageSearcherOptions(base_options,
+                                   _EmbeddingOptions(l2_normalize=True),
+                                   search_options)
+    searcher = _ImageSearcher.create_from_options(options)
+
+    # Loads image.
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
+
+    # Perform text search.
+    image_search_result = searcher.search(image)
+    nearest_neighbors = image_search_result.nearest_neighbors
+
+    self.assertLessEqual(
+      len(nearest_neighbors), _MAX_RESULTS, 'Too many results returned.')
 
 
 if __name__ == '__main__':
