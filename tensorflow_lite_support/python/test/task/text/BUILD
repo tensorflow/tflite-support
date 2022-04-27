@@ -11,6 +11,7 @@ py_test(
     data = [
         "//tensorflow_lite_support/cc/test/testdata/task/text:mobilebert_embedding_with_metadata",
         "//tensorflow_lite_support/cc/test/testdata/task/text:regex_embedding_with_metadata",
+        "//tensorflow_lite_support/cc/test/testdata/task/text:universal_sentence_encoder_qa",
     ],
     deps = [
         # build rule placeholder: tensorflow dep,
@@ -29,6 +30,7 @@ py_test(
         "//tensorflow_lite_support/cc/test/testdata/task/text:mobilebert_embedding_with_metadata",
         "//tensorflow_lite_support/cc/test/testdata/task/text:regex_embedding_with_metadata",
         "//tensorflow_lite_support/cc/test/testdata/task/text:test_indices",
+        "//tensorflow_lite_support/cc/test/testdata/task/text:universal_sentence_encoder_qa",
     ],
     deps = [
         # build rule placeholder: tensorflow dep,

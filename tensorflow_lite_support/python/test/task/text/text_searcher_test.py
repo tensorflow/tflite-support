@@ -80,6 +80,31 @@ nearest_neighbors {
 }
 """
 
+_USE_MODEL = 'universal_sentence_encoder_qa_with_metadata.tflite'
+_USE_INDEX = 'universal_sentence_encoder_index.ldb'
+_EXPECTED_USE_SEARCH_PARAMS = """
+nearest_neighbors {
+  metadata: "The weather was excellent."
+  distance: 0.0
+}
+nearest_neighbors {
+  metadata: "It was a sunny day."
+  distance: 0.146359
+}
+nearest_neighbors {
+  metadata: "The sun was shining on that day."
+  distance: 0.152225
+}
+nearest_neighbors {
+  metadata: "The cat is chasing after the mouse."
+  distance: 0.359965
+}
+nearest_neighbors {
+  metadata: "He was very happy with his newly bought car."
+  distance: 0.366927
+}
+"""
+
 _MAX_RESULTS = 2
 
 
@@ -188,7 +213,15 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
       (_BERT_MODEL, _BERT_INDEX, True, False, ModelFileType.FILE_NAME,
        IndexFileType.FILE_CONTENT, _EXPECTED_BERT_SEARCH_PARAMS),
       (_BERT_MODEL, _BERT_INDEX, True, False, ModelFileType.FILE_CONTENT,
-       IndexFileType.FILE_CONTENT, _EXPECTED_BERT_SEARCH_PARAMS))
+       IndexFileType.FILE_CONTENT, _EXPECTED_BERT_SEARCH_PARAMS),
+      (_USE_MODEL, _USE_INDEX, True, False, ModelFileType.FILE_NAME,
+       IndexFileType.FILE_NAME, _EXPECTED_USE_SEARCH_PARAMS),
+      (_USE_MODEL, _USE_INDEX, True, False, ModelFileType.FILE_CONTENT,
+       IndexFileType.FILE_NAME, _EXPECTED_USE_SEARCH_PARAMS),
+      (_USE_MODEL, _USE_INDEX, True, False, ModelFileType.FILE_NAME,
+       IndexFileType.FILE_CONTENT, _EXPECTED_USE_SEARCH_PARAMS),
+      (_USE_MODEL, _USE_INDEX, True, False, ModelFileType.FILE_CONTENT,
+       IndexFileType.FILE_CONTENT, _EXPECTED_USE_SEARCH_PARAMS))
   def test_search(self, model_name, index_name, l2_normalize, quantize,
                   model_file_type, index_file_type, expected_result_text_proto):
     # Create BaseOptions.
