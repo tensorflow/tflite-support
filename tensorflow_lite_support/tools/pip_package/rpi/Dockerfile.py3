@@ -26,7 +26,9 @@ RUN apt-get update && \
       zlib1g-dev  \
       curl \
       unzip \
-      git && \
+      git \
+      libusb-1.0-0-dev \
+      xxd && \
     apt-get clean
 
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
