@@ -112,3 +112,11 @@ py_library(
         "//tensorflow_lite_support/cc/task/processor/proto:search_result_py_pb2",
     ],
 )
+
+py_library(
+    name = "nl_classification_options_pb2",
+    srcs = ["nl_classification_options_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:nl_classification_options_py_pb2",
+    ],
+)

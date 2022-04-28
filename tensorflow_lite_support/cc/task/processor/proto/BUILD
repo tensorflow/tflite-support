@@ -242,3 +242,22 @@ support_py_proto_library(
     api_version = 2,
     proto_deps = [":search_result_proto"],
 )
+
+proto_library(
+    name = "nl_classification_options_proto",
+    srcs = ["nl_classification_options.proto"],
+)
+
+cc_proto_library(
+    name = "nl_classification_options_cc_proto",
+    deps = [
+        ":nl_classification_options_proto",
+    ],
+)
+
+support_py_proto_library(
+    name = "nl_classification_options_py_pb2",
+    srcs = ["nl_classification_options.proto"],
+    api_version = 2,
+    proto_deps = [":nl_classification_options_proto"],
+)
