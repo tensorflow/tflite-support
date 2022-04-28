@@ -18,7 +18,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/processor/proto/detection_options.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/detections.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/object_detector.h"
-#include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/utils/image_utils.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
