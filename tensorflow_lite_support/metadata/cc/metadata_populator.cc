@@ -26,7 +26,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
-#include "tensorflow_lite_support/metadata/cc/utils/zip_mem_file.h"
+#include "tensorflow_lite_support/metadata/cc/utils/zip_writable_mem_file.h"
 #include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 
 namespace tflite {
@@ -97,11 +97,13 @@ void ModelMetadataPopulator::LoadAssociatedFiles(
 tflite::support::StatusOr<std::string>
 ModelMetadataPopulator::AppendAssociatedFiles(const char* model_buffer_data,
                                               size_t model_buffer_size) {
-  // Create in-memory zip file.
-  ZipMemFile mem_file = ZipMemFile(model_buffer_data, model_buffer_size);
+  // Create in-memory writable zip file.
+  ZipWritableMemFile mem_file =
+      ZipWritableMemFile(model_buffer_data, model_buffer_size);
   // Open zip.
-  zipFile zf = zipOpen2(/*pathname=*/nullptr, APPEND_STATUS_CREATEAFTER,
-                        /*globalcomment=*/nullptr, &mem_file.GetFileFuncDef());
+  zipFile zf =
+      zipOpen2_64(/*pathname=*/nullptr, APPEND_STATUS_CREATEAFTER,
+                  /*globalcomment=*/nullptr, &mem_file.GetFileFunc64Def());
   if (zf == nullptr) {
     return CreateStatusWithPayload(
         StatusCode::kUnknown, "Unable to open zip archive",
@@ -109,15 +111,16 @@ ModelMetadataPopulator::AppendAssociatedFiles(const char* model_buffer_data,
   }
   // Write associated files.
   for (const auto& [name, contents] : associated_files_) {
-    if ((zipOpenNewFileInZip(zf, name.c_str(),
-                             /*zipfi=*/nullptr,
-                             /*extrafield_local=*/nullptr,
-                             /*size_extrafield_local=*/0,
-                             /*extrafield_global=*/nullptr,
-                             /*size_extrafield_global=*/0,
-                             /*comment=*/nullptr,
-                             /*method=*/0,
-                             /*level=*/Z_DEFAULT_COMPRESSION) != ZIP_OK) ||
+    if ((zipOpenNewFileInZip64(zf, name.c_str(),
+                               /*zipfi=*/nullptr,
+                               /*extrafield_local=*/nullptr,
+                               /*size_extrafield_local=*/0,
+                               /*extrafield_global=*/nullptr,
+                               /*size_extrafield_global=*/0,
+                               /*comment=*/nullptr,
+                               /*method=*/0,
+                               /*level=*/Z_DEFAULT_COMPRESSION,
+                               /*zip64=*/0) != ZIP_OK) ||
         (zipWriteInFileInZip(zf, contents.data(), contents.length()) !=
          ZIP_OK) ||
         (zipCloseFileInZip(zf) != ZIP_OK)) {

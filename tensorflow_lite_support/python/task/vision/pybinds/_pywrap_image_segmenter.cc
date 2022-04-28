@@ -17,7 +17,7 @@ limitations under the License.
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/task/processor/proto/segmentation_options.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_segmenter.h"
-#include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/utils/image_utils.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {

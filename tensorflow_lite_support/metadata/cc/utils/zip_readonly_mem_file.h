@@ -24,43 +24,45 @@ limitations under the License.
 namespace tflite {
 namespace metadata {
 
-// In-memory zip file implementation.
+// In-memory read-only zip file implementation.
 //
 // Adapted from [1], with a few key differences:
-// * backed by an `std::string` instead of malloc-ed C buffers,
-// * supports opening the file for writing through `zipOpen2`.
+// * backed by an `absl::string_view` instead of malloc-ed C buffers,
+// * supports opening the file for reading through `unzOpen2_64`.
+//
+// This class is NOT thread-safe.
 //
 // [1]:
 // https://github.com/google/libkml/blob/master/third_party/zlib-1.2.3/contrib/minizip/iomem_simple.c
-class ZipMemFile {
+class ZipReadOnlyMemFile {
  public:
-  // Constructs an in-memory zip file from a buffer.
-  ZipMemFile(const char* buffer, size_t size);
-  // Provides access to the `zlib_filefunc_def` implementation for the in-memory
-  // zip file.
-  zlib_filefunc_def& GetFileFuncDef();
-  // Provides access to the file contents.
-  absl::string_view GetFileContent() const;
+  // Constructs an in-memory read-only zip file from a buffer. Does not copy or
+  // take ownership over the provided buffer: the caller is responsible for
+  // ensuring the buffer outlives this object.
+  ZipReadOnlyMemFile(const char* buffer, size_t size);
+  // Provides access to the `zlib_filefunc64_def` implementation for the
+  // in-memory zip file.
+  zlib_filefunc64_def& GetFileFunc64Def();
 
  private:
-  // The string backing the in-memory file.
-  std::string data_;
+  // The string view backing the in-memory file.
+  absl::string_view data_;
   // The current offset in the file.
-  size_t offset_;
-  // The `zlib_filefunc_def` implementation for this in-memory zip file.
-  zlib_filefunc_def zlib_filefunc_def_;
+  ZPOS64_T offset_;
+  // The `zlib_filefunc64_def` implementation for this in-memory zip file.
+  zlib_filefunc64_def zlib_filefunc64_def_;
 
   // Convenience function to access the current data size.
   size_t Size() const { return data_.size(); }
 
-  // The file function implementations used in the `zlib_filefunc_def`.
-  static voidpf OpenFile(voidpf opaque, const char* filename, int mode);
-  static size_t ReadFile(voidpf opaque, voidpf stream, void* buf, size_t size);
-  static size_t WriteFile(voidpf opaque, voidpf stream, const void* buf,
-                          size_t size);
-  static ptrdiff_t TellFile(voidpf opaque, voidpf stream);
-  static ptrdiff_t SeekFile(voidpf opaque, voidpf stream, size_t offset,
-                            int origin);
+  // The file function implementations used in the `zlib_filefunc64_def`.
+  static voidpf OpenFile(voidpf opaque, const void* filename, int mode);
+  static uLong ReadFile(voidpf opaque, voidpf stream, void* buf, uLong size);
+  static uLong WriteFile(voidpf opaque, voidpf stream, const void* buf,
+                         uLong size);
+  static ZPOS64_T TellFile(voidpf opaque, voidpf stream);
+  static long SeekFile  // NOLINT
+      (voidpf opaque, voidpf stream, ZPOS64_T offset, int origin);
   static int CloseFile(voidpf opaque, voidpf stream);
   static int ErrorFile(voidpf opaque, voidpf stream);
 };

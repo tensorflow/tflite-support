@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/utils/image_utils.h"
 
 #include "pybind11/pybind11.h"
 #include "pybind11_abseil/status_casters.h"  // from @pybind11_abseil

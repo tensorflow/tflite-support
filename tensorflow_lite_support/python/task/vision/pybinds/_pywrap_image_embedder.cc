@@ -20,7 +20,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/processor/proto/bounding_box.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/embedding.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/image_embedder.h"
-#include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/utils/image_utils.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {

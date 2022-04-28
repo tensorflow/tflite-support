@@ -35,8 +35,8 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 #include "tensorflow_lite_support/cc/task/vision/proto/image_searcher_options.pb.h"
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/utils/image_utils.h"
 #include "tensorflow_lite_support/cc/test/test_utils.h"
-#include "tensorflow_lite_support/examples/task/vision/desktop/utils/image_utils.h"
 
 namespace tflite {
 namespace task {
@@ -145,7 +145,7 @@ TEST_F(CreateFromOptionsTest, FailsWithQuantization) {
   EXPECT_EQ(image_searcher_or.status().code(),
             absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(image_searcher_or.status().message(),
-              HasSubstr("Setting EmbeddingOptions.normalize = true is not "
+              HasSubstr("Setting EmbeddingOptions.quantize = true is not "
                         "allowed in searchers"));
   EXPECT_THAT(image_searcher_or.status().GetPayload(kTfLiteSupportPayload),
               Optional(absl::Cord(
