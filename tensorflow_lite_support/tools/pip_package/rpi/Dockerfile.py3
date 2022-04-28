@@ -26,7 +26,8 @@ RUN apt-get update && \
       zlib1g-dev  \
       curl \
       unzip \
-      git && \
+      git \
+      xxd && \
     apt-get clean
 
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
@@ -42,7 +43,11 @@ RUN apt-get update && \
       python$PYTHON_VERSION-distutils \
       libpython$PYTHON_VERSION-dev \
       libpython$PYTHON_VERSION-dev:armhf \
-      libpython$PYTHON_VERSION-dev:arm64
+      libpython$PYTHON_VERSION-dev:arm64 \
+      libusb-1.0-0-dev \
+      libusb-1.0-0-dev:armhf \
+      libusb-1.0-0-dev:arm64
+
 RUN ln -sf /usr/bin/python$PYTHON_VERSION /usr/bin/python3
 RUN curl -OL https://bootstrap.pypa.io/get-pip.py
 RUN python3 get-pip.py

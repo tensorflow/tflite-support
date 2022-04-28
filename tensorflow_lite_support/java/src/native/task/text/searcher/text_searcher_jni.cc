@@ -19,12 +19,9 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/search_result.pb.h"
-#include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
-#include "tensorflow_lite_support/cc/task/vision/image_searcher.h"
-#include "tensorflow_lite_support/cc/task/vision/proto/image_searcher_options.pb.h"
-#include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
+#include "tensorflow_lite_support/cc/task/text/proto/text_searcher_options.pb.h"
+#include "tensorflow_lite_support/cc/task/text/text_searcher.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
-#include "tensorflow_lite_support/java/src/native/task/vision/jni_utils.h"
 
 namespace tflite {
 namespace task {
@@ -40,22 +37,21 @@ using ::tflite::support::StatusOr;
 using ::tflite::support::utils::ConvertVectorToArrayList;
 using ::tflite::support::utils::CreateByteArray;
 using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
+using ::tflite::support::utils::JStringToString;
 using ::tflite::support::utils::kInvalidPointer;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::core::BaseOptions;
 using ::tflite::task::processor::NearestNeighbor;
 using ::tflite::task::processor::SearchResult;
-using ::tflite::task::vision::BoundingBox;
-using ::tflite::task::vision::FrameBuffer;
-using ::tflite::task::vision::ImageSearcher;
-using ::tflite::task::vision::ImageSearcherOptions;
+using ::tflite::task::text::TextSearcher;
+using ::tflite::task::text::TextSearcherOptions;
 
-// Creates an ImageSearcherOptions proto based on the Java class.
-ImageSearcherOptions ConvertToProtoOptions(jlong base_options_handle,
-                                           bool l2_normalize, bool quantize,
-                                           int index_descriptor,
-                                           int max_results) {
-  ImageSearcherOptions proto_options;
+// Creates an TextSearcherOptions proto based on the Java class.
+TextSearcherOptions ConvertToProtoOptions(jlong base_options_handle,
+                                          bool l2_normalize, bool quantize,
+                                          int index_descriptor,
+                                          int max_results) {
+  TextSearcherOptions proto_options;
 
   if (base_options_handle != kInvalidPointer) {
     // proto_options will free the previous base_options and set the new one.
@@ -78,19 +74,19 @@ ImageSearcherOptions ConvertToProtoOptions(jlong base_options_handle,
   return proto_options;
 }
 
-jlong CreateImageSearcherFromOptions(JNIEnv* env,
-                                     const ImageSearcherOptions& options) {
-  StatusOr<std::unique_ptr<ImageSearcher>> image_searcher_or =
-      ImageSearcher::CreateFromOptions(options,
-                                       tflite::task::CreateOpResolver());
-  if (image_searcher_or.ok()) {
-    return reinterpret_cast<jlong>(image_searcher_or->release());
+jlong CreateTextSearcherFromOptions(JNIEnv* env,
+                                    const TextSearcherOptions& options) {
+  StatusOr<std::unique_ptr<TextSearcher>> text_searcher_or =
+      TextSearcher::CreateFromOptions(options,
+                                      tflite::task::CreateOpResolver());
+  if (text_searcher_or.ok()) {
+    return reinterpret_cast<jlong>(text_searcher_or->release());
   } else {
     ThrowException(
         env,
-        GetExceptionClassNameForStatusCode(image_searcher_or.status().code()),
-        "Error occurred when initializing ImageSearcher: %s",
-        image_searcher_or.status().message().data());
+        GetExceptionClassNameForStatusCode(text_searcher_or.status().code()),
+        "Error occurred when initializing TextSearcher: %s",
+        text_searcher_or.status().message().data());
     return kInvalidPointer;
   }
 }
@@ -123,21 +119,21 @@ jobject ConvertToSearchResults(JNIEnv* env, const SearchResult& results) {
 }  // namespace
 
 extern "C" JNIEXPORT void JNICALL
-Java_org_tensorflow_lite_task_vision_searcher_ImageSearcher_deinitJni(
+Java_org_tensorflow_lite_task_text_searcher_TextSearcher_deinitJni(
     JNIEnv* env, jobject thiz, jlong native_handle) {
-  delete reinterpret_cast<ImageSearcher*>(native_handle);
+  delete reinterpret_cast<TextSearcher*>(native_handle);
 }
 
-// Creates an ImageSearcher instance from the model file descriptor.
+// Creates an TextSearcher instance from the model file descriptor.
 // file_descriptor_length and file_descriptor_offset are optional. Non-positive
 // values will be ignored.
 extern "C" JNIEXPORT jlong JNICALL
-Java_org_tensorflow_lite_task_vision_searcher_ImageSearcher_initJniWithModelFdAndOptions(
+Java_org_tensorflow_lite_task_text_searcher_TextSearcher_initJniWithModelFdAndOptions(
     JNIEnv* env, jclass thiz, jint model_descriptor,
     jlong model_descriptor_length, jlong model_descriptor_offset,
     jlong base_options_handle, bool l2_normalize, bool quantize,
     jint index_descriptor, int max_results) {
-  ImageSearcherOptions proto_options =
+  TextSearcherOptions proto_options =
       ConvertToProtoOptions(base_options_handle, l2_normalize, quantize,
                             index_descriptor, max_results);
   auto file_descriptor_meta = proto_options.mutable_base_options()
@@ -151,47 +147,35 @@ Java_org_tensorflow_lite_task_vision_searcher_ImageSearcher_initJniWithModelFdAn
     file_descriptor_meta->set_offset(model_descriptor_offset);
   }
 
-  return CreateImageSearcherFromOptions(env, proto_options);
+  return CreateTextSearcherFromOptions(env, proto_options);
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_org_tensorflow_lite_task_vision_searcher_ImageSearcher_initJniWithByteBuffer(
+Java_org_tensorflow_lite_task_text_searcher_TextSearcher_initJniWithByteBuffer(
     JNIEnv* env, jclass thiz, jobject model_buffer, jlong base_options_handle,
     bool l2_normalize, bool quantize, jlong index_descriptor, int max_results) {
-  ImageSearcherOptions proto_options =
+  TextSearcherOptions proto_options =
       ConvertToProtoOptions(base_options_handle, l2_normalize, quantize,
                             index_descriptor, max_results);
   proto_options.mutable_base_options()->mutable_model_file()->set_file_content(
       static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
       static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
 
-  return CreateImageSearcherFromOptions(env, proto_options);
+  return CreateTextSearcherFromOptions(env, proto_options);
 }
 
 extern "C" JNIEXPORT jobject JNICALL
-Java_org_tensorflow_lite_task_vision_searcher_ImageSearcher_searchNative(
-    JNIEnv* env, jclass thiz, jlong native_handle, jlong frame_buffer_handle,
-    jintArray jroi) {
-  auto* searcher = reinterpret_cast<ImageSearcher*>(native_handle);
-  // frame_buffer will be deleted after inference is done in
-  // base_vision_api_jni.cc.
-  auto* frame_buffer = reinterpret_cast<FrameBuffer*>(frame_buffer_handle);
+Java_org_tensorflow_lite_task_text_searcher_TextSearcher_searchNative(
+    JNIEnv* env, jclass thiz, jlong native_handle, jstring text) {
+  auto* searcher = reinterpret_cast<TextSearcher*>(native_handle);
+  auto results_or = searcher->Search(JStringToString(env, text));
 
-  int* roi_array = env->GetIntArrayElements(jroi, 0);
-  BoundingBox roi;
-  roi.set_origin_x(roi_array[0]);
-  roi.set_origin_y(roi_array[1]);
-  roi.set_width(roi_array[2]);
-  roi.set_height(roi_array[3]);
-  env->ReleaseIntArrayElements(jroi, roi_array, 0);
-
-  auto results_or = searcher->Search(*frame_buffer, roi);
   if (results_or.ok()) {
     return ConvertToSearchResults(env, results_or.value());
   } else {
     ThrowException(
         env, GetExceptionClassNameForStatusCode(results_or.status().code()),
-        "Error occurred when searching the image: %s",
+        "Error occurred when searching the input text: %s",
         results_or.status().message().data());
     return nullptr;
   }

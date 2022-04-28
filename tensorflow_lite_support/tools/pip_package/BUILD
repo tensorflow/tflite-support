@@ -25,12 +25,15 @@ TASK_PIP_DEPS = [
     "//tensorflow_lite_support/python/task/vision:image_classifier",
     "//tensorflow_lite_support/python/task/vision:image_embedder",
     "//tensorflow_lite_support/python/task/vision:image_segmenter",
+    "//tensorflow_lite_support/python/task/vision:image_searcher",
     "//tensorflow_lite_support/python/task/vision:object_detector",
     "//tensorflow_lite_support/python/task/text:text_embedder",
+    "//tensorflow_lite_support/python/task/text:text_searcher",
     "//tensorflow_lite_support/python/task/audio:audio_classifier",
     "//tensorflow_lite_support/python/task/audio:audio_embedder",
     # For Model Maker Searcher API to build ScaNN index.
     "//tensorflow_lite_support/scann_ondevice/cc/python:index_builder",
+    "//tensorflow_lite_support/scann_ondevice/cc/core:serialized_searcher_py_pb2",
 ]
 
 filegroup(

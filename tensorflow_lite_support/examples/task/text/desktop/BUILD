@@ -1,3 +1,5 @@
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+
 package(
     default_visibility = [
         "//tensorflow_lite_support:internal",
@@ -85,17 +87,19 @@ cc_binary(
     }),
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "universal_sentence_encoder_qa_op_resolver",
     srcs = ["universal_sentence_encoder_qa_op_resolver.cc"],
     hdrs = ["universal_sentence_encoder_qa_op_resolver.h"],
+    tflite_deps = [
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+    ],
     deps = [
         "//tensorflow_lite_support/custom_ops/kernel/ragged:ragged_tensor_to_tensor_tflite",  # fixdeps: keep
         "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_tokenizer_tflite",  # fixdeps: keep
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite:op_resolver",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ],
 )
 

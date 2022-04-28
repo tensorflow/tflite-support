@@ -1,4 +1,4 @@
-/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,24 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow_lite_support/c/task/text/nl_classifier_common.h"
+#include "tensorflow_lite_support/examples/task/text/desktop/universal_sentence_encoder_qa_op_resolver.h"
 
-#include <memory>
-
-#ifdef __cplusplus
-extern "C" {
-#endif  // __cplusplus
-
-void TfLiteNLClassifierCategoriesDelete(Categories* categories) {
-  for (int i = 0; i < categories->size; i++) {
-    // `strdup` obtains memory using `malloc` and the memory needs to be
-    // released using `free`.
-    free(categories->categories[i].text);
-  }
-  delete[] categories->categories;
-  delete categories;
+namespace tflite {
+namespace task {
+// Provides a custom OpResolver for TextSearcher Java API.
+std::unique_ptr<OpResolver> CreateOpResolver() {
+  return tflite::task::text::CreateQACustomOpResolver();
 }
 
-#ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus
+}  // namespace task
+}  // namespace tflite

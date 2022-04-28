@@ -29,6 +29,7 @@ _TextEmbedderOptions = text_embedder.TextEmbedderOptions
 
 _REGEX_MODEL = "regex_one_embedding_with_metadata.tflite"
 _BERT_MODEL = "mobilebert_embedding_with_metadata.tflite"
+_USE_MODEL = "universal_sentence_encoder_qa_with_metadata.tflite"
 
 
 class ModelFileType(enum.Enum):
@@ -73,6 +74,8 @@ class TextEmbedderTest(parameterized.TestCase, tf.test.TestCase):
       (_REGEX_MODEL, True, True, ModelFileType.FILE_NAME, 16, 0.999878),
       (_BERT_MODEL, False, False, ModelFileType.FILE_CONTENT, 512, 0.969514),
       (_BERT_MODEL, True, True, ModelFileType.FILE_CONTENT, 512, 0.966984),
+      (_USE_MODEL, False, False, ModelFileType.FILE_NAME, 100, 0.851961),
+      (_USE_MODEL, True, True, ModelFileType.FILE_CONTENT, 100, 0.852664),
   )
   def test_embed(self, model_name, l2_normalize, quantize, model_file_type,
                  embedding_length, expected_similarity):

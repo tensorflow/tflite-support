@@ -1,4 +1,4 @@
-load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
+load("//tensorflow_lite_support/python/task:build_defs.bzl", "pybind_extension_may_pack_coral")
 
 package(
     default_visibility = [
@@ -7,7 +7,7 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-pybind_extension(
+pybind_extension_may_pack_coral(
     name = "_pywrap_audio_embedder",
     srcs = [
         "_pywrap_audio_embedder.cc",
@@ -24,7 +24,7 @@ pybind_extension(
     ],
 )
 
-pybind_extension(
+pybind_extension_may_pack_coral(
     name = "_pywrap_audio_classifier",
     srcs = [
         "_pywrap_audio_classifier.cc",

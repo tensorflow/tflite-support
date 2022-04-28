@@ -13,50 +13,51 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package org.tensorflow.lite.task.vision.searcher;
+package org.tensorflow.lite.task.text.searcher;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.graphics.Rect;
 import android.os.ParcelFileDescriptor;
-import com.google.android.odml.image.MlImage;
 import com.google.auto.value.AutoValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.List;
-import org.tensorflow.lite.support.image.MlImageAdapter;
-import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.task.core.BaseOptions;
+import org.tensorflow.lite.task.core.BaseTaskApi;
 import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
-import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
 import org.tensorflow.lite.task.processor.NearestNeighbor;
 import org.tensorflow.lite.task.processor.SearcherOptions;
-import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi;
-import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi.InferenceProvider;
 
 /**
- * Performs similarity search on images.
+ * Performs similarity search on text string.
  *
  * <p>The API expects a TFLite model with optional, but strongly recommended, <a
  * href="https://www.tensorflow.org/lite/convert/metadata">TFLite Model Metadata.</a>.
  *
+ * <p>The API expects a TFLite model with metadata populated. The metadata should contain the
+ * following information:
+ *
  * <ul>
- *   <li>Input image tensor ({@code kTfLiteUInt8}/{@code kTfLiteFloat32})
+ *   <li>For Bert based TFLite model:
  *       <ul>
- *         <li>image input of size {@code [batch x height x width x channels]}.
- *         <li>batch inference is not supported ({@code batch} is required to be 1).
- *         <li>only RGB inputs are supported ({@code channels} is required to be 3).
- *         <li>if type is {@code kTfLiteFloat32}, NormalizationOptions are required to be attached
- *             to the metadata for input normalization.
+ *         <li>3 input tensors of type kTfLiteString with names "ids", "mask" and "segment_ids".
+ *         <li>input_process_units for Wordpiece/Sentencepiece Tokenizer
+ *         <li>exactly one output tensor of type kTfLiteFloat32
  *       </ul>
- *   <li>Output tensor ({@code kTfLiteUInt8}/{@code kTfLiteFloat32})
+ *   <li>For Regex based TFLite model:
  *       <ul>
- *         <li>{@code N} components corresponding to the {@code N} dimensions of the returned
- *             feature vector for this output layer.
- *         <li>Either 2 or 4 dimensions, i.e. {@code [1 x N]} or {@code [1 x 1 x 1 x N]}.
+ *         <li>1 input tensor.
+ *         <li>input_process_units for RegexTokenizer Tokenizer
+ *         <li>exactly one output tensor of type kTfLiteFloat32
+ *       </ul>
+ *   <li>For Universal Sentence Encoder based TFLite model:
+ *       <ul>
+ *         <li>3 input tensors with names "inp_text", "res_context" and "res_text"
+ *         <li>2 output tensors with names "query_encoding" and "response_encoding" of type
+ *             kTfLiteFloat32
  *       </ul>
  * </ul>
  *
@@ -65,14 +66,14 @@ import org.tensorflow.lite.task.vision.core.BaseVisionTaskApi.InferenceProvider;
  * <p>TODO(b/222671076): add factory create methods without options, such as `createFromFile`, once
  * the single file format (index file packed in the model) is supported.
  */
-public final class ImageSearcher extends BaseVisionTaskApi {
+public final class TextSearcher extends BaseTaskApi {
 
-  private static final String IMAGE_SEARCHER_NATIVE_LIB = "task_vision_jni";
+  private static final String TEXT_SEARCHER_NATIVE_LIB = "task_text_jni";
   private static final int OPTIONAL_FD_LENGTH = -1;
   private static final int OPTIONAL_FD_OFFSET = -1;
 
   /**
-   * Creates an {@link ImageSearcher} instance from {@link ImageSearcherOptions}.
+   * Creates an {@link TextSearcher} instance from {@link TextSearcherOptions}.
    *
    * @param modelPath path of the search model with metadata in the assets
    * @throws IOException if an I/O error occurs when loading the tflite model or the index file
@@ -80,8 +81,8 @@ public final class ImageSearcher extends BaseVisionTaskApi {
    * @throws IllegalStateException if there is an internal error
    * @throws RuntimeException if there is an otherwise unspecified error
    */
-  public static ImageSearcher createFromFileAndOptions(
-      Context context, String modelPath, final ImageSearcherOptions options) throws IOException {
+  public static TextSearcher createFromFileAndOptions(
+      Context context, String modelPath, final TextSearcherOptions options) throws IOException {
     try (AssetFileDescriptor assetFileDescriptor = context.getAssets().openFd(modelPath)) {
       return createFromModelFdAndOptions(
           /*modelDescriptor=*/ assetFileDescriptor.getParcelFileDescriptor().getFd(),
@@ -92,7 +93,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
   }
 
   /**
-   * Creates an {@link ImageSearcher} instance.
+   * Creates an {@link TextSearcher} instance.
    *
    * @param modelFile the search model {@link File} instance
    * @throws IOException if an I/O error occurs when loading the tflite model or the index file
@@ -100,8 +101,8 @@ public final class ImageSearcher extends BaseVisionTaskApi {
    * @throws IllegalStateException if there is an internal error
    * @throws RuntimeException if there is an otherwise unspecified error
    */
-  public static ImageSearcher createFromFileAndOptions(
-      File modelFile, final ImageSearcherOptions options) throws IOException {
+  public static TextSearcher createFromFileAndOptions(
+      File modelFile, final TextSearcherOptions options) throws IOException {
     try (ParcelFileDescriptor descriptor =
         ParcelFileDescriptor.open(modelFile, ParcelFileDescriptor.MODE_READ_ONLY)) {
       return createFromModelFdAndOptions(
@@ -113,7 +114,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
   }
 
   /**
-   * Creates an {@link ImageSearcher} instance with a model buffer and {@link ImageSearcherOptions}.
+   * Creates an {@link TextSearcher} instance with a model buffer and {@link TextSearcherOptions}.
    *
    * @param modelBuffer a direct {@link ByteBuffer} or a {@link MappedByteBuffer} of the search
    *     model
@@ -123,8 +124,8 @@ public final class ImageSearcher extends BaseVisionTaskApi {
    * @throws IllegalStateException if there is an internal error
    * @throws RuntimeException if there is an otherwise unspecified error
    */
-  public static ImageSearcher createFromBufferAndOptions(
-      final ByteBuffer modelBuffer, final ImageSearcherOptions options) throws IOException {
+  public static TextSearcher createFromBufferAndOptions(
+      final ByteBuffer modelBuffer, final TextSearcherOptions options) throws IOException {
     if (!(modelBuffer.isDirect() || modelBuffer instanceof MappedByteBuffer)) {
       throw new IllegalArgumentException(
           "The model buffer should be either a direct ByteBuffer or a MappedByteBuffer.");
@@ -140,9 +141,9 @@ public final class ImageSearcher extends BaseVisionTaskApi {
     }
   }
 
-  public static ImageSearcher createFromBufferAndOptionsImpl(
-      final ByteBuffer modelBuffer, final ImageSearcherOptions options, final int indexFd) {
-    return new ImageSearcher(
+  public static TextSearcher createFromBufferAndOptionsImpl(
+      final ByteBuffer modelBuffer, final TextSearcherOptions options, final int indexFd) {
+    return new TextSearcher(
         TaskJniUtils.createHandleFromLibrary(
             new EmptyHandleProvider() {
               @Override
@@ -156,7 +157,7 @@ public final class ImageSearcher extends BaseVisionTaskApi {
                     options.getSearcherOptions().getMaxResults());
               }
             },
-            IMAGE_SEARCHER_NATIVE_LIB));
+            TEXT_SEARCHER_NATIVE_LIB));
   }
 
   /**
@@ -164,25 +165,25 @@ public final class ImageSearcher extends BaseVisionTaskApi {
    *
    * @param nativeHandle a pointer referencing memory allocated in C++
    */
-  ImageSearcher(long nativeHandle) {
+  TextSearcher(long nativeHandle) {
     super(nativeHandle);
   }
 
-  /** Options for setting up an ImageSearcher. */
+  /** Options for setting up an TextSearcher. */
   @AutoValue
-  public abstract static class ImageSearcherOptions {
+  public abstract static class TextSearcherOptions {
 
     abstract BaseOptions getBaseOptions();
 
     abstract SearcherOptions getSearcherOptions();
 
     public static Builder builder() {
-      return new AutoValue_ImageSearcher_ImageSearcherOptions.Builder()
+      return new AutoValue_TextSearcher_TextSearcherOptions.Builder()
           .setBaseOptions(BaseOptions.builder().build())
           .setSearcherOptions(SearcherOptions.builder().build());
     }
 
-    /** Builder for {@link ImageSearcherOptions}. */
+    /** Builder for {@link TextSearcherOptions}. */
     @AutoValue.Builder
     public abstract static class Builder {
       /** Sets the general options to configure Task APIs, such as accelerators. */
@@ -191,125 +192,28 @@ public final class ImageSearcher extends BaseVisionTaskApi {
       /** Sets the options to configure Searcher API. */
       public abstract Builder setSearcherOptions(SearcherOptions searcherOptions);
 
-      public abstract ImageSearcherOptions build();
+      public abstract TextSearcherOptions build();
     }
   }
 
   /**
-   * Performs embedding extraction on the provided {@link TensorImage}, followed by nearest-neighbor
-   * search in the index.
+   * Performs embedding extraction on the provided string input, followed by nearest-neighbor search
+   * in the index.
    *
-   * <p>{@link ImageSearcher} supports the following {@link TensorImage} color space types:
-   *
-   * <ul>
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
-   * </ul>
-   *
-   * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
-   * @throws IllegalArgumentException if the color space type of image is unsupported
+   * @param text input text query to the model
    */
-  public List<NearestNeighbor> search(TensorImage image) {
-    return search(image, ImageProcessingOptions.builder().build());
+  public List<NearestNeighbor> search(String text) {
+    return searchNative(getNativeHandle(), text);
   }
 
-  /**
-   * Performs embedding extraction on the provided {@link TensorImage} with {@link
-   * ImageProcessingOptions}, followed by nearest-neighbor search in the index.
-   *
-   * <p>{@link ImageSearcher} supports the following options:
-   *
-   * <ul>
-   *   <li>Region of interest (ROI) (through {@link ImageProcessingOptions.Builder#setRoi}). It
-   *       defaults to the entire image.
-   *   <li>image rotation (through {@link ImageProcessingOptions.Builder#setOrientation}). It
-   *       defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}.
-   * </ul>
-   *
-   * <p>{@link ImageSearcher} supports the following {@link TensorImage} color space types:
-   *
-   * <ul>
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#RGB}
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV12}
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#NV21}
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV12}
-   *   <li>{@link org.tensorflow.lite.support.image.ColorSpaceType#YV21}
-   * </ul>
-   *
-   * @param image a UINT8 {@link TensorImage} object that represents an RGB or YUV image
-   * @throws IllegalArgumentException if the color space type of image is unsupported
-   */
-  public List<NearestNeighbor> search(TensorImage image, ImageProcessingOptions options) {
-    return run(
-        new InferenceProvider<List<NearestNeighbor>>() {
-          @Override
-          public List<NearestNeighbor> run(
-              long frameBufferHandle, int width, int height, ImageProcessingOptions options) {
-            return search(frameBufferHandle, width, height, options);
-          }
-        },
-        image,
-        options);
-  }
-
-  /**
-   * Performs embedding extraction on the provided {@code MlImage}, followed by nearest-neighbor
-   * search in the index.
-   *
-   * @param image an {@code MlImage} object that represents an image
-   * @throws IllegalArgumentException if the storage type or format of the image is unsupported
-   */
-  public List<NearestNeighbor> search(MlImage image) {
-    return search(image, ImageProcessingOptions.builder().build());
-  }
-
-  /**
-   * Performs embedding extraction on the provided {@code MlImage} with {@link
-   * ImageProcessingOptions}, followed by nearest-neighbor search in the index.
-   *
-   * <p>{@link ImageSearcher} supports the following options:
-   *
-   * <ul>
-   *   <li>Region of interest (ROI) (through {@link ImageProcessingOptions.Builder#setRoi}). It
-   *       defaults to the entire image.
-   *   <li>image rotation (through {@link ImageProcessingOptions.Builder#setOrientation}). It
-   *       defaults to {@link ImageProcessingOptions.Orientation#TOP_LEFT}. {@link
-   *       MlImage#getRotation()} is not effective.
-   * </ul>
-   *
-   * @param image a {@code MlImage} object that represents an image
-   * @param options configures options including ROI and rotation
-   * @throws IllegalArgumentException if the storage type or format of the image is unsupported
-   */
-  public List<NearestNeighbor> search(MlImage image, ImageProcessingOptions options) {
-    image.getInternal().acquire();
-    TensorImage tensorImage = MlImageAdapter.createTensorImageFrom(image);
-    List<NearestNeighbor> result = search(tensorImage, options);
-    image.close();
-    return result;
-  }
-
-  private List<NearestNeighbor> search(
-      long frameBufferHandle, int width, int height, ImageProcessingOptions options) {
-    checkNotClosed();
-    Rect roi = options.getRoi().isEmpty() ? new Rect(0, 0, width, height) : options.getRoi();
-    return searchNative(
-        getNativeHandle(),
-        frameBufferHandle,
-        new int[] {roi.left, roi.top, roi.width(), roi.height()});
-  }
-
-  private static ImageSearcher createFromModelFdAndOptions(
+  private static TextSearcher createFromModelFdAndOptions(
       final int modelDescriptor,
       final long modelDescriptorLength,
       final long modelDescriptorOffset,
-      final ImageSearcherOptions options)
+      final TextSearcherOptions options)
       throws IOException {
     if (options.getSearcherOptions().getIndexFile() != null) {
-      // indexDescriptor must be alive before ImageSearcher is initialized completely in the native
+      // indexDescriptor must be alive before TextSearcher is initialized completely in the native
       // layer.
       try (ParcelFileDescriptor indexDescriptor =
           ParcelFileDescriptor.open(
@@ -328,11 +232,11 @@ public final class ImageSearcher extends BaseVisionTaskApi {
     }
   }
 
-  private static ImageSearcher createFromModelFdAndOptionsImpl(
+  private static TextSearcher createFromModelFdAndOptionsImpl(
       final int modelDescriptor,
       final long modelDescriptorLength,
       final long modelDescriptorOffset,
-      final ImageSearcherOptions options,
+      final TextSearcherOptions options,
       final int indexFd) {
     long nativeHandle =
         TaskJniUtils.createHandleFromLibrary(
@@ -350,8 +254,8 @@ public final class ImageSearcher extends BaseVisionTaskApi {
                     options.getSearcherOptions().getMaxResults());
               }
             },
-            IMAGE_SEARCHER_NATIVE_LIB);
-    return new ImageSearcher(nativeHandle);
+            TEXT_SEARCHER_NATIVE_LIB);
+    return new TextSearcher(nativeHandle);
   }
 
   private static native long initJniWithModelFdAndOptions(
@@ -372,14 +276,8 @@ public final class ImageSearcher extends BaseVisionTaskApi {
       int indexFileDescriptor,
       int maxResults);
 
-  /**
-   * The native method to search an image based on the ROI specified.
-   *
-   * @param roi the ROI of the input image, an array representing the bounding box as {left, top,
-   *     width, height}
-   */
-  private static native List<NearestNeighbor> searchNative(
-      long nativeHandle, long frameBufferHandle, int[] roi);
+  /** The native method to search an input text string. */
+  private static native List<NearestNeighbor> searchNative(long nativeHandle, String text);
 
   @Override
   protected void deinit(long nativeHandle) {

@@ -11,13 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ==============================================================================
-"""An import entry for Task Text Library."""
+"""Search result protobuf."""
 
-from tensorflow_lite_support.python.task.text import text_embedder
-from tensorflow_lite_support.python.task.text import text_searcher
+from tensorflow_lite_support.cc.task.processor.proto import search_result_pb2
 
-TextEmbedder = text_embedder.TextEmbedder
-TextEmbedderOptions = text_embedder.TextEmbedderOptions
-TextSearcher = text_searcher.TextSearcher
-TextSearcherOptions = text_searcher.TextSearcherOptions
+SearchResult = search_result_pb2.SearchResult
+NearestNeighbor = search_result_pb2.NearestNeighbor
