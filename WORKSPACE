@@ -252,19 +252,12 @@ http_archive(
         "http://mirror.bazel.build/zlib.net/fossils/zlib-1.2.11.tar.gz",
         "http://zlib.net/fossils/zlib-1.2.11.tar.gz",  # 2017-01-15
     ],
-)
-
-http_archive(
-    name = "org_libzip",
-    build_file = "//third_party:libzip.BUILD",
-    sha256 = "a5d22f0c87a2625450eaa5e10db18b8ee4ef17042102d04c62e311993a2ba363",
-    strip_prefix = "libzip-rel-1-5-1",
-    urls = [
-        # Bazel does not like the official download link at libzip.org,
-        # so use the GitHub release tag.
-        "https://mirror.bazel.build/github.com/nih-at/libzip/archive/rel-1-5-1.zip",
-        "https://github.com/nih-at/libzip/archive/rel-1-5-1.zip",
+    patches = [
+        "@//third_party:zlib.patch"
     ],
+    patch_args = [
+        "-p1"
+    ]
 )
 
 http_archive(

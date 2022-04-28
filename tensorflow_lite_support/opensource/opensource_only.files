@@ -19,7 +19,6 @@ tensorflow_lite_support/third_party/google_toolbox_for_mac.BUILD:
 tensorflow_lite_support/third_party/icu.BUILD:
 tensorflow_lite_support/third_party/leveldb.BUILD:
 tensorflow_lite_support/third_party/libyuv.BUILD:
-tensorflow_lite_support/third_party/libzip.BUILD:
 tensorflow_lite_support/third_party/pybind11.BUILD:
 tensorflow_lite_support/third_party/python_runtime/BUILD:
 tensorflow_lite_support/third_party/six.BUILD:
