@@ -78,7 +78,7 @@ CreateEmbeddingPostprocessor(TfLiteEngine* engine,
   if (options->quantize()) {
     // ScaNN only supports searching from float embeddings.
     return CreateStatusWithPayload(absl::StatusCode::kInvalidArgument,
-                                   "Setting EmbeddingOptions.normalize = true "
+                                   "Setting EmbeddingOptions.quantize = true "
                                    "is not allowed in searchers.",
                                    TfLiteSupportStatus::kInvalidArgumentError);
   }

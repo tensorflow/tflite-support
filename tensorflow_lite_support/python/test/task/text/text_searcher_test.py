@@ -179,7 +179,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     # Invalid quantization option.
     with self.assertRaisesRegex(
         ValueError,
-        r'Setting EmbeddingOptions.normalize = true is not allowed in '
+        r'Setting EmbeddingOptions.quantize = true is not allowed in '
         r'searchers.'):
       options = _TextSearcherOptions(
           base_options=_BaseOptions(file_name=self.model_path),

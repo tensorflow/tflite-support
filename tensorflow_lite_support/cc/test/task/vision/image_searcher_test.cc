@@ -145,7 +145,7 @@ TEST_F(CreateFromOptionsTest, FailsWithQuantization) {
   EXPECT_EQ(image_searcher_or.status().code(),
             absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(image_searcher_or.status().message(),
-              HasSubstr("Setting EmbeddingOptions.normalize = true is not "
+              HasSubstr("Setting EmbeddingOptions.quantize = true is not "
                         "allowed in searchers"));
   EXPECT_THAT(image_searcher_or.status().GetPayload(kTfLiteSupportPayload),
               Optional(absl::Cord(
