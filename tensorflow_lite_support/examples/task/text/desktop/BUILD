@@ -149,3 +149,27 @@ cc_binary(
         "@com_google_absl//absl/strings:str_format",
     ],
 )
+
+# Example usage:
+# bazel run -c opt \
+#  tensorflow_lite_support/examples/task/text/desktop:text_embedder_demo \
+#  -- \
+#  --model_path=/path/to/model.tflite \
+#  --first_sentence="first sentence" \
+#  --second_sentence="second sentence"
+cc_binary(
+    name = "text_embedder_demo",
+    srcs = ["text_embedder_demo.cc"],
+    deps = [
+        "//tensorflow_lite_support/cc/port:configuration_proto_inc",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_cc_proto",
+        "//tensorflow_lite_support/cc/task/text:text_embedder",
+        "//tensorflow_lite_support/cc/task/text/proto:text_embedder_options_cc_proto",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:str_format",
+    ],
+)
