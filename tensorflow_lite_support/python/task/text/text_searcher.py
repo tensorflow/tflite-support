@@ -14,6 +14,7 @@
 """Text searcher task."""
 
 import dataclasses
+from typing import Optional
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
@@ -50,13 +51,16 @@ class TextSearcher(object):
     self._searcher = cpp_searcher
 
   @classmethod
-  def create_from_file(cls, model_file_path: str,
-                       index_file_path: str) -> "TextSearcher":
+  def create_from_file(cls,
+                       model_file_path: str,
+                       index_file_path: Optional[str] = None) -> "TextSearcher":
     """Creates the `TextSearcher` object from a TensorFlow Lite model.
 
     Args:
       model_file_path: Path to the model.
-      index_file_path: Path to the index.
+      index_file_path: Path to the index. Only required if the index is not
+        attached to the output tensor metadata as an AssociatedFile with type
+        SCANN_INDEX_FILE.
 
     Returns:
       `TextSearcher` object that's created from `options`.

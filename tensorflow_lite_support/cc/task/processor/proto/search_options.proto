@@ -25,7 +25,10 @@ option java_package = "org.tensorflow.lite.task.processor.proto";
 // Options for search processor.
 // Next Id: 4
 message SearchOptions {
-  // The index file to search into.
+  // The index file to search into. Mandatory only if the index is not attached
+  // to the output tensor metadata as an AssociatedFile with type
+  // SCANN_INDEX_FILE.
+  // Note that in case both are provided, this field takes precedence.
   optional core.ExternalFile index_file = 1;
 
   // Maximum number of nearest neighbor results to return.

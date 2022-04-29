@@ -25,9 +25,10 @@ option java_package = "org.tensorflow.lite.task.processor.proto";
 // https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/cc/task/processor/proto/search_options.proto
 // Next Id: 4
 message SearchOptions {
-  // Represents external files used by the Task APIs (e.g. TF Lite FlatBuffer or
-  // plain-text labels file). The files can be specified by one of the following
-  // two ways:
+  // The index file to search into. Mandatory only if the index is not attached
+  // to the output tensor metadata as an AssociatedFile with type
+  // SCANN_INDEX_FILE.
+  // The index file can be specified by one of the following two ways:
   //
   // (1) file contents loaded in `index_file_content`.
   // (2) file path in `index_file_name`.
