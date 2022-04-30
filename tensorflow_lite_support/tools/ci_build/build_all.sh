@@ -58,10 +58,10 @@ bazel build -c opt ${BAZEL_PARALLEL} --config=monolithic \
     //tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/audio:task-library-audio \
     //tensorflow_lite_support/acceleration/configuration:gpu-delegate-plugin
 
-bazel clean
-# Coral plugin.
-bazel build -c opt ${BAZEL_PARALLEL} --define=darwinn_portable=1 \
-    //tensorflow_lite_support/acceleration/configuration:edgetpu_coral_plugin
+# Pip package
+bazel build -c opt ${BAZEL_PARALLEL} \
+      --define darwinn_portable=1 \
+      tensorflow_lite_support/tools/pip_package:build_pip_package
 
 # Tests.
 
