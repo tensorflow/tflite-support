@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
+#include <cstdint>
 #include <vector>
 
 #include "absl/memory/memory.h"  // from @com_google_absl
@@ -44,7 +45,7 @@ PYBIND11_MODULE(leveldb_testing_utils, m) {
               "Failed to create RandomAccessFile at %s", fname));
         }
         auto unique_file = absl::WrapUnique(file);
-        size_t file_size;
+        uint64_t file_size;
         if (!env->GetFileSize(fname, &file_size).ok()) {
           return absl::InternalError(
               absl::StrFormat("Failed to get file size at %s", fname));
