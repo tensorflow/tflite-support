@@ -83,10 +83,10 @@ PYBIND11_MODULE(_pywrap_nl_classifier, m) {
           })
       .def("classify",
            [](NLClassifier& self,
-              const std::string& text) {
+              const std::string& text) -> processor::ClassificationResult {
              auto text_result = self.ClassifyText(text);
              auto results = core::get_value(text_result);
-             CppClassificationResult classification_result;
+             processor::ClassificationResult classification_result;
              auto* classifications = classification_result.add_classifications();
              classifications->set_head_index(0);
              for (int i = 0; i < results.size(); ++i) {
