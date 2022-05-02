@@ -28,21 +28,19 @@ NS_SWIFT_NAME(ImageClassifierOptions)
 @interface TFLImageClassifierOptions : NSObject
 
 /**
- * Base options that is used for creation of any type of task.
- * @seealso TFLBaseOptions
+ * Base options that are used for creation of any type of task.
  */
 @property(nonatomic, copy) TFLBaseOptions *baseOptions;
 
 /**
  * Options that configure the display and filtering of results.
- * @seealso TFLClassificationOptions
  */
 @property(nonatomic, copy) TFLClassificationOptions *classificationOptions;
 
 /**
- * Initializes TFLImageClassifierOptions with the model path set to the specified path to a model
- * file.
- * @description The external model file, must be a single standalone TFLite file. It could be packed
+ * Initializes TFLImageClassifierOptions with the specified model path that points to a model file.
+ * 
+ * @discussion The external model file, must be a single standalone TFLite file. It could be packed
  * with TFLite Model Metadata[1] and associated files if exist. Fail to provide the necessary
  * metadata and associated files might result in errors. Check the [documentation]
  * (https://www.tensorflow.org/lite/convert/metadata) for each task about the specific requirement.
@@ -67,12 +65,13 @@ NS_SWIFT_NAME(ImageClassifier)
 @interface TFLImageClassifier : NSObject
 
 /**
- * Creates TFLImageClassifier from a model file and specified options .
+ * Initializes a new instance of `TFLImageClassifier` from the given `TFLImageClassifierOptions`.
  *
- * @param options TFLImageClassifierOptions instance with the necessary
- * properties set.
- *
- * @return A TFLImageClassifier instance.
+ * @param options Options to use for configuring the `TFLImageClassifier`.
+ * @param error An optional error parameter populated when there is an error in initializing
+ * the image classifier.
+ *  
+ * @return A new instance of `TFLImageClassifier` with the given options. `nil` if there is an error in initializing the image classifier.
  */
 + (nullable instancetype)imageClassifierWithOptions:(TFLImageClassifierOptions *)options
                                               error:(NSError **)error
@@ -81,42 +80,39 @@ NS_SWIFT_NAME(ImageClassifier)
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Performs classification on a GMLImage input, returns an array of
- * categorization results where each member in the array is an array of
- * TFLClass objects for each classification head.
- * This method currently supports inference on only following type of images:
- * 1. RGB and RGBA images for GMLImageSourceTypeImage.
- * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
- *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ * Performs classification on the given GMLImage. 
+ * 
+ * @discussion This method currently supports classification of only the following types of images:
+ * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
+ * 2. kCVPixelFormatType_32BGRA for `GMLImageSourceTypePixelBuffer` and
+ *    `GMLImageSourceTypeSampleBuffer`. If you are using `AVCaptureSession` to setup
  *    camera and get the frames for inference, you must request for this format
  *    from AVCaptureVideoDataOutput. Otherwise your classification
  *    results will be wrong.
  *
- * @param image input to the model.
+ * @param image An image to be classified, represented as a `GMLImage`.
  *
- * @return An NSArray<NSArray<TFLClass *>*> * of classification results.
+ * @return A TFLClassificationResult with one set of results per image classifier head. `nil` if there is an error encountered during classification.
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                                      error:(NSError *_Nullable *)error
     NS_SWIFT_NAME(classify(gmlImage:));
 
 /**
- * Performs classification on a GMLImage input on the pixels in the
- * specified bounding box, returns an array of categorization results
- * where each member in the array is an array of TFLClass objects for
- * each classification head.
- * This method currently supports inference on only following type of images:
- * 1. RGB and RGBA images for GMLImageSourceTypeImage.
- * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
- *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ * Performs classification on the pixels within the specified region of interest of the given `GMLImage`.
+ *
+ * @discussion This method currently supports inference on only following type of images:
+ * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
+ * 2. kCVPixelFormatType_32BGRA for `GMLImageSourceTypePixelBuffer` and
+ *    `GMLImageSourceTypeSampleBuffer`. If you are using `AVCaptureSession` to setup
  *    camera and get the frames for inference, you must request for this format
  *    from AVCaptureVideoDataOutput. Otherwise your classification
  *    results will be wrong.
  *
- * @param image input to the model.
- * @param roi CGRect specifying region of interest in image.
+ * @param image An image to be classified, represented as a `GMLImage`.
+ * @param roi A CGRect specifying the region of interest within the given `GMLImage`, on which classification should be performed.
  *
- * @return An NSArray<NSArray<TFLClass *>*> * of classification results.
+ * @return A TFLClassificationResult with one set of results per image classifier head. `nil` if there is an error encountered during classification.
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                           regionOfInterest:(CGRect)roi
