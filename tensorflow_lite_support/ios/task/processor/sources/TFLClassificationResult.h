@@ -32,11 +32,10 @@ NS_SWIFT_NAME(Classifications)
 @property(nonatomic, readonly) NSArray<TFLCategory *> *categories;
 
 /**
- * Initializes TFLClassifications.
+ * Initializes a new instance of TFLClassifications.
  *
  * @param categories Array of TFLCategory objects encapsulating a list of
  * predictions usually sorted by descending scores (e.g. from high to low probability).
- * @seealso TFLCategory
  *
  * @return An instance of TFLClassifications initialized to
  * the specified values.
@@ -60,7 +59,6 @@ NS_SWIFT_NAME(ClassificationResult)
  *
  * @param classifications Array of TFLClassifications objects containing image classifier
  * predictions per image classifier head.
- * @seealso TFLClassifications
  *
  * @return An instance of TFLClassificationResult initialized to the specified values.
  */
