@@ -37,3 +37,4 @@ from tensorflow_lite_support.metadata import metadata_schema_py_generated
 from tensorflow_lite_support.metadata import schema_py_generated
 from tensorflow_lite_support.metadata.python import metadata
 from tflite_support import metadata_writers
+from tflite_support import task
