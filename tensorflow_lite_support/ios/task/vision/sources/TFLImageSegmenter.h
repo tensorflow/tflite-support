@@ -60,13 +60,13 @@ NS_SWIFT_NAME(ImageSegmenterOptions)
  */
 @property(nonatomic) TFLOutputType outputType;
 
-/** 
+/**
  * Display names local for display names
  */
 @property(nonatomic, copy) NSString *displayNamesLocale;
 
 /**
- * Initializes a new `TFLImageSegmenterOptions` with the absolute path to the model file 
+ * Initializes a new `TFLImageSegmenterOptions` with the absolute path to the model file
  * stored locally on the device, set to the given the model path.
  * .
  * @discussion The external model file, must be a single standalone TFLite
@@ -93,8 +93,9 @@ NS_SWIFT_NAME(ImageSegmenter)
  * @param options Options to use for configuring the `TFLImageSegmenter`.
  * @param error An optional error parameter populated when there is an error in initializing
  * the image segmenter.
- *  
- * @return A new instance of `TFLImageSegmenter` with the given options. `nil` if there is an error in initializing the image segmenter.
+ *
+ * @return A new instance of `TFLImageSegmenter` with the given options. `nil` if there is an error
+ * in initializing the image segmenter.
  */
 + (nullable instancetype)imageSegmenterWithOptions:(nonnull TFLImageSegmenterOptions *)options
                                              error:(NSError **)error
@@ -104,7 +105,7 @@ NS_SWIFT_NAME(ImageSegmenter)
 
 /**
  * Performs segmentation on the given GMLImage.
- * 
+ *
  * @discussion This method currently supports segmentation of only the following types of images:
  * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
  * 2. kCVPixelFormatType_32BGRA for `GMLImageSourceTypePixelBuffer` and
@@ -115,8 +116,9 @@ NS_SWIFT_NAME(ImageSegmenter)
  *
  * @param image An image to be segmented, represented as a `GMLImage`.
  *
- * @return A TFLSegmentationResult that holds the segmentation masks returned by the image segmentation task. `nil` if there is an error encountered during segmentation.
- * Please see `TFLSegmentationResult` for more details.
+ * @return A TFLSegmentationResult that holds the segmentation masks returned by the image
+ * segmentation task. `nil` if there is an error encountered during segmentation. Please see
+ * `TFLSegmentationResult` for more details.
  */
 - (nullable TFLSegmentationResult *)segmentWithGMLImage:(GMLImage *)image
                                                   error:(NSError *_Nullable *)error

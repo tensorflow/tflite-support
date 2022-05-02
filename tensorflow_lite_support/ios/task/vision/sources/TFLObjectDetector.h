@@ -39,9 +39,9 @@ NS_SWIFT_NAME(ObjectDetectorOptions)
 @property(nonatomic, copy) TFLClassificationOptions *classificationOptions;
 
 /**
- * Initializes a new `TFLObjectDetectorOptions` with the absolute path to the model file 
+ * Initializes a new `TFLObjectDetectorOptions` with the absolute path to the model file
  * stored locally on the device, set to the given the model path.
- * 
+ *
  * @discussion The external model file, must be a single standalone TFLite file. It could be packed
  * with TFLite Model Metadata[1] and associated files if exist. Fail to provide the necessary
  * metadata and associated files might result in errors. Check the [documentation]
@@ -64,8 +64,9 @@ NS_SWIFT_NAME(ObjectDetector)
  * @param options Options to use for configuring the `TFLObjectDetector`.
  * @param error An optional error parameter populated when there is an error in initializing
  * the object detector.
- *  
- * @return A new instance of `TFLObjectDetector` with the given options. `nil` if there is an error in initializing the object detector.
+ *
+ * @return A new instance of `TFLObjectDetector` with the given options. `nil` if there is an error
+ * in initializing the object detector.
  */
 + (nullable instancetype)objectDetectorWithOptions:(TFLObjectDetectorOptions *)options
                                              error:(NSError **)error
@@ -75,7 +76,8 @@ NS_SWIFT_NAME(ObjectDetector)
 
 /**
  * Performs object detection on the given GMLImage.
- * @discussion This method currently supports object detection on only the following types of images:
+ * @discussion This method currently supports object detection on only the following types of
+ * images:
  * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
  * 2. `kCVPixelFormatType_32BGRA` for `GMLImageSourceTypePixelBuffer` and
  *    `GMLImageSourceTypeSampleBuffer`. If you are using `AVCaptureSession` to setup
@@ -84,9 +86,10 @@ NS_SWIFT_NAME(ObjectDetector)
  *    results will be wrong.
  *
  * @param image An image on which object detection is to be performed, represented as a `GMLImage`.
- * 
- * @return A `TFLDetectionResult` holding an array of TFLDetection objects, each having a bounding box specifying the region the were detected in and an array of predicted classes.
- * Please see `TFLDetectionResult` for more details.
+ *
+ * @return A `TFLDetectionResult` holding an array of TFLDetection objects, each having a bounding
+ * box specifying the region the were detected in and an array of predicted classes. Please see
+ * `TFLDetectionResult` for more details.
  */
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
                                               error:(NSError *_Nullable *)error

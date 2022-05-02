@@ -40,9 +40,9 @@ NS_SWIFT_NAME(ImageClassifierOptions)
 @property(nonatomic, copy) TFLClassificationOptions *classificationOptions;
 
 /**
- * Initializes a new `TFLImageClassifierOptions` with the absolute path to the model file 
+ * Initializes a new `TFLImageClassifierOptions` with the absolute path to the model file
  * stored locally on the device, set to the given the model path.
- * 
+ *
  * @discussion The external model file, must be a single standalone TFLite file. It could be packed
  * with TFLite Model Metadata[1] and associated files if exist. Fail to provide the necessary
  * metadata and associated files might result in errors. Check the [documentation]
@@ -73,8 +73,9 @@ NS_SWIFT_NAME(ImageClassifier)
  * @param options Options to use for configuring the `TFLImageClassifier`.
  * @param error An optional error parameter populated when there is an error in initializing
  * the image classifier.
- *  
- * @return A new instance of `TFLImageClassifier` with the given options. `nil` if there is an error in initializing the image classifier.
+ *
+ * @return A new instance of `TFLImageClassifier` with the given options. `nil` if there is an error
+ * in initializing the image classifier.
  */
 + (nullable instancetype)imageClassifierWithOptions:(TFLImageClassifierOptions *)options
                                               error:(NSError **)error
@@ -83,8 +84,8 @@ NS_SWIFT_NAME(ImageClassifier)
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Performs classification on the given GMLImage. 
- * 
+ * Performs classification on the given GMLImage.
+ *
  * @discussion This method currently supports classification of only the following types of images:
  * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
  * 2. kCVPixelFormatType_32BGRA for `GMLImageSourceTypePixelBuffer` and
@@ -95,15 +96,17 @@ NS_SWIFT_NAME(ImageClassifier)
  *
  * @param image An image to be classified, represented as a `GMLImage`.
  *
- * @return A TFLClassificationResult with one set of results per image classifier head. `nil` if there is an error encountered during classification.
- * Please see `TFLClassificationResult` for more details.
+ * @return A TFLClassificationResult with one set of results per image classifier head. `nil` if
+ * there is an error encountered during classification. Please see `TFLClassificationResult` for
+ * more details.
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                                      error:(NSError *_Nullable *)error
     NS_SWIFT_NAME(classify(gmlImage:));
 
 /**
- * Performs classification on the pixels within the specified region of interest of the given `GMLImage`.
+ * Performs classification on the pixels within the specified region of interest of the given
+ * `GMLImage`.
  *
  * @discussion This method currently supports inference on only following type of images:
  * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
@@ -114,9 +117,11 @@ NS_SWIFT_NAME(ImageClassifier)
  *    results will be wrong.
  *
  * @param image An image to be classified, represented as a `GMLImage`.
- * @param roi A CGRect specifying the region of interest within the given `GMLImage`, on which classification should be performed.
+ * @param roi A CGRect specifying the region of interest within the given `GMLImage`, on which
+ * classification should be performed.
  *
- * @return A TFLClassificationResult with one set of results per image classifier head. `nil` if there is an error encountered during classification.
+ * @return A TFLClassificationResult with one set of results per image classifier head. `nil` if
+ * there is an error encountered during classification.
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                           regionOfInterest:(CGRect)roi
