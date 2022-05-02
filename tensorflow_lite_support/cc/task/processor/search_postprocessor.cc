@@ -30,6 +30,7 @@ limitations under the License.
 #include "absl/memory/memory.h"  // from @com_google_absl
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/str_format.h"  // from @com_google_absl
+#include "absl/strings/string_view.h"  // from @com_google_absl
 #include "absl/types/span.h"  // from @com_google_absl
 #include "Eigen/Core"  // from @eigen
 #include "tensorflow_lite_support/cc/common.h"
@@ -42,6 +43,8 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/processor/proto/embedding_options.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/search_options.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/search_result.pb.h"
+#include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
+#include "tensorflow_lite_support/metadata/metadata_schema_generated.h"
 #include "tensorflow_lite_support/scann_ondevice/cc/index.h"
 #include "tensorflow_lite_support/scann_ondevice/proto/index_config.pb.h"
 
@@ -59,6 +62,8 @@ using ::tflite::scann_ondevice::core::FloatFindNeighbors;
 using ::tflite::scann_ondevice::core::QueryInfo;
 using ::tflite::scann_ondevice::core::ScannOnDeviceConfig;
 using ::tflite::scann_ondevice::core::TopN;
+using ::tflite::TensorMetadata;
+using ::tflite::metadata::ModelMetadataExtractor;
 using ::tflite::scann_ondevice::Index;
 using ::tflite::scann_ondevice::IndexConfig;
 using ::tflite::support::CreateStatusWithPayload;
@@ -87,12 +92,6 @@ CreateEmbeddingPostprocessor(TfLiteEngine* engine,
 }
 
 absl::Status SanityCheckOptions(const SearchOptions& options) {
-  if (!options.has_index_file()) {
-    return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        "Missing mandatory `index_file` field in `search_options`.",
-        TfLiteSupportStatus::kInvalidArgumentError);
-  }
   if (options.max_results() < 1) {
     return CreateStatusWithPayload(
         absl::StatusCode::kInvalidArgument,
@@ -135,6 +134,22 @@ absl::Status SanityCheckIndexConfig(const IndexConfig& config) {
           TfLiteSupportStatus::kError);
   }
   return absl::OkStatus();
+}
+
+StatusOr<absl::string_view> GetIndexFileContentFromMetadata(
+    const ModelMetadataExtractor& metadata_extractor,
+    const TensorMetadata& tensor_metadata) {
+  auto index_file_name = ModelMetadataExtractor::FindFirstAssociatedFileName(
+      tensor_metadata, tflite::AssociatedFileType_SCANN_INDEX_FILE);
+  if (index_file_name.empty()) {
+    return CreateStatusWithPayload(
+        absl::StatusCode::kInvalidArgument,
+        "Unable to find index file: SearchOptions.index_file is not set and no "
+        "AssociatedFile with type SCANN_INDEX_FILE could be found in the "
+        "output tensor metadata.",
+        TfLiteSupportStatus::kMetadataAssociatedFileNotFoundError);
+  }
+  return metadata_extractor.GetAssociatedFile(index_file_name);
 }
 
 absl::StatusOr<DistanceMeasure> GetDistanceMeasure(
@@ -271,10 +286,17 @@ absl::Status SearchPostprocessor::Init(
   options_ = std::move(options);
 
   // Initialize index.
-  ASSIGN_OR_RETURN(
-      index_file_handler_,
-      ExternalFileHandler::CreateFromExternalFile(&options_->index_file()));
-  auto index_file_content = index_file_handler_->GetFileContent();
+  absl::string_view index_file_content;
+  if (options_->has_index_file()) {
+    ASSIGN_OR_RETURN(
+        index_file_handler_,
+        ExternalFileHandler::CreateFromExternalFile(&options_->index_file()));
+    index_file_content = index_file_handler_->GetFileContent();
+  } else {
+    ASSIGN_OR_RETURN(index_file_content,
+                     GetIndexFileContentFromMetadata(*GetMetadataExtractor(),
+                                                     *GetTensorMetadata()));
+  }
   ASSIGN_OR_RETURN(index_,
                    Index::CreateFromIndexBuffer(index_file_content.data(),
                                                 index_file_content.size()));

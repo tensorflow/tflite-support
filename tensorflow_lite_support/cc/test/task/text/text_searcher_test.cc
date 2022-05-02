@@ -55,13 +55,17 @@ using ::tflite::task::processor::SearchResult;
 
 constexpr char kTestDataDirectory[] =
     "/tensorflow_lite_support/cc/test/testdata/task/text/";
-constexpr char kMobileBert[] = "mobilebert_embedding_with_metadata.tflite";
+constexpr char kMobileBertEmbedder[] =
+    "mobilebert_embedding_with_metadata.tflite";
 constexpr char kMobileBertIndex[] = "mobilebert_index.ldb";
-constexpr char kRegexModel[] = "regex_one_embedding_with_metadata.tflite";
+constexpr char kMobileBertSearcher[] = "mobilebert_searcher.tflite";
+constexpr char kRegexEmbedder[] = "regex_one_embedding_with_metadata.tflite";
 constexpr char kRegexIndex[] = "regex_index.ldb";
-constexpr char kUSEModel[] =
+constexpr char kRegexSearcher[] = "regex_searcher.tflite";
+constexpr char kUSEEmbedder[] =
     "universal_sentence_encoder_qa_with_metadata.tflite";
 constexpr char kUSEIndex[] = "universal_sentence_encoder_index.ldb";
+constexpr char kUSESearcher[] = "universal_sentence_encoder_searcher.tflite";
 
 // Checks that the two provided `SearchResult`  protos are equal, with a
 // tolerancy on floating-point scores to account for numerical instabilities.
@@ -88,22 +92,34 @@ std::unique_ptr<tflite::OpResolver> GetOpResolver(
 
 struct CreateFromOptionsParams {
   std::string name;
-  std::string model_name;
+  std::string embedder_model_name;
+  std::string searcher_model_name;
   bool is_universal_sentence_encoder;
   std::string index_name;
 };
 
 class CreateFromOptionsTest : public TestWithParam<CreateFromOptionsParams> {};
 
-TEST_P(CreateFromOptionsTest, Succeeds) {
+TEST_P(CreateFromOptionsTest, SucceedsWithStandaloneIndex) {
   TextSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               GetParam().model_name));
+               GetParam().embedder_model_name));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                GetParam().index_name));
+
+  SUPPORT_ASSERT_OK(TextSearcher::CreateFromOptions(
+      options, GetOpResolver(GetParam().is_universal_sentence_encoder)));
+}
+
+TEST_P(CreateFromOptionsTest, SucceedsWithMetadataIndex) {
+  TextSearcherOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               GetParam().searcher_model_name));
+  options.mutable_embedding_options()->set_l2_normalize(true);
 
   SUPPORT_ASSERT_OK(TextSearcher::CreateFromOptions(
       options, GetOpResolver(GetParam().is_universal_sentence_encoder)));
@@ -134,7 +150,7 @@ TEST_P(CreateFromOptionsTest, FailsWithMissingIndex) {
   TextSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               GetParam().model_name));
+               GetParam().embedder_model_name));
   options.mutable_embedding_options()->set_l2_normalize(true);
 
   StatusOr<std::unique_ptr<TextSearcher>> image_searcher_or =
@@ -145,17 +161,19 @@ TEST_P(CreateFromOptionsTest, FailsWithMissingIndex) {
             absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       image_searcher_or.status().message(),
-      HasSubstr("Missing mandatory `index_file` field in `search_options`"));
+      HasSubstr("Unable to find index file: SearchOptions.index_file is not "
+                "set and no AssociatedFile with type SCANN_INDEX_FILE could be "
+                "found in the output tensor metadata."));
   EXPECT_THAT(image_searcher_or.status().GetPayload(kTfLiteSupportPayload),
-              Optional(absl::Cord(
-                  absl::StrCat(TfLiteSupportStatus::kInvalidArgumentError))));
+              Optional(absl::Cord(absl::StrCat(
+                  TfLiteSupportStatus::kMetadataAssociatedFileNotFoundError))));
 }
 
 TEST_P(CreateFromOptionsTest, FailsWithQuantization) {
   TextSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               GetParam().model_name));
+               GetParam().embedder_model_name));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_embedding_options()->set_quantize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
@@ -180,7 +198,7 @@ TEST_P(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
   TextSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               GetParam().model_name));
+               GetParam().embedder_model_name));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
@@ -203,15 +221,18 @@ TEST_P(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
 INSTANTIATE_TEST_SUITE_P(
     CreateFromOptionsTest, CreateFromOptionsTest,
     Values(CreateFromOptionsParams{.name = "Bert",
-                                   .model_name = kMobileBert,
+                                   .embedder_model_name = kMobileBertEmbedder,
+                                   .searcher_model_name = kMobileBertSearcher,
                                    .is_universal_sentence_encoder = false,
                                    .index_name = kMobileBertIndex},
            CreateFromOptionsParams{.name = "Regex",
-                                   .model_name = kRegexModel,
+                                   .embedder_model_name = kRegexEmbedder,
+                                   .searcher_model_name = kRegexSearcher,
                                    .is_universal_sentence_encoder = false,
                                    .index_name = kRegexIndex},
            CreateFromOptionsParams{.name = "USE",
-                                   .model_name = kUSEModel,
+                                   .embedder_model_name = kUSEEmbedder,
+                                   .searcher_model_name = kUSESearcher,
                                    .is_universal_sentence_encoder = true,
                                    .index_name = kUSEIndex}),
     [](const TestParamInfo<CreateFromOptionsTest::ParamType>& info) {
@@ -220,7 +241,8 @@ INSTANTIATE_TEST_SUITE_P(
 
 struct SearchParams {
   std::string name;
-  std::string model_name;
+  std::string embedder_model_name;
+  std::string searcher_model_name;
   bool is_universal_sentence_encoder;
   std::string index_name;
   std::string expected_result;
@@ -228,16 +250,37 @@ struct SearchParams {
 
 class SearchTest : public TestWithParam<SearchParams> {};
 
-TEST_P(SearchTest, Succeeds) {
+TEST_P(SearchTest, SucceedsWithStandaloneIndex) {
   // Create Searcher.
   TextSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               GetParam().model_name));
+               GetParam().embedder_model_name));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                GetParam().index_name));
+  SUPPORT_ASSERT_OK_AND_ASSIGN(
+      std::unique_ptr<TextSearcher> searcher,
+      TextSearcher::CreateFromOptions(
+          options, GetOpResolver(GetParam().is_universal_sentence_encoder)));
+
+  // Perform search.
+  SUPPORT_ASSERT_OK_AND_ASSIGN(const SearchResult& result,
+                       searcher->Search("The weather was excellent."));
+
+  // Check results.
+  ExpectApproximatelyEqual(
+      result, ParseTextProtoOrDie<SearchResult>(GetParam().expected_result));
+}
+
+TEST_P(SearchTest, SucceedsWithMetadataIndex) {
+  // Create Searcher.
+  TextSearcherOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               GetParam().searcher_model_name));
+  options.mutable_embedding_options()->set_l2_normalize(true);
   SUPPORT_ASSERT_OK_AND_ASSIGN(
       std::unique_ptr<TextSearcher> searcher,
       TextSearcher::CreateFromOptions(
@@ -257,7 +300,7 @@ TEST_P(SearchTest, SucceedsWithMaxResults) {
   TextSearcherOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
-               GetParam().model_name));
+               GetParam().embedder_model_name));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
@@ -288,7 +331,8 @@ INSTANTIATE_TEST_SUITE_P(
     Values(
         SearchParams{
             .name = "Bert",
-            .model_name = kMobileBert,
+            .embedder_model_name = kMobileBertEmbedder,
+            .searcher_model_name = kMobileBertSearcher,
             .is_universal_sentence_encoder = false,
             .index_name = kMobileBertIndex,
             .expected_result = R"pb(
@@ -315,7 +359,8 @@ INSTANTIATE_TEST_SUITE_P(
             )pb"},
         SearchParams{
             .name = "Regex",
-            .model_name = kRegexModel,
+            .embedder_model_name = kRegexEmbedder,
+            .searcher_model_name = kRegexSearcher,
             .is_universal_sentence_encoder = false,
             .index_name = kRegexIndex,
             .expected_result = R"pb(
@@ -342,7 +387,8 @@ INSTANTIATE_TEST_SUITE_P(
             )pb"},
         SearchParams{
             .name = "USE",
-            .model_name = kUSEModel,
+            .embedder_model_name = kUSEEmbedder,
+            .searcher_model_name = kUSESearcher,
             .is_universal_sentence_encoder = true,
             .index_name = kUSEIndex,
             .expected_result = R"pb(

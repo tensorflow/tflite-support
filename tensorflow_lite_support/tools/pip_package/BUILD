@@ -34,6 +34,7 @@ TASK_PIP_DEPS = [
     # For Model Maker Searcher API to build ScaNN index.
     "//tensorflow_lite_support/scann_ondevice/cc/python:index_builder",
     "//tensorflow_lite_support/scann_ondevice/cc/core:serialized_searcher_py_pb2",
+    "//tensorflow_lite_support/scann_ondevice/cc/test/python:leveldb_testing_utils",
 ]
 
 filegroup(

@@ -54,13 +54,17 @@ class ImageSearcher(object):
     self._searcher = cpp_searcher
 
   @classmethod
-  def create_from_file(cls, model_file_path: str,
-                       index_file_path: str) -> "ImageSearcher":
+  def create_from_file(
+      cls,
+      model_file_path: str,
+      index_file_path: Optional[str] = None) -> "ImageSearcher":
     """Creates the `ImageSearcher` object from a TensorFlow Lite model.
 
     Args:
       model_file_path: Path to the model.
-      index_file_path: Path to the index.
+      index_file_path: Path to the index. Only required if the index is not
+        attached to the output tensor metadata as an AssociatedFile with type
+        SCANN_INDEX_FILE.
 
     Returns:
       `ImageSearcher` object that's created from `options`.

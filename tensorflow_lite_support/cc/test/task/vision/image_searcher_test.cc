@@ -54,11 +54,16 @@ using ::tflite::task::processor::SearchResult;
 constexpr char kTestDataDirectory[] =
     "/tensorflow_lite_support/cc/test/testdata/task/"
     "vision/";
-// Test model. Float inputs, produces feature vectors that are not
+// Test embedder model. Float inputs, produces feature vectors that are not
 // L2-normalized as this model doesn't include a L2_NORMALIZATION TFLite Op.
-constexpr char kMobileNetV3[] = "mobilenet_v3_small_100_224_embedder.tflite";
-// Test index.
+constexpr char kMobileNetV3Embedder[] =
+    "mobilenet_v3_small_100_224_embedder.tflite";
+// Standalone test index.
 constexpr char kIndex[] = "searcher_index.ldb";
+// Test searcher model. Identical to kMobileNetV3Embedder, but with the contents
+// of kIndex baked into the model metadata.
+constexpr char kMobileNetV3Searcher[] =
+    "mobilenet_v3_small_100_224_searcher.tflite";
 
 StatusOr<ImageData> LoadImage(std::string image_name) {
   return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
@@ -81,13 +86,24 @@ void ExpectApproximatelyEqual(const SearchResult& actual,
 
 class CreateFromOptionsTest : public tflite_shims::testing::Test {};
 
-TEST_F(CreateFromOptionsTest, Succeeds) {
+TEST_F(CreateFromOptionsTest, SucceedsWithStandaloneIndex) {
   ImageSearcherOptions options;
-  options.mutable_base_options()->mutable_model_file()->set_file_name(JoinPath(
-      "./" /*test src dir*/, kTestDataDirectory, kMobileNetV3));
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetV3Embedder));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory, kIndex));
+
+  SUPPORT_ASSERT_OK(ImageSearcher::CreateFromOptions(options));
+}
+
+TEST_F(CreateFromOptionsTest, SucceedsWithMetadataIndex) {
+  ImageSearcherOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetV3Searcher));
+  options.mutable_embedding_options()->set_l2_normalize(true);
 
   SUPPORT_ASSERT_OK(ImageSearcher::CreateFromOptions(options));
 }
@@ -113,8 +129,9 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingModel) {
 
 TEST_F(CreateFromOptionsTest, FailsWithMissingIndex) {
   ImageSearcherOptions options;
-  options.mutable_base_options()->mutable_model_file()->set_file_name(JoinPath(
-      "./" /*test src dir*/, kTestDataDirectory, kMobileNetV3));
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetV3Embedder));
   options.mutable_embedding_options()->set_l2_normalize(true);
 
   StatusOr<std::unique_ptr<ImageSearcher>> image_searcher_or =
@@ -124,16 +141,19 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingIndex) {
             absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       image_searcher_or.status().message(),
-      HasSubstr("Missing mandatory `index_file` field in `search_options`"));
+      HasSubstr("Unable to find index file: SearchOptions.index_file is not "
+                "set and no AssociatedFile with type SCANN_INDEX_FILE could be "
+                "found in the output tensor metadata."));
   EXPECT_THAT(image_searcher_or.status().GetPayload(kTfLiteSupportPayload),
-              Optional(absl::Cord(
-                  absl::StrCat(TfLiteSupportStatus::kInvalidArgumentError))));
+              Optional(absl::Cord(absl::StrCat(
+                  TfLiteSupportStatus::kMetadataAssociatedFileNotFoundError))));
 }
 
 TEST_F(CreateFromOptionsTest, FailsWithQuantization) {
   ImageSearcherOptions options;
-  options.mutable_base_options()->mutable_model_file()->set_file_name(JoinPath(
-      "./" /*test src dir*/, kTestDataDirectory, kMobileNetV3));
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetV3Embedder));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_embedding_options()->set_quantize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
@@ -154,8 +174,9 @@ TEST_F(CreateFromOptionsTest, FailsWithQuantization) {
 
 TEST_F(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
   ImageSearcherOptions options;
-  options.mutable_base_options()->mutable_model_file()->set_file_name(JoinPath(
-      "./" /*test src dir*/, kTestDataDirectory, kMobileNetV3));
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetV3Embedder));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory, kIndex));
@@ -173,11 +194,12 @@ TEST_F(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
                   absl::StrCat(TfLiteSupportStatus::kInvalidArgumentError))));
 }
 
-TEST(SearchTest, Succeeds) {
+TEST(SearchTest, SucceedsWithStandaloneIndex) {
   // Create Searcher.
   ImageSearcherOptions options;
-  options.mutable_base_options()->mutable_model_file()->set_file_name(JoinPath(
-      "./" /*test src dir*/, kTestDataDirectory, kMobileNetV3));
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetV3Embedder));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory, kIndex));
@@ -204,11 +226,42 @@ TEST(SearchTest, Succeeds) {
       )pb"));
 }
 
+TEST(SearchTest, SucceedsWithMetadataIndex) {
+  // Create Searcher.
+  ImageSearcherOptions options;
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetV3Searcher));
+  options.mutable_embedding_options()->set_l2_normalize(true);
+  SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageSearcher> searcher,
+                       ImageSearcher::CreateFromOptions(options));
+  // Load image.
+  SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData image, LoadImage("burger.jpg"));
+  std::unique_ptr<FrameBuffer> frame_buffer = CreateFromRgbRawBuffer(
+      image.pixel_data, FrameBuffer::Dimension{image.width, image.height});
+
+  // Perform search.
+  SUPPORT_ASSERT_OK_AND_ASSIGN(const SearchResult& result,
+                       searcher->Search(*frame_buffer));
+  ImageDataFree(&image);
+
+  // Check results.
+  ExpectApproximatelyEqual(
+      result, ParseTextProtoOrDie<SearchResult>(R"pb(
+        nearest_neighbors { metadata: "burger" distance: 0.0 }
+        nearest_neighbors { metadata: "car" distance: 1.82244 }
+        nearest_neighbors { metadata: "bird" distance: 1.93094 }
+        nearest_neighbors { metadata: "dog" distance: 2.04736 }
+        nearest_neighbors { metadata: "cat" distance: 2.07587 }
+      )pb"));
+}
+
 TEST(SearchTest, SucceedsWithMaxResults) {
   // Create Searcher.
   ImageSearcherOptions options;
-  options.mutable_base_options()->mutable_model_file()->set_file_name(JoinPath(
-      "./" /*test src dir*/, kTestDataDirectory, kMobileNetV3));
+  options.mutable_base_options()->mutable_model_file()->set_file_name(
+      JoinPath("./" /*test src dir*/, kTestDataDirectory,
+               kMobileNetV3Embedder));
   options.mutable_embedding_options()->set_l2_normalize(true);
   options.mutable_search_options()->mutable_index_file()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory, kIndex));

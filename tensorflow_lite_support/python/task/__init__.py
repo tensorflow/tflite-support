@@ -11,3 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""The TensorFlow Lite Task Library.
+
+TensorFlow Lite Task Library contains a set of powerful and easy-to-use
+task-specific libraries for app developers to create ML experiences with
+TensorFlow Lite. It provides optimized out-of-box model interfaces for popular
+machine learning tasks, such as image and text classification. The model
+interfaces are specifically designed for each task to achieve the best
+performance and usability.
+
+Read more in the [Task Library Guide](
+https://tensorflow.org/lite/inference_with_metadata/task_library/overview).
+"""
+
+from tflite_support.task import audio
+from tflite_support.task import core
+from tflite_support.task import processor
+from tflite_support.task import text
+from tflite_support.task import vision
