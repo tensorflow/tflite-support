@@ -14,10 +14,9 @@
 """NL Classifier task."""
 
 import dataclasses
-from typing import List
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import class_pb2
+from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.processor.proto import nl_classification_options_pb2
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_nl_classifier
 
@@ -79,7 +78,7 @@ class NLClassifier(object):
         options.base_options, options.nl_classification_options)
     return cls(options, classifier)
 
-  def classify(self, text: str) -> List[class_pb2.Category]:
+  def classify(self, text: str) -> classifications_pb2.ClassificationResult:
     """Performs actual NL classification on the provided text.
 
     Args:

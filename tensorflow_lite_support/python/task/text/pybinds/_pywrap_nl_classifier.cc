@@ -17,9 +17,10 @@ limitations under the License.
 #include "pybind11/stl.h"
 #include "pybind11/numpy.h"
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
-#include "tensorflow_lite_support/cc/task/processor/proto/class.pb.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/classifications.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/nl_classification_options.pb.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
+#include "tensorflow_lite_support/examples/task/text/desktop/nl_classifier_op_resolver.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
@@ -30,7 +31,7 @@ namespace {
 namespace py = ::pybind11;
 using PythonBaseOptions = ::tflite::python::task::core::BaseOptions;
 using CppBaseOptions = ::tflite::task::core::BaseOptions;
-using CppClass = ::tflite::task::processor::Class;
+using CppClassificationResult = ::tflite::task::processor::ClassificationResult;
 using NLClassifier = ::tflite::task::text::nlclassifier::NLClassifier;
 }  // namespace
 
@@ -76,26 +77,24 @@ PYBIND11_MODULE(_pywrap_nl_classifier, m) {
                     nl_classification_options.output_label_tensor_index());
             }
 
-            auto classifier = NLClassifier::CreateFromOptions(options);
+            auto classifier = NLClassifier::CreateFromOptions(
+                options, CreateCustomOpResolver());
             return core::get_value(classifier);
           })
       .def("classify",
            [](NLClassifier& self,
               const std::string& text) {
-             auto classification_result = self.ClassifyText(text);
-             auto results = core::get_value(classification_result);
-             std::vector<CppClass> categories(results.size());
-             std::transform(
-                 results.begin(), results.end(), categories.begin(),
-                 [](const auto& result)
-                 {
-                    CppClass category;
-                    category.set_class_name(result.class_name);
-                    category.set_score(result.score);
-                    return category;
-                 }
-             );
-             return categories;
+             auto text_result = self.ClassifyText(text);
+             auto results = core::get_value(text_result);
+             CppClassificationResult classification_result;
+             auto* classifications = classification_result.add_classifications();
+             classifications->set_head_index(0);
+             for (int i = 0; i < results.size(); ++i) {
+                auto* cl = classifications->add_classes();
+                cl->set_class_name(results[i].class_name);
+                cl->set_score(results[i].score);
+             }
+             return classification_result;
           });
 }
 
