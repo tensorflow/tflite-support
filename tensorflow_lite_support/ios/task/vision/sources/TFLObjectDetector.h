@@ -21,34 +21,35 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Options to configure TFLObjectDetector.
+ * Options to configure `TFLObjectDetector`.
  */
 NS_SWIFT_NAME(ObjectDetectorOptions)
 @interface TFLObjectDetectorOptions : NSObject
 
 /**
  * Base options that is used for creation of any type of task.
- * @seealso TFLBaseOptions
+ * @discussion Please see `TFLBaseOptions` for more details.
  */
 @property(nonatomic, copy) TFLBaseOptions *baseOptions;
 
 /**
  * Options that configure the display and filtering of results.
- * @seealso TFLClassificationOptions
+ * @discussion Please see `TFLClassificationOptions` for more details.
  */
 @property(nonatomic, copy) TFLClassificationOptions *classificationOptions;
 
 /**
- * Initializes TFLObjectDetectorOptions with the model path set to the specified path to a model
- * file.
- * @description The external model file, must be a single standalone TFLite file. It could be packed
+ * Initializes a new `TFLObjectDetectorOptions` with the absolute path to the model file 
+ * stored locally on the device, set to the given the model path.
+ * 
+ * @discussion The external model file, must be a single standalone TFLite file. It could be packed
  * with TFLite Model Metadata[1] and associated files if exist. Fail to provide the necessary
  * metadata and associated files might result in errors. Check the [documentation]
  * (https://www.tensorflow.org/lite/convert/metadata) for each task about the specific requirement.
  *
- * @param modelPath Path to a TFLite model file.
- * @return An instance of TFLObjectDetectorOptions set to the specified
- * modelPath.
+ * @param modelPath An absolute path to a TensorFlow Lite model file stored locally on the device.
+ * @return An new instance of `TFLObjectDetectorOptions` set to the given
+ * model path.
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
 
@@ -58,12 +59,13 @@ NS_SWIFT_NAME(ObjectDetector)
 @interface TFLObjectDetector : NSObject
 
 /**
- * Creates TFLObjectDetector from a model file and specified options .
+ * Initializes a new instance of `TFLObjectDetector` from the given `TFLObjectDetectorOptions`.
  *
- * @param options TFLObjectDetectorOptions instance with the necessary
- * properties set.
- *
- * @return A TFLObjectDetector instance.
+ * @param options Options to use for configuring the `TFLObjectDetector`.
+ * @param error An optional error parameter populated when there is an error in initializing
+ * the object detector.
+ *  
+ * @return A new instance of `TFLObjectDetector` with the given options. `nil` if there is an error in initializing the object detector.
  */
 + (nullable instancetype)objectDetectorWithOptions:(TFLObjectDetectorOptions *)options
                                              error:(NSError **)error
@@ -72,19 +74,19 @@ NS_SWIFT_NAME(ObjectDetector)
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Performs object detection on a GMLImage input, returns the detected objects in the image.
- * This method currently supports inference on only following type of images:
- * 1. RGB and RGBA images for GMLImageSourceTypeImage.
- * 2. kCVPixelFormatType_32BGRA for GMLImageSourceTypePixelBuffer and
- *    GMLImageSourceTypeSampleBuffer. If you are using AVCaptureSession to setup
+ * Performs object detection on the given GMLImage.
+ * @discussion This method currently supports object detection on only the following types of images:
+ * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
+ * 2. `kCVPixelFormatType_32BGRA` for `GMLImageSourceTypePixelBuffer` and
+ *    `GMLImageSourceTypeSampleBuffer`. If you are using `AVCaptureSession` to setup
  *    camera and get the frames for inference, you must request for this format
- *    from AVCaptureVideoDataOutput. Otherwise your classification
+ *    from AVCaptureVideoDataOutput. Otherwise your object detection
  *    results will be wrong.
  *
- * @param image input to the model.
- * @return Detection Result of type TFLDetectionResult an array of
- * detected objeects  where each detected object has a bounding box and an array of TFLCategory
- * holding the predicted classes for the detected object.
+ * @param image An image on which object detection is to be performed, represented as a `GMLImage`.
+ * 
+ * @return A `TFLDetectionResult` holding an array of TFLDetection objects, each having a bounding box specifying the region the were detected in and an array of predicted classes.
+ * Please see `TFLDetectionResult` for more details.
  */
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
                                               error:(NSError *_Nullable *)error

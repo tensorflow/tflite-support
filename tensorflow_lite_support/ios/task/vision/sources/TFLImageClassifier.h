@@ -29,26 +29,29 @@ NS_SWIFT_NAME(ImageClassifierOptions)
 
 /**
  * Base options that are used for creation of any type of task.
+ * @discussion Please see `TFLBaseOptions` for more details.
  */
 @property(nonatomic, copy) TFLBaseOptions *baseOptions;
 
 /**
  * Options that configure the display and filtering of results.
+ * @discussion Please see `TFLClassificationOptions` for more details.
  */
 @property(nonatomic, copy) TFLClassificationOptions *classificationOptions;
 
 /**
- * Initializes TFLImageClassifierOptions with the specified model path that points to a model file.
+ * Initializes a new `TFLImageClassifierOptions` with the absolute path to the model file 
+ * stored locally on the device, set to the given the model path.
  * 
  * @discussion The external model file, must be a single standalone TFLite file. It could be packed
  * with TFLite Model Metadata[1] and associated files if exist. Fail to provide the necessary
  * metadata and associated files might result in errors. Check the [documentation]
  * (https://www.tensorflow.org/lite/convert/metadata) for each task about the specific requirement.
  *
- * @param modelPath Path to a TFLite model file.
+ * @param modelPath An absolute path to a TensorFlow Lite model file stored locally on the device.
  *
- * @return An instance of TFLImageClassifierOptions set to the specified
- * modelPath.
+ * @return An new instance of `TFLImageClassifierOptions` set to the given
+ * model path.
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
 
@@ -93,6 +96,7 @@ NS_SWIFT_NAME(ImageClassifier)
  * @param image An image to be classified, represented as a `GMLImage`.
  *
  * @return A TFLClassificationResult with one set of results per image classifier head. `nil` if there is an error encountered during classification.
+ * Please see `TFLClassificationResult` for more details.
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                                      error:(NSError *_Nullable *)error
