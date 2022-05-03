@@ -33,8 +33,13 @@ TF Lite guide.
 # In pip build, this file will be renamed as tflite_support/__init__.py.
 
 import flatbuffers
+import platform
+
 from tensorflow_lite_support.metadata import metadata_schema_py_generated
 from tensorflow_lite_support.metadata import schema_py_generated
 from tensorflow_lite_support.metadata.python import metadata
 from tflite_support import metadata_writers
-from tflite_support import task
+
+if platform.system() != 'Windows':
+  # Task Library is not supported on Windows yet.
+  from tflite_support import task
