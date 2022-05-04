@@ -216,15 +216,15 @@ class ImageSegmenterTests: XCTestCase {
     let imageSegmenterOptions = ImageSegmenterOptions(modelPath: modelPath)
 
     let imageSegmenter =
-      try ImageSegmenter.imageSegmenter(options: imageSegmenterOptions)
+      try ImageSegmenter.segmenter(options: imageSegmenterOptions)
 
-    let gmlImage = try XCTUnwrap(
+    let mlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
         class: type(of: self),
         filename: "segmentation_input_rotation0",
         type: "jpg"))
     let segmentationResult: SegmentationResult =
-      try XCTUnwrap(imageSegmenter.segment(gmlImage: gmlImage))
+      try XCTUnwrap(imageSegmenter.segment(mlImage: mlImage))
 
     XCTAssertEqual(segmentationResult.segmentations.count, 1)
 
