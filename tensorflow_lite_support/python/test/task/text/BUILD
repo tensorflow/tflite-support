@@ -43,3 +43,18 @@ py_test(
         "@absl_py//absl/testing:parameterized",
     ],
 )
+
+py_test(
+    name = "bert_nl_classifier_test",
+    srcs = ["bert_nl_classifier_test.py"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/text:bert_nl_classifier_models",
+    ],
+    deps = [
+        # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
+        "//tensorflow_lite_support/python/task/text:bert_nl_classifier",
+        "//tensorflow_lite_support/python/test:test_util",
+        "@absl_py//absl/testing:parameterized",
+    ],
+)

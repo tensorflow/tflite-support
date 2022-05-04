@@ -33,3 +33,16 @@ py_library(
         "//tensorflow_lite_support/python/task/text/pybinds:_pywrap_text_searcher",
     ],
 )
+
+py_library(
+    name = "bert_nl_classifier",
+    srcs = [
+        "bert_nl_classifier.py",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
+        "//tensorflow_lite_support/python/task/text/pybinds:_pywrap_bert_nl_classifier",
+    ],
+)
