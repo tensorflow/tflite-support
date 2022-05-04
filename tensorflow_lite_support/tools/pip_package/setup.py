@@ -50,7 +50,7 @@ SETUP_PACKAGES = [
 
 REQUIRED_PACKAGES = [
     'absl-py >= 0.7.0',
-    'numpy >= 1.19.2',
+    'numpy >= 1.20.0',
     # TODO(b/187981032): remove the constraint for 2.0 once the incompatibile
     # issue is resolved.
     'flatbuffers >= 1.12, <2',

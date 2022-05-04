@@ -134,6 +134,7 @@ cc_binary(
     name = "text_searcher_demo",
     srcs = ["text_searcher_demo.cc"],
     deps = [
+        ":universal_sentence_encoder_qa_op_resolver",
         "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/task/core/proto:base_options_cc_proto",
@@ -161,6 +162,7 @@ cc_binary(
     name = "text_embedder_demo",
     srcs = ["text_embedder_demo.cc"],
     deps = [
+        ":universal_sentence_encoder_qa_op_resolver",
         "//tensorflow_lite_support/cc/port:configuration_proto_inc",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/task/core/proto:base_options_cc_proto",
