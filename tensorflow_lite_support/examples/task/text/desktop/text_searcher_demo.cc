@@ -37,6 +37,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/processor/proto/search_result.pb.h"
 #include "tensorflow_lite_support/cc/task/text/proto/text_searcher_options.pb.h"
 #include "tensorflow_lite_support/cc/task/text/text_searcher.h"
+#include "tensorflow_lite_support/examples/task/text/desktop/universal_sentence_encoder_qa_op_resolver.h"
 
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' text embedder model.");
@@ -100,8 +101,9 @@ void DisplayResults(const processor::SearchResult& result) {
 absl::Status Search() {
   // Build TextSearcher.
   const TextSearcherOptions options = BuildOptions();
-  ASSIGN_OR_RETURN(std::unique_ptr<TextSearcher> text_searcher,
-                   TextSearcher::CreateFromOptions(options));
+  ASSIGN_OR_RETURN(
+      std::unique_ptr<TextSearcher> text_searcher,
+      TextSearcher::CreateFromOptions(options, CreateQACustomOpResolver()));
 
   // Run search and display results.
   auto start_search = steady_clock::now();
