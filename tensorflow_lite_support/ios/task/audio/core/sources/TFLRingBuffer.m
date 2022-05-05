@@ -103,6 +103,10 @@
   return floatBuffer;
 }
 
+-(void)clear {
+  [_buffer clear];
+}
+
 - (NSUInteger)size {
   return _buffer.size;
 }

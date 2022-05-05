@@ -44,6 +44,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithSize:(NSUInteger)size;
 
+/**
+ * Clears the buffer by setting all elements to zero .
+ *
+ */
+- (void)clear;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -28,7 +28,7 @@ NS_SWIFT_NAME(AudioTensor)
 @property(nonatomic, readonly) TFLRingBuffer *ringBuffer;
 
 /**
- * Initializes `TFLAudioTensor` with a `TFLAudioFormat` and sample countl.
+ * Initializes a new `TFLAudioTensor` with a `TFLAudioFormat` and sample countl.
  *
  * @discussion The created instance stores data in a ring buffer of size sampleCount *
  * TFLAudioFormat.channelCount.

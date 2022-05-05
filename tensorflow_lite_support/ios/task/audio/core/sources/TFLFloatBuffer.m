@@ -47,6 +47,12 @@
   return [[TFLFloatBuffer alloc] initWithData:self.data size:self.size];
 }
 
+- (void)clear {
+  for (int i = 0; i < _size; i++) {
+    _data[i] = 0.0;
+  }
+}
+
 - (void)dealloc {
   free(_data);
 }

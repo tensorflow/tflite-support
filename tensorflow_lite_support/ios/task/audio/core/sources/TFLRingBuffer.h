@@ -61,6 +61,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable TFLFloatBuffer *)floatBufferWithOffset:(NSUInteger)offset size:(NSUInteger)size;
 
 /**
+ * Clears the `TFLRingBuffer` by setting all elements to zero .
+ */
+-(void)clear;
+
+/**
  * Capacity of ring buffer in number of elements.
  */
 - (NSUInteger)size NS_SWIFT_NAME(size());

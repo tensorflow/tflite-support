@@ -35,7 +35,7 @@
 }
 
 - (nullable instancetype)initWithAudioFormat:(TFLAudioFormat *)audioFormat
-                                 sampleCount:(NSUInteger)sampleCount
+                                  bufferSize:(NSUInteger)bufferSize
                                        error:(NSError *_Nullable *)error {
   self = [self init];
   if (self) {
@@ -48,6 +48,14 @@
       return nil;
     }
 
+    if (bufferSize % audioFormat.channelCount != 0) {
+      [TFLCommonUtils
+          createCustomError:error
+                   withCode:TFLSupportErrorCodeInvalidArgumentError
+                description:@"The buffer size provided is not a multiple of channel count."];
+      return nil;
+    }
+ 
     NSError *waitError = nil;
     [TFLCommonUtils
         createCustomError:&waitError
@@ -58,8 +66,9 @@
     _globalError = waitError;
     _audioFormat = audioFormat;
     _audioEngine = [[AVAudioEngine alloc] init];
-    _bufferSize = sampleCount * audioFormat.channelCount;
-    _ringBuffer = [[TFLRingBuffer alloc] initWithBufferSize:sampleCount * audioFormat.channelCount];
+    _bufferSize = bufferSize;
+
+    _ringBuffer = [[TFLRingBuffer alloc] initWithBufferSize:_bufferSize];
     _conversionQueue =
         dispatch_queue_create("com.tflAudio.AudioConversionQueue", NULL);  // Serial Queue
   }
@@ -211,6 +220,9 @@
 - (void)stop {
   [[_audioEngine inputNode] removeTapOnBus:0];
   [_audioEngine stop];
+  dispatch_sync(self->_conversionQueue, ^{
+    [self->_ringBuffer clear];
+  });
 }
 
 - (nullable TFLFloatBuffer *)readAtOffset:(NSUInteger)offset
