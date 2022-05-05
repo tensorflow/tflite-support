@@ -28,49 +28,52 @@ NS_SWIFT_NAME(AudioTensor)
 @property(nonatomic, readonly) TFLRingBuffer *ringBuffer;
 
 /**
- * Initializes a new `TFLAudioTensor` with a `TFLAudioFormat` and sample countl.
+ * Initializes a new `TFLAudioTensor` with a given `TFLAudioFormat` and sample count.
  *
- * @discussion The created instance stores data in a ring buffer of size sampleCount *
+ * @discussion The `TFLAudioTensor` stores data in a ring buffer of size sampleCount *
  * TFLAudioFormat.channelCount.
  *
  * @param format An audio format of type `TFLAudioFormat`.
+ * @param sampleCount The number of samples `TFLAudioTensor` can store at any given
+ * time. The sampleCount provided will be used to calculate the buffer size of `TFLAudioTensor` 
+ * bufferSize = format.channelCount * sampleCount.
  *
- * @param sampleCount The number of samples this `TFLAudioTensor` instance can store at any given
- * time. The sampleCount provided will be used to calculate the buffer size needed by multiplying
- * with channelCount of format.
- *
- * @return An instance of TFLAudioFormat
+ * @return A new instance of TFLAudioTensor with the given audio format and sample count.
  */
 - (instancetype)initWithAudioFormat:(TFLAudioFormat *)format sampleCount:(NSUInteger)sampleCount;
 
 /**
- * Convenience method to load the of `TFLAudioRecord` into `TFLAudioTensors`.
+ * Convenience method to load the elements currently in the internal buffer of `TFLAudioRecord` into `TFLAudioTensor`.
  *
- * @discussion You must make sure that the  audio formats of TFLAudioRecord and the current
- * TFLTensorAudio match.
+ * @discussion You must ensure that the  audio formats of `TFLAudioRecord` and the current
+ * `TFLAudioTensor` match. 
+ * New data from the input buffer is appended to the end of the buffer by shifting out
+ * any old data from the beginning of the buffer if need be to make space. If the size of the new
+ * data to be copied is more than the capacity of the buffer, only the most recent data
+ * of the `TFLAudioTensor`'s buffer size will be copied from the input buffer.
  *
- * @param audioRecord  A TFLAudioRecord.
- *
+ * @param audioRecord  An object of TFLAudioRecord.
+ * @param error An optional error parameter populated with the reason for failure, if the internal buffer of `TFLAudioRecord` could not be loaded into the `TFLAudioTensor`.
  * @return A boolean indicating if the load operation succeded.
  */
 - (BOOL)loadAudioRecord:(TFLAudioRecord *)audioRecord
               withError:(NSError **)error NS_SWIFT_NAME(loadAudioRecord(audioRecord:));
 
 /**
- * This function loads the TFLAudioTensor ring buffer with a the provided buffer.
+ * This function loads the internal buffer of `TFLAudioTensor` with the provided buffer.
  *
  * @discussion New data from the input buffer is appended to the end of the buffer by shifting out
  * any old data from the beginning of the buffer if need be to make space. If the size of the new
- * data to be copied is more than the capacity of TFLAudioTensor's buffer, only the most recent data
- * of the TFLAudioTensor's buffer size will be copied from the input buffer .
+ * data to be copied is more than the capacity of the buffer, only the most recent data
+ * of the `TFLAudioTensor`'s buffer size will be copied from the input buffer.
  *
- * @param sourceBuffer  A buffer of type TFLFloatBuffer output by TFLAudioRecord. You must make sure
- * that the buffer size and audio format of TFLAudioRecord matches the the format. For multi-channel
- * input, the array is interleaved.
- * @param offset Starting position in the sorce buffer.
- * @param size The number of  values to be copied.
+ * @param sourceBuffer  A buffer of type `TFLFloatBuffer`. For multi-channel
+ * input, the array must be interleaved.
+ * @param offset Starting index in the source buffer from which elements should be copied.
+ * @param size The number of elements to be copied.
+ * @param error An optional error parameter populated with the reason for failure, if the internal buffer could not be loaded with the source buffer.
  *
- * @return An instance of TFLAudioFormat
+ * @return A boolean indicating if the load operation succeded.
  */
 - (BOOL)loadBuffer:(TFLFloatBuffer *)sourceBuffer
             offset:(NSInteger)offset

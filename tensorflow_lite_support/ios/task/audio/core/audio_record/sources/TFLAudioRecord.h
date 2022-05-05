@@ -31,13 +31,13 @@ NS_SWIFT_NAME(AudioRecord)
 @property(nonatomic, readonly) NSUInteger bufferSize;
 
 /**
- * Initializes a new `TFLAudioRecord` with a given `TFLAudioFormat` and buffer size.
+ * Initializes a new `TFLAudioRecord` with the given audio format and buffer size.
  *
  * @param format An audio format of type `TFLAudioFormat`.
  * @param bufferSize Maximum number of elements the internal buffer of `TFLAudioRecord` can hold at any given point of time. The buffer length should be a multiple of format.channelCount.
  * @param error An optional error parameter populated if the initialization of `TFLAudioRecord` was not successful.
  *
- * @return An new instance of `TFLAudioRecord`. `nil` if there is an error in initializing `TFLAudioRecord`.
+ * @return An new instance of `TFLAudioRecord` with the given audio format and buffer size. `nil` if there is an error in initializing `TFLAudioRecord`.
  */
 - (nullable instancetype)initWithAudioFormat:(TFLAudioFormat *)format
                                   bufferSize:(NSUInteger)bufferSize
