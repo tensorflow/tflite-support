@@ -66,7 +66,7 @@ NS_SWIFT_NAME(ImageSegmenterOptions)
 @property(nonatomic, copy) NSString *displayNamesLocale;
 
 /**
- * Initializes a new `TFLImageSegmenterOptions` with the absolute path to the model file
+ * Initializes a newly allocated object of `TFLImageSegmenterOptions` with the absolute path to the model file
  * stored locally on the device, set to the given the model path.
  * .
  * @discussion The external model file, must be a single standalone TFLite
@@ -88,7 +88,7 @@ NS_SWIFT_NAME(ImageSegmenter)
 @interface TFLImageSegmenter : NSObject
 
 /**
- * Initializes a new instance of `TFLImageSegmenter` from the given `TFLImageSegmenterOptions`.
+ * Creates a new object of `TFLImageSegmenter` from the given `TFLImageSegmenterOptions`.
  *
  * @param options Options to use for configuring the `TFLImageSegmenter`.
  * @param error An optional error parameter populated when there is an error in initializing

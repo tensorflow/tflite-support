@@ -39,7 +39,7 @@ NS_SWIFT_NAME(ObjectDetectorOptions)
 @property(nonatomic, copy) TFLClassificationOptions *classificationOptions;
 
 /**
- * Initializes a new `TFLObjectDetectorOptions` with the absolute path to the model file
+ * Initializes a newly allocated object of `TFLObjectDetectorOptions` with the absolute path to the model file
  * stored locally on the device, set to the given the model path.
  *
  * @discussion The external model file, must be a single standalone TFLite file. It could be packed
@@ -59,7 +59,7 @@ NS_SWIFT_NAME(ObjectDetector)
 @interface TFLObjectDetector : NSObject
 
 /**
- * Initializes a new instance of `TFLObjectDetector` from the given `TFLObjectDetectorOptions`.
+ * Creates a new object of `TFLObjectDetector` from the given `TFLObjectDetectorOptions`.
  *
  * @param options Options to use for configuring the `TFLObjectDetector`.
  * @param error An optional error parameter populated when there is an error in initializing
