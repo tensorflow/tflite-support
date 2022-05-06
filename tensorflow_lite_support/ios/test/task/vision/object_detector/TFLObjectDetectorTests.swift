@@ -85,15 +85,15 @@ class ObjectDetectorTests: XCTestCase {
     let objectDetectorOptions = ObjectDetectorOptions(modelPath: modelPath)
 
     let objectDetector =
-      try ObjectDetector.detector(options: objectDetectorOptions)
+      try ObjectDetector.objectDetector(options: objectDetectorOptions)
 
-    let mlImage = try XCTUnwrap(
+    let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
         class: type(of: self),
         filename: "cats_and_dogs",
         type: "jpg"))
     let detectionResults: DetectionResult =
-      try objectDetector.detect(mlImage: mlImage)
+      try objectDetector.detect(gmlImage: gmlImage)
 
     self.verifyDetectionResult(detectionResults)
   }
@@ -108,15 +108,15 @@ class ObjectDetectorTests: XCTestCase {
     objectDetectorOptions.classificationOptions.maxResults = maxResults
 
     let objectDetector =
-      try ObjectDetector.detector(options: objectDetectorOptions)
+      try ObjectDetector.objectDetector(options: objectDetectorOptions)
 
-    let mlImage = try XCTUnwrap(
+    let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
         class: type(of: self),
         filename: "cats_and_dogs",
         type: "jpg"))
     let detectionResult: DetectionResult = try objectDetector.detect(
-      mlImage: mlImage)
+      gmlImage: gmlImage)
 
     XCTAssertLessThanOrEqual(detectionResult.detections.count, maxResults)
 

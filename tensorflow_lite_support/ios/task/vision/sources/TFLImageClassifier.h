@@ -79,7 +79,7 @@ NS_SWIFT_NAME(ImageClassifier)
  */
 + (nullable instancetype)imageClassifierWithOptions:(TFLImageClassifierOptions *)options
                                               error:(NSError **)error
-    NS_SWIFT_NAME(classifier(options:));
+    NS_SWIFT_NAME(imageClassifier(options:));
 
 + (instancetype)new NS_UNAVAILABLE;
 
@@ -101,8 +101,8 @@ NS_SWIFT_NAME(ImageClassifier)
  * more details.
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
-                                                     error:(NSError **)error
-    NS_SWIFT_NAME(classify(mlImage:));
+                                                     error:(NSError *_Nullable *)error
+    NS_SWIFT_NAME(classify(gmlImage:));
 
 /**
  * Performs classification on the pixels within the specified region of interest of the given
@@ -125,8 +125,8 @@ NS_SWIFT_NAME(ImageClassifier)
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                           regionOfInterest:(CGRect)roi
-                                                     error:(NSError **)error
-    NS_SWIFT_NAME(classify(mlImage:regionOfInterest:));
+                                                     error:(NSError *_Nullable *)error
+    NS_SWIFT_NAME(classify(gmlImage:regionOfInterest:));
 
 - (instancetype)init NS_UNAVAILABLE;
 

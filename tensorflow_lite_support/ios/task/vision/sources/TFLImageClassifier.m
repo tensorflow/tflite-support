@@ -105,7 +105,7 @@
 }
 
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
-                                                     error:(NSError **)error {
+                                                     error:(NSError *_Nullable *)error {
   return [self classifyWithGMLImage:image
                    regionOfInterest:CGRectMake(0, 0, image.width, image.height)
                               error:error];
@@ -113,7 +113,7 @@
 
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                           regionOfInterest:(CGRect)roi
-                                                     error:(NSError **)error {
+                                                     error:(NSError *_Nullable *)error {
   if (!image) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError

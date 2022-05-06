@@ -103,7 +103,7 @@
 }
 
 - (nullable TFLSegmentationResult *)segmentWithGMLImage:(GMLImage *)image
-                                                  error:(NSError **)error {
+                                                  error:(NSError *_Nullable *)error {
   if (!image) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
