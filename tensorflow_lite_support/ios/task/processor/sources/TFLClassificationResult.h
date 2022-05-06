@@ -40,21 +40,22 @@ NS_SWIFT_NAME(Classifications)
 @property(nonatomic, readonly) NSArray<TFLCategory *> *categories;
 
 /**
- * Initializes a newly allocated instance of `TFLClassifications`.
+ * Initializes a new `TFLClassifications` with the given head index and array of categories.
+ * head name is initialized to `nil`.
  *
  * @param headindex The index of the image classifier head these classes refer to.
  * @param categories An array of `TFLCategory` objects encapsulating a list of
  * predictions usually sorted by descending scores (e.g. from high to low probability).
  *
- * @return A new instance of `TFLClassifications` with the given `headIndex` and
- * `categories`.
+ * @return An instance of `TFLClassifications` initialized with the given head index and
+ * array of categories.
  */
 - (instancetype)initWithHeadIndex:(NSInteger)headIndex
                        categories:(NSArray<TFLCategory *> *)categories;
 
 
 /**
- * Initializes a newly allocated object of `TFLClassifications` with the given head index, head name and categories.
+ * Initializes a new `TFLClassifications` with the given head index, head name and array of categories.
  *
  * @param headIndex The index of the image classifier head these classes refer to.
  * @param headName The name of the classifier head, which is the corresponding tensor metadata
@@ -62,8 +63,8 @@ NS_SWIFT_NAME(Classifications)
  * @param categories An array of `TFLCategory` objects encapsulating a list of
  * predictions usually sorted by descending scores (e.g. from high to low probability).
  *
- * @return A new instance of `TFLClassifications` with the given head index, head name and
- * categories.
+ * @return An object of `TFLClassifications` initialized with the given head index, head name and
+ * array of categories.
  */
 - (instancetype)initWithHeadIndex:(NSInteger)headIndex
                          headName:(nullable NSString *)headName
@@ -81,12 +82,12 @@ NS_SWIFT_NAME(ClassificationResult)
 @property(nonatomic, readonly) NSArray<TFLClassifications *> *classifications;
 
 /**
- * Initializes a newly allocated object of `TFLClassificationResult` with the given classifications.
+ * Initializes a new `TFLClassificationResult` with the given array of classifications.
  *
- * @param classifications Array of TFLClassifications objects containing image classifier
+ * @param classifications An Aaray of `TFLClassifications` objects containing image classifier
  * predictions per image classifier head.
  *
- * @return An instance of TFLClassificationResult initialized to the specified values.
+ * @return An instance of 1TFLClassificationResult1 initialized with the given array of classifications.
  */
 - (instancetype)initWithClassifications:(NSArray<TFLClassifications *> *)classifications;
 

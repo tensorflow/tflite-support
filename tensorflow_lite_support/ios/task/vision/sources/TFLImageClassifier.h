@@ -40,7 +40,7 @@ NS_SWIFT_NAME(ImageClassifierOptions)
 @property(nonatomic, copy) TFLClassificationOptions *classificationOptions;
 
 /**
- * Initializes a newly allocated object of `TFLImageClassifierOptions` with the absolute path to the model file
+ * Initializes a new `TFLImageClassifierOptions` with the absolute path to the model file
  * stored locally on the device, set to the given the model path.
  *
  * @discussion The external model file, must be a single standalone TFLite file. It could be packed
@@ -50,7 +50,7 @@ NS_SWIFT_NAME(ImageClassifierOptions)
  *
  * @param modelPath An absolute path to a TensorFlow Lite model file stored locally on the device.
  *
- * @return An new instance of `TFLImageClassifierOptions` set to the given
+ * @return An instance of `TFLImageClassifierOptions` initialized to the given
  * model path.
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
@@ -68,9 +68,9 @@ NS_SWIFT_NAME(ImageClassifier)
 @interface TFLImageClassifier : NSObject
 
 /**
- * Creates a new object of `TFLImageClassifier` from the given `TFLImageClassifierOptions`.
+ * Creates a new instance of `TFLImageClassifier` from the given `TFLImageClassifierOptions`.
  *
- * @param options Options to use for configuring the `TFLImageClassifier`.
+ * @param options The options to use for configuring the `TFLImageClassifier`.
  * @param error An optional error parameter populated when there is an error in initializing
  * the image classifier.
  *

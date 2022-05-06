@@ -39,7 +39,7 @@ NS_SWIFT_NAME(ObjectDetectorOptions)
 @property(nonatomic, copy) TFLClassificationOptions *classificationOptions;
 
 /**
- * Initializes a newly allocated object of `TFLObjectDetectorOptions` with the absolute path to the model file
+ * Initializes a new `TFLObjectDetectorOptions` with the absolute path to the model file
  * stored locally on the device, set to the given the model path.
  *
  * @discussion The external model file, must be a single standalone TFLite file. It could be packed
@@ -48,7 +48,7 @@ NS_SWIFT_NAME(ObjectDetectorOptions)
  * (https://www.tensorflow.org/lite/convert/metadata) for each task about the specific requirement.
  *
  * @param modelPath An absolute path to a TensorFlow Lite model file stored locally on the device.
- * @return An new instance of `TFLObjectDetectorOptions` set to the given
+ * @return An instance of `TFLObjectDetectorOptions` initialized to the given
  * model path.
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
@@ -59,9 +59,9 @@ NS_SWIFT_NAME(ObjectDetector)
 @interface TFLObjectDetector : NSObject
 
 /**
- * Creates a new object of `TFLObjectDetector` from the given `TFLObjectDetectorOptions`.
+ * Creates a new instance of `TFLObjectDetector` from the given `TFLObjectDetectorOptions`.
  *
- * @param options Options to use for configuring the `TFLObjectDetector`.
+ * @param options The options to use for configuring the `TFLObjectDetector`.
  * @param error An optional error parameter populated when there is an error in initializing
  * the object detector.
  *

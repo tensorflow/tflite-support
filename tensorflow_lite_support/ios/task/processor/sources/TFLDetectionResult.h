@@ -34,13 +34,13 @@ NS_SWIFT_NAME(Detection)
 @property(nonatomic, readonly) NSArray<TFLCategory *> *categories;
 
 /**
- * Initializes TFLDetection.
+ * Initializes an object of `TFLDetection` with the given bounding box and array of categories.
  *
  * @param boundingBox CGRect specifying the bounds of the object represented by this detection.
  * @param categories Array of predicted classes, usually sorted by descending scores (e.g.from high
  * to low probability).
  *
- * @return An instance of TFLDetection initialized to the specified values.
+ * @return An instance of `TFLDetection` initialized with the given bounding box and array of categories.
  */
 - (instancetype)initWithBoundingBox:(CGRect)boundingBox
                          categories:(NSArray<TFLCategory *> *)categories;
@@ -58,11 +58,11 @@ NS_SWIFT_NAME(DetectionResult)
 @property(nonatomic, readonly) NSArray<TFLDetection *> *detections;
 
 /**
- * Initializes TFLDetectionResult.
+ * Initializes a new `TFLDetectionResult` with the given array of detections.
  *
  * @param detections Array of detected objects of type TFLDetection.
  *
- * @return An instance of TFLDetectionResult initialized to the specified values.
+ * @return An instance of `TFLDetectionResult` initialized with the given array of detections.
  */
 - (instancetype)initWithDetections:(NSArray<TFLDetection *> *)detections;
 
