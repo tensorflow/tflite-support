@@ -92,7 +92,7 @@ NS_SWIFT_NAME(ObjectDetector)
  * `TFLDetectionResult` for more details.
  */
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
-                                              error:(NSError *_Nullable *)error
+                                              error:(NSError **)error
     NS_SWIFT_NAME(detect(gmlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;

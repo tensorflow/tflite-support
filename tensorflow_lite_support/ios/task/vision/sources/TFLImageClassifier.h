@@ -101,7 +101,7 @@ NS_SWIFT_NAME(ImageClassifier)
  * more details.
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
-                                                     error:(NSError *_Nullable *)error
+                                                     error:(NSError **)error
     NS_SWIFT_NAME(classify(gmlImage:));
 
 /**
@@ -125,7 +125,7 @@ NS_SWIFT_NAME(ImageClassifier)
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                           regionOfInterest:(CGRect)roi
-                                                     error:(NSError *_Nullable *)error
+                                                     error:(NSError **)error
     NS_SWIFT_NAME(classify(gmlImage:regionOfInterest:));
 
 - (instancetype)init NS_UNAVAILABLE;
