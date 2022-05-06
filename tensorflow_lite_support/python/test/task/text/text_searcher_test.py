@@ -55,6 +55,28 @@ nearest_neighbors {
   distance: 0.000119
 }
 """
+_EXPECTED_REGEX_DEFAULT_OPTIONS_SEARCH_RESULT = """
+nearest_neighbors {
+  metadata: "The weather was excellent."
+  distance: 0.889665
+}
+nearest_neighbors {
+  metadata: "The sun was shining on that day."
+  distance: 0.889668
+}
+nearest_neighbors {
+  metadata: "The cat is chasing after the mouse."
+  distance: 0.88967
+}
+nearest_neighbors {
+  metadata: "It was a sunny day."
+  distance: 0.889671
+}
+nearest_neighbors {
+  metadata: "He was very happy with his newly bought car."
+  distance: 0.889672
+}
+"""
 
 _BERT_EMBEDDER_MODEL = 'mobilebert_embedding_with_metadata.tflite'
 _BERT_SEARCHER_MODEL = 'mobilebert_searcher.tflite'
@@ -228,6 +250,17 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
           search_options=_SearchOptions(
               index_file_name=self.index_path, max_results=-1))
       _TextSearcher.create_from_options(options)
+
+  def test_search_with_default_options(self):
+    # Create searcher.
+    searcher = _TextSearcher.create_from_file(self.embedder_model_path,
+                                              self.index_path)
+
+    # Perform text search.
+    text_search_result = searcher.search('The weather was excellent.')
+
+    self.assertProtoEquals(_EXPECTED_REGEX_DEFAULT_OPTIONS_SEARCH_RESULT,
+                           text_search_result)
 
   @parameterized.parameters(
       (_REGEX_EMBEDDER_MODEL, _REGEX_INDEX, ModelFileType.FILE_NAME,
