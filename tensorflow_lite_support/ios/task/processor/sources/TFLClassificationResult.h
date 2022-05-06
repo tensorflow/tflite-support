@@ -43,7 +43,7 @@ NS_SWIFT_NAME(Classifications)
  * Initializes a new `TFLClassifications` with the given head index and array of categories.
  * head name is initialized to `nil`.
  *
- * @param headindex The index of the image classifier head these classes refer to.
+ * @param headIndex The index of the image classifier head these classes refer to.
  * @param categories An array of `TFLCategory` objects encapsulating a list of
  * predictions usually sorted by descending scores (e.g. from high to low probability).
  *
