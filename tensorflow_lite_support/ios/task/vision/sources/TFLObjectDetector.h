@@ -48,7 +48,7 @@ NS_SWIFT_NAME(ObjectDetectorOptions)
  * (https://www.tensorflow.org/lite/convert/metadata) for each task about the specific requirement.
  *
  * @param modelPath An absolute path to a TensorFlow Lite model file stored locally on the device.
- * @return An new instance of `TFLObjectDetectorOptions` set to the given
+ * @return An instance of `TFLObjectDetectorOptions` initialized to the given
  * model path.
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
@@ -59,9 +59,9 @@ NS_SWIFT_NAME(ObjectDetector)
 @interface TFLObjectDetector : NSObject
 
 /**
- * Initializes a new instance of `TFLObjectDetector` from the given `TFLObjectDetectorOptions`.
+ * Creates a new instance of `TFLObjectDetector` from the given `TFLObjectDetectorOptions`.
  *
- * @param options Options to use for configuring the `TFLObjectDetector`.
+ * @param options The options to use for configuring the `TFLObjectDetector`.
  * @param error An optional error parameter populated when there is an error in initializing
  * the object detector.
  *
@@ -92,7 +92,7 @@ NS_SWIFT_NAME(ObjectDetector)
  * `TFLDetectionResult` for more details.
  */
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
-                                              error:(NSError *_Nullable *)error
+                                              error:(NSError **)error
     NS_SWIFT_NAME(detect(gmlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;

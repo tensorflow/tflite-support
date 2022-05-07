@@ -77,7 +77,7 @@ NS_SWIFT_NAME(ImageSegmenterOptions)
  *
  * @param modelPath An absolute path to a TensorFlow Lite model file stored locally on the device.
  *
- * @return An new instance of `TFLImageSegmenterOptions` set to the given
+ * @return An instance of `TFLImageSegmenterOptions` initialized to the given
  * model path.
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
@@ -88,9 +88,9 @@ NS_SWIFT_NAME(ImageSegmenter)
 @interface TFLImageSegmenter : NSObject
 
 /**
- * Initializes a new instance of `TFLImageSegmenter` from the given `TFLImageSegmenterOptions`.
+ * Creates a new instance of `TFLImageSegmenter` from the given `TFLImageSegmenterOptions`.
  *
- * @param options Options to use for configuring the `TFLImageSegmenter`.
+ * @param options The options to use for configuring the `TFLImageSegmenter`.
  * @param error An optional error parameter populated when there is an error in initializing
  * the image segmenter.
  *
@@ -121,7 +121,7 @@ NS_SWIFT_NAME(ImageSegmenter)
  * `TFLSegmentationResult` for more details.
  */
 - (nullable TFLSegmentationResult *)segmentWithGMLImage:(GMLImage *)image
-                                                  error:(NSError *_Nullable *)error
+                                                  error:(NSError **)error
     NS_SWIFT_NAME(segment(gmlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;

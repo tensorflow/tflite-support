@@ -34,19 +34,18 @@ NS_SWIFT_NAME(ClassificationCategory)
 @property(nonatomic, readonly, nullable) NSString *displayName;
 
 /**
- * Initializes TFLCategory.
+ * Initializes a new `TFLCategory` with the given index, score, label and display name.
  *
  * @param index Index of the class in the corresponding label map, usually packed in the TFLite
  * Model Metadata.
  *
- * @param score Confidence score for this class .
+ * @param score Confidence score for this class.
  *
  * @param label Class name of the class.
  *
  * @param displayName Display name of the class.
  *
- * @return An instance of TFLCategory initialized to
- * the specified values.
+ * @return An instance of `TFLCategory` initialized with the given index, score, label and display name.
  */
 - (instancetype)initWithIndex:(NSInteger)index
                         score:(float)score
