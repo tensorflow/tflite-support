@@ -99,9 +99,11 @@ NS_SWIFT_NAME(ImageSegmenter)
  */
 + (nullable instancetype)imageSegmenterWithOptions:(nonnull TFLImageSegmenterOptions *)options
                                              error:(NSError **)error
-    NS_SWIFT_NAME(imageSegmenter(options:));
+    NS_SWIFT_NAME(segmenter(options:));
 
 + (instancetype)new NS_UNAVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  * Performs segmentation on the given GMLImage.
@@ -122,9 +124,7 @@ NS_SWIFT_NAME(ImageSegmenter)
  */
 - (nullable TFLSegmentationResult *)segmentWithGMLImage:(GMLImage *)image
                                                   error:(NSError **)error
-    NS_SWIFT_NAME(segment(gmlImage:));
-
-- (instancetype)init NS_UNAVAILABLE;
+    NS_SWIFT_NAME(segment(mlImage:));
 
 @end
 
