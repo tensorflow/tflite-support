@@ -55,10 +55,6 @@ NS_SWIFT_NAME(ImageClassifierOptions)
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
 
-- (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)new NS_UNAVAILABLE;
-
 @end
 
 /**
@@ -82,6 +78,8 @@ NS_SWIFT_NAME(ImageClassifier)
     NS_SWIFT_NAME(classifier(options:));
 
 + (instancetype)new NS_UNAVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  * Performs classification on the given GMLImage.
@@ -127,8 +125,6 @@ NS_SWIFT_NAME(ImageClassifier)
                                           regionOfInterest:(CGRect)roi
                                                      error:(NSError **)error
     NS_SWIFT_NAME(classify(mlImage:regionOfInterest:));
-
-- (instancetype)init NS_UNAVAILABLE;
 
 @end
 
