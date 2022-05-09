@@ -16,12 +16,20 @@
 
 This PyPI package includes the Python bindings for following features:
 
+ - Task Library: a set of powerful and easy-to-use task-specific libraries to
+ integrate TFLite models onto various platforms. See the [Task Library
+ documentation](https://www.tensorflow.org/lite/inference_with_metadata/task_library/overview)
+ for more information.
  - Metadata schemas: wraps TFLite model schema and metadata schema in Python.
- - Metadata populator and displayer: can be used to populate the metadata and
+ - Metadata writer and displayer: can be used to populate the metadata and
  associated files into the model, as well as converting the populated metadata
- into the json format.
+ into the json format. See the [Metadata
+ documentation](https://www.tensorflow.org/lite/convert/metadata) for more
+ information.
  - Android Codegen tool: generates the Java model interface used in Android for
- a particular model.
+ a particular model. See the [Codegen tool
+ documentation](https://www.tensorflow.org/lite/inference_with_metadata/codegen)
+ for more information.
 """
 
 from __future__ import absolute_import
