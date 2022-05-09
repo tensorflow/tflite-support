@@ -72,7 +72,6 @@ class TextSearcher(object):
     """
     options = TextSearcherOptions(
         base_options=_BaseOptions(file_name=model_file_path),
-        embedding_options=_EmbeddingOptions(l2_normalize=True),
         search_options=_SearchOptions(index_file_name=index_file_path))
     return cls.create_from_options(options)
 

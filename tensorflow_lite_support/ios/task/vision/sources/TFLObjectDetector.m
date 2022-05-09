@@ -105,7 +105,7 @@
 }
 
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
-                                              error:(NSError *_Nullable *)error {
+                                              error:(NSError **)error {
   if (!image) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError

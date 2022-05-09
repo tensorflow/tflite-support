@@ -50,7 +50,7 @@ NS_SWIFT_NAME(ImageClassifierOptions)
  *
  * @param modelPath An absolute path to a TensorFlow Lite model file stored locally on the device.
  *
- * @return An new instance of `TFLImageClassifierOptions` set to the given
+ * @return An instance of `TFLImageClassifierOptions` initialized to the given
  * model path.
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
@@ -68,9 +68,9 @@ NS_SWIFT_NAME(ImageClassifier)
 @interface TFLImageClassifier : NSObject
 
 /**
- * Initializes a new instance of `TFLImageClassifier` from the given `TFLImageClassifierOptions`.
+ * Creates a new instance of `TFLImageClassifier` from the given `TFLImageClassifierOptions`.
  *
- * @param options Options to use for configuring the `TFLImageClassifier`.
+ * @param options The options to use for configuring the `TFLImageClassifier`.
  * @param error An optional error parameter populated when there is an error in initializing
  * the image classifier.
  *
@@ -101,7 +101,7 @@ NS_SWIFT_NAME(ImageClassifier)
  * more details.
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
-                                                     error:(NSError *_Nullable *)error
+                                                     error:(NSError **)error
     NS_SWIFT_NAME(classify(gmlImage:));
 
 /**
@@ -125,7 +125,7 @@ NS_SWIFT_NAME(ImageClassifier)
  */
 - (nullable TFLClassificationResult *)classifyWithGMLImage:(GMLImage *)image
                                           regionOfInterest:(CGRect)roi
-                                                     error:(NSError *_Nullable *)error
+                                                     error:(NSError **)error
     NS_SWIFT_NAME(classify(gmlImage:regionOfInterest:));
 
 - (instancetype)init NS_UNAVAILABLE;

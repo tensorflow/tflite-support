@@ -45,7 +45,9 @@ limitations under the License.
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' image embedder model.");
 ABSL_FLAG(std::string, index_path, "",
-          "Absolute path to the index to search into.");
+          "Absolute path to the index to search into. Mandatory only if the "
+          "index is not attached to the output tensor metadata of the embedder "
+          "model as an AssociatedFile with type SCANN_INDEX_FILE.");
 ABSL_FLAG(std::string, image_path, "",
           "Absolute path to the image to search. The image must be RGB or "
           "RGBA (grayscale is not supported). The image EXIF orientation "
@@ -76,8 +78,10 @@ ImageSearcherOptions BuildOptions() {
   if (absl::GetFlag(FLAGS_l2_normalize)) {
     options.mutable_embedding_options()->set_l2_normalize(true);
   }
-  options.mutable_search_options()->mutable_index_file()->set_file_name(
-      absl::GetFlag(FLAGS_index_path));
+  if (!absl::GetFlag(FLAGS_index_path).empty()) {
+    options.mutable_search_options()->mutable_index_file()->set_file_name(
+        absl::GetFlag(FLAGS_index_path));
+  }
   options.mutable_search_options()->set_max_results(
       absl::GetFlag(FLAGS_max_results));
   if (absl::GetFlag(FLAGS_use_coral)) {
@@ -150,10 +154,6 @@ int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
   if (absl::GetFlag(FLAGS_model_path).empty()) {
     std::cerr << "Missing mandatory 'model_path' argument.\n";
-    return 1;
-  }
-  if (absl::GetFlag(FLAGS_index_path).empty()) {
-    std::cerr << "Missing mandatory 'index_path' argument.\n";
     return 1;
   }
   if (absl::GetFlag(FLAGS_image_path).empty()) {

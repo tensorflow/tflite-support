@@ -244,11 +244,11 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
 
     # Expected results.
     expected_result_text_proto = """
-    nearest_neighbors { metadata: "burger" distance: 0.134547 }
-    nearest_neighbors { metadata: "car" distance: 1.819211 }
-    nearest_neighbors { metadata: "bird" distance: 1.96461 }
-    nearest_neighbors { metadata: "dog" distance: 2.0569 }
-    nearest_neighbors { metadata: "cat" distance: 2.062612 }
+    nearest_neighbors { metadata: "burger" distance: 184.85214 }
+    nearest_neighbors { metadata: "car" distance: 209.32019 }
+    nearest_neighbors { metadata: "bird" distance: 211.43195 }
+    nearest_neighbors { metadata: "dog" distance: 212.77237 }
+    nearest_neighbors { metadata: "cat" distance: 212.8553 }
     """
 
     # Comparing results.
