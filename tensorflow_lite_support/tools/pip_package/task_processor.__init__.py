@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""An import entry for the Task Processor module."""
+"""TensorFlow Lite Task Library's processor module.
+
+This module contains classes related to the pre-processing and post-processing
+steps of the Task Library.
+"""
 
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
@@ -37,3 +41,16 @@ SegmentationOptions = segmentation_options_pb2.SegmentationOptions
 Segmentation = segmentations_pb2.Segmentation
 SearchOptions = search_options_pb2.SearchOptions
 SearchResult = search_result_pb2.SearchResult
+
+# Remove unnecessary modules to avoid duplication in API docs.
+del bounding_box_pb2
+del classification_options_pb2
+del classifications_pb2
+del detection_options_pb2
+del detections_pb2
+del embedding_options_pb2
+del embedding_pb2
+del segmentation_options_pb2
+del segmentations_pb2
+del search_options_pb2
+del search_result_pb2

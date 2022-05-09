@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""The TFLite Support Library.
+"""The TensorFlow Lite Support Library.
 
 Install the pip package:
 
@@ -20,9 +20,17 @@ Install the pip package:
 pip install tflite-support
 ```
 
+This package provides two major features:
+* Metadata writers: add metadata to TensorFlow Lite models.
+* Task Library: run TensorFlow Lite models of major machine learning tasks.
+
 To learn more about metadata, flatbuffers and TensorFlow Lite models, check out
 the [metadata section](https://www.tensorflow.org/lite/convert/metadata) of the
-TF Lite guide.
+TensorFlow Lite guide.
+
+To learn more about Task Library, check out the
+[documentation](https://www.tensorflow.org/lite/inference_with_metadata/task_library/overview)
+on the TensorFlow Lite website.
 """
 
 # In the original project structure, all python targets are accessed by paths
