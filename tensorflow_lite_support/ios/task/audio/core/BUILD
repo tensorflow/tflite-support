@@ -1,0 +1,31 @@
+package(
+    default_visibility = ["//tensorflow_lite_support:internal"],
+    licenses = ["notice"],  # Apache 2.0
+)
+
+objc_library(
+    name = "TFLFloatBuffer",
+    srcs = [
+        "sources/TFLFloatBuffer.m",
+    ],
+    hdrs = [
+        "sources/TFLFloatBuffer.h",
+    ],
+    module_name = "TFLFloatBuffer",
+)
+
+objc_library(
+    name = "TFLRingBuffer",
+    srcs = [
+        "sources/TFLRingBuffer.m",
+    ],
+    hdrs = [
+        "sources/TFLRingBuffer.h",
+    ],
+    deps = [
+         ":TFLFloatBuffer",
+         "//tensorflow_lite_support/ios:TFLCommonUtils"
+    ],
+    module_name = "TFLRingBuffer",
+)
+
