@@ -7,6 +7,9 @@ package(
 
 cc_library(
     name = "audio_buffer_cpp_c_utils",
+    srcs = [
+        "audio_buffer_cpp_c_utils.cc",
+    ],
     hdrs = [
         "audio_buffer_cpp_c_utils.h",
     ],
@@ -17,3 +20,4 @@ cc_library(
         "@com_google_absl//absl/strings:str_format",
     ],
 )
+

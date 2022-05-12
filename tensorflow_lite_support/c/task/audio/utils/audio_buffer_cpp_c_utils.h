@@ -30,6 +30,9 @@ namespace audio {
 tflite::support::StatusOr<std::unique_ptr<tflite::task::audio::AudioBuffer>>
 CreateCppAudioBuffer(const TfLiteAudioBuffer* audio_buffer);
 
+tflite::support::StatusOr<TfLiteAudioFormat*>
+CreateCAudioFormat(tflite::support::StatusOr<tflite::task::audio::AudioBuffer::AudioFormat> cpp_audio_format);
+
 }  // namespace audio
 }  // namespace task
 }  // namespace tflite
