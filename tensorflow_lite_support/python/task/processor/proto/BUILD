@@ -42,6 +42,7 @@ py_library(
     name = "classifications_pb2",
     srcs = ["classifications_pb2.py"],
     deps = [
+        ":class_pb2",
         "//tensorflow_lite_support/cc/task/processor/proto:classifications_py_pb2",
     ],
 )
@@ -58,6 +59,7 @@ py_library(
     name = "detections_pb2",
     srcs = ["detections_pb2.py"],
     deps = [
+        ":class_pb2",
         "//tensorflow_lite_support/cc/task/processor/proto:detections_py_pb2",
     ],
 )

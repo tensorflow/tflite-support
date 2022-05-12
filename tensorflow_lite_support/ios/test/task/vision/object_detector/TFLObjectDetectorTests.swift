@@ -73,7 +73,7 @@ class ObjectDetectorTests: XCTestCase {
     XCTAssertEqual(
       detection.categories[0].label,
       expectedFirstLabel)
-    XCTAssertEqualWithAccuracy(
+    XCTAssertEqual(
       detection.categories[0].score,
       expectedFirstScore, accuracy: 0.001)
   }
@@ -85,7 +85,7 @@ class ObjectDetectorTests: XCTestCase {
     let objectDetectorOptions = ObjectDetectorOptions(modelPath: modelPath)
 
     let objectDetector =
-      try ObjectDetector.objectDetector(options: objectDetectorOptions)
+      try ObjectDetector.detector(options: objectDetectorOptions)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -93,7 +93,7 @@ class ObjectDetectorTests: XCTestCase {
         filename: "cats_and_dogs",
         type: "jpg"))
     let detectionResults: DetectionResult =
-      try objectDetector.detect(gmlImage: gmlImage)
+      try objectDetector.detect(mlImage: gmlImage)
 
     self.verifyDetectionResult(detectionResults)
   }
@@ -108,7 +108,7 @@ class ObjectDetectorTests: XCTestCase {
     objectDetectorOptions.classificationOptions.maxResults = maxResults
 
     let objectDetector =
-      try ObjectDetector.objectDetector(options: objectDetectorOptions)
+      try ObjectDetector.detector(options: objectDetectorOptions)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -116,7 +116,7 @@ class ObjectDetectorTests: XCTestCase {
         filename: "cats_and_dogs",
         type: "jpg"))
     let detectionResult: DetectionResult = try objectDetector.detect(
-      gmlImage: gmlImage)
+      mlImage: gmlImage)
 
     XCTAssertLessThanOrEqual(detectionResult.detections.count, maxResults)
 

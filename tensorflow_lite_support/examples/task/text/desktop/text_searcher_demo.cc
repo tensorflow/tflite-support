@@ -37,11 +37,14 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/processor/proto/search_result.pb.h"
 #include "tensorflow_lite_support/cc/task/text/proto/text_searcher_options.pb.h"
 #include "tensorflow_lite_support/cc/task/text/text_searcher.h"
+#include "tensorflow_lite_support/examples/task/text/desktop/universal_sentence_encoder_qa_op_resolver.h"
 
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' text embedder model.");
 ABSL_FLAG(std::string, index_path, "",
-          "Absolute path to the index to search into.");
+          "Absolute path to the index to search into. Mandatory only if the "
+          "index is not attached to the output tensor metadata of the embedder "
+          "model as an AssociatedFile with type SCANN_INDEX_FILE.");
 ABSL_FLAG(std::string, input_sentence, "",
           "Input sentence whose nearest-neighbors to search for in the index.");
 ABSL_FLAG(int32, max_results, 5,
@@ -70,8 +73,10 @@ TextSearcherOptions BuildOptions() {
   if (absl::GetFlag(FLAGS_l2_normalize)) {
     options.mutable_embedding_options()->set_l2_normalize(true);
   }
-  options.mutable_search_options()->mutable_index_file()->set_file_name(
-      absl::GetFlag(FLAGS_index_path));
+  if (!absl::GetFlag(FLAGS_index_path).empty()) {
+    options.mutable_search_options()->mutable_index_file()->set_file_name(
+        absl::GetFlag(FLAGS_index_path));
+  }
   options.mutable_search_options()->set_max_results(
       absl::GetFlag(FLAGS_max_results));
   if (absl::GetFlag(FLAGS_use_coral)) {
@@ -96,8 +101,9 @@ void DisplayResults(const processor::SearchResult& result) {
 absl::Status Search() {
   // Build TextSearcher.
   const TextSearcherOptions options = BuildOptions();
-  ASSIGN_OR_RETURN(std::unique_ptr<TextSearcher> text_searcher,
-                   TextSearcher::CreateFromOptions(options));
+  ASSIGN_OR_RETURN(
+      std::unique_ptr<TextSearcher> text_searcher,
+      TextSearcher::CreateFromOptions(options, CreateQACustomOpResolver()));
 
   // Run search and display results.
   auto start_search = steady_clock::now();
@@ -126,10 +132,6 @@ int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
   if (absl::GetFlag(FLAGS_model_path).empty()) {
     std::cerr << "Missing mandatory 'model_path' argument.\n";
-    return 1;
-  }
-  if (absl::GetFlag(FLAGS_index_path).empty()) {
-    std::cerr << "Missing mandatory 'index_path' argument.\n";
     return 1;
   }
   if (absl::GetFlag(FLAGS_input_sentence).empty()) {

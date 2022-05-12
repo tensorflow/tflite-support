@@ -34,6 +34,7 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/processor/proto/embedding.pb.h"
 #include "tensorflow_lite_support/cc/task/text/proto/text_embedder_options.pb.h"
 #include "tensorflow_lite_support/cc/task/text/text_embedder.h"
+#include "tensorflow_lite_support/examples/task/text/desktop/universal_sentence_encoder_qa_op_resolver.h"
 
 ABSL_FLAG(std::string, model_path, "",
           "Absolute path to the '.tflite' text embedder model.");
@@ -79,8 +80,9 @@ TextEmbedderOptions BuildOptions() {
 absl::Status ComputeCosineSimilarity() {
   // Build TextEmbedder.
   const TextEmbedderOptions options = BuildOptions();
-  ASSIGN_OR_RETURN(std::unique_ptr<TextEmbedder> text_embedder,
-                   TextEmbedder::CreateFromOptions(options));
+  ASSIGN_OR_RETURN(
+      std::unique_ptr<TextEmbedder> text_embedder,
+      TextEmbedder::CreateFromOptions(options, CreateQACustomOpResolver()));
 
   // Run search and display results.
   auto start_embed = steady_clock::now();

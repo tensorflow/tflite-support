@@ -76,7 +76,7 @@ NS_SWIFT_NAME(CategoryMask)
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Initializes a TFLCategoryMask mask.
+ * Initializes a new `TFLCategoryMask` mask.
  *
  * @param width Width of the mask.
  * @param height Height of the mask.
@@ -117,7 +117,7 @@ NS_SWIFT_NAME(ColoredLabel)
 @property(nonatomic, readonly) NSString *displayName;
 
 /**
- * Initializes a TFLColoredLabel.
+ * Initializes a new `TFLColoredLabel` with red, gree, blue color components, label and display name.
  *
  * @param r Red component of the RGB color components.
  * @param g Green component of the RGB color components.
@@ -125,8 +125,7 @@ NS_SWIFT_NAME(ColoredLabel)
  * @param label Class name.
  * @param displayName Display name.
  *
- * @return An instance of TFLColoredLabel initialized to the values passed as
- * arguments.
+ * @return An instance of TFLColoredLabel initialized with red, gree, blue color components, label and display name.
  */
 - (instancetype)initWithRed:(NSUInteger)r
                       green:(NSUInteger)g
@@ -173,27 +172,25 @@ NS_SWIFT_NAME(Segmentation)
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Initializes a TFLSegmentation.
- * This method initialises `categoryMask` to nil by default.
+ * Initializes a new `TFLSegmentation` with an array of confidence masks and an array of colored labels.
+ * `categoryMask` is initialized to `nil` as it is mutually exclusive with `confidenceMasks`.
  *
- * @param confidenceMasks Array of TFLConfidenceMask objects.
- * @param coloredLabels Array of TFLColoredLabel objects.
+ * @param confidenceMasks An array of `TFLConfidenceMask` objects.
+ * @param coloredLabels An array of `TFLColoredLabel` objects.
  *
- * @return An instance of TFLSegmentation initialized to the values passed as
- * arguments.
+ * @return An instance of `TFLSegmentation` initialized with an array of confidence masks and an array of colored labels.
  */
 - (instancetype)initWithConfidenceMasks:(NSArray<TFLConfidenceMask *> *)confidenceMasks
                           coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
 
 /**
- * Initializes a TFLSegmentation.
- * This method initialises `categoryMask` to nil by default.
+ * Initializes a new `TFLSegmentation` with a category mask and array of colored labels.
+ * `confidenceMasks` is initialized to `nil` as it is mutually exclusive with `categoryMask`.
  *
- * @param categoryMask A TFLCategoryMask object.
- * @param coloredLabels Array of TFLColoredLabel objects.
+ * @param categoryMask A `TFLCategoryMask` object.
+ * @param coloredLabels An array of `TFLColoredLabel` objects.
  *
- * @return An instance of TFLSegmentation initialized to the values passed as
- * arguments.
+ * @return An instance of `TFLSegmentation` initialized with a category mask and array of colored labels.
  */
 - (instancetype)initWithCategoryMask:(TFLCategoryMask *)categoryMask
                        coloredLabels:(NSArray<TFLColoredLabel *> *)coloredLabels;
@@ -217,13 +214,11 @@ NS_SWIFT_NAME(SegmentationResult)
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Initializes a TFLSegmentationResult.
- * This method initialises `categoryMask` to nil by default.
+ * Initializes a new `TFLSegmentationResult` with an array of segmentations.
  *
- * @param segmentations Array of TFLSegmentation objects.
+ * @param segmentations An array of `TFLSegmentation` objects.
  *
- * @return An instance of TFLSegmentationResult initialized to the values passed
- * as arguments.
+ * @return An instance of `TFLSegmentationResult` initialized with an array of segmentations.
  */
 - (instancetype)initWithSegmentations:(NSArray<TFLSegmentation *> *)segmentations;
 
