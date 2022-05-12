@@ -21,6 +21,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLRingBuffer : NSObject
 
 /**
+ * A copy of all the internal ring buffer elements in order.
+ */
+@property (nullable, nonatomic, readonly) TFLFloatBuffer *floatBuffer; 
+
+/** 
+ * Capacity of the ring buffer in number of elements.
+ */
+@property (nonatomic, readonly) NSInteger size; 
+
+/**
  * Initializes a new `TFLRingBuffer` with the given size. All elements of the
  * `TFLRingBuffer` will be initialized to zero.
  *
@@ -43,11 +53,6 @@ NS_ASSUME_NONNULL_BEGIN
              error:(NSError **)error;
 
 /**
- * Returns a `TFLFloatBuffer` with a copy of all the ring buffer elements in order.
- */
-- (TFLFloatBuffer *)floatBuffer NS_SWIFT_NAME(floatBuffer());
-
-/**
  * Returns a `TFLFloatBuffer` with a copy of size number of the ring buffer elements in order starting at
  * offset, i.e, buffer[offset:offset+size].
  *
@@ -63,11 +68,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Clears the `TFLRingBuffer` by setting all the elements to zero .
  */
 -(void)clear;
-
-/**
- * Capacity of ring buffer in number of elements.
- */
-- (NSUInteger)size NS_SWIFT_NAME(size());
 
 @end
 

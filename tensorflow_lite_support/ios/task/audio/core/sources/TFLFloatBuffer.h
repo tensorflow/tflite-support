@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** An wrapper class to store pointer to a float array and its size. */
 @interface TFLFloatBuffer : NSObject <NSCopying>
 
-/** Size of the array. */
+/** Capacity of the array in number of elements. */
 @property(nonatomic, readonly) NSUInteger size;
 
 /** Pointer to float array wrapped by TFLFloatBuffer. */

@@ -19,12 +19,14 @@
 @implementation TFLRingBuffer {
   NSInteger _nextIndex;
   TFLFloatBuffer *_buffer;
+  NSInteger _size;
 }
 
 - (instancetype)initWithBufferSize:(NSInteger)size {
   self = [self init];
   if (self) {
     _buffer = [[TFLFloatBuffer alloc] initWithSize:size];
+    _size = size;
   }
   return self;
 }
@@ -79,28 +81,30 @@
     return nil;
   }
 
+  // TODO: Investigate if allocating is needed everytime or a global alloc of self.floatBuffer and
+  // copying of elements each time and returning self.floatBuffer would suffice.
+  TFLFloatBuffer *bufferToReturn = [[TFLFloatBuffer alloc] initWithSize:size];
+
   // Return buffer in correct order.
   // Compute offset in flat ring buffer array considering warping.
   NSUInteger correctOffset = (_nextIndex + offset) % _buffer.size;
-
-  TFLFloatBuffer *floatBuffer = [[TFLFloatBuffer alloc] initWithSize:size];
-
+  
   // If no; elements to be copied are within the end of the flat ring buffer.
   if ((correctOffset + size) <= _buffer.size) {
-    memcpy(floatBuffer.data, _buffer.data + correctOffset, sizeof(float) * size);
+    memcpy(bufferToReturn.data, _buffer.data + correctOffset, sizeof(float) * size);
   } else {
     // If no; elements to be copied warps around to the beginning of the ring buffer.
     // Copy the chunk starting at ringBuffer[nextIndex + offset : size] to
     // beginning of the result array.
     NSInteger endChunkSize = _buffer.size - correctOffset;
-    memcpy(floatBuffer.data, _buffer.data + correctOffset, sizeof(float) * endChunkSize);
+    memcpy(bufferToReturn.data, _buffer.data + correctOffset, sizeof(float) * endChunkSize);
 
     // Next copy the chunk starting at ringBuffer[0 : size - endChunkSize] to the result array.
     NSInteger firstChunkSize = size - endChunkSize;
-    memcpy(floatBuffer.data + endChunkSize, _buffer.data, sizeof(float) * firstChunkSize);
+    memcpy(bufferToReturn.data + endChunkSize, _buffer.data, sizeof(float) * firstChunkSize);
   }
 
-  return floatBuffer;
+  return bufferToReturn;
 }
 
 -(void)clear {
