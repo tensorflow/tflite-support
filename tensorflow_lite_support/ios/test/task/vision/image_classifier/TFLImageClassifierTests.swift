@@ -31,7 +31,7 @@ class ImageClassifierTests: XCTestCase {
     let imageClassifierOptions = ImageClassifierOptions(modelPath: modelPath)
 
     let imageClassifier =
-      try ImageClassifier.imageClassifier(options: imageClassifierOptions)
+      try ImageClassifier.classifier(options: imageClassifierOptions)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -40,7 +40,7 @@ class ImageClassifierTests: XCTestCase {
         type: "jpg"))
 
     let classificationResults: ClassificationResult =
-      try imageClassifier.classify(gmlImage: gmlImage)
+      try imageClassifier.classify(mlImage: gmlImage)
 
     XCTAssertNotNil(classificationResults)
     XCTAssertEqual(classificationResults.classifications.count, 1)
@@ -61,7 +61,7 @@ class ImageClassifierTests: XCTestCase {
     imageClassifierOptions.classificationOptions.maxResults = maxResults
 
     let imageClassifier =
-      try ImageClassifier.imageClassifier(options: imageClassifierOptions)
+      try ImageClassifier.classifier(options: imageClassifierOptions)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -70,7 +70,7 @@ class ImageClassifierTests: XCTestCase {
         type: "jpg"))
 
     let classificationResults: ClassificationResult = try imageClassifier.classify(
-      gmlImage: gmlImage)
+      mlImage: gmlImage)
 
     XCTAssertNotNil(classificationResults)
     XCTAssertEqual(classificationResults.classifications.count, 1)
@@ -89,7 +89,7 @@ class ImageClassifierTests: XCTestCase {
     let imageClassifierOptions = ImageClassifierOptions(modelPath: modelPath)
 
     let imageClassifier =
-      try ImageClassifier.imageClassifier(options: imageClassifierOptions)
+      try ImageClassifier.classifier(options: imageClassifierOptions)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -99,7 +99,7 @@ class ImageClassifierTests: XCTestCase {
 
     let roi = CGRect(x: 406, y: 110, width: 148, height: 153)
     let classificationResults =
-      try imageClassifier.classify(gmlImage: gmlImage, regionOfInterest: roi)
+      try imageClassifier.classify(mlImage: gmlImage, regionOfInterest: roi)
 
     XCTAssertNotNil(classificationResults)
     XCTAssertEqual(classificationResults.classifications.count, 1)
@@ -118,7 +118,7 @@ class ImageClassifierTests: XCTestCase {
     let imageClassifierOptions = ImageClassifierOptions(modelPath: modelPath)
 
     let imageClassifier =
-      try ImageClassifier.imageClassifier(options: imageClassifierOptions)
+      try ImageClassifier.classifier(options: imageClassifierOptions)
 
     let gmlImage = try XCTUnwrap(
       MLImage.imageFromBundle(
@@ -127,7 +127,7 @@ class ImageClassifierTests: XCTestCase {
         type: "png"))
 
     let classificationResults =
-      try imageClassifier.classify(gmlImage: gmlImage)
+      try imageClassifier.classify(mlImage: gmlImage)
 
     XCTAssertNotNil(classificationResults)
     XCTAssertEqual(classificationResults.classifications.count, 1)

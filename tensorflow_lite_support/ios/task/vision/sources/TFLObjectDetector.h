@@ -70,7 +70,7 @@ NS_SWIFT_NAME(ObjectDetector)
  */
 + (nullable instancetype)objectDetectorWithOptions:(TFLObjectDetectorOptions *)options
                                              error:(NSError **)error
-    NS_SWIFT_NAME(objectDetector(options:));
+    NS_SWIFT_NAME(detector(options:));
 
 + (instancetype)new NS_UNAVAILABLE;
 
@@ -93,7 +93,7 @@ NS_SWIFT_NAME(ObjectDetector)
  */
 - (nullable TFLDetectionResult *)detectWithGMLImage:(GMLImage *)image
                                               error:(NSError **)error
-    NS_SWIFT_NAME(detect(gmlImage:));
+    NS_SWIFT_NAME(detect(mlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;
 

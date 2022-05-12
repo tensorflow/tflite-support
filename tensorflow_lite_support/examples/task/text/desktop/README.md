@@ -205,8 +205,6 @@ Cosine similarity: 0.952549
 
 #### Prerequisites
 
-TODO(b/231294362): update link to Model Maker.
-
 You will need:
 
 *   a TFLite text embedder model such as the universal sentence encoder QA model
@@ -269,4 +267,4 @@ Results:
 [5]: http://bert/nl/classifier/model
 [6]: https://tfhub.dev/google/lite-model/universal-sentence-encoder-qa-ondevice/1
 [7]: https://en.wikipedia.org/wiki/Cosine_similarity
-[8]: https://www.tensorflow.org/lite/guide/model_maker
+[8]: https://www.tensorflow.org/lite/api_docs/python/tflite_model_maker/searcher

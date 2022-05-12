@@ -303,8 +303,6 @@ Cosine similarity: 0.932738
 
 #### Prerequisites
 
-TODO(b/231294362): update link to Model Maker.
-
 You will need:
 
 *   a TFLite image embedder model (e.g. [mobilenet v3][5], a generic image
@@ -367,4 +365,4 @@ Results:
 [4]: https://coral.ai/docs/edgetpu/inference/
 [5]: https://tfhub.dev/google/lite-model/imagenet/mobilenet_v3_small_100_224/feature_vector/5/metadata/1
 [6]: https://en.wikipedia.org/wiki/Cosine_similarity
-[7]: https://www.tensorflow.org/lite/guide/model_maker
+[7]: https://www.tensorflow.org/lite/api_docs/python/tflite_model_maker/searcher

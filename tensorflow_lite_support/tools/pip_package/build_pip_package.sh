@@ -98,6 +98,7 @@ function prepare_src() {
     # Task Library is not supported on Windows yet.
     mkdir ${TMPDIR}/tflite_support/task
     mkdir ${TMPDIR}/tflite_support/task/core
+    cp tensorflow_lite_support/tools/pip_package/task.__init__.py ${TMPDIR}/tflite_support/task/__init__.py
     cp tensorflow_lite_support/tools/pip_package/task_core.__init__.py ${TMPDIR}/tflite_support/task/core/__init__.py
     mkdir ${TMPDIR}/tflite_support/task/vision
     cp tensorflow_lite_support/tools/pip_package/task_vision.__init__.py ${TMPDIR}/tflite_support/task/vision/__init__.py

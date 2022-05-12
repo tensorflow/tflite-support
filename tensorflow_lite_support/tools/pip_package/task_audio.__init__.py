@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""An import entry for Task Audio Library."""
+"""TensorFlow Lite Task Library Audio APIs.
+
+This module provides interface to run TensorFlow Lite audio models.
+"""
 
 from tensorflow_lite_support.python.task.audio import audio_classifier
 from tensorflow_lite_support.python.task.audio import audio_embedder
@@ -24,4 +27,11 @@ AudioClassifierOptions = audio_classifier.AudioClassifierOptions
 AudioEmbedder = audio_embedder.AudioEmbedder
 AudioEmbedderOptions = audio_embedder.AudioEmbedderOptions
 AudioRecord = audio_record.AudioRecord
+AudioFormat = tensor_audio.AudioFormat
 TensorAudio = tensor_audio.TensorAudio
+
+# Remove unnecessary modules to avoid duplication in API docs.
+del audio_classifier
+del audio_embedder
+del audio_record
+del tensor_audio
