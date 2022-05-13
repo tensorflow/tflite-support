@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2021 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""NL Classification options protobuf."""
+"""Configuration protobuf."""
 
-from tensorflow_lite_support.cc.task.processor.proto import nl_classification_options_pb2
+from tensorflow.lite.experimental.acceleration.configuration import configuration_pb2
 
-NLClassificationOptions = nl_classification_options_pb2.NLClassificationOptions
+Delegate = configuration_pb2.Delegate

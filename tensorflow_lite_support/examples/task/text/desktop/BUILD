@@ -59,23 +59,6 @@ cc_binary(
     }),
 )
 
-cc_library_with_tflite(
-    name = "nl_classifier_op_resolver",
-    srcs = ["nl_classifier_op_resolver.cc"],
-    hdrs = ["nl_classifier_op_resolver.h"],
-    tflite_deps = [
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
-    ],
-    deps = [
-        "//tensorflow_lite_support/cc/task/core:task_utils",
-        "@com_google_absl//absl/memory",
-        "@org_tensorflow//tensorflow/lite:op_resolver",
-        "@org_tensorflow//tensorflow/lite:string_util",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
-        "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
-    ],
-)
-
 # Example usage:
 # bazel run -c opt \
 #  tensorflow_lite_support/examples/task/text/desktop:nl_classifier_demo \

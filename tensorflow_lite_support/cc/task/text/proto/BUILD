@@ -20,6 +20,16 @@ support_cc_proto_library(
     ],
 )
 
+support_py_proto_library(
+    name = "nl_classifier_options_py_pb2",
+    srcs = ["nl_classifier_options.proto"],
+    api_version = 2,
+    proto_deps = [":nl_classifier_options_proto"],
+    py_proto_deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_py_pb2",
+    ],
+)
+
 cc_library(
     name = "nl_classifier_options_proto_inc",
     hdrs = ["nl_classifier_options_proto_inc.h"],

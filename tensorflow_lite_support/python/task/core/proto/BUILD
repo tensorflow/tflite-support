@@ -25,3 +25,9 @@ support_py_proto_library(
     api_version = 2,
     proto_deps = [":base_options_proto"],
 )
+
+py_library(
+    name = "configuration_pb2",
+    srcs = ["configuration_pb2.py"],
+    deps = ["@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto_external_py"],
+)

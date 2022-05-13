@@ -14,22 +14,27 @@
 """NL Classifier task."""
 
 import dataclasses
+from typing import Optional
 
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
-from tensorflow_lite_support.python.task.processor.proto import nl_classification_options_pb2
+from tensorflow_lite_support.python.task.core import task_options
+from tensorflow_lite_support.python.task.core import task_utils
+from tensorflow_lite_support.python.task.processor import processor_options
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_nl_classifier
+from tensorflow_lite_support.python.task.text.pybinds import nl_classifier_options_pb2
 
+_ProtoNLClassifierOptions = nl_classifier_options_pb2.NLClassifierOptions
 _CppNLClassifier = _pywrap_nl_classifier.NLClassifier
-_BaseOptions = base_options_pb2.BaseOptions
-_NLClassificationOptions = nl_classification_options_pb2.NLClassificationOptions
+_NLClassificationOptions = processor_options.NLClassificationOptions
+_Category = processor_options.Category
+_Classifications = processor_options.Classifications
+_ClassificationResult = processor_options.ClassificationResult
 
 
 @dataclasses.dataclass
 class NLClassifierOptions:
   """Options for the NL classifier task."""
-  base_options: _BaseOptions
-  nl_classification_options: _NLClassificationOptions = _NLClassificationOptions()
+  base_options: task_options.BaseOptions
+  nl_classification_options: Optional[_NLClassificationOptions] = None
 
 
 class NLClassifier(object):
@@ -56,7 +61,8 @@ class NLClassifier(object):
         file such as invalid file.
       RuntimeError: If other types of error occurred.
     """
-    base_options = _BaseOptions(file_name=file_path)
+    model_file = task_options.ExternalFile(file_name=file_path)
+    base_options = task_options.BaseOptions(model_file=model_file)
     options = NLClassifierOptions(base_options=base_options)
     return cls.create_from_options(options)
 
@@ -74,11 +80,34 @@ class NLClassifier(object):
         `NLClassifierOptions` such as missing the model.
       RuntimeError: If other types of error occurred.
     """
-    classifier = _CppNLClassifier.create_from_options(
-        options.base_options, options.nl_classification_options)
+    proto_options = _ProtoNLClassifierOptions()
+    proto_options.base_options.CopyFrom(
+      task_utils.ConvertToProtoBaseOptions(options.base_options))
+
+    if options.nl_classification_options:
+      if options.nl_classification_options.input_tensor_name is not None:
+        proto_options.input_tensor_name = \
+          options.nl_classification_options.input_tensor_name
+      if options.nl_classification_options.output_score_tensor_name is not None:
+        proto_options.output_score_tensor_name = \
+          options.nl_classification_options.output_score_tensor_name
+      if options.nl_classification_options.output_label_tensor_name is not None:
+        proto_options.output_label_tensor_name = \
+          options.nl_classification_options.output_label_tensor_name
+      if options.nl_classification_options.input_tensor_index is not None:
+        proto_options.input_tensor_index = \
+          options.nl_classification_options.input_tensor_index
+      if options.nl_classification_options.output_score_tensor_index is not None:
+        proto_options.output_score_tensor_index = \
+          options.nl_classification_options.output_score_tensor_index
+      if options.nl_classification_options.output_label_tensor_index is not None:
+        proto_options.output_label_tensor_index = \
+          options.nl_classification_options.output_label_tensor_index
+
+    classifier = _CppNLClassifier.create_from_options(proto_options)
     return cls(options, classifier)
 
-  def classify(self, text: str) -> classifications_pb2.ClassificationResult:
+  def classify(self, text: str) -> _ClassificationResult:
     """Performs actual NL classification on the provided text.
 
     Args:
@@ -91,7 +120,22 @@ class NLClassifier(object):
       ValueError: If any of the input arguments is invalid.
       RuntimeError: If failed to calculate the embedding vector.
     """
-    return self._classifier.classify(text)
+    classification_result = _ClassificationResult()
+    proto_classification_result = self._classifier.classify(text)
+
+    if proto_classification_result.classifications:
+      for proto_classification in proto_classification_result.classifications:
+        classifications = _Classifications(
+          head_index=proto_classification.head_index)
+        if proto_classification.classes:
+          for proto_category in proto_classification.classes:
+            category = _Category(score=proto_category.score,
+                                 class_name=proto_category.class_name,
+                                 display_name=proto_category.display_name)
+            classifications.categories.append(category)
+        classification_result.classifications.append(classifications)
+
+    return classification_result
 
   @property
   def options(self) -> NLClassifierOptions:

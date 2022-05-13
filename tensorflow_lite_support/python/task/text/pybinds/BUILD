@@ -39,6 +39,14 @@ pybind_extension_may_pack_coral(
     ],
 )
 
+py_library(
+    name = "nl_classifier_options_pb2",
+    srcs = ["nl_classifier_options_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/text/proto:nl_classifier_options_py_pb2",
+    ],
+)
+
 pybind_extension_may_pack_coral(
     name = "_pywrap_nl_classifier",
     srcs = [
@@ -47,9 +55,7 @@ pybind_extension_may_pack_coral(
     module_name = "_pywrap_nl_classifier",
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:classifications_cc_proto",
-        "//tensorflow_lite_support/cc/task/processor/proto:nl_classification_options_cc_proto",
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
-        "//tensorflow_lite_support/examples/task/text/desktop:nl_classifier_op_resolver",
         "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
         "@pybind11",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
