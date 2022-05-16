@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** 
  * Capacity of the ring buffer in number of elements.
  */
-@property (nonatomic, readonly) NSInteger size; 
+@property (nonatomic, readonly) NSUInteger size; 
 
 /**
  * Initializes a new `TFLRingBuffer` with the given size. All elements of the
@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return A new instance of `TFLRingBuffer` with the given size and all elements
  * initialized to zero.
  */
-- (instancetype)initWithBufferSize:(NSInteger)size;
+- (instancetype)initWithBufferSize:(NSUInteger)size;
 
 /**
  * Loads a slice of a float array to the ring buffer. If the float array is longer than ring
