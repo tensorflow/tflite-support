@@ -131,7 +131,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     image_result = detector.detect(image)
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_text_proto, image_result)
+    self.assertProtoEquals(expected_result_text_proto, image_result.to_pb2())
 
   def test_score_threshold_option(self):
     # Creates detector.
@@ -147,7 +147,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     detections = image_result.detections
 
     for detection in detections:
-      score = detection.classes[0].score
+      score = detection.categories[0].score
       self.assertGreaterEqual(
           score, _SCORE_THRESHOLD,
           f'Detection with score lower than threshold found. {detection}')
@@ -182,7 +182,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     detections = image_result.detections
 
     for detection in detections:
-      label = detection.classes[0].class_name
+      label = detection.categories[0].class_name
       self.assertIn(label, _ALLOW_LIST,
                     f'Label {label} found but not in label allow list')
 
@@ -200,7 +200,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     detections = image_result.detections
 
     for detection in detections:
-      label = detection.classes[0].class_name
+      label = detection.categories[0].class_name
       self.assertNotIn(label, _DENY_LIST,
                        f'Label {label} found but in deny list.')
 

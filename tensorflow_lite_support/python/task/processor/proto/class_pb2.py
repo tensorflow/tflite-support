@@ -13,6 +13,63 @@
 # limitations under the License.
 """Class protobuf."""
 
+import dataclasses
+from typing import Any
+
+from tensorflow.tools.docs import doc_controls
 from tensorflow_lite_support.cc.task.processor.proto import class_pb2
 
-Category = class_pb2.Class
+
+@dataclasses.dataclass
+class Category:
+  """Category is a util class, contains a label, its display name, a float
+  value as score, and the index of the label in the corresponding label file.
+  Typically it's used as result of classification tasks.
+
+  Attributes:
+    index: The index of the label in the corresponding label file.
+    score: The probability score of this label category.
+    display_name: The display name of the label, which may be translated for
+      different locales. For example, a label, "apple", may be translated into
+      Spanish for display purpose, so that the `display_name` is "manzana".
+    class_name: The label of this category object.
+  """
+
+  index: int
+  score: float
+  display_name: str
+  class_name: str
+
+  @doc_controls.do_not_generate_docs
+  def to_pb2(self) -> class_pb2.Class:
+    """Generates a protobuf object to pass to the C++ layer."""
+    return class_pb2.Class(
+      index=self.index,
+      score=self.score,
+      display_name=self.display_name,
+      class_name=self.class_name)
+
+  @classmethod
+  @doc_controls.do_not_generate_docs
+  def create_from_pb2(cls,
+                      pb2_obj: class_pb2.Class) -> "Category":
+    """Creates a `Category` object from the given protobuf object."""
+    return Category(
+      index=pb2_obj.index,
+      score=pb2_obj.score,
+      display_name=pb2_obj.display_name,
+      class_name=pb2_obj.class_name)
+
+  def __eq__(self, other: Any) -> bool:
+    """Checks if this object is equal to the given object.
+
+    Args:
+      other: The object to be compared with.
+
+    Returns:
+      True if the objects are equal.
+    """
+    if not isinstance(other, Category):
+      return False
+
+    return self.to_pb2().__eq__(other.to_pb2())
