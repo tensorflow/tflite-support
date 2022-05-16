@@ -106,6 +106,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
       class_name: "bagel" 
     }
     head_index: 0
+    head_name: ""
   }
   """), (ModelFileType.FILE_CONTENT, 3, """
   classifications {
@@ -125,6 +126,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
       class_name: "bagel" 
     }
     head_index: 0
+    head_name: ""
   }
   """))
   def test_classify_model(self, model_file_type, max_results,
@@ -150,7 +152,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     image_result = classifier.classify(image, bounding_box=None)
 
     # Comparing results (classification w/o bounding box).
-    self.assertProtoEquals(expected_result_text_proto, image_result)
+    self.assertProtoEquals(expected_result_text_proto, image_result.to_pb2())
 
   def test_classify_model_with_bounding_box(self):
     # Creates classifier.
@@ -187,11 +189,12 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
         class_name: "bagel" 
       }
       head_index: 0
+      head_name: ""
     }
     """
 
     # Comparing results (classification w/ bounding box).
-    self.assertProtoEquals(expected_result_text_proto, image_result)
+    self.assertProtoEquals(expected_result_text_proto, image_result.to_pb2())
 
   def test_max_results_option(self):
     # Creates classifier.
@@ -205,7 +208,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
-    categories = image_result.classifications[0].classes
+    categories = image_result.classifications[0].categories
 
     self.assertLessEqual(
         len(categories), _MAX_RESULTS, 'Too many results returned.')
@@ -222,7 +225,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
-    categories = image_result.classifications[0].classes
+    categories = image_result.classifications[0].categories
 
     for category in categories:
       self.assertGreaterEqual(
@@ -241,7 +244,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
-    categories = image_result.classifications[0].classes
+    categories = image_result.classifications[0].categories
 
     for category in categories:
       label = category.class_name
@@ -260,7 +263,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
-    categories = image_result.classifications[0].classes
+    categories = image_result.classifications[0].categories
 
     for category in categories:
       label = category.class_name

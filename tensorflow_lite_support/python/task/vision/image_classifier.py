@@ -33,7 +33,8 @@ _BaseOptions = base_options_pb2.BaseOptions
 class ImageClassifierOptions:
   """Options for the image classifier task."""
   base_options: _BaseOptions
-  classification_options: _ClassificationOptions = _ClassificationOptions()
+  classification_options: _ClassificationOptions = \
+    _ClassificationOptions.create_from_pb2()
 
 
 class ImageClassifier(object):
@@ -78,7 +79,7 @@ class ImageClassifier(object):
       RuntimeError: If other types of error occurred.
     """
     classifier = _CppImageClassifier.create_from_options(
-        options.base_options, options.classification_options)
+        options.base_options, options.classification_options.to_pb2())
     return cls(options, classifier)
 
   def classify(
@@ -104,9 +105,12 @@ class ImageClassifier(object):
     """
     image_data = image_utils.ImageData(image.buffer)
     if bounding_box is None:
-      return self._classifier.classify(image_data)
-
-    return self._classifier.classify(image_data, bounding_box.to_pb2())
+      classification_result = self._classifier.classify(image_data)
+    else:
+      classification_result = self._classifier.classify(image_data,
+                                                        bounding_box.to_pb2())
+    return classifications_pb2.ClassificationResult.create_from_pb2(
+      classification_result)
 
   @property
   def options(self) -> ImageClassifierOptions:

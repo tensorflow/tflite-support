@@ -80,8 +80,7 @@ class ObjectDetector(object):
       RuntimeError: If other types of error occurred.
     """
     detector = _CppObjectDetector.create_from_options(
-      options.base_options,
-      options.detection_options.to_pb2())
+      options.base_options, options.detection_options.to_pb2())
     return cls(options, detector)
 
   def detect(self,

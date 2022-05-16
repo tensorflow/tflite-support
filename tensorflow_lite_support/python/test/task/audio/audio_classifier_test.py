@@ -215,7 +215,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
     audio_result = classifier.classify(tensor)
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_text_proto, audio_result)
+    self.assertProtoEquals(expected_result_text_proto, audio_result.to_pb2())
 
   def test_max_results_option(self):
     # Creates classifier.
@@ -230,7 +230,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     audio_result = classifier.classify(tensor)
-    categories = audio_result.classifications[0].classes
+    categories = audio_result.classifications[0].categories
 
     self.assertLessEqual(
         len(categories), _MAX_RESULTS, 'Too many results returned.')
@@ -248,7 +248,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     audio_result = classifier.classify(tensor)
-    categories = audio_result.classifications[0].classes
+    categories = audio_result.classifications[0].categories
 
     for category in categories:
       self.assertGreaterEqual(
@@ -269,7 +269,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     audio_result = classifier.classify(tensor)
-    categories = audio_result.classifications[0].classes
+    categories = audio_result.classifications[0].categories
 
     for category in categories:
       label = category.class_name
@@ -290,7 +290,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     audio_result = classifier.classify(tensor)
-    categories = audio_result.classifications[0].classes
+    categories = audio_result.classifications[0].categories
 
     for category in categories:
       label = category.class_name
