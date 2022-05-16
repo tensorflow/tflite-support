@@ -126,7 +126,7 @@ class ImageSearcher(object):
     image_data = image_utils.ImageData(image.buffer)
     if bounding_box is None:
       return self._searcher.search(image_data)
-    return self._searcher.search(image_data, bounding_box)
+    return self._searcher.search(image_data, bounding_box.to_pb2())
 
   def get_user_info(self) -> str:
     """Gets the user info stored in the index file.
