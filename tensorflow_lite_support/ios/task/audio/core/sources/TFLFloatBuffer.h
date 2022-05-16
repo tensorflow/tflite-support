@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initializes a `TFLFloatBuffer` of the specified size with zeros.
  *
- * @param size Number of elements the TFLFloatBuffer` can hold.
+ * @param size Number of elements the `TFLFloatBuffer` can hold.
  *
  * @return A new instance of `TFLFloatBuffer` of the given size with all elements initialized to zero.
  */
