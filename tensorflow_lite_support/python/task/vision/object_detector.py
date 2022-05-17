@@ -31,7 +31,7 @@ _DetectionOptions = detection_options_pb2.DetectionOptions
 class ObjectDetectorOptions:
   """Options for the object detector task."""
   base_options: _BaseOptions
-  detection_options: _DetectionOptions = _DetectionOptions.create_from_pb2()
+  detection_options: _DetectionOptions = _DetectionOptions()
 
 
 class ObjectDetector(object):

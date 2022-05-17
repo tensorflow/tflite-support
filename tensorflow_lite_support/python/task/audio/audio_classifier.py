@@ -34,8 +34,7 @@ _BaseOptions = base_options_pb2.BaseOptions
 class AudioClassifierOptions:
   """Options for the audio classifier task."""
   base_options: _BaseOptions
-  classification_options: _ClassificationOptions = \
-    _ClassificationOptions.create_from_pb2()
+  classification_options: _ClassificationOptions = _ClassificationOptions()
 
 
 class AudioClassifier(object):
