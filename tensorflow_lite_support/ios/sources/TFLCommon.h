@@ -205,6 +205,29 @@ typedef NS_ENUM(NSUInteger, TFLSupportErrorCode) {
    * underlying system have not been satisfied. This error code is reserved for serious errors.
    */
   TFLSupportErrorCodeInternalError,
+
+  /**
+   * Audio processing operations failed.
+   * E.g. Format conversion operations by TFLAudioRecord.
+   */
+  TFLSupportErrorCodeAudioProcessingError = 3000,
+
+  /**
+   * Audio record permissions were denied by the user.
+   */ 
+  TFLSupportErrorCodeAudioRecordPermissionDeniedError,
+  
+  /**
+   * Audio record permissions cannot be determined. If this error is returned by
+   * TFLAudioRecord, the caller has to acquire permissions using AVFoundation.
+   */ 
+  TFLSupportErrorCodeAudioRecordPermissionUndeterminedError,
+  
+  /**
+   * TFLAudioRecord is waiting for new mic input.
+   */ 
+  TFLSupportErrorCodeWaitingForNewMicInputError
+
 } NS_SWIFT_NAME(SupportErrorCode);
 
 NS_ASSUME_NONNULL_END

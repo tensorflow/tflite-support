@@ -29,3 +29,15 @@ objc_library(
     module_name = "TFLRingBuffer",
 )
 
+objc_library(
+    name = "TFLAudioFormat",
+    srcs = [
+        "sources/TFLAudioFormat.m",
+    ],
+    hdrs = [
+        "sources/TFLAudioFormat.h",
+    ],
+    module_name = "TFLAudioFormat",
+)
+
+
