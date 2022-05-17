@@ -32,7 +32,7 @@ class Category:
     display_name: The display name of the label, which may be translated for
       different locales. For example, a label, "apple", may be translated into
       Spanish for display purpose, so that the `display_name` is "manzana".
-    class_name: The label of this category object.
+    category_name: The label of this category object.
   """
 
   index: int

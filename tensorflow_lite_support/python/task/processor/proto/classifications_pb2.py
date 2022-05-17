@@ -99,7 +99,8 @@ class ClassificationResult:
       cls,
       pb2_obj: _ClassificationResult
   ) -> "ClassificationResult":
-    """Creates a `DetectionResult` object from the given protobuf object."""
+    """Creates a `_ClassificationResult` object from the given protobuf
+    object."""
     return ClassificationResult(
       classifications=[
         Classifications.create_from_pb2(classification)
