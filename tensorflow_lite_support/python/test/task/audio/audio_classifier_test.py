@@ -270,7 +270,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
     base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = _create_classifier_from_options(
-        base_options, class_name_allowlist=_ALLOW_LIST)
+        base_options, category_name_allowlist=_ALLOW_LIST)
 
     # Load the input audio file.
     tensor = tensor_audio.TensorAudio.create_from_wav_file(
@@ -291,7 +291,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
     base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = _create_classifier_from_options(
-        base_options, score_threshold=0.01, class_name_denylist=_DENY_LIST)
+        base_options, score_threshold=0.01, category_name_denylist=_DENY_LIST)
 
     # Load the input audio file.
     tensor = tensor_audio.TensorAudio.create_from_wav_file(
@@ -314,7 +314,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
         r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
       classification_options = classification_options_pb2.ClassificationOptions(
-          class_name_allowlist=['foo'], class_name_denylist=['bar'])
+          category_name_allowlist=['foo'], category_name_denylist=['bar'])
       options = _AudioClassifierOptions(
           base_options=base_options,
           classification_options=classification_options)

@@ -172,7 +172,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     # Creates detector.
     base_options = _BaseOptions(file_name=self.model_path)
     detector = _create_detector_from_options(
-        base_options, class_name_allowlist=_ALLOW_LIST)
+        base_options, category_name_allowlist=_ALLOW_LIST)
 
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
@@ -190,7 +190,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     # Creates detector.
     base_options = _BaseOptions(file_name=self.model_path)
     detector = _create_detector_from_options(
-        base_options, class_name_denylist=_DENY_LIST)
+        base_options, category_name_denylist=_DENY_LIST)
 
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
@@ -212,7 +212,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
         r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
       detection_options = detection_options_pb2.DetectionOptions(
-          class_name_allowlist=['foo'], class_name_denylist=['bar'])
+          category_name_allowlist=['foo'], category_name_denylist=['bar'])
       options = _ObjectDetectorOptions(
           base_options=base_options, detection_options=detection_options)
       _ObjectDetector.create_from_options(options)

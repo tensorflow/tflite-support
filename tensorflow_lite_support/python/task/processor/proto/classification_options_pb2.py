@@ -33,17 +33,17 @@ class ClassificationOptions:
       return.
     score_threshold: Overrides the ones provided in the model metadata. Results
       below this value are rejected.
-    class_name_allowlist: If non-empty, classifications whose class name is not
-      in this set will be filtered out. Duplicate or unknown class names are
+    category_name_allowlist: If non-empty, classifications whose class name is
+      not in this set will be filtered out. Duplicate or unknown class names are
       ignored. Mutually exclusive with `class_name_denylist`.
-    class_name_denylist: If non-empty, classifications whose class name is in
+    category_name_denylist: If non-empty, classifications whose class name is in
       this set will be filtered out. Duplicate or unknown class names are
       ignored. Mutually exclusive with `class_name_allowlist`.
   """
 
   score_threshold: Optional[float] = None
-  class_name_allowlist: Optional[List[str]] = None
-  class_name_denylist: Optional[List[str]] = None
+  category_name_allowlist: Optional[List[str]] = None
+  category_name_denylist: Optional[List[str]] = None
   display_names_locale: Optional[str] = None
   max_results: Optional[int] = None
 
@@ -52,8 +52,8 @@ class ClassificationOptions:
     """Generates a protobuf object to pass to the C++ layer."""
     return _ClassificationOptions(
       score_threshold=self.score_threshold,
-      class_name_allowlist=self.class_name_allowlist,
-      class_name_denylist=self.class_name_denylist,
+      class_name_allowlist=self.category_name_allowlist,
+      class_name_denylist=self.category_name_denylist,
       display_names_locale=self.display_names_locale,
       max_results=self.max_results)
 
@@ -66,8 +66,8 @@ class ClassificationOptions:
     """Creates a `DetectionOptions` object from the given protobuf object."""
     return ClassificationOptions(
       score_threshold=pb2_obj.score_threshold,
-      class_name_allowlist=pb2_obj.class_name_allowlist,
-      class_name_denylist=pb2_obj.class_name_denylist,
+      category_name_allowlist=pb2_obj.class_name_allowlist,
+      category_name_denylist=pb2_obj.class_name_denylist,
       display_names_locale=pb2_obj.display_names_locale,
       max_results=pb2_obj.max_results)
 
