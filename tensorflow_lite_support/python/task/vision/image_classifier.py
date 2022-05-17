@@ -106,7 +106,7 @@ class ImageClassifier(object):
     if bounding_box is None:
       return self._classifier.classify(image_data)
 
-    return self._classifier.classify(image_data, bounding_box)
+    return self._classifier.classify(image_data, bounding_box.to_pb2())
 
   @property
   def options(self) -> ImageClassifierOptions:

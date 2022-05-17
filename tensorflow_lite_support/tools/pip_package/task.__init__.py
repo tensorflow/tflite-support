@@ -12,20 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""TensorFlow Lite Task Library Text APIs.
+"""The TensorFlow Lite Task Library.
 
-This module provides interface to run TensorFlow Lite natural language
-processing models.
+TensorFlow Lite Task Library contains a set of powerful and easy-to-use
+task-specific libraries for app developers to create ML experiences with
+TensorFlow Lite. It provides optimized out-of-box model interfaces for popular
+machine learning tasks, such as image and text classification. The model
+interfaces are specifically designed for each task to achieve the best
+performance and usability.
+
+Read more in the [Task Library Guide](
+https://tensorflow.org/lite/inference_with_metadata/task_library/overview).
 """
 
-from tensorflow_lite_support.python.task.text import text_embedder
-from tensorflow_lite_support.python.task.text import text_searcher
-
-TextEmbedder = text_embedder.TextEmbedder
-TextEmbedderOptions = text_embedder.TextEmbedderOptions
-TextSearcher = text_searcher.TextSearcher
-TextSearcherOptions = text_searcher.TextSearcherOptions
-
-# Remove unnecessary modules to avoid duplication in API docs.
-del text_embedder
-del text_searcher
+from . import audio
+from . import core
+from . import processor
+from . import text
+from . import vision

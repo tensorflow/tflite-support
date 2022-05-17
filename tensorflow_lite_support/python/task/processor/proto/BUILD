@@ -25,9 +25,7 @@ py_library(
 py_library(
     name = "bounding_box_pb2",
     srcs = ["bounding_box_pb2.py"],
-    deps = [
-        "//tensorflow_lite_support/cc/task/processor/proto:bounding_box_py_pb2",
-    ],
+    deps = ["//tensorflow_lite_support/cc/task/processor/proto:bounding_box_py_pb2"],
 )
 
 py_library(
@@ -42,6 +40,7 @@ py_library(
     name = "classifications_pb2",
     srcs = ["classifications_pb2.py"],
     deps = [
+        ":class_pb2",
         "//tensorflow_lite_support/cc/task/processor/proto:classifications_py_pb2",
     ],
 )
@@ -58,6 +57,7 @@ py_library(
     name = "detections_pb2",
     srcs = ["detections_pb2.py"],
     deps = [
+        ":class_pb2",
         "//tensorflow_lite_support/cc/task/processor/proto:detections_py_pb2",
     ],
 )

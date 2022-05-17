@@ -7,6 +7,9 @@ package(
 
 cc_library(
     name = "audio_buffer",
+    srcs = [
+        "audio_buffer.cc",
+    ],
     hdrs = [
         "audio_buffer.h",
     ],
