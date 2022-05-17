@@ -61,7 +61,7 @@ class DetectionOptions:
   @doc_controls.do_not_generate_docs
   def create_from_pb2(
       cls,
-      pb2_obj: _DetectionOptions = _DetectionOptions()
+      pb2_obj: _DetectionOptions
   ) -> "DetectionOptions":
     """Creates a `DetectionOptions` object from the given protobuf object."""
     return DetectionOptions(
