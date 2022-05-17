@@ -32,10 +32,10 @@ class ClassificationOptions:
     max_results: The maximum number of top-scored classification results to
       return.
     score_threshold: Overrides the ones provided in the model metadata. Results
-      below this value are rejected
+      below this value are rejected.
     class_name_allowlist: If non-empty, classifications whose class name is not
       in this set will be filtered out. Duplicate or unknown class names are
-      ignored. Mutually exclusive with `class_name_denylist`
+      ignored. Mutually exclusive with `class_name_denylist`.
     class_name_denylist: If non-empty, classifications whose class name is in
       this set will be filtered out. Duplicate or unknown class names are
       ignored. Mutually exclusive with `class_name_allowlist`.
