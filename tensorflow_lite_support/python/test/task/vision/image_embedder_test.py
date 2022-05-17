@@ -137,11 +137,10 @@ class ImageEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     embedder = _ImageEmbedder.create_from_options(options)
 
     # Builds test data.
-    embedding = embedding_pb2.Embedding(output_index=0)
-    embedding.feature_vector.value_float.append(1.0)
-    embedding.feature_vector.value_float.append(0.0)
-    embedding_result = embedding_pb2.EmbeddingResult()
-    embedding_result.embeddings.append(embedding)
+    feature_vector = embedding_pb2.FeatureVector(value_float=[1.0, 0.0])
+    embedding = embedding_pb2.Embedding(output_index=0,
+                                        feature_vector=feature_vector)
+    embedding_result = embedding_pb2.EmbeddingResult(embeddings=[embedding])
 
     result0 = embedder.get_embedding_by_index(embedding_result, 0)
     self.assertEqual(result0.output_index, 0)
