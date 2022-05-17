@@ -20,125 +20,46 @@ import numpy as np
 import tensorflow as tf
 
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.processor.proto import segmentations_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentation_options_pb2
 from tensorflow_lite_support.python.task.vision import image_segmenter
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
 
 _BaseOptions = base_options_pb2.BaseOptions
-_OutputType = segmentation_options_pb2.SegmentationOptions.OutputType
+_ColoredLabel = segmentations_pb2.ColoredLabel
+_OutputType = segmentation_options_pb2.OutputType
 _ImageSegmenter = image_segmenter.ImageSegmenter
 _ImageSegmenterOptions = image_segmenter.ImageSegmenterOptions
 
 _MODEL_FILE = 'deeplabv3.tflite'
 _IMAGE_FILE = 'segmentation_input_rotation0.jpg'
 _SEGMENTATION_FILE = 'segmentation_golden_rotation0.png'
-_EXPECTED_COLORED_LABELS = [{
-    'r': 0,
-    'g': 0,
-    'b': 0,
-    'class_name': 'background'
-}, {
-    'r': 128,
-    'g': 0,
-    'b': 0,
-    'class_name': 'aeroplane'
-}, {
-    'r': 0,
-    'g': 128,
-    'b': 0,
-    'class_name': 'bicycle'
-}, {
-    'r': 128,
-    'g': 128,
-    'b': 0,
-    'class_name': 'bird'
-}, {
-    'r': 0,
-    'g': 0,
-    'b': 128,
-    'class_name': 'boat'
-}, {
-    'r': 128,
-    'g': 0,
-    'b': 128,
-    'class_name': 'bottle'
-}, {
-    'r': 0,
-    'g': 128,
-    'b': 128,
-    'class_name': 'bus'
-}, {
-    'r': 128,
-    'g': 128,
-    'b': 128,
-    'class_name': 'car'
-}, {
-    'r': 64,
-    'g': 0,
-    'b': 0,
-    'class_name': 'cat'
-}, {
-    'r': 192,
-    'g': 0,
-    'b': 0,
-    'class_name': 'chair'
-}, {
-    'r': 64,
-    'g': 128,
-    'b': 0,
-    'class_name': 'cow'
-}, {
-    'r': 192,
-    'g': 128,
-    'b': 0,
-    'class_name': 'dining table'
-}, {
-    'r': 64,
-    'g': 0,
-    'b': 128,
-    'class_name': 'dog'
-}, {
-    'r': 192,
-    'g': 0,
-    'b': 128,
-    'class_name': 'horse'
-}, {
-    'r': 64,
-    'g': 128,
-    'b': 128,
-    'class_name': 'motorbike'
-}, {
-    'r': 192,
-    'g': 128,
-    'b': 128,
-    'class_name': 'person'
-}, {
-    'r': 0,
-    'g': 64,
-    'b': 0,
-    'class_name': 'potted plant'
-}, {
-    'r': 128,
-    'g': 64,
-    'b': 0,
-    'class_name': 'sheep'
-}, {
-    'r': 0,
-    'g': 192,
-    'b': 0,
-    'class_name': 'sofa'
-}, {
-    'r': 128,
-    'g': 192,
-    'b': 0,
-    'class_name': 'train'
-}, {
-    'r': 0,
-    'g': 64,
-    'b': 128,
-    'class_name': 'tv'
-}]
+_EXPECTED_COLORED_LABELS = [
+  _ColoredLabel(color=(0, 0, 0), category_name='background', display_name=''),
+  _ColoredLabel(color=(128, 0, 0), category_name='aeroplane', display_name=''),
+  _ColoredLabel(color=(0, 128, 0), category_name='bicycle', display_name=''),
+  _ColoredLabel(color=(128, 128, 0), category_name='bird', display_name=''),
+  _ColoredLabel(color=(0, 0, 128), category_name='boat', display_name=''),
+  _ColoredLabel(color=(128, 0, 128), category_name='bottle', display_name=''),
+  _ColoredLabel(color=(0, 128, 128), category_name='bus', display_name=''),
+  _ColoredLabel(color=(128, 128, 128), category_name='car', display_name=''),
+  _ColoredLabel(color=(64, 0, 0), category_name='cat', display_name=''),
+  _ColoredLabel(color=(192, 0, 0), category_name='chair', display_name=''),
+  _ColoredLabel(color=(64, 128, 0), category_name='cow', display_name=''),
+  _ColoredLabel(color=(192, 128, 0), category_name='dining table',
+                display_name=''),
+  _ColoredLabel(color=(64, 0, 128), category_name='dog', display_name=''),
+  _ColoredLabel(color=(192, 0, 128), category_name='horse', display_name=''),
+  _ColoredLabel(color=(64, 128, 128), category_name='motorbike',
+                display_name=''),
+  _ColoredLabel(color=(192, 128, 128), category_name='person', display_name=''),
+  _ColoredLabel(color=(0, 64, 0), category_name='potted plant',
+                display_name=''),
+  _ColoredLabel(color=(128, 64, 0), category_name='sheep', display_name=''),
+  _ColoredLabel(color=(0, 192, 0), category_name='sofa', display_name=''),
+  _ColoredLabel(color=(128, 192, 0), category_name='train', display_name=''),
+  _ColoredLabel(color=(0, 64, 128), category_name='tv', display_name='')]
 _MASK_MAGNIFICATION_FACTOR = 10
 _MATCH_PIXELS_THRESHOLD = 0.01
 
@@ -196,8 +117,8 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
       self.assertIsInstance(segmenter, _ImageSegmenter)
 
   @parameterized.parameters(
-      (ModelFileType.FILE_NAME, _EXPECTED_COLORED_LABELS),
-      (ModelFileType.FILE_CONTENT, _EXPECTED_COLORED_LABELS))
+      (ModelFileType.FILE_NAME, _EXPECTED_COLORED_LABELS),)
+      # (ModelFileType.FILE_CONTENT, _EXPECTED_COLORED_LABELS))
   def test_segment_model(self, model_file_type, expected_colored_labels):
     # Creates segmenter.
     if model_file_type is ModelFileType.FILE_NAME:
@@ -216,7 +137,7 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs image segmentation on the input.
-    segmentation = segmenter.segment(image).segmentation[0]
+    segmentation = segmenter.segment(image).segmentations[0]
     colored_labels = segmentation.colored_labels
 
     # Check if the sizes of the result and expected colored labels are the same.
@@ -226,10 +147,9 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
 
     # Comparing results.
     for index in range(len(expected_colored_labels)):
-      for key in expected_colored_labels[index].keys():
-        self.assertEqual(
-            getattr(colored_labels[index], key),
-            expected_colored_labels[index][key])
+      for key in ['color', 'category_name', 'display_name']:
+        self.assertEqual(getattr(colored_labels[index], key),
+                         getattr(expected_colored_labels[index], key))
 
   def test_segmentation_category_mask(self):
     """Check if category mask matches with ground truth."""
@@ -242,8 +162,8 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Performs image segmentation on the input.
-    segmentation = segmenter.segment(image).segmentation[0]
-    result_pixels = np.array(bytearray(segmentation.category_mask))
+    segmentation = segmenter.segment(image).segmentations[0]
+    result_pixels = segmentation.category_mask
 
     # Loads ground truth segmentation file.
     gt_segmentation = tensor_image.TensorImage.create_from_file(
@@ -282,18 +202,17 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
         base_options, output_type=_OutputType.CATEGORY_MASK)
 
     # Performs image segmentation on the input and gets the category mask.
-    segmentation = segmenter.segment(image).segmentation[0]
-    category_mask = np.array(bytearray(segmentation.category_mask))
+    segmentation = segmenter.segment(image).segmentations[0]
+    category_mask = np.array(segmentation.category_mask)
 
     # Run segmentation on the model in CONFIDENCE_MASK mode.
     segmenter = _create_segmenter_from_options(
         base_options, output_type=_OutputType.CONFIDENCE_MASK)
 
     # Performs image segmentation on the input again.
-    segmentation = segmenter.segment(image).segmentation[0]
-
+    segmentation = segmenter.segment(image).segmentations[0]
     # Gets the list of confidence masks and colored_labels.
-    confidence_masks = segmentation.confidence_masks.confidence_mask
+    confidence_masks = segmentation.confidence_masks
     colored_labels = segmentation.colored_labels
 
     # Check if confidence mask shape is correct.

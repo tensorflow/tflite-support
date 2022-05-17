@@ -56,6 +56,7 @@ py_test(
         # build rule placeholder: numpy dep,
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:segmentations_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:segmentation_options_pb2",
         "//tensorflow_lite_support/python/task/vision:image_segmenter",
         "//tensorflow_lite_support/python/task/vision/core:tensor_image",
