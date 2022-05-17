@@ -42,7 +42,7 @@ class Detection:
     """Generates a protobuf object to pass to the C++ layer."""
     return _Detection(
       bounding_box=self.bounding_box,
-      classes=self.categories)
+      classes=[category.to_pb2() for category in self.categories])
 
   @classmethod
   @doc_controls.do_not_generate_docs
@@ -53,7 +53,9 @@ class Detection:
     """Creates a `Detection` object from the given protobuf object."""
     return Detection(
       bounding_box=pb2_obj.bounding_box,
-      categories=pb2_obj.classes)
+      categories=[
+        class_pb2.Category.create_from_pb2(category)
+        for category in pb2_obj.classes])
 
   def __eq__(self, other: Any) -> bool:
     """Checks if this object is equal to the given object.

@@ -38,7 +38,7 @@ class Category:
   index: int
   score: float
   display_name: str
-  class_name: str
+  category_name: str
 
   @doc_controls.do_not_generate_docs
   def to_pb2(self) -> class_pb2.Class:
@@ -47,7 +47,7 @@ class Category:
       index=self.index,
       score=self.score,
       display_name=self.display_name,
-      class_name=self.class_name)
+      class_name=self.category_name)
 
   @classmethod
   @doc_controls.do_not_generate_docs
@@ -58,7 +58,7 @@ class Category:
       index=pb2_obj.index,
       score=pb2_obj.score,
       display_name=pb2_obj.display_name,
-      class_name=pb2_obj.class_name)
+      category_name=pb2_obj.class_name)
 
   def __eq__(self, other: Any) -> bool:
     """Checks if this object is equal to the given object.

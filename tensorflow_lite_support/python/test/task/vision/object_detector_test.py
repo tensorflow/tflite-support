@@ -33,19 +33,19 @@ _IMAGE_FILE = 'cats_and_dogs.jpg'
 _EXPECTED_DETECTIONS = """
 detections {
   bounding_box { origin_x: 54 origin_y: 396 width: 393 height: 196 }
-  classes { index: 16 score: 0.64453125 class_name: "cat" }
+  classes { index: 16 score: 0.64453125 display_name: "" class_name: "cat" }
 }
 detections {
   bounding_box { origin_x: 602 origin_y: 157 width: 394 height: 447 }
-  classes { index: 16 score: 0.59765625 class_name: "cat" }
+  classes { index: 16 score: 0.59765625 display_name: "" class_name: "cat" }
 }
 detections {
    bounding_box { origin_x: 261 origin_y: 394 width: 179 height: 209 }
-   classes { index: 16 score: 0.5625 class_name: "cat" }
+   classes { index: 16 score: 0.5625 display_name: "" class_name: "cat" }
 }
 detections {
    bounding_box { origin_x: 389 origin_y: 197 width: 276 height: 409 }
-   classes { index: 17 score: 0.51171875 class_name: "dog" }
+   classes { index: 17 score: 0.51171875 display_name: "" class_name: "dog" }
 }
 """
 _ALLOW_LIST = ['cat', 'dog']
@@ -182,7 +182,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     detections = image_result.detections
 
     for detection in detections:
-      label = detection.categories[0].class_name
+      label = detection.categories[0].category_name
       self.assertIn(label, _ALLOW_LIST,
                     f'Label {label} found but not in label allow list')
 
@@ -200,7 +200,7 @@ class ObjectDetectorTest(parameterized.TestCase, tf.test.TestCase):
     detections = image_result.detections
 
     for detection in detections:
-      label = detection.categories[0].class_name
+      label = detection.categories[0].category_name
       self.assertNotIn(label, _DENY_LIST,
                        f'Label {label} found but in deny list.')
 

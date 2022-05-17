@@ -38,16 +38,19 @@ classifications {
   classes {
     index: 0
     score: 0.917969
+    display_name: ""
     class_name: "Speech"
   }
   classes {
     index: 500
     score: 0.058594
+    display_name: ""
     class_name: "Inside, small room"
   }
   classes {
     index: 494
     score: 0.011719
+    display_name: ""
     class_name: "Silence"
   }
   head_index: 0
@@ -62,16 +65,19 @@ classifications {
   classes {
     index: 508
     score: 0.548616
+    display_name: ""
     class_name: "Environmental noise"
   }
   classes {
     index: 507
     score: 0.380869
+    display_name: ""
     class_name: "Noise"
   }
   classes {
     index: 106
     score: 0.256137
+    display_name: ""
     class_name: "Bird"
   }
   head_index: 0
@@ -81,16 +87,19 @@ classifications {
   classes {
     index: 4
     score: 0.933997
+    display_name: ""
     class_name: "Chestnut-crowned Antpitta"
   }
   classes {
     index: 1
     score: 0.065934
+    display_name: ""
     class_name: "White-breasted Wood-Wren"
   }
   classes {
     index: 0
     score: 6.1469495e-05
+    display_name: ""
     class_name: "Red Crossbill"
   }
   head_index: 1
@@ -272,7 +281,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
     categories = audio_result.classifications[0].categories
 
     for category in categories:
-      label = category.class_name
+      label = category.category_name
       self.assertIn(
           label, _ALLOW_LIST,
           'Label "{0}" found but not in label allow list'.format(label))
@@ -293,7 +302,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
     categories = audio_result.classifications[0].categories
 
     for category in categories:
-      label = category.class_name
+      label = category.category_name
       self.assertNotIn(label, _DENY_LIST,
                        'Label "{0}" found but in deny list.'.format(label))
 

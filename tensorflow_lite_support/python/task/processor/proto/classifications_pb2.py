@@ -45,7 +45,7 @@ class Classifications:
   def to_pb2(self) -> _Classifications:
     """Generates a protobuf object to pass to the C++ layer."""
     return _Classifications(
-      classes=self.categories,
+      classes=[category.to_pb2() for category in self.categories],
       head_index=self.head_index,
       head_name=self.head_name)
 
@@ -57,7 +57,9 @@ class Classifications:
   ) -> "Classifications":
     """Creates a `Classifications` object from the given protobuf object."""
     return Classifications(
-      categories=pb2_obj.classes,
+      categories=[
+        class_pb2.Category.create_from_pb2(category)
+         for category in pb2_obj.classes],
       head_index=pb2_obj.head_index,
       head_name=pb2_obj.head_name)
 

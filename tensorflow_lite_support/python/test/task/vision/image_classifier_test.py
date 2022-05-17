@@ -93,16 +93,19 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     classes {
       index: 934
       score: 0.739974
+      display_name: ""
       class_name: "cheeseburger"
     }
     classes {
       index: 925
       score: 0.026929
+      display_name: ""
       class_name: "guacamole"
     }
     classes { 
       index: 932 
       score: 0.025737 
+      display_name: ""
       class_name: "bagel" 
     }
     head_index: 0
@@ -113,16 +116,19 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     classes {
       index: 934
       score: 0.739974
+      display_name: ""
       class_name: "cheeseburger"
     }
     classes {
       index: 925
       score: 0.026929
+      display_name: ""
       class_name: "guacamole"
     }
     classes { 
       index: 932 
       score: 0.025737 
+      display_name: ""
       class_name: "bagel" 
     }
     head_index: 0
@@ -176,16 +182,19 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
       classes {
         index: 934
         score: 0.881507
+        display_name: ""
         class_name: "cheeseburger"
       }
       classes {
         index: 925
         score: 0.019457
+        display_name: ""
         class_name: "guacamole"
       }
       classes { 
         index: 932 
         score: 0.012489 
+        display_name: ""
         class_name: "bagel" 
       }
       head_index: 0
@@ -247,7 +256,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     categories = image_result.classifications[0].categories
 
     for category in categories:
-      label = category.class_name
+      label = category.category_name
       self.assertIn(label, _ALLOW_LIST,
                     f'Label {label} found but not in label allow list')
 
@@ -266,7 +275,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     categories = image_result.classifications[0].categories
 
     for category in categories:
-      label = category.class_name
+      label = category.category_name
       self.assertNotIn(label, _DENY_LIST,
                        f'Label {label} found but in deny list.')
 
