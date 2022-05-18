@@ -119,6 +119,10 @@ class Segmentation:
   """Represents one Segmentation object in the image segmenter's results.
 
   Attributes:
+    height: The height of the mask. This is an intrinsic parameter of the model
+      being used, and does not depend on the input image dimensions.
+    width: The width of the mask. This is an intrinsic parameter of the model
+      being used, and does not depend on the input image dimensions.
     colored_labels: A list of `ColoredLabel` objects.
     category_mask: A NumPy 2D-array of the category mask.
     confidence_masks: A list of `ConfidenceMask` objects.
