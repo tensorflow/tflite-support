@@ -35,10 +35,10 @@ class ClassificationOptions:
       below this value are rejected.
     category_name_allowlist: If non-empty, classifications whose class name is
       not in this set will be filtered out. Duplicate or unknown class names are
-      ignored. Mutually exclusive with `class_name_denylist`.
+      ignored. Mutually exclusive with `category_name_denylist`.
     category_name_denylist: If non-empty, classifications whose class name is in
       this set will be filtered out. Duplicate or unknown class names are
-      ignored. Mutually exclusive with `class_name_allowlist`.
+      ignored. Mutually exclusive with `category_name_allowlist`.
   """
 
   score_threshold: Optional[float] = None
