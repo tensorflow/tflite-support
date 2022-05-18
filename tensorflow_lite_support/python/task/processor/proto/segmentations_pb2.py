@@ -62,6 +62,8 @@ class ConfidenceMask:
     if not isinstance(other, ConfidenceMask):
       return False
 
+    return self.to_pb2().__eq__(other.to_pb2())
+
 
 @dataclasses.dataclass
 class ColoredLabel:
@@ -104,6 +106,8 @@ class ColoredLabel:
     """
     if not isinstance(other, ColoredLabel):
       return False
+
+    return self.to_pb2().__eq__(other.to_pb2())
 
 
 @dataclasses.dataclass
@@ -219,3 +223,5 @@ class SegmentationResult:
     """
     if not isinstance(other, SegmentationResult):
       return False
+
+    return self.to_pb2().__eq__(other.to_pb2())
