@@ -17,8 +17,8 @@ import dataclasses
 import enum
 from typing import Any, Optional
 
-from tensorflow.tools.docs import doc_controls
 from tensorflow_lite_support.cc.task.processor.proto import segmentation_options_pb2
+from tensorflow_lite_support.python.task.core.optional_dependencies import doc_controls
 
 _SegmentationOptionsProto = segmentation_options_pb2.SegmentationOptions
 

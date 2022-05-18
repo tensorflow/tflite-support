@@ -78,6 +78,7 @@ py_library(
     srcs = ["segmentations_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/vision/proto:segmentations_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -86,6 +87,7 @@ py_library(
     srcs = ["segmentation_options_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 

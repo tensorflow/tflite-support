@@ -17,8 +17,8 @@ import dataclasses
 from typing import Any, Tuple, List, Optional
 
 import numpy as np
-from tensorflow.tools.docs import doc_controls
 from tensorflow_lite_support.cc.task.vision.proto import segmentations_pb2
+from tensorflow_lite_support.python.task.core.optional_dependencies import doc_controls
 
 _SegmentationProto = segmentations_pb2.Segmentation
 _ConfidenceMaskProto = segmentations_pb2.Segmentation.ConfidenceMask
