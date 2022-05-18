@@ -93,38 +93,46 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     classes {
       index: 934
       score: 0.739974
+      display_name: ""
       class_name: "cheeseburger"
     }
     classes {
       index: 925
       score: 0.026929
+      display_name: ""
       class_name: "guacamole"
     }
     classes { 
       index: 932 
       score: 0.025737 
+      display_name: ""
       class_name: "bagel" 
     }
     head_index: 0
+    head_name: ""
   }
   """), (ModelFileType.FILE_CONTENT, 3, """
   classifications {
     classes {
       index: 934
       score: 0.739974
+      display_name: ""
       class_name: "cheeseburger"
     }
     classes {
       index: 925
       score: 0.026929
+      display_name: ""
       class_name: "guacamole"
     }
     classes { 
       index: 932 
       score: 0.025737 
+      display_name: ""
       class_name: "bagel" 
     }
     head_index: 0
+    head_name: ""
   }
   """))
   def test_classify_model(self, model_file_type, max_results,
@@ -150,7 +158,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     image_result = classifier.classify(image, bounding_box=None)
 
     # Comparing results (classification w/o bounding box).
-    self.assertProtoEquals(expected_result_text_proto, image_result)
+    self.assertProtoEquals(expected_result_text_proto, image_result.to_pb2())
 
   def test_classify_model_with_bounding_box(self):
     # Creates classifier.
@@ -174,24 +182,28 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
       classes {
         index: 934
         score: 0.881507
+        display_name: ""
         class_name: "cheeseburger"
       }
       classes {
         index: 925
         score: 0.019457
+        display_name: ""
         class_name: "guacamole"
       }
       classes { 
         index: 932 
         score: 0.012489 
+        display_name: ""
         class_name: "bagel" 
       }
       head_index: 0
+      head_name: ""
     }
     """
 
     # Comparing results (classification w/ bounding box).
-    self.assertProtoEquals(expected_result_text_proto, image_result)
+    self.assertProtoEquals(expected_result_text_proto, image_result.to_pb2())
 
   def test_max_results_option(self):
     # Creates classifier.
@@ -205,7 +217,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
-    categories = image_result.classifications[0].classes
+    categories = image_result.classifications[0].categories
 
     self.assertLessEqual(
         len(categories), _MAX_RESULTS, 'Too many results returned.')
@@ -222,7 +234,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
-    categories = image_result.classifications[0].classes
+    categories = image_result.classifications[0].categories
 
     for category in categories:
       self.assertGreaterEqual(
@@ -234,17 +246,17 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = _create_classifier_from_options(
-        base_options, class_name_allowlist=_ALLOW_LIST)
+        base_options, category_name_allowlist=_ALLOW_LIST)
 
     # Loads image.
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
-    categories = image_result.classifications[0].classes
+    categories = image_result.classifications[0].categories
 
     for category in categories:
-      label = category.class_name
+      label = category.category_name
       self.assertIn(label, _ALLOW_LIST,
                     f'Label {label} found but not in label allow list')
 
@@ -253,17 +265,17 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
     base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = _create_classifier_from_options(
-        base_options, score_threshold=0.01, class_name_denylist=_DENY_LIST)
+        base_options, score_threshold=0.01, category_name_denylist=_DENY_LIST)
 
     # Loads image
     image = tensor_image.TensorImage.create_from_file(self.test_image_path)
 
     # Classifies the input.
     image_result = classifier.classify(image, bounding_box=None)
-    categories = image_result.classifications[0].classes
+    categories = image_result.classifications[0].categories
 
     for category in categories:
-      label = category.class_name
+      label = category.category_name
       self.assertNotIn(label, _DENY_LIST,
                        f'Label {label} found but in deny list.')
 
@@ -275,7 +287,7 @@ class ImageClassifierTest(parameterized.TestCase, tf.test.TestCase):
         r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
       classification_options = classification_options_pb2.ClassificationOptions(
-          class_name_allowlist=['foo'], class_name_denylist=['bar'])
+          category_name_allowlist=['foo'], category_name_denylist=['bar'])
       options = _ImageClassifierOptions(
           base_options=base_options,
           classification_options=classification_options)
