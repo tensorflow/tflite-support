@@ -153,3 +153,5 @@ class EmbeddingResult:
     """
     if not isinstance(other, EmbeddingResult):
       return False
+
+    return self.to_pb2().__eq__(other.to_pb2())
