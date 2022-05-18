@@ -117,8 +117,8 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
       self.assertIsInstance(segmenter, _ImageSegmenter)
 
   @parameterized.parameters(
-      (ModelFileType.FILE_NAME, _EXPECTED_COLORED_LABELS),)
-      # (ModelFileType.FILE_CONTENT, _EXPECTED_COLORED_LABELS))
+      (ModelFileType.FILE_NAME, _EXPECTED_COLORED_LABELS),
+      (ModelFileType.FILE_CONTENT, _EXPECTED_COLORED_LABELS))
   def test_segment_model(self, model_file_type, expected_colored_labels):
     # Creates segmenter.
     if model_file_type is ModelFileType.FILE_NAME:
@@ -203,7 +203,7 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
 
     # Performs image segmentation on the input and gets the category mask.
     segmentation = segmenter.segment(image).segmentations[0]
-    category_mask = np.array(segmentation.category_mask)
+    category_mask = segmentation.category_mask
 
     # Run segmentation on the model in CONFIDENCE_MASK mode.
     segmenter = _create_segmenter_from_options(

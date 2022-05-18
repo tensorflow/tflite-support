@@ -14,15 +14,16 @@
 """Segmentations protobuf."""
 
 import dataclasses
-from typing import Any, Tuple, List
+from typing import Any, Tuple, List, Optional
 
+import numpy as np
 from tensorflow.tools.docs import doc_controls
 from tensorflow_lite_support.cc.task.vision.proto import segmentations_pb2
 
-_Segmentation = segmentations_pb2.Segmentation
-_ConfidenceMask = segmentations_pb2.Segmentation.ConfidenceMask
-_ColoredLabel = segmentations_pb2.Segmentation.ColoredLabel
-_SegmentationResult = segmentations_pb2.SegmentationResult
+_SegmentationProto = segmentations_pb2.Segmentation
+_ConfidenceMaskProto = segmentations_pb2.Segmentation.ConfidenceMask
+_ColoredLabelProto = segmentations_pb2.Segmentation.ColoredLabel
+_SegmentationResultProto = segmentations_pb2.SegmentationResult
 
 
 @dataclasses.dataclass
@@ -37,18 +38,19 @@ class ConfidenceMask:
     value: The value indicates the prediction confidence usually in the
       range [0, 1].
   """
-  value: float
+  value: np.ndarray
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _ConfidenceMask:
+  def to_pb2(self) -> _ConfidenceMaskProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _ConfidenceMask(value=self.value)
+    return _ConfidenceMaskProto(value=self.value)
 
   @classmethod
   @doc_controls.do_not_generate_docs
-  def create_from_pb2(cls, pb2_obj: _ConfidenceMask) -> "ConfidenceMask":
-    """Creates a `ConfidenceMask` object from the given protobuf object."""
-    return ConfidenceMask(value=pb2_obj.value)
+  def create_from_pb2(cls, pb2_obj: _ConfidenceMaskProto) -> "ConfidenceMask":
+    """Creates a `ConfidenceMask` object from the given protobuf object and
+    the segmentation mask's width and height."""
+    return ConfidenceMask(value=np.array(pb2_obj.value))
 
   def __eq__(self, other: Any) -> bool:
     """Checks if this object is equal to the given object.
@@ -78,16 +80,16 @@ class ColoredLabel:
   display_name: str
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _ColoredLabel:
+  def to_pb2(self) -> _ColoredLabelProto:
     """Generates a protobuf object to pass to the C++ layer."""
     r, g, b = self.color
-    return _ColoredLabel(r=r, g=g, b=b,
-                         class_name=self.category_name,
-                         display_name=self.display_name)
+    return _ColoredLabelProto(r=r, g=g, b=b,
+                              class_name=self.category_name,
+                              display_name=self.display_name)
 
   @classmethod
   @doc_controls.do_not_generate_docs
-  def create_from_pb2(cls, pb2_obj: _ColoredLabel) -> "ColoredLabel":
+  def create_from_pb2(cls, pb2_obj: _ColoredLabelProto) -> "ColoredLabel":
     """Creates a `ColoredLabel` object from the given protobuf object."""
     return ColoredLabel(color=(pb2_obj.r, pb2_obj.g, pb2_obj.b),
                         category_name=pb2_obj.class_name,
@@ -110,26 +112,26 @@ class Segmentation:
 
   Attributes:
     colored_labels: A list of `ColoredLabel` objects.
-    category_mask: A bytearray of the category mask.
+    category_mask: A NumPy 2D-array of the category mask.
     confidence_masks: A list of `ConfidenceMask` objects.
   """
 
   colored_labels: List[ColoredLabel]
-  category_mask: bytearray = None
-  confidence_masks: List[ConfidenceMask] = None
+  category_mask: Optional[np.ndarray] = None
+  confidence_masks: Optional[List[ConfidenceMask]] = None
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _Segmentation:
+  def to_pb2(self) -> _SegmentationProto:
     """Generates a protobuf object to pass to the C++ layer."""
 
     if self.category_mask is not None:
-      return _Segmentation(
+      return _SegmentationProto(
         category_mask=bytes(self.category_mask),
         colored_labels=[
           colored_label.to_pb2() for colored_label in self.colored_labels])
 
     elif self.confidence_masks is not None:
-      return _Segmentation(
+      return _SegmentationProto(
         confidence_masks=[
           confidence_mask.to_pb2()
           for confidence_mask in self.confidence_masks],
@@ -141,13 +143,13 @@ class Segmentation:
   @doc_controls.do_not_generate_docs
   def create_from_pb2(
       cls,
-      pb2_obj: _Segmentation
+      pb2_obj: _SegmentationProto
   ) -> "Segmentation":
     """Creates a `Segmentation` object from the given protobuf object."""
 
     if pb2_obj.category_mask:
       return Segmentation(
-        category_mask=bytearray(pb2_obj.category_mask),
+        category_mask=np.array(bytearray(pb2_obj.category_mask)),
         colored_labels=[
           ColoredLabel.create_from_pb2(colored_label)
           for colored_label in pb2_obj.colored_labels])
@@ -189,9 +191,9 @@ class SegmentationResult:
   segmentations: List[Segmentation]
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _SegmentationResult:
+  def to_pb2(self) -> _SegmentationResultProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _SegmentationResult(
+    return _SegmentationResultProto(
       segmentation=[
         segmentation.to_pb2()
         for segmentation in self.segmentations])
@@ -200,7 +202,7 @@ class SegmentationResult:
   @doc_controls.do_not_generate_docs
   def create_from_pb2(
       cls,
-      pb2_obj: _SegmentationResult
+      pb2_obj: _SegmentationResultProto
   ) -> "SegmentationResult":
     """Creates a `SegmentationResult` object from the given protobuf object."""
     return SegmentationResult(

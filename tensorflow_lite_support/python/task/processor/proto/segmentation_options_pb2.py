@@ -20,7 +20,7 @@ from typing import Any, Optional
 from tensorflow.tools.docs import doc_controls
 from tensorflow_lite_support.cc.task.processor.proto import segmentation_options_pb2
 
-_SegmentationOptions = segmentation_options_pb2.SegmentationOptions
+_SegmentationOptionsProto = segmentation_options_pb2.SegmentationOptions
 
 
 class OutputType(enum.Enum):
@@ -43,9 +43,9 @@ class SegmentationOptions:
   output_type: Optional[OutputType] = OutputType.CATEGORY_MASK
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _SegmentationOptions:
+  def to_pb2(self) -> _SegmentationOptionsProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _SegmentationOptions(
+    return _SegmentationOptionsProto(
       display_names_locale=self.display_names_locale,
       output_type=self.output_type.value)
 
@@ -53,7 +53,7 @@ class SegmentationOptions:
   @doc_controls.do_not_generate_docs
   def create_from_pb2(
       cls,
-      pb2_obj: _SegmentationOptions
+      pb2_obj: _SegmentationOptionsProto
   ) -> "SegmentationOptions":
     """Creates a `SegmentationOptions` object from the given protobuf object."""
     return SegmentationOptions(
