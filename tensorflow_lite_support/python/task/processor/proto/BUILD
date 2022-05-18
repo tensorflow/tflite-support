@@ -11,6 +11,7 @@ py_library(
     srcs = ["embedding_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -19,6 +20,7 @@ py_library(
     srcs = ["embedding_options_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 

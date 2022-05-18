@@ -17,8 +17,8 @@ import dataclasses
 from typing import Any, List
 
 import numpy as np
-from tensorflow.tools.docs import doc_controls
 from tensorflow_lite_support.cc.task.processor.proto import embedding_pb2
+from tensorflow_lite_support.python.task.core.optional_dependencies import doc_controls
 
 _FeatureVectorProto = embedding_pb2.FeatureVector
 _EmbeddingProto = embedding_pb2.Embedding
