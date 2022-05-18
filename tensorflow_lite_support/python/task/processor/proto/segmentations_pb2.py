@@ -124,6 +124,8 @@ class Segmentation:
     confidence_masks: A list of `ConfidenceMask` objects.
   """
 
+  height: int
+  width: int
   colored_labels: List[ColoredLabel]
   category_mask: Optional[np.ndarray] = None
   confidence_masks: Optional[List[ConfidenceMask]] = None
@@ -134,12 +136,16 @@ class Segmentation:
 
     if self.category_mask is not None:
       return _SegmentationProto(
+        height=self.height,
+        width=self.width,
         category_mask=bytes(self.category_mask),
         colored_labels=[
           colored_label.to_pb2() for colored_label in self.colored_labels])
 
     elif self.confidence_masks is not None:
       return _SegmentationProto(
+        height=self.height,
+        width=self.width,
         confidence_masks=[
           confidence_mask.to_pb2()
           for confidence_mask in self.confidence_masks],
@@ -156,16 +162,19 @@ class Segmentation:
     """Creates a `Segmentation` object from the given protobuf object."""
 
     if pb2_obj.category_mask:
-      height, width = pb2_obj.height, pb2_obj.width
       return Segmentation(
-        category_mask=np.array(
-          bytearray(pb2_obj.category_mask)).reshape(height, width),
+        height=pb2_obj.height,
+        width=pb2_obj.width,
+        category_mask=np.array(bytearray(pb2_obj.category_mask))
+                        .reshape(pb2_obj.height, pb2_obj.width),
         colored_labels=[
           ColoredLabel.create_from_pb2(colored_label)
           for colored_label in pb2_obj.colored_labels])
 
     elif pb2_obj.confidence_masks.confidence_mask:
       return Segmentation(
+        height=pb2_obj.height,
+        width=pb2_obj.width,
         confidence_masks=[
           ConfidenceMask.create_from_pb2(
             pb2_obj.confidence_masks.confidence_mask[index],
