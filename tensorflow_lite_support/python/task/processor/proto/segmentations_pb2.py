@@ -112,7 +112,7 @@ class Segmentation:
 
   Attributes:
     colored_labels: A list of `ColoredLabel` objects.
-    category_mask: A NumPy 2D-array of the category mask.
+    category_mask: A flattened NumPy 2D-array of the category mask.
     confidence_masks: A list of `ConfidenceMask` objects.
   """
 
