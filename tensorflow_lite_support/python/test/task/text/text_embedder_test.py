@@ -102,23 +102,18 @@ class TextEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     result1 = embedder.embed("what a great and fantastic trip")
 
     # Check embedding sizes.
-    def _check_embedding_size(result):
-      self.assertLen(result.embeddings, 1)
-      feature_vector = result.embeddings[0].feature_vector
-      self.assertLen(feature_vector.value, embedding_length)
+    self.assertLen(result0.embeddings, 1)
+    result0_feature_vector = result0.embeddings[0].feature_vector
+    self.assertLen(result1.embeddings, 1)
+    result1_feature_vector = result1.embeddings[0].feature_vector
 
-    # Check data types.
-    def _check_data_type(result, dtype):
-      feature_vector = result.embeddings[0].feature_vector
-      self.assertEqual(feature_vector.value.dtype, dtype)
-
-    _check_embedding_size(result0)
-    _check_embedding_size(result1)
+    self.assertLen(result0_feature_vector.value, embedding_length)
+    self.assertLen(result1_feature_vector.value, embedding_length)
 
     if quantize:
-      _check_data_type(result0, 'uint8')
+      self.assertEqual(result0_feature_vector.value.dtype, 'uint8')
     else:
-      _check_data_type(result0, 'float64')
+      self.assertEqual(result1_feature_vector.value.dtype, 'float64')
 
     # Checks cosine similarity.
     similarity = embedder.cosine_similarity(

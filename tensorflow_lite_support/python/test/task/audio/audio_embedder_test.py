@@ -134,19 +134,13 @@ class AudioEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     result1 = embedder.embed(tensor1)
 
     # Check embedding sizes.
-    def _check_embedding_size(result):
-      self.assertLen(result.embeddings, 1)
-      feature_vector = result.embeddings[0].feature_vector
-      if quantize:
-        self.assertLen(feature_vector.value, embedding_length)
-      else:
-        self.assertLen(feature_vector.value, embedding_length)
-
-    _check_embedding_size(result0)
-    _check_embedding_size(result1)
-
+    self.assertLen(result0.embeddings, 1)
     result0_feature_vector = result0.embeddings[0].feature_vector
+    self.assertLen(result1.embeddings, 1)
     result1_feature_vector = result1.embeddings[0].feature_vector
+
+    self.assertLen(result0_feature_vector.value, embedding_length)
+    self.assertLen(result1_feature_vector.value, embedding_length)
 
     if quantize:
       self.assertEqual(result0_feature_vector.value.dtype, 'uint8')
