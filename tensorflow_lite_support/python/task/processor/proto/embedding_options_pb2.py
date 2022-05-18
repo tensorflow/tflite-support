@@ -19,7 +19,7 @@ from typing import Any, Optional
 from tensorflow.tools.docs import doc_controls
 from tensorflow_lite_support.cc.task.processor.proto import embedding_options_pb2
 
-_EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
+_EmbeddingOptionsProto = embedding_options_pb2.EmbeddingOptions
 
 
 @dataclasses.dataclass
@@ -41,16 +41,16 @@ class EmbeddingOptions:
   quantize: Optional[bool] = None
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _EmbeddingOptions:
+  def to_pb2(self) -> _EmbeddingOptionsProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _EmbeddingOptions(l2_normalize=self.l2_normalize,
-                             quantize=self.quantize)
+    return _EmbeddingOptionsProto(l2_normalize=self.l2_normalize,
+                                  quantize=self.quantize)
 
   @classmethod
   @doc_controls.do_not_generate_docs
   def create_from_pb2(
       cls,
-      pb2_obj: _EmbeddingOptions
+      pb2_obj: _EmbeddingOptionsProto
   ) -> "EmbeddingOptions":
     """Creates a `EmbeddingOptions` object from the given protobuf object."""
     return EmbeddingOptions(l2_normalize=pb2_obj.l2_normalize,

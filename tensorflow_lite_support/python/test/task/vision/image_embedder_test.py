@@ -15,6 +15,7 @@
 
 import enum
 
+import numpy as np
 from absl.testing import parameterized
 
 import tensorflow as tf
@@ -119,12 +120,9 @@ class ImageEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     image_feature_vector = image_result.embeddings[0].feature_vector
     self.assertLen(crop_result.embeddings, 1)
     crop_feature_vector = crop_result.embeddings[0].feature_vector
-    if quantize:
-      self.assertLen(image_feature_vector.value_string, 1024)
-      self.assertLen(crop_feature_vector.value_string, 1024)
-    else:
-      self.assertLen(image_feature_vector.value_float, 1024)
-      self.assertLen(crop_feature_vector.value_float, 1024)
+
+    self.assertLen(image_feature_vector.value, 1024)
+    self.assertLen(crop_feature_vector.value, 1024)
 
     # Checks cosine similarity.
     similarity = embedder.cosine_similarity(image_feature_vector,
@@ -137,15 +135,15 @@ class ImageEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     embedder = _ImageEmbedder.create_from_options(options)
 
     # Builds test data.
-    feature_vector = embedding_pb2.FeatureVector(value_float=[1.0, 0.0])
+    feature_vector = embedding_pb2.FeatureVector(value=np.array([1.0, 0.0]))
     embedding = embedding_pb2.Embedding(output_index=0,
                                         feature_vector=feature_vector)
     embedding_result = embedding_pb2.EmbeddingResult(embeddings=[embedding])
 
     result0 = embedder.get_embedding_by_index(embedding_result, 0)
     self.assertEqual(result0.output_index, 0)
-    self.assertEqual(result0.feature_vector.value_float[0], 1.0)
-    self.assertEqual(result0.feature_vector.value_float[1], 0.0)
+    self.assertEqual(result0.feature_vector.value[0], 1.0)
+    self.assertEqual(result0.feature_vector.value[1], 0.0)
 
     with self.assertRaisesRegex(ValueError, r"Output index is out of bound\."):
       embedder.get_embedding_by_index(embedding_result, 1)

@@ -138,9 +138,9 @@ class AudioEmbedderTest(parameterized.TestCase, tf.test.TestCase):
       self.assertLen(result.embeddings, 1)
       feature_vector = result.embeddings[0].feature_vector
       if quantize:
-        self.assertLen(feature_vector.value_string, embedding_length)
+        self.assertLen(feature_vector.value, embedding_length)
       else:
-        self.assertLen(feature_vector.value_float, embedding_length)
+        self.assertLen(feature_vector.value, embedding_length)
 
     _check_embedding_size(result0)
     _check_embedding_size(result1)
@@ -148,12 +148,8 @@ class AudioEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     result0_feature_vector = result0.embeddings[0].feature_vector
     result1_feature_vector = result1.embeddings[0].feature_vector
 
-    if quantize:
-      self.assertLen(result0_feature_vector.value_string, 1024)
-      self.assertLen(result1_feature_vector.value_string, 1024)
-    else:
-      self.assertLen(result0_feature_vector.value_float, 1024)
-      self.assertLen(result1_feature_vector.value_float, 1024)
+    self.assertLen(result0_feature_vector.value, 1024)
+    self.assertLen(result1_feature_vector.value, 1024)
 
     # Checks cosine similarity.
     similarity = embedder.cosine_similarity(result0_feature_vector,

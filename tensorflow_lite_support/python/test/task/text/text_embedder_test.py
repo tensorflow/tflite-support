@@ -105,10 +105,7 @@ class TextEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     def _check_embedding_size(result):
       self.assertLen(result.embeddings, 1)
       feature_vector = result.embeddings[0].feature_vector
-      if quantize:
-        self.assertLen(feature_vector.value_string, embedding_length)
-      else:
-        self.assertLen(feature_vector.value_float, embedding_length)
+      self.assertLen(feature_vector.value, embedding_length)
 
     _check_embedding_size(result0)
     _check_embedding_size(result1)

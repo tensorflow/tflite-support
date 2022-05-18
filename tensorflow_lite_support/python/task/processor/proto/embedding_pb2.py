@@ -16,12 +16,13 @@
 import dataclasses
 from typing import Any, List
 
+import numpy as np
 from tensorflow.tools.docs import doc_controls
 from tensorflow_lite_support.cc.task.processor.proto import embedding_pb2
 
-_FeatureVector = embedding_pb2.FeatureVector
-_Embedding = embedding_pb2.Embedding
-_EmbeddingResult = embedding_pb2.EmbeddingResult
+_FeatureVectorProto = embedding_pb2.FeatureVector
+_EmbeddingProto = embedding_pb2.Embedding
+_EmbeddingResultProto = embedding_pb2.EmbeddingResult
 
 
 @dataclasses.dataclass
@@ -30,36 +31,34 @@ class FeatureVector:
   Feature vectors are assumed to be one-dimensional and L2-normalized.
 
   Attributes:
-    value_float: Raw output of the embedding layer. Only provided if `quantize`
-      is set to False in the `EmbeddingOptions`, which is the case by default.
-    value_string: Scalar-quantized embedding. Only provided if `quantize` is
-      set to true in `EmbeddingOptions`.
+    value: A NumPy array indidcating the raw output of the embedding layer.
+      The datatype of elements in the array can be either np.single (float) or
+      np.byte if `quantize` is set to True in `EmbeddingOptions`.
   """
 
-  value_float: List[float] = None
-  value_string: bytearray = None
+  value: np.ndarray
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _FeatureVector:
+  def to_pb2(self) -> _FeatureVectorProto:
     """Generates a protobuf object to pass to the C++ layer."""
 
-    if self.value_float is not None:
-      return _FeatureVector(value_float=self.value_float)
+    if self.value.dtype == np.float64:
+      return _FeatureVectorProto(value_float=self.value)
 
-    elif self.value_string is not None:
-      return _FeatureVector(value_string=bytes(self.value_string))
+    elif self.value.dtype == np.uint8:
+      return _FeatureVectorProto(value_string=bytes(self.value))
 
   @classmethod
   @doc_controls.do_not_generate_docs
-  def create_from_pb2(cls, pb2_obj: _FeatureVector) -> "FeatureVector":
+  def create_from_pb2(cls, pb2_obj: _FeatureVectorProto) -> "FeatureVector":
     """Creates a `FeatureVector` object from the given protobuf object."""
 
     if pb2_obj.value_float:
       return FeatureVector(
-        value_float=[value for value in pb2_obj.value_float])
+        value=np.array([value for value in pb2_obj.value_float]))
 
     elif pb2_obj.value_string:
-      return FeatureVector(value_string=bytearray(pb2_obj.value_string))
+      return FeatureVector(value=np.array(bytearray(pb2_obj.value_string)))
 
   def __eq__(self, other: Any) -> bool:
     """Checks if this object is equal to the given object.
@@ -88,14 +87,14 @@ class Embedding:
   output_index: int
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _Embedding:
+  def to_pb2(self) -> _EmbeddingProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _Embedding(feature_vector=self.feature_vector.to_pb2(),
-                      output_index=self.output_index)
+    return _EmbeddingProto(feature_vector=self.feature_vector.to_pb2(),
+                           output_index=self.output_index)
 
   @classmethod
   @doc_controls.do_not_generate_docs
-  def create_from_pb2(cls, pb2_obj: _Embedding) -> "Embedding":
+  def create_from_pb2(cls, pb2_obj: _EmbeddingProto) -> "Embedding":
     """Creates a `Embedding` object from the given protobuf object."""
     return Embedding(
       feature_vector=FeatureVector.create_from_pb2(
@@ -128,16 +127,16 @@ class EmbeddingResult:
   embeddings: List[Embedding]
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _EmbeddingResult:
+  def to_pb2(self) -> _EmbeddingResultProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _EmbeddingResult(
+    return _EmbeddingResultProto(
       embeddings=[embedding.to_pb2() for embedding in self.embeddings])
 
   @classmethod
   @doc_controls.do_not_generate_docs
   def create_from_pb2(
       cls,
-      pb2_obj: _EmbeddingResult
+      pb2_obj: _EmbeddingResultProto
   ) -> "EmbeddingResult":
     """Creates a `EmbeddingResult` object from the given protobuf object."""
     return EmbeddingResult(
