@@ -148,6 +148,11 @@ class AudioEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     result0_feature_vector = result0.embeddings[0].feature_vector
     result1_feature_vector = result1.embeddings[0].feature_vector
 
+    if quantize:
+      self.assertEqual(result0_feature_vector.value.dtype, 'uint8')
+    else:
+      self.assertEqual(result1_feature_vector.value.dtype, 'float64')
+
     self.assertLen(result0_feature_vector.value, 1024)
     self.assertLen(result1_feature_vector.value, 1024)
 

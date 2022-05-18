@@ -124,6 +124,11 @@ class ImageEmbedderTest(parameterized.TestCase, tf.test.TestCase):
     self.assertLen(image_feature_vector.value, 1024)
     self.assertLen(crop_feature_vector.value, 1024)
 
+    if quantize:
+      self.assertEqual(image_feature_vector.value.dtype, 'uint8')
+    else:
+      self.assertEqual(image_feature_vector.value.dtype, 'float64')
+
     # Checks cosine similarity.
     similarity = embedder.cosine_similarity(image_feature_vector,
                                             crop_feature_vector)
