@@ -28,29 +28,33 @@ _SegmentationResultProto = segmentations_pb2.SegmentationResult
 
 @dataclasses.dataclass
 class ConfidenceMask:
-  """This is a flattened 2D-array in row major order. For each pixel, the
-    value indicates the prediction confidence usually in the [0, 1] range
-    where higher values represent a stronger confidence.
-    Ultimately this is model specific, and other range of values might be
-    used.
+  """This hold the NumPy 2D-array representing the confidence mask in row major
+   order. For each pixel, the value indicates the prediction confidence usually
+  in the [0, 1] range where higher values represent a stronger confidence.
+  Ultimately this is model specific, and other range of values might be used.
 
   Attributes:
-    value: The value indicates the prediction confidence usually in the
-      range [0, 1].
+    value: A NumPy 2D-array indicating the prediction confidence values usually
+      in the range [0, 1].
   """
   value: np.ndarray
 
   @doc_controls.do_not_generate_docs
   def to_pb2(self) -> _ConfidenceMaskProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _ConfidenceMaskProto(value=self.value)
+    return _ConfidenceMaskProto(value=self.value.flatten())
 
   @classmethod
   @doc_controls.do_not_generate_docs
-  def create_from_pb2(cls, pb2_obj: _ConfidenceMaskProto) -> "ConfidenceMask":
+  def create_from_pb2(
+      cls,
+      pb2_obj: _ConfidenceMaskProto,
+      height: int,
+      width: int
+  ) -> "ConfidenceMask":
     """Creates a `ConfidenceMask` object from the given protobuf object and
     the segmentation mask's width and height."""
-    return ConfidenceMask(value=np.array(pb2_obj.value))
+    return ConfidenceMask(value=np.array(pb2_obj.value).reshape(height, width))
 
   def __eq__(self, other: Any) -> bool:
     """Checks if this object is equal to the given object.
@@ -116,7 +120,7 @@ class Segmentation:
 
   Attributes:
     colored_labels: A list of `ColoredLabel` objects.
-    category_mask: A flattened NumPy 2D-array of the category mask.
+    category_mask: A NumPy 2D-array of the category mask.
     confidence_masks: A list of `ConfidenceMask` objects.
   """
 
@@ -152,8 +156,10 @@ class Segmentation:
     """Creates a `Segmentation` object from the given protobuf object."""
 
     if pb2_obj.category_mask:
+      height, width = pb2_obj.height, pb2_obj.width
       return Segmentation(
-        category_mask=np.array(bytearray(pb2_obj.category_mask)),
+        category_mask=np.array(
+          bytearray(pb2_obj.category_mask)).reshape(height, width),
         colored_labels=[
           ColoredLabel.create_from_pb2(colored_label)
           for colored_label in pb2_obj.colored_labels])
@@ -162,7 +168,8 @@ class Segmentation:
       return Segmentation(
         confidence_masks=[
           ConfidenceMask.create_from_pb2(
-            pb2_obj.confidence_masks.confidence_mask[index])
+            pb2_obj.confidence_masks.confidence_mask[index],
+            pb2_obj.height, pb2_obj.width)
           for index in range(len(pb2_obj.confidence_masks.confidence_mask))],
         colored_labels=[
           ColoredLabel.create_from_pb2(colored_label)

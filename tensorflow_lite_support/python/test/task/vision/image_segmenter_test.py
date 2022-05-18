@@ -163,7 +163,7 @@ class ImageSegmenterTest(parameterized.TestCase, tf.test.TestCase):
 
     # Performs image segmentation on the input.
     segmentation = segmenter.segment(image).segmentations[0]
-    result_pixels = segmentation.category_mask
+    result_pixels = segmentation.category_mask.flatten()
 
     # Loads ground truth segmentation file.
     gt_segmentation = tensor_image.TensorImage.create_from_file(
