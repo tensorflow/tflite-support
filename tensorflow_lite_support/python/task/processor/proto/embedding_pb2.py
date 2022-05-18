@@ -55,7 +55,8 @@ class FeatureVector:
     """Creates a `FeatureVector` object from the given protobuf object."""
 
     if pb2_obj.value_float:
-      return FeatureVector(value_float=pb2_obj.value_float)
+      return FeatureVector(
+        value_float=[value for value in pb2_obj.value_float])
 
     elif pb2_obj.value_string:
       return FeatureVector(value_string=bytearray(pb2_obj.value_string))
