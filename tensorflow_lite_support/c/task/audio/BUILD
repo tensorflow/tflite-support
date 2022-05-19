@@ -9,6 +9,9 @@ package(
 
 cc_library_with_tflite(
     name = "audio_classifier",
+    srcs = [
+        "audio_classifier.cc",
+    ],
     hdrs = [
         "audio_classifier.h",
     ],
@@ -26,6 +29,7 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/c/task/processor:classification_result",
         "//tensorflow_lite_support/c/task/processor/utils:classification_options_utils",
         "//tensorflow_lite_support/cc/task/audio/proto:audio_classifier_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/audio/proto:class_proto_inc",
         "//tensorflow_lite_support/cc/task/audio/proto:classifications_proto_inc",
     ],
 )

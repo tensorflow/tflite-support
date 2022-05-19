@@ -22,12 +22,12 @@ extern "C" {
 #endif  // __cplusplus
 
 // Holds audio format metadata.
-struct TfLiteAudioFormat {
+typedef struct TfLiteAudioFormat {
   // The number of channels in the audio buffer.
   int channels;
   // The sample rate of the audio buffer.
   int sample_rate;
-};
+} TfLiteAudioFormat;
 
 // A `TfLiteAudioBuffer` provides a view into the provided backing buffer and
 // the audio format metadata.. TfLiteAudioBuffer doesn't take ownership of the
@@ -38,12 +38,18 @@ typedef struct TfLiteAudioBuffer {
 
   // Backing buffer that holds the audio samples which are to be processed. For
   // muti channel data array is expected to be interleaved .
-  const float* data;
+  float* data;
 
   // Size of the audio buffer. This size can be used to loop through the
   // audio_buffer.
-  const int size;
+  int size;
 } TfLiteAudioBuffer;
+
+void TfLiteAudioBufferDelete(TfLiteAudioBuffer *buffer);
+
+void TfLiteAudioBufferDeleteData(const TfLiteAudioBuffer audio_buffer);
+
+void TfLiteAudioFormatDelete(TfLiteAudioFormat *format);
 
 #ifdef __cplusplus
 }  // extern "C"
