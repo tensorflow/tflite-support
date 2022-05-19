@@ -205,7 +205,6 @@ typedef NS_ENUM(NSUInteger, TFLSupportErrorCode) {
    * underlying system have not been satisfied. This error code is reserved for serious errors.
    */
   TFLSupportErrorCodeInternalError
-
 } NS_SWIFT_NAME(SupportErrorCode);
 
 NS_ASSUME_NONNULL_END
