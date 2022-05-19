@@ -110,7 +110,7 @@ class ImageEmbedder(object):
     if bounding_box is None:
       return self._embedder.embed(image_data)
 
-    return self._embedder.embed(image_data, bounding_box)
+    return self._embedder.embed(image_data, bounding_box.to_pb2())
 
   def get_embedding_by_index(self, result: embedding_pb2.EmbeddingResult,
                              output_index: int) -> embedding_pb2.Embedding:

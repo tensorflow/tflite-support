@@ -27,6 +27,7 @@ py_library(
     srcs = ["bounding_box_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:bounding_box_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -35,6 +36,7 @@ py_library(
     srcs = ["class_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:class_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -42,7 +44,9 @@ py_library(
     name = "classifications_pb2",
     srcs = ["classifications_pb2.py"],
     deps = [
+        ":class_pb2",
         "//tensorflow_lite_support/cc/task/processor/proto:classifications_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -51,6 +55,7 @@ py_library(
     srcs = ["classification_options_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:classification_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -58,7 +63,10 @@ py_library(
     name = "detections_pb2",
     srcs = ["detections_pb2.py"],
     deps = [
+        ":bounding_box_pb2",
+        ":class_pb2",
         "//tensorflow_lite_support/cc/task/processor/proto:detections_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -67,6 +75,7 @@ py_library(
     srcs = ["detection_options_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:detection_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 

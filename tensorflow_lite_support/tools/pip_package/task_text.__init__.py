@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""An import entry for Task Text Library."""
+"""TensorFlow Lite Task Library Text APIs.
+
+This module provides interface to run TensorFlow Lite natural language
+processing models.
+"""
 
 from tensorflow_lite_support.python.task.text import text_embedder
 from tensorflow_lite_support.python.task.text import text_searcher
@@ -21,3 +25,7 @@ TextEmbedder = text_embedder.TextEmbedder
 TextEmbedderOptions = text_embedder.TextEmbedderOptions
 TextSearcher = text_searcher.TextSearcher
 TextSearcherOptions = text_searcher.TextSearcherOptions
+
+# Remove unnecessary modules to avoid duplication in API docs.
+del text_embedder
+del text_searcher
