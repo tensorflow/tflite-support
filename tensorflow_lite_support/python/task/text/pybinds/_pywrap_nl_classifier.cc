@@ -20,7 +20,6 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/processor/proto/classifications.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/nl_classification_options.pb.h"
 #include "tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
-#include "tensorflow_lite_support/examples/task/text/desktop/nl_classifier_op_resolver.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
@@ -77,8 +76,7 @@ PYBIND11_MODULE(_pywrap_nl_classifier, m) {
                     nl_classification_options.output_label_tensor_index());
             }
 
-            auto classifier = NLClassifier::CreateFromOptions(
-                options, CreateCustomOpResolver());
+            auto classifier = NLClassifier::CreateFromOptions(options);
             return core::get_value(classifier);
           })
       .def("classify",

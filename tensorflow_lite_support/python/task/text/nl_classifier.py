@@ -75,7 +75,7 @@ class NLClassifier(object):
       RuntimeError: If other types of error occurred.
     """
     classifier = _CppNLClassifier.create_from_options(
-        options.base_options, options.nl_classification_options)
+        options.base_options, options.nl_classification_options.to_pb2())
     return cls(options, classifier)
 
   def classify(self, text: str) -> classifications_pb2.ClassificationResult:
@@ -91,7 +91,9 @@ class NLClassifier(object):
       ValueError: If any of the input arguments is invalid.
       RuntimeError: If failed to calculate the embedding vector.
     """
-    return self._classifier.classify(text)
+    classification_result = self._classifier.classify(text)
+    return classifications_pb2.ClassificationResult.create_from_pb2(
+      classification_result)
 
   @property
   def options(self) -> NLClassifierOptions:

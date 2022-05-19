@@ -127,5 +127,6 @@ py_library(
     srcs = ["nl_classification_options_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:nl_classification_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
