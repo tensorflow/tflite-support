@@ -204,7 +204,7 @@ typedef NS_ENUM(NSUInteger, TFLSupportErrorCode) {
   /** kInternal indicates an internal error has occurred and some invariants expected by the
    * underlying system have not been satisfied. This error code is reserved for serious errors.
    */
-  TFLSupportErrorCodeInternalError
+  TFLSupportErrorCodeInternalError,
 } NS_SWIFT_NAME(SupportErrorCode);
 
 NS_ASSUME_NONNULL_END
