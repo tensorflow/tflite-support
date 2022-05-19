@@ -70,10 +70,10 @@ class BertNLClassifier(object):
       options: Options for the Bert NL classifier task.
 
     Returns:
-      `NLClassifier` object that's created from `options`.
+      `BertNLClassifier` object that's created from `options`.
     Raises:
-      ValueError: If failed to create `NLClassifier` object from
-        `NLClassifierOptions` such as missing the model.
+      ValueError: If failed to create `BertNLClassifier` object from
+        `BertNLClassifierOptions` such as missing the model.
       RuntimeError: If other types of error occurred.
     """
     classifier = _CppBertNLClassifier.create_from_options(
@@ -93,7 +93,9 @@ class BertNLClassifier(object):
       ValueError: If any of the input arguments is invalid.
       RuntimeError: If failed to calculate the embedding vector.
     """
-    return self._classifier.classify(text)
+    classification_result = self._classifier.classify(text)
+    return classifications_pb2.ClassificationResult.create_from_pb2(
+      classification_result)
 
   @property
   def options(self) -> BertNLClassifierOptions:

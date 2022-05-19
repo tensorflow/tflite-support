@@ -32,14 +32,19 @@ _POSITIVE_INPUT = "it's a charming and often affecting journey"
 _EXPECTED_RESULTS_OF_POSITIVE_INPUT = """
 classifications {
   classes {
-    score: 5.534090814762749e-05
+    index: 0
+    score: 5.534091e-05
+    display_name: ""
     class_name: "negative"
   }
   classes {
-    score: 0.9999446868896484
+    index: 0
+    score: 0.999945
+    display_name: ""
     class_name: "positive"
   }
   head_index: 0
+  head_name: ""
 }
 """
 
@@ -47,14 +52,19 @@ _NEGATIVE_INPUT = "unflinchingly bleak and desperate"
 _EXPECTED_RESULTS_OF_NEGATIVE_INPUT = """
 classifications {
   classes {
-    score: 0.9563165307044983
+    index: 0
+    score: 0.956317
+    display_name: ""
     class_name: "negative"
   }
   classes {
-    score: 0.04368339478969574
+    index: 0
+    score: 0.043683
+    display_name: ""
     class_name: "positive"
   }
   head_index: 0
+  head_name: ""
 }
 """
 
@@ -62,14 +72,19 @@ _MAX_SEQ_LEN = 128
 _EXPECTED_RESULTS_OF_LONG_POSITIVE_INPUT = """
 classifications {
   classes {
+    index: 0
     score: 0.000133
+    display_name: ""
     class_name: "negative"
   }
   classes {
+    index: 0
     score: 0.999867
+    display_name: ""
     class_name: "positive"
   }
   head_index: 0
+  head_name: ""
 }
 """
 
@@ -143,7 +158,7 @@ class BertNLClassifierTest(parameterized.TestCase, tf.test.TestCase):
     # Classifies text using the given model.
     text_classification_result = classifier.classify(text)
     self.assertProtoEquals(expected_result_text_proto,
-                           text_classification_result)
+                           text_classification_result.to_pb2())
 
   def test_classify_succeeds_with_long_positive_not_out_of_bounds(self):
     # Creates classifier.
@@ -161,7 +176,7 @@ class BertNLClassifierTest(parameterized.TestCase, tf.test.TestCase):
     # Classifies text using the given model.
     text_classification_result = classifier.classify(positive_review_str)
     self.assertProtoEquals(_EXPECTED_RESULTS_OF_LONG_POSITIVE_INPUT,
-                           text_classification_result)
+                           text_classification_result.to_pb2())
 
 
 if __name__ == "__main__":
