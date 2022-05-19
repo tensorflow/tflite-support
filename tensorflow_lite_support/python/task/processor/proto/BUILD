@@ -23,6 +23,15 @@ py_library(
 )
 
 py_library(
+    name = "qa_answers_pb2",
+    srcs = ["qa_answers_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:qa_answers_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
+    ],
+)
+
+py_library(
     name = "bounding_box_pb2",
     srcs = ["bounding_box_pb2.py"],
     deps = [

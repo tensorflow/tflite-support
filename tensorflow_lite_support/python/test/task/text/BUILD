@@ -43,3 +43,19 @@ py_test(
         "@absl_py//absl/testing:parameterized",
     ],
 )
+
+py_test(
+    name = "bert_question_answerer_test",
+    srcs = ["bert_question_answerer_test.py"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/text:albert_model",
+        "//tensorflow_lite_support/cc/test/testdata/task/text:mobile_bert_model",
+    ],
+    deps = [
+        # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
+        "//tensorflow_lite_support/python/task/text:bert_question_answerer",
+        "//tensorflow_lite_support/python/test:test_util",
+        "@absl_py//absl/testing:parameterized",
+    ],
+)

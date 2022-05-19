@@ -1,0 +1,113 @@
+# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Tests for bert_question_answerer."""
+
+import enum
+
+from absl.testing import parameterized
+
+import tensorflow as tf
+from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.text import bert_question_answerer
+from tensorflow_lite_support.python.test import test_util
+
+_BaseOptions = base_options_pb2.BaseOptions
+_BertQuestionAnswerer = bert_question_answerer.BertQuestionAnswerer
+_BertQuestionAnswererOptions = bert_question_answerer.BertQuestionAnswererOptions
+
+
+
+_INPUT_QUESTION = "What is a course of study called?"
+_INPUT_CONTEXT = \
+  "The role of teacher is often formal and ongoing, carried out at a school " \
+  "or other place of formal education. In many countries, a person who " \
+  "wishes to become a teacher must first obtain specified professional " \
+  "qualifications or credentials from a university or college. These " \
+  "professional qualifications may include the study of pedagogy, the " \
+  "science of teaching. Teachers, like other professionals, may have to " \
+  "continue their education after they qualify, a process known as " \
+  "continuing professional development. Teachers may use a lesson plan to " \
+  "facilitate student learning, providing a course of study which is called " \
+  "the curriculum."
+
+_MOBILE_BERT_MODEL = 'mobilebert_with_metadata.tflite'
+_EXPECTED_MOBILE_BERT_QA_RESULT = """
+answers {
+  pos {
+    start: 118
+    end: 120
+    logit: 10.609820
+  }
+  text: "called the curriculum."
+}
+"""
+
+_ALBERT_MODEL = "albert_with_metadata.tflite"
+_EXPECTED_ALBERT_QA_RESULT = """
+answers {
+  pos {
+    start: 118
+    end: 120
+    logit: 12.718668
+  }
+  text: "called the curriculum."
+}
+"""
+
+
+class ModelFileType(enum.Enum):
+  FILE_CONTENT = 1
+  FILE_NAME = 2
+
+
+class BertQuestionAnswererTest(parameterized.TestCase, tf.test.TestCase):
+
+  def setUp(self):
+    super().setUp()
+    # self.model_path = test_util.get_test_data_path(_MODEL)
+
+  @parameterized.parameters(
+      (_MOBILE_BERT_MODEL, ModelFileType.FILE_NAME, _INPUT_CONTEXT,
+       _INPUT_QUESTION, _EXPECTED_MOBILE_BERT_QA_RESULT),
+      (_MOBILE_BERT_MODEL, ModelFileType.FILE_CONTENT, _INPUT_CONTEXT,
+       _INPUT_QUESTION, _EXPECTED_MOBILE_BERT_QA_RESULT),
+      (_ALBERT_MODEL, ModelFileType.FILE_NAME, _INPUT_CONTEXT,
+       _INPUT_QUESTION, _EXPECTED_ALBERT_QA_RESULT),
+      (_ALBERT_MODEL, ModelFileType.FILE_CONTENT, _INPUT_CONTEXT,
+       _INPUT_QUESTION, _EXPECTED_ALBERT_QA_RESULT),
+  )
+  def test_embed(self, model_name, model_file_type, context, question, answer):
+    # Create question answerer.
+    model_path = test_util.get_test_data_path(model_name)
+    if model_file_type is ModelFileType.FILE_NAME:
+      base_options = _BaseOptions(file_name=model_path)
+    elif model_file_type is ModelFileType.FILE_CONTENT:
+      with open(model_path, "rb") as f:
+        model_content = f.read()
+      base_options = _BaseOptions(file_content=model_content)
+    else:
+      # Should never happen
+      raise ValueError("model_file_type is invalid.")
+
+    options = _BertQuestionAnswererOptions(base_options)
+    question_answerer = _BertQuestionAnswerer.create_from_options(options)
+
+    # Perform Bert Question Answering.
+    text_result = question_answerer.answer(context, question)
+
+    self.assertProtoEquals(answer, text_result.to_pb2())
+
+
+if __name__ == "__main__":
+  tf.test.main()

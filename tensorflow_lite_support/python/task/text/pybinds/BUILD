@@ -38,3 +38,18 @@ pybind_extension_may_pack_coral(
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
+
+pybind_extension_may_pack_coral(
+    name = "_pywrap_bert_question_answerer",
+    srcs = [
+        "_pywrap_bert_question_answerer.cc",
+    ],
+    module_name = "_pywrap_bert_question_answerer",
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:qa_answers_cc_proto",
+        "//tensorflow_lite_support/cc/task/text:bert_question_answerer",
+        "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
+        "@pybind11",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)
