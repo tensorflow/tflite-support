@@ -1,4 +1,3 @@
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@org_tensorflow//tensorflow/lite/ios:ios.bzl", "TFL_DEFAULT_TAGS", "TFL_DISABLED_SANITIZER_TAGS", "TFL_MINIMUM_OS_VERSION")
 load("@build_bazel_rules_apple//apple:ios.bzl", "ios_unit_test")
 load("@org_tensorflow//tensorflow/lite:special_rules.bzl", "tflite_ios_lab_runner")
@@ -14,7 +13,9 @@ objc_library(
     srcs = ["TFLRingBufferTests.m"],
     tags = TFL_DEFAULT_TAGS,
     deps = [
+        "//tensorflow_lite_support/ios:TFLCommon",
         "//tensorflow_lite_support/ios/task/audio/core:TFLRingBuffer",
+        "//third_party/apple_frameworks:XCTest",
     ],
 )
 
@@ -27,5 +28,3 @@ ios_unit_test(
         ":TFLRingBufferObjcTestLibrary",
     ],
 )
-
-

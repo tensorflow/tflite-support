@@ -12,6 +12,7 @@ objc_library(
         "sources/TFLFloatBuffer.h",
     ],
     module_name = "TFLFloatBuffer",
+    deps = ["//third_party/apple_frameworks:Foundation"],
 )
 
 objc_library(
@@ -22,11 +23,13 @@ objc_library(
     hdrs = [
         "sources/TFLRingBuffer.h",
     ],
-    deps = [
-         ":TFLFloatBuffer",
-         "//tensorflow_lite_support/ios:TFLCommonUtils"
-    ],
     module_name = "TFLRingBuffer",
+    deps = [
+        ":TFLFloatBuffer",
+        "//tensorflow_lite_support/ios:TFLCommon",
+        "//tensorflow_lite_support/ios:TFLCommonUtils",
+        "//third_party/apple_frameworks:Foundation",
+    ],
 )
 
 objc_library(
@@ -39,5 +42,3 @@ objc_library(
     ],
     module_name = "TFLAudioFormat",
 )
-
-

@@ -23,12 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A copy of all the internal ring buffer elements in order.
  */
-@property (nullable, nonatomic, readonly) TFLFloatBuffer *floatBuffer; 
+@property(nullable, nonatomic, readonly) TFLFloatBuffer *floatBuffer;
 
-/** 
+/**
  * Capacity of the ring buffer in number of elements.
  */
-@property (nonatomic, readonly) NSUInteger size; 
+@property(nonatomic, readonly) NSUInteger size;
 
 /**
  * Initializes a new `TFLRingBuffer` with the given size. All elements of the
@@ -53,21 +53,22 @@ NS_ASSUME_NONNULL_BEGIN
              error:(NSError **)error;
 
 /**
- * Returns a `TFLFloatBuffer` with a copy of size number of the ring buffer elements in order starting at
- * offset, i.e, buffer[offset:offset+size].
+ * Returns a `TFLFloatBuffer` with a copy of size number of the ring buffer elements in order
+ * starting at offset, i.e, buffer[offset:offset+size].
  *
  * @param offset Offset in the ring buffer from which elements are to be returned.
  *
  * @param size Number of elements to be returned.
  *
- * @return A new `TFLFloatBuffer` if offset + size is within the bounds of the ring buffer, otherwise nil.
+ * @return A new `TFLFloatBuffer` if offset + size is within the bounds of the ring buffer,
+ * otherwise nil.
  */
 - (nullable TFLFloatBuffer *)floatBufferWithOffset:(NSUInteger)offset size:(NSUInteger)size;
 
 /**
  * Clears the `TFLRingBuffer` by setting all the elements to zero .
  */
--(void)clear;
+- (void)clear;
 
 @end
 

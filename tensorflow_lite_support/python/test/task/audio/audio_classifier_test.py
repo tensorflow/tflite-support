@@ -38,16 +38,19 @@ classifications {
   classes {
     index: 0
     score: 0.917969
+    display_name: ""
     class_name: "Speech"
   }
   classes {
     index: 500
     score: 0.058594
+    display_name: ""
     class_name: "Inside, small room"
   }
   classes {
     index: 494
     score: 0.011719
+    display_name: ""
     class_name: "Silence"
   }
   head_index: 0
@@ -62,16 +65,19 @@ classifications {
   classes {
     index: 508
     score: 0.548616
+    display_name: ""
     class_name: "Environmental noise"
   }
   classes {
     index: 507
     score: 0.380869
+    display_name: ""
     class_name: "Noise"
   }
   classes {
     index: 106
     score: 0.256137
+    display_name: ""
     class_name: "Bird"
   }
   head_index: 0
@@ -81,16 +87,19 @@ classifications {
   classes {
     index: 4
     score: 0.933997
+    display_name: ""
     class_name: "Chestnut-crowned Antpitta"
   }
   classes {
     index: 1
     score: 0.065934
+    display_name: ""
     class_name: "White-breasted Wood-Wren"
   }
   classes {
     index: 0
     score: 6.1469495e-05
+    display_name: ""
     class_name: "Red Crossbill"
   }
   head_index: 1
@@ -215,7 +224,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
     audio_result = classifier.classify(tensor)
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_text_proto, audio_result)
+    self.assertProtoEquals(expected_result_text_proto, audio_result.to_pb2())
 
   def test_max_results_option(self):
     # Creates classifier.
@@ -230,7 +239,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     audio_result = classifier.classify(tensor)
-    categories = audio_result.classifications[0].classes
+    categories = audio_result.classifications[0].categories
 
     self.assertLessEqual(
         len(categories), _MAX_RESULTS, 'Too many results returned.')
@@ -248,7 +257,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     audio_result = classifier.classify(tensor)
-    categories = audio_result.classifications[0].classes
+    categories = audio_result.classifications[0].categories
 
     for category in categories:
       self.assertGreaterEqual(
@@ -261,7 +270,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
     base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = _create_classifier_from_options(
-        base_options, class_name_allowlist=_ALLOW_LIST)
+        base_options, category_name_allowlist=_ALLOW_LIST)
 
     # Load the input audio file.
     tensor = tensor_audio.TensorAudio.create_from_wav_file(
@@ -269,10 +278,10 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     audio_result = classifier.classify(tensor)
-    categories = audio_result.classifications[0].classes
+    categories = audio_result.classifications[0].categories
 
     for category in categories:
-      label = category.class_name
+      label = category.category_name
       self.assertIn(
           label, _ALLOW_LIST,
           'Label "{0}" found but not in label allow list'.format(label))
@@ -282,7 +291,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
     base_options = _BaseOptions(file_name=self.model_path)
 
     classifier = _create_classifier_from_options(
-        base_options, score_threshold=0.01, class_name_denylist=_DENY_LIST)
+        base_options, score_threshold=0.01, category_name_denylist=_DENY_LIST)
 
     # Load the input audio file.
     tensor = tensor_audio.TensorAudio.create_from_wav_file(
@@ -290,10 +299,10 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies the input.
     audio_result = classifier.classify(tensor)
-    categories = audio_result.classifications[0].classes
+    categories = audio_result.classifications[0].categories
 
     for category in categories:
-      label = category.class_name
+      label = category.category_name
       self.assertNotIn(label, _DENY_LIST,
                        'Label "{0}" found but in deny list.'.format(label))
 
@@ -305,7 +314,7 @@ class AudioClassifierTest(parameterized.TestCase, tf.test.TestCase):
         r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
       classification_options = classification_options_pb2.ClassificationOptions(
-          class_name_allowlist=['foo'], class_name_denylist=['bar'])
+          category_name_allowlist=['foo'], category_name_denylist=['bar'])
       options = _AudioClassifierOptions(
           base_options=base_options,
           classification_options=classification_options)

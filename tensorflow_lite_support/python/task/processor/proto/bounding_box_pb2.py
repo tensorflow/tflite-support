@@ -16,8 +16,8 @@
 import dataclasses
 from typing import Any
 
-from tensorflow.tools.docs import doc_controls
 from tensorflow_lite_support.cc.task.processor.proto import bounding_box_pb2
+from tensorflow_lite_support.python.task.core.optional_dependencies import doc_controls
 
 
 @dataclasses.dataclass

@@ -17,16 +17,14 @@
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 
 @implementation TFLRingBuffer {
-  NSInteger _nextIndex;
+  NSUInteger _nextIndex;
   TFLFloatBuffer *_buffer;
-  NSInteger _size;
 }
 
-- (instancetype)initWithBufferSize:(NSInteger)size {
+- (instancetype)initWithBufferSize:(NSUInteger)size {
   self = [self init];
   if (self) {
     _buffer = [[TFLFloatBuffer alloc] initWithSize:size];
-    _size = size;
   }
   return self;
 }
@@ -35,8 +33,8 @@
             offset:(NSUInteger)offset
               size:(NSUInteger)size
              error:(NSError **)error {
-  NSInteger sizeToCopy = size;
-  NSInteger newOffset = offset;
+  NSUInteger sizeToCopy = size;
+  NSUInteger newOffset = offset;
 
   if (offset + size > sourceBuffer.size) {
     [TFLCommonUtils
@@ -58,11 +56,10 @@
   if (_nextIndex + sizeToCopy < _buffer.size) {
     memcpy(_buffer.data + _nextIndex, sourceBuffer.data + newOffset, sizeof(float) * sizeToCopy);
   } else {
-    // If
-    NSInteger endChunkSize = _buffer.size - _nextIndex;
+    NSUInteger endChunkSize = _buffer.size - _nextIndex;
     memcpy(_buffer.data + _nextIndex, sourceBuffer.data + newOffset, sizeof(float) * endChunkSize);
 
-    NSInteger startChunkSize = sizeToCopy - endChunkSize;
+    NSUInteger startChunkSize = sizeToCopy - endChunkSize;
     memcpy(_buffer.data, sourceBuffer.data + newOffset + endChunkSize,
            sizeof(float) * startChunkSize);
   }
@@ -73,7 +70,7 @@
 }
 
 - (TFLFloatBuffer *)floatBuffer {
-  return [self floatBufferWithOffset:0 size:[self size]];
+  return [self floatBufferWithOffset:0 size:self.size];
 }
 
 - (nullable TFLFloatBuffer *)floatBufferWithOffset:(NSUInteger)offset size:(NSUInteger)size {
@@ -81,14 +78,12 @@
     return nil;
   }
 
-  // TODO: Investigate if allocating is needed everytime or a global alloc of self.floatBuffer and
-  // copying of elements each time and returning self.floatBuffer would suffice.
   TFLFloatBuffer *bufferToReturn = [[TFLFloatBuffer alloc] initWithSize:size];
 
   // Return buffer in correct order.
   // Compute offset in flat ring buffer array considering warping.
-  NSUInteger correctOffset = (_nextIndex + offset) % _buffer.size;
-  
+  NSInteger correctOffset = (_nextIndex + offset) % _buffer.size;
+
   // If no; elements to be copied are within the end of the flat ring buffer.
   if ((correctOffset + size) <= _buffer.size) {
     memcpy(bufferToReturn.data, _buffer.data + correctOffset, sizeof(float) * size);
@@ -107,7 +102,7 @@
   return bufferToReturn;
 }
 
--(void)clear {
+- (void)clear {
   [_buffer clear];
 }
 

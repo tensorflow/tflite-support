@@ -44,13 +44,11 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  return [[TFLFloatBuffer alloc] initWithData:self.data size:self.size];
+  return [[TFLFloatBuffer alloc] initWithData:_data size:_size];
 }
 
 - (void)clear {
-  for (int i = 0; i < _size; i++) {
-    _data[i] = 0.0;
-  }
+  memset(_data, 0, sizeof(float) * _size);
 }
 
 - (void)dealloc {
