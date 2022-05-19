@@ -19,7 +19,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** A wrapper class to record the device's microphone continuously. Currently this class only supports
- tapping the input node of the AVAudioEngine which emits audio data having only one channel.*/
+ recording upto 2 channels. If the number of channels is 2, then the mono microphone input is duplicated to
+ provide dual channel data. */
 NS_SWIFT_NAME(AudioRecord)
 @interface TFLAudioRecord : NSObject
 
