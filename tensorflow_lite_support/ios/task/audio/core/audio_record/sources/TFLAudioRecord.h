@@ -18,7 +18,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** A wrapper class to tap the device's microphone continuously. Currently this class only supports
+/** A wrapper class to record the device's microphone continuously. Currently this class only supports
  tapping the input node of the AVAudioEngine which emits audio data having only one channel.*/
 NS_SWIFT_NAME(AudioRecord)
 @interface TFLAudioRecord : NSObject
@@ -27,7 +27,8 @@ NS_SWIFT_NAME(AudioRecord)
 @property(nonatomic, readonly) TFLAudioFormat *audioFormat;
 
 /** Size of the buffer held by `TFLAudioRecord`. It ensures delivery of audio data of length
- * bufferSize arrays when you tap the input microphone. */
+ * bufferSize arrays when you start recording the microphone input. 
+ */
 @property(nonatomic, readonly) NSUInteger bufferSize;
 
 /**
@@ -47,36 +48,35 @@ NS_SWIFT_NAME(AudioRecord)
                                        error:(NSError *_Nullable *)error;
 
 /**
- * This function starts tapping the input audio samples from the mic if audio record permissions
+ * This function starts recording the audio from the microphone if audio record permissions
  * have been granted by the user.
  *
  * @discussion Before calling this function, you must call
- * - [AVAudioSession requestRecordPermission:] on [AVAudioSession sharedInstance] to acquire
+ * - [AVAudioSession requestRecordPermission:] on +[AVAudioSession sharedInstance] to acquire
  * record permissions. If the user has denied permission or the permissions are undetermined, the
- * return value will be false and appropriate error is populated in the error pointer. The internal
- * buffer of TFLAudioRecord of length bufferSize will always have the most recent data samples
- * acquired from the mic if this function returns successfully.  Use:
+ * return value will be false and appropriate error is populated in the error pointer. 
+ * The internal buffer of `TFLAudioRecord` of length bufferSize will always have the most recent audio samples
+ * acquired from the microphhone if this function returns successfully.  Use:
  * - [TFLAudioRecord readAtOffset:withSize:error:] to get the data from the buffer at any instance,
  * if audio recording has started successfully.
  *
- * Use - [TFLAudioRecord stop] to stop tapping the  mic input.
+ * Use - [TFLAudioRecord stop] to stop the audio recording.
  *
- * @param error An optional error parameter populated when the mic input could not be tapped
+ * @param error An optional error parameter populated when the microphone input could not be recorded
  * successfully.
  *
- * @return Boolean value indicating if audio recording started successfully. If NO, and an address
- * to an error is passed in, the error will hold the reason for failure once the function returns.
+ * @return Boolean value indicating if audio recording started successfully.
  */
 - (BOOL)startRecordingWithError:(NSError **)error NS_SWIFT_NAME(startRecording());
 
 /**
- * Stops tapping the audio samples from the input mic. All elements in the internal buffer of
+ * Stops recording audio from the microphone. All elements in the internal buffer of
  * `TFLAudioRecord` will also be set to zero.
  */
 - (void)stop;
 
 /**
- * Returns the size number of elements in the internal buffer of `TFLAudioRecord` starting at
+ * Returns the `size` number of elements in the internal buffer of `TFLAudioRecord` starting at
  * offset, i.e, buffer[offset:offset+size].
  *
  * @param offset Index in the buffer from which elements are to be read.
@@ -85,7 +85,7 @@ NS_SWIFT_NAME(AudioRecord)
  * successfully.
  *
  * @returns A `TFLFloatBuffer` containing the elements of the internal buffer of `TFLAudioRecord` in
- * the range, i.e, buffer[offset:offset+size]. `nil` if there is an error in reading the internal
+ * the range, buffer[offset:offset+size]. `nil` if there is an error in reading the internal
  * buffer.
  */
 - (nullable TFLFloatBuffer *)readAtOffset:(NSUInteger)offset

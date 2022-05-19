@@ -30,8 +30,8 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
 
   /* Specifying a custom buffer size on AVAUdioEngine while tapping does not take effect. Hence we
    * are storing the returned samples in a ring buffer to acheive the desired buffer size. If
-   * specified buffer size is shorter than the buffer size supported by AVAUdioEngine only the most
-   * recent data of the buffer of size bufferSize will be stored by the ring buffer. */
+   * specified buffer size is shorter than the buffer size supported by `AVAUdioEngine` only the most
+   * recent data of the buffer of size `bufferSize` will be stored by the ring buffer. */
   TFLRingBuffer *_ringBuffer;
   dispatch_queue_t _conversionQueue;
   NSError *_globalError;
@@ -130,7 +130,7 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
       [TFLCommonUtils createCustomError:error
                              withDomain:TFLAudioRecordErrorDomain
                                    code:TFLAudioRecordErrorCodeProcessingError
-                            description:@"Not enough input is available to satisy the request."];
+                            description:@"Not enough input is available to satisfy the request."];
       break;
     }
   }
