@@ -61,7 +61,8 @@ class ClassificationOptions:
   @doc_controls.do_not_generate_docs
   def create_from_pb2(
       cls, pb2_obj: _ClassificationOptionsProto) -> "ClassificationOptions":
-    """Creates a `DetectionOptions` object from the given protobuf object."""
+    """Creates a `ClassificationOptions` object from the given protobuf object.
+    """
     return ClassificationOptions(
         score_threshold=pb2_obj.score_threshold,
         category_name_allowlist=[
