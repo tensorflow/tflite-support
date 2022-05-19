@@ -3,6 +3,21 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+load(
+    "@org_tensorflow//tensorflow/lite/ios:ios.bzl",
+    "TFL_MINIMUM_OS_VERSION",
+    "tflite_ios_framework",
+)
+load(
+    "//tensorflow_lite_support/ios:ios.bzl",
+    "strip_c_api_include_path_prefix",
+)
+
+# strip_c_api_include_path_prefix(
+#     name = "strip_c_api_include_path",
+#     hdr_labels = [ "//tensorflow_lite_support/ios/task/vision:TFLImageClassifierTest.h"],
+# )
+
 objc_library(
     name = "TFLImageClassifier",
     srcs = [
@@ -70,5 +85,34 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLSegmentationResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
         "//tensorflow_lite_support/odml/ios/image:MLImage",
+    ],
+)
+
+objc_library(
+    name = "TFLImageClassifierTest",
+    srcs = [
+        "sources/TFLImageClassifierTest.mm",
+    ],
+    hdrs = [
+        "sources/TFLImageClassifierTest.h",
+    ],
+    features = ["-layering_check"],
+    module_name = "TFLImageClassifierTest",
+    deps = [
+        "//tensorflow_lite_support/cc/task/vision:image_classifier",
+    ],
+    copts = ["-ObjC++","-std=c++14"],
+)
+
+tflite_ios_framework(
+    name = "TensorFlowLiteTaskImageClassifierTest_framework",
+    hdrs = [
+        "sources/TFLImageClassifierTest.h",
+    ],
+    allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskText.txt",
+    bundle_name = "TensorFlowLiteTaskImageClassifierTest",
+    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    deps = [
+        "//tensorflow_lite_support/ios/task/vision:TFLImageClassifierTest",
     ],
 )
