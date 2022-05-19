@@ -259,8 +259,10 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
     }
   });
 
-  if (error) *error = readError;
-
+  if (!bufferToReturn && error) {
+    *error = readError;
+  }
+  
   return bufferToReturn;
 }
 
