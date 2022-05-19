@@ -35,6 +35,28 @@ _ImageSearcherOptions = image_searcher.ImageSearcherOptions
 _MOBILENET_EMBEDDER_MODEL = 'mobilenet_v3_small_100_224_embedder.tflite'
 _MOBILENET_SEARCHER_MODEL = 'mobilenet_v3_small_100_224_searcher.tflite'
 _MOBILENET_INDEX = 'searcher_index.ldb'
+_EXPECTED_MOBILENET_DEFAULT_OPTIONS_SEARCH_RESULT = """
+nearest_neighbors {
+  metadata: "burger"
+  distance: 200.798508
+}
+nearest_neighbors {
+  metadata: "car"
+  distance: 228.445480
+}
+nearest_neighbors {
+  metadata: "bird"
+  distance: 230.091507
+}
+nearest_neighbors {
+  metadata: "dog"
+  distance: 231.857605
+}
+nearest_neighbors {
+  metadata: "cat"
+  distance: 232.290115
+}
+"""
 
 _IMAGE_FILE = 'burger.jpg'
 _MAX_RESULTS = 2
@@ -159,6 +181,20 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
               index_file_name=self.index_path, max_results=-1))
       _ImageSearcher.create_from_options(options)
 
+  def test_search_with_default_options(self):
+    # Create searcher.
+    searcher = _ImageSearcher.create_from_file(self.embedder_model_path,
+                                               self.index_path)
+
+    # Loads image.
+    image = tensor_image.TensorImage.create_from_file(self.test_image_path)
+
+    # Perform image search.
+    image_search_result = searcher.search(image)
+
+    self.assertProtoEquals(_EXPECTED_MOBILENET_DEFAULT_OPTIONS_SEARCH_RESULT,
+                           image_search_result.to_pb2())
+
   @parameterized.parameters(
       (_MOBILENET_EMBEDDER_MODEL, ModelFileType.FILE_NAME,
        IndexFileType.FILE_NAME),
@@ -222,7 +258,8 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     """
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_text_proto, image_search_result)
+    self.assertProtoEquals(expected_result_text_proto,
+                           image_search_result.to_pb2())
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
@@ -252,7 +289,8 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     """
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_text_proto, image_search_result)
+    self.assertProtoEquals(expected_result_text_proto,
+                           image_search_result.to_pb2())
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')

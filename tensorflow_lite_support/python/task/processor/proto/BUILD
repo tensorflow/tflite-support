@@ -95,23 +95,14 @@ py_library(
     ],
 )
 
-proto_library(
-    name = "search_options_proto",
-    srcs = ["search_options.proto"],
-)
-
-support_cc_proto_library(
-    name = "search_options_cc_proto",
+py_library(
+    name = "search_options_pb2",
+    srcs = ["search_options_pb2.py"],
     deps = [
-        ":search_options_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:search_options_py_pb2",
+        "//tensorflow_lite_support/cc/task/core/proto:external_file_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
-)
-
-support_py_proto_library(
-    name = "search_options_py_pb2",
-    srcs = ["search_options.proto"],
-    api_version = 2,
-    proto_deps = [":search_options_proto"],
 )
 
 py_library(

@@ -260,7 +260,7 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     text_search_result = searcher.search('The weather was excellent.')
 
     self.assertProtoEquals(_EXPECTED_REGEX_DEFAULT_OPTIONS_SEARCH_RESULT,
-                           text_search_result)
+                           text_search_result.to_pb2())
 
   @parameterized.parameters(
       (_REGEX_EMBEDDER_MODEL, _REGEX_INDEX, ModelFileType.FILE_NAME,
@@ -339,7 +339,8 @@ class TextSearcherTest(parameterized.TestCase, tf.test.TestCase):
     text_search_result = searcher.search('The weather was excellent.')
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_text_proto, text_search_result)
+    self.assertProtoEquals(expected_result_text_proto,
+                           text_search_result.to_pb2())
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
