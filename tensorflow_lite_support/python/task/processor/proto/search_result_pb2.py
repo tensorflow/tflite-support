@@ -14,7 +14,7 @@
 """Search result protobuf."""
 
 import dataclasses
-from typing import Any, Tuple, List, Optional
+from typing import Any, List
 
 from tensorflow_lite_support.cc.task.processor.proto import search_result_pb2
 from tensorflow_lite_support.python.task.core.optional_dependencies import doc_controls
