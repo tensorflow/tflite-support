@@ -91,7 +91,7 @@ class TextSearcher(object):
     """
     searcher = _CppTextSearcher.create_from_options(
         options.base_options, options.embedding_options.to_pb2(),
-        options.search_options.to_pb2())
+        options.search_options)
     return cls(options, searcher)
 
   def search(self, text: str) -> search_result_pb2.SearchResult:
@@ -110,8 +110,7 @@ class TextSearcher(object):
       ValueError: If any of the input arguments is invalid.
       RuntimeError: If failed to perform nearest-neighbor search.
     """
-    search_result = self._searcher.search(text)
-    return search_result_pb2.SearchResult.create_from_pb2(search_result)
+    return self._searcher.search(text)
 
   def get_user_info(self) -> str:
     """Gets the user info stored in the index file.

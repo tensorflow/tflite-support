@@ -96,7 +96,7 @@ class ImageSearcher(object):
     """
     searcher = _CppImageSearcher.create_from_options(
         options.base_options, options.embedding_options.to_pb2(),
-        options.search_options.to_pb2())
+        options.search_options)
     return cls(options, searcher)
 
   def search(
@@ -125,10 +125,8 @@ class ImageSearcher(object):
     """
     image_data = image_utils.ImageData(image.buffer)
     if bounding_box is None:
-      search_result = self._searcher.search(image_data)
-    else:
-      search_result = self._searcher.search(image_data, bounding_box.to_pb2())
-    return search_result_pb2.SearchResult.create_from_pb2(search_result)
+      return self._searcher.search(image_data)
+    return self._searcher.search(image_data, bounding_box.to_pb2())
 
   def get_user_info(self) -> str:
     """Gets the user info stored in the index file.
