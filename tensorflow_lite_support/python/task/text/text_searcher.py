@@ -90,7 +90,7 @@ class TextSearcher(object):
       RuntimeError: If other types of error occurred.
     """
     searcher = _CppTextSearcher.create_from_options(
-        options.base_options, options.embedding_options,
+        options.base_options, options.embedding_options.to_pb2(),
         options.search_options.to_pb2())
     return cls(options, searcher)
 
