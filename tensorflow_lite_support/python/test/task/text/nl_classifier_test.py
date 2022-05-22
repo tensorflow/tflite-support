@@ -19,12 +19,17 @@ from absl.testing import parameterized
 
 import tensorflow as tf
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.processor.proto import class_pb2
+from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.processor.proto import nl_classification_options_pb2
 from tensorflow_lite_support.python.task.text import nl_classifier
 from tensorflow_lite_support.python.test import test_util
 
 _BaseOptions = base_options_pb2.BaseOptions
 _NLClassifier = nl_classifier.NLClassifier
+_Category = class_pb2.Category
+_Classifications = classifications_pb2.Classifications
+_ClassificationResult = classifications_pb2.ClassificationResult
 _NLClassifierOptions = nl_classifier.NLClassifierOptions
 _NLClassificationOptions = nl_classification_options_pb2.NLClassificationOptions
 
@@ -32,43 +37,46 @@ _NLClassificationOptions = nl_classification_options_pb2.NLClassificationOptions
 _REGEX_TOKENIZER_MODEL = 'test_model_nl_classifier_with_regex_tokenizer.tflite'
 _POSITIVE_INPUT = "This is the best movie I’ve seen in recent years. " \
                   "Strongly recommend it!"
-_EXPECTED_RESULTS_OF_POSITIVE_INPUT = """
-classifications {
-  classes {
-    index: 0
-    score: 0.48657345771789551
-    display_name: ""
-    class_name: "Negative"
-  }
-  classes {
-    index: 0
-    score: 0.51342660188674927
-    display_name: ""
-    class_name: "Positive"
-  }
-  head_index: 0
-  head_name: ""
-}
-"""
+_EXPECTED_RESULTS_OF_POSITIVE_INPUT = _ClassificationResult(
+  classifications=[
+    _Classifications(
+      categories=[
+        _Category(
+          index=0,
+          score=0.486573,
+          display_name='',
+          category_name='Negative'),
+        _Category(
+          index=0,
+          score=0.513427,
+          display_name='',
+          category_name='Positive'
+        )
+      ],
+      head_index=0,
+      head_name=''
+    )])
+
 _NEGATIVE_INPUT = "What a waste of my time."
-_EXPECTED_RESULTS_OF_NEGATIVE_INPUT = """
-classifications {
-  classes {
-    index: 0
-    score: 0.81312954425811768
-    display_name: ""
-    class_name: "Negative"
-  }
-  classes {
-    index: 0
-    score: 0.18687039613723755
-    display_name: ""
-    class_name: "Positive"
-  }
-  head_index: 0
-  head_name: ""
-}
-"""
+_EXPECTED_RESULTS_OF_NEGATIVE_INPUT = _ClassificationResult(
+  classifications=[
+    _Classifications(
+      categories=[
+        _Category(
+          index=0,
+          score=0.813130,
+          display_name='',
+          category_name='Negative'),
+        _Category(
+          index=0,
+          score=0.186870,
+          display_name='',
+          category_name='Positive'
+        )
+      ],
+      head_index=0,
+      head_name=''
+    )])
 
 
 class ModelFileType(enum.Enum):
@@ -151,7 +159,7 @@ class NLClassifierTest(parameterized.TestCase, tf.test.TestCase):
       (_REGEX_TOKENIZER_MODEL, ModelFileType.FILE_CONTENT, _NEGATIVE_INPUT,
        _EXPECTED_RESULTS_OF_NEGATIVE_INPUT))
   def test_classify_model(self, model_name, model_file_type, text,
-                          expected_result_text_proto):
+                          expected_classification_result):
     # Creates classifier.
     model_path = test_util.get_test_data_path(model_name)
     if model_file_type is ModelFileType.FILE_NAME:
@@ -168,8 +176,8 @@ class NLClassifierTest(parameterized.TestCase, tf.test.TestCase):
     classifier = _NLClassifier.create_from_options(options)
     # Classifies text using the given model.
     text_classification_result = classifier.classify(text)
-    self.assertProtoEquals(expected_result_text_proto,
-                           text_classification_result.to_pb2())
+    self.assertProtoEquals(text_classification_result.to_pb2(),
+                           expected_classification_result.to_pb2())
 
 
 if __name__ == "__main__":
