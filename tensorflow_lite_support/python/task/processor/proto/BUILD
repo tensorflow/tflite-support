@@ -10,7 +10,9 @@ py_library(
     name = "embedding_pb2",
     srcs = ["embedding_pb2.py"],
     deps = [
+        # build rule placeholder: numpy dep,
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -19,6 +21,7 @@ py_library(
     srcs = ["embedding_options_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -84,6 +87,8 @@ py_library(
     srcs = ["segmentations_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/vision/proto:segmentations_py_pb2",
+        # build rule placeholder: numpy dep,
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 
@@ -92,6 +97,7 @@ py_library(
     srcs = ["segmentation_options_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:segmentation_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
 

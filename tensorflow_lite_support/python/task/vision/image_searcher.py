@@ -94,9 +94,9 @@ class ImageSearcher(object):
         `ImageSearcherOptions` such as missing the model.
       RuntimeError: If other types of error occurred.
     """
-    searcher = _CppImageSearcher.create_from_options(options.base_options,
-                                                     options.embedding_options,
-                                                     options.search_options)
+    searcher = _CppImageSearcher.create_from_options(
+        options.base_options, options.embedding_options.to_pb2(),
+        options.search_options)
     return cls(options, searcher)
 
   def search(
