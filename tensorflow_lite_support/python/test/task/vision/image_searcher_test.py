@@ -22,6 +22,7 @@ from tensorflow_lite_support.python.task.core.proto import base_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_options_pb2
+from tensorflow_lite_support.python.task.processor.proto import search_result_pb2
 from tensorflow_lite_support.python.task.vision import image_searcher
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
@@ -29,34 +30,32 @@ from tensorflow_lite_support.python.test import test_util
 _BaseOptions = base_options_pb2.BaseOptions
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 _SearchOptions = search_options_pb2.SearchOptions
+_SearchResult = search_result_pb2.SearchResult
+_NearestNeighbor = search_result_pb2.NearestNeighbor
 _ImageSearcher = image_searcher.ImageSearcher
 _ImageSearcherOptions = image_searcher.ImageSearcherOptions
 
 _MOBILENET_EMBEDDER_MODEL = 'mobilenet_v3_small_100_224_embedder.tflite'
 _MOBILENET_SEARCHER_MODEL = 'mobilenet_v3_small_100_224_searcher.tflite'
 _MOBILENET_INDEX = 'searcher_index.ldb'
-_EXPECTED_MOBILENET_DEFAULT_OPTIONS_SEARCH_RESULT = """
-nearest_neighbors {
-  metadata: "burger"
-  distance: 200.798508
-}
-nearest_neighbors {
-  metadata: "car"
-  distance: 228.445480
-}
-nearest_neighbors {
-  metadata: "bird"
-  distance: 230.091507
-}
-nearest_neighbors {
-  metadata: "dog"
-  distance: 231.857605
-}
-nearest_neighbors {
-  metadata: "cat"
-  distance: 232.290115
-}
-"""
+_EXPECTED_MOBILENET_DEFAULT_OPTIONS_SEARCH_RESULT = _SearchResult(
+  nearest_neighbors=[
+    _NearestNeighbor(
+      metadata=bytearray(b'burger'),
+      distance=200.798508),
+    _NearestNeighbor(
+      metadata=bytearray(b'car'),
+      distance=228.445480),
+    _NearestNeighbor(
+      metadata=bytearray(b'bird'),
+      distance=230.091507),
+    _NearestNeighbor(
+      metadata=bytearray(b'dog'),
+      distance=231.857605),
+    _NearestNeighbor(
+      metadata=bytearray(b'cat'),
+      distance=232.290115)
+  ])
 
 _IMAGE_FILE = 'burger.jpg'
 _MAX_RESULTS = 2
@@ -192,8 +191,9 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     # Perform image search.
     image_search_result = searcher.search(image)
 
-    self.assertProtoEquals(_EXPECTED_MOBILENET_DEFAULT_OPTIONS_SEARCH_RESULT,
-                           image_search_result.to_pb2())
+    self.assertProtoEquals(
+      image_search_result.to_pb2(),
+      _EXPECTED_MOBILENET_DEFAULT_OPTIONS_SEARCH_RESULT.to_pb2())
 
   @parameterized.parameters(
       (_MOBILENET_EMBEDDER_MODEL, ModelFileType.FILE_NAME,
@@ -249,17 +249,28 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     image_search_result = searcher.search(image)
 
     # Expected results.
-    expected_result_text_proto = """
-    nearest_neighbors { metadata: "burger" distance: -0.0 }
-    nearest_neighbors { metadata: "car" distance: 1.822435 }
-    nearest_neighbors { metadata: "bird" distance: 1.930939 }
-    nearest_neighbors { metadata: "dog" distance: 2.047355 }
-    nearest_neighbors { metadata: "cat" distance: 2.075868 }
-    """
+    expected_search_result = _SearchResult(
+      nearest_neighbors=[
+        _NearestNeighbor(
+          metadata=bytearray(b'burger'),
+          distance=-0.0),
+        _NearestNeighbor(
+          metadata=bytearray(b'car'),
+          distance=1.822435),
+        _NearestNeighbor(
+          metadata=bytearray(b'bird'),
+          distance=1.930939),
+        _NearestNeighbor(
+          metadata=bytearray(b'dog'),
+          distance=2.047355),
+        _NearestNeighbor(
+          metadata=bytearray(b'cat'),
+          distance=2.075868)
+      ])
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_text_proto,
-                           image_search_result.to_pb2())
+    self.assertProtoEquals(image_search_result.to_pb2(),
+                           expected_search_result.to_pb2())
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
@@ -280,17 +291,28 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     image_search_result = searcher.search(image, bounding_box)
 
     # Expected results.
-    expected_result_text_proto = """
-    nearest_neighbors { metadata: "burger" distance: 184.85214 }
-    nearest_neighbors { metadata: "car" distance: 209.32019 }
-    nearest_neighbors { metadata: "bird" distance: 211.43195 }
-    nearest_neighbors { metadata: "dog" distance: 212.77237 }
-    nearest_neighbors { metadata: "cat" distance: 212.8553 }
-    """
+    expected_search_result = _SearchResult(
+      nearest_neighbors=[
+        _NearestNeighbor(
+          metadata=bytearray(b'burger'),
+          distance=184.85214),
+        _NearestNeighbor(
+          metadata=bytearray(b'car'),
+          distance=209.32019),
+        _NearestNeighbor(
+          metadata=bytearray(b'bird'),
+          distance=211.43195),
+        _NearestNeighbor(
+          metadata=bytearray(b'dog'),
+          distance=212.77237),
+        _NearestNeighbor(
+          metadata=bytearray(b'cat'),
+          distance=212.8553)
+      ])
 
     # Comparing results.
-    self.assertProtoEquals(expected_result_text_proto,
-                           image_search_result.to_pb2())
+    self.assertProtoEquals(image_search_result.to_pb2(),
+                           expected_search_result.to_pb2())
 
     # Get user info and compare values.
     self.assertEqual(searcher.get_user_info(), 'userinfo')
