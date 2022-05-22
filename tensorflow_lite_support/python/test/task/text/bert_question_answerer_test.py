@@ -19,13 +19,16 @@ from absl.testing import parameterized
 
 import tensorflow as tf
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.processor.proto import qa_answers_pb2
 from tensorflow_lite_support.python.task.text import bert_question_answerer
 from tensorflow_lite_support.python.test import test_util
 
 _BaseOptions = base_options_pb2.BaseOptions
+_Pos = qa_answers_pb2.Pos
+_QaAnswer = qa_answers_pb2.QaAnswer
+_QuestionAnswererResult = qa_answers_pb2.QuestionAnswererResult
 _BertQuestionAnswerer = bert_question_answerer.BertQuestionAnswerer
 _BertQuestionAnswererOptions = bert_question_answerer.BertQuestionAnswererOptions
-
 
 
 _INPUT_QUESTION = "What is a course of study called?"
@@ -42,28 +45,28 @@ _INPUT_CONTEXT = \
   "the curriculum."
 
 _MOBILE_BERT_MODEL = 'mobilebert_with_metadata.tflite'
-_EXPECTED_MOBILE_BERT_QA_RESULT = """
-answers {
-  pos {
-    start: 118
-    end: 120
-    logit: 10.609820
-  }
-  text: "called the curriculum."
-}
-"""
+_EXPECTED_MOBILE_BERT_QA_RESULT = _QuestionAnswererResult(
+  answers=[
+    _QaAnswer(
+      pos=_Pos(
+        start=118,
+        end=120,
+        logit=10.609820
+      ),
+      text='called the curriculum.'
+    )])
 
 _ALBERT_MODEL = "albert_with_metadata.tflite"
-_EXPECTED_ALBERT_QA_RESULT = """
-answers {
-  pos {
-    start: 118
-    end: 120
-    logit: 12.718668
-  }
-  text: "called the curriculum."
-}
-"""
+_EXPECTED_ALBERT_QA_RESULT = _QuestionAnswererResult(
+  answers=[
+    _QaAnswer(
+      pos=_Pos(
+        start=118,
+        end=120,
+        logit=12.718668
+      ),
+      text='called the curriculum.'
+    )])
 
 
 class ModelFileType(enum.Enum):
@@ -105,8 +108,7 @@ class BertQuestionAnswererTest(parameterized.TestCase, tf.test.TestCase):
 
     # Perform Bert Question Answering.
     text_result = question_answerer.answer(context, question)
-
-    self.assertProtoEquals(answer, text_result.to_pb2())
+    self.assertProtoEquals(text_result.to_pb2(), answer.to_pb2())
 
 
 if __name__ == "__main__":
