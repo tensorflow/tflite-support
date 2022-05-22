@@ -19,74 +19,82 @@ from absl.testing import parameterized
 
 import tensorflow as tf
 from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.processor.proto import class_pb2
+from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.text import bert_nl_classifier
 from tensorflow_lite_support.python.test import test_util
 
 _BaseOptions = base_options_pb2.BaseOptions
 _BertNLClassifier = bert_nl_classifier.BertNLClassifier
+_Category = class_pb2.Category
+_Classifications = classifications_pb2.Classifications
+_ClassificationResult = classifications_pb2.ClassificationResult
 _BertNLClassifierOptions = bert_nl_classifier.BertNLClassifierOptions
 
 _BERT_MODEL = 'bert_nl_classifier.tflite'
 
 _POSITIVE_INPUT = "it's a charming and often affecting journey"
-_EXPECTED_RESULTS_OF_POSITIVE_INPUT = """
-classifications {
-  classes {
-    index: 0
-    score: 5.534091e-05
-    display_name: ""
-    class_name: "negative"
-  }
-  classes {
-    index: 0
-    score: 0.999945
-    display_name: ""
-    class_name: "positive"
-  }
-  head_index: 0
-  head_name: ""
-}
-"""
+_EXPECTED_RESULTS_OF_POSITIVE_INPUT = _ClassificationResult(
+  classifications=[
+    _Classifications(
+      categories=[
+        _Category(
+          index=0,
+          score=5.534091e-05,
+          display_name='',
+          category_name='negative'),
+        _Category(
+          index=0,
+          score=0.999945,
+          display_name='',
+          category_name='positive'
+        )
+      ],
+      head_index=0,
+      head_name=''
+    )])
 
 _NEGATIVE_INPUT = "unflinchingly bleak and desperate"
-_EXPECTED_RESULTS_OF_NEGATIVE_INPUT = """
-classifications {
-  classes {
-    index: 0
-    score: 0.956317
-    display_name: ""
-    class_name: "negative"
-  }
-  classes {
-    index: 0
-    score: 0.043683
-    display_name: ""
-    class_name: "positive"
-  }
-  head_index: 0
-  head_name: ""
-}
-"""
+_EXPECTED_RESULTS_OF_NEGATIVE_INPUT = _ClassificationResult(
+  classifications=[
+    _Classifications(
+      categories=[
+        _Category(
+          index=0,
+          score=0.956317,
+          display_name='',
+          category_name='negative'),
+        _Category(
+          index=0,
+          score=0.043683,
+          display_name='',
+          category_name='positive'
+        )
+      ],
+      head_index=0,
+      head_name=''
+    )])
 
 _MAX_SEQ_LEN = 128
-_EXPECTED_RESULTS_OF_LONG_POSITIVE_INPUT = """
-classifications {
-  classes {
-    index: 0
-    score: 0.000133
-    display_name: ""
-    class_name: "negative"
-  }
-  classes {
-    index: 0
-    score: 0.999867
-    display_name: ""
-    class_name: "positive"
-  }
-  head_index: 0
-  head_name: ""
-}
-"""
+_EXPECTED_RESULTS_OF_LONG_POSITIVE_INPUT = _ClassificationResult(
+  classifications=[
+    _Classifications(
+      categories=[
+        _Category(
+          index=0,
+          score=0.000133,
+          display_name='',
+          category_name='negative'),
+        _Category(
+          index=0,
+          score=0.999867,
+          display_name='',
+          category_name='positive'
+        )
+      ],
+      head_index=0,
+      head_name=''
+    )])
 
 
 class ModelFileType(enum.Enum):
@@ -140,7 +148,7 @@ class BertNLClassifierTest(parameterized.TestCase, tf.test.TestCase):
       (_BERT_MODEL, ModelFileType.FILE_CONTENT, _NEGATIVE_INPUT,
        _EXPECTED_RESULTS_OF_NEGATIVE_INPUT))
   def test_classify_model(self, model_name, model_file_type, text,
-                          expected_result_text_proto):
+                          expected_classification_result):
     # Creates classifier.
     model_path = test_util.get_test_data_path(model_name)
     if model_file_type is ModelFileType.FILE_NAME:
@@ -157,8 +165,8 @@ class BertNLClassifierTest(parameterized.TestCase, tf.test.TestCase):
     classifier = _BertNLClassifier.create_from_options(options)
     # Classifies text using the given model.
     text_classification_result = classifier.classify(text)
-    self.assertProtoEquals(expected_result_text_proto,
-                           text_classification_result.to_pb2())
+    self.assertProtoEquals(text_classification_result.to_pb2(),
+                           expected_classification_result.to_pb2())
 
   def test_classify_succeeds_with_long_positive_not_out_of_bounds(self):
     # Creates classifier.
@@ -175,8 +183,8 @@ class BertNLClassifierTest(parameterized.TestCase, tf.test.TestCase):
 
     # Classifies text using the given model.
     text_classification_result = classifier.classify(positive_review_str)
-    self.assertProtoEquals(_EXPECTED_RESULTS_OF_LONG_POSITIVE_INPUT,
-                           text_classification_result.to_pb2())
+    self.assertProtoEquals(text_classification_result.to_pb2(),
+                           _EXPECTED_RESULTS_OF_LONG_POSITIVE_INPUT.to_pb2())
 
 
 if __name__ == "__main__":
