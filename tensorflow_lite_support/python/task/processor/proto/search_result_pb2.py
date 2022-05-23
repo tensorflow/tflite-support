@@ -34,20 +34,20 @@ class NearestNeighbor:
       Lower is better.
   """
 
-  metadata: str
+  metadata: bytearray
   distance: float
 
   @doc_controls.do_not_generate_docs
   def to_pb2(self) -> _NearestNeighborProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _NearestNeighborProto(metadata=bytes(self.metadata.encode()),
+    return _NearestNeighborProto(metadata=bytes(self.metadata),
                                  distance=self.distance)
 
   @classmethod
   @doc_controls.do_not_generate_docs
   def create_from_pb2(cls, pb2_obj: _NearestNeighborProto) -> "NearestNeighbor":
     """Creates a `NearestNeighbor` object from the given protobuf object."""
-    return NearestNeighbor(metadata=bytearray(pb2_obj.metadata).decode(),
+    return NearestNeighbor(metadata=bytearray(pb2_obj.metadata),
                            distance=pb2_obj.distance)
 
   def __eq__(self, other: Any) -> bool:
