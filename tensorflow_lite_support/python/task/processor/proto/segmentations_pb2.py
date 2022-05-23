@@ -17,8 +17,15 @@ import dataclasses
 from typing import Any, Tuple, List, Optional
 
 import numpy as np
-from tensorflow_lite_support.cc.task.vision.proto import segmentations_pb2
 from tensorflow_lite_support.python.task.core.optional_dependencies import doc_controls
+
+# Using the proto in vision.proto here instead of processor.proto to match with
+# the C++ layer. It's to avoid converting the large confidence masks or category
+# mask from the proto type defined in vision.proto to processor.proto. For other
+# tasks, the proto in processor.proto is always used in the Python layer and
+# vision.proto <-> processor.proto's proto conversion happens in the C++ layer
+# as those conversions of small protobuf objects are trivial.
+from tensorflow_lite_support.cc.task.vision.proto import segmentations_pb2
 
 _SegmentationProto = segmentations_pb2.Segmentation
 _ConfidenceMaskProto = segmentations_pb2.Segmentation.ConfidenceMask

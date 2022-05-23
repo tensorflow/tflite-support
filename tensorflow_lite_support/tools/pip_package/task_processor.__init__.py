@@ -46,7 +46,10 @@ EmbeddingResult = embedding_pb2.EmbeddingResult
 SearchOptions = search_options_pb2.SearchOptions
 SearchResult = search_result_pb2.SearchResult
 NearestNeighbor = search_result_pb2.NearestNeighbor
+OutputType = segmentation_options_pb2.OutputType
 SegmentationOptions = segmentation_options_pb2.SegmentationOptions
+ColoredLabel = segmentations_pb2.ColoredLabel
+ConfidenceMask = segmentations_pb2.ConfidenceMask
 Segmentation = segmentations_pb2.Segmentation
 SegmentationResult = segmentations_pb2.SegmentationResult
 
