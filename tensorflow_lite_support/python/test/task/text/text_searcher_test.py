@@ -39,38 +39,38 @@ _REGEX_INDEX = 'regex_index.ldb'
 _EXPECTED_REGEX_SEARCH_RESULT = _SearchResult(
   nearest_neighbors=[
     _NearestNeighbor(
-      metadata=bytearray(b'The weather was excellent.'),
+      metadata='The weather was excellent.',
       distance=0.0),
     _NearestNeighbor(
-      metadata=bytearray(b'The sun was shining on that day.'),
+      metadata='The sun was shining on that day.',
       distance=5.7e-5),
     _NearestNeighbor(
-      metadata=bytearray(b'The cat is chasing after the mouse.'),
+      metadata='The cat is chasing after the mouse.',
       distance=8.9e-5),
     _NearestNeighbor(
-      metadata=bytearray(b'It was a sunny day.'),
+      metadata='It was a sunny day.',
       distance=0.000113),
     _NearestNeighbor(
-      metadata=bytearray(b'He was very happy with his newly bought car.'),
+      metadata='He was very happy with his newly bought car.',
       distance=0.000119)
   ])
 
 _EXPECTED_REGEX_DEFAULT_OPTIONS_SEARCH_RESULT = _SearchResult(
   nearest_neighbors=[
     _NearestNeighbor(
-      metadata=bytearray(b'The weather was excellent.'),
+      metadata='The weather was excellent.',
       distance=0.889665),
     _NearestNeighbor(
-      metadata=bytearray(b'The sun was shining on that day.'),
+      metadata='The sun was shining on that day.',
       distance=0.889668),
     _NearestNeighbor(
-      metadata=bytearray(b'The cat is chasing after the mouse.'),
+      metadata='The cat is chasing after the mouse.',
       distance=0.88967),
     _NearestNeighbor(
-      metadata=bytearray(b'It was a sunny day.'),
+      metadata='It was a sunny day.',
       distance=0.889671),
     _NearestNeighbor(
-      metadata=bytearray(b'He was very happy with his newly bought car.'),
+      metadata='He was very happy with his newly bought car.',
       distance=0.889672)
   ])
 
@@ -80,19 +80,19 @@ _BERT_INDEX = 'mobilebert_index.ldb'
 _EXPECTED_BERT_SEARCH_RESULT = _SearchResult(
   nearest_neighbors=[
     _NearestNeighbor(
-      metadata=bytearray(b'The weather was excellent.'),
+      metadata='The weather was excellent.',
       distance=0.0),
     _NearestNeighbor(
-      metadata=bytearray(b'It was a sunny day.'),
+      metadata='It was a sunny day.',
       distance=0.115369),
     _NearestNeighbor(
-      metadata=bytearray(b'The sun was shining on that day.'),
+      metadata='The sun was shining on that day.',
       distance=0.230017),
     _NearestNeighbor(
-      metadata=bytearray(b'He was very happy with his newly bought car.'),
+      metadata='He was very happy with his newly bought car.',
       distance=0.324563),
     _NearestNeighbor(
-      metadata=bytearray(b'The cat is chasing after the mouse.'),
+      metadata='The cat is chasing after the mouse.',
       distance=0.966928)
   ])
 
@@ -102,19 +102,19 @@ _USE_INDEX = 'universal_sentence_encoder_index.ldb'
 _EXPECTED_USE_SEARCH_RESULT = _SearchResult(
   nearest_neighbors=[
     _NearestNeighbor(
-      metadata=bytearray(b'The weather was excellent.'),
+      metadata='The weather was excellent.',
       distance=0.0),
     _NearestNeighbor(
-      metadata=bytearray(b'It was a sunny day.'),
+      metadata='It was a sunny day.',
       distance=0.146359),
     _NearestNeighbor(
-      metadata=bytearray(b'The sun was shining on that day.'),
+      metadata='The sun was shining on that day.',
       distance=0.152225),
     _NearestNeighbor(
-      metadata=bytearray(b'The cat is chasing after the mouse.'),
+      metadata='The cat is chasing after the mouse.',
       distance=0.359965),
     _NearestNeighbor(
-      metadata=bytearray(b'He was very happy with his newly bought car.'),
+      metadata='He was very happy with his newly bought car.',
       distance=0.366927)
   ])
 

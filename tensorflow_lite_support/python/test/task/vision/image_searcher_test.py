@@ -41,19 +41,19 @@ _MOBILENET_INDEX = 'searcher_index.ldb'
 _EXPECTED_MOBILENET_DEFAULT_OPTIONS_SEARCH_RESULT = _SearchResult(
   nearest_neighbors=[
     _NearestNeighbor(
-      metadata=bytearray(b'burger'),
+      metadata='burger',
       distance=200.798508),
     _NearestNeighbor(
-      metadata=bytearray(b'car'),
+      metadata='car',
       distance=228.445480),
     _NearestNeighbor(
-      metadata=bytearray(b'bird'),
+      metadata='bird',
       distance=230.091507),
     _NearestNeighbor(
-      metadata=bytearray(b'dog'),
+      metadata='dog',
       distance=231.857605),
     _NearestNeighbor(
-      metadata=bytearray(b'cat'),
+      metadata='cat',
       distance=232.290115)
   ])
 
@@ -252,19 +252,19 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     expected_search_result = _SearchResult(
       nearest_neighbors=[
         _NearestNeighbor(
-          metadata=bytearray(b'burger'),
+          metadata='burger',
           distance=-0.0),
         _NearestNeighbor(
-          metadata=bytearray(b'car'),
+          metadata='car',
           distance=1.822435),
         _NearestNeighbor(
-          metadata=bytearray(b'bird'),
+          metadata='bird',
           distance=1.930939),
         _NearestNeighbor(
-          metadata=bytearray(b'dog'),
+          metadata='dog',
           distance=2.047355),
         _NearestNeighbor(
-          metadata=bytearray(b'cat'),
+          metadata='cat',
           distance=2.075868)
       ])
 
@@ -294,19 +294,19 @@ class ImageSearcherTest(parameterized.TestCase, tf.test.TestCase):
     expected_search_result = _SearchResult(
       nearest_neighbors=[
         _NearestNeighbor(
-          metadata=bytearray(b'burger'),
+          metadata='burger',
           distance=184.85214),
         _NearestNeighbor(
-          metadata=bytearray(b'car'),
+          metadata='car',
           distance=209.32019),
         _NearestNeighbor(
-          metadata=bytearray(b'bird'),
+          metadata='bird',
           distance=211.43195),
         _NearestNeighbor(
-          metadata=bytearray(b'dog'),
+          metadata='dog',
           distance=212.77237),
         _NearestNeighbor(
-          metadata=bytearray(b'cat'),
+          metadata='cat',
           distance=212.8553)
       ])
 
