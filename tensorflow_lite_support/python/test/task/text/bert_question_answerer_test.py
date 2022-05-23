@@ -49,10 +49,34 @@ _EXPECTED_MOBILE_BERT_QA_RESULT = _QuestionAnswererResult(
   answers=[
     _QaAnswer(
       pos=_Pos(
+        start=119,
+        end=120,
+        logit=18.815560
+      ),
+      text='the curriculum.'),
+    _QaAnswer(
+      pos=_Pos(
+        start=120,
+        end=120,
+        logit=16.111582),
+      text='curriculum.'),
+    _QaAnswer(
+      pos=_Pos(
+        start=119,
+        end=121,
+        logit=14.863710),
+      text='the curriculum.'),
+    _QaAnswer(
+      pos=_Pos(
+        start=120,
+        end=121,
+        logit=12.159734),
+      text='curriculum.'),
+    _QaAnswer(
+      pos=_Pos(
         start=118,
         end=120,
-        logit=10.609820
-      ),
+        logit=10.609820),
       text='called the curriculum.'
     )])
 
@@ -61,10 +85,33 @@ _EXPECTED_ALBERT_QA_RESULT = _QuestionAnswererResult(
   answers=[
     _QaAnswer(
       pos=_Pos(
+        start=119,
+        end=120,
+        logit=19.000027),
+      text='the curriculum.'),
+    _QaAnswer(
+      pos=_Pos(
+        start=120,
+        end=120,
+        logit=17.882782),
+      text='curriculum.'),
+    _QaAnswer(
+      pos=_Pos(
+        start=119,
+        end=121,
+        logit=15.372071),
+      text='the curriculum.'),
+    _QaAnswer(
+      pos=_Pos(
+        start=120,
+        end=121,
+        logit=14.254826),
+      text='curriculum.'),
+    _QaAnswer(
+      pos=_Pos(
         start=118,
         end=120,
-        logit=12.718668
-      ),
+        logit=12.718668),
       text='called the curriculum.'
     )])
 

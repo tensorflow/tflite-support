@@ -57,9 +57,8 @@ PYBIND11_MODULE(_pywrap_bert_question_answerer, m) {
              tflite::task::processor::QuestionAnswererResult
                 question_answerer_result;
 
-             auto* answers = question_answerer_result.add_answers();
-
              for (int i = 0; i < results.size(); ++i) {
+                auto* answers = question_answerer_result.add_answers();
                 answers->mutable_pos()->set_start(results[i].pos.start);
                 answers->mutable_pos()->set_end(results[i].pos.end);
                 answers->mutable_pos()->set_logit(results[i].pos.logit);
