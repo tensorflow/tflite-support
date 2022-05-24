@@ -93,7 +93,7 @@ category[1]: 'Positive' : '0.18687'
 
 #### Prerequisites
 
-TODO(b/163086702): Update the links to models with metadata attached.
+<!-- TODO(b/163086702): Update the links to models with metadata attached. -->
 
 You will need:
 
