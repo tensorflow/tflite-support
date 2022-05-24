@@ -19,7 +19,7 @@ from tensorflow_lite_support.python.task.audio.core import audio_record
 from tensorflow_lite_support.python.task.audio.core import tensor_audio
 from tensorflow_lite_support.python.task.audio.core.pybinds import _pywrap_audio_buffer
 from tensorflow_lite_support.python.task.audio.pybinds import _pywrap_audio_classifier
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core import base_options
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 
@@ -27,7 +27,7 @@ _CppAudioFormat = _pywrap_audio_buffer.AudioFormat
 _CppAudioBuffer = _pywrap_audio_buffer.AudioBuffer
 _CppAudioClassifier = _pywrap_audio_classifier.AudioClassifier
 _ClassificationOptions = classification_options_pb2.ClassificationOptions
-_BaseOptions = base_options_pb2.BaseOptions
+_BaseOptions = base_options.BaseOptions
 
 
 @dataclasses.dataclass
@@ -82,8 +82,9 @@ class AudioClassifier(object):
         `AudioClassifierOptions` such as missing the model.
       RuntimeError: If other types of error occurred.
     """
+    print(options.base_options.to_pb2())
     classifier = _CppAudioClassifier.create_from_options(
-        options.base_options, options.classification_options.to_pb2())
+        options.base_options.to_pb2(), options.classification_options.to_pb2())
     return cls(options, classifier)
 
   def create_input_tensor_audio(self) -> tensor_audio.TensorAudio:

@@ -18,13 +18,13 @@ import enum
 from absl.testing import parameterized
 import tensorflow as tf
 
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core import base_options
 from tensorflow_lite_support.python.task.processor.proto import detection_options_pb2
 from tensorflow_lite_support.python.task.vision import object_detector
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
 
-_BaseOptions = base_options_pb2.BaseOptions
+_BaseOptions = base_options.BaseOptions
 _ObjectDetector = object_detector.ObjectDetector
 _ObjectDetectorOptions = object_detector.ObjectDetectorOptions
 

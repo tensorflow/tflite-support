@@ -22,12 +22,12 @@ import unittest
 from tensorflow_lite_support.python.task.audio import audio_classifier
 from tensorflow_lite_support.python.task.audio.core import audio_record
 from tensorflow_lite_support.python.task.audio.core import tensor_audio
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core import base_options
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
 from tensorflow_lite_support.python.test import test_util
 
 _mock = unittest.mock
-_BaseOptions = base_options_pb2.BaseOptions
+_BaseOptions = base_options.BaseOptions
 _AudioClassifier = audio_classifier.AudioClassifier
 _AudioClassifierOptions = audio_classifier.AudioClassifierOptions
 
