@@ -57,15 +57,11 @@ class BaseOptions:
   @doc_controls.do_not_generate_docs
   def to_pb2(self) -> _BaseOptionsProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    if self.file_name is not None or self.file_content is not None:
-      return _BaseOptionsProto(
-        file_name=self.file_name,
-        file_content=self.file_content,
-        num_threads=self.num_threads,
-        use_coral=self.use_coral)
-
-    return _BaseOptionsProto(num_threads=self.num_threads,
-                             use_coral=self.use_coral)
+    return _BaseOptionsProto(
+      file_name=self.file_name,
+      file_content=self.file_content,
+      num_threads=self.num_threads,
+      use_coral=self.use_coral)
 
   @classmethod
   @doc_controls.do_not_generate_docs
