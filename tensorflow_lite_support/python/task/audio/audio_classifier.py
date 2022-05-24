@@ -82,7 +82,6 @@ class AudioClassifier(object):
         `AudioClassifierOptions` such as missing the model.
       RuntimeError: If other types of error occurred.
     """
-    print(options.base_options.to_pb2())
     classifier = _CppAudioClassifier.create_from_options(
         options.base_options.to_pb2(), options.classification_options.to_pb2())
     return cls(options, classifier)

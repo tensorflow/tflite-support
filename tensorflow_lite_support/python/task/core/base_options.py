@@ -24,11 +24,7 @@ _BaseOptionsProto = base_options_pb2.BaseOptions
 
 @dataclasses.dataclass
 class BaseOptions:
-  """Base options for python task libraries.
-
-  This contains a subset of the C++ base options that are useful in Python.
-  See C++ base options at:
-  https://github.com/tensorflow/tflite-support/blob/master/tensorflow_lite_support/cc/task/core/proto/base_options.proto
+  """Base options for TensorFlow Lite Task Library's Python APIs.
 
   Represents external files used by the Task APIs (e.g. TF Lite FlatBuffer or
   plain-text labels file). The files can be specified by one of the following
