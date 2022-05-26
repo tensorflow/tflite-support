@@ -15,7 +15,6 @@
 #import "tensorflow_lite_support/ios/task/audio/core/audio_record/sources/TFLAudioRecord.h"
 
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
-#import "tensorflow_lite_support/ios/task/audio/core/audio_record/sources/TFLAudioRecordErrorCode.h"
 #import "tensorflow_lite_support/ios/task/audio/core/sources/TFLRingBuffer.h"
 
 #import <AVFoundation/AVFoundation.h>
@@ -30,7 +29,7 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
 
   /* Specifying a custom buffer size on AVAUdioEngine while tapping does not take effect. Hence we
    * are storing the returned samples in a ring buffer to acheive the desired buffer size. If
-   * specified buffer size is shorter than the buffer size supported by `AVAUdioEngine` only the most
+   * specified buffer size is shorter than the buffer size supported by `AVAudioEngine` only the most
    * recent data of the buffer of size `bufferSize` will be stored by the ring buffer. */
   TFLRingBuffer *_ringBuffer;
   dispatch_queue_t _conversionQueue;
@@ -47,8 +46,8 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
           createCustomError:error
                  withDomain:TFLAudioRecordErrorDomain
                        code:TFLAudioRecordErrorCodeInvalidArgumentError
-                description:@"The channel count provided does not match the supported "
-                            @"channel count. Only upto 2 audio channels are currently supported."];
+                description:[NSString stringWithFormat:@"The channel count provided does not match the supported "
+                            @"channel count. Only upto %d audio channels are currently supported.", SUPPORTED_CHANNEL_COUNT]];
       return nil;
     }
 
@@ -76,7 +75,7 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
 
     _ringBuffer = [[TFLRingBuffer alloc] initWithBufferSize:_bufferSize];
     _conversionQueue =
-        dispatch_queue_create("com.tflAudio.AudioConversionQueue", NULL);  // Serial Queue
+        dispatch_queue_create("org.tensorflow.lite.AudioConversionQueue", NULL);  // Serial Queue
   }
   return self;
 }

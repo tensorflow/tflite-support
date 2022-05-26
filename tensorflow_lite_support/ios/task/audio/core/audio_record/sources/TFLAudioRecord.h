@@ -18,6 +18,42 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * @enum TFLAudioRecordErrorCode
+ * This enum specifies error codes for TFLAudioRecord of the TensorFlow Lite Task Library.
+ */
+typedef NS_ENUM(NSUInteger, TFLAudioRecordErrorCode) {
+
+  /** Unspecified error. */
+  TFLAudioRecordErrorCodeUnspecifiedError = 1,
+
+  /** Invalid argument specified. */
+  TFLAudioRecordErrorCodeInvalidArgumentError,
+
+  /**
+   * Audio processing operation failed.
+   * E.g. Format conversion operations by TFLAudioRecord.
+   */
+  TFLAudioRecordErrorCodeProcessingError,
+
+  /**
+   * Audio record permissions were denied by the user.
+   */
+  TFLAudioRecordErrorCodeRecordPermissionDeniedError,
+
+  /**
+   * Audio record permissions cannot be determined. If this error is returned by
+   * TFLAudioRecord, the caller has to acquire permissions using AVFoundation.
+   */
+  TFLAudioRecordErrorCodeRecordPermissionUndeterminedError,
+
+  /**
+   * TFLAudioRecord is waiting for new mic input.
+   */
+  TFLAudioRecordErrorCodeWaitingForNewMicInputError
+
+} NS_SWIFT_NAME(AudioRecordErrorCode);
+
 /** A wrapper class to record the device's microphone continuously. Currently this class only supports
  recording upto 2 channels. If the number of channels is 2, then the mono microphone input is duplicated to
  provide dual channel data. */
