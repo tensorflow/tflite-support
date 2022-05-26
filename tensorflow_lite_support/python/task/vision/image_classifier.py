@@ -16,7 +16,7 @@
 import dataclasses
 from typing import Optional
 
-from tensorflow_lite_support.python.task.core import base_options
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
@@ -26,7 +26,7 @@ from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_cla
 
 _CppImageClassifier = _pywrap_image_classifier.ImageClassifier
 _ClassificationOptions = classification_options_pb2.ClassificationOptions
-_BaseOptions = base_options.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 
 
 @dataclasses.dataclass

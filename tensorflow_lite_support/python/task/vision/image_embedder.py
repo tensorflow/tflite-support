@@ -16,7 +16,7 @@
 import dataclasses
 from typing import Optional
 
-from tensorflow_lite_support.python.task.core import base_options
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_pb2
@@ -25,7 +25,7 @@ from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_embedder
 
 _CppImageEmbedder = _pywrap_image_embedder.ImageEmbedder
-_BaseOptions = base_options.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 
 

@@ -19,7 +19,7 @@ from tensorflow_lite_support.python.task.audio.core import audio_record
 from tensorflow_lite_support.python.task.audio.core import tensor_audio
 from tensorflow_lite_support.python.task.audio.core.pybinds import _pywrap_audio_buffer
 from tensorflow_lite_support.python.task.audio.pybinds import _pywrap_audio_classifier
-from tensorflow_lite_support.python.task.core import base_options
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 
@@ -27,7 +27,7 @@ _CppAudioFormat = _pywrap_audio_buffer.AudioFormat
 _CppAudioBuffer = _pywrap_audio_buffer.AudioBuffer
 _CppAudioClassifier = _pywrap_audio_classifier.AudioClassifier
 _ClassificationOptions = classification_options_pb2.ClassificationOptions
-_BaseOptions = base_options.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 
 
 @dataclasses.dataclass

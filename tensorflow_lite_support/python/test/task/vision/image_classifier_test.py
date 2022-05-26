@@ -18,14 +18,14 @@ import enum
 from absl.testing import parameterized
 import tensorflow as tf
 
-from tensorflow_lite_support.python.task.core import base_options
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
 from tensorflow_lite_support.python.task.vision import image_classifier
 from tensorflow_lite_support.python.task.vision.core import tensor_image
 from tensorflow_lite_support.python.test import test_util
 
-_BaseOptions = base_options.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 _ImageClassifier = image_classifier.ImageClassifier
 _ImageClassifierOptions = image_classifier.ImageClassifierOptions
 

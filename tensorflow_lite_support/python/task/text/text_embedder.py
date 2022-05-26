@@ -15,13 +15,13 @@
 
 import dataclasses
 
-from tensorflow_lite_support.python.task.core import base_options
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_pb2
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_text_embedder
 
 _CppTextEmbedder = _pywrap_text_embedder.TextEmbedder
-_BaseOptions = base_options.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 
 

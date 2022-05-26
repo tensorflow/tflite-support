@@ -15,7 +15,7 @@
 
 import dataclasses
 
-from tensorflow_lite_support.python.task.core import base_options
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import segmentation_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import segmentations_pb2
 from tensorflow_lite_support.python.task.vision.core import tensor_image
@@ -24,7 +24,7 @@ from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_seg
 
 _CppImageSegmenter = _pywrap_image_segmenter.ImageSegmenter
 _SegmentationOptions = segmentation_options_pb2.SegmentationOptions
-_BaseOptions = base_options.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 
 
 @dataclasses.dataclass
