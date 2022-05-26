@@ -92,59 +92,6 @@ tflite_ios_framework(
     ],
 )
 
-tflite_ios_framework(
-    name = "TensorFlowLiteTaskVisionTestC_framework",
-    hdrs = [
-        ":base_options.h",
-        ":bounding_box.h",
-        ":category.h",
-        ":classification_options.h",
-        ":classification_result.h",
-        ":common.h",
-        ":frame_buffer.h",
-        ":image_classifier.h",
-    ],
-    allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
-    bundle_name = "TensorFlowLiteTaskVisionC",
-    minimum_os_version = TFL_MINIMUM_OS_VERSION,
-    deps = [
-        "//tensorflow_lite_support/c/task/vision:image_classifier",
-        "//tensorflow_lite_support/cc/task/vision:image_classifier",
-    ],
-)
-
-objc_library(
-    name = "TFLCommon",
-    hdrs = [
-        "sources/TFLCommon.h",
-    ],
-    module_name = "TFLCommon",
-    visibility = [
-        "//tensorflow_lite_support:__subpackages__",
-    ],
-)
-
-tflite_ios_framework(
-    name = "TensorFlowLiteTaskVisionTestC_framework",
-    hdrs = [
-        ":base_options.h",
-        ":bounding_box.h",
-        ":category.h",
-        ":classification_options.h",
-        ":classification_result.h",
-        ":common.h",
-        ":frame_buffer.h",
-        ":image_classifier.h",
-    ],
-    allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
-    bundle_name = "TensorFlowLiteTaskVisionC",
-    minimum_os_version = TFL_MINIMUM_OS_VERSION,
-    deps = [
-        "//tensorflow_lite_support/c/task/vision:image_classifier",
-        "//tensorflow_lite_support/cc/task/vision:image_classifier",
-    ],
-)
-
 objc_library(
     name = "TFLCommon",
     hdrs = [

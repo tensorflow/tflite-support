@@ -12,16 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import "GMLImage.h"
-#import "TFLBaseOptions.h"
-#import "TFLCategory.h"
-#import "TFLClassificationOptions.h"
-#import "TFLClassificationResult.h"
-#import "TFLCommon.h"
-#import "TFLDetectionResult.h"
-#import "TFLImageClassifier.h"
-#import "TFLImageSegmenter.h"
-#import "TFLObjectDetector.h"
-#import "TFLSegmentationResult.h"
+
 #import "TFLImageClassifierTest.h"
 

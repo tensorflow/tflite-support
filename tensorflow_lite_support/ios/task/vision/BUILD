@@ -70,6 +70,7 @@ objc_library(
     name = "TFLImageSegmenter",
     srcs = [
         "sources/TFLImageSegmenter.m",
+        
     ],
     hdrs = [
         "sources/TFLImageSegmenter.h",
@@ -108,11 +109,20 @@ tflite_ios_framework(
     name = "TensorFlowLiteTaskImageClassifierTest_framework",
     hdrs = [
         "sources/TFLImageClassifierTest.h",
+        # "sources/TFLObjectDetector.h",
+        # "sources/TFLImageSegmenter.h",
+        # "sources/TFLImageClassifier.h",
+        # "sources/TFLImageClassifier.h",
+        # "//tensorflow_lite_support/ios/task/processor/sources/TFLCategory.h"
+
     ],
     allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskText.txt",
     bundle_name = "TensorFlowLiteTaskImageClassifierTest",
     minimum_os_version = TFL_MINIMUM_OS_VERSION,
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifierTest",
+        # "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
+        # "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
+        # "//tensorflow_lite_support/ios/task/vision:TFLObjectDetector",
     ],
 )
