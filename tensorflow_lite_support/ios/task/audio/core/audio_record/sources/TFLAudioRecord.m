@@ -149,10 +149,8 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
                                  code:TFLAudioRecordErrorCodeInvalidArgumentError
                           description:@"You have passed an unsupported number of channels."];
   } else {
-    TFLFloatBuffer *floatBuffer = [[TFLFloatBuffer alloc] initWithData:pcmBuffer.floatChannelData[0]
-                                                                  size:pcmBuffer.frameLength];
 
-    if ([self->_ringBuffer loadBuffer:floatBuffer offset:0 size:floatBuffer.size error:error]) {
+    if ([self->_ringBuffer loadFloatData:pcmBuffer.floatChannelData[0] dataSize:pcmBuffer.frameLength offset:0 size:floatBuffer.size error:error]) {
       return YES;
     }
   }
