@@ -46,7 +46,7 @@ NS_SWIFT_NAME(AudioRecord)
  */
 - (nullable instancetype)initWithAudioFormat:(TFLAudioFormat *)format
                                   bufferSize:(NSUInteger)bufferSize
-                                       error:(NSError *_Nullable *)error;
+                                       error:(NSError **)error;
 
 /**
  * This function starts recording the audio from the microphone if audio record permissions
@@ -91,7 +91,7 @@ NS_SWIFT_NAME(AudioRecord)
  */
 - (nullable TFLFloatBuffer *)readAtOffset:(NSUInteger)offset
                                  withSize:(NSUInteger)size
-                                    error:(NSError *_Nullable *)error;
+                                    error:(NSError **)error;
 
 @end
 

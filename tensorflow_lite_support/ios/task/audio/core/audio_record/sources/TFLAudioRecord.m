@@ -39,7 +39,7 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
 
 - (nullable instancetype)initWithAudioFormat:(TFLAudioFormat *)audioFormat
                                   bufferSize:(NSUInteger)bufferSize
-                                       error:(NSError *_Nullable *)error {
+                                       error:(NSError **)error {
   self = [self init];
   if (self) {
     if (audioFormat.channelCount > SUPPORTED_CHANNEL_COUNT) {
@@ -240,7 +240,7 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
 
 - (nullable TFLFloatBuffer *)readAtOffset:(NSUInteger)offset
                                  withSize:(NSUInteger)size
-                                    error:(NSError *_Nullable *)error {
+                                    error:(NSError **)error {
   __block TFLFloatBuffer *bufferToReturn = nil;
   __block NSError *readError = nil;
 
