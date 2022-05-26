@@ -18,14 +18,14 @@ import enum
 from absl.testing import parameterized
 
 import tensorflow as tf
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core import base_options
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_result_pb2
 from tensorflow_lite_support.python.task.text import text_searcher
 from tensorflow_lite_support.python.test import test_util
 
-_BaseOptions = base_options_pb2.BaseOptions
+_BaseOptions = base_options.BaseOptions
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 _SearchOptions = search_options_pb2.SearchOptions
 _SearchResult = search_result_pb2.SearchResult

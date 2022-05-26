@@ -16,7 +16,7 @@
 import dataclasses
 from typing import Optional
 
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core import base_options
 from tensorflow_lite_support.python.task.processor.proto import bounding_box_pb2
 from tensorflow_lite_support.python.task.processor.proto import embedding_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import search_options_pb2
@@ -26,7 +26,7 @@ from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_image_searcher
 
 _CppImageSearcher = _pywrap_image_searcher.ImageSearcher
-_BaseOptions = base_options_pb2.BaseOptions
+_BaseOptions = base_options.BaseOptions
 _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 _SearchOptions = search_options_pb2.SearchOptions
 
@@ -95,7 +95,7 @@ class ImageSearcher(object):
       RuntimeError: If other types of error occurred.
     """
     searcher = _CppImageSearcher.create_from_options(
-        options.base_options, options.embedding_options.to_pb2(),
+        options.base_options.to_pb2(), options.embedding_options.to_pb2(),
         options.search_options.to_pb2())
     return cls(options, searcher)
 
