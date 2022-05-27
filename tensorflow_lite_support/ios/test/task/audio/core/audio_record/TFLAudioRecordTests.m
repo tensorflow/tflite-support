@@ -31,6 +31,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic) AVAudioFormat *audioEngineFormat;
 @end
 
+// This category of TFLAudioRecord is private to the current test file.
+// This is needed in order to expose the method to load the audio record buffer 
+// without calling: -[TFLAudioRecord startRecordingWithError:].
+// This is needed to avoid exposing this method which isn't useful to the consumers
+// of the framework.
 @interface TFLAudioRecord (Tests)
 - (void)convertAndLoadBuffer:(AVAudioPCMBuffer *)buffer
          usingAudioConverter:(AVAudioConverter *)audioConverter;
