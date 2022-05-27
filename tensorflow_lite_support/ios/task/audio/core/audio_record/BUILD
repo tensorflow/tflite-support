@@ -16,6 +16,7 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/ios:TFLCommonUtils",
         "//tensorflow_lite_support/ios/task/audio/core:TFLRingBuffer",
+        "//tensorflow_lite_support/ios/task/audio/core:TFLAudioFormat",
     ],
 )
 
