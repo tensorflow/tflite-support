@@ -152,6 +152,12 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
                                  code:TFLAudioRecordErrorCodeProcessingError
                           description:@"Some error occured while processing mic input."];
   } else {
+    // `pcmBuffer` is already converted to an interleaved format since this method is called after 
+    // -[self bufferFromInputBuffer:usingAudioConverter:error:]. 
+    // If an `AVAudioPCMBuffer` is interleaved, both floatChannelData[0] and floatChannelData[1] point to the same 1d array with 
+    // both channels in an interleaved format according to:
+    // https://developer.apple.com/documentation/avfaudio/avaudiopcmbuffer/1386212-floatchanneldata
+    // Hence we can safely access floatChannelData[0] to get the 1D data in interleaved fashion.
     if ([self->_ringBuffer loadFloatData:pcmBuffer.floatChannelData[0]
                                 dataSize:pcmBuffer.frameLength
                                   offset:0

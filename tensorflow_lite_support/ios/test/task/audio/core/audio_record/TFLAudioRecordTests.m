@@ -175,6 +175,9 @@ NS_ASSUME_NONNULL_BEGIN
 
   XCTAssertNotNil(floatBuffer);
   XCTAssertEqual(floatBuffer.size, audioRecord.bufferSize);
+
+  // audioConverter will produce bufferToCompare with floatChannelData[0] in an interleaved format.
+  // Hence bufferToCompare can be compared to the result of `readAtOffset` directly without verifying is there is sample duplication.
   for (int i = 0; i < floatBuffer.size; i++) {
     XCTAssertEqual(
         floatBuffer.data[i],
