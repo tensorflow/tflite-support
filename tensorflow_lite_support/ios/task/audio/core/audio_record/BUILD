@@ -11,6 +11,7 @@ objc_library(
     hdrs = [
         "sources/TFLAudioRecord.h",
     ],
+    sdk_frameworks = ["AVFoundation"],
     module_name = "TFLAudioRecord",
     deps = [
         "//tensorflow_lite_support/ios:TFLCommonUtils",
