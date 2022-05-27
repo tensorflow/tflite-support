@@ -54,9 +54,9 @@ typedef NS_ENUM(NSUInteger, TFLAudioRecordErrorCode) {
 
 } NS_SWIFT_NAME(AudioRecordErrorCode);
 
-/** A wrapper class to record the device's microphone continuously. Currently this class only supports
- recording upto 2 channels. If the number of channels is 2, then the mono microphone input is duplicated to
- provide dual channel data. */
+/** A wrapper class to record the device's microphone continuously. Currently this class only
+ supports recording upto 2 channels. If the number of channels is 2, then the mono microphone input
+ is duplicated to provide dual channel data. */
 NS_SWIFT_NAME(AudioRecord)
 @interface TFLAudioRecord : NSObject
 
@@ -64,7 +64,7 @@ NS_SWIFT_NAME(AudioRecord)
 @property(nonatomic, readonly) TFLAudioFormat *audioFormat;
 
 /** Size of the buffer held by `TFLAudioRecord`. It ensures delivery of audio data of length
- * bufferSize arrays when you start recording the microphone input. 
+ * bufferSize arrays when you start recording the microphone input.
  */
 @property(nonatomic, readonly) NSUInteger bufferSize;
 
@@ -91,16 +91,16 @@ NS_SWIFT_NAME(AudioRecord)
  * @discussion Before calling this function, you must call
  * - [AVAudioSession requestRecordPermission:] on +[AVAudioSession sharedInstance] to acquire
  * record permissions. If the user has denied permission or the permissions are undetermined, the
- * return value will be false and appropriate error is populated in the error pointer. 
- * The internal buffer of `TFLAudioRecord` of length bufferSize will always have the most recent audio samples
- * acquired from the microphhone if this function returns successfully.  Use:
+ * return value will be false and appropriate error is populated in the error pointer.
+ * The internal buffer of `TFLAudioRecord` of length bufferSize will always have the most recent
+ * audio samples acquired from the microphhone if this function returns successfully.  Use:
  * - [TFLAudioRecord readAtOffset:withSize:error:] to get the data from the buffer at any instance,
  * if audio recording has started successfully.
  *
  * Use - [TFLAudioRecord stop] to stop the audio recording.
  *
- * @param error An optional error parameter populated when the microphone input could not be recorded
- * successfully.
+ * @param error An optional error parameter populated when the microphone input could not be
+ * recorded successfully.
  *
  * @return Boolean value indicating if audio recording started successfully.
  */

@@ -29,8 +29,8 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
 
   /* Specifying a custom buffer size on AVAUdioEngine while tapping does not take effect. Hence we
    * are storing the returned samples in a ring buffer to acheive the desired buffer size. If
-   * specified buffer size is shorter than the buffer size supported by `AVAudioEngine` only the most
-   * recent data of the buffer of size `bufferSize` will be stored by the ring buffer. */
+   * specified buffer size is shorter than the buffer size supported by `AVAudioEngine` only the
+   * most recent data of the buffer of size `bufferSize` will be stored by the ring buffer. */
   TFLRingBuffer *_ringBuffer;
   dispatch_queue_t _conversionQueue;
   NSError *_globalError;
@@ -46,8 +46,12 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
           createCustomError:error
                  withDomain:TFLAudioRecordErrorDomain
                        code:TFLAudioRecordErrorCodeInvalidArgumentError
-                description:[NSString stringWithFormat:@"The channel count provided does not match the supported "
-                            @"channel count. Only upto %d audio channels are currently supported.", SUPPORTED_CHANNEL_COUNT]];
+                description:
+                    [NSString
+                        stringWithFormat:
+                            @"The channel count provided does not match the supported "
+                            @"channel count. Only upto %d audio channels are currently supported.",
+                            SUPPORTED_CHANNEL_COUNT]];
       return nil;
     }
 
@@ -87,7 +91,6 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
   // latency as the input pcmBuffer.
   AVAudioFrameCount capacity = ceil(pcmBuffer.frameLength * audioConverter.outputFormat.sampleRate /
                                     audioConverter.inputFormat.sampleRate);
-
   AVAudioPCMBuffer *outPCMBuffer = [[AVAudioPCMBuffer alloc]
       initWithPCMFormat:audioConverter.outputFormat
           frameCapacity:capacity * (AVAudioFrameCount)audioConverter.outputFormat.channelCount];
@@ -143,18 +146,38 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
                                  code:TFLAudioRecordErrorCodeInvalidArgumentError
                           description:@"You may have to try with a different "
                                       @"channel count or sample rate"];
-  } else if ((pcmBuffer.frameLength % self.audioFormat.channelCount) != 0) {
+  } else if (pcmBuffer.format.commonFormat != AVAudioPCMFormatFloat32) {
     [TFLCommonUtils createCustomError:error
                            withDomain:TFLAudioRecordErrorDomain
-                                 code:TFLAudioRecordErrorCodeInvalidArgumentError
-                          description:@"You have passed an unsupported number of channels."];
+                                 code:TFLAudioRecordErrorCodeProcessingError
+                          description:@"Some error occured while processing mic input."];
   } else {
-
-    if ([self->_ringBuffer loadFloatData:pcmBuffer.floatChannelData[0] dataSize:pcmBuffer.frameLength offset:0 size:pcmBuffer.frameLength error:error]) {
+    if ([self->_ringBuffer loadFloatData:pcmBuffer.floatChannelData[0]
+                                dataSize:pcmBuffer.frameLength
+                                  offset:0
+                                    size:pcmBuffer.frameLength
+                                   error:error]) {
       return YES;
     }
   }
   return NO;
+}
+
+- (void)convertAndLoadBuffer:(AVAudioPCMBuffer *)buffer
+         usingAudioConverter:(AVAudioConverter *)audioConverter {
+  dispatch_sync(self->_conversionQueue, ^{
+    NSError *conversionError = nil;
+    AVAudioPCMBuffer *convertedPCMBuffer = [self bufferFromInputBuffer:buffer
+                                                   usingAudioConverter:audioConverter
+                                                                 error:&conversionError];
+
+    if (!(convertedPCMBuffer && [self loadAudioPCMBuffer:convertedPCMBuffer
+                                                   error:&conversionError])) {
+      self->_globalError = conversionError;
+    } else {
+      self->_globalError = nil;
+    }
+  });
 }
 
 - (void)startTappingMicrophoneWithError:(NSError **)error {
@@ -172,26 +195,12 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
 
   // Setting buffer size takes no effect on the input node. This class uses a ring buffer internally
   // to ensure the requested buffer size.
-  [inputNode
-      installTapOnBus:0
-           bufferSize:(AVAudioFrameCount)self.bufferSize
-               format:format
-                block:^(AVAudioPCMBuffer *buffer, AVAudioTime *when) {
-                  dispatch_async(self->_conversionQueue, ^{
-                    NSError *conversionError = nil;
-                    AVAudioPCMBuffer *convertedPCMBuffer =
-                        [self bufferFromInputBuffer:buffer
-                                usingAudioConverter:audioConverter
-                                              error:&conversionError];
-
-                    if (!(convertedPCMBuffer && [self loadAudioPCMBuffer:convertedPCMBuffer
-                                                                   error:&conversionError])) {
-                      self->_globalError = conversionError;
-                    } else {
-                      self->_globalError = nil;
-                    }
-                  });
-                }];
+  [inputNode installTapOnBus:0
+                  bufferSize:(AVAudioFrameCount)self.bufferSize
+                      format:format
+                       block:^(AVAudioPCMBuffer *buffer, AVAudioTime *when) {
+                         [self convertAndLoadBuffer:buffer usingAudioConverter:audioConverter];
+                       }];
 
   [_audioEngine prepare];
   [_audioEngine startAndReturnError:error];
@@ -250,7 +259,7 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
                  withDomain:TFLAudioRecordErrorDomain
                        code:TFLAudioRecordErrorCodeInvalidArgumentError
                 description:@"Index out of bounds: offset + size should be <= to the size of "
-                            @"TFLAudioRecord's internal buffer. "];
+                            @"TFLAudioRecord's internal buffer."];
     } else {
       bufferToReturn = [_ringBuffer floatBufferWithOffset:offset size:size];
     }
@@ -259,7 +268,7 @@ static NSString *const TFLAudioRecordErrorDomain = @"org.tensorflow.lite.audio.r
   if (!bufferToReturn && error) {
     *error = readError;
   }
-  
+
   return bufferToReturn;
 }
 
