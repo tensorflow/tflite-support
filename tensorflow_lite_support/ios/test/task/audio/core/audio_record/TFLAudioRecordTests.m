@@ -79,6 +79,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (AVAudioPCMBuffer *)audioEngineFromFileWithName:(NSString *)name extension:(NSString *)extension {
+
+  // Loading AVAudioPCMBuffer with an array is not currentlyy suupported for iOS versions < 15.0.
+  // Instead audio samples from a wav file are loaded and converted into the same format
+  // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
   NSURL *fileURL = [[NSBundle bundleForClass:self.class] URLForResource:name
                                                           withExtension:extension];
 
@@ -98,7 +102,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  bufferSize:100
                                                                       error:nil];
   XCTAssertNotNil(audioRecord);
-
+  
+  // Loading AVAudioPCMBuffer with an array is not currentlyy suupported for iOS versions < 15.0.
+  // Instead audio samples from a wav file are loaded and converted into the same format
+  // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
   AVAudioPCMBuffer *audioEngineBuffer = [self audioEngineFromFileWithName:@"speech"
                                                                 extension:@"wav"];
   XCTAssertNotNil(audioEngineBuffer);
@@ -112,8 +119,13 @@ NS_ASSUME_NONNULL_BEGIN
   AVAudioConverter *audioConverter = [[AVAudioConverter alloc] initFromFormat:self.audioEngineFormat
                                                                      toFormat:recordingFormat];
 
+   // convert and load audio buffer using audio engine.
   [audioRecord convertAndLoadBuffer:audioEngineBuffer usingAudioConverter:audioConverter];
 
+  // To compare the result of readAtOffset:, we produce a bufferToCompare by converting audioEngineBuffer using by the same logic
+  // that coonverts the buffer to the required format in the `TFLAudioRecord`. Since the conversion is performed by
+  // the native `AVAudioConverter`, we don't have to test if the conversion itself produces valid samples. We simply
+  // compare the resulting buffer to the buffer that is read from `TFLAudioRecord`.
   AVAudioPCMBuffer *bufferToCompare = [audioEngineBuffer bufferUsingAudioConverter:audioConverter];
   XCTAssertNotNil(bufferToCompare);
 
