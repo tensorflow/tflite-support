@@ -16,12 +16,12 @@
 import dataclasses
 from typing import Optional
 
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_bert_nl_classifier
 
 _CppBertNLClassifier = _pywrap_bert_nl_classifier.BertNLClassifier
-_BaseOptions = base_options_pb2.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 
 
 @dataclasses.dataclass
@@ -77,7 +77,7 @@ class BertNLClassifier(object):
       RuntimeError: If other types of error occurred.
     """
     classifier = _CppBertNLClassifier.create_from_options(
-        options.base_options, options.max_seq_len)
+        options.base_options.to_pb2(), options.max_seq_len)
     return cls(options, classifier)
 
   def classify(self, text: str) -> classifications_pb2.ClassificationResult:
