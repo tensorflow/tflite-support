@@ -15,12 +15,12 @@
 
 import dataclasses
 
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import qa_answers_pb2
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_bert_question_answerer
 
 _CppBertQuestionAnswerer = _pywrap_bert_question_answerer.BertQuestionAnswerer
-_BaseOptions = base_options_pb2.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 
 
 @dataclasses.dataclass
@@ -76,7 +76,7 @@ class BertQuestionAnswerer(object):
       RuntimeError: If other types of error occurred.
     """
     question_answerer = _CppBertQuestionAnswerer.create_from_options(
-      options.base_options)
+        options.base_options.to_pb2())
     return cls(options, question_answerer)
 
   def answer(
