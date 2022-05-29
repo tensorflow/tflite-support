@@ -1,5 +1,4 @@
 # Placeholder for internal Python strict library compatibility macro.
-load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_cc_proto_library", "support_py_proto_library")
 
 package(
     default_visibility = ["//tensorflow_lite_support:internal"],
@@ -110,23 +109,13 @@ py_library(
     ],
 )
 
-proto_library(
-    name = "search_options_proto",
-    srcs = ["search_options.proto"],
-)
-
-support_cc_proto_library(
-    name = "search_options_cc_proto",
+py_library(
+    name = "search_options_pb2",
+    srcs = ["search_options_pb2.py"],
     deps = [
-        ":search_options_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:search_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
-)
-
-support_py_proto_library(
-    name = "search_options_py_pb2",
-    srcs = ["search_options.proto"],
-    api_version = 2,
-    proto_deps = [":search_options_proto"],
 )
 
 py_library(
@@ -134,5 +123,6 @@ py_library(
     srcs = ["search_result_pb2.py"],
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:search_result_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )

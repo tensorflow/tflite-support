@@ -15,7 +15,7 @@
 
 import dataclasses
 
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import detection_options_pb2
 from tensorflow_lite_support.python.task.processor.proto import detections_pb2
 from tensorflow_lite_support.python.task.vision.core import tensor_image
@@ -23,7 +23,7 @@ from tensorflow_lite_support.python.task.vision.core.pybinds import image_utils
 from tensorflow_lite_support.python.task.vision.pybinds import _pywrap_object_detector
 
 _CppObjectDetector = _pywrap_object_detector.ObjectDetector
-_BaseOptions = base_options_pb2.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 _DetectionOptions = detection_options_pb2.DetectionOptions
 
 
@@ -80,7 +80,7 @@ class ObjectDetector(object):
       RuntimeError: If other types of error occurred.
     """
     detector = _CppObjectDetector.create_from_options(
-        options.base_options, options.detection_options.to_pb2())
+        options.base_options.to_pb2(), options.detection_options.to_pb2())
     return cls(options, detector)
 
   def detect(self,

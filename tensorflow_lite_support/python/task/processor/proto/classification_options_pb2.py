@@ -35,10 +35,10 @@ class ClassificationOptions:
       below this value are rejected.
     category_name_allowlist: If non-empty, classifications whose class name is
       not in this set will be filtered out. Duplicate or unknown class names are
-      ignored. Mutually exclusive with `class_name_denylist`.
+      ignored. Mutually exclusive with `category_name_denylist`.
     category_name_denylist: If non-empty, classifications whose class name is in
       this set will be filtered out. Duplicate or unknown class names are
-      ignored. Mutually exclusive with `class_name_allowlist`.
+      ignored. Mutually exclusive with `category_name_allowlist`.
   """
 
   score_threshold: Optional[float] = None
@@ -61,7 +61,7 @@ class ClassificationOptions:
   @doc_controls.do_not_generate_docs
   def create_from_pb2(
       cls, pb2_obj: _ClassificationOptionsProto) -> "ClassificationOptions":
-    """Creates a `DetectionOptions` object from the given protobuf object."""
+    """Creates a `ClassificationOptions` object from the given protobuf object."""
     return ClassificationOptions(
         score_threshold=pb2_obj.score_threshold,
         category_name_allowlist=[
