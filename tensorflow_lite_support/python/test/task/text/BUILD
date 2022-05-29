@@ -54,7 +54,7 @@ py_test(
     ],
     deps = [
         # build rule placeholder: tensorflow dep,
-        "//tensorflow_lite_support/python/task/core/proto:base_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:base_options",
         "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:nl_classification_options_pb2",

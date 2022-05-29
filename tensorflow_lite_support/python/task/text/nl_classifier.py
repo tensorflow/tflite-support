@@ -15,13 +15,13 @@
 
 import dataclasses
 
-from tensorflow_lite_support.python.task.core.proto import base_options_pb2
+from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.processor.proto import nl_classification_options_pb2
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_nl_classifier
 
 _CppNLClassifier = _pywrap_nl_classifier.NLClassifier
-_BaseOptions = base_options_pb2.BaseOptions
+_BaseOptions = base_options_module.BaseOptions
 _NLClassificationOptions = nl_classification_options_pb2.NLClassificationOptions
 
 
@@ -75,7 +75,8 @@ class NLClassifier(object):
       RuntimeError: If other types of error occurred.
     """
     classifier = _CppNLClassifier.create_from_options(
-        options.base_options, options.nl_classification_options.to_pb2())
+        options.base_options.to_pb2(),
+        options.nl_classification_options.to_pb2())
     return cls(options, classifier)
 
   def classify(self, text: str) -> classifications_pb2.ClassificationResult:
