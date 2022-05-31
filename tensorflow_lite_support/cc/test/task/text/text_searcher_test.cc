@@ -34,9 +34,8 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/processor/proto/search_options.pb.h"
 #include "tensorflow_lite_support/cc/task/processor/proto/search_result.pb.h"
 #include "tensorflow_lite_support/cc/task/text/proto/text_searcher_options.pb.h"
+#include "tensorflow_lite_support/cc/task/text/utils/text_op_resolver.h"
 #include "tensorflow_lite_support/cc/test/test_utils.h"
-#include "tensorflow_lite_support/examples/task/text/desktop/universal_sentence_encoder_qa_op_resolver.h"
-
 namespace tflite {
 namespace task {
 namespace text {
@@ -84,7 +83,7 @@ void ExpectApproximatelyEqual(const SearchResult& actual,
 std::unique_ptr<tflite::OpResolver> GetOpResolver(
     bool is_universal_sentence_encoder) {
   if (is_universal_sentence_encoder) {
-    return CreateQACustomOpResolver();
+    return CreateTextOpResolver();
   } else {
     return absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>();
   }
