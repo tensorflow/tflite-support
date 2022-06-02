@@ -31,3 +31,15 @@ objc_library(
         "//third_party/apple_frameworks:Foundation",
     ],
 )
+
+objc_library(
+    name = "TFLAudioFormat",
+    srcs = [
+        "sources/TFLAudioFormat.m",
+    ],
+    hdrs = [
+        "sources/TFLAudioFormat.h",
+    ],
+    module_name = "TFLAudioFormat",
+    deps = ["//third_party/apple_frameworks:Foundation"],
+)

@@ -21,7 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TFLCommonUtils : NSObject
 
 /**
- * Creates and saves an NSError with the given code and description.
+ * Creates and saves an NSError in the Tensorflow Lite Task Library domain, with the given code and
+ * description.
  *
  * @param code Error code.
  * @param description Error description.
@@ -30,6 +31,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)createCustomError:(NSError **)error
                  withCode:(NSInteger)code
+              description:(NSString *)description;
+
+/**
+ * Creates and saves an NSError with the given domain, code and description.
+ *
+ * @param error Pointer to the memory location where the created error should be saved. If `nil`,
+ * no error will be saved.
+ * @param domain Error domain.
+ * @param code Error code.
+ * @param description Error description.
+ */
++ (void)createCustomError:(NSError **)error
+               withDomain:(NSString *)domain
+                     code:(NSInteger)code
               description:(NSString *)description;
 
 /**
