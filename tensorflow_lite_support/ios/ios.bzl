@@ -28,3 +28,33 @@ def strip_c_api_include_path_prefix(name, hdr_labels, prefix = ""):
             > "$@"
             """.format(prefix, hdr_label),
         )
+
+def strip_ios_api_include_path_prefix(name, hdr_labels, prefix = ""):
+    """Create modified header files with the common.h include path stripped out.
+
+    Args:
+      name: The name to be used as a prefix to the generated genrules.
+      hdr_labels: List of header labels to strip out the include path. Each
+          label must end with a colon followed by the header file name.
+      prefix: Optional prefix path to prepend to the header inclusion path.
+    """
+
+    for hdr_label in hdr_labels:
+        hdr_filename = hdr_label.split(":")[-1]
+        if hdr_filename.startswith("sources/"):
+            hdr_filename = hdr_filename[len("sources/"):]
+        if hdr_filename.startswith("apis/"):
+            hdr_filename = hdr_filename[len("apis/"):]
+        
+        hdr_basename = hdr_filename.split(".")[0]
+        native.genrule(
+            name = "{}_{}".format(name, hdr_basename),
+            srcs = [hdr_label],
+            outs = [hdr_filename],
+            cmd = """
+            sed 's|#import ".*/\\([^/]\\{{1,\\}}\\.h\\)"|#import "{}\\1"|'\
+            "$(location {})"\
+            > "$@"
+            """.format(prefix, hdr_label),
+        )
+

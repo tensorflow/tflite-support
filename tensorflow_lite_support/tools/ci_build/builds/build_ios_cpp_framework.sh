@@ -67,7 +67,7 @@ function build_c_api_framework {
 
 function build_ios_api_framework {
   "${BAZEL}" build -c opt --config=ios_fat \
-    //tensorflow_lite_support/ios/task/vision:TensorFlowLiteTaskImageClassifierTest_framework
+    //tensorflow_lite_support/ios/task/vision:TTensorFlowLiteCPPTest_framework
 
     # "${BAZEL}" build -c opt --config=ios_fat //tensorflow_lite_support/ios/task/vision:TFLImageClassifierTest
 }
@@ -189,9 +189,9 @@ function create_framework_archive {
 
   # ----- (2) Unzip the prebuilt C API framework -----
   # unzip "${C_API_FRAMEWORK_NAME}_framework.zip" -d "${TFLS_TMPDIR}"/Frameworks
-    unzip "bazel-bin/tensorflow_lite_support/ios/task/vision/TensorFlowLiteTaskImageClassifierTest_framework.zip" -d "${TFLS_TMPDIR}"/Frameworks
+    unzip "bazel-bin/tensorflow_lite_support/ios/task/vision/TensorFlowLiteCPPTest_framework.zip" -d "${TFLS_TMPDIR}"/Frameworks
 
-    cp "${TFLS_ROOT_DIR}/tensorflow_lite_support/ios/task/vision/apis/framework_cpp.modulemap" ${TFLS_TMPDIR}
+    # cp "${TFLS_ROOT_DIR}/tensorflow_lite_support/ios/task/vision/apis/framework_cpp.modulemap" ${TFLS_TMPDIR}
     # cp "${TFLS_ROOT_DIR}/bazel-bin/tensorflow_lite_support/ios/task/vision/libTFLImageClassifierTest.a" ${TFLS_TMPDIR}
     # cp "${TFLS_ROOT_DIR}/tensorflow_lite_support/ios/task/vision/libTFLImageClassifierTest.a" ${TFLS_TMPDIR}
 

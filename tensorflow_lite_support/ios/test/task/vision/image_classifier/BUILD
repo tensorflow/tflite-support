@@ -84,3 +84,23 @@ ios_unit_test(
         ":TFLImageClassifierCoreMLDelegateTestLibrary",
     ],
 )
+
+objc_library(
+    name = "TFLImageClassifierCPPTestLibrary",
+    testonly = 1,
+    srcs = ["TFLImageClassifierCPPTests.m"],
+    tags = TFL_DEFAULT_TAGS,
+    deps = [
+        "//tensorflow_lite_support/ios/task/vision:TFLImageClassifierTest",
+    ],
+)
+
+ios_unit_test(
+    name = "TFLImageClassifierCPPTest",
+    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    runner = tflite_ios_lab_runner("IOS_LATEST"),
+    tags = TFL_DEFAULT_TAGS + TFL_DISABLED_SANITIZER_TAGS,
+    deps = [
+        ":TFLImageClassifierCPPTestLibrary",
+    ],
+)

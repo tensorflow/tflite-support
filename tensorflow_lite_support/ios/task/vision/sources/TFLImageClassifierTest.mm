@@ -25,10 +25,10 @@ using ::tflite::support::StatusOr;
 
 }  // namespace
 
-@interface TFLImageClassifierTest ()
-/** ImageClassifier backed by C API */
-// @property(nonatomic) TfLiteImageClassifier *imageClassifier;
-@end
+// @interface TFLImageClassifierTest ()
+// /** ImageClassifier backed by C API */
+// // @property(nonatomic) TfLiteImageClassifier *imageClassifier;
+// @end
 
 @implementation TFLImageClassifierTest
 
