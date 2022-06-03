@@ -20,10 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A TensorFlow Lite Task Image Classifiier.
  */
-NS_SWIFT_NAME(ImageClassifierTest)
-@interface TFLImageClassifierTest : NSObject
+NS_SWIFT_NAME(ImageEmbedder)
+@interface TFLImageEmbedder : NSObject
 
--(BOOL)testClassifier;
+- (instancetype)initWithModelPath:(NSString *)modelPath;
 @end
 
 NS_ASSUME_NONNULL_END

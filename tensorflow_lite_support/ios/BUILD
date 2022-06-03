@@ -8,6 +8,12 @@ load(
 load(
     "//tensorflow_lite_support/ios:ios.bzl",
     "strip_c_api_include_path_prefix",
+    "strip_ios_api_include_path_prefix",
+)
+
+load(
+    "@build_bazel_rules_apple//apple:ios.bzl",
+    "ios_static_framework",
 )
 
 package(
@@ -34,6 +40,13 @@ strip_c_api_include_path_prefix(
         "//tensorflow_lite_support/c/task/processor:category.h",
         "//tensorflow_lite_support/c/task/core:base_options.h",
         "//tensorflow_lite_support/c:common.h",
+    ],
+)
+
+strip_ios_api_include_path_prefix(
+    name = "strip_ios_api_include_path",
+     hdr_labels = [
+        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageEmbedder.h",
     ],
 )
 
@@ -120,3 +133,16 @@ objc_library(
         "//tensorflow_lite_support/ios:TFLCommon",
     ],
 )
+
+ios_static_framework(
+    name = "TensorFlowLiteTaskVisionObjCPP_framework",
+    hdrs = [
+        ":TFLImageEmbedder.h",
+    ],
+    bundle_name = "TensorFlowLiteTaskVisionObjCPP",
+    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    deps = [
+        "//tensorflow_lite_support/ios/task/vision:TFLImageEmbedder",
+    ],
+)
+
