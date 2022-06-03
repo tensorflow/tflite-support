@@ -26,8 +26,7 @@ Pod::Spec.new do |s|
     objc_dir + 'sources/TFLCommon.h',
     objc_core_dir + 'sources/TFLBaseOptions.h',
     objc_processor_dir + 'sources/{TFLClassificationOptions,TFLCategory,TFLClassificationResult,TFLDetectionResult,TFLSegmentationResult}.h',
-    objc_vision_dir + 'sources/*.h',
-    "Frameworks/TensorFlowLiteTaskImageClassifierTest.framework/Headers/*.h"
+    objc_vision_dir + 'sources/*.h'
   ]
 
   c_dir = root_dir_name + '/c/'
@@ -49,7 +48,6 @@ Pod::Spec.new do |s|
     objc_vision_dir + 'sources/*',
     gml_image_dir + 'apis/*.h',
     gml_image_dir + 'sources/*'
-    "Frameworks/TensorFlowLiteTaskImageClassifierTest.framework/Headers/*.h"
   ]
 
   s.module_map = objc_vision_dir + 'apis/framework.modulemap'
@@ -60,5 +58,5 @@ Pod::Spec.new do |s|
   }
 
   s.library = 'c++'
-  s.vendored_frameworks = 'Frameworks/TensorFlowLiteTaskVisionC.framework', 'Frameworks/TensorFlowLiteTaskImageClassifierTest.framework'
+  s.vendored_frameworks = 'Frameworks/TensorFlowLiteTaskVisionC.framework'
 end
