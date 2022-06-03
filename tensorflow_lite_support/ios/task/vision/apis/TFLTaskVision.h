@@ -23,5 +23,4 @@
 #import "TFLImageSegmenter.h"
 #import "TFLObjectDetector.h"
 #import "TFLSegmentationResult.h"
-#import "TFLImageClassifierTest.h"
 

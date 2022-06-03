@@ -55,7 +55,6 @@ objc_library(
     name = "TFLImageSegmenter",
     srcs = [
         "sources/TFLImageSegmenter.m",
-        
     ],
     hdrs = [
         "sources/TFLImageSegmenter.h",
