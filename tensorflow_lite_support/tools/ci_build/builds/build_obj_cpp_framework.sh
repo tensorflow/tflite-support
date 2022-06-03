@@ -125,3 +125,4 @@ function create_framework_archive {
 cd "${TFLS_ROOT_DIR}"
 build_ios_api_framework $FRAMEWORK_NAME
 create_framework_archive $FRAMEWORK_NAME
+
