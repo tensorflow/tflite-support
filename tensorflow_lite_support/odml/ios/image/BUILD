@@ -15,7 +15,7 @@ load(
 )
 
 package(
-    default_visibility = ["//tensorflow_lite_support:internal"],
+    default_visibility = ["//visibility:private"],
     licenses = ["notice"],  # Apache 2.0
 )
 

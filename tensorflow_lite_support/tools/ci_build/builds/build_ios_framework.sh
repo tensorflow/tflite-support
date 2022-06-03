@@ -65,37 +65,6 @@ function build_c_api_framework {
     //tensorflow_lite_support/ios:$1C_framework
 }
 
-function strip_path_and_copy_source_files {
-   # List of individual files obtained from the patterns above.
-  SRC_FILES=$(xargs -n1 find * -wholename <<< "${SRC_PATTERNS}" | sort | uniq)
-
-  # Copy source files with the intermediate directories preserved.
-  xargs -n1 -I{} rsync -R {} "${TFLS_TMPDIR}" <<< "${SRC_FILES}"
-
-  popd
-
-  pushd "${TFLS_ROOT_DIR}"
-
-  # List of individual files obtained from the patterns above.
-  IOS_HEADER_FILES=$(xargs -n1 find * -wholename <<< "${IOS_HEADER_PATTERNS}" | sort | uniq)
-  popd
-
-  # The iOS headers should be stripped off the path prefixes in the #imports.
-  # This is required for the cocoapods to build fine since the header files in
-  # an iOS framework cannot be organised in multilevel directories.
-  for filename in ${IOS_HEADER_FILES}
-  do
-    LAST_PATH_COMPONENT=$(basename ${filename})
-    FULL_SOURCE_PATH="$TFLS_ROOT_DIR/$filename"
-    FULL_DEST_PATH="$TFLS_TMPDIR/$filename"
-    sed -E 's|#import ".+\/([^/]+.h)"|#import "\1"|' $FULL_SOURCE_PATH > $FULL_DEST_PATH
-  done
-
-  # ----- (2) Unzip the prebuilt C API framework -----
-  unzip "${C_API_FRAMEWORK_NAME}_framework.zip" -d "${TFLS_TMPDIR}"/Frameworks
-}
-
-
 function create_framework_archive {
   TARGET_FRAMEWORK_NAME="$1"
   C_API_FRAMEWORK_NAME="$1C"
@@ -181,14 +150,6 @@ function create_framework_archive {
         */ios/task/text/*/Sources/*.h
       "
     ;;
-
-    "TensorFlowLiteTaskVisionObjCPP")
-      SRC_PATTERNS="
-        */c/task/text/*.h
-        */ios/task/text/*/Sources/*
-        */ios/task/text/apis/*
-      "
-    ;;
     *)
       echo "FRAMEWORK_NAME provided is not in the list of buildable frameworks.
             The accepted values are TensorFlowLiteTaskVision,
@@ -197,10 +158,36 @@ function create_framework_archive {
     ;;
   esac
 
- 
- 
-   # Copy the license file to TFLS_TMPDIR
+  # List of individual files obtained from the patterns above.
+  SRC_FILES=$(xargs -n1 find * -wholename <<< "${SRC_PATTERNS}" | sort | uniq)
+
+  # Copy source files with the intermediate directories preserved.
+  xargs -n1 -I{} rsync -R {} "${TFLS_TMPDIR}" <<< "${SRC_FILES}"
+  
+  # Copy the license file to TFLS_TMPDIR
   cp "${TFLS_ROOT_DIR}/LICENSE" ${TFLS_TMPDIR}
+
+  popd
+
+  pushd "${TFLS_ROOT_DIR}"
+
+  # List of individual files obtained from the patterns above.
+  IOS_HEADER_FILES=$(xargs -n1 find * -wholename <<< "${IOS_HEADER_PATTERNS}" | sort | uniq)
+  popd
+
+  # The iOS headers should be stripped off the path prefixes in the #imports.
+  # This is required for the cocoapods to build fine since the header files in
+  # an iOS framework cannot be organised in multilevel directories.
+  for filename in ${IOS_HEADER_FILES}
+  do
+    LAST_PATH_COMPONENT=$(basename ${filename})
+    FULL_SOURCE_PATH="$TFLS_ROOT_DIR/$filename"
+    FULL_DEST_PATH="$TFLS_TMPDIR/$filename"
+    sed -E 's|#import ".+\/([^/]+.h)"|#import "\1"|' $FULL_SOURCE_PATH > $FULL_DEST_PATH
+  done
+
+  # ----- (2) Unzip the prebuilt C API framework -----
+  unzip "${C_API_FRAMEWORK_NAME}_framework.zip" -d "${TFLS_TMPDIR}"/Frameworks
 
   # ----- (3) Move the framework to the destination -----
   if [[ "${ARCHIVE_FRAMEWORK}" == true ]]; then
