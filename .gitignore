@@ -1,0 +1,12 @@
+.idea/
+.aswb/
+.clwb/
+.ijwb/
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-tflite-support
+tensorflow_lite_support/java/gen
+tensorflow_lite_support/java/tensorflow_lite_support.iml
+tensorflow_lite_support/metadata/metadata.iml
+.DS_Store

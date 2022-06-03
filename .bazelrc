@@ -159,3 +159,10 @@ test --config=v2
 
 # Put user-specific options in .bazelrc.user
 try-import %workspace%/.bazelrc.user
+
+# TF now has `cc_shared_library` targets, so it needs the experimental flag
+# TODO(rostam): Remove when `cc_shared_library` is enabled by default
+build --experimental_cc_shared_library
+build --action_env TF_HEADER_DIR="/Users/ccen/.pyenv/versions/3.7.3/lib/python3.7/site-packages/tensorflow/include"
+build --action_env TF_SHARED_LIBRARY_DIR="/Users/ccen/.pyenv/versions/3.7.3/lib/python3.7/site-packages/tensorflow"
+build --action_env TF_SHARED_LIBRARY_NAME="libtensorflow_framework.so"

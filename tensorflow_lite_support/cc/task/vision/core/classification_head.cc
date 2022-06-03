@@ -38,6 +38,8 @@ StatusOr<ClassificationHead> BuildClassificationHead(
     head.name = output_tensor_metadata.name()->str();
   }
 
+  std::cout << "MLGB: head.label_map_items.size: " << head.label_map_items.size() << std::endl;
+
   // Build label map, if present.
   const std::string labels_filename =
       ModelMetadataExtractor::FindFirstAssociatedFileName(
@@ -105,7 +107,7 @@ StatusOr<ClassificationHead> BuildClassificationHead(
                          score_calibration_file, head.label_map_items));
     head.calibration_params = sigmoid_params;
   }
-
+  std::cout << "MLGB: head.label_map_items.size: " << head.label_map_items.size() << std::endl;
   return head;
 }
 

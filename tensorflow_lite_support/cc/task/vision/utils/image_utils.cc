@@ -55,6 +55,7 @@ StatusOr<ImageData> DecodeImageFromFile(const std::string& file_name) {
                         "(RGBA) channels, found %d",
                         image_data.channels));
   }
+  std::cout << "image_data.width: " << image_data.width << " image_data.height: " << image_data.height << " image_data.channels: " << image_data.channels << std::endl;
   return image_data;
 }
 

@@ -23,3 +23,17 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite:op_resolver",
     ],
 )
+
+# Default provider for BuiltInOpResover. Create your own target, overwrite the
+# function to provide a MutableOpResolver for customized OPs and/or a subset of
+# builtin OPs.
+cc_library_with_tflite(
+    name = "custom_op_resolver",
+    srcs = ["custom_op_resolver.cc"],
+    tflite_deps = [
+        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+    ],
+    deps = [
+        "@org_tensorflow//tensorflow/lite:op_resolver",
+    ],
+)

@@ -14,12 +14,28 @@ cc_library_with_tflite(
     ],
 )
 
+cc_library_with_tflite(
+    name = "image_classifier_native_custom",
+    tflite_jni_binaries = [
+        ":libtask_vision_jni_custom.so",
+    ],
+)
+
 jni_binary_with_tflite(
     name = "libtask_vision_jni.so",
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
     tflite_deps = [
         ":native_without_resolver",
         "//tensorflow_lite_support/java/src/native/task/core:builtin_op_resolver",
+    ],
+)
+
+jni_binary_with_tflite(
+    name = "libtask_vision_jni_custom.so",
+    linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
+    tflite_deps = [
+        ":native_without_resolver",
+        "//tensorflow_lite_support/java/src/native/task/core:custom_op_resolver",
     ],
 )
 

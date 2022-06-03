@@ -71,11 +71,17 @@ using std::chrono::microseconds;
 using std::chrono::steady_clock;
 }  // namespace
 
+void log(const std::string& message) {
+  std::cout << message << std::endl;
+}
+
+
+
 ImageClassifierOptions BuildOptions() {
   ImageClassifierOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       absl::GetFlag(FLAGS_model_path));
-  options.set_max_results(absl::GetFlag(FLAGS_max_results));
+//  options.set_max_results(absl::GetFlag(FLAGS_max_results));
   if (absl::GetFlag(FLAGS_score_threshold) >= 0) {
     options.set_score_threshold(absl::GetFlag(FLAGS_score_threshold));
   }
@@ -103,22 +109,23 @@ void DisplayResult(const ClassificationResult& result) {
       std::cout << absl::StrFormat(" Head index %d:\n", head);
     }
     const Classifications& classifications = result.classifications(head);
-    for (int rank = 0; rank < classifications.classes_size(); ++rank) {
-      const Class& classification = classifications.classes(rank);
-      std::cout << absl::StrFormat("  Rank #%d:\n", rank);
-      std::cout << absl::StrFormat("   index       : %d\n",
-                                   classification.index());
-      std::cout << absl::StrFormat("   score       : %.5f\n",
-                                   classification.score());
-      if (classification.has_class_name()) {
-        std::cout << absl::StrFormat("   class name  : %s\n",
-                                     classification.class_name());
-      }
-      if (classification.has_display_name()) {
-        std::cout << absl::StrFormat("   display name: %s\n",
-                                     classification.display_name());
-      }
-    }
+    std::cout << "size: " << classifications.classes_size() << std::endl;
+//    for (int rank = 0; rank < classifications.classes_size(); ++rank) {
+//      const Class& classification = classifications.classes(rank);
+//      std::cout << absl::StrFormat("  Rank #%d:\n", rank);
+//      std::cout << absl::StrFormat("   index       : %d\n",
+//                                   classification.index());
+//      std::cout << absl::StrFormat("   score       : %.5f\n",
+//                                   classification.score());
+//      if (classification.has_class_name()) {
+//        std::cout << absl::StrFormat("   class name  : %s\n",
+//                                     classification.class_name());
+//      }
+//      if (classification.has_display_name()) {
+//        std::cout << absl::StrFormat("   display name: %s\n",
+//                                     classification.display_name());
+//      }
+//    }
   }
 }
 
@@ -163,6 +170,7 @@ absl::Status Classify() {
   ImageDataFree(&image);
   return absl::OkStatus();
 }
+
 
 }  // namespace vision
 }  // namespace task

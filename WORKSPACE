@@ -77,9 +77,9 @@ http_archive(
 # GoogleTest/GoogleMock framework. Used by most unit-tests.
 http_archive(
     name = "com_google_googletest",
-    urls = ["https://github.com/google/googletest/archive/4ec4cd23f486bf70efcc5d2caa40f24368f752e3.zip"],
-    strip_prefix = "googletest-4ec4cd23f486bf70efcc5d2caa40f24368f752e3",
     sha256 = "de682ea824bfffba05b4e33b67431c247397d6175962534305136aa06f92e049",
+    strip_prefix = "googletest-4ec4cd23f486bf70efcc5d2caa40f24368f752e3",
+    urls = ["https://github.com/google/googletest/archive/4ec4cd23f486bf70efcc5d2caa40f24368f752e3.zip"],
 )
 
 # Apple and Swift rules.
@@ -103,20 +103,22 @@ http_archive(
 
 # TF on 2022-04-20.
 TENSORFLOW_COMMIT = "314479be97046e0db0ff7662b1fbdb17af2ef4b4"
+
 TENSORFLOW_SHA256 = "b3c439aa7da6780956780e0cb312011416fcd476201f8033f90b3c4fc1cff7a0"
+
 http_archive(
     name = "org_tensorflow",
-    sha256 = TENSORFLOW_SHA256,
-    strip_prefix = "tensorflow-" + TENSORFLOW_COMMIT,
-    urls = [
-        "https://github.com/tensorflow/tensorflow/archive/" + TENSORFLOW_COMMIT
-        + ".tar.gz",
-    ],
+    patch_args = ["-p1"],
     patches = [
         # We need to rename lite/ios/BUILD.apple to lite/ios/BUILD.
         "@//third_party:tensorflow_lite_ios_build.patch",
     ],
-    patch_args = ["-p1"],
+    sha256 = TENSORFLOW_SHA256,
+    strip_prefix = "tensorflow-" + TENSORFLOW_COMMIT,
+    urls = [
+        "https://github.com/tensorflow/tensorflow/archive/" + TENSORFLOW_COMMIT +
+        ".tar.gz",
+    ],
 )
 
 # Set up dependencies. Need to do this before set up TF so that our modification
@@ -125,21 +127,24 @@ load("//third_party:repo.bzl", "third_party_http_archive")
 
 # Use our patched gflags which fixes a linking issue.
 load("//third_party/gflags:workspace.bzl", gflags = "repo")
+
 gflags()
 
 third_party_http_archive(
     name = "pybind11",
+    build_file = "@pybind11_bazel//:pybind11.BUILD",
+    sha256 = "616d1c42e4cf14fa27b2a4ff759d7d7b33006fdc5ad8fd603bb2c22622f27020",
+    strip_prefix = "pybind11-2.7.1",
     urls = [
         "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pybind/pybind11/archive/v2.7.1.tar.gz",
         "https://github.com/pybind/pybind11/archive/v2.7.1.tar.gz",
     ],
-    sha256 = "616d1c42e4cf14fa27b2a4ff759d7d7b33006fdc5ad8fd603bb2c22622f27020",
-    strip_prefix = "pybind11-2.7.1",
-    build_file = "@pybind11_bazel//:pybind11.BUILD",
 )
 
 PP_COMMIT = "3594106f2df3d725e65015ffb4c7886d6eeee683"
+
 PP_SHA256 = "baa1f53568283630a5055c85f0898b8810f7a6431bd01bbaedd32b4c1defbcb1"
+
 http_archive(
     name = "pybind11_protobuf",
     sha256 = PP_SHA256,
@@ -151,14 +156,14 @@ http_archive(
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "bb1ddd8172b745cbdc75f06841bd9e7c9de0b3956397723d883423abfab8e176",
-    strip_prefix = "protobuf-3.18.0",
     # Patched to give visibility into private targets to pybind11_protobuf
     patches = ["//third_party/pybind11_protobuf:com_google_protobuf_build.patch"],
+    repo_mapping = {"@six": "@six_archive"},
+    sha256 = "bb1ddd8172b745cbdc75f06841bd9e7c9de0b3956397723d883423abfab8e176",
+    strip_prefix = "protobuf-3.18.0",
     urls = [
         "https://github.com/protocolbuffers/protobuf/archive/v3.18.0.zip",
     ],
-    repo_mapping = {"@six": "@six_archive"},
 )
 
 http_archive(
@@ -184,8 +189,8 @@ http_archive(
 
 http_archive(
     name = "com_google_sentencepiece",
-    strip_prefix = "sentencepiece-1.0.0",
     sha256 = "c05901f30a1d0ed64cbcf40eba08e48894e1b0e985777217b7c9036cac631346",
+    strip_prefix = "sentencepiece-1.0.0",
     urls = [
         "https://github.com/google/sentencepiece/archive/1.0.0.zip",
     ],
@@ -193,14 +198,14 @@ http_archive(
 
 http_archive(
     name = "org_tensorflow_text",
+    patch_args = ["-p1"],
+    patches = ["@//third_party:tensorflow_text_remove_tf_deps.patch"],
+    repo_mapping = {"@com_google_re2": "@com_googlesource_code_re2"},
     sha256 = "f64647276f7288d1b1fe4c89581d51404d0ce4ae97f2bcc4c19bd667549adca8",
     strip_prefix = "text-2.2.0",
     urls = [
         "https://github.com/tensorflow/text/archive/v2.2.0.zip",
     ],
-    patches = ["@//third_party:tensorflow_text_remove_tf_deps.patch"],
-    patch_args = ["-p1"],
-    repo_mapping = {"@com_google_re2": "@com_googlesource_code_re2"},
 )
 
 http_archive(
@@ -218,18 +223,18 @@ http_archive(
 http_archive(
     name = "com_google_absl",
     build_file = "//third_party:com_google_absl.BUILD",
-    urls = [
-        "https://github.com/abseil/abseil-cpp/archive/20210324.2.tar.gz",
-    ],
-    # Remove after https://github.com/abseil/abseil-cpp/issues/326 is solved.
-    patches = [
-        "@//third_party:com_google_absl_f863b622fe13612433fdf43f76547d5edda0c93001.diff"
-    ],
     patch_args = [
         "-p1",
     ],
+    # Remove after https://github.com/abseil/abseil-cpp/issues/326 is solved.
+    patches = [
+        "@//third_party:com_google_absl_f863b622fe13612433fdf43f76547d5edda0c93001.diff",
+    ],
+    sha256 = "59b862f50e710277f8ede96f083a5bb8d7c9595376146838b9580be90374ee1f",
     strip_prefix = "abseil-cpp-20210324.2",
-    sha256 = "59b862f50e710277f8ede96f083a5bb8d7c9595376146838b9580be90374ee1f"
+    urls = [
+        "https://github.com/abseil/abseil-cpp/archive/20210324.2.tar.gz",
+    ],
 )
 
 http_archive(
@@ -242,49 +247,48 @@ http_archive(
     ],
 )
 
-
 http_archive(
     name = "zlib",
     build_file = "//third_party:zlib.BUILD",
+    patch_args = [
+        "-p1",
+    ],
+    patches = [
+        "@//third_party:zlib.patch",
+    ],
     sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
     strip_prefix = "zlib-1.2.11",
     urls = [
         "http://mirror.bazel.build/zlib.net/fossils/zlib-1.2.11.tar.gz",
         "http://zlib.net/fossils/zlib-1.2.11.tar.gz",  # 2017-01-15
     ],
-    patches = [
-        "@//third_party:zlib.patch"
-    ],
-    patch_args = [
-        "-p1"
-    ]
 )
 
 http_archive(
     name = "libyuv",
-    urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/39240f7149cffde62e3620344d222c8ab2c21178.tar.gz"],
     # Adding the constrain of sha256 and strip_prefix will cause failure as of
     # Jan 2021. It seems that the downloaded libyuv was different every time,
     # so that the specified sha256 and strip_prefix cannot match.
     # sha256 = "01c2e30eb8e83880f9ba382f6bece9c38cd5b07f9cadae46ef1d5a69e07fafaf",
     # strip_prefix = "libyuv-39240f7149cffde62e3620344d222c8ab2c21178",
     build_file = "//third_party:libyuv.BUILD",
+    urls = ["https://chromium.googlesource.com/libyuv/libyuv/+archive/39240f7149cffde62e3620344d222c8ab2c21178.tar.gz"],
 )
 
 http_archive(
     name = "stblib",
-    strip_prefix = "stb-b42009b3b9d4ca35bc703f5310eedc74f584be58",
-    sha256 = "13a99ad430e930907f5611325ec384168a958bf7610e63e60e2fd8e7b7379610",
-    urls = ["https://github.com/nothings/stb/archive/b42009b3b9d4ca35bc703f5310eedc74f584be58.tar.gz"],
     build_file = "//third_party:stblib.BUILD",
+    sha256 = "13a99ad430e930907f5611325ec384168a958bf7610e63e60e2fd8e7b7379610",
+    strip_prefix = "stb-b42009b3b9d4ca35bc703f5310eedc74f584be58",
+    urls = ["https://github.com/nothings/stb/archive/b42009b3b9d4ca35bc703f5310eedc74f584be58.tar.gz"],
 )
 
 http_archive(
     name = "google_toolbox_for_mac",
-    url = "https://github.com/google/google-toolbox-for-mac/archive/v2.2.1.zip",
+    build_file = "@//third_party:google_toolbox_for_mac.BUILD",
     sha256 = "e3ac053813c989a88703556df4dc4466e424e30d32108433ed6beaec76ba4fdc",
     strip_prefix = "google-toolbox-for-mac-2.2.1",
-    build_file = "@//third_party:google_toolbox_for_mac.BUILD",
+    url = "https://github.com/google/google-toolbox-for-mac/archive/v2.2.1.zip",
 )
 
 http_archive(
@@ -297,16 +301,21 @@ http_archive(
     ],
 )
 
-http_archive(
-    name = "icu",
-    strip_prefix = "icu-release-64-2",
-    sha256 = "dfc62618aa4bd3ca14a3df548cd65fe393155edd213e49c39f3a30ccd618fc27",
-    urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/unicode-org/icu/archive/release-64-2.zip",
-        "https://github.com/unicode-org/icu/archive/release-64-2.zip",
-    ],
-    build_file = "@//third_party:icu.BUILD",
-)
+#http_archive(
+#    name = "icu",
+#    strip_prefix = "icu-release-64-2",
+#    sha256 = "dfc62618aa4bd3ca14a3df548cd65fe393155edd213e49c39f3a30ccd618fc27",
+#    urls = [
+#        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/unicode-org/icu/archive/release-64-2.zip",
+#        "https://github.com/unicode-org/icu/archive/release-64-2.zip",
+#    ],
+#    build_file = "@//third_party:icu.BUILD",
+#)
+
+# Patched icu.
+load("//third_party/icu:workspace.bzl", icu = "repo")
+
+icu()
 
 http_archive(
     name = "fft2d",
@@ -330,61 +339,54 @@ http_archive(
 )
 
 http_archive(
-  name = "libedgetpu",
-  sha256 = "a179016a5874c58db969a5edd3fecf57610604e751b5c4d6d82ad58c383ffd64",
-  strip_prefix = "libedgetpu-ea1eaddbddece0c9ca1166e868f8fd03f4a3199e",
-  urls = [
-    "https://github.com/google-coral/libedgetpu/archive/ea1eaddbddece0c9ca1166e868f8fd03f4a3199e.tar.gz"
-  ],
+    name = "libedgetpu",
+    sha256 = "a179016a5874c58db969a5edd3fecf57610604e751b5c4d6d82ad58c383ffd64",
+    strip_prefix = "libedgetpu-ea1eaddbddece0c9ca1166e868f8fd03f4a3199e",
+    urls = [
+        "https://github.com/google-coral/libedgetpu/archive/ea1eaddbddece0c9ca1166e868f8fd03f4a3199e.tar.gz",
+    ],
 )
 
 http_archive(
-  name = "eigen",
-  sha256 = "b4c198460eba6f28d34894e3a5710998818515104d6e74e5cc331ce31e46e626",
-  strip_prefix = "eigen-3.4.0",
-  urls = [
-      "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.bz2",
-  ],
-  build_file = "@//third_party:eigen3.BUILD",
+    name = "eigen",
+    build_file = "@//third_party:eigen3.BUILD",
+    sha256 = "b4c198460eba6f28d34894e3a5710998818515104d6e74e5cc331ce31e46e626",
+    strip_prefix = "eigen-3.4.0",
+    urls = [
+        "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.bz2",
+    ],
 )
 
 http_archive(
-  name = "com_google_leveldb",
-  build_file = "@//third_party:leveldb.BUILD",
-  patch_cmds = [
-      """mkdir leveldb; cp include/leveldb/* leveldb""",
-  ],
-  sha256 = "9a37f8a6174f09bd622bc723b55881dc541cd50747cbd08831c2a82d620f6d76",
-  strip_prefix = "leveldb-1.23",
-  urls = [
-      "https://github.com/google/leveldb/archive/refs/tags/1.23.tar.gz",
-  ],
+    name = "com_google_leveldb",
+    build_file = "@//third_party:leveldb.BUILD",
+    patch_cmds = [
+        """mkdir leveldb; cp include/leveldb/* leveldb""",
+    ],
+    sha256 = "9a37f8a6174f09bd622bc723b55881dc541cd50747cbd08831c2a82d620f6d76",
+    strip_prefix = "leveldb-1.23",
+    urls = [
+        "https://github.com/google/leveldb/archive/refs/tags/1.23.tar.gz",
+    ],
 )
 
 http_archive(
-  name = "snappy",
-  build_file = "@//third_party:snappy.BUILD",
-  sha256 = "16b677f07832a612b0836178db7f374e414f94657c138e6993cbfc5dcc58651f",
-  strip_prefix = "snappy-1.1.8",
-  urls = ["https://github.com/google/snappy/archive/1.1.8.tar.gz"],
+    name = "snappy",
+    build_file = "@//third_party:snappy.BUILD",
+    sha256 = "16b677f07832a612b0836178db7f374e414f94657c138e6993cbfc5dcc58651f",
+    strip_prefix = "snappy-1.1.8",
+    urls = ["https://github.com/google/snappy/archive/1.1.8.tar.gz"],
 )
 
 # Set up TensorFlow version for Coral.
 load("@libedgetpu//:workspace.bzl", "libedgetpu_dependencies")
+
 libedgetpu_dependencies(TENSORFLOW_COMMIT, TENSORFLOW_SHA256)
 
 # AutoValue 1.6+ shades Guava, Auto Common, and JavaPoet. That's OK
 # because none of these jars become runtime dependencies.
 java_import_external(
     name = "com_google_auto_value",
-    jar_sha256 = "fd811b92bb59ae8a4cf7eb9dedd208300f4ea2b6275d726e4df52d8334aaae9d",
-    jar_urls = [
-        "https://mirror.bazel.build/repo1.maven.org/maven2/com/google/auto/value/auto-value/1.6/auto-value-1.6.jar",
-        "https://repo1.maven.org/maven2/com/google/auto/value/auto-value/1.6/auto-value-1.6.jar",
-    ],
-    licenses = ["notice"],  # Apache 2.0
-    generated_rule_name = "processor",
-    exports = ["@com_google_auto_value_annotations"],
     extra_build_file_content = "\n".join([
         "java_plugin(",
         "    name = \"AutoAnnotationProcessor\",",
@@ -420,11 +422,20 @@ java_import_external(
         "    exports = [\"@com_google_auto_value_annotations\"],",
         ")",
     ]),
+    generated_rule_name = "processor",
+    jar_sha256 = "fd811b92bb59ae8a4cf7eb9dedd208300f4ea2b6275d726e4df52d8334aaae9d",
+    jar_urls = [
+        "https://mirror.bazel.build/repo1.maven.org/maven2/com/google/auto/value/auto-value/1.6/auto-value-1.6.jar",
+        "https://repo1.maven.org/maven2/com/google/auto/value/auto-value/1.6/auto-value-1.6.jar",
+    ],
+    licenses = ["notice"],  # Apache 2.0
+    exports = ["@com_google_auto_value_annotations"],
 )
 
 # Auto value annotations
 java_import_external(
     name = "com_google_auto_value_annotations",
+    default_visibility = ["@com_google_auto_value//:__pkg__"],
     jar_sha256 = "d095936c432f2afc671beaab67433e7cef50bba4a861b77b9c46561b801fae69",
     jar_urls = [
         "https://mirror.bazel.build/repo1.maven.org/maven2/com/google/auto/value/auto-value-annotations/1.6/auto-value-annotations-1.6.jar",
@@ -432,15 +443,16 @@ java_import_external(
     ],
     licenses = ["notice"],  # Apache 2.0
     neverlink = True,
-    default_visibility = ["@com_google_auto_value//:__pkg__"],
 )
 
 http_archive(
     name = "robolectric",
-    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.7.3.tar.gz"],
     strip_prefix = "robolectric-bazel-4.7.3",
+    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.7.3.tar.gz"],
 )
+
 load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
+
 robolectric_repositories()
 
 load("//third_party/flatbuffers:workspace.bzl", flatbuffers = "repo")
@@ -451,8 +463,8 @@ RULES_JVM_EXTERNAL_TAG = "4.2"
 
 http_archive(
     name = "rules_jvm_external",
-    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
     sha256 = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
     url = "https://github.com/bazelbuild/rules_jvm_external/archive/refs/tags/%s.zip" % RULES_JVM_EXTERNAL_TAG,
 )
 
@@ -460,45 +472,60 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 # Set up TF.
 load("@org_tensorflow//tensorflow:workspace3.bzl", "workspace")
+
 workspace()
+
 load("@org_tensorflow//tensorflow:workspace2.bzl", "workspace")  # buildifier: disable=load
+
 workspace()
+
 load("@org_tensorflow//tensorflow:workspace1.bzl", "workspace")  # buildifier: disable=load
+
 workspace()
+
 load("@org_tensorflow//tensorflow:workspace0.bzl", "workspace")  # buildifier: disable=load
+
 workspace()
 
 load("//third_party/tensorflow:tf_configure.bzl", "tf_configure")
+
 tf_configure(name = "local_config_tf")
 
 # TF submodule compilation doesn't take care of grpc deps. Do it manually here.
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
 grpc_deps()
 
 load(
     "@build_bazel_rules_apple//apple:repositories.bzl",
     "apple_rules_dependencies",
 )
+
 apple_rules_dependencies()
 
 load(
     "@build_bazel_apple_support//lib:repositories.bzl",
     "apple_support_dependencies",
 )
+
 apple_support_dependencies()
 
 load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
+
 bazel_version_repository(name = "bazel_version")
 
 python_configure(name = "local_config_python")
 
 ATS_TAG = "androidx-test-1.3.0"
+
 http_archive(
     name = "android_test_support",
     strip_prefix = "android-test-%s" % ATS_TAG,
     urls = ["https://github.com/android/android-test/archive/%s.tar.gz" % ATS_TAG],
 )
+
 load("@android_test_support//:repo.bzl", "android_test_repositories")
+
 android_test_repositories()
 
 # Maven dependencies.
@@ -521,12 +548,12 @@ maven_install(
         "org.robolectric:robolectric:jar:4.7.3",
         "junit:junit:jar:4.13",
     ],
+    fetch_sources = True,
     repositories = [
         "https://maven.google.com",
         "https://dl.google.com/dl/android/maven2",
         "https://repo1.maven.org/maven2",
     ],
-    fetch_sources = True,
     version_conflict_policy = "pinned",
 )
 
@@ -545,7 +572,7 @@ load("@tf_toolchains//toolchains/embedded/arm-linux:arm_linux_toolchain_configur
 # TFLite crossbuild toolchain for embeddeds Linux
 arm_linux_toolchain_configure(
     name = "local_config_embedded_arm",
-    build_file = "@tf_toolchains//toolchains/embedded/arm-linux:BUILD",
     aarch64_repo = "../aarch64_linux_toolchain",
     armhf_repo = "../armhf_linux_toolchain",
+    build_file = "@tf_toolchains//toolchains/embedded/arm-linux:BUILD",
 )

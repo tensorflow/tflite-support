@@ -210,6 +210,7 @@ absl::Status ImageClassifier::CheckAndSetOutputs() {
     const TfLiteTensor* output_tensor =
         TfLiteEngine::GetOutput(GetTfLiteEngine()->interpreter(), i);
     const int num_dimensions = output_tensor->dims->size;
+    std::cout << "MLGB 0 num_dimensions" << num_dimensions << std::endl; // should be 2
     if (num_dimensions == 4) {
       if (output_tensor->dims->data[1] != 1 ||
           output_tensor->dims->data[2] != 1) {
@@ -239,17 +240,23 @@ absl::Status ImageClassifier::CheckAndSetOutputs() {
                           output_tensor->dims->data[0], i),
           TfLiteSupportStatus::kInvalidOutputTensorDimensionsError);
     }
+    // dimes is [1, x]
     int num_classes = output_tensor->dims->data[num_dimensions - 1];
+    std::cout << "MLGB 0 num_classes" << num_classes << std::endl; // should be 9
+
     // If label map is not set, build a default one based on model
     // introspection. This happens if a model with partial or no metadata was
     // provided through the `model_file_with_metadata` options field.
     if (classification_heads_[i].label_map_items.empty()) {
+      std::cout << "MLGB 0 label_map_items.empty, adding empty labelmapitem" << std::endl;
       classification_heads_[i].label_map_items.reserve(num_classes);
       for (int class_index = 0; class_index < num_classes; ++class_index) {
         classification_heads_[i].label_map_items.emplace_back(LabelMapItem{});
       }
     }
     int num_label_map_items = classification_heads_[i].label_map_items.size();
+    std::cout << "MLGB 0 classification_heads_[0].label_map_items.size()" << classification_heads_[i].label_map_items.size() << std::endl; // should be 9
+
     if (num_classes != num_label_map_items) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
@@ -259,6 +266,8 @@ absl::Status ImageClassifier::CheckAndSetOutputs() {
                           num_label_map_items),
           TfLiteSupportStatus::kMetadataInconsistencyError);
     }
+    std::cout << "MLGB 0 output_tensor->type" << output_tensor->type << std::endl; // should be 9
+
     if (output_tensor->type == kTfLiteUInt8) {
       num_quantized_outputs++;
     } else if (output_tensor->type != kTfLiteFloat32) {
@@ -404,6 +413,7 @@ StatusOr<ClassificationResult> ImageClassifier::Postprocess(
     const auto& head = classification_heads_[i];
     score_pairs.clear();
     score_pairs.reserve(head.label_map_items.size());
+    std::cout << "MLGB1: head.label_map_items.size: " << head.label_map_items.size() << std::endl;
 
     const TfLiteTensor* output_tensor = output_tensors[i];
     if (has_uint8_outputs_) {
@@ -415,15 +425,18 @@ StatusOr<ClassificationResult> ImageClassifier::Postprocess(
                                          output_tensor->params.zero_point));
       }
     } else {
+      std::cout << "MLGB1: reading float32 data: " << std::endl;
       ASSIGN_OR_RETURN(const float* output_data,
                        AssertAndReturnTypedTensor<float>(output_tensor));
       for (int j = 0; j < head.label_map_items.size(); ++j) {
         score_pairs.emplace_back(j, output_data[j]);
+        std::cout << "MLGB1: saving float32 pair: " << j << " : " << output_data[j] << std::endl;
       }
     }
 
     // Optional score calibration.
     if (score_calibrations_[i] != nullptr) {
+      std::cout << "MLGB: optional score calibration: " << std::endl;
       for (auto& score_pair : score_pairs) {
         const std::string& class_name =
             head.label_map_items[score_pair.first].name;
@@ -449,26 +462,37 @@ StatusOr<ClassificationResult> ImageClassifier::Postprocess(
             ? std::min(static_cast<int>(head.label_map_items.size()),
                        options_->max_results())
             : head.label_map_items.size();
+
+    std::cout << "MLGB: num_results: " << num_results << std::endl;
+
+
+    std::cout << "MLGB1: score_pairs.size.size: " << score_pairs.size() << std::endl;
+
     float score_threshold = options_->has_score_threshold()
                                 ? options_->score_threshold()
                                 : head.score_threshold;
 
+    std::cout << "MLGB: score_threshold: " << head.score_threshold << std::endl;
+
     if (class_name_set_.values.empty()) {
+      std::cout << "MLGB: class_name_set_ is empty: " << std::endl;
       // Partially sort in descending order (higher score is better).
-      absl::c_partial_sort(
-          score_pairs, score_pairs.begin() + num_results,
-          [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
-            return a.second > b.second;
-          });
+      // no sort, no threshold filtering
+//      absl::c_partial_sort(
+//          score_pairs, score_pairs.begin() + num_results,
+//          [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
+//            return a.second > b.second;
+//          });
 
       for (int j = 0; j < num_results; ++j) {
         float score = score_pairs[j].second;
-        if (score < score_threshold) {
-          break;
-        }
+//        if (score < score_threshold) {
+//          break;
+//        }
         auto* cl = classifications->add_classes();
         cl->set_index(score_pairs[j].first);
         cl->set_score(score);
+        std::cout << "MLGB1: adding score pair: " << score_pairs[j].first << " : " << score_pairs[j].second << std::endl;
       }
     } else {
       // Sort in descending order (higher score is better).
@@ -503,6 +527,8 @@ StatusOr<ClassificationResult> ImageClassifier::Postprocess(
 
   RETURN_IF_ERROR(FillResultsFromLabelMaps(&result));
 
+  std::cout << "MLGB1 heads: " << result.classifications_size() << std::endl;
+  std::cout << "MLGB1 heads[0] size: " << result.classifications()[0].classes_size() << std::endl;
   return result;
 }
 

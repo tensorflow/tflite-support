@@ -24,6 +24,11 @@ from tensorflow_lite_support.metadata.python.metadata_writers import metadata_in
 from tensorflow_lite_support.metadata.python.tests.metadata_writers import test_utils
 
 _FLOAT_MODEL = "../testdata/image_classifier/mobilenet_v2_1.0_224.tflite"
+
+# float32 in/out
+_ID_DETECTOR = "../testdata/image_classifier/idDetector.tflite"
+_ID_DETECTOR_JSON_INFERENCE = "../testdata/image_classifier/idDetector.json"
+
 _QUANT_MODEL = "../testdata/image_classifier/mobilenet_v2_1.0_224_quant.tflite"
 _LABEL_FILE = "../testdata/image_classifier/labels.txt"
 _SCORE_CALIBRATION_FILE = "../testdata/image_classifier/score_calibration.txt"
@@ -41,8 +46,8 @@ class MetadataWriterTest(tf.test.TestCase, parameterized.TestCase):
   @parameterized.named_parameters(
       {
           "testcase_name": "float_model",
-          "model_file": _FLOAT_MODEL,
-          "golden_json": _FLOAT_JSON_FOR_INFERENCE
+          "model_file": _ID_DETECTOR,
+          "golden_json": _ID_DETECTOR_JSON_INFERENCE
       }, {
           "testcase_name": "quant_model",
           "model_file": _QUANT_MODEL,
@@ -60,23 +65,29 @@ class MetadataWriterTest(tf.test.TestCase, parameterized.TestCase):
     metadata_json = writer.get_metadata_json()
     expected_json = test_utils.load_file(golden_json, "r")
     self.assertEqual(metadata_json, expected_json)
+    f = open("/tmp/idDetectorWithMetadata.tflite", "wb")
+    f.write(writer.populate())
+    f.close()
 
-  @parameterized.named_parameters(
-      {
-          "testcase_name": "float_model",
-          "model_file": _FLOAT_MODEL,
-      }, {
-          "testcase_name": "quant_model",
-          "model_file": _QUANT_MODEL,
-      })
-  def test_create_from_metadata_info_by_default_should_succeed(
-      self, model_file):
-    writer = image_classifier.MetadataWriter.create_from_metadata_info(
-        test_utils.load_file(model_file))
-
-    metadata_json = writer.get_metadata_json()
-    expected_json = test_utils.load_file(_JSON_DEFAULT, "r")
-    self.assertEqual(metadata_json, expected_json)
+  # @parameterized.named_parameters(
+  #     {
+  #         "testcase_name": "float_model",
+  #         "model_file": _FLOAT_MODEL,
+  #     }, {
+  #         "testcase_name": "quant_model",
+  #         "model_file": _QUANT_MODEL,
+  #     })
+  # def test_create_from_metadata_info_by_default_should_succeed(
+  #     self, model_file):
+  #   writer = image_classifier.MetadataWriter.create_from_metadata_info(
+  #       test_utils.load_file(model_file))
+  #
+  #   metadata_json = writer.get_metadata_json()
+  #   expected_json = test_utils.load_file(_JSON_DEFAULT, "r")
+  #   self.assertEqual(metadata_json, expected_json)
+  #   f = open("/tmp/idDetectorWithMetadata.tflite", "wb")
+  #   f.write(writer.populate())
+  #   f.close()
 
 
 if __name__ == "__main__":
