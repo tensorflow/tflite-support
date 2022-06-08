@@ -18,13 +18,16 @@ limitations under the License.
 
 #include <memory>
 
-#include "tensorflow/lite/op_resolver.h"
+#include "tensorflow/lite/core/api/op_resolver.h"
 
 namespace tflite {
 namespace task {
 namespace text {
 
-std::unique_ptr<tflite::OpResolver> CreateQACustomOpResolver();
+// Creates a custom OpResolver containing the additional SENTENCEPIECE_TOKENIZER
+// and RAGGED_TENSOR_TO_TENSOR ops needed by some text embedders such as
+// universal sentence encoder-based models.
+std::unique_ptr<tflite::OpResolver> CreateTextOpResolver();
 
 }  // namespace text
 }  // namespace task
