@@ -18,13 +18,11 @@ import dataclasses
 from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import nl_classification_options_pb2
 from tensorflow_lite_support.python.task.text.pybinds import _pywrap_nl_classifier
 
 _CppNLClassifier = _pywrap_nl_classifier.NLClassifier
 _BaseOptions = base_options_module.BaseOptions
 _ClassificationOptions = classification_options_pb2.ClassificationOptions
-_NLClassificationOptions = nl_classification_options_pb2.NLClassificationOptions
 
 
 @dataclasses.dataclass
@@ -91,7 +89,7 @@ class NLClassifier(object):
           "exclusive options.")
 
     classifier = _CppNLClassifier.create_from_options(
-        options.base_options.to_pb2(), _NLClassificationOptions())
+        options.base_options.to_pb2())
     return cls(options, classifier)
 
   def classify(self, text: str) -> classifications_pb2.ClassificationResult:

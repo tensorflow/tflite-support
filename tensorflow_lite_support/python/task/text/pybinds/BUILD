@@ -46,7 +46,6 @@ pybind_extension_may_pack_coral(
     module_name = "_pywrap_nl_classifier",
     deps = [
         "//tensorflow_lite_support/cc/task/processor/proto:classifications_cc_proto",
-        "//tensorflow_lite_support/cc/task/processor/proto:nl_classification_options_cc_proto",
         "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
         "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
         "@pybind11",
