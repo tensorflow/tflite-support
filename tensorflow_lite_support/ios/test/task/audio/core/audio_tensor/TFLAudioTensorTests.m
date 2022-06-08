@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   TFLAudioTensor *audioTensor = [[TFLAudioTensor alloc] initWithAudioFormat:audioFormat
                                                                 sampleCount:sampleCount];
-  XCTAssertEqual(audioTensor.ringBuffer.size, sampleCount * audioFormat.channelCount);
+  XCTAssertEqual(audioTensor.buffer.size, sampleCount * audioFormat.channelCount);
 }
 
 - (void)testLoadAudioRecordSucceeds {
@@ -105,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
   [audioTensor loadAudioRecord:audioRecord withError:nil];
 
   // Get the current buffer of audio tensor.
-  TFLFloatBuffer *audioTensorBuffer = audioTensor.ringBuffer.floatBuffer;
+  TFLFloatBuffer *audioTensorBuffer = audioTensor.buffer.floatBuffer;
   XCTAssertNotNil(audioTensorBuffer);
 
   // Get the buffer to compare the audio tensor buffer to. Here we convert the buffer which mimics
@@ -163,7 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
   AVAudioPCMBuffer *bufferToCompare = [audioEngineBuffer bufferUsingAudioConverter:audioConverter];
   XCTAssertNotNil(bufferToCompare);
 
-  TFLFloatBuffer *audioTensorBuffer = audioTensor.ringBuffer.floatBuffer;
+  TFLFloatBuffer *audioTensorBuffer = audioTensor.buffer.floatBuffer;
   XCTAssertNotNil(audioTensorBuffer);
 
   XCTAssertEqual(audioTensorBuffer.size, sampleCount);
@@ -241,7 +241,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   // State after load: [1.0, 2.0, 3.0, 4.0, 5.0]
 
-  TFLFloatBuffer *outBuffer = audioTensor.ringBuffer.floatBuffer;
+  TFLFloatBuffer *outBuffer = audioTensor.buffer.floatBuffer;
   XCTAssertNotNil(outBuffer);
   XCTAssertEqual(outBuffer.size, sampleCount);
 

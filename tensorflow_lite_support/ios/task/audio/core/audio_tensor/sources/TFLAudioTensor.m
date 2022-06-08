@@ -16,7 +16,9 @@
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 
-@implementation TFLAudioTensor
+@implementation TFLAudioTensor {
+  TFLRingBuffer *_ringBuffer;
+}
 
 - (instancetype)initWithAudioFormat:(TFLAudioFormat *)format sampleCount:(NSUInteger)sampleCount {
   self = [self init];
@@ -76,6 +78,10 @@
   }
 
   return [self loadBuffer:buffer offset:0 size:sizeToLoad error:error];
+}
+
+- (TFLFloatBuffer *)buffer {
+  return _ringBuffer.floatBuffer;
 }
 
 @end
