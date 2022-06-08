@@ -126,12 +126,6 @@ class NLClassifier(object):
     """
     classification_options = self.options.classification_options
 
-    if classification_options.category_name_allowlist is not None and \
-        classification_options.category_name_denylist is not None:
-      if len(classification_options.category_name_allowlist) == 0 and \
-          len(classification_options.category_name_denylist) == 0:
-        return result
-
     # Sort in descending order (higher score is better).
     categories = result.classifications[0].categories
     categories = sorted(
