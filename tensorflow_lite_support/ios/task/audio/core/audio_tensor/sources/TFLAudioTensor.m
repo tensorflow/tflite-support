@@ -59,7 +59,6 @@
 
 - (BOOL)loadAudioRecord:(TFLAudioRecord *)audioRecord withError:(NSError **)error {
   if (![self.audioFormat isEqual:audioRecord.audioFormat]) {
-    NSLog(@"hellllllllllllllllo");
     [TFLCommonUtils
         createCustomError:error
                  withCode:TFLSupportErrorCodeInvalidArgumentError
