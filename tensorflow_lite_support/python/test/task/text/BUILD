@@ -57,6 +57,7 @@ py_test(
         "//tensorflow_lite_support/python/task/core:base_options",
         "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:classifications_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:classification_options_pb2",
         "//tensorflow_lite_support/python/task/processor/proto:nl_classification_options_pb2",
         "//tensorflow_lite_support/python/task/text:nl_classifier",
         "//tensorflow_lite_support/python/test:test_util",
