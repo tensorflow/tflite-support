@@ -22,7 +22,6 @@ from tensorflow_lite_support.python.task.core import base_options as base_option
 from tensorflow_lite_support.python.task.processor.proto import class_pb2
 from tensorflow_lite_support.python.task.processor.proto import classifications_pb2
 from tensorflow_lite_support.python.task.processor.proto import classification_options_pb2
-from tensorflow_lite_support.python.task.processor.proto import nl_classification_options_pb2
 from tensorflow_lite_support.python.task.text import nl_classifier
 from tensorflow_lite_support.python.test import test_util
 
@@ -33,7 +32,6 @@ _Classifications = classifications_pb2.Classifications
 _ClassificationResult = classifications_pb2.ClassificationResult
 _NLClassifierOptions = nl_classifier.NLClassifierOptions
 _ClassificationOptions = classification_options_pb2.ClassificationOptions
-_NLClassificationOptions = nl_classification_options_pb2.NLClassificationOptions
 
 
 _REGEX_TOKENIZER_MODEL = 'test_model_nl_classifier_with_regex_tokenizer.tflite'
