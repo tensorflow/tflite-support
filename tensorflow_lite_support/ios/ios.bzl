@@ -1,8 +1,8 @@
 """TensorFlow Lite Support Library Helper Rules for iOS"""
 
-# When the static framework is built with bazel, the all header files are moved
+# When the static framework is built with bazel, all the header files are moved
 # to the "Headers" directory with no header path prefixes. This auxiliary rule
-# is used for stripping the path prefix to the C API header files included by
+# is used for stripping the path prefix from the C API header files included by
 # other C API header files.
 def strip_c_api_include_path_prefix(name, hdr_labels, prefix = ""):
     """Create modified header files with the common.h include path stripped out.
@@ -29,9 +29,9 @@ def strip_c_api_include_path_prefix(name, hdr_labels, prefix = ""):
             """.format(prefix, hdr_label),
         )
 
-# When the static framework is built with bazel, the all header files are moved
+# When the static framework is built with bazel, all the header files are moved
 # to the "Headers" directory with no header path prefixes. This auxiliary rule
-# is used for stripping the path prefix to the iOS API header files imported by
+# is used for stripping the path prefix from the iOS API header files imported by
 # other iOS API header files.
 def strip_ios_api_include_path_prefix(name, hdr_labels, prefix = ""):
     """Create modified header files with the import path stripped out.
