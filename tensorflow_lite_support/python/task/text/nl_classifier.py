@@ -103,7 +103,7 @@ class NLClassifier(object):
 
     Raises:
       ValueError: If any of the input arguments is invalid.
-      RuntimeError: If failed to calculate the embedding vector.
+      RuntimeError: If failed to perform NL classification.
     """
     classification_result = self._classifier.classify(text)
     classification_result = classifications_pb2.ClassificationResult.\
@@ -118,9 +118,6 @@ class NLClassifier(object):
 
     Returns:
       The filtered classification result.
-
-    Raises:
-      ValueError: If any of the classification options is invalid.
     """
     classification_options = self.options.classification_options
 
