@@ -177,7 +177,7 @@ class NLClassifierTest(parameterized.TestCase, tf.test.TestCase):
     # Fails with combined allowlist and denylist
     with self.assertRaisesRegex(
         ValueError,
-        r'`class_name_allowlist` and `class_name_denylist` are mutually '
+        r'`category_name_allowlist` and `category_name_denylist` are mutually '
         r'exclusive options.'):
       base_options = _BaseOptions(file_name=self.model_path)
       classification_options = classification_options_pb2.ClassificationOptions(

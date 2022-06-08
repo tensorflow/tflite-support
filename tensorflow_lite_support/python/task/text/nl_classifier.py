@@ -85,7 +85,7 @@ class NLClassifier(object):
       if len(classification_options.category_name_allowlist) > 0 and \
           len(classification_options.category_name_denylist) > 0:
         raise ValueError(
-          "`class_name_allowlist` and `class_name_denylist` are mutually "
+          "`category_name_allowlist` and `category_name_denylist` are mutually "
           "exclusive options.")
 
     classifier = _CppNLClassifier.create_from_options(
