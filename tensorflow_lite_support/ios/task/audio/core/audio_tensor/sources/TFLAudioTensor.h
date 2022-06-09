@@ -31,7 +31,7 @@ NS_SWIFT_NAME(AudioTensor)
  */
 @property(nonatomic, readonly) TFLFloatBuffer *buffer;
 
-/** Capacit of the `TFLAudioTensor` buffer in number of elements. */
+/** Capacity of the `TFLAudioTensor` buffer in number of elements. */
 @property(nonatomic, readonly) NSUInteger bufferSize;
 
 /**
