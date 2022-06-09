@@ -85,7 +85,7 @@ NS_SWIFT_NAME(AudioTensor)
  *
  * @return A boolean indicating if the load operation succeded.
  */
-- (BOOL)loadBuffer:(TFLFloatBuffer *)sourceBuffer
+- (BOOL)loadBuffer:(TFLFloatBuffer *)buffer
             offset:(NSInteger)offset
               size:(NSInteger)size
              error:(NSError **)error;

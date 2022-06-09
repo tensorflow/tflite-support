@@ -27,19 +27,18 @@
     
     const NSInteger size = sampleCount * format.channelCount;
     _ringBuffer = [[TFLRingBuffer alloc] initWithBufferSize:size];
-    _bufferSize = size;
   }
   return self;
 }
 
-- (BOOL)loadBuffer:(TFLFloatBuffer *)floatBuffer
+- (BOOL)loadBuffer:(TFLFloatBuffer *)buffer
             offset:(NSInteger)offset
               size:(NSInteger)size
              error:(NSError **)error {
-  return [_ringBuffer loadFloatData:floatBuffer.data
-                           dataSize:floatBuffer.size
+  return [_ringBuffer loadFloatData:buffer.data
+                           dataSize:buffer.size
                              offset:offset
-                               size:floatBuffer.size
+                               size:buffer.size
                               error:error];
 }
 
@@ -48,7 +47,7 @@
   // when TFLAudioRecord which created this record buffer starts emitting wrong sized buffers.
 
   // Checking buffer size makes sure that channel count and buffer size match.
-  if ([_ringBuffer size] != floatBuffer.size) {
+  if (_ringBuffer.size != floatBuffer.size) {
     [TFLCommonUtils
         createCustomError:error
                  withCode:TFLSupportErrorCodeInvalidArgumentError
@@ -85,6 +84,10 @@
 
 - (TFLFloatBuffer *)buffer {
   return _ringBuffer.floatBuffer;
+}
+
+- (TFLFloatBuffer *)bufferSize {
+  return _ringBuffer.size;
 }
 
 @end
