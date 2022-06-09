@@ -42,8 +42,8 @@ NS_SWIFT_NAME(AudioTensor)
  *
  * @param format An audio format of type `TFLAudioFormat`.
  * @param sampleCount The number of samples `TFLAudioTensor` can store at any given
- * time. The sampleCount provided will be used to calculate the buffer size of `TFLAudioTensor`
- * bufferSize = format.channelCount * sampleCount.
+ * time. The `sampleCount` provided will be used to calculate the buffer size of `TFLAudioTensor`
+ * (with `bufferSize = format.channelCount * sampleCount`.
  *
  * @return A new instance of TFLAudioTensor with the given audio format and sample count.
  */
@@ -63,7 +63,7 @@ NS_SWIFT_NAME(AudioTensor)
  * @param audioRecord  An object of `TFLAudioRecord`.
  * @param error An optional error parameter populated with the reason for failure, if the internal
  * buffer of `TFLAudioRecord` could not be loaded into the `TFLAudioTensor`.
- * 
+ *
  * @return A boolean indicating if the load operation succeded.
  */
 - (BOOL)loadAudioRecord:(TFLAudioRecord *)audioRecord
@@ -77,8 +77,8 @@ NS_SWIFT_NAME(AudioTensor)
  * data to be copied is more than the capacity of the buffer, only the most recent data
  * of the `TFLAudioTensor`'s buffer size will be copied from the input buffer.
  *
- * @param sourceBuffer  A buffer of type `TFLFloatBuffer`. For multi-channel
- * input, the array must be interleaved.
+ * @param sourceBuffer  A buffer of type `TFLFloatBuffer`. For multi-channel input, the array must
+ * be interleaved.
  * @param offset Starting index in the source buffer from which elements should be copied.
  * @param size The number of elements to be copied.
  * @param error An optional error parameter populated with the reason for failure, if the internal

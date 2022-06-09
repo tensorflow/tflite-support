@@ -24,7 +24,7 @@
   self = [self init];
   if (self) {
     _audioFormat = format;
-    
+
     const NSInteger size = sampleCount * format.channelCount;
     _ringBuffer = [[TFLRingBuffer alloc] initWithBufferSize:size];
   }
