@@ -86,7 +86,7 @@
   return _ringBuffer.floatBuffer;
 }
 
-- (TFLFloatBuffer *)bufferSize {
+- (NSUInteger *)bufferSize {
   return _ringBuffer.size;
 }
 

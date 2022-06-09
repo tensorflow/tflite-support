@@ -56,13 +56,14 @@ NS_SWIFT_NAME(AudioTensor)
  * @discussion You must ensure that the  audio formats of `TFLAudioRecord` and the current
  * `TFLAudioTensor` match.
  * New data from the input buffer is appended to the end of the buffer by shifting out
- * any old data from the beginning of the buffer if need be to make space. If the size of the new
+ * any old data from the beginning of the buffer if needed to make space. If the size of the new
  * data to be copied is more than the capacity of the buffer, only the most recent data
  * of the `TFLAudioTensor`'s buffer size will be copied from the input buffer.
  *
  * @param audioRecord  An object of `TFLAudioRecord`.
  * @param error An optional error parameter populated with the reason for failure, if the internal
  * buffer of `TFLAudioRecord` could not be loaded into the `TFLAudioTensor`.
+ * 
  * @return A boolean indicating if the load operation succeded.
  */
 - (BOOL)loadAudioRecord:(TFLAudioRecord *)audioRecord
@@ -72,7 +73,7 @@ NS_SWIFT_NAME(AudioTensor)
  * This function loads the internal buffer of `TFLAudioTensor` with the provided buffer.
  *
  * @discussion New data from the input buffer is appended to the end of the buffer by shifting out
- * any old data from the beginning of the buffer if need be to make space. If the size of the new
+ * any old data from the beginning of the buffer if needed to make space. If the size of the new
  * data to be copied is more than the capacity of the buffer, only the most recent data
  * of the `TFLAudioTensor`'s buffer size will be copied from the input buffer.
  *
