@@ -14,7 +14,7 @@
  ==============================================================================*/
 #import <Foundation/Foundation.h>
 
-#import "tensorflow_lite_support/ios/task/core/sources/BaseOptions.h"
+#import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult.h"
 #import "tensorflow_lite_support/ios/task/audio/core/audio_tensor/sources/TFLAudioTensor.h"

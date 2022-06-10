@@ -112,13 +112,6 @@
 }
 
 - (nullable instancetype)initWithModelPath:(NSString *)modelPath error:(NSError **)error {
-  if (!modelPath) {
-    [TFLCommonUtils createCustomError:error
-                             withCode:TFLSupportErrorCodeInvalidArgumentError
-                          description:@"modelPath argument cannot be nil."];
-    return nil;
-  }
-
   TFLAudioClassifierOptions *options = [[TFLAudioClassifierOptions alloc] initWithModelPath:modelPath];
 
   return [self initWithOptions:options error:error];
@@ -134,7 +127,7 @@
   }
 
   TfLiteAudioBuffer cAudioBuffer =
-      [audioTensor cAudioBufferFromFloatBuffer:[audioTensor.ringBuffer floatBuffer]];
+      [audioTensor cAudioBufferFromFloatBuffer:audioTensor.buffer];
 
   TfLiteSupportError *classifyError = NULL;
   TfLiteClassificationResult *cClassificationResult =
@@ -224,7 +217,7 @@
   // clients could run TFLAudioRecord's `startRecordingWithError:`
   // together with TFLAudioClassifier's `classifyWithAudioTensor:error:`
   return [[TFLAudioRecord alloc] initWithAudioFormat:format
-                                         sampleCount:(bufferSize / format.channelCount) * 2
+                                          bufferSize:bufferSize * 2
                                                error:error];
 }
 
