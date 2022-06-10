@@ -80,4 +80,24 @@
   return [buffer bufferUsingAudioConverter:audioConverter];
 }
 
++ (nullable AVAudioPCMBuffer *)loadPCMBufferFromFileWithPath:(NSString *)path
+                                                 audioFormat:(TFLAudioFormat *)audioFormat {
+  // Task library expects float data in interleaved format.
+  AVAudioFormat *processingFormat =
+      [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32
+                                       sampleRate:audioFormat.sampleRate
+                                         channels:(AVAudioChannelCount)audioFormat.channelCount
+                                      interleaved:YES];
+
+  return [AVAudioPCMBuffer loadPCMBufferFromFileWithPath:path processingFormat:processingFormat];
+}
+
+- (nullable TFLFloatBuffer *)floatBuffer {
+  if (self.format.commonFormat != AVAudioPCMFormatFloat32) {
+    return nil;
+  }
+
+  return [[TFLFloatBuffer alloc] initWithData:self.floatChannelData[0] size:self.frameLength];
+}
+
 @end

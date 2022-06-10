@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -48,16 +48,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic) AVAudioFormat *audioEngineFormat;
 @end
 
-// This category of TFLAudioRecord is private to the current test file.
-// This is needed in order to expose the method to load the audio record buffer
-// without calling: -[TFLAudioRecord startRecordingWithError:].
-// This is needed to avoid exposing this method which isn't useful to the consumers
-// of the framework.
+// This category of TFLAudioRecord is private to the current test file. This is needed in order to
+// expose the method to load the audio record buffer without calling: -[TFLAudioRecord
+// startRecordingWithError:]. This is needed to avoid exposing this method which isn't useful to the
+// consumers of the framework.
 @interface TFLAudioRecord (Tests)
 - (void)convertAndLoadBuffer:(AVAudioPCMBuffer *)buffer
          usingAudioConverter:(AVAudioConverter *)audioConverter;
 @end
-
 
 @implementation TFLAudioClassifierTests
 
@@ -65,8 +63,9 @@ NS_ASSUME_NONNULL_BEGIN
   // Put setup code here. This method is called before the invocation of each test method in the
   // class.
   [super setUp];
-  self.modelPath = [[NSBundle bundleForClass:self.class] pathForResource:@"yamnet_audio_classifier_with_metadata"
-                                                                  ofType:@"tflite"];
+  self.modelPath =
+      [[NSBundle bundleForClass:self.class] pathForResource:@"yamnet_audio_classifier_with_metadata"
+                                                     ofType:@"tflite"];
   XCTAssertNotNil(self.modelPath);
 
   self.audioEngineFormat = [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32
@@ -75,53 +74,48 @@ NS_ASSUME_NONNULL_BEGIN
                                                            interleaved:NO];
 }
 
+- (nullable AVAudioPCMBuffer *)bufferFromFileWithName:(NSString *)name
+                                            extension:(NSString *)extension
+                                          audioFormat:(TFLAudioFormat *)audioFormat {
+  NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:name ofType:extension];
 
-- (AVAudioPCMBuffer *)audioEngineBufferFromFileWithName:(NSString *)name extension:(NSString *)extension {
-  // Loading AVAudioPCMBuffer with an array is not currently suupported for iOS versions < 15.0.
-  // Instead audio samples from a wav file are loaded and converted into the same format
-  // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
+  return [AVAudioPCMBuffer loadPCMBufferFromFileWithPath:filePath audioFormat:audioFormat];
+}
+
+- (nullable AVAudioPCMBuffer *)bufferFromFileWithName:(NSString *)name
+                                            extension:(NSString *)extension
+                                     processingFormat:(AVAudioFormat *)processingFormat {
   NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:name ofType:extension];
 
   return [AVAudioPCMBuffer loadPCMBufferFromFileWithPath:filePath
-                                        processingFormat:self.audioEngineFormat];
+                                        processingFormat:processingFormat];
 }
 
-- (void)testInferenceWithAudioRecordSucceeds {
-
-  TFLAudioClassifier *audioClassifier =
-      [[TFLAudioClassifier alloc] initWithModelPath:self.modelPath error:nil];
+- (void)testInferenceWithFloatBufferSucceeds {
+  TFLAudioClassifier *audioClassifier = [[TFLAudioClassifier alloc] initWithModelPath:self.modelPath
+                                                                                error:nil];
   XCTAssertNotNil(audioClassifier);
 
-  TFLAudioRecord *audioRecord = [audioClassifier createAudioRecordWithError:nil];
-  XCTAssertNotNil(audioRecord);
-
-
-  // Loading AVAudioPCMBuffer with an array is not currently supported for iOS versions < 15.0.
-  // Instead audio samples from a wav file are loaded and converted into the same format
-  // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
-  AVAudioPCMBuffer *audioEngineBuffer = [self audioEngineBufferFromFileWithName:@"speech"
-                                                                      extension:@"wav"];
-  XCTAssertNotNil(audioEngineBuffer);
-
-  AVAudioFormat *recordingFormat =
-      [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32
-                                       sampleRate:audioRecord.audioFormat.sampleRate
-                                         channels:(AVAudioChannelCount)audioRecord.audioFormat.channelCount
-                                      interleaved:YES];
-
-  AVAudioConverter *audioConverter = [[AVAudioConverter alloc] initFromFormat:self.audioEngineFormat
-                                                                     toFormat:recordingFormat];
-  // Convert and load the buffer of `TFLAudioRecord`.
-  [audioRecord convertAndLoadBuffer:audioEngineBuffer usingAudioConverter:audioConverter];
-
+  // Create the audio tensor using audio classifier.
   TFLAudioTensor *audioTensor = [audioClassifier createInputAudioTensorWithError:nil];
   XCTAssertNotNil(audioTensor);
 
-  [audioTensor loadAudioRecord:audioRecord withError:nil];
+  // Load pcm buffer from file.
+  AVAudioPCMBuffer *buffer = [self bufferFromFileWithName:@"speech"
+                                                extension:@"wav"
+                                              audioFormat:audioTensor.audioFormat];
 
+  // Get float buffer from pcm buffer.
+  TFLFloatBuffer *floatBuffer = buffer.floatBuffer;
+  XCTAssertNotNil(floatBuffer);
 
-  TFLClassificationResult *classificationResult = [audioClassifier classifyWithAudioTensor:audioTensor error:nil];
-   
+  // Load float buffer into the audio tensor.
+  [audioTensor loadBuffer:floatBuffer offset:0 size:floatBuffer.size error:nil];
+
+  // Perform classification on audio tensor.
+  TFLClassificationResult *classificationResult =
+      [audioClassifier classifyWithAudioTensor:audioTensor error:nil];
+
   const NSInteger expectedClassificationsCount = 1;
   VerifyClassificationResult(classificationResult, expectedClassificationsCount);
 
@@ -130,62 +124,70 @@ NS_ASSUME_NONNULL_BEGIN
   VerifyClassifications(classificationResult.classifications[0], expectedHeadIndex,
                         expectedCategoryCount);
   VerifyCategory(classificationResult.classifications[0].categories[0],
-                 0,              // expectedIndex
-                 0.957031,         // expectedScore
+                 0,          // expectedIndex
+                 0.957031,   // expectedScore
                  @"Speech",  // expectedLabel
-                 nil               // expectedDisplaName
+                 nil         // expectedDisplaName
   );
   VerifyCategory(classificationResult.classifications[0].categories[1],
-                 500,           // expectedIndex
-                 0.019531,      // expectedScore
+                 500,                    // expectedIndex
+                 0.019531,               // expectedScore
                  @"Inside, small room",  // expectedLabel
-                 nil            // expectedDisplaName
+                 nil                     // expectedDisplaName
   );
+  // The 3rd result is different from python tests because of the audio file format conversions are
+  // done using iOS native classes to mimic audio record behaviour. The iOS native classes handle
+  // audio format conversion differently as opposed to the task library C++ convenience method.
   VerifyCategory(classificationResult.classifications[0].categories[2],
-                 380,       // expectedIndex
-                 0.003906,  // expectedScore
-                 @"Computer keyboard",  // expectedLabel
-                 nil        // expectedDisplaName
+                 485,          // expectedIndex
+                 0.003906,     // expectedScore
+                 @"Clicking",  // expectedLabel
+                 nil           // expectedDisplaName
   );
-
 }
 
-
 - (void)testInferenceWithAudioRecordSucceeds {
-
-  TFLAudioClassifier *audioClassifier =
-      [[TFLAudioClassifier alloc] initWithModelPath:self.modelPath error:nil];
+  TFLAudioClassifier *audioClassifier = [[TFLAudioClassifier alloc] initWithModelPath:self.modelPath
+                                                                                error:nil];
   XCTAssertNotNil(audioClassifier);
 
+  // Create auudio record using audio classifier
   TFLAudioRecord *audioRecord = [audioClassifier createAudioRecordWithError:nil];
   XCTAssertNotNil(audioRecord);
 
-
   // Loading AVAudioPCMBuffer with an array is not currently supported for iOS versions < 15.0.
   // Instead audio samples from a wav file are loaded and converted into the same format
-  // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
-  AVAudioPCMBuffer *audioEngineBuffer = [self audioEngineBufferFromFileWithName:@"speech"
-                                                                      extension:@"wav"];
+  // of AVAudioEngine's input node to mock the input from the AVAudio Engine.
+  AVAudioPCMBuffer *audioEngineBuffer = [self bufferFromFileWithName:@"speech"
+                                                           extension:@"wav"
+                                                    processingFormat:self.audioEngineFormat];
   XCTAssertNotNil(audioEngineBuffer);
 
-  AVAudioFormat *recordingFormat =
-      [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32
-                                       sampleRate:audioRecord.audioFormat.sampleRate
-                                         channels:(AVAudioChannelCount)audioRecord.audioFormat.channelCount
-                                      interleaved:YES];
+  // Convert the buffer in the audio engine input format to the format with which audio record is
+  // intended to output the audio samples. This mocks the internal conversion of audio record when
+  // -[TFLAudioRecord startRecording:withError:] is called.
+  AVAudioFormat *recordingFormat = [[AVAudioFormat alloc]
+      initWithCommonFormat:AVAudioPCMFormatFloat32
+                sampleRate:audioRecord.audioFormat.sampleRate
+                  channels:(AVAudioChannelCount)audioRecord.audioFormat.channelCount
+               interleaved:YES];
 
   AVAudioConverter *audioConverter = [[AVAudioConverter alloc] initFromFormat:self.audioEngineFormat
                                                                      toFormat:recordingFormat];
   // Convert and load the buffer of `TFLAudioRecord`.
   [audioRecord convertAndLoadBuffer:audioEngineBuffer usingAudioConverter:audioConverter];
 
+  // Create audio tensor using audio classifier.
   TFLAudioTensor *audioTensor = [audioClassifier createInputAudioTensorWithError:nil];
   XCTAssertNotNil(audioTensor);
 
+  // Load the audioRecord buffer into the audio tensor.
   [audioTensor loadAudioRecord:audioRecord withError:nil];
 
-  TFLClassificationResult *classificationResult = [audioClassifier classifyWithAudioTensor:audioTensor error:nil];
-   
+  // Perform classification on audio tensor.
+  TFLClassificationResult *classificationResult =
+      [audioClassifier classifyWithAudioTensor:audioTensor error:nil];
+
   const NSInteger expectedClassificationsCount = 1;
   VerifyClassificationResult(classificationResult, expectedClassificationsCount);
 
@@ -194,102 +196,27 @@ NS_ASSUME_NONNULL_BEGIN
   VerifyClassifications(classificationResult.classifications[0], expectedHeadIndex,
                         expectedCategoryCount);
   VerifyCategory(classificationResult.classifications[0].categories[0],
-                 0,              // expectedIndex
-                 0.957031,         // expectedScore
+                 0,          // expectedIndex
+                 0.957031,   // expectedScore
                  @"Speech",  // expectedLabel
-                 nil               // expectedDisplaName
+                 nil         // expectedDisplaName
   );
   VerifyCategory(classificationResult.classifications[0].categories[1],
-                 500,           // expectedIndex
-                 0.019531,      // expectedScore
+                 500,                    // expectedIndex
+                 0.019531,               // expectedScore
                  @"Inside, small room",  // expectedLabel
-                 nil            // expectedDisplaName
+                 nil                     // expectedDisplaName
   );
-  // The 3rd result is different from python tests because of the audio file format conversions are done using iOS native classes to mimic audio record behaviour. The iOS native classes handle conversions differently as opposed to the task library C++ convenience method.
+  // The 3rd result is different from python tests because of the audio file format conversions are
+  // done using iOS native classes to mimic audio record behaviour. The iOS native classes handle
+  // audio format conversion differently as opposed to the task library C++ convenience method.
   VerifyCategory(classificationResult.classifications[0].categories[2],
-                 380,       // expectedIndex
-                 0.003906,  // expectedScore
+                 380,                   // expectedIndex
+                 0.003906,              // expectedScore
                  @"Computer keyboard",  // expectedLabel
-                 nil        // expectedDisplaName
+                 nil                    // expectedDisplaName
   );
-
 }
-
-// - (void)testModelOptionsWithMaxResults {
-//   TFLImageClassifierOptions *imageClassifierOptions =
-//       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
-//   int maxResults = 3;
-//   imageClassifierOptions.classificationOptions.maxResults = maxResults;
-
-//   TFLImageClassifier *imageClassifier =
-//       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
-//   XCTAssertNotNil(imageClassifier);
-
-//   GMLImage *gmlImage =
-//       [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
-//   XCTAssertNotNil(gmlImage);
-
-//   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
-//                                                                                    error:nil];
-//   XCTAssertTrue(classificationResults.classifications.count > 0);
-//   XCTAssertLessThanOrEqual(classificationResults.classifications[0].categories.count, maxResults);
-
-//   TFLCategory *category = classificationResults.classifications[0].categories[0];
-//   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
-//   // TODO: match the score as image_classifier_test.cc
-//   XCTAssertEqualWithAccuracy(category.score, 0.748976, 0.001);
-// }
-
-// - (void)testInferenceWithBoundingBox {
-//   TFLImageClassifierOptions *imageClassifierOptions =
-//       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
-//   int maxResults = 3;
-//   imageClassifierOptions.classificationOptions.maxResults = maxResults;
-
-//   TFLImageClassifier *imageClassifier =
-//       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
-//   XCTAssertNotNil(imageClassifier);
-
-//   GMLImage *gmlImage =
-//       [GMLImage imageFromBundleWithClass:self.class fileName:@"multi_objects" ofType:@"jpg"];
-//   XCTAssertNotNil(gmlImage);
-
-//   CGRect roi = CGRectMake(406, 110, 148, 153);
-//   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
-//                                                                         regionOfInterest:roi
-//                                                                                    error:nil];
-//   XCTAssertTrue(classificationResults.classifications.count > 0);
-//   XCTAssertTrue(classificationResults.classifications[0].categories.count > 0);
-
-//   TFLCategory *category = classificationResults.classifications[0].categories[0];
-//   // TODO: match the label and score as image_classifier_test.cc
-//   // XCTAssertTrue([category.label isEqual:@"soccer ball"]);
-//   // XCTAssertEqualWithAccuracy(category.score, 0.256512, 0.001);
-// }
-
-// - (void)testInferenceWithRGBAImage {
-//   TFLImageClassifierOptions *imageClassifierOptions =
-//       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
-
-//   TFLImageClassifier *imageClassifier =
-//       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
-//   XCTAssertNotNil(imageClassifier);
-
-//   GMLImage *gmlImage =
-//       [GMLImage imageFromBundleWithClass:self.class fileName:@"sparrow" ofType:@"png"];
-//   XCTAssertNotNil(gmlImage);
-
-//   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
-//                                                                                    error:nil];
-//   XCTAssertTrue(classificationResults.classifications.count > 0);
-//   XCTAssertTrue(classificationResults.classifications[0].categories.count > 0);
-
-//   TFLCategory *category = classificationResults.classifications[0].categories[0];
-//   XCTAssertTrue([category.label isEqual:@"junco"]);
-//   // TODO: inspect if score is correct. Better to test againest "burger", because we know the
-//   // expected result for "burger.jpg".
-//   XCTAssertEqualWithAccuracy(category.score, 0.253016, 0.001);
-// }
 
 @end
 
