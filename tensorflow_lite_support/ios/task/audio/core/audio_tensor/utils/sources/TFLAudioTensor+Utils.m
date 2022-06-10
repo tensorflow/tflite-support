@@ -12,7 +12,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#import "tensorflow_lite_support/ios/task/audio/core/audio_tensor/utils/TFLAudioTensor+Utils.h"
+#import "tensorflow_lite_support/ios/task/audio/core/audio_tensor/utils/sources/TFLAudioTensor+Utils.h"
 
 @implementation TFLAudioTensor (Utils)
 

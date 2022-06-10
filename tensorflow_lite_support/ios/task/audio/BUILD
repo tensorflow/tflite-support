@@ -21,6 +21,6 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResult",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResultHelpers",
-        "//tensorflow_lite_support/ios/task/audio/core/audio_tensor:TFLAudioTensor",
+        "//tensorflow_lite_support/ios/task/audio/core/audio_tensor/utils:TFLAudioTensorUtils",
     ]
 )
