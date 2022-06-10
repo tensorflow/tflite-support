@@ -13,12 +13,12 @@
  limitations under the License.
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/audio/sources/TFLAudioClassifier.h"
+#import "tensorflow_lite_support/ios/sources/TFLCommon.h"
+#import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 #import "tensorflow_lite_support/ios/task/audio/core/audio_tensor/utils/sources/TFLAudioTensor+Utils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult+Helpers.h"
-#import "tensorflow_lite_support/ios/sources/TFLCommon.h"
-#import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 
 #include "tensorflow_lite_support/c/task/audio/audio_classifier.h"
 
@@ -112,7 +112,8 @@
 }
 
 - (nullable instancetype)initWithModelPath:(NSString *)modelPath error:(NSError **)error {
-  TFLAudioClassifierOptions *options = [[TFLAudioClassifierOptions alloc] initWithModelPath:modelPath];
+  TFLAudioClassifierOptions *options =
+      [[TFLAudioClassifierOptions alloc] initWithModelPath:modelPath];
 
   return [self initWithOptions:options error:error];
 }
@@ -126,8 +127,7 @@
     return nil;
   }
 
-  TfLiteAudioBuffer cAudioBuffer =
-      [audioTensor cAudioBufferFromFloatBuffer:audioTensor.buffer];
+  TfLiteAudioBuffer cAudioBuffer = [audioTensor cAudioBufferFromFloatBuffer:audioTensor.buffer];
 
   TfLiteSupportError *classifyError = NULL;
   TfLiteClassificationResult *cClassificationResult =
@@ -216,9 +216,7 @@
   // The sample count of audio record should be strictly longer than audio tensor's so that
   // clients could run TFLAudioRecord's `startRecordingWithError:`
   // together with TFLAudioClassifier's `classifyWithAudioTensor:error:`
-  return [[TFLAudioRecord alloc] initWithAudioFormat:format
-                                          bufferSize:bufferSize * 2
-                                               error:error];
+  return [[TFLAudioRecord alloc] initWithAudioFormat:format bufferSize:bufferSize * 2 error:error];
 }
 
 @end
