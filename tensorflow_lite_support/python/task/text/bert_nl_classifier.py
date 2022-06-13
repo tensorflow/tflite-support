@@ -26,7 +26,12 @@ _BaseOptions = base_options_module.BaseOptions
 
 @dataclasses.dataclass
 class BertNLClassifierOptions:
-  """Options for the Bert NL classifier task."""
+  """Options for the Bert NL classifier task.
+
+  Attributes:
+    base_options: Base options for the Bert NL classifier task.
+    max_seq_len: Max number of tokens to pass to the model.
+  """
   base_options: _BaseOptions
   max_seq_len: Optional[int] = 128
 
