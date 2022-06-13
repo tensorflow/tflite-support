@@ -52,13 +52,20 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (AVAudioPCMBuffer *)audioEngineFromFileWithName:(NSString *)name extension:(NSString *)extension {
-  // Loading AVAudioPCMBuffer with an array is not currently suupported for iOS versions < 15.0.
+  // Loading AVAudioPCMBuffer with an array is not currentlyy suupported for iOS versions < 15.0.
   // Instead audio samples from a wav file are loaded and converted into the same format
   // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
-  NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:name ofType:extension];
+  NSURL *fileURL = [[NSBundle bundleForClass:self.class] URLForResource:name
+                                                          withExtension:extension];
 
-  return [AVAudioPCMBuffer loadPCMBufferFromFileWithPath:filePath
-                                        processingFormat:self.audioEngineFormat];
+  AVAudioPCMBuffer *inputBuffer = [AVAudioPCMBuffer loadPCMBufferFromFileWithURL:fileURL];
+
+  AVAudioConverter *audioEngineConverter =
+      [[AVAudioConverter alloc] initFromFormat:inputBuffer.format toFormat:self.audioEngineFormat];
+  AVAudioPCMBuffer *audioEngineBuffer =
+      [inputBuffer bufferUsingAudioConverter:audioEngineConverter];
+
+  return audioEngineBuffer;
 }
 
 - (void)testInitAudioRecordFailsWithInvalidChannelCount {

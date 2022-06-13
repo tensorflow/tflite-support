@@ -50,7 +50,7 @@
   return nil;
 }
 
-+ (nullable AVAudioPCMBuffer *)loadPCMBufferFromFileWithURL:(NSURL *)url {
++ (AVAudioPCMBuffer *)loadPCMBufferFromFileWithURL:(NSURL *)url {
   AVAudioFile *audioFile = [[AVAudioFile alloc] initForReading:url error:nil];
   AVAudioPCMBuffer *buffer =
       [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFile.processingFormat
@@ -60,24 +60,4 @@
 
   return buffer;
 }
-
-+ (nullable AVAudioPCMBuffer *)loadPCMBufferFromFileWithPath:(NSString *)path
-                                            processingFormat:(AVAudioFormat *)processingFormat {
-  AVAudioPCMBuffer *buffer =
-      [AVAudioPCMBuffer loadPCMBufferFromFileWithURL:[NSURL fileURLWithPath:path]];
-
-  if (!buffer) {
-    return nil;
-  }
-
-  if ([buffer.format isEqual:processingFormat]) {
-    return buffer;
-  }
-
-  AVAudioConverter *audioConverter = [[AVAudioConverter alloc] initFromFormat:buffer.format
-                                                                     toFormat:processingFormat];
-
-  return [buffer bufferUsingAudioConverter:audioConverter];
-}
-
 @end

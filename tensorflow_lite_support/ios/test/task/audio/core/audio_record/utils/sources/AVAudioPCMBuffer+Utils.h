@@ -21,8 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (AVAudioPCMBuffer *)bufferUsingAudioConverter:(AVAudioConverter *)audioConverter;
 
-+ (nullable AVAudioPCMBuffer *)loadPCMBufferFromFileWithPath:(NSString *)path
-                                            processingFormat:(AVAudioFormat *)processingFormat;
++ (AVAudioPCMBuffer *)loadPCMBufferFromFileWithURL:(NSURL *)url;
 
 @end
 
