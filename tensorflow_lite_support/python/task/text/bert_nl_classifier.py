@@ -30,10 +30,8 @@ class BertNLClassifierOptions:
 
   Attributes:
     base_options: Base options for the Bert NL classifier task.
-    max_seq_len: Max number of tokens to pass to the model.
   """
   base_options: _BaseOptions
-  max_seq_len: Optional[int] = 128
 
 
 class BertNLClassifier(object):
@@ -82,7 +80,7 @@ class BertNLClassifier(object):
       RuntimeError: If other types of error occurred.
     """
     classifier = _CppBertNLClassifier.create_from_options(
-        options.base_options.to_pb2(), options.max_seq_len)
+        options.base_options.to_pb2())
     return cls(options, classifier)
 
   def classify(self, text: str) -> classifications_pb2.ClassificationResult:

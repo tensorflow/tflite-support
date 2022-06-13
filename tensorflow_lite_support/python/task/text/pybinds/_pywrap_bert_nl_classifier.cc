@@ -40,15 +40,11 @@ PYBIND11_MODULE(_pywrap_bert_nl_classifier, m) {
   pybind11::class_<BertNLClassifier>(m, "BertNLClassifier")
       .def_static(
           "create_from_options",
-          [](const PythonBaseOptions& base_options, const int max_seq_len) {
+          [](const PythonBaseOptions& base_options) {
             BertNLClassifierOptions options;
             auto cpp_base_options =
                 core::convert_to_cpp_base_options(base_options);
             options.set_allocated_base_options(cpp_base_options.release());
-
-            if (max_seq_len > 0) {
-                options.set_max_seq_len(max_seq_len);
-            }
 
             auto classifier = BertNLClassifier ::CreateFromOptions(options);
             return core::get_value(classifier);
