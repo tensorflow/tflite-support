@@ -54,48 +54,6 @@ _EXPECTED_RESULTS_OF_POSITIVE_INPUT = _ClassificationResult(
       head_name=''
     )])
 
-_NEGATIVE_INPUT = "unflinchingly bleak and desperate"
-_EXPECTED_RESULTS_OF_NEGATIVE_INPUT = _ClassificationResult(
-  classifications=[
-    _Classifications(
-      categories=[
-        _Category(
-          index=0,
-          score=0.956317,
-          display_name='',
-          category_name='negative'),
-        _Category(
-          index=0,
-          score=0.043683,
-          display_name='',
-          category_name='positive'
-        )
-      ],
-      head_index=0,
-      head_name=''
-    )])
-
-_MAX_SEQ_LEN = 128
-_EXPECTED_RESULTS_OF_LONG_POSITIVE_INPUT = _ClassificationResult(
-  classifications=[
-    _Classifications(
-      categories=[
-        _Category(
-          index=0,
-          score=0.000133,
-          display_name='',
-          category_name='negative'),
-        _Category(
-          index=0,
-          score=0.999867,
-          display_name='',
-          category_name='positive'
-        )
-      ],
-      head_index=0,
-      head_name=''
-    )])
-
 
 class ModelFileType(enum.Enum):
   FILE_CONTENT = 1
@@ -108,45 +66,11 @@ class BertNLClassifierTest(parameterized.TestCase, tf.test.TestCase):
     super().setUp()
     self.model_path = test_util.get_test_data_path(_BERT_MODEL)
 
-  def test_create_from_file_succeeds_with_valid_model_path(self):
-    # Creates with default option and valid model file successfully.
-    classifier = _BertNLClassifier.create_from_file(self.model_path)
-    self.assertIsInstance(classifier, _BertNLClassifier)
-
-  def test_create_from_options_succeeds_with_valid_model_path(self):
-    # Creates with options containing model file successfully.
-    base_options = _BaseOptions(file_name=self.model_path)
-    options = _BertNLClassifierOptions(base_options=base_options)
-    classifier = _BertNLClassifier.create_from_options(options)
-    self.assertIsInstance(classifier, _BertNLClassifier)
-
-  def test_create_from_options_fails_with_invalid_model_path(self):
-    # Invalid empty model path.
-    with self.assertRaisesRegex(
-        ValueError,
-        r"ExternalFile must specify at least one of 'file_content', "
-        r"'file_name' or 'file_descriptor_meta'."):
-      base_options = _BaseOptions(file_name='')
-      options = _BertNLClassifierOptions(base_options=base_options)
-      _BertNLClassifier.create_from_options(options)
-
-  def test_create_from_options_succeeds_with_valid_model_content(self):
-    # Creates with options containing model content successfully.
-    with open(self.model_path, 'rb') as f:
-      base_options = _BaseOptions(file_content=f.read())
-      options = _BertNLClassifierOptions(base_options=base_options)
-      classifier = _BertNLClassifier.create_from_options(options)
-      self.assertIsInstance(classifier, _BertNLClassifier)
-
   @parameterized.parameters(
       (_BERT_MODEL, ModelFileType.FILE_NAME, _POSITIVE_INPUT,
        _EXPECTED_RESULTS_OF_POSITIVE_INPUT),
       (_BERT_MODEL, ModelFileType.FILE_CONTENT, _POSITIVE_INPUT,
-       _EXPECTED_RESULTS_OF_POSITIVE_INPUT),
-      (_BERT_MODEL, ModelFileType.FILE_NAME, _NEGATIVE_INPUT,
-       _EXPECTED_RESULTS_OF_NEGATIVE_INPUT),
-      (_BERT_MODEL, ModelFileType.FILE_CONTENT, _NEGATIVE_INPUT,
-       _EXPECTED_RESULTS_OF_NEGATIVE_INPUT))
+       _EXPECTED_RESULTS_OF_POSITIVE_INPUT))
   def test_classify_model(self, model_name, model_file_type, text,
                           expected_classification_result):
     # Creates classifier.
@@ -167,24 +91,6 @@ class BertNLClassifierTest(parameterized.TestCase, tf.test.TestCase):
     text_classification_result = classifier.classify(text)
     self.assertProtoEquals(text_classification_result.to_pb2(),
                            expected_classification_result.to_pb2())
-
-  def test_classify_succeeds_with_long_positive_not_out_of_bounds(self):
-    # Creates classifier.
-    classifier = _BertNLClassifier.create_from_file(self.model_path)
-    # BertNLClassifier limits the input sequence to `max_seq_len`, so we
-    # verify if the classifier works correctly if the input is longer than
-    # `max_seq_len`.
-    positive_review_str = "it's a charming and often affecting journey " \
-                          "and this is a long"
-    for index in range(_MAX_SEQ_LEN):
-      positive_review_str += "long"
-
-    positive_review_str += " movie review"
-
-    # Classifies text using the given model.
-    text_classification_result = classifier.classify(positive_review_str)
-    self.assertProtoEquals(text_classification_result.to_pb2(),
-                           _EXPECTED_RESULTS_OF_LONG_POSITIVE_INPUT.to_pb2())
 
 
 if __name__ == "__main__":
