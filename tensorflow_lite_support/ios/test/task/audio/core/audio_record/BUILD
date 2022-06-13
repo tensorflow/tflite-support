@@ -8,22 +8,28 @@ package(
 )
 
 objc_library(
-    name = "TFLRingBufferObjcTestLibrary",
+    name = "TFLAudioRecordObjcTestLibrary",
     testonly = 1,
-    srcs = ["TFLRingBufferTests.m"],
+    srcs = ["TFLAudioRecordTests.m"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/audio:test_audio_clips",
+    ],
     tags = TFL_DEFAULT_TAGS,
     deps = [
         "//tensorflow_lite_support/ios:TFLCommon",
-        "//tensorflow_lite_support/ios/task/audio/core:TFLRingBuffer",
+        "//tensorflow_lite_support/ios/task/audio/core/audio_record:TFLAudioRecord",
+        "//tensorflow_lite_support/ios/test/task/audio/core/audio_record/utils:AVAudioPCMBufferUtils",
+        "//third_party/apple_frameworks:AVFoundation",
+        "//third_party/apple_frameworks:XCTest",
     ],
 )
 
 ios_unit_test(
-    name = "TFLRingBufferObjcTest",
+    name = "TFLAudioRecordObjcTest",
     minimum_os_version = TFL_MINIMUM_OS_VERSION,
     runner = tflite_ios_lab_runner("IOS_LATEST"),
     tags = TFL_DEFAULT_TAGS + TFL_DISABLED_SANITIZER_TAGS,
     deps = [
-        ":TFLRingBufferObjcTestLibrary",
+        ":TFLAudioRecordObjcTestLibrary",
     ],
 )

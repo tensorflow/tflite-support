@@ -18,7 +18,7 @@ limitations under the License.
 
 #include "absl/status/statusor.h"  // from @com_google_absl
 #include "absl/strings/string_view.h"  // from @com_google_absl
-#include "tensorflow/lite/interpreter.h"
+#include "tensorflow_lite_support/cc/task/core/tflite_engine.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_clu_annotator_options_proto_inc.h"
 #include "tensorflow_lite_support/cc/task/text/proto/clu_proto_inc.h"
 #include "tensorflow_lite_support/cc/text/tokenizers/bert_tokenizer.h"
@@ -76,7 +76,7 @@ class AbstractModule {
  protected:
   AbstractModule() = default;
 
-  absl::Status Init(Interpreter* interpreter,
+  absl::Status Init(core::TfLiteEngine::Interpreter* interpreter,
                     const BertCluAnnotatorOptions* options);
 
   using NamesAndConfidences =
@@ -88,7 +88,7 @@ class AbstractModule {
       int names_tensor_idx, int scores_tensor_idx) const;
 
   // TFLite interpreter
-  Interpreter* interpreter_ = nullptr;
+  core::TfLiteEngine::Interpreter* interpreter_ = nullptr;
 
   const TensorIndexMap* tensor_index_map_ = nullptr;
 };
@@ -98,7 +98,8 @@ class AbstractModule {
 class UtteranceSeqModule : public AbstractModule {
  public:
   static absl::StatusOr<std::unique_ptr<AbstractModule>> Create(
-      Interpreter* interpreter, const TensorIndexMap* tensor_index_map,
+      core::TfLiteEngine::Interpreter* interpreter,
+      const TensorIndexMap* tensor_index_map,
       const BertCluAnnotatorOptions* options,
       const tflite::support::text::tokenizer::BertTokenizer* tokenizer);
 
@@ -116,7 +117,8 @@ class UtteranceSeqModule : public AbstractModule {
 class DomainModule : public AbstractModule {
  public:
   static absl::StatusOr<std::unique_ptr<AbstractModule>> Create(
-      Interpreter* interpreter, const TensorIndexMap* tensor_index_map,
+      core::TfLiteEngine::Interpreter* interpreter,
+      const TensorIndexMap* tensor_index_map,
       const BertCluAnnotatorOptions* options);
 
   absl::Status Postprocess(Artifacts* artifacts,
@@ -130,7 +132,8 @@ class DomainModule : public AbstractModule {
 class IntentModule : public AbstractModule {
  public:
   static absl::StatusOr<std::unique_ptr<AbstractModule>> Create(
-      Interpreter* interpreter, const TensorIndexMap* tensor_index_map,
+      core::TfLiteEngine::Interpreter* interpreter,
+      const TensorIndexMap* tensor_index_map,
       const BertCluAnnotatorOptions* options);
 
   absl::Status Postprocess(Artifacts* artifacts,
@@ -145,7 +148,8 @@ class IntentModule : public AbstractModule {
 class SlotModule : public AbstractModule {
  public:
   static absl::StatusOr<std::unique_ptr<AbstractModule>> Create(
-      Interpreter* interpreter, const TensorIndexMap* tensor_index_map,
+      core::TfLiteEngine::Interpreter* interpreter,
+      const TensorIndexMap* tensor_index_map,
       const BertCluAnnotatorOptions* options);
 
   absl::Status Postprocess(Artifacts* artifacts,

@@ -16,7 +16,7 @@ limitations under the License.
 #include "pybind11/pybind11.h"
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/task/text/text_searcher.h"
-#include "tensorflow_lite_support/examples/task/text/desktop/universal_sentence_encoder_qa_op_resolver.h"
+#include "tensorflow_lite_support/cc/task/text/utils/text_op_resolver.h"
 #include "tensorflow_lite_support/python/task/core/pybinds/task_utils.h"
 
 namespace tflite {
@@ -59,7 +59,7 @@ PYBIND11_MODULE(_pywrap_text_searcher, m) {
             options.set_allocated_search_options(cpp_search_options.release());
 
             auto searcher = TextSearcher::CreateFromOptions(
-                options, CreateQACustomOpResolver());
+                options, CreateTextOpResolver());
             return core::get_value(searcher);
           })
       .def("search",
