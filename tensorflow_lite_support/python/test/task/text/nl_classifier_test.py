@@ -54,6 +54,25 @@ _EXPECTED_RESULTS_OF_POSITIVE_INPUT = _ClassificationResult(classifications=[
         head_name='')
 ])
 
+_NEGATIVE_INPUT = 'What a waste of my time.'
+_EXPECTED_RESULTS_OF_NEGATIVE_INPUT = _ClassificationResult(classifications=[
+    _Classifications(
+        categories=[
+            _Category(
+                index=0,
+                score=0.813130,
+                display_name='',
+                category_name='Negative'),
+            _Category(
+                index=0,
+                score=0.186870,
+                display_name='',
+                category_name='Positive'),
+        ],
+        head_index=0,
+        head_name='')
+])
+
 
 class ModelFileType(enum.Enum):
   FILE_CONTENT = 1
@@ -66,12 +85,46 @@ class NLClassifierTest(parameterized.TestCase, tf.test.TestCase):
     super().setUp()
     self.model_path = test_util.get_test_data_path(_REGEX_TOKENIZER_MODEL)
 
+  def test_create_from_file_succeeds_with_valid_model_path(self):
+    # Creates with default option and valid model file successfully.
+    classifier = _NLClassifier.create_from_file(self.model_path)
+    self.assertIsInstance(classifier, _NLClassifier)
+
+  def test_create_from_options_succeeds_with_valid_model_path(self):
+    # Creates with options containing model file successfully.
+    base_options = _BaseOptions(file_name=self.model_path)
+    options = _NLClassifierOptions(base_options=base_options)
+    classifier = _NLClassifier.create_from_options(options)
+    self.assertIsInstance(classifier, _NLClassifier)
+
+  def test_create_from_options_fails_with_invalid_model_path(self):
+    # Invalid empty model path.
+    with self.assertRaisesRegex(
+        ValueError,
+        r"ExternalFile must specify at least one of 'file_content', "
+        r"'file_name' or 'file_descriptor_meta'."):
+      base_options = _BaseOptions(file_name='')
+      options = _NLClassifierOptions(base_options=base_options)
+      _NLClassifier.create_from_options(options)
+
+  def test_create_from_options_succeeds_with_valid_model_content(self):
+    # Creates with options containing model content successfully.
+    with open(self.model_path, 'rb') as f:
+      base_options = _BaseOptions(file_content=f.read())
+      options = _NLClassifierOptions(base_options=base_options)
+      classifier = _NLClassifier.create_from_options(options)
+      self.assertIsInstance(classifier, _NLClassifier)
+
   @parameterized.parameters(
       # Regex tokenizer model.
       (_REGEX_TOKENIZER_MODEL, ModelFileType.FILE_NAME, _POSITIVE_INPUT,
        _EXPECTED_RESULTS_OF_POSITIVE_INPUT),
+      (_REGEX_TOKENIZER_MODEL, ModelFileType.FILE_NAME, _NEGATIVE_INPUT,
+       _EXPECTED_RESULTS_OF_NEGATIVE_INPUT),
       (_REGEX_TOKENIZER_MODEL, ModelFileType.FILE_CONTENT, _POSITIVE_INPUT,
-       _EXPECTED_RESULTS_OF_POSITIVE_INPUT))
+       _EXPECTED_RESULTS_OF_POSITIVE_INPUT),
+      (_REGEX_TOKENIZER_MODEL, ModelFileType.FILE_CONTENT, _NEGATIVE_INPUT,
+       _EXPECTED_RESULTS_OF_NEGATIVE_INPUT))
   def test_classify_model(self, model_name, model_file_type, text,
                           expected_classification_result):
     # Creates classifier.
