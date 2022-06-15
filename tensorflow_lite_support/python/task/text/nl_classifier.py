@@ -28,7 +28,11 @@ _ClassificationResult = classifications_pb2.ClassificationResult
 
 @dataclasses.dataclass
 class NLClassifierOptions:
-  """Options for the NL classifier task."""
+  """Options for the NL classifier task.
+
+  Attributes:
+    base_options: Base options for the NL classifier task.
+  """
   base_options: _BaseOptions
 
 
