@@ -31,7 +31,13 @@ _BaseOptions = base_options_module.BaseOptions
 
 @dataclasses.dataclass
 class ImageClassifierOptions:
-  """Options for the image classifier task."""
+  """Options for the image classifier task.
+
+  Attributes:
+    base_options: Base options for the image classifier task.
+    classification_options: Classification options for the image classifier
+      task.
+  """
   base_options: _BaseOptions
   classification_options: _ClassificationOptions = _ClassificationOptions()
 

@@ -30,7 +30,13 @@ _SearchOptions = search_options_pb2.SearchOptions
 
 @dataclasses.dataclass
 class TextSearcherOptions:
-  """Options for the text search task."""
+  """Options for the text search task.
+
+  Attributes:
+    base_options: Base options for the text searcher task.
+    embedding_options: Embedding options for the text searcher task.
+    search_options: Search options for the text searcher task.
+  """
   base_options: _BaseOptions
   embedding_options: _EmbeddingOptions = _EmbeddingOptions()
   search_options: _SearchOptions = _SearchOptions()

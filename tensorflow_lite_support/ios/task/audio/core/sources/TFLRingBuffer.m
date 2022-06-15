@@ -29,14 +29,15 @@
   return self;
 }
 
-- (BOOL)loadBuffer:(TFLFloatBuffer *)sourceBuffer
-            offset:(NSUInteger)offset
-              size:(NSUInteger)size
-             error:(NSError **)error {
+- (BOOL)loadFloatData:(float *)data
+             dataSize:(NSUInteger)dataSize
+               offset:(NSUInteger)offset
+                 size:(NSUInteger)size
+                error:(NSError **)error {
   NSUInteger sizeToCopy = size;
   NSUInteger newOffset = offset;
 
-  if (offset + size > sourceBuffer.size) {
+  if (offset + size > dataSize) {
     [TFLCommonUtils
         createCustomError:error
                  withCode:TFLSupportErrorCodeInvalidArgumentError
@@ -54,14 +55,13 @@
   // If the new nextIndex + sizeToCopy is smaller than the size of the ring buffer directly
   // copy all elements to the end of the ring buffer.
   if (_nextIndex + sizeToCopy < _buffer.size) {
-    memcpy(_buffer.data + _nextIndex, sourceBuffer.data + newOffset, sizeof(float) * sizeToCopy);
+    memcpy(_buffer.data + _nextIndex, data + newOffset, sizeof(float) * sizeToCopy);
   } else {
     NSUInteger endChunkSize = _buffer.size - _nextIndex;
-    memcpy(_buffer.data + _nextIndex, sourceBuffer.data + newOffset, sizeof(float) * endChunkSize);
+    memcpy(_buffer.data + _nextIndex, data + newOffset, sizeof(float) * endChunkSize);
 
     NSUInteger startChunkSize = sizeToCopy - endChunkSize;
-    memcpy(_buffer.data, sourceBuffer.data + newOffset + endChunkSize,
-           sizeof(float) * startChunkSize);
+    memcpy(_buffer.data, data + newOffset + endChunkSize, sizeof(float) * startChunkSize);
   }
 
   _nextIndex = (_nextIndex + sizeToCopy) % _buffer.size;

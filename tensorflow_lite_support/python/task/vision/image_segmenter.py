@@ -29,7 +29,12 @@ _BaseOptions = base_options_module.BaseOptions
 
 @dataclasses.dataclass
 class ImageSegmenterOptions:
-  """Options for the image segmenter task."""
+  """Options for the image segmenter task.
+
+  Attributes:
+    base_options: Base options for the image segmenter task.
+    segmentation_options: Segmentation options for the image segmenter task.
+  """
   base_options: _BaseOptions
   segmentation_options: _SegmentationOptions = _SegmentationOptions()
 
