@@ -32,6 +32,7 @@ android_library(
     srcs = glob(["*.java"]),
     javacopts = ["-source 7 -target 7"],
     deps = [
+        "//tensorflow_lite_support/java:tensorflowlite_support_java",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/core:base_task_api",
         "@com_google_auto_value",
         "@maven//:androidx_annotation_annotation",

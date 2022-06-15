@@ -27,7 +27,19 @@ import org.tensorflow.lite.task.core.TaskJniUtils;
 import org.tensorflow.lite.task.core.TaskJniUtils.EmptyHandleProvider;
 import org.tensorflow.lite.task.core.annotations.UsedByReflection;
 
-/** API for BERT-based Conversational Language Understanding. */
+/**
+ * API for BERT-based Conversational Language Understanding.
+ *
+ * <p>The API expects a Bert based TFLite model with metadata populated. The metadata should contain
+ * the following information:
+ *
+ * <ul>
+ *   <li>input_process_units for Wordpiece Tokenizer.
+ *   <li>3 input tensors with names "ids", "mask" and "segment_ids".
+ *   <li>6 output tensors with names "domain_task/names", "domain_task/scores", "intent_task/names",
+ *       "intent_task/scores", "slot_task/names", and "slot_task/scores".
+ * </ul>
+ */
 public class BertCluAnnotator extends BaseTaskApi {
   private static final String BERT_CLU_ANNOTATOR_NATIVE_LIBNAME = "task_text_jni";
   /**
@@ -76,6 +88,16 @@ public class BertCluAnnotator extends BaseTaskApi {
               }
             },
             BERT_CLU_ANNOTATOR_NATIVE_LIBNAME));
+  }
+
+  /**
+   * Annotates the input utterances.
+   *
+   * @param cluRequest input dialogue encoded in a {@link CluRequest}
+   * @return domain, intent, and slot annotations encoded in a {@link CluResponse}
+   */
+  public CluResponse annotate(CluRequest cluRequest) {
+    return annotateNative(getNativeHandle(), cluRequest);
   }
 
   /** Options for setting up a {@link BertCluAnnotator}. */
@@ -135,14 +157,14 @@ public class BertCluAnnotator extends BaseTaskApi {
     }
   }
 
-  // TODO(b/234066484): Implement an `annotateNative` method.
-
   private BertCluAnnotator(long nativeHandle) {
     super(nativeHandle);
   }
 
   private static native long initJniWithByteBuffer(
       BertCluAnnotatorOptions options, ByteBuffer modelBuffer, long baseOptionsHandle);
+
+  private static native CluResponse annotateNative(long nativeHandle, CluRequest cluRequest);
 
   @Override
   protected void deinit(long nativeHandle) {

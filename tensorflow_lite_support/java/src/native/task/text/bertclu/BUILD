@@ -22,7 +22,9 @@ jni_binary_with_tflite(
     deps = [
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto_inc",
+        "//tensorflow_lite_support/cc/task/core/proto:class_cc_proto",
         "//tensorflow_lite_support/cc/task/text/proto:bert_clu_annotator_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/text/proto:clu_cc_proto",
         "//tensorflow_lite_support/java/jni",
     ],
 )

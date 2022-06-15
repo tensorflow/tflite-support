@@ -23,6 +23,8 @@ import org.tensorflow.lite.annotations.UsedByReflection;
  * index of the label in the corresponding label file. Typically it's used as result of
  * classification tasks.
  */
+// This class also acts as a Java wrapper for
+// third_party/tensorflow_lite_support/cc/task/core/proto/class.proto.
 @UsedByReflection("TFLiteSupport/Task")
 public final class Category {
   private static final int DEFAULT_INDEX = -1;

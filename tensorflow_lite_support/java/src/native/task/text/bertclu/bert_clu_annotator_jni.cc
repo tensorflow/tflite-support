@@ -16,30 +16,40 @@ limitations under the License.
 #include <jni.h>
 
 #include "tensorflow_lite_support/cc/port/statusor.h"
-#include "tensorflow_lite_support/cc/task/core/proto/base_options_proto_inc.h"
+#include "tensorflow_lite_support/cc/task/core/proto/class.pb.h"
 #include "tensorflow_lite_support/cc/task/text/bert_clu_annotator.h"
 #include "tensorflow_lite_support/cc/task/text/clu_annotator.h"
 #include "tensorflow_lite_support/cc/task/text/proto/bert_clu_annotator_options.pb.h"
+#include "tensorflow_lite_support/cc/task/text/proto/clu.pb.h"
 #include "tensorflow_lite_support/cc/utils/jni_utils.h"
 
 namespace {
 
 using ::tflite::support::StatusOr;
+using ::tflite::support::utils::ConvertVectorToArrayList;
 using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::kInvalidPointer;
+using ::tflite::support::utils::StringListToVector;
 using ::tflite::support::utils::ThrowException;
 using ::tflite::task::core::BaseOptions;
+using ::tflite::task::core::Class;
 using ::tflite::task::text::BertCluAnnotatorOptions;
+using ::tflite::task::text::CategoricalSlot;
+using ::tflite::task::text::CluRequest;
+using ::tflite::task::text::CluResponse;
+using ::tflite::task::text::Extraction;
+using ::tflite::task::text::NonCategoricalSlot;
 using ::tflite::task::text::clu::BertCluAnnotator;
 using ::tflite::task::text::clu::CluAnnotator;
 
 // Creates a BertCluAnnotatorOptions proto based on the Java class.
-BertCluAnnotatorOptions ConvertJavaBertCluAnnotatorProtoOptions(
+BertCluAnnotatorOptions ConvertJavaBertCluAnnotatorProtoOptionsToCpp(
     JNIEnv* env, jobject java_bert_clu_annotator_options,
     jlong base_options_handle) {
-  static jclass bert_clu_annotator_options_class = env->FindClass(
-      "org/tensorflow/lite/task/text/bertclu/"
-      "BertCluAnnotator$BertCluAnnotatorOptions");
+  static jclass bert_clu_annotator_options_class =
+      static_cast<jclass>(env->NewGlobalRef(
+          env->FindClass("org/tensorflow/lite/task/text/bertclu/"
+                         "BertCluAnnotator$BertCluAnnotatorOptions")));
   static jmethodID max_history_turns_method_id = env->GetMethodID(
       bert_clu_annotator_options_class, "getMaxHistoryTurns", "()I");
   static jmethodID domain_threshold_method_id = env->GetMethodID(
@@ -73,6 +83,149 @@ BertCluAnnotatorOptions ConvertJavaBertCluAnnotatorProtoOptions(
   return proto_options;
 }
 
+// Creates a CluRequest proto based on the Java class.
+CluRequest ConvertJavaCluRequestToCpp(JNIEnv* env, jobject java_clu_request) {
+  static jclass clu_request_class = static_cast<jclass>(env->NewGlobalRef(
+      env->FindClass("org/tensorflow/lite/task/text/bertclu/CluRequest")));
+  static jmethodID utterances_method_id = env->GetMethodID(
+      clu_request_class, "getUtterances", "()Ljava/util/List;");
+  jobject java_utterances =
+      env->CallObjectMethod(java_clu_request, utterances_method_id);
+  std::vector<std::string> utterances =
+      StringListToVector(env, java_utterances);
+  CluRequest clu_request;
+  clu_request.mutable_utterances()->Reserve(utterances.size());
+  for (const std::string& utterance : utterances) {
+    clu_request.add_utterances(std::move(utterance));
+  }
+  env->DeleteLocalRef(java_utterances);
+  return clu_request;
+}
+
+// Builds a Java Category based on the Cpp Class proto.
+jobject ConvertCppCategoryToJava(JNIEnv* env, const Class& category) {
+  static jclass category_class = static_cast<jclass>(env->NewGlobalRef(
+      env->FindClass("org/tensorflow/lite/support/label/Category")));
+  static jmethodID category_create_method_id =
+      env->GetStaticMethodID(category_class, "create",
+                             "(Ljava/lang/String;Ljava/lang/String;FI)Lorg/"
+                             "tensorflow/lite/support/label/Category;");
+
+  jstring java_display_name =
+      env->NewStringUTF(category.display_name().c_str());
+  jstring java_class_name = env->NewStringUTF(category.class_name().c_str());
+  jobject java_category = env->CallStaticObjectMethod(
+      category_class, category_create_method_id, java_class_name,
+      java_display_name, category.score(), category.index());
+
+  env->DeleteLocalRef(java_display_name);
+  env->DeleteLocalRef(java_class_name);
+  return java_category;
+}
+
+// Builds a Java List of CategoricalSlots based on the input `clu_response`.
+jobject ConvertCppCategoricalSlotsToJava(JNIEnv* env,
+                                         const CluResponse& clu_response) {
+  static jclass categorical_slot_class = static_cast<
+      jclass>(env->NewGlobalRef(env->FindClass(
+      "org/tensorflow/lite/task/text/bertclu/CluResponse$CategoricalSlot")));
+  static jmethodID categorical_slot_create_method_id = env->GetStaticMethodID(
+      categorical_slot_class, "create",
+      "(Ljava/lang/String;Lorg/tensorflow/lite/support/label/Category;)Lorg/"
+      "tensorflow/lite/task/text/bertclu/CluResponse$CategoricalSlot;");
+  return ConvertVectorToArrayList(
+      env, clu_response.categorical_slots().begin(),
+      clu_response.categorical_slots().end(),
+      [env](const CategoricalSlot& categorical_slot) {
+        jstring java_slot = env->NewStringUTF(categorical_slot.slot().c_str());
+        jobject java_prediction =
+            ConvertCppCategoryToJava(env, categorical_slot.prediction());
+        jobject java_categorical_slots = env->CallStaticObjectMethod(
+            categorical_slot_class, categorical_slot_create_method_id,
+            java_slot, java_prediction);
+
+        env->DeleteLocalRef(java_slot);
+        env->DeleteLocalRef(java_prediction);
+        return java_categorical_slots;
+      });
+}
+
+// Builds a Java List of NonCategoricalSlots based on the input `clu_response`.
+jobject ConvertCppNonCategoricalSlotsToJava(JNIEnv* env,
+                                            const CluResponse& clu_response) {
+  static jclass extraction_class =
+      static_cast<jclass>(env->NewGlobalRef(env->FindClass(
+          "org/tensorflow/lite/task/text/bertclu/CluResponse$Extraction")));
+  static jmethodID extraction_create_method_id =
+      env->GetStaticMethodID(extraction_class, "create",
+                             "(Ljava/lang/String;FII)Lorg/tensorflow/lite/task/"
+                             "text/bertclu/CluResponse$Extraction;");
+  static jclass non_categorical_slot_class = static_cast<
+      jclass>(env->NewGlobalRef(env->FindClass(
+      "org/tensorflow/lite/task/text/bertclu/CluResponse$NonCategoricalSlot")));
+  static jmethodID non_categorical_slot_create_method_id =
+      env->GetStaticMethodID(
+          non_categorical_slot_class, "create",
+          "(Ljava/lang/String;Lorg/tensorflow/lite/task/text/bertclu/"
+          "CluResponse$Extraction;)Lorg/tensorflow/lite/task/text/bertclu/"
+          "CluResponse$NonCategoricalSlot;");
+
+  return ConvertVectorToArrayList(
+      env, clu_response.noncategorical_slots().begin(),
+      clu_response.noncategorical_slots().end(),
+      [env](const NonCategoricalSlot& non_categorical_slot) {
+        Extraction extraction = non_categorical_slot.extraction();
+        jobject java_extraction = env->CallStaticObjectMethod(
+            extraction_class, extraction_create_method_id,
+            env->NewStringUTF(extraction.value().c_str()), extraction.score(),
+            extraction.start(), extraction.end());
+        jstring java_slot =
+            env->NewStringUTF(non_categorical_slot.slot().c_str());
+        jobject java_non_categorical_slots = env->CallStaticObjectMethod(
+            non_categorical_slot_class, non_categorical_slot_create_method_id,
+            java_slot, java_extraction);
+
+        env->DeleteLocalRef(java_extraction);
+        env->DeleteLocalRef(java_slot);
+        return java_non_categorical_slots;
+      });
+}
+
+// Builds a Java CluResponse based on the input CluResponse proto.
+jobject ConvertCppCluResponseToJava(JNIEnv* env,
+                                    const CluResponse& clu_response) {
+  static jclass clu_response_class = static_cast<jclass>(env->NewGlobalRef(
+      env->FindClass("org/tensorflow/lite/task/text/bertclu/CluResponse")));
+  static jmethodID clu_response_create_method_id = env->GetStaticMethodID(
+      clu_response_class, "create",
+      "(Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)Lorg/"
+      "tensorflow/lite/task/text/bertclu/CluResponse;");
+
+  jobject java_domains = ConvertVectorToArrayList(
+      env, clu_response.domains().begin(), clu_response.domains().end(),
+      [env](const Class& category) {
+        return ConvertCppCategoryToJava(env, category);
+      });
+  jobject java_intents = ConvertVectorToArrayList(
+      env, clu_response.intents().begin(), clu_response.intents().end(),
+      [env](const Class& category) {
+        return ConvertCppCategoryToJava(env, category);
+      });
+  jobject java_categorical_slots =
+      ConvertCppCategoricalSlotsToJava(env, clu_response);
+  jobject java_non_categorical_slots =
+      ConvertCppNonCategoricalSlotsToJava(env, clu_response);
+  jobject java_clu_response = env->CallStaticObjectMethod(
+      clu_response_class, clu_response_create_method_id, java_domains,
+      java_intents, java_categorical_slots, java_non_categorical_slots);
+
+  env->DeleteLocalRef(java_domains);
+  env->DeleteLocalRef(java_intents);
+  env->DeleteLocalRef(java_categorical_slots);
+  env->DeleteLocalRef(java_non_categorical_slots);
+  return java_clu_response;
+}
+
 }  // namespace
 
 extern "C" JNIEXPORT void JNICALL
@@ -86,8 +239,8 @@ Java_org_tensorflow_lite_task_text_bertclu_BertCluAnnotator_initJniWithByteBuffe
     JNIEnv* env, jclass thiz, jobject bert_clu_annotator_options,
     jobject model_buffer, jlong base_options_handle) {
   BertCluAnnotatorOptions proto_options =
-      ConvertJavaBertCluAnnotatorProtoOptions(env, bert_clu_annotator_options,
-                                              base_options_handle);
+      ConvertJavaBertCluAnnotatorProtoOptionsToCpp(
+          env, bert_clu_annotator_options, base_options_handle);
   proto_options.mutable_base_options()->mutable_model_file()->set_file_content(
       static_cast<char*>(env->GetDirectBufferAddress(model_buffer)),
       static_cast<size_t>(env->GetDirectBufferCapacity(model_buffer)));
@@ -105,4 +258,18 @@ Java_org_tensorflow_lite_task_text_bertclu_BertCluAnnotator_initJniWithByteBuffe
   }
 }
 
-// TODO(b/234066484): Implement an `annotateNative` method.
+extern "C" JNIEXPORT jobject JNICALL
+Java_org_tensorflow_lite_task_text_bertclu_BertCluAnnotator_annotateNative(
+    JNIEnv* env, jclass thiz, jlong native_handle, jobject java_clu_request) {
+  CluRequest clu_request = ConvertJavaCluRequestToCpp(env, java_clu_request);
+  auto* bert_clu_annotator = reinterpret_cast<BertCluAnnotator*>(native_handle);
+  absl::StatusOr<CluResponse> clu_response =
+      bert_clu_annotator->Annotate(clu_request);
+  if (!clu_response.ok()) {
+    ThrowException(
+        env, GetExceptionClassNameForStatusCode(clu_response.status().code()),
+        "Error occurred during BERT CLU annotation: %s",
+        clu_response.status().message().data());
+  }
+  return ConvertCppCluResponseToJava(env, *clu_response);
+}
