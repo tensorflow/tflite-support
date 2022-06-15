@@ -55,10 +55,6 @@ NS_SWIFT_NAME(AudioClassifierOptions)
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
 
-- (instancetype)init NS_UNAVAILABLE;
-
-+ (instancetype)new NS_UNAVAILABLE;
-
 @end
 
 /**
@@ -100,7 +96,7 @@ NS_SWIFT_NAME(AudioClassifier)
  * failure.
  */
 - (nullable instancetype)initWithOptions:(TFLAudioClassifierOptions *)options
-                                   error:(NSError *_Nullable *)error;
+                                   error:(NSError**)error;
 
 /**
  * Creates a `TFLAudioTensor` instance to store the input audio samples to be classified. The
