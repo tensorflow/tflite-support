@@ -78,7 +78,8 @@ _EXPECTED_MOBILE_BERT_QA_RESULT = _QuestionAnswererResult(
         end=120,
         logit=10.609820),
       text='called the curriculum.'
-    )])
+    )
+])
 
 _ALBERT_MODEL = "albert_with_metadata.tflite"
 _EXPECTED_ALBERT_QA_RESULT = _QuestionAnswererResult(
@@ -113,7 +114,8 @@ _EXPECTED_ALBERT_QA_RESULT = _QuestionAnswererResult(
         end=120,
         logit=12.718668),
       text='called the curriculum.'
-    )])
+    )
+])
 
 
 class ModelFileType(enum.Enum):
