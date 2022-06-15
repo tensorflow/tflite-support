@@ -128,29 +128,6 @@ NS_SWIFT_NAME(AudioClassifier)
 - (nullable TFLAudioRecord *)createAudioRecordWithError:(NSError **)error;
 
 /**
- * Returns the required input buffer size in number elements or zero in case of failure to determine
- * the input buffer size.
- *
- * @param error An optional error parameter populated if there is an error in determining the input
- * buffer size.
- *
- * @return Required input buffer size in number elements or zero in case of failure to determine the
- * input buffer size.
- */
-- (NSInteger)requiredBufferSizeWithError:(NSError **)error;
-
-/**
- * Returns the `TFLAudioFormat` matching the model requirements.
- *
- * @param error An optional error parameter populated if there is an error in determining the
- * `TFLAudioFormat` required by the model.
- *
- * @return Returns the `TFLAudioFormat` matching the model requirements or nil in case of failure to
- * determine the required TFLAudioFormat.
- */
-- (TFLAudioFormat *)requiredTensorFormatWithError:(NSError **)error;
-
-/**
  * Performs classification on an array of audio samples encapsulated by `TFLAudioTensor`.
  *
  * @param audioTensor A `TFLAudioTensor` to be classified.
