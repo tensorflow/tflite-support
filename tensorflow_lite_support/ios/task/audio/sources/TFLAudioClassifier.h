@@ -109,7 +109,7 @@ NS_SWIFT_NAME(AudioClassifier)
  * @return A `TFLAudioTensor` with the same buffer size as the model input tensor and audio format
  * required by the model, if creation is successful otherwise nil.
  */
-- (nullable TFLAudioTensor *)createInputAudioTensorWithError:(NSError **)error;
+- (nullable TFLAudioTensor *)createInputAudioTensor;
 
 /**
  * Creates a `TFLAudioRecord` instance to start recording audio input from the microphone. The

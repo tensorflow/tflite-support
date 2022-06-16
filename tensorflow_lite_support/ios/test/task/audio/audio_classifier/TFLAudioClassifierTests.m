@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
   XCTAssertNotNil(audioClassifier);
 
   // Create the audio tensor using audio classifier.
-  TFLAudioTensor *audioTensor = [audioClassifier createInputAudioTensorWithError:nil];
+  TFLAudioTensor *audioTensor = [audioClassifier createInputAudioTensor];
   XCTAssertNotNil(audioTensor);
 
   // Load pcm buffer from file.
@@ -149,10 +149,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testInferenceWithAudioRecordSucceeds {
   TFLAudioClassifier *audioClassifier = [[TFLAudioClassifier alloc] initWithModelPath:self.modelPath
                                                                                 error:nil];
+  NSLog(@"init check");                                                                         
   XCTAssertNotNil(audioClassifier);
 
-  // Create auudio record using audio classifier
+  // Create audio record using audio classifier
+  NSLog(@"check 2");
   TFLAudioRecord *audioRecord = [audioClassifier createAudioRecordWithError:nil];
+  NSLog(@"check after");
+
   XCTAssertNotNil(audioRecord);
 
   // Loading AVAudioPCMBuffer with an array is not currently supported for iOS versions < 15.0.
@@ -178,7 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
   [audioRecord convertAndLoadBuffer:audioEngineBuffer usingAudioConverter:audioConverter];
 
   // Create audio tensor using audio classifier.
-  TFLAudioTensor *audioTensor = [audioClassifier createInputAudioTensorWithError:nil];
+  TFLAudioTensor *audioTensor = [audioClassifier createInputAudioTensor];
   XCTAssertNotNil(audioTensor);
 
   // Load the audioRecord buffer into the audio tensor.
