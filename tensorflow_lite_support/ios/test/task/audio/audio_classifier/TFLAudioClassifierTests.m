@@ -149,13 +149,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testInferenceWithAudioRecordSucceeds {
   TFLAudioClassifier *audioClassifier = [[TFLAudioClassifier alloc] initWithModelPath:self.modelPath
                                                                                 error:nil];
-  NSLog(@"init check");                                                                         
   XCTAssertNotNil(audioClassifier);
 
   // Create audio record using audio classifier
-  NSLog(@"check 2");
   TFLAudioRecord *audioRecord = [audioClassifier createAudioRecordWithError:nil];
-  NSLog(@"check after");
 
   XCTAssertNotNil(audioRecord);
 

@@ -114,12 +114,10 @@
       deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
   
   if(![self populateRequiredBufferSizeWithError:error]) {
-    NSLog(@"Check bool");
     return nil;
   } 
 
   if(![self populateRequiredTensorFormatWithError:error]) {
-        NSLog(@"Check bool 1");
     return nil;
   } 
 
@@ -175,12 +173,10 @@
     TfLiteSupportErrorDelete(requiredBufferSizeError);
   }
   
-  NSLog(@"%d Bufferr", _requiredCBufferSize);
   return _requiredCBufferSize > 0;
 }
 
 - (BOOL)populateRequiredTensorFormatWithError:(NSError **)error {
-  NSLog(@"check pop tensor");
   TfLiteSupportError *getAudioFormatError = nil;
   _requiredCAudioFormat =
       TfLiteAudioClassifierGetRequiredAudioFormat(_audioClassifier, &getAudioFormatError);
@@ -189,19 +185,7 @@
     TfLiteSupportErrorDelete(getAudioFormatError);
   }
   
-  NSLog(@"check poop tensor after");
   return _requiredCAudioFormat != NULL;
-
-  // if (!cFormat) {
-  //   return NO;
-  // }
-
-  // requiredAudioFormat = [[TFLAudioFormat alloc] initWithChannelCount:cFormat->channels
-  //                                                            sampleRate:cFormat->sample_rate];
-
-  // TfLiteAudioFormatDelete(cFormat);
-
-  // return YES;
 }
 
 - (TFLAudioTensor *)createInputAudioTensor {
