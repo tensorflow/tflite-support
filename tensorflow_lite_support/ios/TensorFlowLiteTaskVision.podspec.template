@@ -17,5 +17,5 @@ Pod::Spec.new do |s|
   }
   s.library = 'c++'
   s.frameworks = 'CoreMedia', 'Accelerate'
-  s.vendored_frameworks = 'Frameworks/TensorFlowLiteTaskVisionObjCPP.framework'
+  s.vendored_frameworks = 'Frameworks/TensorFlowLiteTaskVision.framework'
 end
