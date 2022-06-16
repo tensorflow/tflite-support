@@ -23,6 +23,7 @@
   XCTAssertEqual(error.domain, expectedErrorDomain);                                             \
   XCTAssertEqual(error.code, expectedErrorCode);                                                 \
   XCTAssertEqualObjects(error.localizedDescription, expectedLocalizedDescription);
+#define BUFFER_SIZE 100
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -53,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (AVAudioPCMBuffer *)audioEngineBufferFromFileWithName:(NSString *)name
                                               extension:(NSString *)extension {
-  // Loading AVAudioPCMBuffer with an array is not currently suupported for iOS versions < 15.0.
+  // Loading AVAudioPCMBuffer with an array is not currently supported for iOS versions < 15.0.
   // Instead audio samples from a wav file are loaded and converted into the same format
   // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
   NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:name ofType:extension];
@@ -62,31 +63,22 @@ NS_ASSUME_NONNULL_BEGIN
                                         processingFormat:self.audioEngineFormat];
 }
 
-- (void)testInitWithMultipleChannelsSucceeds {
-  TFLAudioFormat *audioFormat = [[TFLAudioFormat alloc] initWithChannelCount:2 sampleRate:8000];
-
-  NSUInteger sampleCount = 100;
-
-  TFLAudioTensor *audioTensor = [[TFLAudioTensor alloc] initWithAudioFormat:audioFormat
-                                                                sampleCount:sampleCount];
-  XCTAssertEqual(audioTensor.bufferSize, sampleCount * audioFormat.channelCount);
+- (TFLAudioFormat *)createAudioFormatWithSampleRate:(NSUInteger)sampleRate {
+  return [[TFLAudioFormat alloc] initWithChannelCount:1 sampleRate:sampleRate];
 }
 
-- (void)testLoadAudioRecordSucceeds {
-  TFLAudioFormat *audioFormat = [[TFLAudioFormat alloc] initWithChannelCount:1 sampleRate:8000];
-
+- (TFLAudioRecord *)createAudioRecordWithAudioFormat:(TFLAudioFormat *)audioFormat {
   NSUInteger bufferSize = 100;
   TFLAudioRecord *audioRecord = [[TFLAudioRecord alloc] initWithAudioFormat:audioFormat
                                                                  bufferSize:bufferSize
                                                                       error:nil];
   XCTAssertNotNil(audioRecord);
+  return audioRecord;
+}
 
-  // Loading AVAudioPCMBuffer with an array is not currently supported for iOS versions < 15.0.
-  // Instead audio samples from a wav file are loaded and converted into the same format
-  // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
-  AVAudioPCMBuffer *audioEngineBuffer = [self audioEngineBufferFromFileWithName:@"speech"
-                                                                      extension:@"wav"];
-  XCTAssertNotNil(audioEngineBuffer);
+- (void)validateTensorWithAudioFormat:(TFLAudioFormat *)audioFormat
+                          sampleCount:(NSUInteger)sampleCount {
+  TFLAudioRecord *audioRecord = [self createAudioRecordWithAudioFormat:audioFormat];
 
   AVAudioFormat *recordingFormat =
       [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32
@@ -96,12 +88,20 @@ NS_ASSUME_NONNULL_BEGIN
 
   AVAudioConverter *audioConverter = [[AVAudioConverter alloc] initFromFormat:self.audioEngineFormat
                                                                      toFormat:recordingFormat];
+
+  // Loading AVAudioPCMBuffer with an array is not currently supported for iOS versions < 15.0.
+  // Instead audio samples from a wav file are loaded and converted into the same format
+  // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
+  AVAudioPCMBuffer *audioEngineBuffer = [self audioEngineBufferFromFileWithName:@"speech"
+                                                                      extension:@"wav"];
+  XCTAssertNotNil(audioEngineBuffer);
+
   // Convert and load the buffer of `TFLAudioRecord`.
   [audioRecord convertAndLoadBuffer:audioEngineBuffer usingAudioConverter:audioConverter];
 
   // Initialize audio tensor with the same audio format as the audio record.
   TFLAudioTensor *audioTensor = [[TFLAudioTensor alloc] initWithAudioFormat:audioFormat
-                                                                sampleCount:bufferSize];
+                                                                sampleCount:sampleCount];
   [audioTensor loadAudioRecord:audioRecord withError:nil];
 
   // Get the current buffer of audio tensor.
@@ -114,23 +114,38 @@ NS_ASSUME_NONNULL_BEGIN
   AVAudioPCMBuffer *bufferToCompare = [audioEngineBuffer bufferUsingAudioConverter:audioConverter];
   XCTAssertNotNil(bufferToCompare);
 
-  XCTAssertEqual(audioTensorBuffer.size, audioRecord.bufferSize);
+  XCTAssertEqual(audioTensorBuffer.size, sampleCount);
   for (int i = 0; i < audioTensorBuffer.size; i++) {
     NSInteger startIndex = bufferToCompare.frameLength - audioTensorBuffer.size;
     XCTAssertEqual(audioTensorBuffer.data[i], bufferToCompare.floatChannelData[0][startIndex + i]);
   }
 }
 
-- (void)testLoadMostRecentElementsFromAudioRecordSucceeds {
-  TFLAudioFormat *audioFormat = [[TFLAudioFormat alloc] initWithChannelCount:1 sampleRate:8000];
+- (void)testInitWithMultipleChannelsSucceeds {
+  TFLAudioFormat *audioFormat = [[TFLAudioFormat alloc] initWithChannelCount:2 sampleRate:8000];
 
-  NSUInteger bufferSize = 100;
-  TFLAudioRecord *audioRecord = [[TFLAudioRecord alloc] initWithAudioFormat:audioFormat
-                                                                 bufferSize:bufferSize
-                                                                      error:nil];
-  XCTAssertNotNil(audioRecord);
+  NSUInteger sampleCount = BUFFER_SIZE;
+  TFLAudioTensor *audioTensor = [[TFLAudioTensor alloc] initWithAudioFormat:audioFormat
+                                                                sampleCount:sampleCount];
+  XCTAssertEqual(audioTensor.bufferSize, sampleCount * audioFormat.channelCount);
+}
 
-  // Loading AVAudioPCMBuffer with an array is not currently supported for iOS versions < 15.0.
+- (void)testLoadFullBufferFromAudioRecordSucceeds {
+  TFLAudioFormat *audioFormat = [self createAudioFormatWithSampleRate:8000];
+  [self validateTensorWithAudioFormat:audioFormat sampleCount:BUFFER_SIZE];
+}
+
+- (void)testLoadRecentElementsFromAudioRecordSucceeds {
+  TFLAudioFormat *audioFormat = [self createAudioFormatWithSampleRate:8000];
+  NSInteger sampleCount = 45;
+  [self validateTensorWithAudioFormat:audioFormat sampleCount:sampleCount];
+}
+
+- (void)testLoadAudioRecordFailsWithUnequalAudioFormats {
+  TFLAudioFormat *audioFormat = [self createAudioFormatWithSampleRate:8000];
+  TFLAudioRecord *audioRecord = [self createAudioRecordWithAudioFormat:audioFormat];
+
+  // Loading AVAudioPCMBuffer with an array is not currentlyy supported for iOS versions < 15.0.
   // Instead audio samples from a wav file are loaded and converted into the same format
   // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
   AVAudioPCMBuffer *audioEngineBuffer = [self audioEngineBufferFromFileWithName:@"speech"
@@ -142,60 +157,6 @@ NS_ASSUME_NONNULL_BEGIN
                                        sampleRate:audioFormat.sampleRate
                                          channels:(AVAudioChannelCount)audioFormat.channelCount
                                       interleaved:YES];
-
-  AVAudioFormat *audioEngineFormat =
-      [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32
-                                       sampleRate:48000
-                                         channels:1
-                                      interleaved:NO];
-
-  AVAudioConverter *audioConverter = [[AVAudioConverter alloc] initFromFormat:audioEngineFormat
-                                                                     toFormat:recordingFormat];
-
-  // Convert and load the buffer of `TFLAudioRecord`.
-  [audioRecord convertAndLoadBuffer:audioEngineBuffer usingAudioConverter:audioConverter];
-
-  NSInteger sampleCount = 45;
-  TFLAudioTensor *audioTensor = [[TFLAudioTensor alloc] initWithAudioFormat:audioFormat
-                                                                sampleCount:sampleCount];
-  [audioTensor loadAudioRecord:audioRecord withError:nil];
-
-  AVAudioPCMBuffer *bufferToCompare = [audioEngineBuffer bufferUsingAudioConverter:audioConverter];
-  XCTAssertNotNil(bufferToCompare);
-
-  TFLFloatBuffer *audioTensorBuffer = audioTensor.buffer;
-  XCTAssertNotNil(audioTensorBuffer);
-
-  XCTAssertEqual(audioTensorBuffer.size, sampleCount);
-  for (int i = 0; i < audioTensorBuffer.size; i++) {
-    NSInteger startIndex = bufferToCompare.frameLength - audioTensorBuffer.size;
-    XCTAssertEqual(audioTensorBuffer.data[i], bufferToCompare.floatChannelData[0][startIndex + i]);
-  }
-}
-
-- (void)testLoadAudioRecordFailsWithUnequalAudioFormats {
-  TFLAudioFormat *audioRecordFormat = [[TFLAudioFormat alloc] initWithChannelCount:1
-                                                                        sampleRate:8000];
-
-  NSUInteger bufferSize = 100;
-
-  TFLAudioRecord *audioRecord = [[TFLAudioRecord alloc] initWithAudioFormat:audioRecordFormat
-                                                                 bufferSize:bufferSize
-                                                                      error:nil];
-  XCTAssertNotNil(audioRecord);
-
-  // Loading AVAudioPCMBuffer with an array is not currentlyy supported for iOS versions < 15.0.
-  // Instead audio samples from a wav file are loaded and converted into the same format
-  // of AVAudioEngine's input node to mock thhe input from the AVAudio Engine.
-  AVAudioPCMBuffer *audioEngineBuffer = [self audioEngineBufferFromFileWithName:@"speech"
-                                                                      extension:@"wav"];
-  XCTAssertNotNil(audioEngineBuffer);
-
-  AVAudioFormat *recordingFormat = [[AVAudioFormat alloc]
-      initWithCommonFormat:AVAudioPCMFormatFloat32
-                sampleRate:audioRecordFormat.sampleRate
-                  channels:(AVAudioChannelCount)audioRecordFormat.channelCount
-               interleaved:YES];
 
   AVAudioFormat *audioEngineFormat =
       [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32
@@ -213,7 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                         sampleRate:16000];
 
   TFLAudioTensor *audioTensor = [[TFLAudioTensor alloc] initWithAudioFormat:audioTensorFormat
-                                                                sampleCount:bufferSize];
+                                                                sampleCount:BUFFER_SIZE];
 
   NSError *error = nil;
   XCTAssertFalse([audioTensor loadAudioRecord:audioRecord withError:&error]);
@@ -226,7 +187,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)testLoadBufferSucceeds {
-  TFLAudioFormat *audioFormat = [[TFLAudioFormat alloc] initWithChannelCount:1 sampleRate:8000];
+  TFLAudioFormat *audioFormat = [self createAudioFormatWithSampleRate:8000];
   NSInteger sampleCount = 5;
 
   TFLAudioTensor *audioTensor = [[TFLAudioTensor alloc] initWithAudioFormat:audioFormat
@@ -253,7 +214,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)testLoadBufferFailsWithIndexOutOfBounds {
-  TFLAudioFormat *audioFormat = [[TFLAudioFormat alloc] initWithChannelCount:1 sampleRate:8000];
+  TFLAudioFormat *audioFormat = [self createAudioFormatWithSampleRate:8000];
   NSInteger sampleCount = 5;
 
   TFLAudioTensor *audioTensor = [[TFLAudioTensor alloc] initWithAudioFormat:audioFormat

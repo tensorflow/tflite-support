@@ -47,13 +47,16 @@ NS_SWIFT_NAME(AudioTensor)
  *
  * @return A new instance of TFLAudioTensor with the given audio format and sample count.
  */
-- (instancetype)initWithAudioFormat:(TFLAudioFormat *)format sampleCount:(NSUInteger)sampleCount;
+- (instancetype)initWithAudioFormat:(TFLAudioFormat *)format
+                        sampleCount:(NSUInteger)sampleCount NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  * Convenience method to load the elements currently in the internal buffer of `TFLAudioRecord` into
  * `TFLAudioTensor`.
  *
- * @discussion You must ensure that the  audio formats of `TFLAudioRecord` and the current
+ * @discussion You must ensure that the audio formats of `TFLAudioRecord` and the current
  * `TFLAudioTensor` match.
  * New data from the input buffer is appended to the end of the buffer by shifting out
  * any old data from the beginning of the buffer if needed to make space. If the size of the new

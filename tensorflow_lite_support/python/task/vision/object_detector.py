@@ -29,7 +29,12 @@ _DetectionOptions = detection_options_pb2.DetectionOptions
 
 @dataclasses.dataclass
 class ObjectDetectorOptions:
-  """Options for the object detector task."""
+  """Options for the object detector task.
+
+  Attributes:
+    base_options: Base options for the object detector task.
+    detection_options: Detection options for the object detector task.
+  """
   base_options: _BaseOptions
   detection_options: _DetectionOptions = _DetectionOptions()
 

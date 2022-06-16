@@ -37,3 +37,35 @@ pybind_extension_may_pack_coral(
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
+
+pybind_extension_may_pack_coral(
+    name = "_pywrap_nl_classifier",
+    srcs = [
+        "_pywrap_nl_classifier.cc",
+    ],
+    module_name = "_pywrap_nl_classifier",
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:class_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:classifications_cc_proto",
+        "//tensorflow_lite_support/cc/task/text/nlclassifier:nl_classifier",
+        "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
+        "@pybind11",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)
+
+pybind_extension_may_pack_coral(
+    name = "_pywrap_bert_nl_classifier",
+    srcs = [
+        "_pywrap_bert_nl_classifier.cc",
+    ],
+    module_name = "_pywrap_bert_nl_classifier",
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:class_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:classifications_cc_proto",
+        "//tensorflow_lite_support/cc/task/text:bert_nl_classifier",
+        "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
+        "@pybind11",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)

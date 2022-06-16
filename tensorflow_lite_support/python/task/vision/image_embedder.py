@@ -31,7 +31,12 @@ _EmbeddingOptions = embedding_options_pb2.EmbeddingOptions
 
 @dataclasses.dataclass
 class ImageEmbedderOptions:
-  """Options for the image embedder task."""
+  """Options for the image embedder task.
+
+  Attributes:
+    base_options: Base options for the image embedder task.
+    embedding_options: Embedding options for the image embedder task.
+  """
   base_options: _BaseOptions
   embedding_options: _EmbeddingOptions = _EmbeddingOptions()
 
