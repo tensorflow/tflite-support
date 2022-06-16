@@ -16,12 +16,11 @@
 # TensorFlow isn't a dependency of tflite-support pip package. It's only
 # required in the API docgen pipeline so we'll ignore it if tensorflow is not
 # installed.
-# pylint: disable=g-import-not-at-top
+# pylint: disable=g-import-not-at-top,unused-import
 try:
-  from tensorflow.tools import docs
-  doc_controls = docs.doc_controls
+  from tensorflow.tools.docs import doc_controls
 except ModuleNotFoundError:
   # Replace the real doc_controls with MagicMock to ignore all calls to it.
   from unittest import mock
   doc_controls = mock.MagicMock()
-# pylint: enable=g-import-not-at-top
+# pylint: enable=g-import-not-at-top,unused-import
