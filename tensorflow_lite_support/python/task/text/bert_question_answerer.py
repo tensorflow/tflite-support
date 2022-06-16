@@ -30,7 +30,7 @@ class BertQuestionAnswererOptions:
 
 
 class BertQuestionAnswerer(object):
-  """Class that performs Bert question answerer on text."""
+  """Class that performs Bert question answering on text."""
 
   def __init__(self, options: BertQuestionAnswererOptions,
                cpp_bert_question_answerer: _CppBertQuestionAnswerer) -> None:
