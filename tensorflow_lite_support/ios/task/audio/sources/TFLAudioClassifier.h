@@ -64,39 +64,19 @@ NS_SWIFT_NAME(AudioClassifier)
 @interface TFLAudioClassifier : NSObject
 
 /**
- * Initializes a new `TFLAudioClassifier` with the absolute path to the model file stored locally on
- * the device.
+ * Creates a new instance of `TFLAudioClassifier from the given `TFLAudioClassifierOptions`.
  *
- * @discussion The external model file, must be a single standalone TFLite file. It could be packed
- * with TFLite Model Metadata[1] and associated files if exist. Fail to provide the necessary
- * metadata and associated files might result in errors. Check the
- * [documentation](https://www.tensorflow.org/lite/convert/metadata) for each task about the
- * specific requirement.
+ * @param options The options to use for configuring the `TFLAudioClassifier`.
+ * @param error An optional error parameter populated when there is an error in initializing
+ * the audio classifier.
  *
- * @param modelPath Path to the model file.
- *
- * @param error An optional error parameter populated if there is an error in initializing the audio
- * classifier.
- *
- * @return A `TFLAudioClassifier` instance if initialization is successful or nil in case of
- * failure.
+ * @return A new instance of `TFLAudioClassifier` with the given options. `nil` if there is an error
+ * in initializing the audio classifier.
  */
-- (nullable instancetype)initWithModelPath:(NSString *)modelPath error:(NSError **)error;
++ (nullable instancetype)audioClassifierWithOptions:(TFLAudioClassifierOptions *)options
+                                              error:(NSError **)error;
 
-/**
- * Initializes a new `TFLAudioClassifier` with the given `TFLAudioClassifierOptions`.
- *
- * @param options `TFLAudioClassifierOptions` initized with the absolute path to a model file stored
- * locally on the device and other custom options for configuring the audio classifier.
- *
- * @param error An optional error parameter populated when there is an error in initializing the
- * audio classifier.
- *
- * @return A `TFLAudioClassifier` instance if initialization is successful or nil in case of
- * failure.
- */
-- (nullable instancetype)initWithOptions:(TFLAudioClassifierOptions *)options
-                                   error:(NSError**)error;
++ (instancetype)new NS_UNAVAILABLE;
 
 /**
  * Creates a `TFLAudioTensor` instance to store the input audio samples to be classified. The
@@ -140,7 +120,6 @@ NS_SWIFT_NAME(AudioClassifier)
                                                         error:(NSError **)error
     NS_SWIFT_NAME(classify(audioTensor:));
 
-+ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 @end

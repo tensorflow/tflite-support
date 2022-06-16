@@ -92,8 +92,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)testInferenceWithFloatBufferSucceeds {
-  TFLAudioClassifier *audioClassifier = [[TFLAudioClassifier alloc] initWithModelPath:self.modelPath
-                                                                                error:nil];
+  TFLAudioClassifierOptions *options = [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
+  TFLAudioClassifier *audioClassifier = [TFLAudioClassifier audioClassifierWithOptions:options
+                                                                                 error:nil];
   XCTAssertNotNil(audioClassifier);
 
   // Create the audio tensor using audio classifier.
@@ -147,8 +148,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)testInferenceWithAudioRecordSucceeds {
-  TFLAudioClassifier *audioClassifier = [[TFLAudioClassifier alloc] initWithModelPath:self.modelPath
-                                                                                error:nil];
+  TFLAudioClassifierOptions *options = [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
+  TFLAudioClassifier *audioClassifier = [TFLAudioClassifier audioClassifierWithOptions:options
+                                                                                 error:nil];
   XCTAssertNotNil(audioClassifier);
 
   // Create audio record using audio classifier
