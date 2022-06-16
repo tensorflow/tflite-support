@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'TensorFlowLiteTaskVision'
-  s.version          = '0.0.1'
+  s.version          = '${TFLS_BUILD_VERSION}'
   s.authors          = 'Google Inc.'
   s.license          = { :type => 'Apache',:file => "LICENSE"}
   s.homepage         = 'https://github.com/tensorflow/tflite-support'
