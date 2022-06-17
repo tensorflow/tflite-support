@@ -91,6 +91,30 @@ NS_ASSUME_NONNULL_BEGIN
                                         processingFormat:processingFormat];
 }
 
+-(void)mockLoadBufferOfAudioRecord:(TFLAudioRecord *)audioRecord {
+  // Loading AVAudioPCMBuffer with an array is not currently supported for iOS versions < 15.0.
+  // Instead audio samples from a wav file are loaded and converted into the same format
+  // of AVAudioEngine's input node to mock the input from the AVAudio Engine.
+  AVAudioPCMBuffer *audioEngineBuffer = [self bufferFromFileWithName:@"speech"
+                                                           extension:@"wav"
+                                                    processingFormat:self.audioEngineFormat];
+  XCTAssertNotNil(audioEngineBuffer);
+
+  // Convert the buffer in the audio engine input format to the format with which audio record is
+  // intended to output the audio samples. This mocks the internal conversion of audio record when
+  // -[TFLAudioRecord startRecording:withError:] is called.
+  AVAudioFormat *recordingFormat = [[AVAudioFormat alloc]
+      initWithCommonFormat:AVAudioPCMFormatFloat32
+                sampleRate:audioRecord.audioFormat.sampleRate
+                  channels:(AVAudioChannelCount)audioRecord.audioFormat.channelCount
+               interleaved:YES];
+
+  AVAudioConverter *audioConverter = [[AVAudioConverter alloc] initFromFormat:self.audioEngineFormat
+                                                                     toFormat:recordingFormat];
+  // Convert and load the buffer of `TFLAudioRecord`.
+  [audioRecord convertAndLoadBuffer:audioEngineBuffer usingAudioConverter:audioConverter];
+}
+
 - (void)testInferenceWithFloatBufferSucceeds {
   TFLAudioClassifierOptions *options = [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
   TFLAudioClassifier *audioClassifier = [TFLAudioClassifier audioClassifierWithOptions:options
@@ -155,30 +179,10 @@ NS_ASSUME_NONNULL_BEGIN
 
   // Create audio record using audio classifier
   TFLAudioRecord *audioRecord = [audioClassifier createAudioRecordWithError:nil];
-
   XCTAssertNotNil(audioRecord);
-
-  // Loading AVAudioPCMBuffer with an array is not currently supported for iOS versions < 15.0.
-  // Instead audio samples from a wav file are loaded and converted into the same format
-  // of AVAudioEngine's input node to mock the input from the AVAudio Engine.
-  AVAudioPCMBuffer *audioEngineBuffer = [self bufferFromFileWithName:@"speech"
-                                                           extension:@"wav"
-                                                    processingFormat:self.audioEngineFormat];
-  XCTAssertNotNil(audioEngineBuffer);
-
-  // Convert the buffer in the audio engine input format to the format with which audio record is
-  // intended to output the audio samples. This mocks the internal conversion of audio record when
-  // -[TFLAudioRecord startRecording:withError:] is called.
-  AVAudioFormat *recordingFormat = [[AVAudioFormat alloc]
-      initWithCommonFormat:AVAudioPCMFormatFloat32
-                sampleRate:audioRecord.audioFormat.sampleRate
-                  channels:(AVAudioChannelCount)audioRecord.audioFormat.channelCount
-               interleaved:YES];
-
-  AVAudioConverter *audioConverter = [[AVAudioConverter alloc] initFromFormat:self.audioEngineFormat
-                                                                     toFormat:recordingFormat];
-  // Convert and load the buffer of `TFLAudioRecord`.
-  [audioRecord convertAndLoadBuffer:audioEngineBuffer usingAudioConverter:audioConverter];
+  
+  // Mocks the loading of the internal buffer of audio record when new samples are input from the mic.
+  [self mockLoadBufferOfAudioRecord:audioRecord];
 
   // Create audio tensor using audio classifier.
   TFLAudioTensor *audioTensor = [audioClassifier createInputAudioTensor];
