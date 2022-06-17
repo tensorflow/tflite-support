@@ -38,8 +38,8 @@
 - (instancetype)init {
   self = [super init];
   if (self) {
-    self.baseOptions = [[TFLBaseOptions alloc] init];
-    self.classificationOptions = [[TFLClassificationOptions alloc] init];
+    self.baseOptions = [TFLBaseOptions new];
+    self.classificationOptions = [TFLClassificationOptions new];
   }
   return self;
 }
