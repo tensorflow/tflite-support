@@ -20,7 +20,8 @@
 try:
   from tensorflow.tools.docs import doc_controls
 except ModuleNotFoundError:
-  # Replace the real doc_controls with MagicMock to ignore all calls to it.
-  from unittest import mock
-  doc_controls = mock.MagicMock()
+  # Replace the real doc_controls.do_not_generate_docs with an no-op
+  doc_controls = lambda: None
+  no_op = lambda x: x
+  setattr(doc_controls, 'do_not_generate_docs', no_op)
 # pylint: enable=g-import-not-at-top,unused-import
