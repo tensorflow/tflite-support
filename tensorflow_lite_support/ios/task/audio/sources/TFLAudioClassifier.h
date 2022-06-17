@@ -43,7 +43,7 @@ NS_SWIFT_NAME(AudioClassifierOptions)
  * Initializes a new `TFLAudioClassifierOptions` with the absolute path to the model file stored
  * locally on the device.
  *
- * @discussion The external model file, must be a single standalone TFLite file. It could be packed
+ * @discussion The external model file must be a single standalone TFLite file. It could be packed
  * with TFLite Model Metadata[1] and associated files if exist. Fail to provide the necessary
  * metadata and associated files might result in errors. Check the
  * [documentation](https://www.tensorflow.org/lite/convert/metadata) for each task about the
@@ -64,7 +64,7 @@ NS_SWIFT_NAME(AudioClassifier)
 @interface TFLAudioClassifier : NSObject
 
 /**
- * Creates a new instance of `TFLAudioClassifier from the given `TFLAudioClassifierOptions`.
+ * Creates a new instance of `TFLAudioClassifier` from the given `TFLAudioClassifierOptions`.
  *
  * @param options The options to use for configuring the `TFLAudioClassifier`.
  * @param error An optional error parameter populated when there is an error in initializing
