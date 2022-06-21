@@ -73,7 +73,7 @@
   return _requiredCBufferSize > 0;
 }
 
-- (BOOL)populateRequiredTensorFormatWithError:(NSError **)error {
+- (BOOL)populateRequiredAudioFormatWithError:(NSError **)error {
   TfLiteSupportError *getAudioFormatError = nil;
   _requiredCAudioFormat =
       TfLiteAudioClassifierGetRequiredAudioFormat(_audioClassifier, &getAudioFormatError);
@@ -94,7 +94,7 @@
       return nil;
     }
 
-    if (![self populateRequiredTensorFormatWithError:error]) {
+    if (![self populateRequiredAudioFormatWithError:error]) {
       return nil;
     }
   }
