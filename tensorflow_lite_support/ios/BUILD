@@ -8,6 +8,12 @@ load(
 load(
     "//tensorflow_lite_support/ios:ios.bzl",
     "strip_c_api_include_path_prefix",
+    "strip_ios_api_include_path_prefix",
+)
+
+load(
+    "@build_bazel_rules_apple//apple:ios.bzl",
+    "ios_static_framework",
 )
 
 package(
@@ -37,6 +43,24 @@ strip_c_api_include_path_prefix(
     ],
 )
 
+strip_ios_api_include_path_prefix(
+    name = "strip_ios_api_include_path",
+     hdr_labels = [
+        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageEmbedder.h",
+        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageClassifier.h",
+        "//tensorflow_lite_support/ios/task/vision:sources/TFLObjectDetector.h",
+        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageSegmenter.h",
+        "//tensorflow_lite_support/ios:sources/TFLCommon.h",
+        "//tensorflow_lite_support/ios/task/core:sources/TFLBaseOptions.h",
+        "//tensorflow_lite_support/ios/task/processor:sources/TFLClassificationOptions.h",
+        "//tensorflow_lite_support/ios/task/processor:sources/TFLCategory.h",
+        "//tensorflow_lite_support/ios/task/processor:sources/TFLClassificationResult.h",
+        "//tensorflow_lite_support/ios/task/processor:sources/TFLDetectionResult.h",
+        "//tensorflow_lite_support/ios/task/processor:sources/TFLSegmentationResult.h",
+        "//tensorflow_lite_support/odml/ios/image:apis/GMLImage.h",
+    ],
+)
+
 # This target builds a monolithic static framework for the TFLite Text API,
 # which includes the TFLite runtime in it.
 #
@@ -56,39 +80,6 @@ tflite_ios_framework(
         "//tensorflow_lite_support/c/task/text:bert_nl_classifier",
         "//tensorflow_lite_support/c/task/text:bert_question_answerer",
         "//tensorflow_lite_support/c/task/text:nl_classifier",
-    ],
-)
-
-# Xcode 12 does not support ios fat libraries. Frameworks built for multiple
-# architectures should be compiled into a .xcframework inside. Bazel currently
-# does not support building .xcframework. You have to build the framework
-# for the architecture you decide to test on.
-# Use the below command to build for arm64 which lets you test the library on
-# iOS devices.
-# bazel build -c opt --config=ios_arm64 //tensorflow_lite_support/ios:TensorFlowLiteTaskVisionC_framework
-tflite_ios_framework(
-    name = "TensorFlowLiteTaskVisionC_framework",
-    hdrs = [
-        ":base_options.h",
-        ":bounding_box.h",
-        ":category.h",
-        ":classification_options.h",
-        ":classification_result.h",
-        ":common.h",
-        ":detection_result.h",
-        ":frame_buffer.h",
-        ":image_classifier.h",
-        ":image_segmenter.h",
-        ":object_detector.h",
-        ":segmentation_result.h",
-    ],
-    allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
-    bundle_name = "TensorFlowLiteTaskVisionC",
-    minimum_os_version = TFL_MINIMUM_OS_VERSION,
-    deps = [
-        "//tensorflow_lite_support/c/task/vision:image_classifier",
-        "//tensorflow_lite_support/c/task/vision:image_segmenter",
-        "//tensorflow_lite_support/c/task/vision:object_detector",
     ],
 )
 
@@ -120,3 +111,35 @@ objc_library(
         "//tensorflow_lite_support/ios:TFLCommon",
     ],
 )
+
+# Xcode 12 does not support ios fat libraries. Frameworks built for multiple
+# architectures should be compiled into a .xcframework inside. Bazel currently
+# does not support building .xcframework. You have to build the framework
+# for the architecture you decide to test on.
+# Use the below command to build for arm64 which lets you test the library on
+# iOS devices.
+# bazel build -c opt --config=ios_arm64 //tensorflow_lite_support/ios:TensorFlowLiteTaskVision_framework
+ios_static_framework(
+    name = "TensorFlowLiteTaskVision_framework",
+    hdrs = [
+        ":TFLImageClassifier.h",
+        # ":TFLObjectDetector.h",
+        # ":TFLImageSegmenter.h",
+        ":TFLCommon.h",
+        ":TFLBaseOptions.h",
+        ":TFLClassificationOptions.h",
+        ":TFLCategory.h",
+        ":TFLClassificationResult.h",
+        # ":TFLDetectionResult.h",
+        # ":TFLSegmentationResult.h",
+        ":GMLImage.h",
+    ],
+    bundle_name = "TensorFlowLiteTaskVision",
+    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    deps = [
+        "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
+        # "//tensorflow_lite_support/ios/task/vision:TFLObjectDetector",
+        # "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
+    ],
+)
+
