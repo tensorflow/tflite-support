@@ -1,3 +1,5 @@
+load("@org_tensorflow//tensorflow/lite/ios:ios.bzl", "TFL_DEFAULT_TAGS", "TFL_DISABLED_SANITIZER_TAGS", "TFL_MINIMUM_OS_VERSION")
+
 package(
     default_visibility = ["//tensorflow_lite_support:internal"],
     licenses = ["notice"],  # Apache 2.0
@@ -24,6 +26,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
         "//tensorflow_lite_support/odml/ios/image:MLImage",
+        # "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:gpu_plugin",
     ],
 )
 

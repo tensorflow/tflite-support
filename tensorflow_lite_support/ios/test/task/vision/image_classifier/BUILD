@@ -45,7 +45,7 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
-        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:gpu_plugin",
+        # "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:_plugin",
     ],
 )
 

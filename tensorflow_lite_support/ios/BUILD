@@ -120,7 +120,7 @@ objc_library(
 # iOS devices.
 # bazel build -c opt --config=ios_arm64 //tensorflow_lite_support/ios:TensorFlowLiteTaskVision_framework
 ios_static_framework(
-    name = "TensorFlowLiteTaskVision_framework",
+    name = "TensorFlowLiteTaskVisionCoreml_framework",
     hdrs = [
         ":TFLImageClassifier.h",
         # ":TFLObjectDetector.h",
@@ -134,7 +134,7 @@ ios_static_framework(
         # ":TFLSegmentationResult.h",
         ":GMLImage.h",
     ],
-    bundle_name = "TensorFlowLiteTaskVision",
+    bundle_name = "TensorFlowLiteTaskVisionCoreml_framework",
     minimum_os_version = TFL_MINIMUM_OS_VERSION,
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",

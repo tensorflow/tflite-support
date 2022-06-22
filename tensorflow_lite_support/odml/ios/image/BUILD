@@ -65,6 +65,8 @@ TEST_COPTS = RELEASE_COPTS + [
     "-Wno-shadow",
 ]
 
+exports_files(["apis/GMLImage.h"])
+
 objc_library(
     name = "MLImage",
     srcs = SOURCES,
