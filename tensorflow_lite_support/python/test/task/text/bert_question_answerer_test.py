@@ -81,6 +81,40 @@ class ModelFileType(enum.Enum):
 
 class BertQuestionAnswererTest(parameterized.TestCase, tf.test.TestCase):
 
+  def setUp(self):
+    super().setUp()
+    self.model_path = test_util.get_test_data_path(_MOBILE_BERT_MODEL)
+
+  def test_create_from_file_succeeds_with_valid_model_path(self):
+    # Creates with default option and valid model file successfully.
+    answerer = _BertQuestionAnswerer.create_from_file(self.model_path)
+    self.assertIsInstance(answerer, _BertQuestionAnswerer)
+
+  def test_create_from_options_succeeds_with_valid_model_path(self):
+    # Creates with options containing model file successfully.
+    base_options = _BaseOptions(file_name=self.model_path)
+    options = _BertQuestionAnswererOptions(base_options=base_options)
+    answerer = _BertQuestionAnswerer.create_from_options(options)
+    self.assertIsInstance(answerer, _BertQuestionAnswerer)
+
+  def test_create_from_options_fails_with_invalid_model_path(self):
+    # Invalid empty model path.
+    with self.assertRaisesRegex(
+        ValueError,
+        r"ExternalFile must specify at least one of 'file_content', "
+        r"'file_name' or 'file_descriptor_meta'."):
+      base_options = _BaseOptions(file_name='')
+      options = _BertQuestionAnswererOptions(base_options=base_options)
+      _BertQuestionAnswerer.create_from_options(options)
+
+  def test_create_from_options_succeeds_with_valid_model_content(self):
+    # Creates with options containing model content successfully.
+    with open(self.model_path, 'rb') as f:
+      base_options = _BaseOptions(file_content=f.read())
+      options = _BertQuestionAnswererOptions(base_options=base_options)
+      answerer = _BertQuestionAnswerer.create_from_options(options)
+      self.assertIsInstance(answerer, _BertQuestionAnswerer)
+
   @parameterized.parameters(
       (_MOBILE_BERT_MODEL, ModelFileType.FILE_NAME, _INPUT_CONTEXT,
        _INPUT_QUESTION, _EXPECTED_MOBILE_BERT_QA_RESULT),
@@ -89,9 +123,8 @@ class BertQuestionAnswererTest(parameterized.TestCase, tf.test.TestCase):
       (_ALBERT_MODEL, ModelFileType.FILE_NAME, _INPUT_CONTEXT, _INPUT_QUESTION,
        _EXPECTED_ALBERT_QA_RESULT),
       (_ALBERT_MODEL, ModelFileType.FILE_CONTENT, _INPUT_CONTEXT,
-       _INPUT_QUESTION, _EXPECTED_ALBERT_QA_RESULT),
-  )
-  def test_embed(self, model_name, model_file_type, context, question, answer):
+       _INPUT_QUESTION, _EXPECTED_ALBERT_QA_RESULT))
+  def test_answer(self, model_name, model_file_type, context, question, answer):
     # Create question answerer.
     model_path = test_util.get_test_data_path(model_name)
     if model_file_type is ModelFileType.FILE_NAME:

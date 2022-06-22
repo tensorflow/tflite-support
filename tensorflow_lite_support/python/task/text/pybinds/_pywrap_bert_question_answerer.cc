@@ -14,7 +14,6 @@ limitations under the License.
 ==============================================================================*/
 
 #include "pybind11/pybind11.h"
-#include "pybind11/stl.h"
 #include "pybind11_protobuf/native_proto_caster.h"  // from @pybind11_protobuf
 #include "tensorflow_lite_support/cc/task/processor/proto/qa_answers.pb.h"
 #include "tensorflow_lite_support/cc/task/text/bert_question_answerer.h"
