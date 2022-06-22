@@ -45,6 +45,7 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:gpu_plugin",
     ],
 )
 
@@ -73,6 +74,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:coreml_plugin",
     ],
+    copts = ["-std=c++14"],
 )
 
 ios_unit_test(

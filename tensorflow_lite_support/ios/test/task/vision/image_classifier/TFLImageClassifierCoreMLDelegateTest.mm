@@ -14,10 +14,10 @@ limitations under the License.
 ==============================================================================*/
 #import <XCTest/XCTest.h>
 
-#import "third_party/tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
+#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
-#include "third_party/tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
-#include "third_party/tensorflow_lite_support/cc/task/vision/image_classifier.h"
+#include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 
 using ImageClassifier = ::tflite::task::vision::ImageClassifier;
 using ImageClassifierOptions = ::tflite::task::vision::ImageClassifierOptions;
@@ -47,12 +47,12 @@ using ClassificationResult = ::tflite::task::vision::ClassificationResult;
   options.mutable_base_options()
       ->mutable_compute_settings()
       ->mutable_tflite_settings()
-      ->set_delegate(::acceleration::Delegate::CORE_ML);
+      ->set_delegate(tflite::proto::Delegate::CORE_ML);
   options.mutable_base_options()
       ->mutable_compute_settings()
       ->mutable_tflite_settings()
       ->mutable_coreml_settings()
-      ->set_enabled_devices(::acceleration::CoreMLDelegateSettings::DEVICES_ALL);
+      ->set_enabled_devices(tflite::proto::CoreMLSettings::DEVICES_ALL);
 
   // Creates the classifier.
   tflite::support::StatusOr<std::unique_ptr<ImageClassifier>> image_classifier_status =
