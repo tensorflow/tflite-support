@@ -91,13 +91,13 @@ StatusOr<ImageClassifierOptionsCpp> CreateImageClassifierCppOptionsFromCOptions(
   cpp_options.mutable_base_options()
       ->mutable_compute_settings()
       ->mutable_tflite_settings()
-      ->set_delegate(tflite::proto::Delegate::GPU);
+      ->set_delegate(tflite::proto::Delegate::CORE_ML);
 
-  // cpp_options.mutable_base_options()
-  //     ->mutable_compute_settings()
-  //     ->mutable_tflite_settings()
-  //     ->mutable_coreml_settings()
-  //     ->set_enabled_devices(tflite::proto::CoreMLSettings::DEVICES_ALL);
+  cpp_options.mutable_base_options()
+      ->mutable_compute_settings()
+      ->mutable_tflite_settings()
+      ->mutable_coreml_settings()
+      ->set_enabled_devices(tflite::proto::CoreMLSettings::DEVICES_ALL);
 
   return cpp_options;
 }
