@@ -14,8 +14,8 @@
  ==============================================================================*/
 #import <XCTest/XCTest.h>
 
-#import "tensorflow_lite_support/ios/task/audio/sources/TFLAudioClassifier.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
+#import "tensorflow_lite_support/ios/task/audio/sources/TFLAudioClassifier.h"
 #import "tensorflow_lite_support/ios/test/task/audio/core/audio_record/utils/sources/AVAudioPCMBuffer+Utils.h"
 
 #define VerifyError(error, expectedDomain, expectedCode, expectedLocalizedDescription)  \
@@ -57,7 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)convertAndLoadBuffer:(AVAudioPCMBuffer *)buffer
          usingAudioConverter:(AVAudioConverter *)audioConverter;
 @end
-
 
 @implementation TFLAudioClassifierTests
 
@@ -156,7 +155,8 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (TFLClassificationResult *)classifyWithAudioClassifier:(TFLAudioClassifier *)audioClassifier
-                                             audioTensor:(TFLAudioTensor *)audioTensor expectedCategoryCount:(const NSInteger)expectedCategoryCount {
+                                             audioTensor:(TFLAudioTensor *)audioTensor
+                                   expectedCategoryCount:(const NSInteger)expectedCategoryCount {
   TFLClassificationResult *classificationResult =
       [audioClassifier classifyWithAudioTensor:audioTensor error:nil];
 
@@ -190,10 +190,10 @@ NS_ASSUME_NONNULL_BEGIN
   // The third category is different from the third category specified in -[TFLAudioClassifierTests
   // validateClassificationResultForInferenceWithFloatBuffer]. This is because in case of inference
   // with audio record involves more native internal conversions to mock the conversions done by the
-  // audio record as opposed to inference with float buffer where the number of native conversions are
-  // fewer. Since each native conversion by `AVAudioConverter` employ strategies to pick samples based
-  // on the format specified, the samples passed in for inference in case of float buffer and audio
-  // record will be slightly different.
+  // audio record as opposed to inference with float buffer where the number of native conversions
+  // are fewer. Since each native conversion by `AVAudioConverter` employ strategies to pick samples
+  // based on the format specified, the samples passed in for inference in case of float buffer and
+  // audio record will be slightly different.
   VerifyCategory(categories[0],
                  0,          // expectedIndex
                  0.957031,   // expectedScore
@@ -212,10 +212,10 @@ NS_ASSUME_NONNULL_BEGIN
   // The third category is different from the third category specified in -[TFLAudioClassifierTests
   // validateClassificationResultForInferenceWithFloatBuffer]. This is because in case of inference
   // with audio record involves more native internal conversions to mock the conversions done by the
-  // audio record as opposed to inference with float buffer where the number of native conversions are
-  // fewer. Since each native conversion by `AVAudioConverter` employ strategies to pick samples based
-  // on the format specified, the samples passed in for inference in case of float buffer and audio
-  // record will be slightly different.
+  // audio record as opposed to inference with float buffer where the number of native conversions
+  // are fewer. Since each native conversion by `AVAudioConverter` employ strategies to pick samples
+  // based on the format specified, the samples passed in for inference in case of float buffer and
+  // audio record will be slightly different.
   VerifyCategory(categories[0],
                  500,                    // expectedIndex
                  0.015625,               // expectedScore
@@ -234,14 +234,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testInferenceWithFloatBufferSucceeds {
   TFLAudioClassifier *audioClassifier = [self createAudioClassifierWithModelPath:self.modelPath];
-  
+
   TFLAudioTensor *audioTensor = [self createAudioTensorWithAudioClassifier:audioClassifier];
   [self loadAudioTensor:audioTensor fromWavFileWithName:@"speech"];
 
   const NSInteger expectedCategoryCount = 521;
-  TFLClassificationResult *classificationResult = [self classifyWithAudioClassifier:audioClassifier
-                                                                        audioTensor:audioTensor
-                                                                        expectedCategoryCount:expectedCategoryCount];
+  TFLClassificationResult *classificationResult =
+      [self classifyWithAudioClassifier:audioClassifier
+                            audioTensor:audioTensor
+                  expectedCategoryCount:expectedCategoryCount];
 
   [self validateClassificationResultForInferenceWithFloatBuffer:classificationResult
                                                                     .classifications[0]
@@ -260,69 +261,67 @@ NS_ASSUME_NONNULL_BEGIN
   [audioTensor loadAudioRecord:audioRecord withError:nil];
 
   const NSInteger expectedCategoryCount = 521;
-  TFLClassificationResult *classificationResult = [self classifyWithAudioClassifier:audioClassifier
-                                                                        audioTensor:audioTensor
-                                                                        expectedCategoryCount:expectedCategoryCount];
+  TFLClassificationResult *classificationResult =
+      [self classifyWithAudioClassifier:audioClassifier
+                            audioTensor:audioTensor
+                  expectedCategoryCount:expectedCategoryCount];
 
   [self validateCategoriesForInferenceWithAudioRecord:classificationResult.classifications[0]
                                                           .categories];
 }
 
 - (void)testInferenceWithMaxResultsSucceeds {
-  
   const NSInteger maxResults = 3;
   TFLAudioClassifierOptions *options =
-    [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
+      [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
   options.classificationOptions.maxResults = maxResults;
-  
-  
+
   TFLAudioClassifier *audioClassifier = [self createAudioClassifierWithOptions:options];
   TFLAudioTensor *audioTensor = [self createAudioTensorWithAudioClassifier:audioClassifier];
   [self loadAudioTensor:audioTensor fromWavFileWithName:@"speech"];
 
   TFLClassificationResult *classificationResult = [self classifyWithAudioClassifier:audioClassifier
                                                                         audioTensor:audioTensor
-                                                                        expectedCategoryCount:maxResults];
+                                                              expectedCategoryCount:maxResults];
 
   [self validateClassificationResultForInferenceWithFloatBuffer:classificationResult
                                                                     .classifications[0]
                                                                     .categories];
 }
 
-
 - (void)testInferenceWithClassNameBlackListAndWhiteListFails {
-  
   TFLAudioClassifierOptions *options =
-    [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
-  options.classificationOptions.labelAllowList = @[@"Speech"];
-  options.classificationOptions.labelDenyList = @[@"Inside, small room"];
-  
+      [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
+  options.classificationOptions.labelAllowList = @[ @"Speech" ];
+  options.classificationOptions.labelDenyList = @[ @"Inside, small room" ];
+
   NSError *error = nil;
   TFLAudioClassifier *audioClassifier = [TFLAudioClassifier audioClassifierWithOptions:options
                                                                                  error:&error];
   XCTAssertNil(audioClassifier);
   VerifyError(error,
-              expectedTaskErrorDomain,                 // expectedErrorDomain
-              TFLSupportErrorCodeInvalidArgumentError, // expectedErrorCode
-              @"INVALID_ARGUMENT: `class_name_allowlist` and `class_name_denylist` are mutually exclusive options." // expectedErrorMessage
+              expectedTaskErrorDomain,                  // expectedErrorDomain
+              TFLSupportErrorCodeInvalidArgumentError,  // expectedErrorCode
+              @"INVALID_ARGUMENT: `class_name_allowlist` and `class_name_denylist` are mutually "
+              @"exclusive options."  // expectedErrorMessage
   );
 }
 
 - (void)testInferenceWithLabelAllowListSucceeds {
-  
   TFLAudioClassifierOptions *options =
-    [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
-  options.classificationOptions.labelAllowList = @[@"Speech", @"Inside, small room"];
-  
+      [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
+  options.classificationOptions.labelAllowList = @[ @"Speech", @"Inside, small room" ];
+
   NSError *error = nil;
   TFLAudioClassifier *audioClassifier = [TFLAudioClassifier audioClassifierWithOptions:options
                                                                                  error:&error];
   TFLAudioTensor *audioTensor = [self createAudioTensorWithAudioClassifier:audioClassifier];
   [self loadAudioTensor:audioTensor fromWavFileWithName:@"speech"];
 
-  TFLClassificationResult *classificationResult = [self classifyWithAudioClassifier:audioClassifier
-                                                                        audioTensor:audioTensor
-                                                                        expectedCategoryCount:options.classificationOptions.labelAllowList.count];
+  TFLClassificationResult *classificationResult =
+      [self classifyWithAudioClassifier:audioClassifier
+                            audioTensor:audioTensor
+                  expectedCategoryCount:options.classificationOptions.labelAllowList.count];
 
   [self validateClassificationResultForInferenceWithFloatBuffer:classificationResult
                                                                     .classifications[0]
@@ -330,11 +329,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)testInferenceWithLabelDenyListSucceeds {
-  
   TFLAudioClassifierOptions *options =
-    [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
-  options.classificationOptions.labelDenyList = @[@"Speech"];
-  
+      [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
+  options.classificationOptions.labelDenyList = @[ @"Speech" ];
+
   NSError *error = nil;
   TFLAudioClassifier *audioClassifier = [TFLAudioClassifier audioClassifierWithOptions:options
                                                                                  error:&error];
@@ -342,41 +340,40 @@ NS_ASSUME_NONNULL_BEGIN
   [self loadAudioTensor:audioTensor fromWavFileWithName:@"speech"];
 
   const NSInteger expectedCategoryCount = 520;
-  TFLClassificationResult *classificationResult = [self classifyWithAudioClassifier:audioClassifier
-                                                                        audioTensor:audioTensor
-                                                                        expectedCategoryCount:expectedCategoryCount];
+  TFLClassificationResult *classificationResult =
+      [self classifyWithAudioClassifier:audioClassifier
+                            audioTensor:audioTensor
+                  expectedCategoryCount:expectedCategoryCount];
 
-  [self validateCategoriesForInferenceWithLabelDenyList:classificationResult
-                                                                    .classifications[0]
-                                                                    .categories];
+  [self validateCategoriesForInferenceWithLabelDenyList:classificationResult.classifications[0]
+                                                            .categories];
 }
 
 - (void)testCreateAudioClassifierWithNilOptionsFails {
-  
   NSError *error = nil;
-  TFLAudioClassifier *audioClassifier = [TFLAudioClassifier audioClassifierWithOptions:nil error:&error];
+  TFLAudioClassifier *audioClassifier = [TFLAudioClassifier audioClassifierWithOptions:nil
+                                                                                 error:&error];
 
   XCTAssertNil(audioClassifier);
-   VerifyError(error,
-              expectedTaskErrorDomain,                             // expectedErrorDomain
-              TFLSupportErrorCodeInvalidArgumentError,             // expectedErrorCode
-              @"TFLAudioClassifierOptions argument cannot be nil." // expectedErrorMessage
+  VerifyError(error,
+              expectedTaskErrorDomain,                              // expectedErrorDomain
+              TFLSupportErrorCodeInvalidArgumentError,              // expectedErrorCode
+              @"TFLAudioClassifierOptions argument cannot be nil."  // expectedErrorMessage
   );
 }
 
 - (void)testInferenceWithNilAudioTensorFails {
-  
   TFLAudioClassifier *audioClassifier = [self createAudioClassifierWithModelPath:self.modelPath];
 
   NSError *error = nil;
-  TFLClassificationResult *classificationResult =
-      [audioClassifier classifyWithAudioTensor:nil error:&error];
+  TFLClassificationResult *classificationResult = [audioClassifier classifyWithAudioTensor:nil
+                                                                                     error:&error];
 
   XCTAssertNil(classificationResult);
-   VerifyError(error,
-              expectedTaskErrorDomain,                 // expectedErrorDomain
-              TFLSupportErrorCodeInvalidArgumentError, // expectedErrorCode
-              @"audioTensor argument cannot be nil."   // expectedErrorMessage
+  VerifyError(error,
+              expectedTaskErrorDomain,                  // expectedErrorDomain
+              TFLSupportErrorCodeInvalidArgumentError,  // expectedErrorCode
+              @"audioTensor argument cannot be nil."    // expectedErrorMessage
   );
 }
 
