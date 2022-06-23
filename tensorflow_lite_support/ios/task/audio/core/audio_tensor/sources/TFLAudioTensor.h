@@ -70,7 +70,8 @@ NS_SWIFT_NAME(AudioTensor)
  * @return A boolean indicating if the load operation succeded.
  */
 - (BOOL)loadAudioRecord:(TFLAudioRecord *)audioRecord
-              withError:(NSError **)error NS_SWIFT_NAME(loadAudioRecord(audioRecord:));
+              withError:(NSError **)error
+    NS_SWIFT_NAME(load(audioRecord:));
 
 /**
  * This function loads the internal buffer of `TFLAudioTensor` with the provided buffer.
@@ -92,8 +93,9 @@ NS_SWIFT_NAME(AudioTensor)
 - (BOOL)loadBuffer:(TFLFloatBuffer *)buffer
             offset:(NSUInteger)offset
               size:(NSUInteger)size
-             error:(NSError **)error;
-
+             error:(NSError **)error
+    NS_SWIFT_NAME(load(buffer:offset:size:));
+  
 @end
 
 NS_ASSUME_NONNULL_END
