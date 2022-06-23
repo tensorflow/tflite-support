@@ -209,13 +209,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)validateCategoriesForInferenceWithLabelDenyList:(NSArray<TFLCategory *> *)categories {
-  // The third category is different from the third category specified in -[TFLAudioClassifierTests
-  // validateClassificationResultForInferenceWithFloatBuffer]. This is because in case of inference
-  // with audio record involves more native internal conversions to mock the conversions done by the
-  // audio record as opposed to inference with float buffer where the number of native conversions
-  // are fewer. Since each native conversion by `AVAudioConverter` employ strategies to pick samples
-  // based on the format specified, the samples passed in for inference in case of float buffer and
-  // audio record will be slightly different.
   VerifyCategory(categories[0],
                  500,                    // expectedIndex
                  0.019531,               // expectedScore
