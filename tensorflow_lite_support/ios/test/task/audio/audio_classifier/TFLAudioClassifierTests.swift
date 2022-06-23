@@ -23,25 +23,160 @@ class AudioClassifierTests: XCTestCase {
   static let modelPath = bundle.path(
     forResource: "yamnet_audio_classifier_with_metadata",
     ofType: "tflite")
+
+  func verifyError(
+    _ error: Error,
+    expectedLocalizedDescription: String
+  ) {
+    
+    XCTAssertEqual(
+      error.localizedDescription, 
+      expectedLocalizedDescription)
+  }
+
+  func verifyCategory(
+    _ category: ClassificationCategory,
+    expectedIndex: NSInteger,
+    expectedScore: Float,
+    expectedLabel: String,
+    expectedDisplayName: String?
+  ) {
+    XCTAssertEqual(
+      category.index, 
+      expectedIndex)
+    XCTAssertEqual(
+      category.score, 
+      expectedScore, 
+      accuracy: 1e-2); 
+    XCTAssertEqual(
+      category.label, 
+      expectedLabel) 
+    XCTAssertEqual(
+      category.displayName, 
+      expectedDisplayName)
+  }
+
+  func verifyClassifications(
+    _ classifications: Classifications,
+    expectedHeadIndex: NSInteger,
+    expectedCategoryCount: NSInteger
+  ) {
+    XCTAssertEqual(
+      classifications.headIndex, 
+      expectedHeadIndex)
+    XCTAssertEqual(
+      classifications.categories.count, 
+      expectedCategoryCount)
+  }
+
+  func verifyClassificationResult(
+    _ classificationResult: ClassificationResult,
+    expectedClassificationsCount: NSInteger
+  ) {
+    XCTAssertEqual(classificationResult.classifications.count, expectedClassificationsCount)
+  }
   
-  func bufferFromFile(name: String, fileExtension:String, audioFormat:AudioFormat) -> AVAudioPCMBuffer? {
+  func bufferFromFile(withName name: String, fileExtension:String, audioFormat:AudioFormat) -> AVAudioPCMBuffer? {
     guard let filePath = AudioClassifierTests.bundle.path(
       forResource: name,
       ofType: fileExtension) else {
         return nil;
       }
 
-    return AVAudioPCMBuffer.loadPCMBufferFromFile(withPath:filePath, audioFormat:audioFormat)
+    return AVAudioPCMBuffer.loadPCMBufferFromFile(
+      withPath:filePath,
+      audioFormat:audioFormat)
   }
-  func testInferenceWithFloatBufferSucceeds() throws {
 
-    let modelPath = try XCTUnwrap(AudioClassifierTests.modelPath)
-
+  func createAudioClassifier(withModelPath modelPath:String?
+  ) throws -> AudioClassifier? {
+    let modelPath = try XCTUnwrap(modelPath)
     let options = AudioClassifierOptions(modelPath: modelPath)
 
-    let audioClassifier =
-      try AudioClassifier.classifier(options: options)
+    let audioClassifier = try XCTUnwrap(
+      AudioClassifier.classifier(
+        options: options))
 
+    return audioClassifier
+  }
+
+  func createAudioTensor(withAudioClassifier audioClassifier:AudioClassifier) -> AudioTensor {
+    let audioTensor = audioClassifier.createInputAudioTensor()
+    return audioTensor
+  }
+
+  func loadAudioTensor(
+    _ audioTensor:AudioTensor,
+    fromWavFileWithName fileName:String
+  ) throws {
+    // Load pcm buffer from file.
+  let buffer = try XCTUnwrap(
+    self.bufferFromFile(
+      withName:fileName,
+      fileExtension:"wav",
+      audioFormat:audioTensor.audioFormat))
+
+  // Get float buffer from pcm buffer.
+  let floatBuffer = try XCTUnwrap(buffer.floatBuffer);
+
+  // Load float buffer into the audio tensor.
+  try audioTensor.loadBuffer(
+    floatBuffer, 
+    offset:0, 
+    size:floatBuffer.size);
+  }
+
+  func classify(
+    audioTensor: AudioTensor,
+    usingAudioClassifier audioClassifier:AudioClassifier
+    ) throws -> ClassificationResult? {
+    let classificationResult = try XCTUnwrap(
+      audioClassifier.classify(
+        audioTensor:audioTensor))
+    
+    let expectedClassificationsCount = 1
+    self.verifyClassificationResult(
+      classificationResult, 
+      expectedClassificationsCount: expectedClassificationsCount)
+
+    let expectedCategoryCount = 521
+    let expectedHeadIndex = 0
+    self.verifyClassifications(
+      classificationResult.classifications[0], 
+      expectedHeadIndex: expectedHeadIndex, 
+      expectedCategoryCount: expectedCategoryCount)
+
+    return classificationResult
+  }
+
+  func validateForInferenceWithFloatBuffer(categories:[ClassificationCategory]) {
+    self.verifyCategory(
+      categories[0], 
+      expectedIndex: 0, 
+      expectedScore: 0.957031,
+      expectedLabel: "Speech", 
+      expectedDisplayName: nil);
+    self.verifyCategory(
+      categories[1], 
+      expectedIndex: 500, 
+      expectedScore: 0.015625, 
+      expectedLabel: "Inside, small room",
+      expectedDisplayName: nil);
+  }
+
+  func testInferenceWithFloatBufferSucceeds() throws {
+    let audioClassifier = try XCTUnwrap(
+      self.createAudioClassifier(
+        withModelPath: AudioClassifierTests.modelPath))
+    let audioTensor = self.createAudioTensor(
+      withAudioClassifier: audioClassifier)
+    try self.loadAudioTensor(
+      audioTensor, fromWavFileWithName:"speech")
+    let classificationResult = try XCTUnwrap(
+      self.classify(audioTensor: audioTensor, 
+      usingAudioClassifier: audioClassifier))
+    self.validateForInferenceWithFloatBuffer(
+      categories: classificationResult.classifications[0].categories)
   }
 
 }

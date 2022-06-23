@@ -32,8 +32,8 @@
 }
 
 - (BOOL)loadBuffer:(TFLFloatBuffer *)buffer
-            offset:(NSInteger)offset
-              size:(NSInteger)size
+            offset:(NSUInteger)offset
+              size:(NSUInteger)size
              error:(NSError **)error {
   return [_ringBuffer loadFloatData:buffer.data
                            dataSize:buffer.size
