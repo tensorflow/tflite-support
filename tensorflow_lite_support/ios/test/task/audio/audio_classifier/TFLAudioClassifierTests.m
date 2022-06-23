@@ -28,7 +28,7 @@
 
 #define VerifyCategory(category, expectedIndex, expectedScore, expectedLabel, expectedDisplayName) \
   XCTAssertEqual(category.index, expectedIndex);                                                   \
-  XCTAssertEqualWithAccuracy(category.score, expectedScore, 1e-2);                                 \
+  XCTAssertEqualWithAccuracy(category.score, expectedScore, 1e-6);                                 \
   XCTAssertEqualObjects(category.label, expectedLabel);                                            \
   XCTAssertEqualObjects(category.displayName, expectedDisplayName);
 
@@ -180,7 +180,7 @@ NS_ASSUME_NONNULL_BEGIN
   );
   VerifyCategory(categories[1],
                  500,                    // expectedIndex
-                 0.015625,               // expectedScore
+                 0.019531,               // expectedScore
                  @"Inside, small room",  // expectedLabel
                  nil                     // expectedDisplaName
   );
@@ -202,7 +202,7 @@ NS_ASSUME_NONNULL_BEGIN
   );
   VerifyCategory(categories[1],
                  500,                    // expectedIndex
-                 0.015625,               // expectedScore
+                 0.019531,               // expectedScore
                  @"Inside, small room",  // expectedLabel
                  nil                     // expectedDisplaName
   );
@@ -218,7 +218,7 @@ NS_ASSUME_NONNULL_BEGIN
   // audio record will be slightly different.
   VerifyCategory(categories[0],
                  500,                    // expectedIndex
-                 0.015625,               // expectedScore
+                 0.019531,               // expectedScore
                  @"Inside, small room",  // expectedLabel
                  nil                     // expectedDisplaName
   );
