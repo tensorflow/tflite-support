@@ -12,7 +12,7 @@ objc_library(
         "sources/TFLFloatBuffer.h",
     ],
     module_name = "TFLFloatBuffer",
-    deps = ["//third_party/apple_frameworks:Foundation"],
+    # deps = ["//third_party/apple_frameworks:Foundation"],
 )
 
 objc_library(
@@ -28,7 +28,7 @@ objc_library(
         ":TFLFloatBuffer",
         "//tensorflow_lite_support/ios:TFLCommon",
         "//tensorflow_lite_support/ios:TFLCommonUtils",
-        "//third_party/apple_frameworks:Foundation",
+        # "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -41,5 +41,5 @@ objc_library(
         "sources/TFLAudioFormat.h",
     ],
     module_name = "TFLAudioFormat",
-    deps = ["//third_party/apple_frameworks:Foundation"],
+    # deps = ["//:Foundation"],
 )
