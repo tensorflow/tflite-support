@@ -135,7 +135,7 @@ ios_static_framework(
         ":GMLImage.h",
     ],
     bundle_name = "TensorFlowLiteTaskVisionCoreml_framework",
-    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    minimum_os_version = "11.0",
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
         # "//tensorflow_lite_support/ios/task/vision:TFLObjectDetector",

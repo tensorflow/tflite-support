@@ -45,7 +45,7 @@ if [ -z ${FRAMEWORK_NAME+x} ]; then
 fi
 
 case $FRAMEWORK_NAME in
-  "TensorFlowLiteTaskVision")
+  "TensorFlowLiteTaskVisionCoreml")
     ;;
   *)
     echo "Wrong framework name"
