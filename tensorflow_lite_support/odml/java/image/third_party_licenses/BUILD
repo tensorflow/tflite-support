@@ -22,7 +22,6 @@ third_party_licenses(
         "AndroidX architecture core library": "third_party/java/androidx/arch/core/LICENSE",
         "AndroidX architecture library": "third_party/java/androidx/arch/core/LICENSE",
         "AndroidX asynclayoutinflater library": "third_party/java/androidx/asynclayoutinflater/LICENSE",
-        "AndroidX collection library": "third_party/java/androidx/collection/hack_for_licenses/LICENSE",
         "AndroidX concurrent futures library": "third_party/java/androidx/concurrent/futures/LICENSE",
         "AndroidX coordinatorlayout library": "third_party/java/androidx/coordinatorlayout/LICENSE",
         "AndroidX core library": "third_party/java/android/android_sdk_linux/extras/android/compatibility/compat/LICENSE",
