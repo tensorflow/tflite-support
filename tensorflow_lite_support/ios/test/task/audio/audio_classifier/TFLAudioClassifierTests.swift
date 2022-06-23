@@ -47,7 +47,7 @@ class AudioClassifierTests: XCTestCase {
     XCTAssertEqual(
       category.score, 
       expectedScore, 
-      accuracy: 1e-2); 
+      accuracy: 1e-6); 
     XCTAssertEqual(
       category.label, 
       expectedLabel) 
@@ -93,11 +93,19 @@ class AudioClassifierTests: XCTestCase {
       audioFormat: audioFormat)
   }
 
-  func createAudioClassifier(withModelPath modelPath: String?
-  ) throws -> AudioClassifier? {
+  func createAudioClassifierOptions(modelPath: String?
+  ) throws -> AudioClassifierOptions? {
     let modelPath = try XCTUnwrap(modelPath)
     let options = AudioClassifierOptions(modelPath: modelPath)
 
+    return options
+  }
+
+  func createAudioClassifier(withModelPath modelPath: String?
+  ) throws -> AudioClassifier? {
+    let options = try XCTUnwrap(
+      self.createAudioClassifierOptions(
+        modelPath:AudioClassifierTests.modelPath))
     let audioClassifier = try XCTUnwrap(
       AudioClassifier.classifier(
         options: options))
@@ -166,7 +174,7 @@ class AudioClassifierTests: XCTestCase {
     self.verifyCategory(
       categories[1], 
       expectedIndex: 500, 
-      expectedScore: 0.015625, 
+      expectedScore: 0.019531, 
       expectedLabel: "Inside, small room",
       expectedDisplayName: nil);
   }
@@ -186,4 +194,17 @@ class AudioClassifierTests: XCTestCase {
       categories: classificationResult.classifications[0].categories)
   }
 
-}
+  func testInferenceWithNoModelPathFails() throws {
+    let options = AudioClassifierOptions()
+    do {
+      let audioClassifier = try AudioClassifier.classifier(
+        options:options)
+      XCTAssertNil(audioClassifier)
+    }
+    catch {
+      self.verifyError(
+        error,
+        expectedLocalizedDescription: "INVALID_ARGUMENT: Missing mandatory `model_file` field in `base_options`")
+    }
+  }
+  
