@@ -73,10 +73,15 @@ class AudioClassifierTests: XCTestCase {
     _ classificationResult: ClassificationResult,
     expectedClassificationsCount: NSInteger
   ) {
-    XCTAssertEqual(classificationResult.classifications.count, expectedClassificationsCount)
+    XCTAssertEqual(
+      classificationResult.classifications.count, 
+      expectedClassificationsCount)
   }
   
-  func bufferFromFile(withName name: String, fileExtension:String, audioFormat:AudioFormat) -> AVAudioPCMBuffer? {
+  func bufferFromFile(
+    withName name: String, 
+    fileExtension: String, 
+    audioFormat: AudioFormat) -> AVAudioPCMBuffer? {
     guard let filePath = AudioClassifierTests.bundle.path(
       forResource: name,
       ofType: fileExtension) else {
@@ -84,11 +89,11 @@ class AudioClassifierTests: XCTestCase {
       }
 
     return AVAudioPCMBuffer.loadPCMBufferFromFile(
-      withPath:filePath,
-      audioFormat:audioFormat)
+      withPath: filePath,
+      audioFormat: audioFormat)
   }
 
-  func createAudioClassifier(withModelPath modelPath:String?
+  func createAudioClassifier(withModelPath modelPath: String?
   ) throws -> AudioClassifier? {
     let modelPath = try XCTUnwrap(modelPath)
     let options = AudioClassifierOptions(modelPath: modelPath)
@@ -100,39 +105,40 @@ class AudioClassifierTests: XCTestCase {
     return audioClassifier
   }
 
-  func createAudioTensor(withAudioClassifier audioClassifier:AudioClassifier) -> AudioTensor {
+  func createAudioTensor(
+    withAudioClassifier audioClassifier: AudioClassifier) -> AudioTensor {
     let audioTensor = audioClassifier.createInputAudioTensor()
     return audioTensor
   }
 
   func loadAudioTensor(
-    _ audioTensor:AudioTensor,
-    fromWavFileWithName fileName:String
+    _ audioTensor: AudioTensor,
+    fromWavFileWithName fileName: String
   ) throws {
     // Load pcm buffer from file.
   let buffer = try XCTUnwrap(
     self.bufferFromFile(
-      withName:fileName,
-      fileExtension:"wav",
-      audioFormat:audioTensor.audioFormat))
+      withName: fileName,
+      fileExtension: "wav",
+      audioFormat: audioTensor.audioFormat))
 
   // Get float buffer from pcm buffer.
   let floatBuffer = try XCTUnwrap(buffer.floatBuffer);
 
   // Load float buffer into the audio tensor.
-  try audioTensor.loadBuffer(
-    floatBuffer, 
-    offset:0, 
-    size:floatBuffer.size);
+  try audioTensor.load(
+    buffer: floatBuffer, 
+    offset: 0, 
+    size: floatBuffer.size);
   }
 
   func classify(
     audioTensor: AudioTensor,
-    usingAudioClassifier audioClassifier:AudioClassifier
+    usingAudioClassifier audioClassifier: AudioClassifier
     ) throws -> ClassificationResult? {
     let classificationResult = try XCTUnwrap(
       audioClassifier.classify(
-        audioTensor:audioTensor))
+        audioTensor: audioTensor))
     
     let expectedClassificationsCount = 1
     self.verifyClassificationResult(
@@ -149,7 +155,8 @@ class AudioClassifierTests: XCTestCase {
     return classificationResult
   }
 
-  func validateForInferenceWithFloatBuffer(categories:[ClassificationCategory]) {
+  func validateForInferenceWithFloatBuffer(
+    categories: [ClassificationCategory]) {
     self.verifyCategory(
       categories[0], 
       expectedIndex: 0, 
