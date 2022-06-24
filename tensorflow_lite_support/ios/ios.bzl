@@ -2,8 +2,10 @@
 
 # When the static framework is built with bazel, the all header files are moved
 # to the "Headers" directory with no header path prefixes. This auxiliary rule
-# is used for stripping the path prefix to the C API header files included by
-# other C API header files.
+# is used for stripping the path prefix to the C/iOS API header files included by
+# other C/iOS API header files.
+# In case of C header files includes start with a keyword of "#include'.
+# Imports in iOS header files start with a keyword of '#import'.
 def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
     """Create modified header files with the import path stripped out.
 
@@ -16,6 +18,9 @@ def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
     for hdr_label in hdr_labels:
         hdr_filename = hdr_label.split(":")[-1]
         import_keyword = "#include"
+        # The last path component of iOS header files can be sources/some_file.h 
+        # or Sources/some_file.h. Hence it wiill contain a '/'. So we can safely 
+        # assume that the import keyword will be #import
         if "/" in hdr_filename:
             hdr_filename = hdr_filename.split("/")[-1]
             import_keyword = "#import"
