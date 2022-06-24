@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #import "tensorflow_lite_support/ios/task/audio/core/audio_tensor/sources/TFLAudioTensor.h"
+#import "tensorflow_lite_support/ios/task/audio/core/sources/TFLRingBuffer.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 

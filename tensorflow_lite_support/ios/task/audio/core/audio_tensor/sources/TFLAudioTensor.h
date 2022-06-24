@@ -14,7 +14,7 @@
 
 #import <Foundation/Foundation.h>
 #import "tensorflow_lite_support/ios/task/audio/core/audio_record/sources/TFLAudioRecord.h"
-#import "tensorflow_lite_support/ios/task/audio/core/sources/TFLRingBuffer.h"
+#import "tensorflow_lite_support/ios/task/audio/core/sources/TFLFloatBuffer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
