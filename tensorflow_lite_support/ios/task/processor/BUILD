@@ -34,9 +34,7 @@ objc_library(
         "sources/TFLClassificationResult.h",
     ],
     module_name = "TFLClassificationResult",
-    deps = [
-        ":TFLCategory",
-    ],
+    deps = [":TFLCategory"],
 )
 
 objc_library(
@@ -62,9 +60,7 @@ objc_library(
         "sources/TFLSegmentationResult.h",
     ],
     module_name = "TFLSegmentationResult",
-    deps = [
-        "//tensorflow_lite_support/ios:TFLCommonUtils",
-    ],
+    deps = ["//tensorflow_lite_support/ios:TFLCommonUtils"],
 )
 
 objc_library(
