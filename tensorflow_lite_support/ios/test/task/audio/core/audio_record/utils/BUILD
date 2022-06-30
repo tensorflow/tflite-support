@@ -18,4 +18,3 @@ objc_library(
         "//tensorflow_lite_support/ios/task/audio/core:TFLFloatBuffer",
     ],
 )
-
