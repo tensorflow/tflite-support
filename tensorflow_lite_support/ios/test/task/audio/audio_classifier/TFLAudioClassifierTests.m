@@ -282,7 +282,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     .categories];
 }
 
-- (void)testInferenceWithClassNameBlackListAndWhiteListFails {
+- (void)testInferenceWithClassNameAllowListAndDenyListFails {
   TFLAudioClassifierOptions *options =
       [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
   options.classificationOptions.labelAllowList = @[ @"Speech" ];
