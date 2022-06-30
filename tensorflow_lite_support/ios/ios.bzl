@@ -17,13 +17,10 @@ def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
     """
     for hdr_label in hdr_labels:
         hdr_filename = hdr_label.split(":")[-1]
-        import_keyword = "#include"
         # The last path component of iOS header files can be sources/some_file.h 
-        # or Sources/some_file.h. Hence it wiill contain a '/'. So we can safely 
-        # assume that the import keyword will be #import
+        # or Sources/some_file.h. Hence it wiill contain a '/'.
         if "/" in hdr_filename:
             hdr_filename = hdr_filename.split("/")[-1]
-            import_keyword = "#import"
 
         hdr_basename = hdr_filename.split(".")[0]
         native.genrule(
@@ -31,9 +28,9 @@ def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
             srcs = [hdr_label],
             outs = [hdr_filename],
             cmd = """
-            sed 's|{} ".*/\\([^/]\\{{1,\\}}\\.h\\)"|{} "{}\\1"|'\
+            sed 's|#\\([a-z]*\\) ".*/\\([^/]\\{{1,\\}}\\.h\\)"|#\\1 "{}\\2"|'\
             "$(location {})"\
             > "$@"
-            """.format(import_keyword, import_keyword, prefix, hdr_label),
+            """.format(prefix, hdr_label),
         )
 
