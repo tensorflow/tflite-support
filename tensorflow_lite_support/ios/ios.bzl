@@ -18,7 +18,8 @@ def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
     for hdr_label in hdr_labels:
         hdr_filename = hdr_label.split(":")[-1]
         # The last path component of iOS header files can be sources/some_file.h 
-        # or Sources/some_file.h. Hence it wiill contain a '/'.
+        # or Sources/some_file.h. Hence it wiill contain a '/'. So the string 
+        # can be split at / to get the header file name.
         if "/" in hdr_filename:
             hdr_filename = hdr_filename.split("/")[-1]
 
