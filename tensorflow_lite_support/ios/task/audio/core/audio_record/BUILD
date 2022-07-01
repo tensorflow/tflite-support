@@ -18,7 +18,5 @@ objc_library(
         "//tensorflow_lite_support/ios/task/audio/core:TFLAudioFormat",
         "//tensorflow_lite_support/ios/task/audio/core:TFLFloatBuffer",
         "//tensorflow_lite_support/ios/task/audio/core:TFLRingBuffer",
-        "//third_party/apple_frameworks:AVFoundation",
-        "//third_party/apple_frameworks:Foundation",
     ],
 )

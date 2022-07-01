@@ -29,7 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
                                             processingFormat:(AVAudioFormat *)processingFormat;
 
 + (nullable AVAudioPCMBuffer *)loadPCMBufferFromFileWithPath:(NSString *)path
-                                                 audioFormat:(TFLAudioFormat *)audioFormat;
+                                                 audioFormat:(TFLAudioFormat *)audioFormat
+    NS_SWIFT_NAME(loadPCMBufferFromFile(withPath:audioFormat:));
+
 
 @end
 
