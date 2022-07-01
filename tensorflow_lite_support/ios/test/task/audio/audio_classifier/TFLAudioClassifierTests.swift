@@ -207,4 +207,5 @@ class AudioClassifierTests: XCTestCase {
         expectedLocalizedDescription: "INVALID_ARGUMENT: Missing mandatory `model_file` field in `base_options`")
     }
   }
+}
   
