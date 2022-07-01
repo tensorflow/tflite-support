@@ -54,6 +54,11 @@ strip_api_include_path_prefix(
         "//tensorflow_lite_support/ios/task/processor:sources/TFLDetectionResult.h",
         "//tensorflow_lite_support/ios/task/processor:sources/TFLSegmentationResult.h",
         "//tensorflow_lite_support/odml/ios/image:apis/GMLImage.h",
+        "//tensorflow_lite_support/ios/task/audio/core:sources/TFLAudioFormat.h",
+        "//tensorflow_lite_support/ios/task/audio/core:sources/TFLFloatBuffer.h",
+        "//tensorflow_lite_support/ios/task/audio/core/audio_record:sources/TFLAudioRecord.h",
+        "//tensorflow_lite_support/ios/task/audio/core/audio_tensor:sources/TFLAudioTensor.h",
+        "//tensorflow_lite_support/ios/task/audio:sources/TFLAudioClassifier.h",
     ],
 )
 
@@ -181,4 +186,26 @@ ios_static_framework(
         "//tensorflow_lite_support/ios/task/text/qa:TFLBertQuestionAnswerer",
     ],
 )
+
+ios_static_framework(
+    name = "TensorFlowLiteTaskAudio_framework",
+    hdrs = [
+        ":TFLCommon.h",
+        ":TFLBaseOptions.h",
+        ":TFLClassificationOptions.h",
+        ":TFLCategory.h",
+        ":TFLClassificationResult.h",
+        ":TFLAudioFormat.h",
+        ":TFLFloatBuffer.h",
+        ":TFLAudioRecord.h",
+        ":TFLAudioTensor.h",
+        ":TFLAudioClassifier.h",
+    ],
+    bundle_name = "TensorFlowLiteTaskAudio",
+    minimum_os_version = "10.0",
+    deps = [
+        "//tensorflow_lite_support/ios/task/audio:TFLAudioClassifier",
+    ],
+)
+
 
