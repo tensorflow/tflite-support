@@ -15,6 +15,7 @@
 #import "tensorflow_lite_support/ios/task/audio/core/audio_tensor/sources/TFLAudioTensor.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
+#import "tensorflow_lite_support/ios/task/audio/core/sources/TFLRingBuffer.h"
 
 @implementation TFLAudioTensor {
   TFLRingBuffer *_ringBuffer;
@@ -32,8 +33,8 @@
 }
 
 - (BOOL)loadBuffer:(TFLFloatBuffer *)buffer
-            offset:(NSInteger)offset
-              size:(NSInteger)size
+            offset:(NSUInteger)offset
+              size:(NSUInteger)size
              error:(NSError **)error {
   return [_ringBuffer loadFloatData:buffer.data
                            dataSize:buffer.size

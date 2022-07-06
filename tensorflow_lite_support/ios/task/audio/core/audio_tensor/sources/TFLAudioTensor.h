@@ -14,7 +14,7 @@
 
 #import <Foundation/Foundation.h>
 #import "tensorflow_lite_support/ios/task/audio/core/audio_record/sources/TFLAudioRecord.h"
-#import "tensorflow_lite_support/ios/task/audio/core/sources/TFLRingBuffer.h"
+#import "tensorflow_lite_support/ios/task/audio/core/sources/TFLFloatBuffer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -70,7 +70,7 @@ NS_SWIFT_NAME(AudioTensor)
  * @return A boolean indicating if the load operation succeded.
  */
 - (BOOL)loadAudioRecord:(TFLAudioRecord *)audioRecord
-              withError:(NSError **)error NS_SWIFT_NAME(loadAudioRecord(audioRecord:));
+              withError:(NSError **)error NS_SWIFT_NAME(load(audioRecord:));
 
 /**
  * This function loads the internal buffer of `TFLAudioTensor` with the provided buffer.
@@ -90,9 +90,9 @@ NS_SWIFT_NAME(AudioTensor)
  * @return A boolean indicating if the load operation succeded.
  */
 - (BOOL)loadBuffer:(TFLFloatBuffer *)buffer
-            offset:(NSInteger)offset
-              size:(NSInteger)size
-             error:(NSError **)error;
+            offset:(NSUInteger)offset
+              size:(NSUInteger)size
+             error:(NSError **)error NS_SWIFT_NAME(load(buffer:offset:size:));
 
 @end
 
