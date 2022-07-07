@@ -155,7 +155,6 @@
   TfLiteAudioBuffer cAudioBuffer = [audioTensor cAudioBufferFromFloatBuffer:audioTensorBuffer];
 
   TfLiteSupportError *classifyError = NULL;
-
   TfLiteClassificationResult *cClassificationResult =
       TfLiteAudioClassifierClassify(_audioClassifier, &cAudioBuffer, &classifyError);
 
