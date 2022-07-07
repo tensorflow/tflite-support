@@ -151,9 +151,11 @@
     return nil;
   }
 
-  TfLiteAudioBuffer cAudioBuffer = [audioTensor cAudioBufferFromFloatBuffer:audioTensor.buffer];
+  TFLFloatBuffer *audioTensorBuffer = audioTensor.buffer;
+  TfLiteAudioBuffer cAudioBuffer = [audioTensor cAudioBufferFromFloatBuffer:audioTensorBuffer];
 
   TfLiteSupportError *classifyError = NULL;
+
   TfLiteClassificationResult *cClassificationResult =
       TfLiteAudioClassifierClassify(_audioClassifier, &cAudioBuffer, &classifyError);
 
