@@ -43,7 +43,8 @@ class TensorAudio(object):
 
   @classmethod
   def create_from_wav_file(cls, file_name: str,
-                           sample_count: int) -> "TensorAudio":
+                           sample_count: int,
+                           offset: int = 0) -> "TensorAudio":
     """Creates `TensorAudio` object from the WAV file.
 
     Args:
@@ -53,6 +54,8 @@ class TensorAudio(object):
         will consume the created TensorAudio object. If the WAV file contains
         more samples than sample_count, only the samples at the beginning of the
         WAV file will be loaded.
+      offset: An optional offset for allowing the user to skip a certain number
+        samples at the beginning.
 
     Returns:
       `TensorAudio` object.
@@ -61,7 +64,7 @@ class TensorAudio(object):
       ValueError: If the audio file is invalid.
       RuntimeError: If other types of error occurred.
     """
-    audio = _LoadAudioBufferFromFile(file_name, sample_count,
+    audio = _LoadAudioBufferFromFile(file_name, sample_count, offset,
                                      np.zeros([sample_count]))
     tensor = TensorAudio(audio.audio_format, audio.buffer_size)
     tensor.load_from_array(np.array(audio.float_buffer, copy=False))

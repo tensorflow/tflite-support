@@ -34,7 +34,7 @@ namespace task {
 namespace audio {
 
 tflite::support::StatusOr<AudioBuffer> LoadAudioBufferFromFile(
-    const std::string& wav_file, int buffer_size,
+    const std::string& wav_file, int buffer_size, int offset,
     std::vector<float>* wav_data) {
   std::string contents = ReadFile(wav_file);
 
@@ -42,7 +42,7 @@ tflite::support::StatusOr<AudioBuffer> LoadAudioBufferFromFile(
   uint16 decoded_channel_count;
   uint32 decoded_sample_rate;
   RETURN_IF_ERROR(DecodeLin16WaveAsFloatVector(
-      contents, wav_data, &decoded_sample_count, &decoded_channel_count,
+      contents, wav_data, offset, &decoded_sample_count, &decoded_channel_count,
       &decoded_sample_rate));
 
   if (decoded_sample_count > buffer_size) {
@@ -71,10 +71,12 @@ tflite::support::StatusOr<ClassificationResult> Classify(
 
   // `wav_data` holds data loaded from the file and needs to outlive `buffer`.
   std::vector<float> wav_data;
+  int offset = 0;
   ASSIGN_OR_RETURN(
       AudioBuffer buffer,
       LoadAudioBufferFromFile(
-          wav_file, classifier->GetRequiredInputBufferSize(), &wav_data));
+          wav_file, classifier->GetRequiredInputBufferSize(), offset,
+          &wav_data));
 
   auto start_classify = std::chrono::steady_clock::now();
   ASSIGN_OR_RETURN(ClassificationResult result, classifier->Classify(buffer));

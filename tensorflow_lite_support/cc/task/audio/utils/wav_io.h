@@ -56,6 +56,7 @@ constexpr bool kLittleEndian = __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__;
 // The results are output as floats within the range -1 to 1,
 absl::Status DecodeLin16WaveAsFloatVector(const std::string& wav_string,
                                           std::vector<float>* float_values,
+                                          int offset,
                                           uint32_t* sample_count,
                                           uint16_t* channel_count,
                                           uint32_t* sample_rate);

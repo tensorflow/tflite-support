@@ -49,13 +49,14 @@ StatusOr<TfLiteAudioBuffer> LoadAudioBufferFromFileNamed(
   std::string contents = ReadFile(
       JoinPath("./" /*test src dir*/, kTestDataDirectory, wav_file));
 
+  int offset = 0;
   uint32_t decoded_sample_count;
   uint16_t decoded_channel_count;
   uint32_t decoded_sample_rate;
   std::vector<float> wav_data;
 
   absl::Status read_audio_file_status = DecodeLin16WaveAsFloatVector(
-      contents, &wav_data, &decoded_sample_count, &decoded_channel_count,
+      contents, &wav_data, offset, &decoded_sample_count, &decoded_channel_count,
       &decoded_sample_rate);
 
   if (decoded_sample_count > buffer_size) {

@@ -113,10 +113,10 @@ absl::Status ReadString(const std::string& data, int expected_length,
 
 absl::Status DecodeLin16WaveAsFloatVector(const std::string& wav_string,
                                           std::vector<float>* float_values,
+                                          int offset,
                                           uint32_t* sample_count,
                                           uint16_t* channel_count,
                                           uint32_t* sample_rate) {
-  int offset = 0;
   RETURN_IF_ERROR(ExpectText(wav_string, kRiffChunkId, &offset));
   uint32_t total_file_size;
   RETURN_IF_ERROR(ReadValue<uint32_t>(wav_string, &total_file_size, &offset));
