@@ -198,7 +198,10 @@ http_archive(
     urls = [
         "https://github.com/tensorflow/text/archive/v2.2.0.zip",
     ],
-    patches = ["@//third_party:tensorflow_text_remove_tf_deps.patch"],
+    patches = [
+        "@//third_party:tensorflow_text_remove_tf_deps.patch",
+        "@//third_party:tensorflow_text_a0f49e63.patch"
+    ],
     patch_args = ["-p1"],
     repo_mapping = {"@com_google_re2": "@com_googlesource_code_re2"},
 )
