@@ -191,6 +191,7 @@ http_archive(
     ],
 )
 
+# TODO(b/238430210): Update RE2 depedency and remove the patch.
 http_archive(
     name = "org_tensorflow_text",
     sha256 = "f64647276f7288d1b1fe4c89581d51404d0ce4ae97f2bcc4c19bd667549adca8",
@@ -213,6 +214,8 @@ http_archive(
     urls = [
         "https://github.com/google/re2/archive/506cfa4bffd060c06ec338ce50ea3468daa6c814.tar.gz",
     ],
+    patches = ["@//third_party:re2_59a5c74e.patch"],
+    patch_args = ["-p1"],
 )
 
 # ABSL cpp library lts_2021_03_24 Patch2
