@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'Apache',:file => "LICENSE" }
   s.homepage         = 'https://github.com/tensorflow/tflite-support'
   s.source           = { :http => '${TFLS_DOWNLOAD_URL}' }
-  s.summary          = 'The Natural Language APIs of the TFLite Task Library'
+  s.summary          = 'TensorFlow Lite Task Library - Text'
   s.description      = 'The Natural Language APIs of the TFLite Task Library'
 
   s.ios.deployment_target = '10.0'
