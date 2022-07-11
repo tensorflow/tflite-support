@@ -123,10 +123,6 @@ http_archive(
 # could take effects.
 load("//third_party:repo.bzl", "third_party_http_archive")
 
-# Use our patched gflags which fixes a linking issue.
-load("//third_party/gflags:workspace.bzl", gflags = "repo")
-gflags()
-
 third_party_http_archive(
     name = "pybind11",
     urls = [
@@ -240,14 +236,22 @@ http_archive(
 
 http_archive(
     name = "com_google_glog",
-    sha256 = "1ee310e5d0a19b9d584a855000434bb724aa744745d5b8ab1855c85bff8a8e21",
-    strip_prefix = "glog-028d37889a1e80e8a07da1b8945ac706259e5fd8",
+    sha256 = "50a05b9119802beffe6ec9f8302aa1ab770db10f2297b659b8e8f15e55854aed",
+    strip_prefix = "glog-c515e1ae2fc8b36ca19362842f9347e9429be7ad",
     urls = [
-        "https://mirror.bazel.build/github.com/google/glog/archive/028d37889a1e80e8a07da1b8945ac706259e5fd8.tar.gz",
-        "https://github.com/google/glog/archive/028d37889a1e80e8a07da1b8945ac706259e5fd8.tar.gz",
+        "https://mirror.bazel.build/github.com/google/glog/archive/c515e1ae2fc8b36ca19362842f9347e9429be7ad.tar.gz",
+        "https://github.com/google/glog/archive/c515e1ae2fc8b36ca19362842f9347e9429be7ad.tar.gz",
     ],
 )
 
+http_archive(
+    name = "com_github_gflags_gflags",
+    sha256 = "94eee3622e33eb7641614964b4ea8b7a77ed8b6e6795ee2f73124f67fe99245e",
+    strip_prefix = "gflags-986e8eed00ded8168ef4eaa6f925dc6be50b40fa",
+    urls = [
+        "https://github.com/gflags/gflags/archive/986e8eed00ded8168ef4eaa6f925dc6be50b40fa.tar.gz",
+    ],
+)
 
 http_archive(
     name = "zlib",
