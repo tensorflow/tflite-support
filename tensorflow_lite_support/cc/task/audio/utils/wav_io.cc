@@ -62,8 +62,8 @@ std::string ReadFile(const std::string filepath) {
 
 // Handles moving the data index forward, validating the arguments, and avoiding
 // overflow or underflow.
-absl::Status IncrementOffset(uint32_t *old_offset, size_t increment, size_t max_size,
-                             int* new_offset) {
+absl::Status IncrementOffset(uint32_t* old_offset, size_t increment, size_t max_size,
+                             uint32_t* new_offset) {
   if (*old_offset < 0) {
     return absl::InvalidArgumentError(
         absl::StrFormat("Negative offsets are not allowed: %d", *old_offset));
@@ -88,7 +88,7 @@ absl::Status IncrementOffset(uint32_t *old_offset, size_t increment, size_t max_
 
 absl::Status ExpectText(const std::string& data,
                         const std::string& expected_text, uint32_t *offset) {
-  int new_offset;
+  uint32_t new_offset;
   RETURN_IF_ERROR(
       IncrementOffset(offset, expected_text.size(), data.size(), &new_offset));
   const std::string found_text(data.begin() + *offset,
@@ -103,7 +103,7 @@ absl::Status ExpectText(const std::string& data,
 
 absl::Status ReadString(const std::string& data, int expected_length,
                         std::string* value, uint32_t *offset) {
-  int new_offset;
+  uint32_t new_offset;
   RETURN_IF_ERROR(
       IncrementOffset(offset, expected_length, data.size(), &new_offset));
   *value = std::string(data.begin() + *offset, data.begin() + new_offset);
@@ -200,7 +200,7 @@ absl::Status DecodeLin16WaveAsFloatVector(const std::string& wav_string,
       was_data_found = true;
       *sample_count = chunk_size / bytes_per_sample;
       const uint32_t data_count = *sample_count * *channel_count;
-      int unused_new_offset = 0;
+      uint32_t unused_new_offset = 0;
       // Validate that the data exists before allocating space for it
       // (prevent easy OOM errors).
       RETURN_IF_ERROR(IncrementOffset(offset, sizeof(int16_t) * data_count,

@@ -65,15 +65,15 @@ absl::Status DecodeLin16WaveAsFloatVector(const std::string& wav_string,
 
 // Handles moving the data index forward, validating the arguments, and avoiding
 // overflow or underflow.
-absl::Status IncrementOffset(uint32_t *old_offset, size_t increment, size_t max_size,
-                             int* new_offset);
+absl::Status IncrementOffset(uint32_t* old_offset, size_t increment, size_t max_size,
+                             uint32_t* new_offset);
 
 // This function is only exposed in the header for testing purposes, as a
 // template that needs to be instantiated. Reads a typed numeric value from a
 // stream of data.
 template <class T>
 absl::Status ReadValue(const std::string& data, T* value, uint32_t *offset) {
-  int new_offset;
+  uint32_t new_offset;
   RETURN_IF_ERROR(
       IncrementOffset(offset, sizeof(T), data.size(), &new_offset));
   if (port::kLittleEndian) {
