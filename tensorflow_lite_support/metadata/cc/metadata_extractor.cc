@@ -108,12 +108,14 @@ absl::StatusOr<ZipFileInfo> GetCurrentZipFileInfo(const unzFile& zf) {
         StatusCode::kUnknown, "Unable to read file in zip archive.",
         TfLiteSupportStatus::kMetadataAssociatedFileZipError);
   }
-  ZipFileInfo result = {.name = file_name,
-                        .position = position,
-                        .size = file_info.uncompressed_size};
 
   // Close file and return.
   RETURN_IF_ERROR(UnzipErrorToStatus(unzCloseCurrentFile(zf)));
+
+  ZipFileInfo result{};
+  result.name = file_name;
+  result.position = position;
+  result.size = file_info.uncompressed_size;
   return result;
 }
 }  // namespace
