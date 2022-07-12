@@ -177,7 +177,7 @@ absl::Status DecodeLin16WaveAsFloatVector(const std::string& wav_string,
   }
   if (format_chunk_size == 18) {
     // Skip over this unused section.
-    offset += 2;
+    *offset += 2;
   }
 
   bool was_data_found = false;
@@ -213,7 +213,7 @@ absl::Status DecodeLin16WaveAsFloatVector(const std::string& wav_string,
         (*float_values)[i] = Int16SampleToFloat(single_channel_value);
       }
     } else {
-      offset += chunk_size;
+      *offset += chunk_size;
     }
   }
   if (!was_data_found) {
