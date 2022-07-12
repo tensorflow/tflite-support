@@ -102,7 +102,7 @@ absl::Status ExpectText(const std::string& data,
 }
 
 absl::Status ReadString(const std::string& data, int expected_length,
-                        std::string* value, uint32_t *offset) {
+                        std::string* value, uint32_t* offset) {
   uint32_t new_offset;
   RETURN_IF_ERROR(
       IncrementOffset(offset, expected_length, data.size(), &new_offset));
