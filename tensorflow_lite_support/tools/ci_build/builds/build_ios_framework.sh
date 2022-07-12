@@ -80,8 +80,8 @@ EOF
 }
 
 function build_ios_api_framework {
-  local TARGET="//tensorflow_lite_support/ios"
-  FULL_TARGET="${TARGET}:$1_framework"
+  local TARGET_PREFIX="//tensorflow_lite_support/ios"
+  FULL_TARGET="${TARGET_PREFIX}:$1_framework"
 
   "${BAZEL}" build -c opt --config=ios_fat ${FULL_TARGET}
     
