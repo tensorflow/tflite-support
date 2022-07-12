@@ -61,7 +61,7 @@ PYBIND11_MODULE(_pywrap_audio_buffer, m) {
       });
 
   m.def("LoadAudioBufferFromFile",
-        [](const std::string& wav_file, int buffer_size, int offset,
+        [](const std::string& wav_file, int buffer_size, uint32_t* offset,
            py::buffer buffer) -> AudioBuffer {
           py::buffer_info info = buffer.request();
 
