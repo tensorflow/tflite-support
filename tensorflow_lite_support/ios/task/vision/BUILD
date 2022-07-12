@@ -72,3 +72,19 @@ objc_library(
         "//tensorflow_lite_support/odml/ios/image:MLImage",
     ],
 )
+
+objc_library(
+    name = "TFLImageEmbedder",
+    srcs = [
+        "sources/TFLImageEmbedder.mm",
+    ],
+    hdrs = [
+        "sources/TFLImageEmbedder.h",
+    ],
+    features = ["-layering_check"],
+    module_name = "TFLImageEmbedder",
+    deps = [
+        "//tensorflow_lite_support/cc/task/vision:image_embedder",
+    ],
+    copts = ["-ObjC++","-std=c++14"],
+)
