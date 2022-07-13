@@ -18,6 +18,7 @@ objc_library(
     ],
     tags = TFL_DEFAULT_TAGS,
     deps = [
+        "//tensorflow_lite_support/ios:TFLCommon",
         "//tensorflow_lite_support/ios/task/audio:TFLAudioClassifier",
         "//tensorflow_lite_support/ios/test/task/audio/core/audio_record/utils:AVAudioPCMBufferUtils",
     ],
@@ -43,6 +44,7 @@ swift_library(
     ],
     tags = TFL_DEFAULT_TAGS,
     deps = [
+        "//tensorflow_lite_support/ios:TFLCommon",
         "//tensorflow_lite_support/ios/task/audio:TFLAudioClassifier",
         "//tensorflow_lite_support/ios/test/task/audio/core/audio_record/utils:AVAudioPCMBufferUtils",
     ],

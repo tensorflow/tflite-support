@@ -201,7 +201,7 @@ NS_ASSUME_NONNULL_BEGIN
                  nil         // expectedDisplaName
   );
   VerifyCategory(categories[1],
-                 500,                    // expectedIndex
+                 500,  // expectedIndex
                  0.019531,               // expectedScore
                  @"Inside, small room",  // expectedLabel
                  nil                     // expectedDisplaName
@@ -282,7 +282,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     .categories];
 }
 
-- (void)testInferenceWithClassNameBlackListAndWhiteListFails {
+- (void)testInferenceWithClassNameAllowListAndDenyListFails {
   TFLAudioClassifierOptions *options =
       [[TFLAudioClassifierOptions alloc] initWithModelPath:self.modelPath];
   options.classificationOptions.labelAllowList = @[ @"Speech" ];
@@ -342,6 +342,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                             .categories];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
 - (void)testCreateAudioClassifierWithNilOptionsFails {
   NSError *error = nil;
   TFLAudioClassifier *audioClassifier = [TFLAudioClassifier audioClassifierWithOptions:nil
@@ -369,6 +371,7 @@ NS_ASSUME_NONNULL_BEGIN
               @"audioTensor argument cannot be nil."    // expectedErrorMessage
   );
 }
+#pragma clang diagnostic pop
 
 @end
 

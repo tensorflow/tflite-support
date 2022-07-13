@@ -16,8 +16,6 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_TFLITE_ENGINE_H_
 #define TENSORFLOW_LITE_SUPPORT_CC_TASK_CORE_TFLITE_ENGINE_H_
 
-#include <sys/mman.h>
-
 #include <memory>
 
 #include "absl/memory/memory.h"  // from @com_google_absl
@@ -34,6 +32,10 @@ limitations under the License.
 #include "tensorflow_lite_support/cc/task/core/external_file_handler.h"
 #include "tensorflow_lite_support/cc/task/core/proto/external_file_proto_inc.h"
 #include "tensorflow_lite_support/metadata/cc/metadata_extractor.h"
+
+#ifdef ABSL_HAVE_MMAP
+#include <sys/mman.h>
+#endif
 
 namespace tflite {
 namespace task {

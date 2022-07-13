@@ -32,7 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
                                                  audioFormat:(TFLAudioFormat *)audioFormat
     NS_SWIFT_NAME(loadPCMBufferFromFile(withPath:audioFormat:));
 
-
 @end
 
 NS_ASSUME_NONNULL_END

@@ -5,12 +5,10 @@ load(
     "TFL_MINIMUM_OS_VERSION",
     "tflite_ios_framework",
 )
-
 load(
     "//tensorflow_lite_support/ios:ios.bzl",
     "strip_api_include_path_prefix",
 )
-
 load(
     "@build_bazel_rules_apple//apple:ios.bzl",
     "ios_static_framework",
@@ -150,24 +148,24 @@ objc_library(
 ios_static_framework(
     name = "TensorFlowLiteTaskVision_framework",
     hdrs = [
-        ":TFLImageClassifier.h",
-        ":TFLObjectDetector.h",
-        ":TFLImageSegmenter.h",
-        ":TFLCommon.h",
-        ":TFLBaseOptions.h",
-        ":TFLClassificationOptions.h",
-        ":TFLCategory.h",
-        ":TFLClassificationResult.h",
-        ":TFLDetectionResult.h",
-        ":TFLSegmentationResult.h",
         ":GMLImage.h",
+        ":TFLBaseOptions.h",
+        ":TFLCategory.h",
+        ":TFLClassificationOptions.h",
+        ":TFLClassificationResult.h",
+        ":TFLCommon.h",
+        ":TFLDetectionResult.h",
+        ":TFLImageClassifier.h",
+        ":TFLImageSegmenter.h",
+        ":TFLObjectDetector.h",
+        ":TFLSegmentationResult.h",
     ],
     bundle_name = "TensorFlowLiteTaskVision",
     minimum_os_version = "10.0",
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
-        "//tensorflow_lite_support/ios/task/vision:TFLObjectDetector",
         "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
+        "//tensorflow_lite_support/ios/task/vision:TFLObjectDetector",
     ],
 )
 
@@ -175,8 +173,8 @@ ios_static_framework(
     name = "TensorFlowLiteTaskText_framework",
     hdrs = [
         ":TFLBertNLClassifier.h",
-        ":TFLNLClassifier.h",
         ":TFLBertQuestionAnswerer.h",
+        ":TFLNLClassifier.h",
     ],
     bundle_name = "TensorFlowLiteTaskText",
     minimum_os_version = TFL_MINIMUM_OS_VERSION,
@@ -207,5 +205,3 @@ ios_static_framework(
         "//tensorflow_lite_support/ios/task/audio:TFLAudioClassifier",
     ],
 )
-
-

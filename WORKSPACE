@@ -123,10 +123,6 @@ http_archive(
 # could take effects.
 load("//third_party:repo.bzl", "third_party_http_archive")
 
-# Use our patched gflags which fixes a linking issue.
-load("//third_party/gflags:workspace.bzl", gflags = "repo")
-gflags()
-
 third_party_http_archive(
     name = "pybind11",
     urls = [
@@ -191,6 +187,7 @@ http_archive(
     ],
 )
 
+# TODO(b/238430210): Update RE2 depedency and remove the patch.
 http_archive(
     name = "org_tensorflow_text",
     sha256 = "f64647276f7288d1b1fe4c89581d51404d0ce4ae97f2bcc4c19bd667549adca8",
@@ -198,7 +195,10 @@ http_archive(
     urls = [
         "https://github.com/tensorflow/text/archive/v2.2.0.zip",
     ],
-    patches = ["@//third_party:tensorflow_text_remove_tf_deps.patch"],
+    patches = [
+        "@//third_party:tensorflow_text_remove_tf_deps.patch",
+        "@//third_party:tensorflow_text_a0f49e63.patch"
+    ],
     patch_args = ["-p1"],
     repo_mapping = {"@com_google_re2": "@com_googlesource_code_re2"},
 )
@@ -210,6 +210,8 @@ http_archive(
     urls = [
         "https://github.com/google/re2/archive/506cfa4bffd060c06ec338ce50ea3468daa6c814.tar.gz",
     ],
+    patches = ["@//third_party:re2_59a5c74e.patch"],
+    patch_args = ["-p1"],
 )
 
 # ABSL cpp library lts_2021_03_24 Patch2
@@ -234,14 +236,22 @@ http_archive(
 
 http_archive(
     name = "com_google_glog",
-    sha256 = "1ee310e5d0a19b9d584a855000434bb724aa744745d5b8ab1855c85bff8a8e21",
-    strip_prefix = "glog-028d37889a1e80e8a07da1b8945ac706259e5fd8",
+    sha256 = "50a05b9119802beffe6ec9f8302aa1ab770db10f2297b659b8e8f15e55854aed",
+    strip_prefix = "glog-c515e1ae2fc8b36ca19362842f9347e9429be7ad",
     urls = [
-        "https://mirror.bazel.build/github.com/google/glog/archive/028d37889a1e80e8a07da1b8945ac706259e5fd8.tar.gz",
-        "https://github.com/google/glog/archive/028d37889a1e80e8a07da1b8945ac706259e5fd8.tar.gz",
+        "https://mirror.bazel.build/github.com/google/glog/archive/c515e1ae2fc8b36ca19362842f9347e9429be7ad.tar.gz",
+        "https://github.com/google/glog/archive/c515e1ae2fc8b36ca19362842f9347e9429be7ad.tar.gz",
     ],
 )
 
+http_archive(
+    name = "com_github_gflags_gflags",
+    sha256 = "94eee3622e33eb7641614964b4ea8b7a77ed8b6e6795ee2f73124f67fe99245e",
+    strip_prefix = "gflags-986e8eed00ded8168ef4eaa6f925dc6be50b40fa",
+    urls = [
+        "https://github.com/gflags/gflags/archive/986e8eed00ded8168ef4eaa6f925dc6be50b40fa.tar.gz",
+    ],
+)
 
 http_archive(
     name = "zlib",
