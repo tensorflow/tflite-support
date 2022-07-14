@@ -24,7 +24,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
         "//tensorflow_lite_support/odml/ios/image:MLImage",
-        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:gpu_plugin",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:coreml_plugin",
     ],
 )
 
