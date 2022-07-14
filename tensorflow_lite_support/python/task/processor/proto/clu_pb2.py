@@ -113,10 +113,11 @@ class Extraction:
   """A single extraction result.
 
   Attributes:
-    value: The name of the slot.
-    score: The predicted class.
-    start: The predicted class.
-    end: The predicted class.
+    value: The text value of the extraction.
+    score: The score for this extraction e.g. (but not necessarily) a
+      probability in [0,1].
+    start: Start of the bytes of this extraction.
+    end: Exclusive end of the bytes of this extraction.
   """
 
   value: str
