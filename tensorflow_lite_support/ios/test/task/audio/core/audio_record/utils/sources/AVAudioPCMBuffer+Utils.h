@@ -14,14 +14,23 @@
 
 #import <AVFoundation/AVFoundation.h>
 #import <Foundation/Foundation.h>
+#import "tensorflow_lite_support/ios/task/audio/core/sources/TFLAudioFormat.h"
+#import "tensorflow_lite_support/ios/task/audio/core/sources/TFLFloatBuffer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AVAudioPCMBuffer (Utils)
 
+@property(nonatomic, readonly, nullable) TFLFloatBuffer *floatBuffer;
+
 - (AVAudioPCMBuffer *)bufferUsingAudioConverter:(AVAudioConverter *)audioConverter;
 
-+ (AVAudioPCMBuffer *)loadPCMBufferFromFileWithURL:(NSURL *)url;
++ (nullable AVAudioPCMBuffer *)loadPCMBufferFromFileWithPath:(NSString *)path
+                                            processingFormat:(AVAudioFormat *)processingFormat;
+
++ (nullable AVAudioPCMBuffer *)loadPCMBufferFromFileWithPath:(NSString *)path
+                                                 audioFormat:(TFLAudioFormat *)audioFormat
+    NS_SWIFT_NAME(loadPCMBufferFromFile(withPath:audioFormat:));
 
 @end
 

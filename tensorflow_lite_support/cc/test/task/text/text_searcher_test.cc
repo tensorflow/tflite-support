@@ -219,21 +219,22 @@ TEST_P(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
 
 INSTANTIATE_TEST_SUITE_P(
     CreateFromOptionsTest, CreateFromOptionsTest,
-    Values(CreateFromOptionsParams{.name = "Bert",
-                                   .embedder_model_name = kMobileBertEmbedder,
-                                   .searcher_model_name = kMobileBertSearcher,
-                                   .is_universal_sentence_encoder = false,
-                                   .index_name = kMobileBertIndex},
-           CreateFromOptionsParams{.name = "Regex",
-                                   .embedder_model_name = kRegexEmbedder,
-                                   .searcher_model_name = kRegexSearcher,
-                                   .is_universal_sentence_encoder = false,
-                                   .index_name = kRegexIndex},
-           CreateFromOptionsParams{.name = "USE",
-                                   .embedder_model_name = kUSEEmbedder,
-                                   .searcher_model_name = kUSESearcher,
-                                   .is_universal_sentence_encoder = true,
-                                   .index_name = kUSEIndex}),
+    Values(CreateFromOptionsParams{
+               /* name= */ "Bert",
+               /* embedder_model_name= */ kMobileBertEmbedder,
+               /* searcher_model_name= */ kMobileBertSearcher,
+               /* is_universal_sentence_encoder= */ false,
+               /* index_name= */ kMobileBertIndex},
+           CreateFromOptionsParams{/* name= */ "Regex",
+                                   /* embedder_model_name= */ kRegexEmbedder,
+                                   /* searcher_model_name= */ kRegexSearcher,
+                                   /* is_universal_sentence_encoder= */ false,
+                                   /* index_name= */ kRegexIndex},
+           CreateFromOptionsParams{/* name= */ "USE",
+                                   /* embedder_model_name= */ kUSEEmbedder,
+                                   /* searcher_model_name= */ kUSESearcher,
+                                   /* is_universal_sentence_encoder= */ true,
+                                   /* index_name= */ kUSEIndex}),
     [](const TestParamInfo<CreateFromOptionsTest::ParamType>& info) {
       return info.param.name;
     });
@@ -327,91 +328,90 @@ TEST_P(SearchTest, SucceedsWithMaxResults) {
 
 INSTANTIATE_TEST_SUITE_P(
     SearchTest, SearchTest,
-    Values(
-        SearchParams{
-            .name = "Bert",
-            .embedder_model_name = kMobileBertEmbedder,
-            .searcher_model_name = kMobileBertSearcher,
-            .is_universal_sentence_encoder = false,
-            .index_name = kMobileBertIndex,
-            .expected_result = R"pb(
-              nearest_neighbors {
-                metadata: "The weather was excellent."
-                distance: 0.0
-              }
-              nearest_neighbors {
-                metadata: "It was a sunny day."
-                distance: 0.11537
-              }
-              nearest_neighbors {
-                metadata: "The sun was shining on that day."
-                distance: 0.23002
-              }
-              nearest_neighbors {
-                metadata: "He was very happy with his newly bought car."
-                distance: 0.32456
-              }
-              nearest_neighbors {
-                metadata: "The cat is chasing after the mouse."
-                distance: 0.96693
-              }
-            )pb"},
-        SearchParams{
-            .name = "Regex",
-            .embedder_model_name = kRegexEmbedder,
-            .searcher_model_name = kRegexSearcher,
-            .is_universal_sentence_encoder = false,
-            .index_name = kRegexIndex,
-            .expected_result = R"pb(
-              nearest_neighbors {
-                metadata: "The weather was excellent."
-                distance: 0.0
-              }
-              nearest_neighbors {
-                metadata: "The sun was shining on that day."
-                distance: 0.00006
-              }
-              nearest_neighbors {
-                metadata: "The cat is chasing after the mouse."
-                distance: 0.00009
-              }
-              nearest_neighbors {
-                metadata: "It was a sunny day."
-                distance: 0.00011
-              }
-              nearest_neighbors {
-                metadata: "He was very happy with his newly bought car."
-                distance: 0.00012
-              }
-            )pb"},
-        SearchParams{
-            .name = "USE",
-            .embedder_model_name = kUSEEmbedder,
-            .searcher_model_name = kUSESearcher,
-            .is_universal_sentence_encoder = true,
-            .index_name = kUSEIndex,
-            .expected_result = R"pb(
-              nearest_neighbors {
-                metadata: "The weather was excellent."
-                distance: 0.0
-              }
-              nearest_neighbors {
-                metadata: "It was a sunny day."
-                distance: 0.14636
-              }
-              nearest_neighbors {
-                metadata: "The sun was shining on that day."
-                distance: 0.15222
-              }
-              nearest_neighbors {
-                metadata: "The cat is chasing after the mouse."
-                distance: 0.35997
-              }
-              nearest_neighbors {
-                metadata: "He was very happy with his newly bought car."
-                distance: 0.36693
-              }
-            )pb"}),
+    Values(SearchParams{
+               /* name= */ "Bert",
+               /* embedder_model_name= */ kMobileBertEmbedder,
+               /* searcher_model_name= */ kMobileBertSearcher,
+               /* is_universal_sentence_encoder= */ false,
+               /* index_name= */ kMobileBertIndex,
+               /* expected_result= */ R"pb(
+                 nearest_neighbors {
+                   metadata: "The weather was excellent."
+                   distance: 0.0
+                 }
+                 nearest_neighbors {
+                   metadata: "It was a sunny day."
+                   distance: 0.11537
+                 }
+                 nearest_neighbors {
+                   metadata: "The sun was shining on that day."
+                   distance: 0.23002
+                 }
+                 nearest_neighbors {
+                   metadata: "He was very happy with his newly bought car."
+                   distance: 0.32456
+                 }
+                 nearest_neighbors {
+                   metadata: "The cat is chasing after the mouse."
+                   distance: 0.96693
+                 }
+               )pb"},
+           SearchParams{
+               /* name= */ "Regex",
+               /* embedder_model_name= */ kRegexEmbedder,
+               /* searcher_model_name= */ kRegexSearcher,
+               /* is_universal_sentence_encoder= */ false,
+               /* index_name= */ kRegexIndex,
+               /* expected_result= */ R"pb(
+                 nearest_neighbors {
+                   metadata: "The weather was excellent."
+                   distance: 0.0
+                 }
+                 nearest_neighbors {
+                   metadata: "The sun was shining on that day."
+                   distance: 0.00006
+                 }
+                 nearest_neighbors {
+                   metadata: "The cat is chasing after the mouse."
+                   distance: 0.00009
+                 }
+                 nearest_neighbors {
+                   metadata: "It was a sunny day."
+                   distance: 0.00011
+                 }
+                 nearest_neighbors {
+                   metadata: "He was very happy with his newly bought car."
+                   distance: 0.00012
+                 }
+               )pb"},
+           SearchParams{
+               /* name= */ "USE",
+               /* embedder_model_name= */ kUSEEmbedder,
+               /* searcher_model_name= */ kUSESearcher,
+               /* is_universal_sentence_encoder= */ true,
+               /* index_name= */ kUSEIndex,
+               /* expected_result= */ R"pb(
+                 nearest_neighbors {
+                   metadata: "The weather was excellent."
+                   distance: 0.0
+                 }
+                 nearest_neighbors {
+                   metadata: "It was a sunny day."
+                   distance: 0.14636
+                 }
+                 nearest_neighbors {
+                   metadata: "The sun was shining on that day."
+                   distance: 0.15222
+                 }
+                 nearest_neighbors {
+                   metadata: "The cat is chasing after the mouse."
+                   distance: 0.35997
+                 }
+                 nearest_neighbors {
+                   metadata: "He was very happy with his newly bought car."
+                   distance: 0.36693
+                 }
+               )pb"}),
     [](const TestParamInfo<SearchTest::ParamType>& info) {
       return info.param.name;
     });
