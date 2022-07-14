@@ -27,7 +27,13 @@ _BertCluAnnotationOptions = clu_annotation_options_pb2.BertCluAnnotationOptions
 
 @dataclasses.dataclass
 class BertCluAnnotatorOptions:
-  """Options for the Bert CLU Annotator task."""
+  """Options for the Bert CLU Annotator task.
+
+  Attributes:
+    base_options: Base options for the Bert CLU Annotator task.
+    bert_clu_annotation_options: Bert CLU Annotator options for the Bert CLU
+      Annotator task.
+  """
   base_options: _BaseOptions
   bert_clu_annotation_options: _BertCluAnnotationOptions = \
       _BertCluAnnotationOptions()
