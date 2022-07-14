@@ -1,15 +1,14 @@
 """TensorFlow Lite Support Library Helper Rules for iOS"""
 
-# When the static framework is built with bazel, all the header files are moved
+TFL_TASK_MINIMUM_OS_VERSION = "10.0"
+TFL_TASK_COREML_MINIMUM_OS_VERSION = "11.0"
+
+# When the static framework is built with bazel, the all header files are moved
 # to the "Headers" directory with no header path prefixes. This auxiliary rule
 # is used for stripping the path prefix to the C/iOS API header files included by
 # other C/iOS API header files.
 # In case of C header files includes start with a keyword of "#include'.
 # Imports in iOS header files start with a keyword of '#import'.
-
-TFL_TASK_MINIMUM_OS_VERSION = "10.0"
-TFL_TASK_COREML_MINIMUM_OS_VERSION = "11.0"
-
 def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
     """Create modified header files with the import path stripped out.
 
@@ -21,8 +20,9 @@ def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
     """
     for hdr_label in hdr_labels:
         hdr_filename = hdr_label.split(":")[-1]
-        # The last path component of iOS header files can be sources/some_file.h 
-        # or Sources/some_file.h. Hence it wiill contain a '/'. So the string 
+
+        # The last path component of iOS header files can be sources/some_file.h
+        # or Sources/some_file.h. Hence it wiill contain a '/'. So the string
         # can be split at '/' to get the header file name.
         if "/" in hdr_filename:
             hdr_filename = hdr_filename.split("/")[-1]

@@ -59,24 +59,6 @@ strip_api_include_path_prefix(
     ],
 )
 
-strip_ios_api_include_path_prefix(
-    name = "strip_ios_api_include_path",
-     hdr_labels = [
-        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageEmbedder.h",
-        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageClassifier.h",
-        "//tensorflow_lite_support/ios/task/vision:sources/TFLObjectDetector.h",
-        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageSegmenter.h",
-        "//tensorflow_lite_support/ios:sources/TFLCommon.h",
-        "//tensorflow_lite_support/ios/task/core:sources/TFLBaseOptions.h",
-        "//tensorflow_lite_support/ios/task/processor:sources/TFLClassificationOptions.h",
-        "//tensorflow_lite_support/ios/task/processor:sources/TFLCategory.h",
-        "//tensorflow_lite_support/ios/task/processor:sources/TFLClassificationResult.h",
-        "//tensorflow_lite_support/ios/task/processor:sources/TFLDetectionResult.h",
-        "//tensorflow_lite_support/ios/task/processor:sources/TFLSegmentationResult.h",
-        "//tensorflow_lite_support/odml/ios/image:apis/GMLImage.h",
-    ],
-)
-
 # This target builds a monolithic static framework for the TFLite Text API,
 # which includes the TFLite runtime in it.
 #
