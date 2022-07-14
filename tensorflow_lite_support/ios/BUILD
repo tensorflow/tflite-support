@@ -171,7 +171,7 @@ ios_static_framework(
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
         "//tensorflow_lite_support/ios/task/vision:TFLObjectDetector",
         "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
-    ],
+     ],
 )
 
 ios_static_framework(

@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.summary          = 'TensorFlow Lite Task Library - Vision'
   s.description      = 'The Computer Vision APIs of the TFLite Task Library'
 
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '11.0'
 
   s.module_name = 'TensorFlowLiteTaskVision'
   s.static_framework = true
@@ -16,6 +16,6 @@ Pod::Spec.new do |s|
     'VALID_ARCHS' => 'x86_64, arm64, armv7',
   }
   s.library = 'c++'
-  s.frameworks = 'CoreMedia', 'Accelerate'
+  s.frameworks = 'CoreMedia', 'Accelerate', 'CoreML'
   s.vendored_frameworks = 'Frameworks/TensorFlowLiteTaskVision.framework'
 end
