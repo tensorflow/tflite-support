@@ -81,6 +81,39 @@ tflite_ios_framework(
     ],
 )
 
+# Xcode 12 does not support ios fat libraries. Frameworks built for multiple
+# architectures should be compiled into a .xcframework inside. Bazel currently
+# does not support building .xcframework. You have to build the framework
+# for the architecture you decide to test on.
+# Use the below command to build for arm64 which lets you test the library on
+# iOS devices.
+# bazel build -c opt --config=ios_arm64 //tensorflow_lite_support/ios:TensorFlowLiteTaskVisionC_framework
+tflite_ios_framework(
+    name = "TensorFlowLiteTaskVisionC_framework",
+    hdrs = [
+        ":base_options.h",
+        ":bounding_box.h",
+        ":category.h",
+        ":classification_options.h",
+        ":classification_result.h",
+        ":common.h",
+        ":detection_result.h",
+        ":frame_buffer.h",
+        ":image_classifier.h",
+        ":image_segmenter.h",
+        ":object_detector.h",
+        ":segmentation_result.h",
+    ],
+    allowlist_symbols_file = ":allowlist_TensorFlowLiteTaskVision.txt",
+    bundle_name = "TensorFlowLiteTaskVisionC",
+    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    deps = [
+        "//tensorflow_lite_support/c/task/vision:image_classifier",
+        "//tensorflow_lite_support/c/task/vision:image_segmenter",
+        "//tensorflow_lite_support/c/task/vision:object_detector",
+    ],
+)
+
 objc_library(
     name = "TFLCommon",
     hdrs = [
