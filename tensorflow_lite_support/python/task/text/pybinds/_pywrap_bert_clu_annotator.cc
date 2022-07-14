@@ -72,8 +72,12 @@ PYBIND11_MODULE(_pywrap_bert_clu_annotator, m) {
           })
       .def("annotate",
            [](BertCluAnnotator& self,
-              const CluRequest& request) -> processor::CluResponse {
-             auto text_clu_response = self.Annotate(request);
+              const processor::CluRequest& request) -> processor::CluResponse {
+             // Convert from processor::CluRequest to text::CluRequest as
+             // required by the C++ layer.
+             tflite::task::text::CluRequest text_clu_request;
+             text_clu_request.ParseFromString(request.SerializeAsString());
+             auto text_clu_response = self.Annotate(text_clu_request);
              // Convert from text::CluResponse to
              // processor::CluResponse as required by the Python layer.
              processor::CluResponse clu_response;

@@ -102,7 +102,7 @@ py_test(
     name = "bert_clu_annotator_test",
     srcs = ["bert_clu_annotator_test.py"],
     data = [
-        # TODO: Add the model here once it's made available.
+        "//tensorflow_lite_support/cc/test/testdata/task/text:bert_clu_annotator_with_metadata",
     ],
     deps = [
         # build rule placeholder: tensorflow dep,

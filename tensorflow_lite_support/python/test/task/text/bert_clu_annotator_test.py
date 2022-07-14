@@ -35,14 +35,37 @@ _NonCategoricalSlot = clu_pb2.NonCategoricalSlot
 _Category = class_pb2.Category
 _BertCluAnnotatorOptions = bert_clu_annotator.BertCluAnnotatorOptions
 
-_BERT_MODEL = 'mobilebert_clu.tflite'
-_CLU_REQUEST = clu_pb2.CluRequest(
-  utterances=[
-    "I would like to make a restaurant reservation at morning 11:15.",
-    "Which restaurant do you want to go to?",
-    "Can I get a reservation for two people at Andes Cafe? Where is their "
-    "address?"
-  ])
+_BERT_MODEL = 'bert_clu_annotator_with_metadata.tflite'
+_CLU_REQUEST = _CluRequest(
+    utterances=[
+      "I would like to make a restaurant reservation at morning 11:15.",
+      "Which restaurant do you want to go to?",
+      "Can I get a reservation for two people at Andes Cafe? Where is their "
+      "address?"
+    ])
+_CLU_RESPONSE = _CluResponse(
+    domains=[
+        _Category(
+            index=0, score=0.925057, display_name='Restaurants',
+            category_name='')
+    ],
+    intents=[],
+    categorical_slots=[
+        _CategoricalSlot(
+            slot='number_of_seats',
+            prediction=_Category(
+                index=0, score=0.920792, display_name='2',
+                category_name='')
+        )
+    ],
+    noncategorical_slots=[
+        _NonCategoricalSlot(
+            slot='restaurant_name',
+            extraction=_Extraction(
+                value='Andes Cafe', score=0.914949, start=42, end=52)
+        )
+    ]
+)
 
 
 class ModelFileType(enum.Enum):
@@ -87,8 +110,8 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
       self.assertIsInstance(annotator, _BertCluAnnotator)
 
   @parameterized.parameters(
-      (_BERT_MODEL, ModelFileType.FILE_NAME, None,
-       None),
+      (_BERT_MODEL, ModelFileType.FILE_NAME, _CLU_REQUEST, _CLU_RESPONSE),
+      (_BERT_MODEL, ModelFileType.FILE_CONTENT, _CLU_REQUEST, _CLU_RESPONSE),
   )
   def test_annotate_model(self, model_name, model_file_type, clu_request,
                           expected_clu_response):
@@ -108,7 +131,9 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
     annotator = _BertCluAnnotator.create_from_options(options)
 
     # Annotates CLU request using the given model.
-    text_annotation_result = annotator.annotate(clu_request)
+    text_clu_response = annotator.annotate(clu_request)
+    self.assertProtoEquals(text_clu_response.to_pb2(),
+                           expected_clu_response.to_pb2())
 
 
 if __name__ == "__main__":

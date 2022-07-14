@@ -76,25 +76,22 @@ class CategoricalSlot:
   """
 
   slot: str
-  prediction: List[class_pb2.Category]
+  prediction: class_pb2.Category
 
   @doc_controls.do_not_generate_docs
   def to_pb2(self) -> _CategoricalSlotProto:
     """Generates a protobuf object to pass to the C++ layer."""
     return _CategoricalSlotProto(
-        slot=self.slot,
-        prediction=[category.to_pb2() for category in self.prediction])
+        slot=self.slot, prediction=self.prediction.to_pb2())
 
   @classmethod
   @doc_controls.do_not_generate_docs
   def create_from_pb2(cls, pb2_obj: _CategoricalSlotProto) -> "CategoricalSlot":
     """Creates a `CategoricalSlot` object from the given protobuf object."""
+    print(pb2_obj)
     return CategoricalSlot(
         slot=pb2_obj.slot,
-        prediction=[
-          class_pb2.Category.create_from_pb2(category)
-          for category in pb2_obj.prediction
-        ])
+        prediction=class_pb2.Category.create_from_pb2(pb2_obj.prediction))
 
   def __eq__(self, other: Any) -> bool:
     """Checks if this object is equal to the given object.
@@ -215,7 +212,7 @@ class CluResponse:
   domains: List[class_pb2.Category]
   intents: List[class_pb2.Category]
   categorical_slots: List[CategoricalSlot]
-  non_categorical_slots: List[NonCategoricalSlot]
+  noncategorical_slots: List[NonCategoricalSlot]
 
   @doc_controls.do_not_generate_docs
   def to_pb2(self) -> _CluResponseProto:
@@ -227,9 +224,9 @@ class CluResponse:
           categorical_slot.to_pb2()
           for categorical_slot in self.categorical_slots
         ],
-        non_categorical_slots=[
-          non_categorical_slot.to_pb2()
-          for non_categorical_slot in self.non_categorical_slots
+        noncategorical_slots=[
+          noncategorical_slot.to_pb2()
+          for noncategorical_slot in self.noncategorical_slots
         ]
     )
 
@@ -253,9 +250,9 @@ class CluResponse:
         CategoricalSlot.create_from_pb2(categorical_slot)
         for categorical_slot in pb2_obj.categorical_slots
       ],
-      non_categorical_slots=[
-        NonCategoricalSlot.create_from_pb2(non_categorical_slot)
-        for non_categorical_slot in pb2_obj.non_categorical_slots
+      noncategorical_slots=[
+        NonCategoricalSlot.create_from_pb2(noncategorical_slot)
+        for noncategorical_slot in pb2_obj.noncategorical_slots
       ]
     )
 
