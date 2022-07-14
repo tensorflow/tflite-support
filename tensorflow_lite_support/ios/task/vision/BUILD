@@ -1,5 +1,3 @@
-load("@org_tensorflow//tensorflow/lite/ios:ios.bzl", "TFL_DEFAULT_TAGS", "TFL_DISABLED_SANITIZER_TAGS", "TFL_MINIMUM_OS_VERSION")
-
 package(
     default_visibility = ["//tensorflow_lite_support:internal"],
     licenses = ["notice"],  # Apache 2.0
@@ -26,7 +24,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
         "//tensorflow_lite_support/odml/ios/image:MLImage",
-        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:coreml_plugin",
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:gpu_plugin",
     ],
 )
 
@@ -74,20 +72,4 @@ objc_library(
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
         "//tensorflow_lite_support/odml/ios/image:MLImage",
     ],
-)
-
-objc_library(
-    name = "TFLImageEmbedder",
-    srcs = [
-        "sources/TFLImageEmbedder.mm",
-    ],
-    hdrs = [
-        "sources/TFLImageEmbedder.h",
-    ],
-    features = ["-layering_check"],
-    module_name = "TFLImageEmbedder",
-    deps = [
-        "//tensorflow_lite_support/cc/task/vision:image_embedder",
-    ],
-    copts = ["-ObjC++","-std=c++14"],
 )
