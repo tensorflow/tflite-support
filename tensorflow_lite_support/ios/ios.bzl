@@ -6,6 +6,9 @@
 # other C/iOS API header files.
 # In case of C header files includes start with a keyword of "#include'.
 # Imports in iOS header files start with a keyword of '#import'.
+
+TFL_TASK_MINIMUM_OS_VERSION = "10.0"
+
 def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
     """Create modified header files with the import path stripped out.
 

@@ -7,6 +7,7 @@ load(
 )
 load(
     "//tensorflow_lite_support/ios:ios.bzl",
+    "TFL_TASK_MINIMUM_OS_VERSION",
     "strip_api_include_path_prefix",
 )
 load(
@@ -156,7 +157,7 @@ ios_static_framework(
         ":TFLSegmentationResult.h",
     ],
     bundle_name = "TensorFlowLiteTaskVision",
-    minimum_os_version = "10.0",
+    minimum_os_version = TFL_TASK_MINIMUM_OS_VERSION,
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
         "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
