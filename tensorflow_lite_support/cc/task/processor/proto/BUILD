@@ -242,3 +242,22 @@ support_py_proto_library(
     api_version = 2,
     proto_deps = [":search_result_proto"],
 )
+
+proto_library(
+    name = "qa_answers_proto",
+    srcs = ["qa_answers.proto"],
+)
+
+cc_proto_library(
+    name = "qa_answers_cc_proto",
+    deps = [
+        ":qa_answers_proto",
+    ],
+)
+
+support_py_proto_library(
+    name = "qa_answers_py_pb2",
+    srcs = ["qa_answers.proto"],
+    api_version = 2,
+    proto_deps = [":qa_answers_proto"],
+)
