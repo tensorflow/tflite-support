@@ -73,6 +73,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:coreml_plugin",
     ],
+    copts = ["-std=c++14"],
 )
 
 ios_unit_test(

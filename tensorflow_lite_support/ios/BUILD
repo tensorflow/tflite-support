@@ -8,6 +8,7 @@ load(
 load(
     "//tensorflow_lite_support/ios:ios.bzl",
     "TFL_TASK_MINIMUM_OS_VERSION",
+    "TFL_TASK_COREML_MINIMUM_OS_VERSION",
     "strip_api_include_path_prefix",
 )
 load(
@@ -140,6 +141,12 @@ objc_library(
     ],
 )
 
+# Xcode 12 does not support ios fat libraries. Frameworks built for multiple
+# architectures should be compiled into a .xcframework inside. Bazel currently
+# does not support building .xcframework. You have to build the framework
+# for the architecture you decide to test on.
+# Use the below command to build for arm64 which lets you test the library on
+# iOS devices.
 # bazel build -c opt --config=ios_arm64 //tensorflow_lite_support/ios:TensorFlowLiteTaskVision_framework
 ios_static_framework(
     name = "TensorFlowLiteTaskVision_framework",
@@ -157,7 +164,7 @@ ios_static_framework(
         ":TFLSegmentationResult.h",
     ],
     bundle_name = "TensorFlowLiteTaskVision",
-    minimum_os_version = TFL_TASK_MINIMUM_OS_VERSION,
+    minimum_os_version = TFL_TASK_COREML_MINIMUM_OS_VERSION,
     deps = [
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
         "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
