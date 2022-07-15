@@ -64,6 +64,27 @@ cc_test(
 )
 
 cc_test(
+    name = "bert_clu_annotator_test",
+    timeout = "long",
+    srcs = ["bert_clu_annotator_test.cc"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/text:bert_clu_annotator_with_metadata",
+    ],
+    tags = [
+        "optonly",  # The test takes long, and only run with -c opt.
+    ],
+    deps = [
+        "//tensorflow_lite_support/cc/port:gtest_main",
+        "//tensorflow_lite_support/cc/port:status_macros",
+        "//tensorflow_lite_support/cc/port/default:status_matchers",
+        "//tensorflow_lite_support/cc/task/core:task_utils",
+        "//tensorflow_lite_support/cc/task/text:bert_clu_annotator",
+        "//tensorflow_lite_support/cc/task/text/proto:clu_proto_inc",
+        "//tensorflow_lite_support/cc/test:test_utils",
+    ],
+)
+
+cc_test(
     name = "text_embedder_test",
     srcs = ["text_embedder_test.cc"],
     data = [

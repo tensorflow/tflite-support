@@ -53,6 +53,12 @@ http_file(
 )
 
 http_file(
+    name = "bert_clu_annotator_with_metadata",
+    sha256 = "ad18e4b67e4c3f6563fdf9b59c62760fea276f6af7f351341e64cd460c39da19",
+    urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_clu/bert_clu_annotator_with_metadata.tflite"],
+)
+
+http_file(
     name = "bert_nl_classifier",
     sha256 = "1e5a550c09bff0a13e61858bcfac7654d7fcc6d42106b4f15e11117695069600",
     urls = ["https://storage.googleapis.com/download.tensorflow.org/models/tflite_support/bert_nl_classifier/bert_nl_classifier.tflite"],
