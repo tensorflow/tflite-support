@@ -1,14 +1,13 @@
 """TensorFlow Lite Support Library Helper Rules for iOS"""
 
+TFL_TASK_MINIMUM_OS_VERSION = "10.0"
+
 # When the static framework is built with bazel, the all header files are moved
 # to the "Headers" directory with no header path prefixes. This auxiliary rule
 # is used for stripping the path prefix to the C/iOS API header files included by
 # other C/iOS API header files.
 # In case of C header files includes start with a keyword of "#include'.
 # Imports in iOS header files start with a keyword of '#import'.
-
-TFL_TASK_MINIMUM_OS_VERSION = "10.0"
-
 def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
     """Create modified header files with the import path stripped out.
 

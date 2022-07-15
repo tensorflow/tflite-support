@@ -201,7 +201,7 @@ ios_static_framework(
         ":TFLAudioClassifier.h",
     ],
     bundle_name = "TensorFlowLiteTaskAudio",
-    minimum_os_version = "10.0",
+    minimum_os_version = TFL_TASK_MINIMUM_OS_VERSION,
     deps = [
         "//tensorflow_lite_support/ios/task/audio:TFLAudioClassifier",
     ],
