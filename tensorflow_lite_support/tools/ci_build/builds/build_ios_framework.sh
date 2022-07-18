@@ -49,8 +49,10 @@ case $FRAMEWORK_NAME in
     ;;
   "TensorFlowLiteTaskText")
     ;;
+  "TensorFlowLiteTaskAudio")
+    ;;
   *)
-    echo "Wrong framework name. The following framework names are allowed: TensorFlowLiteTaskVision, TensorFlowLiteTaskText"
+    echo "Wrong framework name. The following framework names are allowed: TensorFlowLiteTaskVision, TensorFlowLiteTaskText, TensorFlowLiteTaskAudio"
     exit 1
   ;;
 esac
