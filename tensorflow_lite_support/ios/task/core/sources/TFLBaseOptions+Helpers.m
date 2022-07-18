@@ -19,7 +19,7 @@
 - (void)copyToCOptions:(TfLiteBaseOptions *)cBaseOptions {
   if (self.modelFile.filePath) {
     cBaseOptions->model_file.file_path = self.modelFile.filePath.UTF8String;
-    cBaseOptions->computeSettings.cpuSettings.num_threads = (int)self.computeSettings.cpuSettings.numThreads;
+    cBaseOptions->compute_settings.cpu_settings.num_threads = (int)self.computeSettings.cpuSettings.numThreads;
   }
 }
 
