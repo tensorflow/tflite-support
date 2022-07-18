@@ -112,7 +112,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testInferenceWithRGBAImage {
   TFLImageClassifierOptions *imageClassifierOptions =
       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
- 
   TFLImageClassifier *imageClassifier =
       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
   XCTAssertNotNil(imageClassifier);
