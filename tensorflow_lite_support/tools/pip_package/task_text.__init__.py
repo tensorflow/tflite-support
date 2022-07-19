@@ -23,6 +23,7 @@ from tensorflow_lite_support.python.task.text import text_searcher
 from tensorflow_lite_support.python.task.text import nl_classifier
 from tensorflow_lite_support.python.task.text import bert_nl_classifier
 from tensorflow_lite_support.python.task.text import bert_question_answerer
+from tensorflow_lite_support.python.task.text import bert_clu_annotator
 
 TextEmbedder = text_embedder.TextEmbedder
 TextEmbedderOptions = text_embedder.TextEmbedderOptions
@@ -34,6 +35,8 @@ BertNLClassifier = bert_nl_classifier.BertNLClassifier
 BertNLClassifierOptions = bert_nl_classifier.BertNLClassifierOptions
 BertQuestionAnswerer = bert_question_answerer.BertQuestionAnswerer
 BertQuestionAnswererOptions = bert_question_answerer.BertQuestionAnswererOptions
+BertCluAnnotator = bert_clu_annotator.BertCluAnnotator
+BertCluAnnotatorOptions = bert_clu_annotator.BertCluAnnotatorOptions
 
 # Remove unnecessary modules to avoid duplication in API docs.
 del text_embedder
@@ -41,3 +44,4 @@ del text_searcher
 del nl_classifier
 del bert_nl_classifier
 del bert_question_answerer
+del bert_clu_annotator

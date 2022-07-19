@@ -32,6 +32,7 @@ TASK_PIP_DEPS = [
     "//tensorflow_lite_support/python/task/text:nl_classifier",
     "//tensorflow_lite_support/python/task/text:bert_nl_classifier",
     "//tensorflow_lite_support/python/task/text:bert_question_answerer",
+    "//tensorflow_lite_support/python/task/text:bert_clu_annotator",
     "//tensorflow_lite_support/python/task/audio:audio_classifier",
     "//tensorflow_lite_support/python/task/audio:audio_embedder",
     # For Model Maker Searcher API to build ScaNN index.

@@ -21,6 +21,7 @@ import tensorflow as tf
 from tensorflow_lite_support.python.task.core import base_options as base_options_module
 from tensorflow_lite_support.python.task.processor.proto import class_pb2
 from tensorflow_lite_support.python.task.processor.proto import clu_pb2
+from tensorflow_lite_support.python.task.processor.proto import clu_annotation_options_pb2
 from tensorflow_lite_support.python.task.text import bert_clu_annotator
 from tensorflow_lite_support.python.test import test_util
 
@@ -33,6 +34,7 @@ _Extraction = clu_pb2.Extraction
 _NonCategoricalSlot = clu_pb2.NonCategoricalSlot
 _Category = class_pb2.Category
 _BertCluAnnotatorOptions = bert_clu_annotator.BertCluAnnotatorOptions
+_BertCluAnnotationOptions = clu_annotation_options_pb2.BertCluAnnotationOptions
 
 _BERT_MODEL = 'bert_clu_annotator_with_metadata.tflite'
 _CLU_REQUEST = _CluRequest(utterances=[
@@ -128,6 +130,73 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
 
     # Annotates CLU request using the given model.
     text_clu_response = annotator.annotate(clu_request)
+    self.assertProtoEquals(text_clu_response.to_pb2(),
+                           expected_clu_response.to_pb2())
+
+  @parameterized.parameters(
+    (_CLU_REQUEST, _CluResponse(
+      domains=[], intents=[], categorical_slots=[], noncategorical_slots=[
+      _NonCategoricalSlot(
+        slot='restaurant_name',
+        extraction=_Extraction(
+          value='Andes Cafe', score=0.914949, start=42, end=52))]),
+     0.99, None, 0.99, None),
+    (_CLU_REQUEST, _CluResponse(
+        domains=[], intents=[], categorical_slots=[], noncategorical_slots=[]),
+     0.99, None, 0.99, 0.99),
+  )
+  def test_thresholds(self, clu_request, expected_clu_response,
+                      domain_threshold, intent_threshold,
+                      categorical_slot_threshold, noncategorical_slot_threshold):
+    # Creates annotator.
+    base_options = _BaseOptions(file_name=self.model_path)
+    bert_clu_annotation_options = _BertCluAnnotationOptions(
+        domain_threshold=domain_threshold, intent_threshold=intent_threshold,
+        categorical_slot_threshold=categorical_slot_threshold,
+        noncategorical_slot_threshold=noncategorical_slot_threshold)
+    options = _BertCluAnnotatorOptions(
+        base_options=base_options,
+        bert_clu_annotation_options=bert_clu_annotation_options)
+    annotator = _BertCluAnnotator.create_from_options(options)
+
+    # Annotates CLU request using the given model.
+    text_clu_response = annotator.annotate(clu_request)
+    self.assertProtoEquals(text_clu_response.to_pb2(),
+                           expected_clu_response.to_pb2())
+
+  def test_max_history_turns(self):
+    # Creates annotator.
+    base_options = _BaseOptions(file_name=self.model_path)
+    bert_clu_annotation_options = _BertCluAnnotationOptions(
+        max_history_turns=10)
+    options = _BertCluAnnotatorOptions(
+        base_options=base_options,
+        bert_clu_annotation_options=bert_clu_annotation_options)
+    annotator = _BertCluAnnotator.create_from_options(options)
+
+    # Annotates CLU request using the given model.
+    expected_clu_response = _CluResponse(
+        domains=[
+            _Category(
+                index=0, score=0.925057, display_name='Restaurants',
+                category_name='')
+        ],
+        intents=[],
+        categorical_slots=[
+            _CategoricalSlot(
+                slot='number_of_seats',
+                prediction=_Category(
+                    index=0, score=0.920792, display_name='2',
+                    category_name=''))
+        ],
+        noncategorical_slots=[
+            _NonCategoricalSlot(
+                slot='restaurant_name',
+                extraction=_Extraction(
+                    value='Andes Cafe', score=0.914949,
+                    start=42, end=52))
+        ])
+    text_clu_response = annotator.annotate(_CLU_REQUEST)
     self.assertProtoEquals(text_clu_response.to_pb2(),
                            expected_clu_response.to_pb2())
 
