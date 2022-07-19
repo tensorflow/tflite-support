@@ -97,3 +97,21 @@ py_test(
         "@absl_py//absl/testing:parameterized",
     ],
 )
+
+py_test(
+    name = "bert_clu_annotator_test",
+    srcs = ["bert_clu_annotator_test.py"],
+    data = [
+        "//tensorflow_lite_support/cc/test/testdata/task/text:bert_clu_annotator_with_metadata",
+    ],
+    deps = [
+        # build rule placeholder: tensorflow dep,
+        "//tensorflow_lite_support/python/task/core:base_options",
+        "//tensorflow_lite_support/python/task/processor/proto:class_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:clu_annotation_options_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:clu_pb2",
+        "//tensorflow_lite_support/python/task/text:bert_clu_annotator",
+        "//tensorflow_lite_support/python/test:test_util",
+        "@absl_py//absl/testing:parameterized",
+    ],
+)

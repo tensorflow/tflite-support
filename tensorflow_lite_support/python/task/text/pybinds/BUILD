@@ -84,3 +84,19 @@ pybind_extension_may_pack_coral(
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
+
+pybind_extension_may_pack_coral(
+    name = "_pywrap_bert_clu_annotator",
+    srcs = [
+        "_pywrap_bert_clu_annotator.cc",
+    ],
+    module_name = "_pywrap_bert_clu_annotator",
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:clu_annotation_options_cc_proto",
+        "//tensorflow_lite_support/cc/task/processor/proto:clu_cc_proto",
+        "//tensorflow_lite_support/cc/task/text:bert_clu_annotator",
+        "//tensorflow_lite_support/python/task/core/pybinds:task_utils",
+        "@pybind11",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)

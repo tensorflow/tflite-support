@@ -72,3 +72,17 @@ py_library(
         "//tensorflow_lite_support/python/task/text/pybinds:_pywrap_bert_question_answerer",
     ],
 )
+
+py_library(
+    name = "bert_clu_annotator",
+    srcs = [
+        "bert_clu_annotator.py",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//tensorflow_lite_support/python/task/core:base_options",
+        "//tensorflow_lite_support/python/task/processor/proto:clu_annotation_options_pb2",
+        "//tensorflow_lite_support/python/task/processor/proto:clu_pb2",
+        "//tensorflow_lite_support/python/task/text/pybinds:_pywrap_bert_clu_annotator",
+    ],
+)

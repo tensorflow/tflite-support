@@ -126,3 +126,22 @@ py_library(
         "//tensorflow_lite_support/python/task/core:optional_dependencies",
     ],
 )
+
+py_library(
+    name = "clu_annotation_options_pb2",
+    srcs = ["clu_annotation_options_pb2.py"],
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:clu_annotation_options_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
+    ],
+)
+
+py_library(
+    name = "clu_pb2",
+    srcs = ["clu_pb2.py"],
+    deps = [
+        ":class_pb2",
+        "//tensorflow_lite_support/cc/task/processor/proto:clu_py_pb2",
+        "//tensorflow_lite_support/python/task/core:optional_dependencies",
+    ],
+)
