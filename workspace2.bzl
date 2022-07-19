@@ -7,7 +7,7 @@ load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
 load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@//third_party/py:python_configure.bzl", "python_configure")
+load("//third_party/py:python_configure.bzl", "python_configure")
 load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
 
 def tflite_support_workspace2():

@@ -125,7 +125,7 @@ def tflite_support_workspace9():
         ],
         patches = [
             # We need to rename lite/ios/BUILD.apple to lite/ios/BUILD.
-            "@//third_party:tensorflow_lite_ios_build.patch",
+            "//third_party:tensorflow_lite_ios_build.patch",
         ],
         patch_args = ["-p1"],
     )
