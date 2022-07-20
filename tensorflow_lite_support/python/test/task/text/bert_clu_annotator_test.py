@@ -37,33 +37,62 @@ _BertCluAnnotatorOptions = bert_clu_annotator.BertCluAnnotatorOptions
 _BertCluAnnotationOptions = clu_annotation_options_pb2.BertCluAnnotationOptions
 
 _BERT_MODEL = 'bert_clu_annotator_with_metadata.tflite'
+
 _CLU_REQUEST = _CluRequest(utterances=[
-    'I would like to make a restaurant reservation at morning 11:15.',
-    'Which restaurant do you want to go to?',
-    'Can I get a reservation for two people at Andes Cafe? Where is their ' +
-    'address?'
+  'Hi, I would like to make a dinner reservation.'
+  'Of course, what evening will you be joining us on?'
+  'We will need the reservation for Tuesday night.'
+  'What time would you like the reservation for?'
+  'We would prefer 7:00 or 7:30.'
+  'How many people will you need the reservation for?'
+  'There will be 4 of us.'
+  'Fine, I can seat you at 7:00 on Tuesday, if you would kindly give me your '
+  'name.'
+  'Thank you. The last name is Foster.'
+  'See you at 7:00 this Tuesday, Mr. Foster.'
+  'Thank you so much. I appreciate your help.'
 ])
 _CLU_RESPONSE = _CluResponse(
-    domains=[
-        _Category(
-            index=0,
-            score=0.925057,
-            display_name='Restaurants',
-            category_name='')
-    ],
-    intents=[],
-    categorical_slots=[
-        _CategoricalSlot(
-            slot='number_of_seats',
-            prediction=_Category(
-                index=0, score=0.920792, display_name='2', category_name=''))
-    ],
-    noncategorical_slots=[
-        _NonCategoricalSlot(
-            slot='restaurant_name',
-            extraction=_Extraction(
-                value='Andes Cafe', score=0.914949, start=42, end=52))
-    ])
+  domains=[
+    _Category(
+      index=0, score=0.925067, display_name='Restaurants',
+      category_name='')],
+  intents=[
+    _Category(
+      index=0, score=0.945974, display_name='ReserveRestaurant',
+      category_name='')],
+  categorical_slots=[
+    _CategoricalSlot(
+      slot='number_of_seats',
+      prediction=_Category(
+        index=0, score=0.784716, display_name='4', category_name=''))
+  ],
+  noncategorical_slots=[
+    _NonCategoricalSlot(
+      slot='restaurant_name', extraction=_Extraction(
+        value='Tuesday night', score=0.603665, start=129, end=142)),
+    _NonCategoricalSlot(
+      slot='time', extraction=_Extraction(
+        value='7:00', score=0.907133, start=204, end=208)),
+    _NonCategoricalSlot(
+      slot='time', extraction=_Extraction(
+        value='7:30', score=0.875162, start=212, end=216)),
+    _NonCategoricalSlot(
+      slot='time', extraction=_Extraction(
+        value='7:00', score=0.912969, start=313, end=317)),
+    _NonCategoricalSlot(
+      slot='date', extraction=_Extraction(
+        value='Tuesday', score=0.519359, start=321, end=328)),
+    _NonCategoricalSlot(
+      slot='restaurant_name', extraction=_Extraction(
+        value='Foster', score=0.917109, start=396, end=402)),
+    _NonCategoricalSlot(
+      slot='restaurant_name', extraction=_Extraction(
+        value='See', score=0.917582, start=403, end=406)),
+    _NonCategoricalSlot(
+      slot='time', extraction=_Extraction(
+        value='7:00', score=0.900137, start=414, end=418))
+  ])
 
 
 class ModelFileType(enum.Enum):
@@ -135,15 +164,39 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
 
   @parameterized.parameters(
     (_CLU_REQUEST, _CluResponse(
-      domains=[], intents=[], categorical_slots=[], noncategorical_slots=[
-      _NonCategoricalSlot(
-        slot='restaurant_name',
-        extraction=_Extraction(
-          value='Andes Cafe', score=0.914949, start=42, end=52))]),
-     0.99, None, 0.99, None),
-    (_CLU_REQUEST, _CluResponse(
-        domains=[], intents=[], categorical_slots=[], noncategorical_slots=[]),
+      domains=[], intents=[
+        _Category(
+          index=0, score=0.945974, display_name='ReserveRestaurant',
+          category_name='')],
+      categorical_slots=[],
+      noncategorical_slots=[]),
      0.99, None, 0.99, 0.99),
+    (_CLU_REQUEST, _CluResponse(
+      domains=[], intents=[
+        _Category(
+          index=0, score=0.945974, display_name='ReserveRestaurant',
+          category_name='')],
+      categorical_slots=[],
+      noncategorical_slots=[
+        _NonCategoricalSlot(
+          slot='time', extraction=_Extraction(
+            value='7:00', score=0.907133, start=204, end=208)),
+        _NonCategoricalSlot(
+          slot='time', extraction=_Extraction(
+            value='7:30', score=0.875162, start=212, end=216)),
+        _NonCategoricalSlot(
+          slot='time', extraction=_Extraction(
+            value='7:00', score=0.912969, start=313, end=317)),
+        _NonCategoricalSlot(
+          slot='restaurant_name', extraction=_Extraction(
+            value='Foster', score=0.917109, start=396, end=402)),
+        _NonCategoricalSlot(
+          slot='restaurant_name', extraction=_Extraction(
+            value='See', score=0.917582, start=403, end=406)),
+        _NonCategoricalSlot(
+          slot='time', extraction=_Extraction(
+            value='7:00', score=0.900137, start=414, end=418))]),
+     0.99, 0.75, 0.99, 0.75),
   )
   def test_thresholds(self, clu_request, expected_clu_response,
                       domain_threshold, intent_threshold,
@@ -168,7 +221,7 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
     # Creates annotator.
     base_options = _BaseOptions(file_name=self.model_path)
     bert_clu_annotation_options = _BertCluAnnotationOptions(
-        max_history_turns=10)
+        max_history_turns=2)
     options = _BertCluAnnotatorOptions(
         base_options=base_options,
         bert_clu_annotation_options=bert_clu_annotation_options)
@@ -176,26 +229,46 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
 
     # Annotates CLU request using the given model.
     expected_clu_response = _CluResponse(
-        domains=[
-            _Category(
-                index=0, score=0.925057, display_name='Restaurants',
-                category_name='')
-        ],
-        intents=[],
-        categorical_slots=[
-            _CategoricalSlot(
-                slot='number_of_seats',
-                prediction=_Category(
-                    index=0, score=0.920792, display_name='2',
-                    category_name=''))
-        ],
-        noncategorical_slots=[
-            _NonCategoricalSlot(
-                slot='restaurant_name',
-                extraction=_Extraction(
-                    value='Andes Cafe', score=0.914949,
-                    start=42, end=52))
-        ])
+      domains=[
+        _Category(
+          index=0, score=0.925067, display_name='Restaurants',
+          category_name='')],
+      intents=[
+        _Category(
+          index=0, score=0.945974, display_name='ReserveRestaurant',
+          category_name='')],
+      categorical_slots=[
+        _CategoricalSlot(
+          slot='number_of_seats', prediction=_Category(
+            index=0, score=0.784716, display_name='4',
+            category_name='')
+        )],
+      noncategorical_slots=[
+        _NonCategoricalSlot(
+          slot='restaurant_name', extraction=_Extraction(
+            value='Tuesday night', score=0.603665, start=129, end=142)
+        ),
+        _NonCategoricalSlot(
+          slot='time', extraction=_Extraction(
+            value='7:00', score=0.907133, start=204, end=208)),
+        _NonCategoricalSlot(
+          slot='time', extraction=_Extraction(
+            value='7:30', score=0.875162, start=212, end=216)),
+        _NonCategoricalSlot(
+          slot='time', extraction=_Extraction(
+            value='7:00', score=0.912969, start=313, end=317)),
+        _NonCategoricalSlot(slot='date', extraction=_Extraction(
+          value='Tuesday', score=0.519359, start=321, end=328)),
+        _NonCategoricalSlot(
+          slot='restaurant_name', extraction=_Extraction(
+            value='Foster', score=0.917109, start=396, end=402)),
+        _NonCategoricalSlot(
+          slot='restaurant_name', extraction=_Extraction(
+            value='See', score=0.917582, start=403, end=406)),
+        _NonCategoricalSlot(
+          slot='time', extraction=_Extraction(
+            value='7:00', score=0.900137, start=414, end=418))
+      ])
     text_clu_response = annotator.annotate(_CLU_REQUEST)
     self.assertProtoEquals(text_clu_response.to_pb2(),
                            expected_clu_response.to_pb2())
