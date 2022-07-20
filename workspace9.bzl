@@ -251,11 +251,14 @@ def tflite_support_workspace9():
 
     http_archive(
         name = "com_github_gflags_gflags",
-        sha256 = "94eee3622e33eb7641614964b4ea8b7a77ed8b6e6795ee2f73124f67fe99245e",
-        strip_prefix = "gflags-986e8eed00ded8168ef4eaa6f925dc6be50b40fa",
+        sha256 = "34af2f15cf7367513b352bdcd2493ab14ce43692d2dcd9dfc499492966c64dcf",
+        strip_prefix = "gflags-2.2.2",
         urls = [
-            "https://github.com/gflags/gflags/archive/986e8eed00ded8168ef4eaa6f925dc6be50b40fa.tar.gz",
+            "http://mirror.tensorflow.org/github.com/gflags/gflags/archive/v2.2.2.tar.gz",
+            "https://github.com/gflags/gflags/archive/v2.2.2.tar.gz",
         ],
+        patches = [Label("//third_party:gflags_fix_android_pthread.diff")],
+        patch_args = ["-p1"],
     )
 
     http_archive(
