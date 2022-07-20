@@ -125,7 +125,7 @@ def tflite_support_workspace9():
         ],
         patches = [
             # We need to rename lite/ios/BUILD.apple to lite/ios/BUILD.
-            "//third_party:tensorflow_lite_ios_build.patch",
+            Label("//third_party:tensorflow_lite_ios_build.patch"),
         ],
         patch_args = ["-p1"],
     )
@@ -157,7 +157,7 @@ def tflite_support_workspace9():
         sha256 = "bb1ddd8172b745cbdc75f06841bd9e7c9de0b3956397723d883423abfab8e176",
         strip_prefix = "protobuf-3.18.0",
         # Patched to give visibility into private targets to pybind11_protobuf
-        patches = ["//third_party/pybind11_protobuf:com_google_protobuf_build.patch"],
+        patches = [Label("//third_party/pybind11_protobuf:com_google_protobuf_build.patch")],
         urls = [
             "https://github.com/protocolbuffers/protobuf/archive/v3.18.0.zip",
         ],
@@ -176,7 +176,7 @@ def tflite_support_workspace9():
 
     http_archive(
         name = "six_archive",
-        build_file = "//third_party:six.BUILD",
+        build_file = Label("//third_party:six.BUILD"),
         sha256 = "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73",
         strip_prefix = "six-1.12.0",
         urls = [
@@ -203,8 +203,8 @@ def tflite_support_workspace9():
             "https://github.com/tensorflow/text/archive/v2.2.0.zip",
         ],
         patches = [
-            "@//third_party:tensorflow_text_remove_tf_deps.patch",
-            "@//third_party:tensorflow_text_a0f49e63.patch",
+            Label("//third_party:tensorflow_text_remove_tf_deps.patch"),
+            Label("//third_party:tensorflow_text_a0f49e63.patch"),
         ],
         patch_args = ["-p1"],
         repo_mapping = {"@com_google_re2": "@com_googlesource_code_re2"},
@@ -224,13 +224,13 @@ def tflite_support_workspace9():
     # Needed for absl/status and absl/status:statusor
     http_archive(
         name = "com_google_absl",
-        build_file = "//third_party:com_google_absl.BUILD",
+        build_file = Label("//third_party:com_google_absl.BUILD"),
         urls = [
             "https://github.com/abseil/abseil-cpp/archive/20210324.2.tar.gz",
         ],
         # Remove after https://github.com/abseil/abseil-cpp/issues/326 is solved.
         patches = [
-            "@//third_party:com_google_absl_f863b622fe13612433fdf43f76547d5edda0c93001.diff",
+            Label("//third_party:com_google_absl_f863b622fe13612433fdf43f76547d5edda0c93001.diff"),
         ],
         patch_args = [
             "-p1",
@@ -260,7 +260,7 @@ def tflite_support_workspace9():
 
     http_archive(
         name = "zlib",
-        build_file = "//third_party:zlib.BUILD",
+        build_file = Label("//third_party:zlib.BUILD"),
         sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
         strip_prefix = "zlib-1.2.11",
         urls = [
@@ -268,7 +268,7 @@ def tflite_support_workspace9():
             "http://zlib.net/fossils/zlib-1.2.11.tar.gz",  # 2017-01-15
         ],
         patches = [
-            "@//third_party:zlib.patch",
+            Label("//third_party:zlib.patch"),
         ],
         patch_args = [
             "-p1",
@@ -283,7 +283,7 @@ def tflite_support_workspace9():
         # so that the specified sha256 and strip_prefix cannot match.
         # sha256 = "01c2e30eb8e83880f9ba382f6bece9c38cd5b07f9cadae46ef1d5a69e07fafaf",
         # strip_prefix = "libyuv-39240f7149cffde62e3620344d222c8ab2c21178",
-        build_file = "//third_party:libyuv.BUILD",
+        build_file = Label("//third_party:libyuv.BUILD"),
     )
 
     http_archive(
@@ -291,7 +291,7 @@ def tflite_support_workspace9():
         strip_prefix = "stb-b42009b3b9d4ca35bc703f5310eedc74f584be58",
         sha256 = "13a99ad430e930907f5611325ec384168a958bf7610e63e60e2fd8e7b7379610",
         urls = ["https://github.com/nothings/stb/archive/b42009b3b9d4ca35bc703f5310eedc74f584be58.tar.gz"],
-        build_file = "//third_party:stblib.BUILD",
+        build_file = Label("//third_party:stblib.BUILD"),
     )
 
     http_archive(
@@ -299,12 +299,12 @@ def tflite_support_workspace9():
         url = "https://github.com/google/google-toolbox-for-mac/archive/v2.2.1.zip",
         sha256 = "e3ac053813c989a88703556df4dc4466e424e30d32108433ed6beaec76ba4fdc",
         strip_prefix = "google-toolbox-for-mac-2.2.1",
-        build_file = "@//third_party:google_toolbox_for_mac.BUILD",
+        build_file = Label("//third_party:google_toolbox_for_mac.BUILD"),
     )
 
     http_archive(
         name = "utf_archive",
-        build_file = "@//third_party:utf.BUILD",
+        build_file = Label("//third_party:utf.BUILD"),
         sha256 = "262a902f622dcd28e05b8a4be10da0aa3899050d0be8f4a71780eed6b2ea65ca",
         urls = [
             "https://mirror.bazel.build/9fans.github.io/plan9port/unix/libutf.tgz",
@@ -320,12 +320,12 @@ def tflite_support_workspace9():
             "https://storage.googleapis.com/mirror.tensorflow.org/github.com/unicode-org/icu/archive/release-64-2.zip",
             "https://github.com/unicode-org/icu/archive/release-64-2.zip",
         ],
-        build_file = "@//third_party:icu.BUILD",
+        build_file = Label("//third_party:icu.BUILD"),
     )
 
     http_archive(
         name = "fft2d",
-        build_file = "@//third_party/fft2d:fft2d.BUILD",
+        build_file = Label("//third_party/fft2d:fft2d.BUILD"),
         sha256 = "5f4dabc2ae21e1f537425d58a49cdca1c49ea11db0d6271e2a4b27e9697548eb",
         strip_prefix = "OouraFFT-1.0",
         urls = [
@@ -336,7 +336,7 @@ def tflite_support_workspace9():
 
     http_archive(
         name = "darts_clone",
-        build_file = "@//third_party:darts_clone.BUILD",
+        build_file = Label("//third_party:darts_clone.BUILD"),
         sha256 = "c97f55d05c98da6fcaf7f9ecc6a6dc6bc5b18b8564465f77abff8879d446491c",
         strip_prefix = "darts-clone-e40ce4627526985a7767444b6ed6893ab6ff8983",
         urls = [
@@ -360,12 +360,12 @@ def tflite_support_workspace9():
         urls = [
             "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.bz2",
         ],
-        build_file = "@//third_party:eigen3.BUILD",
+        build_file = Label("//third_party:eigen3.BUILD"),
     )
 
     http_archive(
         name = "com_google_leveldb",
-        build_file = "@//third_party:leveldb.BUILD",
+        build_file = Label("//third_party:leveldb.BUILD"),
         patch_cmds = [
             """mkdir leveldb; cp include/leveldb/* leveldb""",
         ],
@@ -378,7 +378,7 @@ def tflite_support_workspace9():
 
     http_archive(
         name = "snappy",
-        build_file = "@//third_party:snappy.BUILD",
+        build_file = Label("//third_party:snappy.BUILD"),
         sha256 = "16b677f07832a612b0836178db7f374e414f94657c138e6993cbfc5dcc58651f",
         strip_prefix = "snappy-1.1.8",
         urls = ["https://github.com/google/snappy/archive/1.1.8.tar.gz"],
