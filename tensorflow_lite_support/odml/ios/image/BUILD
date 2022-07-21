@@ -73,11 +73,6 @@ objc_library(
     hdrs = API_HEADERS,
     copts = RELEASE_COPTS,
     module_name = "MLImage",
-    sdk_frameworks = [
-        "CoreGraphics",
-        "CoreMedia",
-        "CoreVideo",
-    ],
     visibility = ["//visibility:public"],
     alwayslink = 1,
 )
@@ -116,12 +111,6 @@ objc_library(
     data = glob([
         "resources/*.jpg",
     ]),
-    sdk_frameworks = [
-        "Accelerate",
-        "CoreGraphics",
-        "CoreMedia",
-        "CoreVideo",
-    ],
     deps = [
         ":MLImage",
     ],
