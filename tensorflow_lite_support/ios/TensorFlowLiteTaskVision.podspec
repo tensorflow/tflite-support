@@ -1,10 +1,11 @@
 Pod::Spec.new do |s|
   s.name             = 'TensorFlowLiteTaskVision'
-  s.version          = '${TFLS_BUILD_VERSION}'
+  s.version          = '5.0.0'
   s.authors          = 'Google Inc.'
   s.license          = { :type => 'Apache',:file => "LICENSE" }
+  #https://www.dropbox.com/s/vns5malr1sxy8u4/TensorFlowLiteTaskVision-5.0.0-dev.tar.gz?dl=0
   s.homepage         = 'https://github.com/tensorflow/tflite-support'
-  s.source           = { :http => '${TFLS_DOWNLOAD_URL}' }
+  s.source           = { :http => 'https://dl.dropboxusercontent.com/s/vns5malr1sxy8u4/TensorFlowLiteTaskVision-5.0.0-dev.tar.gz?dl=0' }
   s.summary          = 'TensorFlow Lite Task Library - Vision'
   s.description      = 'The Computer Vision APIs of the TFLite Task Library'
 

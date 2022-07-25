@@ -99,6 +99,8 @@ StatusOr<ImageClassifierOptionsCpp> CreateImageClassifierCppOptionsFromCOptions(
       ->mutable_coreml_settings()
       ->set_enabled_devices(tflite::proto::CoreMLSettings::DEVICES_ALL);
 
+  std::cout << "Linked core ml" << std::endl;
+
   return cpp_options;
 }
 }  // namespace
