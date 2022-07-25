@@ -16,7 +16,7 @@ objc_library(
     sdk_frameworks = ["Accelerate"],
     deps = [
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
-        "//tensorflow_lite_support/ios:TFLCommonUtils",
+        "//tensorflow_lite_support/ios/utils:TFLCommonUtils",
         "//tensorflow_lite_support/odml/ios/image:MLImage",
     ],
 )

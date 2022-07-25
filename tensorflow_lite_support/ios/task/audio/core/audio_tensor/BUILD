@@ -15,7 +15,7 @@ objc_library(
     sdk_frameworks = ["AVFoundation"],
     deps = [
         "//tensorflow_lite_support/ios:TFLCommon",
-        "//tensorflow_lite_support/ios:TFLCommonUtils",
+        "//tensorflow_lite_support/ios/utils:TFLCommonUtils",
         "//tensorflow_lite_support/ios/task/audio/core:TFLFloatBuffer",
         "//tensorflow_lite_support/ios/task/audio/core:TFLRingBuffer",
         "//tensorflow_lite_support/ios/task/audio/core/audio_record:TFLAudioRecord",
