@@ -19,8 +19,9 @@ limitations under the License.
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Helper utility for the all tasks which encapsulates common functionality of iOS task library backed by C APIs. */
-@interface TFLCommonUtils : TFLCommonUtils
+/** Helper utility for the all tasks which encapsulates common functionality of the iOS task library
+ * backed by C APIs. */
+@interface TFLCommonCUtils : TFLCommonUtils
 
 /**
  * Converts a C library error, TfLiteSupportError to an NSError.

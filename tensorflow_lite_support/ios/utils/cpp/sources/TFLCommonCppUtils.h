@@ -19,7 +19,8 @@ limitations under the License.
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Helper utility for the all tasks which encapsulates common functionality of iOS task library backed by C++ APIs. */
+/** Helper utility for the all tasks which encapsulates common functionality of the iOS task library
+ * backed by C++ APIs. */
 @interface TFLCommonCppUtils : TFLCommonUtils
 
 /**
@@ -29,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param error Pointer to the memory location where the created error should be saved. If `nil`,
  * no error will be saved.
  */
-+ (BOOL)checkCppError:(const absl::Status&)status toError:(NSError **)error;
++ (BOOL)checkCppError:(const absl::Status &)status toError:(NSError **)error;
 
 @end
 

@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import "tensorflow_lite_support/ios/utils/sources/TFLCommonUtils.h"
+#import "tensorflow_lite_support/ios/utils/c/sources/TFLCommonCUtils.h"
 
-/** Error domain of TensorFlow Lite Support related errors. */
-static NSString *const TFLSupportTaskErrorDomain = @"org.tensorflow.lite.tasks";
-
-@implementation TFLCommonUtils
+@implementation TFLCommonCUtils
 
 + (BOOL)checkCError:(TfLiteSupportError *)supportError toError:(NSError **)error {
   if (!supportError) {
