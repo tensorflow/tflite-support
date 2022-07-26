@@ -64,6 +64,7 @@ third_party_licenses(
         "AndroidX collection jvm library": "third_party/java/androidx/collection/jvm/LICENSE",
         "AndroidX core ktx library": "third_party/java/androidx/core/ktx/LICENSE",
         "Android SDK": "third_party/java/android/android_sdk_linux/LICENSE",
+        "kotlinx_atomicfu": "third_party/kotlin/kotlinx_atomicfu/LICENSE",
     },
     platform = "android",
     target = "//tensorflow_lite_support/odml/java/image",
