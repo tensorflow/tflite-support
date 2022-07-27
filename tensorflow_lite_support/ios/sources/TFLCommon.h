@@ -198,6 +198,10 @@ typedef NS_ENUM(NSUInteger, TFLSupportErrorCode) {
    */
   TFLSupportErrorCodeImageProcessingBackendError,
 
+  TFLErrorCodeFirst = TFLSupportErrorCodeUnspecifiedError,
+
+  TFLErrorCodeLast = TFLSupportErrorCodeImageProcessingBackendError,
+
   /** kNotFound indicates some requested entity (such as a file or directory) was not found. */
   TFLSupportErrorCodeNotFoundError = 900,
 

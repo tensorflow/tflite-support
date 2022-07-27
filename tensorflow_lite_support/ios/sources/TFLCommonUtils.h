@@ -17,6 +17,9 @@ limitations under the License.
 
 NS_ASSUME_NONNULL_BEGIN
 
+/** Error domain of TensorFlow Lite Support related errors. */
+static NSString *const TFLSupportTaskErrorDomain = @"org.tensorflow.lite.tasks";
+
 /** Helper utility for the all tasks which encapsulates common functionality. */
 @interface TFLCommonUtils : NSObject
 
@@ -30,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
  * no error will be saved.
  */
 + (void)createCustomError:(NSError **)error
-                 withCode:(NSInteger)code
+                 withCode:(NSUInteger)code
               description:(NSString *)description;
 
 /**
@@ -44,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)createCustomError:(NSError **)error
                withDomain:(NSString *)domain
-                     code:(NSInteger)code
+                     code:(NSUInteger)code
               description:(NSString *)description;
 
 /**
