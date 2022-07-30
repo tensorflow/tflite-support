@@ -40,19 +40,20 @@ using ClassificationResult = ::tflite::task::vision::ClassificationResult;
   XCTAssertNotNil(_modelPath);
 }
 
-- (void)testCoreMLDelegateCreationFailsWithNeuralEngine {
+- (void)testCoreMLDelegateCreationSucceedsWithDevicesAll {
   // Configures the options.
   ImageClassifierOptions options;
   options.mutable_base_options()->mutable_model_file()->set_file_name(_modelPath.UTF8String);
+
   options.mutable_base_options()
       ->mutable_compute_settings()
       ->mutable_tflite_settings()
-      ->set_delegate(::acceleration::Delegate::CORE_ML);
+      ->set_delegate(::tflite::proto::Delegate::CORE_ML);
   options.mutable_base_options()
       ->mutable_compute_settings()
       ->mutable_tflite_settings()
       ->mutable_coreml_settings()
-      ->set_enabled_devices(::acceleration::CoreMLDelegateSettings::DEVICES_ALL);
+      ->set_enabled_devices(::tflite::proto::CoreMLSettings::DEVICES_ALL);
 
   // Creates the classifier.
   tflite::support::StatusOr<std::unique_ptr<ImageClassifier>> image_classifier_status =
