@@ -70,6 +70,8 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/c/task/vision/utils:frame_buffer_cpp_c_utils",
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
+        "//tensorflow_lite_support/ios/task/core:TFLBaseOptions",
+        "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:coreml_plugin",
     ],

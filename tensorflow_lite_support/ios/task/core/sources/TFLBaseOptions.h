@@ -14,6 +14,35 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ * Holds Core ML Delegate settings.
+ * See the documentation in configuration.proto for more details.
+ */
+NS_SWIFT_NAME(TFLCoreMLDelegateSettings)
+@interface TFLCoreMLDelegateSettings : NSObject <NSCopying>
+
+typedef NS_ENUM(NSUInteger, CoreMLDelegateEnabledDevices) {
+  // Always create Core ML delegate.
+  TFLCoreMLDelegateSettings_DevicesAll = 0,
+  // Create Core ML delegate only on devices with Apple Neural Engine.
+  TFLCoreMLDelegateSettings_DevicesWithNeuralEngine = 1,
+} NS_SWIFT_NAME(OnDeviceModelType);
+
+/** Initializes a Core ML Delegate Settings instance. */
+- (instancetype)initWithCoreMLVersion:(int32_t)coreMLVersion
+                       enableddevices:(CoreMLDelegateEnabledDevices)enabledDevices;
+
+/** The device set to enable Core ML Delegate. */
+@property(nonatomic, readonly) CoreMLDelegateEnabledDevices enabledDevices;
+
+/** Specifies target Core ML version for model conversion.
+ * If not set to one of the valid versions (2, 3), the delegate will use the
+ * highest version possible in the platform.
+ */
+@property(nonatomic, readonly) int32_t coreMLVersion;
+
+@end
+
+/**
  * Holds cpu settings.
  */
 NS_SWIFT_NAME(CpuSettings)
@@ -70,6 +99,11 @@ NS_SWIFT_NAME(BaseOptions)
  * Please see documentation of TfLiteComputeSettings and its members for more details.
  */
 @property(nonatomic, copy) TFLComputeSettings *computeSettings;
+
+/**
+ * Holds settings for CoreML Delegate. If set, CoreML Delegate will be activated.
+ */
+@property(nonatomic, copy, nullable) TFLCoreMLDelegateSettings *coreMLDelegateSettings;
 
 @end
 

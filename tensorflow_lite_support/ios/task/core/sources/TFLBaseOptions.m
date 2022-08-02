@@ -35,6 +35,27 @@
 
 @end
 
+@implementation TFLCoreMLDelegateSettings
+
+- (instancetype)initWithCoreMLVersion:(int32_t)coreMLVersion
+                       enableddevices:(CoreMLDelegateEnabledDevices)enabledDevices {
+  self = [super init];
+  if (self) {
+    _enabledDevices = enabledDevices;
+    _coreMLVersion = coreMLVersion;
+  }
+  return self;
+}
+
+- (id)copyWithZone:(NSZone *)zone {
+  TFLCoreMLDelegateSettings *coreMLDelegateSettings =
+      [[TFLCoreMLDelegateSettings alloc] initWithCoreMLVersion:self.coreMLVersion
+                                                enableddevices:self.enabledDevices];
+  return coreMLDelegateSettings;
+}
+
+@end
+
 @implementation TFLComputeSettings
 @synthesize cpuSettings;
 
@@ -78,6 +99,8 @@
   if (self) {
     self.computeSettings = [[TFLComputeSettings alloc] init];
     self.modelFile = [[TFLExternalFile alloc] init];
+    // Initialized to nil to indicate CoreML Delegate is not enabled yet.
+    self.coreMLDelegateSettings = nil;
   }
   return self;
 }
@@ -87,6 +110,7 @@
 
   baseOptions.modelFile = self.modelFile;
   baseOptions.computeSettings = self.computeSettings;
+  baseOptions.coreMLDelegateSettings = self.coreMLDelegateSettings;
 
   return baseOptions;
 }
