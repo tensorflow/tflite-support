@@ -19,6 +19,7 @@ COMMON_PIP_DEPS = [
     "//tensorflow_lite_support/metadata/python/metadata_writers:image_segmenter",
     "//tensorflow_lite_support/metadata/python/metadata_writers:audio_classifier",
     "//tensorflow_lite_support/metadata/python/metadata_writers:nl_classifier",
+    "//tensorflow_lite_support/metadata/python/metadata_writers:bert_nl_classifier",
 ]
 
 TASK_PIP_DEPS = [
