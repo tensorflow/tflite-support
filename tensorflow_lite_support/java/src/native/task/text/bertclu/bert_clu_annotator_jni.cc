@@ -37,8 +37,8 @@ using ::tflite::task::text::BertCluAnnotatorOptions;
 using ::tflite::task::text::CategoricalSlot;
 using ::tflite::task::text::CluRequest;
 using ::tflite::task::text::CluResponse;
-using ::tflite::task::text::Extraction;
-using ::tflite::task::text::NonCategoricalSlot;
+using ::tflite::task::text::Mention;
+using ::tflite::task::text::MentionedSlot;
 using ::tflite::task::text::clu::BertCluAnnotator;
 using ::tflite::task::text::clu::CluAnnotator;
 
@@ -58,9 +58,9 @@ BertCluAnnotatorOptions ConvertJavaBertCluAnnotatorProtoOptionsToCpp(
       bert_clu_annotator_options_class, "getIntentThreshold", "()F");
   static jmethodID categorical_slot_threshold_method_id = env->GetMethodID(
       bert_clu_annotator_options_class, "getCategoricalSlotThreshold", "()F");
-  static jmethodID noncategorical_slot_threshold_method_id =
+  static jmethodID mentioned_slot_threshold_method_id =
       env->GetMethodID(bert_clu_annotator_options_class,
-                       "getNoncategoricalSlotThreshold", "()F");
+                       "getMentionedSlotThreshold", "()F");
   BertCluAnnotatorOptions proto_options;
 
   if (base_options_handle != kInvalidPointer) {
@@ -76,9 +76,9 @@ BertCluAnnotatorOptions ConvertJavaBertCluAnnotatorProtoOptionsToCpp(
       java_bert_clu_annotator_options, intent_threshold_method_id));
   proto_options.set_categorical_slot_threshold(env->CallFloatMethod(
       java_bert_clu_annotator_options, categorical_slot_threshold_method_id));
-  proto_options.set_noncategorical_slot_threshold(
+  proto_options.set_mentioned_slot_threshold(
       env->CallFloatMethod(java_bert_clu_annotator_options,
-                           noncategorical_slot_threshold_method_id));
+                           mentioned_slot_threshold_method_id));
 
   return proto_options;
 }
@@ -150,44 +150,44 @@ jobject ConvertCppCategoricalSlotsToJava(JNIEnv* env,
       });
 }
 
-// Builds a Java List of NonCategoricalSlots based on the input `clu_response`.
-jobject ConvertCppNonCategoricalSlotsToJava(JNIEnv* env,
+// Builds a Java List of `MentionedSlot`s based on the input `clu_response`.
+jobject ConvertCppMentionedSlotsToJava(JNIEnv* env,
                                             const CluResponse& clu_response) {
-  static jclass extraction_class =
+  static jclass mention_class =
       static_cast<jclass>(env->NewGlobalRef(env->FindClass(
-          "org/tensorflow/lite/task/text/bertclu/CluResponse$Extraction")));
-  static jmethodID extraction_create_method_id =
-      env->GetStaticMethodID(extraction_class, "create",
+          "org/tensorflow/lite/task/text/bertclu/CluResponse$Mention")));
+  static jmethodID mention_create_method_id =
+      env->GetStaticMethodID(mention_class, "create",
                              "(Ljava/lang/String;FII)Lorg/tensorflow/lite/task/"
-                             "text/bertclu/CluResponse$Extraction;");
-  static jclass non_categorical_slot_class = static_cast<
+                             "text/bertclu/CluResponse$Mention;");
+  static jclass mentioned_slot_class = static_cast<
       jclass>(env->NewGlobalRef(env->FindClass(
-      "org/tensorflow/lite/task/text/bertclu/CluResponse$NonCategoricalSlot")));
-  static jmethodID non_categorical_slot_create_method_id =
+      "org/tensorflow/lite/task/text/bertclu/CluResponse$MentionedSlot")));
+  static jmethodID mentioned_slot_create_method_id =
       env->GetStaticMethodID(
-          non_categorical_slot_class, "create",
+          mentioned_slot_class, "create",
           "(Ljava/lang/String;Lorg/tensorflow/lite/task/text/bertclu/"
-          "CluResponse$Extraction;)Lorg/tensorflow/lite/task/text/bertclu/"
-          "CluResponse$NonCategoricalSlot;");
+          "CluResponse$Mention;)Lorg/tensorflow/lite/task/text/bertclu/"
+          "CluResponse$MentionedSlot;");
 
   return ConvertVectorToArrayList(
-      env, clu_response.noncategorical_slots().begin(),
-      clu_response.noncategorical_slots().end(),
-      [env](const NonCategoricalSlot& non_categorical_slot) {
-        Extraction extraction = non_categorical_slot.extraction();
-        jobject java_extraction = env->CallStaticObjectMethod(
-            extraction_class, extraction_create_method_id,
-            env->NewStringUTF(extraction.value().c_str()), extraction.score(),
-            extraction.start(), extraction.end());
+      env, clu_response.mentioned_slots().begin(),
+      clu_response.mentioned_slots().end(),
+      [env](const MentionedSlot& mentioned_slot) {
+        Mention mention = mentioned_slot.mention();
+        jobject java_mention = env->CallStaticObjectMethod(
+            mention_class, mention_create_method_id,
+            env->NewStringUTF(mention.value().c_str()), mention.score(),
+            mention.start(), mention.end());
         jstring java_slot =
-            env->NewStringUTF(non_categorical_slot.slot().c_str());
-        jobject java_non_categorical_slots = env->CallStaticObjectMethod(
-            non_categorical_slot_class, non_categorical_slot_create_method_id,
-            java_slot, java_extraction);
+            env->NewStringUTF(mentioned_slot.slot().c_str());
+        jobject java_mentioned_slots = env->CallStaticObjectMethod(
+            mentioned_slot_class, mentioned_slot_create_method_id,
+            java_slot, java_mention);
 
-        env->DeleteLocalRef(java_extraction);
+        env->DeleteLocalRef(java_mention);
         env->DeleteLocalRef(java_slot);
-        return java_non_categorical_slots;
+        return java_mentioned_slots;
       });
 }
 
@@ -213,16 +213,16 @@ jobject ConvertCppCluResponseToJava(JNIEnv* env,
       });
   jobject java_categorical_slots =
       ConvertCppCategoricalSlotsToJava(env, clu_response);
-  jobject java_non_categorical_slots =
-      ConvertCppNonCategoricalSlotsToJava(env, clu_response);
+  jobject java_mentioned_slots =
+      ConvertCppMentionedSlotsToJava(env, clu_response);
   jobject java_clu_response = env->CallStaticObjectMethod(
       clu_response_class, clu_response_create_method_id, java_domains,
-      java_intents, java_categorical_slots, java_non_categorical_slots);
+      java_intents, java_categorical_slots, java_mentioned_slots);
 
   env->DeleteLocalRef(java_domains);
   env->DeleteLocalRef(java_intents);
   env->DeleteLocalRef(java_categorical_slots);
-  env->DeleteLocalRef(java_non_categorical_slots);
+  env->DeleteLocalRef(java_mentioned_slots);
   return java_clu_response;
 }
 

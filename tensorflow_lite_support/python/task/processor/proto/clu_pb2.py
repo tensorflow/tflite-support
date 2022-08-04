@@ -23,8 +23,8 @@ from tensorflow_lite_support.python.task.processor.proto import class_pb2
 _CluRequestProto = clu_pb2.CluRequest
 _CluResponseProto = clu_pb2.CluResponse
 _CategoricalSlotProto = clu_pb2.CategoricalSlot
-_ExtractionProto = clu_pb2.Extraction
-_NonCategoricalSlotProto = clu_pb2.NonCategoricalSlot
+_MentionProto = clu_pb2.Mention
+_MentionedSlotProto = clu_pb2.MentionedSlot
 
 
 @dataclasses.dataclass
@@ -108,15 +108,15 @@ class CategoricalSlot:
 
 
 @dataclasses.dataclass
-class Extraction:
-  """A single extraction result.
+class Mention:
+  """A single mention result.
 
   Attributes:
-    value: The text value of the extraction.
-    score: The score for this extraction e.g. (but not necessarily) a
+    value: The text value of the mention.
+    score: The score for this mention e.g. (but not necessarily) a
       probability in [0,1].
-    start: Start of the bytes of this extraction.
-    end: Exclusive end of the bytes of this extraction.
+    start: Start of the bytes of this mention.
+    end: Exclusive end of the bytes of this mention.
   """
 
   value: str
@@ -125,16 +125,16 @@ class Extraction:
   end: int
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _ExtractionProto:
+  def to_pb2(self) -> _MentionProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _ExtractionProto(
+    return _MentionProto(
         value=self.value, score=self.score, start=self.start, end=self.end)
 
   @classmethod
   @doc_controls.do_not_generate_docs
-  def create_from_pb2(cls, pb2_obj: _ExtractionProto) -> "Extraction":
-    """Creates a `Extraction` object from the given protobuf object."""
-    return Extraction(
+  def create_from_pb2(cls, pb2_obj: _MentionProto) -> "Mention":
+    """Creates a `Mention` object from the given protobuf object."""
+    return Mention(
         value=pb2_obj.value,
         score=pb2_obj.score,
         start=pb2_obj.start,
@@ -149,38 +149,38 @@ class Extraction:
     Returns:
       True if the objects are equal.
     """
-    if not isinstance(other, Extraction):
+    if not isinstance(other, Mention):
       return False
 
     return self.to_pb2().__eq__(other.to_pb2())
 
 
 @dataclasses.dataclass
-class NonCategoricalSlot:
+class MentionedSlot:
   """Non-categorical slot whose values are open text extracted from the input text.
 
   Attributes:
     slot: The name of the slot.
-    extraction: The predicted extraction.
+    mention: The predicted mention.
   """
 
   slot: str
-  extraction: Extraction
+  mention: Mention
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _NonCategoricalSlotProto:
+  def to_pb2(self) -> _MentionedSlotProto:
     """Generates a protobuf object to pass to the C++ layer."""
-    return _NonCategoricalSlotProto(
-        slot=self.slot, extraction=self.extraction.to_pb2())
+    return _MentionedSlotProto(
+        slot=self.slot, mention=self.mention.to_pb2())
 
   @classmethod
   @doc_controls.do_not_generate_docs
   def create_from_pb2(
-      cls, pb2_obj: _NonCategoricalSlotProto) -> "NonCategoricalSlot":
-    """Creates a `NonCategoricalSlot` object from the given protobuf object."""
-    return NonCategoricalSlot(
+      cls, pb2_obj: _MentionedSlotProto) -> "MentionedSlot":
+    """Creates a `MentionedSlot` object from the given protobuf object."""
+    return MentionedSlot(
         slot=pb2_obj.slot,
-        extraction=Extraction.create_from_pb2(pb2_obj.extraction))
+        mention=Mention.create_from_pb2(pb2_obj.mention))
 
   def __eq__(self, other: Any) -> bool:
     """Checks if this object is equal to the given object.
@@ -191,7 +191,7 @@ class NonCategoricalSlot:
     Returns:
       True if the objects are equal.
     """
-    if not isinstance(other, NonCategoricalSlot):
+    if not isinstance(other, MentionedSlot):
       return False
 
     return self.to_pb2().__eq__(other.to_pb2())
@@ -205,13 +205,13 @@ class CluResponse:
     domains: The list of predicted domains.
     intents: The list of predicted intents.
     categorical_slots: The list of predicted categorical slots.
-    noncategorical_slots: The list of predicted noncategorical slots.
+    mentioned_slots: The list of predicted mentioned slots.
   """
 
   domains: List[class_pb2.Category]
   intents: List[class_pb2.Category]
   categorical_slots: List[CategoricalSlot]
-  noncategorical_slots: List[NonCategoricalSlot]
+  mentioned_slots: List[MentionedSlot]
 
   @doc_controls.do_not_generate_docs
   def to_pb2(self) -> _CluResponseProto:
@@ -223,9 +223,9 @@ class CluResponse:
             categorical_slot.to_pb2()
             for categorical_slot in self.categorical_slots
         ],
-        noncategorical_slots=[
-            noncategorical_slot.to_pb2()
-            for noncategorical_slot in self.noncategorical_slots
+        mentioned_slots=[
+            mentioned_slot.to_pb2()
+            for mentioned_slot in self.mentioned_slots
         ])
 
   @classmethod
@@ -245,9 +245,9 @@ class CluResponse:
             CategoricalSlot.create_from_pb2(categorical_slot)
             for categorical_slot in pb2_obj.categorical_slots
         ],
-        noncategorical_slots=[
-            NonCategoricalSlot.create_from_pb2(noncategorical_slot)
-            for noncategorical_slot in pb2_obj.noncategorical_slots
+        mentioned_slots=[
+            MentionedSlot.create_from_pb2(mentioned_slot)
+            for mentioned_slot in pb2_obj.mentioned_slots
         ])
 
   def __eq__(self, other: Any) -> bool:

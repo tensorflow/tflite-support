@@ -30,8 +30,8 @@ _BertCluAnnotator = bert_clu_annotator.BertCluAnnotator
 _CluRequest = clu_pb2.CluRequest
 _CluResponse = clu_pb2.CluResponse
 _CategoricalSlot = clu_pb2.CategoricalSlot
-_Extraction = clu_pb2.Extraction
-_NonCategoricalSlot = clu_pb2.NonCategoricalSlot
+_Mention = clu_pb2.Mention
+_MentionedSlot = clu_pb2.MentionedSlot
 _Category = class_pb2.Category
 _BertCluAnnotatorOptions = bert_clu_annotator.BertCluAnnotatorOptions
 _BertCluAnnotationOptions = clu_annotation_options_pb2.BertCluAnnotationOptions
@@ -67,10 +67,10 @@ _CLU_RESPONSE = _CluResponse(
             category_name='')
     ],
     categorical_slots=[],
-    noncategorical_slots=[
-        _NonCategoricalSlot(
+    mentioned_slots=[
+        _MentionedSlot(
             slot='time',
-            extraction=_Extraction(
+            mention=_Mention(
                 value='4:00 pm', score=0.7940083146095276, start=44, end=51))
     ])
 
@@ -154,7 +154,7 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
                    category_name='')
            ],
            categorical_slots=[],
-           noncategorical_slots=[]), 0.99, None, 0.99, 0.99),
+           mentioned_slots=[]), 0.99, None, 0.99, 0.99),
       (_CLU_REQUEST,
        _CluResponse(
            domains=[
@@ -172,10 +172,10 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
                    category_name='')
            ],
            categorical_slots=[],
-           noncategorical_slots=[
-               _NonCategoricalSlot(
+           mentioned_slots=[
+               _MentionedSlot(
                    slot='time',
-                   extraction=_Extraction(
+                   mention=_Mention(
                        value='4:00 pm',
                        score=0.7940083146095276,
                        start=44,
@@ -185,14 +185,14 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
   def test_thresholds(self, clu_request, expected_clu_response,
                       domain_threshold, intent_threshold,
                       categorical_slot_threshold,
-                      noncategorical_slot_threshold):
+                      mentioned_slot_threshold):
     # Creates annotator.
     base_options = _BaseOptions(file_name=self.model_path)
     bert_clu_annotation_options = _BertCluAnnotationOptions(
         domain_threshold=domain_threshold,
         intent_threshold=intent_threshold,
         categorical_slot_threshold=categorical_slot_threshold,
-        noncategorical_slot_threshold=noncategorical_slot_threshold)
+        mentioned_slot_threshold=mentioned_slot_threshold)
     options = _BertCluAnnotatorOptions(
         base_options=base_options,
         bert_clu_annotation_options=bert_clu_annotation_options)
@@ -224,10 +224,10 @@ class BertCLUAnnotatorTest(parameterized.TestCase, tf.test.TestCase):
         ],
         intents=[],
         categorical_slots=[],
-        noncategorical_slots=[
-            _NonCategoricalSlot(
+        mentioned_slots=[
+            _MentionedSlot(
                 slot='time',
-                extraction=_Extraction(
+                mention=_Mention(
                     value='4:00 pm', score=0.8557882905006409, start=44,
                     end=51))
         ])

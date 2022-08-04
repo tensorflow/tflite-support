@@ -62,9 +62,9 @@ PYBIND11_MODULE(_pywrap_bert_clu_annotator, m) {
               options.set_categorical_slot_threshold(
                   annotation_options.categorical_slot_threshold());
             }
-            if (annotation_options.has_noncategorical_slot_threshold()) {
-              options.set_noncategorical_slot_threshold(
-                  annotation_options.noncategorical_slot_threshold());
+            if (annotation_options.has_mentioned_slot_threshold()) {
+              options.set_mentioned_slot_threshold(
+                  annotation_options.mentioned_slot_threshold());
             }
 
             auto annotator = BertCluAnnotator::CreateFromOptions(options);

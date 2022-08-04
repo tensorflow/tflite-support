@@ -108,7 +108,7 @@ public class BertCluAnnotator extends BaseTaskApi {
     private static final float DEFAULT_DOMAIN_THRESHOLD = 0.5f;
     private static final float DEFAULT_INTENT_THRESHOLD = 0.5f;
     private static final float DEFAULT_CATEGORICAL_SLOT_THRESHOLD = 0.5f;
-    private static final float DEFAULT_NONCATEGORICAL_SLOT_THRESHOLD = 0.5f;
+    private static final float DEFAULT_MENTIONED_SLOT_THRESHOLD = 0.5f;
 
     @UsedByReflection("bert_clu_annotator_jni.cc")
     abstract int getMaxHistoryTurns();
@@ -123,7 +123,7 @@ public class BertCluAnnotator extends BaseTaskApi {
     abstract float getCategoricalSlotThreshold();
 
     @UsedByReflection("bert_clu_annotator_jni.cc")
-    abstract float getNoncategoricalSlotThreshold();
+    abstract float getMentionedSlotThreshold();
 
     @Nullable
     abstract BaseOptions getBaseOptions();
@@ -134,7 +134,7 @@ public class BertCluAnnotator extends BaseTaskApi {
           .setDomainThreshold(DEFAULT_DOMAIN_THRESHOLD)
           .setIntentThreshold(DEFAULT_INTENT_THRESHOLD)
           .setCategoricalSlotThreshold(DEFAULT_CATEGORICAL_SLOT_THRESHOLD)
-          .setNoncategoricalSlotThreshold(DEFAULT_NONCATEGORICAL_SLOT_THRESHOLD);
+          .setMentionedSlotThreshold(DEFAULT_MENTIONED_SLOT_THRESHOLD);
     }
 
     /** Builder for {@link BertCluAnnotatorOptions}. */
@@ -151,7 +151,7 @@ public class BertCluAnnotator extends BaseTaskApi {
 
       public abstract Builder setCategoricalSlotThreshold(float categoricalSlotThreshold);
 
-      public abstract Builder setNoncategoricalSlotThreshold(float noncategoricalSlotThreshold);
+      public abstract Builder setMentionedSlotThreshold(float mentionedSlotThreshold);
 
       public abstract BertCluAnnotatorOptions build();
     }

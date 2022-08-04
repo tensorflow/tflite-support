@@ -32,6 +32,6 @@ message BertCluAnnotationOptions {
   // The threshold of categorical slot prediction.
   optional float categorical_slot_threshold = 4 [default = 0.5];
 
-  // The threshold of noncategorical slot prediction.
-  optional float noncategorical_slot_threshold = 5 [default = 0.5];
+  // The threshold of mentioned slot prediction.
+  optional float mentioned_slot_threshold = 5 [default = 0.5];
 }

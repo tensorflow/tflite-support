@@ -74,15 +74,15 @@ void ExpectApproximatelyEqual(const CluResponse& actual,
     EXPECT_EQ(a.prediction().display_name(), b.prediction().display_name());
   }
 
-  ASSERT_EQ(actual.noncategorical_slots_size(),
-            expected.noncategorical_slots_size());
-  for (int i = 0; i < actual.noncategorical_slots_size(); ++i) {
-    const auto& a = actual.noncategorical_slots(i);
-    const auto& b = expected.noncategorical_slots(i);
+  ASSERT_EQ(actual.mentioned_slots_size(),
+            expected.mentioned_slots_size());
+  for (int i = 0; i < actual.mentioned_slots_size(); ++i) {
+    const auto& a = actual.mentioned_slots(i);
+    const auto& b = expected.mentioned_slots(i);
     EXPECT_EQ(a.slot(), b.slot());
-    EXPECT_EQ(a.extraction().value(), b.extraction().value());
-    EXPECT_EQ(a.extraction().start(), b.extraction().start());
-    EXPECT_EQ(a.extraction().end(), b.extraction().end());
+    EXPECT_EQ(a.mention().value(), b.mention().value());
+    EXPECT_EQ(a.mention().start(), b.mention().start());
+    EXPECT_EQ(a.mention().end(), b.mention().end());
   }
 }
 
@@ -149,9 +149,9 @@ TEST(BertCluAnnotatorTest, TestAnnotatorBasic) {
           slot: "number_of_seats"
           prediction: { display_name: "2" }
         }
-        noncategorical_slots {
+        mentioned_slots {
           slot: "restaurant_name"
-          extraction: { value: "Andes Cafe" start: 42 end: 52 }
+          mention: { value: "Andes Cafe" start: 42 end: 52 }
         }
       )pb"));
 }
@@ -160,7 +160,7 @@ TEST(BertCluAnnotatorTest, TestAnnotatorThresholds) {
   BertCluAnnotatorOptions options;
   options.set_domain_threshold(0.99);
   options.set_categorical_slot_threshold(0.99);
-  options.set_noncategorical_slot_threshold(0.99);
+  options.set_mentioned_slot_threshold(0.99);
   options.mutable_base_options()->mutable_model_file()->set_file_name(
       GetFullPath(kTestBertCluAnnotatorModelWithMetadataPath));
   SUPPORT_ASSERT_OK_AND_ASSIGN(std::unique_ptr<CluAnnotator> clu_annotator,

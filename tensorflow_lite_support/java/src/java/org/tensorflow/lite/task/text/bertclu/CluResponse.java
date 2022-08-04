@@ -32,12 +32,12 @@ public abstract class CluResponse {
       List<Category> domains,
       List<Category> intents,
       List<CategoricalSlot> categoricalSlots,
-      List<NonCategoricalSlot> nonCategoricalSlots) {
+      List<MentionedSlot> mentionedSlots) {
     return new AutoValue_CluResponse(
         Collections.unmodifiableList(new ArrayList<Category>(domains)),
         Collections.unmodifiableList(new ArrayList<Category>(intents)),
         Collections.unmodifiableList(new ArrayList<CategoricalSlot>(categoricalSlots)),
-        Collections.unmodifiableList(new ArrayList<NonCategoricalSlot>(nonCategoricalSlots)));
+        Collections.unmodifiableList(new ArrayList<MentionedSlot>(mentionedSlots)));
   }
 
   // Same reason for not using ImmutableList as stated in
@@ -52,7 +52,7 @@ public abstract class CluResponse {
   public abstract List<CategoricalSlot> getCategoricalSlots();
 
   @SuppressWarnings("AutoValueImmutableFields")
-  public abstract List<NonCategoricalSlot> getNonCategoricalSlots();
+  public abstract List<MentionedSlot> getMentionedSlots();
 
   /** Represents a categorical slot whose values are within a finite set. */
   // Based on CategoricalSlot in third_party/tensorflow_lite_support/cc/task/text/proto/clu.proto.
@@ -69,14 +69,14 @@ public abstract class CluResponse {
     public abstract Category getPrediction();
   }
 
-  /** A single extraction result. */
-  // Based on Extraction in third_party/tensorflow_lite_support/cc/task/text/proto/clu.proto.
+  /** A single mention. */
+  // Based on Mention in third_party/tensorflow_lite_support/cc/task/text/proto/clu.proto.
   @AutoValue
   @UsedByReflection("bert_clu_annotator_jni.cc")
-  public abstract static class Extraction {
+  public abstract static class Mention {
     @UsedByReflection("bert_clu_annotator_jni.cc")
-    static Extraction create(String value, float score, int start, int end) {
-      return new AutoValue_CluResponse_Extraction(value, score, start, end);
+    static Mention create(String value, float score, int start, int end) {
+      return new AutoValue_CluResponse_Mention(value, score, start, end);
     }
 
     public abstract String getValue();
@@ -88,19 +88,19 @@ public abstract class CluResponse {
     public abstract int getEnd();
   }
 
-  /** Represents a non-categorical slot whose values are open text extracted from the input text. */
-  // Based on NonCategoricalSlot in
+  /** Represents a mentioned slot whose values are open text extracted from the input text. */
+  // Based on MentionedSlot in
   // third_party/tensorflow_lite_support/cc/task/text/proto/clu.proto.
   @AutoValue
   @UsedByReflection("bert_clu_annotator_jni.cc")
-  public abstract static class NonCategoricalSlot {
+  public abstract static class MentionedSlot {
     @UsedByReflection("bert_clu_annotator_jni.cc")
-    static NonCategoricalSlot create(String slot, Extraction extraction) {
-      return new AutoValue_CluResponse_NonCategoricalSlot(slot, extraction);
+    static MentionedSlot create(String slot, Mention mention) {
+      return new AutoValue_CluResponse_MentionedSlot(slot, mention);
     }
 
     public abstract String getSlot();
 
-    public abstract Extraction getExtraction();
+    public abstract Mention getMention();
   }
 }

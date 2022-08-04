@@ -60,9 +60,9 @@ QaAnswer = qa_answers_pb2.QaAnswer
 QuestionAnswererResult = qa_answers_pb2.QuestionAnswererResult
 CluRequest = clu_pb2.CluRequest
 CluResponse = clu_pb2.CluResponse
-Extraction = clu_pb2.Extraction
+Mention = clu_pb2.Mention
 CategoricalSlot = clu_pb2.CategoricalSlot
-NonCategoricalSlot = clu_pb2.NonCategoricalSlot
+MentionedSlot = clu_pb2.MentionedSlot
 BertCluAnnotationOptions = clu_annotation_options_pb2.BertCluAnnotationOptions
 
 # Remove unnecessary modules to avoid duplication in API docs.

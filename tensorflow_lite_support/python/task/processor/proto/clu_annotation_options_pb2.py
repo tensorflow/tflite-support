@@ -31,7 +31,7 @@ class BertCluAnnotationOptions:
     domain_threshold: The threshold of domain prediction.
     intent_threshold: The threshold of intent prediction.
     categorical_slot_threshold: The threshold of categorical slot prediction.
-    noncategorical_slot_threshold: The threshold of noncategorical slot
+    mentioned_slot_threshold: The threshold of mentioned slot
       prediction.
   """
 
@@ -39,7 +39,7 @@ class BertCluAnnotationOptions:
   domain_threshold: Optional[float] = 0.5
   intent_threshold: Optional[float] = 0.5
   categorical_slot_threshold: Optional[float] = 0.5
-  noncategorical_slot_threshold: Optional[float] = 0.5
+  mentioned_slot_threshold: Optional[float] = 0.5
 
   @doc_controls.do_not_generate_docs
   def to_pb2(self) -> _BertCluAnnotationOptionsProto:
@@ -49,7 +49,7 @@ class BertCluAnnotationOptions:
         domain_threshold=self.domain_threshold,
         intent_threshold=self.intent_threshold,
         categorical_slot_threshold=self.categorical_slot_threshold,
-        noncategorical_slot_threshold=self.noncategorical_slot_threshold)
+        mentioned_slot_threshold=self.mentioned_slot_threshold)
 
   @classmethod
   @doc_controls.do_not_generate_docs
@@ -62,7 +62,7 @@ class BertCluAnnotationOptions:
         domain_threshold=pb2_obj.domain_threshold,
         intent_threshold=pb2_obj.intent_threshold,
         categorical_slot_threshold=pb2_obj.categorical_slot_threshold,
-        noncategorical_slot_threshold=pb2_obj.noncategorical_slot_threshold)
+        mentioned_slot_threshold=pb2_obj.mentioned_slot_threshold)
 
   def __eq__(self, other: Any) -> bool:
     """Checks if this object is equal to the given object.

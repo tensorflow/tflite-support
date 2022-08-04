@@ -270,8 +270,8 @@ absl::StatusOr<std::unique_ptr<AbstractModule>> SlotModule::Create(
     const BertCluAnnotatorOptions* options) {
   auto out = std::make_unique<SlotModule>();
   out->tensor_index_map_ = tensor_index_map;
-  out->noncategorical_slot_threshold_ =
-      options->noncategorical_slot_threshold();
+  out->mentioned_slot_threshold_ =
+      options->mentioned_slot_threshold();
   RETURN_IF_ERROR(out->Init(interpreter, options));
   return out;
 }
@@ -285,7 +285,7 @@ absl::Status SlotModule::Postprocess(Artifacts* artifacts,
   const auto& [tags, confidences] = t_output;
   RETURN_IF_ERROR(SlotModulePopulateResponse(
       tags, confidences, artifacts->token_alignments, artifacts->token_turn_ids,
-      artifacts->first_subword_indicators, noncategorical_slot_threshold_,
+      artifacts->first_subword_indicators, mentioned_slot_threshold_,
       artifacts->reverse_utterance_list_to_encode, response));
   return absl::OkStatus();
 }
