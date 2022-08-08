@@ -104,7 +104,7 @@ using ClassificationResult = ::tflite::task::vision::ClassificationResult;
              enableddevices:TFLCoreMLDelegateSettings_DevicesAll];
   TFLImageClassifierOptions* imageClassifierOptions =
       [[TFLImageClassifierOptions alloc] initWithModelPath:_modelPath];
-  // Implicitly enables Cor ML Delegate.
+  // Implicitly enables Core ML Delegate.
   imageClassifierOptions.baseOptions.coreMLDelegateSettings = coreMLDelegateSettings;
 
   TFLImageClassifier* imageClassifier =
