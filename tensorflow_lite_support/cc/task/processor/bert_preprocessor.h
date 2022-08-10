@@ -46,12 +46,10 @@ class BertPreprocessor : public TextPreprocessor {
 
   absl::Status Init();
 
+  int GetLastDimSize(int tensor_index);
+
   std::unique_ptr<tflite::support::text::tokenizer::Tokenizer> tokenizer_;
-  // The maximum input sequence length the BERT model can accept. Used for
-  // static input tensors.
-  int bert_max_seq_len_ = 2;
-  // Whether the input tensors are dynamic instead of static.
-  bool input_tensors_are_dynamic_ = false;
+  int bert_max_seq_len_;
 };
 
 }  // namespace processor
