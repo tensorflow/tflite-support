@@ -4,26 +4,27 @@
 # This file should not need to be updated unless the license_presubmit_check is
 # failing. To update it, run the following command from a CitC client on Linux:
 #
-# /google/bin/releases/opensource/tools/addlicensedeps_py/addlicensedeps --target=//third_party/tensorflow_lite_support/odml/java/image:image --create_licenses_and_metadata_filegroups
+# /google/bin/releases/opensource/tools/addlicensedeps_py/addlicensedeps --target=//third_party/tensorflow_lite_support/odml/java/image
 
 load("//devtools/compliance/addlicensedeps/py:third_party_licenses.bzl", "third_party_licenses")
 
-licenses(["notice"])
-
 third_party_licenses(
-    create_licenses_and_metadata_filegroups = True,
+    create_licenses_and_metadata_filegroups = False,
     custom_output_directory = None,
     custom_package = None,
     extra_licenses = {},
     generated_licenses = {
+        "Android SDK": "third_party/java/android/android_sdk_linux/LICENSE",
         "AndroidX activity library": "third_party/java/androidx/activity/hack_for_licenses/LICENSE",
         "AndroidX annotation experimental library": "third_party/java/androidx/annotation/experimental/LICENSE",
         "AndroidX annotation library": "third_party/java/android/android_sdk_linux/extras/android/compatibility/annotations/LICENSE",
-        "AndroidX architecture core library": "third_party/java/androidx/arch/core/LICENSE",
-        "AndroidX architecture library": "third_party/java/androidx/arch/core/LICENSE",
+        "AndroidX architecture core common library": "third_party/java/androidx/arch/core/common/LICENSE",
+        "AndroidX architecture core runtime library": "third_party/java/androidx/arch/core/runtime/LICENSE",
         "AndroidX asynclayoutinflater library": "third_party/java/androidx/asynclayoutinflater/LICENSE",
+        "AndroidX collection jvm library": "third_party/java/androidx/collection/jvm/LICENSE",
         "AndroidX concurrent futures library": "third_party/java/androidx/concurrent/futures/LICENSE",
         "AndroidX coordinatorlayout library": "third_party/java/androidx/coordinatorlayout/LICENSE",
+        "AndroidX core ktx library": "third_party/java/androidx/core/ktx/LICENSE",
         "AndroidX core library": "third_party/java/android/android_sdk_linux/extras/android/compatibility/compat/LICENSE",
         "AndroidX cursoradapter library": "third_party/java/androidx/cursoradapter/LICENSE",
         "AndroidX customview library": "third_party/java/androidx/customview/hack_for_licenses/LICENSE",
@@ -46,24 +47,22 @@ third_party_licenses(
         "AndroidX savedstate library": "third_party/java/androidx/savedstate/hack_for_licenses/LICENSE",
         "AndroidX swiperefreshlayout library": "third_party/java/androidx/swiperefreshlayout/LICENSE",
         "AndroidX tracing library": "third_party/java/androidx/tracing/hack_for_licenses/LICENSE",
-        "AndroidX versionedparcelable library": "third_party/java/androidx/versionedparcelable/hack_for_licenses/LICENSE",
+        "AndroidX versionedparcelable library": "third_party/java/android/android_sdk_linux/extras/android/compatibility/versionedparcelable/LICENSE",
         "AndroidX viewpager library": "third_party/java/androidx/viewpager/LICENSE",
         "Animal Sniffer": "third_party/java/animal_sniffer/LICENSE",
-        "Checker Framework Annotations": "third_party/java/checker_framework_annotations/LICENSE",
+        "Checker Framework Annotations": "third_party/java/checker_framework_annotations/v3_21_4_eisop1/LICENSE",
         "Error Prone": "third_party/java/error_prone/LICENSE",
         "Google Auto": "third_party/java/auto/LICENSE",
         "Guava JDK5": "third_party/java/android_libs/guava_jdk5/LICENSE",
         "Guava JDK7": "third_party/java_src/google_common/LICENSE",
         "J2ObjC": "third_party/java/j2objc/LICENSE",
-        "JSR 250": "third_party/java/jsr250_annotations/LICENSE",
+        "JSR 250": "third_party/java/jsr250_annotations/v9_0_34/LICENSE",
         "JSR 305": "third_party/java/jsr305_annotations/LICENSE",
         "JSpecify": "third_party/java/jspecify_annotations/LICENSE",
         "JsInterop Annotations": "third_party/java_src/jsinterop_annotations/LICENSE",
+        "Kotlin": "third_party/kotlin/kotlin/v1_7_10/LICENSE",
+        "Kotlin coroutines": "third_party/kotlin/kotlinx_coroutines/LICENSE",
         "TensorFlow Lite Support": "third_party/tensorflow_lite_support/LICENSE",
-        "Kotlin": "third_party/kotlin/kotlin/LICENSE",
-        "AndroidX collection jvm library": "third_party/java/androidx/collection/jvm/LICENSE",
-        "AndroidX core ktx library": "third_party/java/androidx/core/ktx/LICENSE",
-        "Android SDK": "third_party/java/android/android_sdk_linux/LICENSE",
         "kotlinx_atomicfu": "third_party/kotlin/kotlinx_atomicfu/LICENSE",
     },
     platform = "android",
