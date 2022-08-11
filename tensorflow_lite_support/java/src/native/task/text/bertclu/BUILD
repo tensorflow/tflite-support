@@ -5,7 +5,7 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-exports_files(["bert_clu_annotator.cc"])
+exports_files(["bert_clu_annotator_jni.cc"])
 
 jni_binary_with_tflite(
     name = "libtask_text_jni.so",
