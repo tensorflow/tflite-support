@@ -4,12 +4,12 @@
 # This file should not need to be updated unless the license_presubmit_check is
 # failing. To update it, run the following command from a CitC client on Linux:
 #
-# /google/bin/releases/opensource/tools/addlicensedeps_py/addlicensedeps --target=//third_party/tensorflow_lite_support/odml/java/image
+# /google/bin/releases/opensource/tools/addlicensedeps_py/addlicensedeps --target=//third_party/tensorflow_lite_support/odml/java/image --create_licenses_and_metadata_filegroups
 
 load("//devtools/compliance/addlicensedeps/py:third_party_licenses.bzl", "third_party_licenses")
 
 third_party_licenses(
-    create_licenses_and_metadata_filegroups = False,
+    create_licenses_and_metadata_filegroups = True,
     custom_output_directory = None,
     custom_package = None,
     extra_licenses = {},
