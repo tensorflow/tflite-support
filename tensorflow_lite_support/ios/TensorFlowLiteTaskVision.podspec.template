@@ -1,15 +1,14 @@
 Pod::Spec.new do |s|
   s.name             = 'TensorFlowLiteTaskVision'
-  s.version          = '5.0.0'
+  s.version          = '${TFLS_BUILD_VERSION}'
   s.authors          = 'Google Inc.'
   s.license          = { :type => 'Apache',:file => "LICENSE" }
-  #https://www.dropbox.com/s/vns5malr1sxy8u4/TensorFlowLiteTaskVision-5.0.0-dev.tar.gz?dl=0
   s.homepage         = 'https://github.com/tensorflow/tflite-support'
-  s.source           = { :http => 'https://dl.dropboxusercontent.com/s/vns5malr1sxy8u4/TensorFlowLiteTaskVision-5.0.0-dev.tar.gz?dl=0' }
+  s.source           = { :http => '${TFLS_DOWNLOAD_URL}' }
   s.summary          = 'TensorFlow Lite Task Library - Vision'
   s.description      = 'The Computer Vision APIs of the TFLite Task Library'
 
-  s.ios.deployment_target = '11.0'
+  s.ios.deployment_target = '10.0'
 
   s.module_name = 'TensorFlowLiteTaskVision'
   s.static_framework = true
@@ -17,6 +16,6 @@ Pod::Spec.new do |s|
     'VALID_ARCHS' => 'x86_64, arm64, armv7',
   }
   s.library = 'c++'
-  s.frameworks = 'CoreMedia', 'Accelerate', 'CoreML'
+  s.frameworks = 'CoreMedia', 'Accelerate'
   s.vendored_frameworks = 'Frameworks/TensorFlowLiteTaskVision.framework'
 end

@@ -1,7 +1,7 @@
 """TensorFlow Lite Support Library Helper Rules for iOS"""
 
 TFL_TASK_MINIMUM_OS_VERSION = "10.0"
-TFL_TASK_COREML_MINIMUM_OS_VERSION = "11.0"
+TFL_TASK_COREML_MINIMUM_OS_VERSION = "12.0"
 
 # When the static framework is built with bazel, the all header files are moved
 # to the "Headers" directory with no header path prefixes. This auxiliary rule

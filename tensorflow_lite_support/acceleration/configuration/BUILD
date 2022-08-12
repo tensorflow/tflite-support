@@ -32,6 +32,18 @@ cc_library(
 )
 
 cc_library(
+    name = "coreml_plugin",
+    hdrs = ["coreml_plugin.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:coreml_plugin",
+    ],
+    alwayslink = 1,  # For registration to always run.
+)
+
+cc_library(
     name = "hexagon_plugin",
     visibility = [
         "//visibility:public",

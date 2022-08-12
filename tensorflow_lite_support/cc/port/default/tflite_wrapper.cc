@@ -23,6 +23,7 @@ limitations under the License.
 #include "tensorflow/lite/experimental/acceleration/configuration/proto_to_flatbuffer.h"
 #include "tensorflow/lite/minimal_logging.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/coreml_plugin.h"
 
 namespace tflite {
 namespace support {
@@ -318,6 +319,10 @@ void TfLiteInterpreterWrapper::SetTfLiteCancellation() {
 
 absl::Status TfLiteInterpreterWrapper::LoadDelegatePlugin(
     const std::string& name, const tflite::TFLiteSettings& tflite_settings) {
+  
+  // Calling this function from coreml_plugin to force linking of core ml plugin for device builds.
+  tflite::delegates::register_new();
+  
   delegate_plugin_ = DelegatePluginRegistry::CreateByName(
       absl::StrFormat("%sPlugin", name), tflite_settings);
 
