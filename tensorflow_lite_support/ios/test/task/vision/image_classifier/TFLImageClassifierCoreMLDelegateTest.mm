@@ -14,12 +14,12 @@ limitations under the License.
 ==============================================================================*/
 #import <XCTest/XCTest.h>
 
-#import "third_party/tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions.h"
-#import "third_party/tensorflow_lite_support/ios/task/vision/sources/TFLImageClassifier.h"
-#import "third_party/tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
+#import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions.h"
+#import "tensorflow_lite_support/ios/task/vision/sources/TFLImageClassifier.h"
+#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
-#include "third_party/tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
-#include "third_party/tensorflow_lite_support/cc/task/vision/image_classifier.h"
+#include "tensorflow_lite_support/c/task/vision/utils/frame_buffer_cpp_c_utils.h"
+#include "tensorflow_lite_support/cc/task/vision/image_classifier.h"
 
 using ImageClassifier = ::tflite::task::vision::ImageClassifier;
 using ImageClassifierOptions = ::tflite::task::vision::ImageClassifierOptions;

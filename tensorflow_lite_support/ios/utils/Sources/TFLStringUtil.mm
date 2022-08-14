@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#import "third_party/tensorflow_lite_support/ios/utils/Sources/TFLStringUtil.h"
+#import "tensorflow_lite_support/ios/utils/Sources/TFLStringUtil.h"
 
 std::string MakeString(NSString* str) { return std::string([str UTF8String]); }
 
