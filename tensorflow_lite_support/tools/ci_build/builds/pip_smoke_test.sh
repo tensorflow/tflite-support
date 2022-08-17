@@ -23,6 +23,8 @@ set -x
 function run_smoke_test() {
   VENV_TMP_DIR="$(mktemp -d)"
 
+  echo "Running on $OSTYPE"
+
   if [[ "$OSTYPE" == "msys" ]]; then
     VENV_TMP_DIR="$(cygpath -m $VENV_TMP_DIR)"
   fi
