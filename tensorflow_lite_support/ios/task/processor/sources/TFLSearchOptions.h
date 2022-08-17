@@ -12,14 +12,26 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#include "tensorflow_lite_support/cc/task/processor/proto/embedding_options_proto_inc.h"
-#import "tensorflow_lite_support/ios/task/processor/sources/TFLEmbeddingOptions.h"
+#import <Foundation/Foundation.h>
+#import "tensorflow_lite_support/ios/task/core/sources/TFLExternalFile.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TFLEmbeddingOptions (Helpers)
+/**
+ * Holds options for search task.
+ */
+NS_SWIFT_NAME(SearchOptions)
+@interface TFLSearchOptions : NSObject <NSCopying>
 
-- (void)copyToCppOptions:(tflite::task::processor::EmbeddingOptions *)cppEmbeddingOptions;
+/** The index file to search into. Mandatory only if the index is not attached to the output tensor
+ * metadata as an AssociatedFile with type SCANN_INDEX_FILE. Note that in case both are provided,
+ * this field takes precedence.
+ * */
+@property(nonatomic, copy) TFLExternalFile *indexFile;
+
+/** Maximum number of nearest neighbor results to return. Defaults to 5.
+ * */
+@property(nonatomic) NSInteger maxResults;
 
 @end
 

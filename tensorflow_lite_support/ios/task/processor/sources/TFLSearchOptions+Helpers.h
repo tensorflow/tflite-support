@@ -12,14 +12,14 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#include "tensorflow_lite_support/cc/task/processor/proto/embedding_options_proto_inc.h"
-#import "tensorflow_lite_support/ios/task/processor/sources/TFLEmbeddingOptions.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/search_options_proto_inc.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchOptions.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TFLEmbeddingOptions (Helpers)
+@interface TFLSearchOptions (Helpers)
 
-- (void)copyToCppOptions:(tflite::task::processor::EmbeddingOptions *)cppEmbeddingOptions;
+- (void)copyToCppOptions:(tflite::task::processor::SearchOptions *)cppSearchOptions;
 
 @end
 

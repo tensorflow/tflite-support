@@ -12,15 +12,15 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#include "tensorflow_lite_support/cc/task/processor/proto/embedding_options_proto_inc.h"
-#import "tensorflow_lite_support/ios/task/processor/sources/TFLEmbeddingOptions.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchOptions+Helpers.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@implementation TFLSearchOptions (Helpers)
 
-@interface TFLEmbeddingOptions (Helpers)
-
-- (void)copyToCppOptions:(tflite::task::processor::EmbeddingOptions *)cppEmbeddingOptions;
+- (void)copyToCppOptions:(tflite::task::processor::SearchOptions *)cppSearchOptions {
+  if (self.indexFile.filePath) {
+    cppSearchOptions->mutable_index_file()->set_file_name(self.indexFile.filePath.UTF8String);
+  }
+  cppSearchOptions->set_max_results(self.maxResults);
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

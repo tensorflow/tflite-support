@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLEmbeddingOptions.h"
 
 @implementation TFLEmbeddingOptions
-@synthesize l2Normalize;
-@synthesize quantize;
 
 - (id)copyWithZone:(NSZone *)zone {
   TFLEmbeddingOptions *embeddingOptions = [[TFLEmbeddingOptions alloc] init];
