@@ -68,6 +68,17 @@ objc_library(
 )
 
 objc_library(
+    name = "TFLEmbeddingOptions",
+    srcs = [
+        "sources/TFLEmbeddingOptions.m",
+    ],
+    hdrs = [
+        "sources/TFLEmbeddingOptions.h",
+    ],
+    module_name = "TFLEmbeddingOptions",
+)
+
+objc_library(
     name = "TFLClassificationOptionsHelpers",
     srcs = [
         "sources/TFLClassificationOptions+Helpers.m",
@@ -143,5 +154,20 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/c/task/processor:segmentation_result",
         "//tensorflow_lite_support/ios/task/processor:TFLSegmentationResult",
+    ],
+)
+
+objc_library(
+    name = "TFLEmbeddingOptionsHelpers",
+    srcs = [
+        "sources/TFLEmbeddingOptions+Helpers.mm",
+    ],
+    hdrs = [
+        "sources/TFLEmbeddingOptions+Helpers.h",
+    ],
+    module_name = "TFLEmbeddingOptionsHelpers",
+    deps = [
+        "//tensorflow_lite_support/cc/task/processor/proto:embedding_options_cc_proto_inc",
+        "//tensorflow_lite_support/ios/task/processor:TFLEmbeddingOptions",
     ],
 )
