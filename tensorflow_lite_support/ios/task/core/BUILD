@@ -4,6 +4,17 @@ package(
 )
 
 objc_library(
+    name = "TFLExternalFile",
+    srcs = [
+        "sources/TFLExternalFile.m",
+    ],
+    hdrs = [
+        "sources/TFLExternalFile.h",
+    ],
+    module_name = "TFLExternalFile",
+)
+
+objc_library(
     name = "TFLBaseOptions",
     srcs = [
         "sources/TFLBaseOptions.m",
