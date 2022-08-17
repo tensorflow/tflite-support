@@ -67,17 +67,15 @@ build:elinux_armhf --cpu=armhf
 build:elinux_armhf --distinct_host_configuration=true
 build:elinux_armhf --copt -mfp16-format=ieee
 
-# By default, build TF in C++ 14 mode.
-build:android --cxxopt=-std=c++14
-build:android --host_cxxopt=-std=c++14
-build:ios --cxxopt=-std=c++14
-build:ios --host_cxxopt=-std=c++14
-build:linux --cxxopt=-std=c++14
-build:linux --host_cxxopt=-std=c++14
-build:macos --cxxopt=-std=c++14
-build:macos --host_cxxopt=-std=c++14
-
-# Under Windows, the Visual Studio compiler requires C++17
+# By default, build TF in C++ 17 mode.
+build:android --cxxopt=-std=c++17
+build:android --host_cxxopt=-std=c++17
+build:ios --cxxopt=-std=c++17
+build:ios --host_cxxopt=-std=c++17
+build:linux --cxxopt=-std=c++17
+build:linux --host_cxxopt=-std=c++17
+build:macos --cxxopt=-std=c++17
+build:macos --host_cxxopt=-std=c++17
 build:windows --cxxopt=/std:c++17
 build:windows --host_cxxopt=/std:c++17
 

@@ -11,7 +11,7 @@ load("//third_party/py:python_configure.bzl", "python_configure")
 load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
 
 def tflite_support_workspace2():
-    """Partial workspace defintion for the TFLite Support Library. See WORKSPACE for usage."""
+    """Partial workspace definition for the TFLite Support Library. See WORKSPACE for usage."""
     tf_configure(name = "local_config_tf")
     grpc_deps()
     apple_rules_dependencies()

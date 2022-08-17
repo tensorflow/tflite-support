@@ -5,7 +5,7 @@ Partial workspace defintion for the TFLite Support Library. See WORKSPACE for us
 load("@tf_toolchains//toolchains/embedded/arm-linux:arm_linux_toolchain_configure.bzl", "arm_linux_toolchain_configure")
 
 def tflite_support_workspace0():
-    """Partial workspace defintion for the TFLite Support Library. See WORKSPACE for usage."""
+    """Partial workspace definition for the TFLite Support Library. See WORKSPACE for usage."""
 
     # TFLite crossbuild toolchain for embeddeds Linux
     arm_linux_toolchain_configure(

@@ -5,5 +5,5 @@ Partial workspace defintion for the TFLite Support Library. See WORKSPACE for us
 load("@org_tensorflow//tensorflow:workspace0.bzl", "workspace")
 
 def tflite_support_workspace3():
-    """Partial workspace defintion for the TFLite Support Library. See WORKSPACE for usage."""
+    """Partial workspace definition for the TFLite Support Library. See WORKSPACE for usage."""
     workspace()
