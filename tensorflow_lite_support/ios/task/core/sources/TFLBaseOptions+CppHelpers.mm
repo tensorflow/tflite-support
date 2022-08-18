@@ -16,7 +16,7 @@
 
 @implementation TFLBaseOptions (CppHelpers)
 
-- (void)copyTocppOptions:(tflite::task::core::BaseOptions *)cppOptions {   
+- (void)copyToCppOptions:(tflite::task::core::BaseOptions *)cppOptions {   
   if (self.modelFile.filePath) {
     cppOptions->mutable_model_file()->set_file_name(self.modelFile.filePath.UTF8String);
   }
