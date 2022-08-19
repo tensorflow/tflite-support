@@ -179,8 +179,8 @@ NS_ASSUME_NONNULL_BEGIN
                  nil         // expectedDisplaName
   );
   VerifyCategory(categories[1],
-                 500,                    // expectedIndex
-                 0.019531,               // expectedScore
+                 500,  // expectedIndex
+                                         0.019531,               // expectedScore
                  @"Inside, small room",  // expectedLabel
                  nil                     // expectedDisplaName
   );
@@ -210,8 +210,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)validateCategoriesForInferenceWithLabelDenyList:(NSArray<TFLCategory *> *)categories {
   VerifyCategory(categories[0],
-                 500,                    // expectedIndex
-                 0.019531,               // expectedScore
+                 500,  // expectedIndex
+                                         0.019531,               // expectedScore
                  @"Inside, small room",  // expectedLabel
                  nil                     // expectedDisplaName
   );

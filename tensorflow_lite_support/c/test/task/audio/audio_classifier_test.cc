@@ -194,10 +194,9 @@ TEST_F(AudioClassifierClassifyTest, SucceedsWithAudioFile) {
   Verify(classification_result->classifications[0].categories[0], 0, "Speech",
          0.917969);
   Verify(classification_result->classifications[0].categories[1], 500,
-         "Inside, small room", 0.058594);
+           "Inside, small room", 0.058594);
   Verify(classification_result->classifications[0].categories[2], 494,
-         "Silence", 0.011719);
-
+           "Silence", 0.011719);
   TfLiteClassificationResultDelete(classification_result);
 }
 

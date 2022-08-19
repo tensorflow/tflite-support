@@ -49,6 +49,9 @@ _FIXED_INPUT_SIZE_MODEL_CLASSIFICATION_RESULT = _ClassificationResult(
                     category_name='Speech'),
                 _Category(
                     index=500,
+                    # TODO(luwa): Update tflite dep version in github repo once
+                    # cl/453375223 is submitted.
+
                     score=0.058594,
                     display_name='',
                     category_name='Inside, small room'),
