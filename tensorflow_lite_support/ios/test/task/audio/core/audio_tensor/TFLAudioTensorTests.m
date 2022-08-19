@@ -20,7 +20,7 @@
 #import "tensorflow_lite_support/ios/test/task/audio/core/audio_record/utils/sources/AVAudioPCMBuffer+Utils.h"
 
 #define VerifyError(error, expectedErrorDomain, expectedErrorCode, expectedLocalizedDescription) \
-  XCTAssertEqual(error.domain, expectedErrorDomain);                                             \
+  XCTAssertEqualObjects(error.domain, expectedErrorDomain);                                      \
   XCTAssertEqual(error.code, expectedErrorCode);                                                 \
   XCTAssertEqualObjects(error.localizedDescription, expectedLocalizedDescription);
 #define BUFFER_SIZE 100

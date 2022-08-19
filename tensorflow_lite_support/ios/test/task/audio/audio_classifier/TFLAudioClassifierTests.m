@@ -20,7 +20,7 @@
 
 #define VerifyError(error, expectedDomain, expectedCode, expectedLocalizedDescription)  \
   XCTAssertNotNil(error);                                                               \
-  XCTAssertEqual(error.domain, expectedDomain);                                         \
+  XCTAssertEqualObjects(error.domain, expectedDomain);                                  \
   XCTAssertEqual(error.code, expectedCode);                                             \
   XCTAssertNotEqual(                                                                    \
       [error.localizedDescription rangeOfString:expectedLocalizedDescription].location, \
