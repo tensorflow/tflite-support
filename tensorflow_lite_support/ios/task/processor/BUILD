@@ -187,7 +187,7 @@ objc_library(
 objc_library(
     name = "TFLSearchOptionsHelpers",
     srcs = [
-        "sources/TTFLSearchOptions+Helpers.mm",
+        "sources/TFLSearchOptions+Helpers.mm",
     ],
     hdrs = [
         "sources/TFLSearchOptions+Helpers.h",
