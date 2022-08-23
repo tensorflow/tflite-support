@@ -97,11 +97,11 @@ class TensorImage(object):
 
   def __del__(self) -> None:
     """Destructor to free the storage of ImageData if loaded from the file."""
-    if self._is_from_numpy_array and image_utils:
+    if not self._is_from_numpy_array and image_utils:
       # __del__ can be executed during interpreter shutdown, therefore
       # image_utils may not be available.
       # See https://docs.python.org/3/reference/datamodel.html#object.__del__
-      image_utils.ImageDataFree(self._image_data)
+      image_utils.image_data_free(self._image_data)
 
   @property
   def buffer(self) -> np.ndarray:
