@@ -16,15 +16,14 @@
 
 @implementation TFLBaseOptions (CppHelpers)
 
-- (void)copyToCppOptions:(tflite::task::core::BaseOptions *)cppOptions {   
+- (void)copyToCppOptions:(tflite::task::core::BaseOptions *)cppOptions {
   if (self.modelFile.filePath) {
     cppOptions->mutable_model_file()->set_file_name(self.modelFile.filePath.UTF8String);
   }
   cppOptions->mutable_compute_settings()
       ->mutable_tflite_settings()
       ->mutable_cpu_settings()
-      ->set_num_threads(
-          (int)self.computeSettings.cpuSettings.numThreads);
+      ->set_num_threads((int)self.computeSettings.cpuSettings.numThreads);
 }
 
 @end
