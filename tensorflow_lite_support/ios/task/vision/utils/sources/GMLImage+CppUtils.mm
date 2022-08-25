@@ -13,7 +13,7 @@
  limitations under the License.
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+CppUtils.h"
-#import "tensorflow_lite_support/ios/utils/sources/TFLCommonCppUtils.h"
+#import "tensorflow_lite_support/ios/sources/TFLCommonCppUtils.h"
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
