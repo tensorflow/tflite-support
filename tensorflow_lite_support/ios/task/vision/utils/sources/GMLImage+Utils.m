@@ -17,9 +17,9 @@
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
 #import <Accelerate/Accelerate.h>
-#import <CoreGraphics/CoreGraphics.h>
-#import <CoreImage/CoreImage.h>
 #import <CoreVideo/CoreVideo.h>
+#import <CoreMedia/CoreMedia.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 @interface TFLCVPixelBufferUtils : NSObject
 
@@ -356,8 +356,6 @@
 }
 
 - (nullable TfLiteFrameBuffer *)cFrameBufferWithError:(NSError *_Nullable *)error {
-  TfLiteFrameBuffer *cFrameBuffer = NULL;
-
   uint8_t *buffer = [self bufferWithError:error];
 
   if (!buffer) {
@@ -375,7 +373,7 @@
     cFrameBuffer->dimension.width = bitmapSize.width;
     cFrameBuffer->dimension.height = bitmapSize.height;
     cFrameBuffer->buffer = buffer;
-    cFrameBuffer->format = frameBufferFormat;
+    cFrameBuffer->format = cFrameBufferFormat;
   }
 
   return cFrameBuffer;

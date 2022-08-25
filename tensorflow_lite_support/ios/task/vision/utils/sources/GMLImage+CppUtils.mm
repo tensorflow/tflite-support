@@ -19,8 +19,6 @@
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 #include "absl/strings/str_format.h"  // from @com_google_absl
 
-#import <CoreGraphics/CoreGraphics.h>
-
 namespace {
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 using ::tflite::support::StatusOr;

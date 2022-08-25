@@ -12,6 +12,7 @@ objc_library(
         "sources/GMLImage+Utils.h",
     ],
     features = ["-layering_check"],
+    sdk_frameworks = ["CoreVideo", "CoreGraphics", "Accelerate", "CoreMedia"],
     module_name = "GMLImageUtils",
     deps = [
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
@@ -30,7 +31,6 @@ objc_library(
     ],
     features = ["-layering_check"],
     module_name = "GMLImageCppUtils",
-    sdk_frameworks = ["Accelerate"],
     deps = [
         ":GMLImageUtils",
         "//tensorflow_lite_support/ios:TFLCommonUtils",
