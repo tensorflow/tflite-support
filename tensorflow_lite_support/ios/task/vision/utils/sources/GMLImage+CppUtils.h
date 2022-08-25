@@ -14,7 +14,7 @@
  ==============================================================================*/
 #import <Foundation/Foundation.h>
 
-#include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
+#include "tensorflow_lite_support/cc/task/vision/core/frame_buffer.h"
 
 #import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
 
@@ -23,9 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** Helper utility for performing operations on GMLImage specific to the
  * TF Lite Task Vision library
  */
-@interface GMLImage (Utils)
-
-@property(nonatomic, readonly) CGSize bitmapSize;
+@interface GMLImage (CppUtils)
 
 /**
  * Creates and returns a TfLiteFrameBuffer from a GMLImage. TfLiteFrameBuffer
@@ -39,39 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return The TfLiteFrameBuffer created from the gmlImage which can be used
  * with the TF Lite Task Vision C library.
  */
-- (nullable uint8_t *)bufferWithError:(NSError *_Nullable *)error;
-
-- (CGSize)size;
-
-- (nullable TfLiteFrameBuffer *)cFrameBufferWithError:(NSError *_Nullable *)error;
-
-/**
- * Gets grayscale pixel buffer from GMLImage if source type is
- * GMLImageSourceTypeImage.
- *
- * @warning Currently method only returns gray scale pixel buffer if source type
- * is GMLImageSourceTypeImage since extracting gray scale pixel buffer from
- * other source types is not a necessity for the current testing framework.
- *
- * @return The CVPixelBufferRef for the newly created gray scale pixel buffer.
- */
-- (CVPixelBufferRef)grayScalePixelBuffer;
-
-/**
- * Loads an image from a file in an app bundle into a GMLImage object.
- *
- * @param classObject The specified class associated with the bundle containing
- * the file to be loaded.
- * @param name Name of the image file.
- * @param type Extenstion of the image file.
- *
- * @return The GMLImage object contains the loaded image. This method returns
- * nil if it cannot load the image.
- */
-+ (nullable GMLImage *)imageFromBundleWithClass:(Class)classObject
-                                       fileName:(NSString *)name
-                                         ofType:(NSString *)type
-    NS_SWIFT_NAME(imageFromBundle(class:filename:type:));
+- (std::unique_ptr<tflite::task::vision::FrameBuffer>)cppFrameBufferWithError:(NSError *_Nullable *)error;
 
 @end
 

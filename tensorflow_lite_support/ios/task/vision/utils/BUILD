@@ -19,3 +19,24 @@ objc_library(
         "//tensorflow_lite_support/odml/ios/image:MLImage",
     ],
 )
+
+objc_library(
+    name = "GMLImageCppUtils",
+    srcs = [
+        "sources/GMLImage+CppUtils.mm",
+    ],
+    hdrs = [
+        "sources/GMLImage+CppUtils.h",
+    ],
+    features = ["-layering_check"],
+    module_name = "GMLImageCppUtils",
+    sdk_frameworks = ["Accelerate"],
+    deps = [
+        ":GMLImageUtils",
+        "//tensorflow_lite_support/ios:TFLCommonUtils",
+        "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
+        "//tensorflow_lite_support/odml/ios/image:MLImage",
+        "@com_google_absl//absl/strings:str_format",
+    ],
+    copts = ["-ObjC++","-std=c++14"]
+)
