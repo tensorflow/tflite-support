@@ -252,6 +252,14 @@ cc_proto_library(
     deps = [":search_result_proto"],
 )
 
+cc_library(
+    name = "search_result_cc_proto_inc",
+    srcs = ["search_result_proto_inc.h"],
+    deps = [
+        ":search_result_cc_proto",
+    ],
+)
+
 support_py_proto_library(
     name = "search_result_py_pb2",
     srcs = ["search_result.proto"],

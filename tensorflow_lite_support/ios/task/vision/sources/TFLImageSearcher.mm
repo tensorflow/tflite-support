@@ -14,14 +14,15 @@
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageSearcher.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
-#import "tensorflow_lite_support/ios/utils/sources/TFLCommonUtils.h"
+#import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+CppHelpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLEmbeddingOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchOptions+Helpers.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchResult+Helpers.h"
 
 // #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions+Helpers.h"
 // #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult+Helpers.h"
-#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
+#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+CppUtils.h"
 
 #include "tensorflow_lite_support/cc/task/vision/image_searcher.h"
 
@@ -29,6 +30,9 @@ namespace {
 using ImageSearcherCpp = ::tflite::task::vision::ImageSearcher;
 using ImageSearcherOptionsCpp =
     ::tflite::task::vision::ImageSearcherOptions;
+using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
+using BoundingBoxCpp = ::tflite::task::vision::BoundingBox;
+using SearchResultCpp = ::tflite::task::processor::SearchResult;
 using ::tflite::support::StatusOr;
 }
 
@@ -63,7 +67,7 @@ std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
 
 - (ImageSearcherOptionsCpp)cppOptions {
     ImageSearcherOptionsCpp cppOptions = {};
-    [self.baseOptions copyTocppOptions:cppOptions.mutable_base_options()];
+    [self.baseOptions copyToCppOptions:cppOptions.mutable_base_options()];
     [self.embeddingOptions copyToCppOptions:cppOptions.mutable_embedding_options()];
     [self.searchOptions copyToCppOptions:cppOptions.mutable_search_options()];
 
@@ -164,9 +168,24 @@ std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
 
 - (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image
                                                      error:(NSError **)error {
-  return [self searchInGMLImage:image
-                   regionOfInterest:CGRectMake(0, 0, image.width, image.height)
-                              error:error];
+
+  if (!image) {
+    [TFLCommonUtils createCustomError:error
+                             withCode:TFLSupportErrorCodeInvalidArgumentError
+                          description:@"GMLImage argument cannot be nil."];
+    return nil;
+  }
+
+  std::unique_ptr<FrameBufferCpp> cppFrameBuffer = [image cppFrameBufferWithError:error];
+
+  if (!cppFrameBuffer) {
+    return nil;
+  }
+
+  StatusOr<SearchResultCpp> cpp_search_result_status =
+      _cppImageSearcher->Search(*cppFrameBuffer);
+ 
+  return [TFLSearchResult searchResultWithCppResult:cpp_search_result_status error:error];
 }
 
 - (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image
@@ -185,55 +204,15 @@ std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
     return nil;
   }
 
-  // TfLiteBoundingBox boundingBox = {.origin_x = roi.origin.x,
-  //                                  .origin_y = roi.origin.y,
-  //                                  .width = roi.size.width,
-  //                                  .height = roi.size.height};
-
   BoundingBoxCpp cc_roi;
-  if (roi == nullptr) {
-    cc_roi.set_width(frame_buffer->dimension.width);
-    cc_roi.set_height(frame_buffer->dimension.height);
-  } else {
-    cc_roi.set_origin_x(roi->origin_x);
-    cc_roi.set_origin_y(roi->origin_y);
-    cc_roi.set_width(roi->width);
-    cc_roi.set_height(roi->height);
-  }                             
+  cc_roi.set_origin_x(roi.origin.x);
+  cc_roi.set_origin_y(roi.origin.y);
+  cc_roi.set_width(roi.size.width);
+  cc_roi.set_height(roi.size.height);                            
   
   StatusOr<SearchResultCpp> cpp_search_result_status =
-      _cppImageSearcher->Search(cppFrameBuffer, cc_roi);
-
-  if (!cpp_classification_result_status.ok()) {
-    tflite::support::CreateTfLiteSupportErrorWithStatus(
-        cpp_classification_result_status.status(), error);
-    return nullptr;
-
-  // TfLiteSupportError *classifyError = NULL;
-  // TfLiteClassificationResult *cClassificationResult = TfLiteImageClassifierClassifyWithRoi(
-  //     _imageClassifier, cFrameBuffer, &boundingBox, &classifyError);
-
-  free(cFrameBuffer->buffer);
-  cFrameBuffer->buffer = NULL;
-
-  free(cFrameBuffer);
-  cFrameBuffer = NULL;
-
-  // Populate iOS error if C Error is not null and afterwards delete it.
-  if (![TFLCommonUtils checkCError:classifyError toError:error]) {
-    TfLiteSupportErrorDelete(classifyError);
-  }
-
-  // Return nil if C result evaluates to nil. If an error was generted by the C layer, it has
-  // already been populated to an NSError and deleted before returning from the method.
-  if (!cClassificationResult) {
-    return nil;
-  }
-
-  TFLClassificationResult *classificationHeadsResults =
-      [TFLClassificationResult classificationResultWithCResult:cClassificationResult];
-  TfLiteClassificationResultDelete(cClassificationResult);
-
-  return classificationHeadsResults;
+      _cppImageSearcher->Search(*cppFrameBuffer, cc_roi);
+ 
+  return [TFLSearchResult searchResultWithCppResult:cpp_search_result_status error:error];
 }
 @end

@@ -25,33 +25,38 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface GMLImage (Utils)
 
+/** Bitmap size of the image*/
 @property(nonatomic, readonly) CGSize bitmapSize;
 
 /**
- * Creates and returns a TfLiteFrameBuffer from a GMLImage. TfLiteFrameBuffer
- * is used by the TFLite Task Vision C library to hold the backing buffer of
- * any image. Image inputs to the TFLite Task Vision C library is of type
- * TfLiteFrameBuffer.
+ * Returns the underlying uint8 pixel buffer of a GMLImage.
  *
  * @param error Pointer to the memory location where errors if any should be
  * saved. If `nil`, no error will be saved.
  *
- * @return The TfLiteFrameBuffer created from the gmlImage which can be used
- * with the TF Lite Task Vision C library.
+ * @return The underlying pixel buffer of gmlImage or nil in case of errors.
  */
 - (nullable uint8_t *)bufferWithError:(NSError *_Nullable *)error;
 
-- (CGSize)size;
-
+/**
+ * Creates and returns a TfLiteFrameBuffer from a GMLImage. TfLiteFrameBuffer is used by the TFLite
+ * Task Vision C library to hold the backing buffer of any image. Image inputs to the TFLite Task
+ * Vision C library is of type TfLiteFrameBuffer.
+ *
+ * @param error Pointer to the memory location where errors if any should be saved. If `nil`, no
+ * error will be saved.
+ *
+ * @return The TfLiteFrameBuffer created from the gmlImage which can be used with the TF Lite Task
+ * Vision C library.
+ */
 - (nullable TfLiteFrameBuffer *)cFrameBufferWithError:(NSError *_Nullable *)error;
 
 /**
- * Gets grayscale pixel buffer from GMLImage if source type is
- * GMLImageSourceTypeImage.
+ * Gets grayscale pixel buffer from GMLImage if source type is GMLImageSourceTypeImage.
  *
- * @warning Currently method only returns gray scale pixel buffer if source type
- * is GMLImageSourceTypeImage since extracting gray scale pixel buffer from
- * other source types is not a necessity for the current testing framework.
+ * @warning Currently method only returns gray scale pixel buffer if source type is
+ * GMLImageSourceTypeImage since extracting gray scale pixel buffer from other source types is not a
+ * necessity for the current testing framework.
  *
  * @return The CVPixelBufferRef for the newly created gray scale pixel buffer.
  */
@@ -60,13 +65,13 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Loads an image from a file in an app bundle into a GMLImage object.
  *
- * @param classObject The specified class associated with the bundle containing
- * the file to be loaded.
+ * @param classObject The specified class associated with the bundle containingthe file to be
+ * loaded.
  * @param name Name of the image file.
  * @param type Extenstion of the image file.
  *
- * @return The GMLImage object contains the loaded image. This method returns
- * nil if it cannot load the image.
+ * @return The GMLImage object contains the loaded image. This method returns nil if it cannot load
+ * the image.
  */
 + (nullable GMLImage *)imageFromBundleWithClass:(Class)classObject
                                        fileName:(NSString *)name

@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,24 +20,24 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Helper utility for performing operations on GMLImage specific to the
- * TF Lite Task Vision library
+/** Helper utility for converting GMLImage to C++ FrameBuffer accepted by the TF Lite Task Vision
+ * C++ library.
  */
 @interface GMLImage (CppUtils)
 
 /**
- * Creates and returns a TfLiteFrameBuffer from a GMLImage. TfLiteFrameBuffer
- * is used by the TFLite Task Vision C library to hold the backing buffer of
- * any image. Image inputs to the TFLite Task Vision C library is of type
- * TfLiteFrameBuffer.
+ * Creates and returns a C++ FrameBuffer from a GMLImage. tflite::task::vision::FrameBuffer is used
+ * by the TFLite Task Vision C++ library to hold the backing buffer of any image. Image inputs to
+ * the TFLite Task Vision C library is of type TfLiteFrameBuffer.
  *
- * @param error Pointer to the memory location where errors if any should be
- * saved. If `nil`, no error will be saved.
+ * @param error Pointer to the memory location where errors if any should be saved. If `nil`, no
+ * error will be saved.
  *
- * @return The TfLiteFrameBuffer created from the gmlImage which can be used
- * with the TF Lite Task Vision C library.
+ * @return The FrameBuffer created from the gmlImage which can be used with the TF Lite Task Vision
+ * C++ library.
  */
-- (std::unique_ptr<tflite::task::vision::FrameBuffer>)cppFrameBufferWithError:(NSError *_Nullable *)error;
+- (std::unique_ptr<tflite::task::vision::FrameBuffer>)cppFrameBufferWithError:
+    (NSError *_Nullable *)error;
 
 @end
 

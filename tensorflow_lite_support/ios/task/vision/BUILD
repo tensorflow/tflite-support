@@ -85,11 +85,11 @@ objc_library(
     module_name = "TFLImageSearcher",
     deps = [
         "//tensorflow_lite_support/cc/task/vision:image_searcher",
-        "//tensorflow_lite_support/ios/utils:TFLCommonUtils",
+        "//tensorflow_lite_support/ios:TFLCommonUtils",
         "//tensorflow_lite_support/ios/task/core:TFLBaseOptionsCppHelpers",
-        "//tensorflow_lite_support/ios/task/processor:TFLSearchOptions",
+        "//tensorflow_lite_support/ios/task/processor:TFLSearchOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLEmbeddingOptionsHelpers",
-        "//tensorflow_lite_support/ios/task/processor:TFLSearchResult",
+        "//tensorflow_lite_support/ios/task/processor:TFLSearchResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageCppUtils",
     ],
     copts = ["-ObjC++","-std=c++14"]
