@@ -44,7 +44,7 @@ using ::tflite::support::StatusOr;
     return NULL;
   }
 
-  return frameBuffer.value();
+  return std::move(frameBuffer.value());
 }
 
 @end
