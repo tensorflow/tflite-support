@@ -12,8 +12,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#include "tensorflow_lite_support/cc/task/processor/proto/search_result_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
+#include "tensorflow_lite_support/cc/task/processor/proto/search_result_proto_inc.h"
 
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchResult.h"
 
@@ -21,17 +21,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TFLSearchResult (Helpers)
 /**
- * Creates and retrurns a TFLSegmentationResult from a TFLSegmentationResult
- * returned by TFLite Task C Library Image Segmentation task.
+ * Creates and retruns a TFLSearchResult from the result of search task returned by TFLite Task C++
+ * Library.
  *
- * @param cppSearchResult Segmentation results returned by TFLite Task
- * C Library Image Segmentation task.
+ * @param cppSearchResult search result returned by TFLite Task C++ Library Search task.
  *
- * @return Segmentation Result of type TFLSegmentationResult to be returned by
- * inference methods of the iOS TF Lite Task Image Segmentation task.
+ * @return A new TFLSearchResult to be returned by inference methods of the iOS TF Lite Task Search
+ * task.
  */
-+ (nullable TFLSearchResult *)searchResultWithCppResult:
-    (const tflite::support::StatusOr<tflite::task::processor::SearchResult>&)cppSearchResult error:(NSError **)error;
++ (nullable TFLSearchResult *)
+    searchResultWithCppResult:
+        (const tflite::support::StatusOr<tflite::task::processor::SearchResult> &)cppSearchResult
+                        error:(NSError **)error;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -26,8 +26,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  return [[TFLNearestNeighbor alloc] initWithMetaData:self.metadata
-                                         distance:self.distance];
+  return [[TFLNearestNeighbor alloc] initWithMetaData:self.metadata distance:self.distance];
 }
 
 @end

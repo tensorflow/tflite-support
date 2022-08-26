@@ -12,35 +12,38 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchResult+Helpers.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommonCppUtils.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchResult+Helpers.h"
 
 namespace {
-  using tflite::support::StatusOr;
-  using SearchResultCpp = tflite::task::processor::SearchResult;
+using tflite::support::StatusOr;
+using SearchResultCpp = tflite::task::processor::SearchResult;
 }
 
 @implementation TFLSearchResult (Helpers)
 
 + (nullable TFLSearchResult *)searchResultWithCppResult:
-    (const StatusOr<SearchResultCpp>&)cppSearchResult error:(NSError **)error {
+                                  (const StatusOr<SearchResultCpp> &)cppSearchResult
+                                                  error:(NSError **)error {
+  if (![TFLCommonCppUtils checkCppError:cppSearchResult.status() toError:error]) {
+    return nil;
+  }
 
- if (![TFLCommonCppUtils checkCppError:cppSearchResult.status() toError:error]) {
-   return nil;
- }
- 
- NSMutableArray *nearestNeighbors = [[NSMutableArray alloc] init];
- 
- auto cpp_search_result_value = cppSearchResult.value();
- for(int i = 0; i < cpp_search_result_value.nearest_neighbors_size(); i++) {
+  NSMutableArray *nearestNeighbors = [[NSMutableArray alloc] init];
+
+  auto cpp_search_result_value = cppSearchResult.value();
   
-  auto cpp_nearest_neighbor = cpp_search_result_value.nearest_neighbors(i);
-  NSString *metadata = [NSString stringWithCString:cpp_nearest_neighbor.metadata().c_str() encoding:NSUTF8StringEncoding];
-  TFLNearestNeighbor *nearestNeighbor = [[TFLNearestNeighbor alloc] initWithMetaData:metadata distance:(CGFloat)cpp_nearest_neighbor.distance()];
-  [nearestNeighbors addObject:nearestNeighbor];
- }
+  for (int i = 0; i < cpp_search_result_value.nearest_neighbors_size(); i++) {
+    auto cpp_nearest_neighbor = cpp_search_result_value.nearest_neighbors(i);
+    NSString *metadata = [NSString stringWithCString:cpp_nearest_neighbor.metadata().c_str()
+                                            encoding:NSUTF8StringEncoding];
+    TFLNearestNeighbor *nearestNeighbor =
+        [[TFLNearestNeighbor alloc] initWithMetaData:metadata
+                                            distance:(CGFloat)cpp_nearest_neighbor.distance()];
+    [nearestNeighbors addObject:nearestNeighbor];
+  }
 
- return [[TFLSearchResult alloc] initWithNearestNeighbors:nearestNeighbors];
+  return [[TFLSearchResult alloc] initWithNearestNeighbors:nearestNeighbors];
 }
 
 @end
