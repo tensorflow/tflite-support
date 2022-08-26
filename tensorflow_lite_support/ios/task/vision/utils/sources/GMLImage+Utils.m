@@ -18,7 +18,7 @@
 
 #import <Accelerate/Accelerate.h>
 #import <CoreGraphics/CoreGraphics.h>
-#import <CoreMedia/CoreMedia.h>
+#import <CoreImage/CoreImage.h>
 #import <CoreVideo/CoreVideo.h>
 
 @interface TFLCVPixelBufferUtils : NSObject
@@ -46,7 +46,7 @@
   size_t destinationBytesPerRow = width * destinationChannelCount;
 
   uint8_t *destPixelBufferAddress =
-      (uint8_t *)[TFLCommonUtils mallocWithSize:sizeof(uint8_t) * height * destinationBytesPerRow
+      [TFLCommonUtils mallocWithSize:sizeof(uint8_t) * height * destinationBytesPerRow
                                           error:error];
 
   if (!destPixelBufferAddress) {
@@ -103,7 +103,7 @@
   CVPixelBufferLockBaseAddress(pixelBuffer, 0);
 
   uint8_t *rgbData = [TFLCVPixelBufferUtils
-      createRGBImageDatafromImageData:(uint8_t *)CVPixelBufferGetBaseAddress(pixelBuffer)
+      createRGBImageDatafromImageData:CVPixelBufferGetBaseAddress(pixelBuffer)
                             withWidth:CVPixelBufferGetWidth(pixelBuffer)
                                height:CVPixelBufferGetHeight(pixelBuffer)
                                stride:CVPixelBufferGetBytesPerRow(pixelBuffer)
@@ -225,7 +225,7 @@
 
   if (context) {
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), cgImage);
-    uint8_t *srcData = (uint8_t *)CGBitmapContextGetData(context);
+    uint8_t *srcData = CGBitmapContextGetData(context);
 
     if (srcData) {
       // We have drawn the image as an RGBA image with 8 bitsPerComponent and hence can safely input
