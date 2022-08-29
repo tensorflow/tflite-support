@@ -170,7 +170,7 @@
     height = CVPixelBufferGetHeight(self.CIImage.pixelBuffer);
   } else if (self.CIImage.CGImage) {
     width = CGImageGetWidth(self.CIImage.CGImage);
-    height = CGImageGetWidth(self.CIImage.CGImage);
+    height = CGImageGetHeight(self.CIImage.CGImage);
   }
   return CGSizeMake(width, height);
 }
