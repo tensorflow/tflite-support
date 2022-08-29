@@ -1,4 +1,4 @@
-/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,18 +12,17 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+CppHelpers.h"
+#import "tensorflow_lite_support/ios/task/core/sources/TFLExternalFile.h"
 
-@implementation TFLBaseOptions (CppHelpers)
+@implementation TFLExternalFile
+@synthesize filePath;
 
-- (void)copyToCppOptions:(tflite::task::core::BaseOptions *)cppOptions {
-  if (self.modelFile.filePath) {
-    cppOptions->mutable_model_file()->set_file_name(self.modelFile.filePath.UTF8String);
-  }
-  cppOptions->mutable_compute_settings()
-      ->mutable_tflite_settings()
-      ->mutable_cpu_settings()
-      ->set_num_threads((int)self.computeSettings.cpuSettings.numThreads);
+- (id)copyWithZone:(NSZone *)zone {
+  TFLExternalFile *externalFile = [[TFLExternalFile alloc] init];
+
+  externalFile.filePath = self.filePath;
+
+  return externalFile;
 }
 
 @end

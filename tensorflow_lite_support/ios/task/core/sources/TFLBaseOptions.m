@@ -77,19 +77,6 @@
 
 @end
 
-@implementation TFLExternalFile
-@synthesize filePath;
-
-- (id)copyWithZone:(NSZone *)zone {
-  TFLExternalFile *externalFile = [[TFLExternalFile alloc] init];
-
-  externalFile.filePath = self.filePath;
-
-  return externalFile;
-}
-
-@end
-
 @implementation TFLBaseOptions
 @synthesize modelFile;
 @synthesize computeSettings;

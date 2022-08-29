@@ -12,18 +12,27 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ==============================================================================*/
-#import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+CppHelpers.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchOptions.h"
 
-@implementation TFLBaseOptions (CppHelpers)
+@implementation TFLSearchOptions
 
-- (void)copyToCppOptions:(tflite::task::core::BaseOptions *)cppOptions {
-  if (self.modelFile.filePath) {
-    cppOptions->mutable_model_file()->set_file_name(self.modelFile.filePath.UTF8String);
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    // maxResults will be 0 at the time of initialization. Setting it to 5 since max_results
+    // defaults to 5 in search_options.proto.
+    _maxResults = 5;
   }
-  cppOptions->mutable_compute_settings()
-      ->mutable_tflite_settings()
-      ->mutable_cpu_settings()
-      ->set_num_threads((int)self.computeSettings.cpuSettings.numThreads);
+  return self;
+}
+
+- (id)copyWithZone:(NSZone *)zone {
+  TFLSearchOptions *searchOptions = [[TFLSearchOptions alloc] init];
+
+  searchOptions.indexFile = self.indexFile;
+  searchOptions.maxResults = self.maxResults;
+
+  return searchOptions;
 }
 
 @end
