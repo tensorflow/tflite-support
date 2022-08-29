@@ -256,20 +256,12 @@
 - (uint8_t *)frameBufferFromCIImage:(CIImage *)ciImage error:(NSError **)error {
   uint8_t *buffer = NULL;
 
-  int width = 0;
-  int height = 0;
-
   if (ciImage.pixelBuffer) {
-    width = (int)CVPixelBufferGetWidth(ciImage.pixelBuffer);
-    height = (int)CVPixelBufferGetHeight(ciImage.pixelBuffer);
-
     buffer = [TFLCVPixelBufferUtils createRGBImageDatafromCVPixelBuffer:ciImage.pixelBuffer
                                                                   error:error];
 
   } else if (ciImage.CGImage) {
     buffer = [UIImage pixelDataFromCGImage:ciImage.CGImage error:error];
-    width = (int)CGImageGetWidth(ciImage.CGImage);
-    height = (int)CGImageGetWidth(ciImage.CGImage);
   } else {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
