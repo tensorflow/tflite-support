@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Loads an image from a file in an app bundle into a GMLImage object.
  *
- * @param classObject The specified class associated with the bundle containingthe file to be
+ * @param classObject The specified class associated with the bundle containing the file to be
  * loaded.
  * @param name Name of the image file.
  * @param type Extenstion of the image file.
