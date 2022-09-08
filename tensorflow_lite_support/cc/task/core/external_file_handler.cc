@@ -18,8 +18,18 @@ limitations under the License.
 #include <errno.h>
 #include <fcntl.h>
 #include <stddef.h>
+
+#ifdef ABSL_HAVE_MMAP
 #include <sys/mman.h>
+#endif
+
+#ifdef _WIN32
+#include <windows.h>
+#include <direct.h>
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 
 #include <memory>
 #include <string>
@@ -44,12 +54,17 @@ using ::tflite::support::TfLiteSupportStatus;
 // file descriptor correctly, as according to mmap(2), the offset used in mmap
 // must be a multiple of sysconf(_SC_PAGE_SIZE).
 int64 GetPageSizeAlignedOffset(int64 offset) {
+#ifdef _WIN32
+  // mmap is not used on Windows
+  return -1;
+#else
   int64 aligned_offset = offset;
   int64 page_size = sysconf(_SC_PAGE_SIZE);
   if (offset % page_size != 0) {
     aligned_offset = offset / page_size * page_size;
   }
   return aligned_offset;
+#endif
 }
 
 }  // namespace
@@ -68,6 +83,13 @@ ExternalFileHandler::CreateFromExternalFile(const ExternalFile* external_file) {
 }
 
 absl::Status ExternalFileHandler::MapExternalFile() {
+// TODO(b/195588083): Add Windows support
+#ifdef _WIN32
+  return CreateStatusWithPayload(
+      StatusCode::kFailedPrecondition,
+      "File loading is not yet supported on Windows",
+      TfLiteSupportStatus::kFileReadError);
+#else
   if (!external_file_.file_content().empty()) {
     return absl::OkStatus();
   }
@@ -168,6 +190,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
         TfLiteSupportStatus::kFileMmapError);
   }
   return absl::OkStatus();
+#endif
 }
 
 absl::string_view ExternalFileHandler::GetFileContent() {
@@ -181,9 +204,11 @@ absl::string_view ExternalFileHandler::GetFileContent() {
 }
 
 ExternalFileHandler::~ExternalFileHandler() {
+#ifndef _WIN32
   if (buffer_ != MAP_FAILED) {
     munmap(buffer_, buffer_aligned_size_);
   }
+#endif
   if (owned_fd_ >= 0) {
     close(owned_fd_);
   }
