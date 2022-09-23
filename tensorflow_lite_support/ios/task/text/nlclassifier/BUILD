@@ -27,9 +27,7 @@ swift_library(
         "//tensorflow_lite_support/cc/test/testdata/task/text:bert_nl_classifier_models",
     ],
     tags = TFL_DEFAULT_TAGS,
-    deps = [
-        ":TFLBertNLClassifier",
-    ],
+    deps = [":TFLBertNLClassifier"],
 )
 
 ios_unit_test(
@@ -85,9 +83,7 @@ swift_library(
         "//tensorflow_lite_support/cc/test/testdata/task/text:nl_classifier_models",
     ],
     tags = TFL_DEFAULT_TAGS,
-    deps = [
-        ":TFLNLClassifier",
-    ],
+    deps = [":TFLNLClassifier"],
 )
 
 ios_unit_test(

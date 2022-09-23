@@ -28,9 +28,7 @@ swift_library(
         "//tensorflow_lite_support/cc/test/testdata/task/text:mobile_bert_model",
     ],
     tags = TFL_DEFAULT_TAGS,
-    deps = [
-        ":TFLBertQuestionAnswerer",
-    ],
+    deps = [":TFLBertQuestionAnswerer"],
 )
 
 ios_unit_test(
