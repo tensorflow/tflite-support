@@ -32,7 +32,7 @@ using SearchResultCpp = tflite::task::processor::SearchResult;
   NSMutableArray *nearestNeighbors = [[NSMutableArray alloc] init];
 
   auto cpp_search_result_value = cppSearchResult.value();
-  
+
   for (int i = 0; i < cpp_search_result_value.nearest_neighbors_size(); i++) {
     auto cpp_nearest_neighbor = cpp_search_result_value.nearest_neighbors(i);
     NSString *metadata = [NSString stringWithCString:cpp_nearest_neighbor.metadata().c_str()

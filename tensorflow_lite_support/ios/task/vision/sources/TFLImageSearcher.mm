@@ -25,8 +25,7 @@
 
 namespace {
 using ImageSearcherCpp = ::tflite::task::vision::ImageSearcher;
-using ImageSearcherOptionsCpp =
-    ::tflite::task::vision::ImageSearcherOptions;
+using ImageSearcherOptionsCpp = ::tflite::task::vision::ImageSearcherOptions;
 using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 using BoundingBoxCpp = ::tflite::task::vision::BoundingBox;
 using SearchResultCpp = ::tflite::task::processor::SearchResult;
@@ -34,8 +33,8 @@ using ::tflite::support::StatusOr;
 }
 
 @interface TFLImageSearcher () {
-/** ImageSearcher backed by C API */
-std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
+  /** ImageSearcher backed by C API */
+  std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
 }
 @end
 
@@ -63,12 +62,12 @@ std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
 }
 
 - (ImageSearcherOptionsCpp)cppOptions {
-    ImageSearcherOptionsCpp cppOptions = {};
-    [self.baseOptions copyToCppOptions:cppOptions.mutable_base_options()];
-    [self.embeddingOptions copyToCppOptions:cppOptions.mutable_embedding_options()];
-    [self.searchOptions copyToCppOptions:cppOptions.mutable_search_options()];
+  ImageSearcherOptionsCpp cppOptions = {};
+  [self.baseOptions copyToCppOptions:cppOptions.mutable_base_options()];
+  [self.embeddingOptions copyToCppOptions:cppOptions.mutable_embedding_options()];
+  [self.searchOptions copyToCppOptions:cppOptions.mutable_search_options()];
 
-    return cppOptions;
+  return cppOptions;
 }
 
 @end
@@ -78,35 +77,32 @@ std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
 - (nullable instancetype)initWithCppImageSearcherOptions:(ImageSearcherOptionsCpp)cppOptions {
   self = [super init];
   if (self) {
-     StatusOr<std::unique_ptr<ImageSearcherCpp>> cppImageSearcher =
-      ImageSearcherCpp::CreateFromOptions(cppOptions);
+    StatusOr<std::unique_ptr<ImageSearcherCpp>> cppImageSearcher =
+        ImageSearcherCpp::CreateFromOptions(cppOptions);
     if (cppImageSearcher.ok()) {
       _cppImageSearcher = std::move(cppImageSearcher.value());
-     }
-     else {
-       return nil;
-     }
+    } else {
+      return nil;
+    }
   }
   return self;
 }
 
 + (nullable instancetype)imageSearcherWithOptions:(TFLImageSearcherOptions *)options
-                                              error:(NSError **)error {
+                                            error:(NSError **)error {
   if (!options) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
                           description:@"TFLImageSearcherOptions argument cannot be nil."];
     return nil;
   }
-  
+
   ImageSearcherOptionsCpp cppOptions = [options cppOptions];
 
   return [[TFLImageSearcher alloc] initWithCppImageSearcherOptions:cppOptions];
 }
 
-- (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image
-                                                     error:(NSError **)error {
-
+- (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image error:(NSError **)error {
   if (!image) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
@@ -120,15 +116,14 @@ std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
     return nil;
   }
 
-  StatusOr<SearchResultCpp> cpp_search_result_status =
-      _cppImageSearcher->Search(*cppFrameBuffer);
- 
+  StatusOr<SearchResultCpp> cpp_search_result_status = _cppImageSearcher->Search(*cppFrameBuffer);
+
   return [TFLSearchResult searchResultWithCppResult:cpp_search_result_status error:error];
 }
 
 - (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image
-                                          regionOfInterest:(CGRect)roi
-                                                     error:(NSError **)error {
+                              regionOfInterest:(CGRect)roi
+                                         error:(NSError **)error {
   if (!image) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
@@ -146,11 +141,11 @@ std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
   cc_roi.set_origin_x(roi.origin.x);
   cc_roi.set_origin_y(roi.origin.y);
   cc_roi.set_width(roi.size.width);
-  cc_roi.set_height(roi.size.height);                            
-  
+  cc_roi.set_height(roi.size.height);
+
   StatusOr<SearchResultCpp> cpp_search_result_status =
       _cppImageSearcher->Search(*cppFrameBuffer, cc_roi);
- 
+
   return [TFLSearchResult searchResultWithCppResult:cpp_search_result_status error:error];
 }
 @end

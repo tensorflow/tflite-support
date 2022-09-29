@@ -15,8 +15,8 @@
 #import <Foundation/Foundation.h>
 
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions.h"
-#import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLEmbeddingOptions.h"
+#import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchResult.h"
 #import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
 
@@ -30,7 +30,7 @@ NS_SWIFT_NAME(ImageSearcherOptions)
 
 /**
  * Base options for configuring the ImageSearcher. This specifies the TFLite
- * model to use for embedding extraction, as well as hardware acceleration 
+ * model to use for embedding extraction, as well as hardware acceleration
  * options to use as inference time.
  */
 @property(nonatomic, copy) TFLBaseOptions *baseOptions;
@@ -81,13 +81,14 @@ NS_SWIFT_NAME(ImageSearcher)
  * in initializing the image searcher.
  */
 + (nullable instancetype)imageSearcherWithOptions:(TFLImageSearcherOptions *)options
-                                              error:(NSError **)error
+                                            error:(NSError **)error
     NS_SWIFT_NAME(searcher(options:));
 
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Performs embedding extraction on the given GMLImage, followed by nearest-neighbor search in the index.
+ * Performs embedding extraction on the given GMLImage, followed by nearest-neighbor search in the
+ * index.
  *
  * @discussion This method currently supports searching on only the following types of images:
  * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
@@ -96,14 +97,14 @@ NS_SWIFT_NAME(ImageSearcher)
  *    camera and get the frames for inference, you must request for this format
  *    from AVCaptureVideoDataOutput. Otherwise your inference results will be wrong.
  *
- * @param image An image on which embedding extraction is to be performed, followed by nearest-neighbor search in the index, represented as a `GMLImage`.
+ * @param image An image on which embedding extraction is to be performed, followed by
+ * nearest-neighbor search in the index, represented as a `GMLImage`.
  *
- * @return A `TFLSearchResult`. `nil` if there is an error encountered during embedding extraction and nearest neighbor search. 
- * Please see `TFLSearchResult` for more details.
+ * @return A `TFLSearchResult`. `nil` if there is an error encountered during embedding extraction
+ * and nearest neighbor search. Please see `TFLSearchResult` for more details.
  */
 - (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image
-                                                     error:(NSError **)error
-    NS_SWIFT_NAME(search(mlImage:));
+                                         error:(NSError **)error NS_SWIFT_NAME(search(mlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;
 
