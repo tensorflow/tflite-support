@@ -12,7 +12,6 @@ objc_library(
         "sources/GMLImage+Utils.h",
     ],
     features = ["-layering_check"],
-    sdk_frameworks = ["CoreVideo", "CoreGraphics", "Accelerate", "CoreMedia"],
     module_name = "GMLImageUtils",
     sdk_frameworks = [
         "CoreGraphics",
