@@ -26,7 +26,7 @@ using ::tflite::support::StatusOr;
 
 @implementation GMLImage (CppUtils)
 
-- (std::unique_ptr<FrameBufferCpp>)cppFrameBufferWithError:(NSError *_Nullable *)error {
+- (std::unique_ptr<FrameBufferCpp>)cppFrameBufferWithError:(NSError **)error {
   uint8_t *buffer = [self bufferWithError:error];
 
   if (!buffer) {

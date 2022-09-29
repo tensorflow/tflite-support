@@ -14,6 +14,12 @@ objc_library(
     features = ["-layering_check"],
     sdk_frameworks = ["CoreVideo", "CoreGraphics", "Accelerate", "CoreMedia"],
     module_name = "GMLImageUtils",
+    sdk_frameworks = [
+        "CoreGraphics",
+        "CoreVideo",
+        "Accelerate",
+        "CoreMedia",
+    ],
     deps = [
         "//tensorflow_lite_support/c/task/vision/core:frame_buffer",
         "//tensorflow_lite_support/ios:TFLCommonUtils",
@@ -33,10 +39,10 @@ objc_library(
     module_name = "GMLImageCppUtils",
     deps = [
         ":GMLImageUtils",
-        "//tensorflow_lite_support/ios:TFLCommonCppUtils",
         "//tensorflow_lite_support/cc/task/vision/core:frame_buffer",
+        "//tensorflow_lite_support/cc/task/vision/utils:frame_buffer_common_utils",
+        "//tensorflow_lite_support/ios:TFLCommonCppUtils",
         "//tensorflow_lite_support/odml/ios/image:MLImage",
         "@com_google_absl//absl/strings:str_format",
     ],
-    copts = ["-ObjC++","-std=c++14"]
 )

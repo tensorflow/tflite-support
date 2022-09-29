@@ -23,6 +23,8 @@ set -x
 function run_smoke_test() {
   VENV_TMP_DIR="$(mktemp -d)"
 
+  echo "Running on $OSTYPE"
+
   if [[ "$OSTYPE" == "msys" ]]; then
     VENV_TMP_DIR="$(cygpath -m $VENV_TMP_DIR)"
   fi
@@ -61,7 +63,10 @@ function run_smoke_test() {
 
   test_codegen
 
-  test_tfl_task_lib
+  # On Mac and Ubuntu, verify that the task library builds successfully.
+  if [[ "$OSTYPE" != "msys" ]]; then
+    test_tfl_task_lib
+  fi
 
   # Deactivate from virtualenv.
   deactivate || source deactivate || \

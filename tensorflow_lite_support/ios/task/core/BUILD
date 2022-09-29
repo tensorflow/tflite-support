@@ -23,7 +23,9 @@ objc_library(
         "sources/TFLBaseOptions.h",
     ],
     module_name = "TFLBaseOptions",
-    deps = [":TFLExternalFile"],
+    deps = [
+        ":TFLExternalFile",
+    ],
 )
 
 objc_library(

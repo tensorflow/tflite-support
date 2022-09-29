@@ -7,7 +7,7 @@ load("@android_test_support//:repo.bzl", "android_test_repositories")
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 def tflite_support_workspace1():
-    """Partial workspace defintion for the TFLite Support Library. See WORKSPACE for usage."""
+    """Partial workspace definition for the TFLite Support Library. See WORKSPACE for usage."""
     android_test_repositories()
 
     # Maven dependencies.

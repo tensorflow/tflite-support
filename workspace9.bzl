@@ -7,7 +7,7 @@ load("//third_party:repo.bzl", "third_party_http_archive")
 load("//third_party/tensorflow:version.bzl", "TENSORFLOW_COMMIT", "TENSORFLOW_SHA256")
 
 def tflite_support_workspace9():
-    """Partial workspace defintion for the TFLite Support Library. See WORKSPACE for usage."""
+    """Partial workspace definition for the TFLite Support Library. See WORKSPACE for usage."""
 
     http_file(
         name = "mobilebert_float",
@@ -112,9 +112,6 @@ def tflite_support_workspace9():
         ],
     )
 
-    # TF on 2022-06-14.
-    TENSORFLOW_COMMIT = "625a4045bc0728c0f3d1b63e05749201f8b401dd"
-    TENSORFLOW_SHA256 = "efb1b271f291ae3613c42f1a5fe3b51550b97ad71034f52a7931bfb260ec8834"
     http_archive(
         name = "org_tensorflow",
         sha256 = TENSORFLOW_SHA256,

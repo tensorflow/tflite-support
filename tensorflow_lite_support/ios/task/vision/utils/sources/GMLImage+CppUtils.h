@@ -20,21 +20,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Helper utility for converting GMLImage to C++ FrameBuffer accepted by the TF Lite Task Vision
- * C++ library.
+/**
+ * Helper utility for converting GMLImage to C++ FrameBuffer accepted by the
+ * TF Lite Task Vision C++ library.
  */
 @interface GMLImage (CppUtils)
 
 /**
- * Creates and returns a C++ FrameBuffer from a GMLImage. tflite::task::vision::FrameBuffer is used
- * by the TFLite Task Vision C++ library to hold the backing buffer of any image. Image inputs to
- * the TFLite Task Vision C library is of type TfLiteFrameBuffer.
+ * Creates and returns a C++ FrameBuffer from a GMLImage.
+ * tflite::task::vision::FrameBuffer is used by the TFLite Task Vision C++
+ * library to hold the backing buffer of any image.
  *
- * @param error Pointer to the memory location where errors if any should be saved. If `nil`, no
- * error will be saved.
+ * @param error Pointer to the memory location where errors if any should be
+ * saved. If @c NULL, no error will be saved.
  *
- * @return The FrameBuffer created from the gmlImage which can be used with the TF Lite Task Vision
- * C++ library.
+ * @return The FrameBuffer created from the gmlImage which can be used with the
+ * TF Lite Task Vision C++ library. @c NULL in case of an error.
  */
 - (std::unique_ptr<tflite::task::vision::FrameBuffer>)cppFrameBufferWithError:
     (NSError *_Nullable *)error;

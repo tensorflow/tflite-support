@@ -8,7 +8,7 @@ load("@libedgetpu//:workspace.bzl", "libedgetpu_dependencies")
 load("//third_party/tensorflow:version.bzl", "TENSORFLOW_COMMIT", "TENSORFLOW_SHA256")
 
 def tflite_support_workspace8():
-    """Partial workspace defintion for the TFLite Support Library. See WORKSPACE for usage."""
+    """Partial workspace definition for the TFLite Support Library. See WORKSPACE for usage."""
 
     # Set up TensorFlow version for Coral.
     libedgetpu_dependencies(TENSORFLOW_COMMIT, TENSORFLOW_SHA256)

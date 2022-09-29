@@ -159,8 +159,8 @@
 }
 
 - (CGSize)bitmapSize {
-  size_t width = 0;
-  size_t height = 0;
+  CGFloat width = 0;
+  CGFloat height = 0;
 
   if (self.CGImage) {
     width = CGImageGetWidth(self.CGImage);
@@ -170,7 +170,7 @@
     height = CVPixelBufferGetHeight(self.CIImage.pixelBuffer);
   } else if (self.CIImage.CGImage) {
     width = CGImageGetWidth(self.CIImage.CGImage);
-    height = CGImageGetWidth(self.CIImage.CGImage);
+    height = CGImageGetHeight(self.CIImage.CGImage);
   }
   return CGSizeMake(width, height);
 }
@@ -256,20 +256,12 @@
 - (uint8_t *)frameBufferFromCIImage:(CIImage *)ciImage error:(NSError **)error {
   uint8_t *buffer = NULL;
 
-  int width = 0;
-  int height = 0;
-
   if (ciImage.pixelBuffer) {
-    width = (int)CVPixelBufferGetWidth(ciImage.pixelBuffer);
-    height = (int)CVPixelBufferGetHeight(ciImage.pixelBuffer);
-
     buffer = [TFLCVPixelBufferUtils createRGBImageDatafromCVPixelBuffer:ciImage.pixelBuffer
                                                                   error:error];
 
   } else if (ciImage.CGImage) {
     buffer = [UIImage pixelDataFromCGImage:ciImage.CGImage error:error];
-    width = (int)CGImageGetWidth(ciImage.CGImage);
-    height = (int)CGImageGetWidth(ciImage.CGImage);
   } else {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
@@ -283,7 +275,7 @@
 
 @implementation GMLImage (Utils)
 
-- (nullable uint8_t *)bufferWithError:(NSError *_Nullable *)error {
+- (nullable uint8_t *)bufferWithError:(NSError **)error {
   uint8_t *buffer = NULL;
 
   switch (self.imageSourceType) {
@@ -310,8 +302,8 @@
 }
 
 - (CGSize)bitmapSize {
-  size_t width = 0;
-  size_t height = 0;
+  CGFloat width = 0;
+  CGFloat height = 0;
 
   switch (self.imageSourceType) {
     case GMLImageSourceTypeSampleBuffer: {
@@ -352,7 +344,7 @@
   return nil;
 }
 
-- (nullable TfLiteFrameBuffer *)cFrameBufferWithError:(NSError *_Nullable *)error {
+- (nullable TfLiteFrameBuffer *)cFrameBufferWithError:(NSError **)error {
   uint8_t *buffer = [self bufferWithError:error];
 
   if (!buffer) {
