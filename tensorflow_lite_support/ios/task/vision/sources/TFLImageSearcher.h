@@ -23,7 +23,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Options to configure TFLImageClassifier.
+ * Options to configure TFLImageSearcher.
  */
 NS_SWIFT_NAME(ImageSearcherOptions)
 @interface TFLImageSearcherOptions : NSObject
@@ -89,19 +89,17 @@ NS_SWIFT_NAME(ImageSearcher)
 /**
  * Performs embedding extraction on the given GMLImage, followed by nearest-neighbor search in the index.
  *
- * @discussion This method currently supports classification of only the following types of images:
+ * @discussion This method currently supports searching on only the following types of images:
  * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
  * 2. kCVPixelFormatType_32BGRA for `GMLImageSourceTypePixelBuffer` and
  *    `GMLImageSourceTypeSampleBuffer`. If you are using `AVCaptureSession` to setup
  *    camera and get the frames for inference, you must request for this format
- *    from AVCaptureVideoDataOutput. Otherwise your classification
- *    results will be wrong.
+ *    from AVCaptureVideoDataOutput. Otherwise your inference results will be wrong.
  *
  * @param image An image on which embedding extraction is to be performed, followed by nearest-neighbor search in the index, represented as a `GMLImage`.
  *
- * @return A TFLClassificationResult with one set of results per image classifier head. `nil` if
- * there is an error encountered during classification. Please see `TFLClassificationResult` for
- * more details.
+ * @return A `TFLSearchResult`. `nil` if there is an error encountered during embedding extraction and nearest neighbor search. 
+ * Please see `TFLSearchResult` for more details.
  */
 - (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image
                                                      error:(NSError **)error

@@ -19,9 +19,6 @@
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLEmbeddingOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchResult+Helpers.h"
-
-// #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions+Helpers.h"
-// #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult+Helpers.h"
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+CppUtils.h"
 
 #include "tensorflow_lite_support/cc/task/vision/image_searcher.h"
@@ -37,7 +34,7 @@ using ::tflite::support::StatusOr;
 }
 
 @interface TFLImageSearcher () {
-/** ImageClassifier backed by C API */
+/** ImageSearcher backed by C API */
 std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
 }
 @end
@@ -77,65 +74,6 @@ std::unique_ptr<ImageSearcherCpp> _cppImageSearcher;
 @end
 
 @implementation TFLImageSearcher
-// - (void)dealloc {
-//   TfLiteImageClassifierDelete(_imageClassifier);
-// }
-
-// - (ImageSearcherOptionsCpp) imageSearcherCppOptionsWihOptions(TFLImageSearcherOptions *)options {
-
-//   // if (options == nullptr) {
-//   //   return CreateStatusWithPayload(
-//   //       absl::StatusCode::kInvalidArgument,
-//   //       absl::StrFormat("Expected non null options."),
-//   //       TfLiteSupportStatus::kInvalidArgumentError);
-//   // }
-
-//   ImageSearcherOptionsCpp cppOptions = {};
-
-
-//   // More file sources can be added in else ifs
-//   if (options.baseOptions.modelFile.filePath) {
-//     cppOptions.mutable_base_options()->mutable_model_file()->set_file_name(
-//         options.baseOptions.modelFile.filePath);
-//   }
-
-//   // c_options->base_options.compute_settings.num_threads is expected to be
-//   // set to value > 0 or -1. Otherwise invoking
-//   // ImageClassifierCpp::CreateFromOptions() results in a not ok status.
-//   cppOptions.mutable_base_options()
-//       ->mutable_compute_settings()
-//       ->mutable_tflite_settings()
-//       ->mutable_cpu_settings()
-//       ->set_num_threads(
-//           options->baseOptions.computeSettings.cpuSettings.numThreads);
-
-//   // for (int i = 0; i < c_options->classification_options.label_denylist.length;
-//   //      i++)
-//   //   cpp_options.add_class_name_blacklist(
-//   //       c_options->classification_options.label_denylist.list[i]);
-
-//   // for (int i = 0; i < c_options->classification_options.label_allowlist.length;
-//   //      i++)
-//   //   cpp_options.add_class_name_whitelist(
-//   //       c_options->classification_options.label_allowlist.list[i]);
-
-//   // // Check needed since setting a nullptr for this field results in a segfault
-//   // // on invocation of ImageClassifierCpp::CreateFromOptions().
-//   // if (c_options->classification_options.display_names_local) {
-//   //   cpp_options.set_display_names_locale(
-//   //       c_options->classification_options.display_names_local);
-//   // }
-
-//   // c_options->classification_options.max_results is expected to be set to -1
-//   // or any value > 0. Otherwise invoking
-//   // ImageClassifierCpp::CreateFromOptions() results in a not ok status.
-//   cpp_options.set_max_results(c_options->classification_options.max_results);
-
-//   cpp_options.set_score_threshold(
-//       c_options->classification_options.score_threshold);
-
-//   return cpp_options;
-// }
 
 - (nullable instancetype)initWithCppImageSearcherOptions:(ImageSearcherOptionsCpp)cppOptions {
   self = [super init];
