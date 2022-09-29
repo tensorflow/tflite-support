@@ -19,6 +19,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define VerifySearchResult(searchResult, expectedNearestNeighborsCount) \
+  XCTAssertEqual(searchResult.nearestNeighbors.count, expectedNearestNeighborsCount);
+
+#define VerifyNearestNeighbor(nearestNeighbor, expectedMetadata, expectedDistance) \
+  XCTAssertEqualObjects(nearestNeighbor.metadata, expectedMetadata);               \
+  XCTAssertEqualWithAccuracy(nearestNeighbor.distance, expectedDistance, 1e-6);
+
 @interface TFLImageSearcherTests : XCTestCase
 @property(nonatomic, nullable) NSString *modelPath;
 @end
@@ -29,119 +36,60 @@ NS_ASSUME_NONNULL_BEGIN
   // Put setup code here. This method is called before the invocation of each test method in the
   // class.
   [super setUp];
-  self.modelPath = [[NSBundle bundleForClass:self.class] pathForResource:@"mobilenet_v3_small_100_224_searcher"
-                                                                  ofType:@"tflite"];
+  self.modelPath =
+      [[NSBundle bundleForClass:self.class] pathForResource:@"mobilenet_v3_small_100_224_searcher"
+                                                     ofType:@"tflite"];
   XCTAssertNotNil(self.modelPath);
 }
 
-- (TFLImageSearcher *)imageSearcherWithModelPath:(NSString *)modelPath {
+- (TFLImageSearcher *)testSuccessfulCreationOfImageSearcherWithSearchContent:(NSString *)modelPath {
   TFLImageSearcherOptions *imageSearcherOptions =
       [[TFLImageSearcherOptions alloc] initWithModelPath:self.modelPath];
 
-  TFLImageSearcher *imageSearcher =
-      [TFLImageSearcher imageSearcherWithOptions:imageSearcherOptions error:nil];
+  TFLImageSearcher *imageSearcher = [TFLImageSearcher imageSearcherWithOptions:imageSearcherOptions
+                                                                         error:nil];
   XCTAssertNotNil(imageSearcher);
-  
+
   return imageSearcher;
 }
 
-- (void)testSuccessfullImageInferenceOnMLImageWithUIImage {
-  TFLImageSearcher *imageSearcher = [self imageSearcherWithModelPath:self.modelPath];
+- (void)verifySearchResultForInferenceWithSearchContent:(TFLSearchResult *)searchResult {
+  VerifySearchResult(searchResult,
+                     5  // expectedNearestNeighborsCount
+  );
+
+  VerifyNearestNeighbor(searchResult.nearestNeighbors[0],
+                        @"burger",  // expectedMetadata
+                        198.456329  // expectedDistance
+  );
+  VerifyNearestNeighbor(searchResult.nearestNeighbors[1],
+                        @"car",     // expectedMetadata
+                        226.022186  // expectedDistance
+  );
+  VerifyNearestNeighbor(searchResult.nearestNeighbors[2],
+                        @"bird",    // expectedMetadata
+                        227.297668  // expectedDistance
+  );
+  VerifyNearestNeighbor(searchResult.nearestNeighbors[3],
+                        @"dog",     // expectedMetadata
+                        229.133789  // expectedDistance
+  );
+  VerifyNearestNeighbor(searchResult.nearestNeighbors[4],
+                        @"cat",     // expectedMetadata
+                        229.718948  // expectedDistance
+  );
+}
+
+- (void)testSuccessfullInferenceWithSearchContentOnMLImageWithUIImage {
+  TFLImageSearcher *imageSearcher =
+      [self testSuccessfulCreationOfImageSearcherWithSearchContent:self.modelPath];
   GMLImage *gmlImage =
       [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
   XCTAssertNotNil(gmlImage);
 
-  TFLSearchResult *searchResult = [imageSearcher searchInGMLImage:gmlImage
-                                                            error:nil];
-  XCTAssertEqual(searchResult.nearestNeighbors.count, 5);
-  for (int i = 0; i < searchResult.nearestNeighbors.count; ++i) {
-    NSLog(@"Cat name: %@",searchResult.nearestNeighbors[i].metadata);
-    NSLog(@"Distance: %f",searchResult.nearestNeighbors[i].distance);
-
-  }
-  // XCTAssertTrue(classificationResults.classifications[0].categories.count > 0);
-
-  // TFLCategory *category = classificationResults.classifications[0].categories[0];
-  // XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
-  // // TODO: match the score as image_classifier_test.cc
-  // XCTAssertEqualWithAccuracy(category.score, 0.748976, 0.001);
+  TFLSearchResult *searchResult = [imageSearcher searchInGMLImage:gmlImage error:nil];
+  [self verifySearchResultForInferenceWithSearchContent:searchResult];
 }
-
-// - (void)testModelOptionsWithMaxResults {
-//   TFLImageClassifierOptions *imageClassifierOptions =
-//       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
-//   int maxResults = 3;
-//   imageClassifierOptions.classificationOptions.maxResults = maxResults;
-
-//   TFLImageClassifier *imageClassifier =
-//       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
-//   XCTAssertNotNil(imageClassifier);
-
-//   GMLImage *gmlImage =
-//       [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
-//   XCTAssertNotNil(gmlImage);
-
-//   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
-//                                                                                    error:nil];
-//   XCTAssertTrue(classificationResults.classifications.count > 0);
-//   XCTAssertLessThanOrEqual(classificationResults.classifications[0].categories.count, maxResults);
-
-//   TFLCategory *category = classificationResults.classifications[0].categories[0];
-//   XCTAssertTrue([category.label isEqual:@"cheeseburger"]);
-//   // TODO: match the score as image_classifier_test.cc
-//   XCTAssertEqualWithAccuracy(category.score, 0.748976, 0.001);
-// }
-
-// - (void)testInferenceWithBoundingBox {
-//   TFLImageClassifierOptions *imageClassifierOptions =
-//       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
-//   int maxResults = 3;
-//   imageClassifierOptions.classificationOptions.maxResults = maxResults;
-
-//   TFLImageClassifier *imageClassifier =
-//       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
-//   XCTAssertNotNil(imageClassifier);
-
-//   GMLImage *gmlImage =
-//       [GMLImage imageFromBundleWithClass:self.class fileName:@"multi_objects" ofType:@"jpg"];
-//   XCTAssertNotNil(gmlImage);
-
-//   CGRect roi = CGRectMake(406, 110, 148, 153);
-//   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
-//                                                                         regionOfInterest:roi
-//                                                                                    error:nil];
-//   XCTAssertTrue(classificationResults.classifications.count > 0);
-//   XCTAssertTrue(classificationResults.classifications[0].categories.count > 0);
-
-//   TFLCategory *category = classificationResults.classifications[0].categories[0];
-//   // TODO: match the label and score as image_classifier_test.cc
-//   // XCTAssertTrue([category.label isEqual:@"soccer ball"]);
-//   // XCTAssertEqualWithAccuracy(category.score, 0.256512, 0.001);
-// }
-
-// - (void)testInferenceWithRGBAImage {
-//   TFLImageClassifierOptions *imageClassifierOptions =
-//       [[TFLImageClassifierOptions alloc] initWithModelPath:self.modelPath];
-
-//   TFLImageClassifier *imageClassifier =
-//       [TFLImageClassifier imageClassifierWithOptions:imageClassifierOptions error:nil];
-//   XCTAssertNotNil(imageClassifier);
-
-//   GMLImage *gmlImage =
-//       [GMLImage imageFromBundleWithClass:self.class fileName:@"sparrow" ofType:@"png"];
-//   XCTAssertNotNil(gmlImage);
-
-//   TFLClassificationResult *classificationResults = [imageClassifier classifyWithGMLImage:gmlImage
-//                                                                                    error:nil];
-//   XCTAssertTrue(classificationResults.classifications.count > 0);
-//   XCTAssertTrue(classificationResults.classifications[0].categories.count > 0);
-
-//   TFLCategory *category = classificationResults.classifications[0].categories[0];
-//   XCTAssertTrue([category.label isEqual:@"junco"]);
-//   // TODO: inspect if score is correct. Better to test againest "burger", because we know the
-//   // expected result for "burger.jpg".
-//   XCTAssertEqualWithAccuracy(category.score, 0.253016, 0.001);
-// }
 
 @end
 
