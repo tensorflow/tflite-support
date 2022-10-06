@@ -16,7 +16,7 @@
 
 @implementation TFLNearestNeighbor
 
-- (instancetype)initWithMetaData:(NSString *)metadata distance:(CGFloat)distance {
+- (instancetype)initWithMetadata:(NSString *)metadata distance:(CGFloat)distance {
   self = [super init];
   if (self) {
     _metadata = metadata;
@@ -26,7 +26,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  return [[TFLNearestNeighbor alloc] initWithMetaData:self.metadata distance:self.distance];
+  return [[TFLNearestNeighbor alloc] initWithMetadata:self.metadata distance:self.distance];
 }
 
 @end

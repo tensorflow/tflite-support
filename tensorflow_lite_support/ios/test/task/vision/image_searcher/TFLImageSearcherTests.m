@@ -19,7 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define VerifySearchResult(searchResult, expectedNearestNeighborsCount) \
+#define VerifySearchResultCount(searchResult, expectedNearestNeighborsCount) \
   XCTAssertEqual(searchResult.nearestNeighbors.count, expectedNearestNeighborsCount);
 
 #define VerifyNearestNeighbor(nearestNeighbor, expectedMetadata, expectedDistance) \
@@ -33,8 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation TFLImageSearcherTests
 
 - (void)setUp {
-  // Put setup code here. This method is called before the invocation of each test method in the
-  // class.
   [super setUp];
   self.modelPath =
       [[NSBundle bundleForClass:self.class] pathForResource:@"mobilenet_v3_small_100_224_searcher"
@@ -54,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)verifySearchResultForInferenceWithSearchContent:(TFLSearchResult *)searchResult {
-  VerifySearchResult(searchResult,
+  VerifySearchResultCount(searchResult,
                      5  // expectedNearestNeighborsCount
   );
 

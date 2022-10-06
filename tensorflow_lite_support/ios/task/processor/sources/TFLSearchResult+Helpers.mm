@@ -38,7 +38,7 @@ using SearchResultCpp = tflite::task::processor::SearchResult;
     NSString *metadata = [NSString stringWithCString:cpp_nearest_neighbor.metadata().c_str()
                                             encoding:NSUTF8StringEncoding];
     TFLNearestNeighbor *nearestNeighbor =
-        [[TFLNearestNeighbor alloc] initWithMetaData:metadata
+        [[TFLNearestNeighbor alloc] initWithMetadata:metadata
                                             distance:(CGFloat)cpp_nearest_neighbor.distance()];
     [nearestNeighbors addObject:nearestNeighbor];
   }

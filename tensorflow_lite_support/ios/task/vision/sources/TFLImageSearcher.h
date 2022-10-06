@@ -103,8 +103,9 @@ NS_SWIFT_NAME(ImageSearcher)
  * @return A `TFLSearchResult`. `nil` if there is an error encountered during embedding extraction
  * and nearest neighbor search. Please see `TFLSearchResult` for more details.
  */
-- (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image
+- (nullable TFLSearchResult *)searchWithGMLImage:(GMLImage *)image
                                          error:(NSError **)error NS_SWIFT_NAME(search(mlImage:));
+                                         
 
 - (instancetype)init NS_UNAVAILABLE;
 

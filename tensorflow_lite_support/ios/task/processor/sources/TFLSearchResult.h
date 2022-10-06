@@ -42,7 +42,7 @@ NS_SWIFT_NAME(NearestNeighbor)
  *
  * @return An instance of `TFLNearestNeighbor` initialized to the given values.
  */
-- (instancetype)initWithMetaData:(NSString *)metadata distance:(CGFloat)distance;
+- (instancetype)initWithMetadata:(NSString *)metadata distance:(CGFloat)distance;
 
 - (instancetype)init NS_UNAVAILABLE;
 

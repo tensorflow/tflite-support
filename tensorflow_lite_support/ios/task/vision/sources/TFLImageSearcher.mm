@@ -102,7 +102,7 @@ using ::tflite::support::StatusOr;
   return [[TFLImageSearcher alloc] initWithCppImageSearcherOptions:cppOptions];
 }
 
-- (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image error:(NSError **)error {
+- (nullable TFLSearchResult *)searchWithGMLImage:(GMLImage *)image error:(NSError **)error {
   if (!image) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
@@ -121,7 +121,7 @@ using ::tflite::support::StatusOr;
   return [TFLSearchResult searchResultWithCppResult:cpp_search_result_status error:error];
 }
 
-- (nullable TFLSearchResult *)searchInGMLImage:(GMLImage *)image
+- (nullable TFLSearchResult *)searchWithGMLImage:(GMLImage *)image
                               regionOfInterest:(CGRect)roi
                                          error:(NSError **)error {
   if (!image) {
