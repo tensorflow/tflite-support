@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ using FrameBufferCpp = ::tflite::task::vision::FrameBuffer;
 using BoundingBoxCpp = ::tflite::task::vision::BoundingBox;
 using SearchResultCpp = ::tflite::task::processor::SearchResult;
 using ::tflite::support::StatusOr;
-}
+}  // namespace
 
 @interface TFLImageSearcher () {
   /** ImageSearcher backed by C API */
@@ -39,16 +39,13 @@ using ::tflite::support::StatusOr;
 @end
 
 @implementation TFLImageSearcherOptions
-@synthesize baseOptions;
-@synthesize embeddingOptions;
-@synthesize searchOptions;
 
 - (instancetype)init {
   self = [super init];
   if (self) {
-    self.baseOptions = [[TFLBaseOptions alloc] init];
-    self.embeddingOptions = [[TFLEmbeddingOptions alloc] init];
-    self.searchOptions = [[TFLSearchOptions alloc] init];
+    _baseOptions = [[TFLBaseOptions alloc] init];
+    _embeddingOptions = [[TFLEmbeddingOptions alloc] init];
+    _searchOptions = [[TFLSearchOptions alloc] init];
   }
   return self;
 }
@@ -56,7 +53,7 @@ using ::tflite::support::StatusOr;
 - (instancetype)initWithModelPath:(NSString *)modelPath {
   self = [self init];
   if (self) {
-    self.baseOptions.modelFile.filePath = modelPath;
+    _baseOptions.modelFile.filePath = modelPath;
   }
   return self;
 }
@@ -116,14 +113,14 @@ using ::tflite::support::StatusOr;
     return nil;
   }
 
-  StatusOr<SearchResultCpp> cpp_search_result_status = _cppImageSearcher->Search(*cppFrameBuffer);
+  StatusOr<SearchResultCpp> cppSearchResultStatus = _cppImageSearcher->Search(*cppFrameBuffer);
 
-  return [TFLSearchResult searchResultWithCppResult:cpp_search_result_status error:error];
+  return [TFLSearchResult searchResultWithCppResult:cppSearchResultStatus error:error];
 }
 
 - (nullable TFLSearchResult *)searchWithGMLImage:(GMLImage *)image
-                              regionOfInterest:(CGRect)roi
-                                         error:(NSError **)error {
+                                regionOfInterest:(CGRect)roi
+                                           error:(NSError **)error {
   if (!image) {
     [TFLCommonUtils createCustomError:error
                              withCode:TFLSupportErrorCodeInvalidArgumentError
@@ -137,15 +134,15 @@ using ::tflite::support::StatusOr;
     return nil;
   }
 
-  BoundingBoxCpp cc_roi;
-  cc_roi.set_origin_x(roi.origin.x);
-  cc_roi.set_origin_y(roi.origin.y);
-  cc_roi.set_width(roi.size.width);
-  cc_roi.set_height(roi.size.height);
+  BoundingBoxCpp regionOfInterest;
+  regionOfInterest.set_origin_x(roi.origin.x);
+  regionOfInterest.set_origin_y(roi.origin.y);
+  regionOfInterest.set_width(roi.size.width);
+  regionOfInterest.set_height(roi.size.height);
 
-  StatusOr<SearchResultCpp> cpp_search_result_status =
-      _cppImageSearcher->Search(*cppFrameBuffer, cc_roi);
+  StatusOr<SearchResultCpp> cppSearchResultStatus =
+      _cppImageSearcher->Search(*cppFrameBuffer, regionOfInterest);
 
-  return [TFLSearchResult searchResultWithCppResult:cpp_search_result_status error:error];
+  return [TFLSearchResult searchResultWithCppResult:cppSearchResultStatus error:error];
 }
 @end

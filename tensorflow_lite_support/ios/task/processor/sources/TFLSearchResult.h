@@ -42,7 +42,8 @@ NS_SWIFT_NAME(NearestNeighbor)
  *
  * @return An instance of `TFLNearestNeighbor` initialized to the given values.
  */
-- (instancetype)initWithMetadata:(NSString *)metadata distance:(CGFloat)distance;
+- (instancetype)initWithMetadata:(NSString *)metadata
+                        distance:(CGFloat)distance NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -69,7 +70,8 @@ NS_SWIFT_NAME(SearchResult)
  *
  * @return An instance of TFLSearchResult initialized to the given values.
  */
-- (instancetype)initWithNearestNeighbors:(NSArray<TFLNearestNeighbor *> *)nearestNeighbors;
+- (instancetype)initWithNearestNeighbors:(NSArray<TFLNearestNeighbor *> *)nearestNeighbors
+    NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 

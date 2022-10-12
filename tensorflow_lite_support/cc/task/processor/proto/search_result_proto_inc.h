@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef TENSORFLOW_LITE_SUPPORT_CC_TASK_PROCESSOR_PROTO_SEARCH_RESULT_PROTO_INC_H_
-#define TENSORFLOW_LITE_SUPPORT_CC_TASK_PROCESSOR_PROTO_SEARCH_RESULT_PROTO_INC_H_
+#ifndef THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TASK_PROCESSOR_PROTO_SEARCH_RESULT_PROTO_INC_H_
+#define THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TASK_PROCESSOR_PROTO_SEARCH_RESULT_PROTO_INC_H_
 
 #include "tensorflow_lite_support/cc/task/processor/proto/search_result.pb.h"
-#endif  // TENSORFLOW_LITE_SUPPORT_CC_TASK_PROCESSOR_PROTO_SEARCH_RESULT_PROTO_INC_H_
+#endif  // THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_TASK_PROCESSOR_PROTO_SEARCH_RESULT_PROTO_INC_H_

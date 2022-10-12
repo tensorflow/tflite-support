@@ -101,7 +101,7 @@ cc_proto_library(
 
 cc_library(
     name = "embedding_options_cc_proto_inc",
-    srcs = ["embedding_options_proto_inc.h"],
+    hdrs = ["embedding_options_proto_inc.h"],
     deps = [
         ":embedding_options_cc_proto",
     ],
@@ -226,7 +226,7 @@ cc_proto_library(
 
 cc_library(
     name = "search_options_cc_proto_inc",
-    srcs = ["search_options_proto_inc.h"],
+    hdrs = ["search_options_proto_inc.h"],
     deps = [
         ":search_options_cc_proto",
     ],
@@ -254,7 +254,7 @@ cc_proto_library(
 
 cc_library(
     name = "search_result_cc_proto_inc",
-    srcs = ["search_result_proto_inc.h"],
+    hdrs = ["search_result_proto_inc.h"],
     deps = [
         ":search_result_cc_proto",
     ],

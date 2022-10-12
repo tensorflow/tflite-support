@@ -19,7 +19,7 @@
 - (instancetype)initWithMetadata:(NSString *)metadata distance:(CGFloat)distance {
   self = [super init];
   if (self) {
-    _metadata = metadata;
+    _metadata = [metadata copy];
     _distance = distance;
   }
   return self;
@@ -36,7 +36,7 @@
 - (instancetype)initWithNearestNeighbors:(NSArray<TFLNearestNeighbor *> *)nearestNeighbors {
   self = [super init];
   if (self) {
-    _nearestNeighbors = nearestNeighbors;
+    _nearestNeighbors = [nearestNeighbors copy];
   }
   return self;
 }

@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -50,15 +50,14 @@ NS_SWIFT_NAME(ImageSearcherOptions)
  * Initializes a new `TFLImageSearcherOptions` with the absolute path to the model file
  * stored locally on the device, set to the given the model path.
  *
- * @discussion The external model file, must be a single standalone TFLite file. It could be packed
- * with TFLite Model Metadata[1] and associated files if exist. Fail to provide the necessary
- * metadata and associated files might result in errors. Check the [documentation]
+ * @discussion The external model file must be a single standalone TFLite file. It could be packed
+ * with TFLite Model Metadata[1] and associated files if they exist. Failure to provide the
+ * necessary metadata and associated files might result in errors. Check the [documentation]
  * (https://www.tensorflow.org/lite/convert/metadata) for each task about the specific requirement.
  *
  * @param modelPath An absolute path to a TensorFlow Lite model file stored locally on the device.
  *
- * @return An instance of `TFLImageSearcherOptions` initialized to the given
- * model path.
+ * @return An instance of `TFLImageSearcherOptions` initialized to the given model path.
  */
 - (instancetype)initWithModelPath:(NSString *)modelPath;
 
@@ -104,8 +103,7 @@ NS_SWIFT_NAME(ImageSearcher)
  * and nearest neighbor search. Please see `TFLSearchResult` for more details.
  */
 - (nullable TFLSearchResult *)searchWithGMLImage:(GMLImage *)image
-                                         error:(NSError **)error NS_SWIFT_NAME(search(mlImage:));
-                                         
+                                           error:(NSError **)error NS_SWIFT_NAME(search(mlImage:));
 
 - (instancetype)init NS_UNAVAILABLE;
 

@@ -18,7 +18,7 @@
 namespace {
 using tflite::support::StatusOr;
 using SearchResultCpp = tflite::task::processor::SearchResult;
-}
+}  // namespace
 
 @implementation TFLSearchResult (Helpers)
 
@@ -29,17 +29,17 @@ using SearchResultCpp = tflite::task::processor::SearchResult;
     return nil;
   }
 
-  NSMutableArray *nearestNeighbors = [[NSMutableArray alloc] init];
+  NSMutableArray<TFLNearestNeighbor *> *nearestNeighbors = [[NSMutableArray alloc] init];
 
-  auto cpp_search_result_value = cppSearchResult.value();
+  auto cppSearchResultValue = cppSearchResult.value();
 
-  for (int i = 0; i < cpp_search_result_value.nearest_neighbors_size(); i++) {
-    auto cpp_nearest_neighbor = cpp_search_result_value.nearest_neighbors(i);
-    NSString *metadata = [NSString stringWithCString:cpp_nearest_neighbor.metadata().c_str()
+  for (int i = 0; i < cppSearchResultValue.nearest_neighbors_size(); i++) {
+    auto cppNearestNeighbor = cppSearchResultValue.nearest_neighbors(i);
+    NSString *metadata = [NSString stringWithCString:cppNearestNeighbor.metadata().c_str()
                                             encoding:NSUTF8StringEncoding];
     TFLNearestNeighbor *nearestNeighbor =
         [[TFLNearestNeighbor alloc] initWithMetadata:metadata
-                                            distance:(CGFloat)cpp_nearest_neighbor.distance()];
+                                            distance:(CGFloat)cppNearestNeighbor.distance()];
     [nearestNeighbors addObject:nearestNeighbor];
   }
 

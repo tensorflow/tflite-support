@@ -81,17 +81,19 @@ objc_library(
     hdrs = [
         "sources/TFLImageSearcher.h",
     ],
+    copts = [
+        "-ObjC++",
+        "-std=c++17",
+    ],
     features = ["-layering_check"],
     module_name = "TFLImageSearcher",
     deps = [
         "//tensorflow_lite_support/cc/task/vision:image_searcher",
         "//tensorflow_lite_support/ios:TFLCommonUtils",
         "//tensorflow_lite_support/ios/task/core:TFLBaseOptionsCppHelpers",
-        "//tensorflow_lite_support/ios/task/processor:TFLSearchOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLEmbeddingOptionsHelpers",
+        "//tensorflow_lite_support/ios/task/processor:TFLSearchOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLSearchResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageCppUtils",
     ],
-    copts = ["-ObjC++","-std=c++14"]
 )
-

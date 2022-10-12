@@ -1,4 +1,4 @@
-/* Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ NSString * const kMobileNetIndexName = @"kk";
 
 - (void)verifySearchResultForInferenceWithSearchContent:(TFLSearchResult *)searchResult {
   VerifySearchResultCount(searchResult,
-                     5  // expectedNearestNeighborsCount
+                          5  // expectedNearestNeighborsCount
   );
 
   VerifyNearestNeighbor(searchResult.nearestNeighbors[0],
@@ -103,7 +103,7 @@ NSString * const kMobileNetIndexName = @"kk";
       [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
   XCTAssertNotNil(gmlImage);
 
-  TFLSearchResult *searchResult = [imageSearcher searchInGMLImage:gmlImage error:nil];
+  TFLSearchResult *searchResult = [imageSearcher searchWithGMLImage:gmlImage error:nil];
   [self verifySearchResultForInferenceWithSearchContent:searchResult];
 }
 

@@ -220,9 +220,9 @@ objc_library(
     ],
     module_name = "TFLSearchResultHelpers",
     deps = [
-        "//tensorflow_lite_support/cc/task/processor/proto:search_result_cc_proto_inc",
-        "//tensorflow_lite_support/ios/task/processor:TFLSearchResult",
-        "//tensorflow_lite_support/ios:TFLCommonCppUtils",
         "//tensorflow_lite_support/cc/port:statusor",
+        "//tensorflow_lite_support/cc/task/processor/proto:search_result_cc_proto_inc",
+        "//tensorflow_lite_support/ios:TFLCommonCppUtils",
+        "//tensorflow_lite_support/ios/task/processor:TFLSearchResult",
     ],
 )
