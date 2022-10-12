@@ -19,6 +19,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+NSString * const kSearcherModelName = @"mobilenet_v3_small_100_224_searcher";
+NSString * const kEmbedderModelName = @"mobilenet_v3_small_100_224_searcher";
+// NSString * const kMobileNetIndexName = @"searcher_index";
+NSString * const kMobileNetIndexName = @"kk";
+
+
 #define VerifySearchResultCount(searchResult, expectedNearestNeighborsCount) \
   XCTAssertEqual(searchResult.nearestNeighbors.count, expectedNearestNeighborsCount);
 
@@ -27,17 +33,29 @@ NS_ASSUME_NONNULL_BEGIN
   XCTAssertEqualWithAccuracy(nearestNeighbor.distance, expectedDistance, 1e-6);
 
 @interface TFLImageSearcherTests : XCTestCase
-@property(nonatomic, nullable) NSString *modelPath;
+@property(nonatomic, nullable) NSString *searcherModelPath;
+@property(nonatomic, nullable) NSString *embedderModelPath;
+@property(nonatomic, nullable) NSString *mobileNetIndexPath;
 @end
 
 @implementation TFLImageSearcherTests
 
 - (void)setUp {
   [super setUp];
-  self.modelPath =
-      [[NSBundle bundleForClass:self.class] pathForResource:@"mobilenet_v3_small_100_224_searcher"
+  self.searcherModelPath =
+      [[NSBundle bundleForClass:self.class] pathForResource:kSearcherModelName
                                                      ofType:@"tflite"];
-  XCTAssertNotNil(self.modelPath);
+  XCTAssertNotNil(self.searcherModelPath);
+
+   self.embedderModelPath =
+      [[NSBundle bundleForClass:self.class] pathForResource:kEmbedderModelName
+                                                     ofType:@"tflite"];
+  XCTAssertNotNil(self.embedderModelPath);
+
+  self.mobileNetIndexPath =
+      [[NSBundle bundleForClass:self.class] pathForResource:kMobileNetIndexName
+                                                     ofType:@"ldb"];
+  XCTAssertNotNil(self.mobileNetIndexPath);
 }
 
 - (TFLImageSearcher *)testSuccessfulCreationOfImageSearcherWithSearchContent:(NSString *)modelPath {
