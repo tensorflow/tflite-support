@@ -15,7 +15,7 @@ objc_library(
     module_name = "TFLImageClassifier",
     deps = [
         "//tensorflow_lite_support/c/task/vision:image_classifier",
-        "//tensorflow_lite_support/ios:TFLCommonUtils",
+        "//tensorflow_lite_support/ios:TFLCommonCppUtils",
         "//tensorflow_lite_support/ios/task/core:TFLBaseOptions",
         "//tensorflow_lite_support/ios/task/core:TFLBaseOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptions",
