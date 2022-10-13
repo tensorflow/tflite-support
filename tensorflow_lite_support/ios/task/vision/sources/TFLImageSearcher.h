@@ -105,6 +105,33 @@ NS_SWIFT_NAME(ImageSearcher)
 - (nullable TFLSearchResult *)searchWithGMLImage:(GMLImage *)image
                                            error:(NSError **)error NS_SWIFT_NAME(search(mlImage:));
 
+/**
+ * Performs embedding extraction on the given GMLImage, followed by nearest-neighbor search in the
+ * index on the pixels within the specified region of interest of the given
+ * `GMLImage`.
+ *
+ * @discussion This method currently supports inference on only following type of images:
+ * 1. RGB and RGBA images for `GMLImageSourceTypeImage`.
+ * 2. kCVPixelFormatType_32BGRA for `GMLImageSourceTypePixelBuffer` and
+ *    `GMLImageSourceTypeSampleBuffer`. If you are using `AVCaptureSession` to setup
+ *    camera and get the frames for inference, you must request for this format
+ *    from AVCaptureVideoDataOutput. Otherwise your classification
+ *    results will be wrong.
+ *
+ * @param image An image on which embedding extraction is to be performed, followed by
+ * nearest-neighbor search in the index, represented as a `GMLImage`.
+ *
+ * @param roi A CGRect specifying the region of interest within the given `GMLImage`, on which
+ * embedding extraction is to be performed, followed by nearest-neighbor search in the index.
+ *
+ * @return A TFLClassificationResult with one set of results per image classifier head. `nil` if
+ * there is an error encountered during classification.
+ */
+- (nullable TFLSearchResult *)searchWithGMLImage:(GMLImage *)image
+                                regionOfInterest:(CGRect)roi
+                                           error:(NSError **)error
+    NS_SWIFT_NAME(search(mlImage:regionOfInterest:));
+
 - (instancetype)init NS_UNAVAILABLE;
 
 @end
