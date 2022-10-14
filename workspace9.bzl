@@ -133,11 +133,11 @@ def tflite_support_workspace9():
     third_party_http_archive(
         name = "pybind11",
         urls = [
-            "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pybind/pybind11/archive/v2.7.1.tar.gz",
-            "https://github.com/pybind/pybind11/archive/v2.7.1.tar.gz",
+            "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pybind/pybind11/archive/v2.10.0.tar.gz",
+            "https://github.com/pybind/pybind11/archive/v2.10.0.tar.gz",
         ],
-        sha256 = "616d1c42e4cf14fa27b2a4ff759d7d7b33006fdc5ad8fd603bb2c22622f27020",
-        strip_prefix = "pybind11-2.7.1",
+        sha256 = "eacf582fa8f696227988d08cfc46121770823839fe9e301a20fbce67e7cd70ec",
+        strip_prefix = "pybind11-2.10.0",
         build_file = "@pybind11_bazel//:pybind11.BUILD",
     )
 
