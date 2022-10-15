@@ -166,22 +166,21 @@ def tflite_support_workspace9():
 
     http_archive(
         name = "absl_py",
-        sha256 = "603febc9b95a8f2979a7bdb77d2f5e4d9b30d4e0d59579f88eba67d4e4cc5462",
-        strip_prefix = "abseil-py-pypi-v0.9.0",
+        sha256 = "a7c51b2a0aa6357a9cbb2d9437e8cd787200531867dc02565218930b6a32166e",
+        strip_prefix = "abseil-py-1.0.0",
         urls = [
-            "https://storage.googleapis.com/mirror.tensorflow.org/github.com/abseil/abseil-py/archive/pypi-v0.9.0.tar.gz",
-            "https://github.com/abseil/abseil-py/archive/pypi-v0.9.0.tar.gz",
+            "https://github.com/abseil/abseil-py/archive/refs/tags/v1.0.0.tar.gz",
         ],
     )
 
     http_archive(
         name = "six_archive",
         build_file = Label("//third_party:six.BUILD"),
-        sha256 = "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73",
-        strip_prefix = "six-1.12.0",
+        sha256 = "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926",
+        strip_prefix = "six-1.16.0",
         urls = [
-            "https://storage.googleapis.com/mirror.tensorflow.org/pypi.python.org/packages/source/s/six/six-1.12.0.tar.gz",
-            "https://pypi.python.org/packages/source/s/six/six-1.12.0.tar.gz",
+            "https://storage.googleapis.com/mirror.tensorflow.org/pypi.python.org/packages/source/s/six/six-1.16.0.tar.gz",
+            "https://pypi.python.org/packages/source/s/six/six-1.16.0.tar.gz",
         ],
     )
 
