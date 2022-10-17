@@ -68,7 +68,7 @@ static NSString *const kMobileNetIndexName = @"searcher_index";
 }
 
 - (TFLImageSearcher *)defaultImageSearcherWithModelName:(NSString *)modelName
-                                       andIndexFileName:(nullable NSString *)indexFileName {
+                                       indexFileName:(nullable NSString *)indexFileName {
   TFLImageSearcherOptions *imageSearcherOptions =
       [self imageSearcherOptionsWithModelName:modelName];
 
@@ -167,7 +167,7 @@ static NSString *const kMobileNetIndexName = @"searcher_index";
 
 - (void)testInferenceWithSearchModelOnMLImageWithUIImage {
   TFLImageSearcher *imageSearcher = [self defaultImageSearcherWithModelName:kSearcherModelName
-                                                           andIndexFileName:nil];
+                                                           indexFileName:nil];
   GMLImage *gmlImage =
       [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
   XCTAssertNotNil(gmlImage);
@@ -178,7 +178,7 @@ static NSString *const kMobileNetIndexName = @"searcher_index";
 
 - (void)testInferenceWithEmbedderModelAndIndexFileOnMLImageWithUIImage {
   TFLImageSearcher *imageSearcher = [self defaultImageSearcherWithModelName:kEmbedderModelName
-                                                           andIndexFileName:kMobileNetIndexName];
+                                                           indexFileName:kMobileNetIndexName];
   GMLImage *gmlImage =
       [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
   XCTAssertNotNil(gmlImage);
@@ -225,7 +225,7 @@ static NSString *const kMobileNetIndexName = @"searcher_index";
 
 - (void)testSearchWithRegionOfInterestSucceeds {
   TFLImageSearcher *imageSearcher = [self defaultImageSearcherWithModelName:kEmbedderModelName
-                                                           andIndexFileName:kMobileNetIndexName];
+                                                           indexFileName:kMobileNetIndexName];
   GMLImage *gmlImage =
       [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
   XCTAssertNotNil(gmlImage);
