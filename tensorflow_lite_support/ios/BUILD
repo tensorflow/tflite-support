@@ -162,6 +162,10 @@ objc_library(
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:cord",
     ],
+     copts = [
+        "-ObjC++",
+        "-std=c++17",
+    ],
 )
 
 # bazel build -c opt --config=ios_arm64 //tensorflow_lite_support/ios:TensorFlowLiteTaskVision_framework
