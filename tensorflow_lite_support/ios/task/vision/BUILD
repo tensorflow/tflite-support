@@ -89,6 +89,7 @@ objc_library(
     module_name = "TFLImageSearcher",
     deps = [
         "//tensorflow_lite_support/cc/task/vision:image_searcher",
+        "//tensorflow_lite_support/ios:TFLCommonCppUtils",
         "//tensorflow_lite_support/ios:TFLCommonUtils",
         "//tensorflow_lite_support/ios/task/core:TFLBaseOptionsCppHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLEmbeddingOptionsHelpers",
