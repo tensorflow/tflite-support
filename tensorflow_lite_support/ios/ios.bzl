@@ -36,6 +36,3 @@ def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
             > "$@"
             """.format(prefix, hdr_label),
         )
-
-                    # sed 's|#\\(import\\) ".*/\\(GMLImage\\.h\\)"|#\\1 <MLImage/GMLImage.h>|'; t; 's|#\\([a-z]*\\) ".*/\\([^/]\\{{1,\\}}\\.h\\)"|#\\1 "{}\\2"|'\
-
