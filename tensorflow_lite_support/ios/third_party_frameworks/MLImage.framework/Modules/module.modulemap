@@ -1,0 +1,9 @@
+framework module MLImage {
+  umbrella header "MLImage.h"
+  export *
+  module * { export * }
+  link framework "CoreGraphics"
+  link framework "CoreMedia"
+  link framework "CoreVideo"
+  link framework "UIKit"
+}

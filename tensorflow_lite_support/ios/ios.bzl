@@ -25,7 +25,6 @@ def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
         # can be split at '/' to get the header file name.
         if "/" in hdr_filename:
             hdr_filename = hdr_filename.split("/")[-1]
-
         hdr_basename = hdr_filename.split(".")[0]
         native.genrule(
             name = "{}_{}".format(name, hdr_basename),
@@ -37,3 +36,6 @@ def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
             > "$@"
             """.format(prefix, hdr_label),
         )
+
+                    # sed 's|#\\(import\\) ".*/\\(GMLImage\\.h\\)"|#\\1 <MLImage/GMLImage.h>|'; t; 's|#\\([a-z]*\\) ".*/\\([^/]\\{{1,\\}}\\.h\\)"|#\\1 "{}\\2"|'\
+

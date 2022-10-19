@@ -23,7 +23,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResult",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
-        "//tensorflow_lite_support/odml/ios/image:MLImage",
+        "//tensorflow_lite_support/ios/third_party_frameworks:MLImage",
     ],
 )
 
@@ -46,8 +46,8 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLDetectionResult",
         "//tensorflow_lite_support/ios/task/processor:TFLDetectionResultHelpers",
-        "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
-        "//tensorflow_lite_support/odml/ios/image:MLImage",
+        "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",        
+        "//tensorflow_lite_support/ios/third_party_frameworks:MLImage",
     ],
 )
 
@@ -69,7 +69,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLSegmentationResult",
         "//tensorflow_lite_support/ios/task/processor:TFLSegmentationResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
-        "//tensorflow_lite_support/odml/ios/image:MLImage",
+        "//tensorflow_lite_support/ios/third_party_frameworks:MLImage",
     ],
 )
 
@@ -95,5 +95,7 @@ objc_library(
         "//tensorflow_lite_support/ios/task/processor:TFLSearchOptionsHelpers",
         "//tensorflow_lite_support/ios/task/processor:TFLSearchResultHelpers",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageCppUtils",
-    ],
+        "//tensorflow_lite_support/ios/third_party_frameworks:MLImage",
+    ],        
+
 )

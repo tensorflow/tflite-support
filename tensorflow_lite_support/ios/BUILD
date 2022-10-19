@@ -44,15 +44,19 @@ strip_api_include_path_prefix(
         "//tensorflow_lite_support/ios/task/text/qa:Sources/TFLBertQuestionAnswerer.h",
         "//tensorflow_lite_support/ios/task/vision:sources/TFLImageClassifier.h",
         "//tensorflow_lite_support/ios/task/vision:sources/TFLObjectDetector.h",
-        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageSegmenter.h",
+        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageSegmenter.h",        
+        "//tensorflow_lite_support/ios/task/vision:sources/TFLImageSearcher.h",
         "//tensorflow_lite_support/ios:sources/TFLCommon.h",
         "//tensorflow_lite_support/ios/task/core:sources/TFLBaseOptions.h",
+        "//tensorflow_lite_support/ios/task/core:sources/TFLExternalFile.h", 
+        "//tensorflow_lite_support/ios/task/processor:sources/TFLEmbeddingOptions.h",        
+        "//tensorflow_lite_support/ios/task/processor:sources/TFLSearchOptions.h",
         "//tensorflow_lite_support/ios/task/processor:sources/TFLClassificationOptions.h",
         "//tensorflow_lite_support/ios/task/processor:sources/TFLCategory.h",
         "//tensorflow_lite_support/ios/task/processor:sources/TFLClassificationResult.h",
         "//tensorflow_lite_support/ios/task/processor:sources/TFLDetectionResult.h",
-        "//tensorflow_lite_support/ios/task/processor:sources/TFLSegmentationResult.h",
-        "//tensorflow_lite_support/odml/ios/image:apis/GMLImage.h",
+        "//tensorflow_lite_support/ios/task/processor:sources/TFLSegmentationResult.h",        
+        "//tensorflow_lite_support/ios/task/processor:sources/TFLSearchResult.h",
         "//tensorflow_lite_support/ios/task/audio/core:sources/TFLAudioFormat.h",
         "//tensorflow_lite_support/ios/task/audio/core:sources/TFLFloatBuffer.h",
         "//tensorflow_lite_support/ios/task/audio/core/audio_record:sources/TFLAudioRecord.h",
@@ -153,6 +157,10 @@ objc_library(
     hdrs = [
         "sources/TFLCommonCppUtils.h",
     ],
+    copts = [
+        "-ObjC++",
+        "-std=c++17",
+    ],
     module_name = "TFLCommonCppUtils",
     deps = [
         ":TFLCommon",
@@ -168,8 +176,10 @@ objc_library(
 ios_static_framework(
     name = "TensorFlowLiteTaskVision_framework",
     hdrs = [
-        ":GMLImage.h",
         ":TFLBaseOptions.h",
+        ":TFLExternalFile.h",
+        ":TFLSearchOptions.h",
+        ":TFLEmbeddingOptions.h",
         ":TFLCategory.h",
         ":TFLClassificationOptions.h",
         ":TFLClassificationResult.h",
@@ -177,8 +187,11 @@ ios_static_framework(
         ":TFLDetectionResult.h",
         ":TFLImageClassifier.h",
         ":TFLImageSegmenter.h",
+        ":TFLImageSearcher.h",
         ":TFLObjectDetector.h",
         ":TFLSegmentationResult.h",
+        ":TFLSearchResult.h"
+
     ],
     bundle_name = "TensorFlowLiteTaskVision",
     minimum_os_version = TFL_TASK_MINIMUM_OS_VERSION,
@@ -186,6 +199,7 @@ ios_static_framework(
         "//tensorflow_lite_support/ios/task/vision:TFLImageClassifier",
         "//tensorflow_lite_support/ios/task/vision:TFLImageSegmenter",
         "//tensorflow_lite_support/ios/task/vision:TFLObjectDetector",
+        "//tensorflow_lite_support/ios/task/vision:TFLImageSearcher",
     ],
 )
 
@@ -213,6 +227,7 @@ ios_static_framework(
         ":TFLAudioRecord.h",
         ":TFLAudioTensor.h",
         ":TFLBaseOptions.h",
+        ":TFLExternalFile.h",
         ":TFLCategory.h",
         ":TFLClassificationOptions.h",
         ":TFLClassificationResult.h",
