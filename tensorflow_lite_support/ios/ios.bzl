@@ -25,6 +25,7 @@ def strip_api_include_path_prefix(name, hdr_labels, prefix = ""):
         # can be split at '/' to get the header file name.
         if "/" in hdr_filename:
             hdr_filename = hdr_filename.split("/")[-1]
+            
         hdr_basename = hdr_filename.split(".")[0]
         native.genrule(
             name = "{}_{}".format(name, hdr_basename),
