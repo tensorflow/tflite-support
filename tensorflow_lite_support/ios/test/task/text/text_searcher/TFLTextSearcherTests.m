@@ -14,8 +14,7 @@
  ==============================================================================*/
 #import <XCTest/XCTest.h>
 
-#import "tensorflow_lite_support/ios/task/text/sources/TFLImageSearcher.h"
-#import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
+#import "tensorflow_lite_support/ios/task/text/sources/TFLTextSearcher.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,29 +25,29 @@ NS_ASSUME_NONNULL_BEGIN
   XCTAssertEqualObjects(nearestNeighbor.metadata, expectedMetadata);               \
   XCTAssertEqualWithAccuracy(nearestNeighbor.distance, expectedDistance, 1e-6);
 
-@interface TFLImageSearcherTests : XCTestCase
+@interface TFLTextSearcherTests : XCTestCase
 @property(nonatomic, nullable) NSString *modelPath;
 @end
 
-@implementation TFLImageSearcherTests
+@implementation TFLTextSearcherTests
 
 - (void)setUp {
   [super setUp];
   self.modelPath =
-      [[NSBundle bundleForClass:self.class] pathForResource:@"mobilenet_v3_small_100_224_searcher"
+      [[NSBundle bundleForClass:self.class] pathForResource:@"regex_searcher"
                                                      ofType:@"tflite"];
   XCTAssertNotNil(self.modelPath);
 }
 
-- (TFLImageSearcher *)testSuccessfulCreationOfImageSearcherWithSearchContent:(NSString *)modelPath {
-  TFLImageSearcherOptions *imageSearcherOptions =
-      [[TFLImageSearcherOptions alloc] initWithModelPath:self.modelPath];
+- (TFLTextSearcher *)testSuccessfulCreationOfTextSearcherWithSearchContent:(NSString *)modelPath {
+  TFLTextSearcherOptions *textSearcherOptions =
+      [[TFLTextSearcherOptions alloc] initWithModelPath:self.modelPath];
 
-  TFLImageSearcher *imageSearcher = [TFLImageSearcher imageSearcherWithOptions:imageSearcherOptions
+  TFLTextSearcher *textSearcher = [TFLTextSearcher textSearcherWithOptions:textSearcherOptions
                                                                          error:nil];
-  XCTAssertNotNil(imageSearcher);
+  XCTAssertNotNil(textSearcher);
 
-  return imageSearcher;
+  return textSearcher;
 }
 
 - (void)verifySearchResultForInferenceWithSearchContent:(TFLSearchResult *)searchResult {
@@ -78,14 +77,14 @@ NS_ASSUME_NONNULL_BEGIN
   );
 }
 
-- (void)testSuccessfullInferenceWithSearchContentOnMLImageWithUIImage {
-  TFLImageSearcher *imageSearcher =
-      [self testSuccessfulCreationOfImageSearcherWithSearchContent:self.modelPath];
-  GMLImage *gmlImage =
-      [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
-  XCTAssertNotNil(gmlImage);
+- (void)testSuccessfullInferenceWithSearchContentOnText {
+  TFLTextSearcher *textSearcher =
+      [self testSuccessfulCreationOfTextSearcherWithSearchContent:self.modelPath];
+  // GMLImage *gmlImage =
+  //     [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
+  // XCTAssertNotNil(gmlImage);
 
-  TFLSearchResult *searchResult = [imageSearcher searchWithGMLImage:gmlImage error:nil];
+  TFLSearchResult *searchResult = [textSearcher searchWithText:@"The weather was excellent." error:nil];
   [self verifySearchResultForInferenceWithSearchContent:searchResult];
 }
 
