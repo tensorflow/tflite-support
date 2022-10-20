@@ -18,7 +18,7 @@
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLEmbeddingOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchOptions.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchResult.h"
-#import "tensorflow_lite_support/odml/ios/image/apis/GMLImage.h"
+#import <MLImage/MLImage.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

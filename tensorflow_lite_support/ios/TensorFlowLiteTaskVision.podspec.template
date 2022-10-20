@@ -18,4 +18,5 @@ Pod::Spec.new do |s|
   s.library = 'c++'
   s.frameworks = 'CoreMedia', 'Accelerate'
   s.vendored_frameworks = 'Frameworks/TensorFlowLiteTaskVision.framework'
-end
+  s.dependency 'MLImage', '~> 1.0.0-beta3'  
+end  
