@@ -18,10 +18,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define VerifySearchResultCount(searchResult, expectedNearestNeighborsCount) \
+#define ValidateSearchResultCount(searchResult, expectedNearestNeighborsCount) \
   XCTAssertEqual(searchResult.nearestNeighbors.count, expectedNearestNeighborsCount);
 
-#define VerifyNearestNeighbor(nearestNeighbor, expectedMetadata, expectedDistance) \
+#define ValidateNearestNeighbor(nearestNeighbor, expectedMetadata, expectedDistance) \
   XCTAssertEqualObjects(nearestNeighbor.metadata, expectedMetadata);               \
   XCTAssertEqualWithAccuracy(nearestNeighbor.distance, expectedDistance, 1e-6);
 
@@ -51,29 +51,29 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)verifySearchResultForInferenceWithSearchContent:(TFLSearchResult *)searchResult {
-  VerifySearchResultCount(searchResult,
+  ValidateSearchResultCount(searchResult,
                           5  // expectedNearestNeighborsCount
   );
 
-  VerifyNearestNeighbor(searchResult.nearestNeighbors[0],
-                        @"burger",  // expectedMetadata
-                        198.456329  // expectedDistance
+  ValidateNearestNeighbor(searchResult.nearestNeighbors[0],
+                          @"The weather was excellent.",  // expectedMetadata
+                          0.889664649963  // expectedDistance
   );
-  VerifyNearestNeighbor(searchResult.nearestNeighbors[1],
-                        @"car",     // expectedMetadata
-                        226.022186  // expectedDistance
+  ValidateNearestNeighbor(searchResult.nearestNeighbors[1],
+                          @"The sun was shining on that day.",     // expectedMetadata
+                          0.889667928219  // expectedDistance
   );
-  VerifyNearestNeighbor(searchResult.nearestNeighbors[2],
-                        @"bird",    // expectedMetadata
-                        227.297668  // expectedDistance
+  ValidateNearestNeighbor(searchResult.nearestNeighbors[2],
+                          @"The cat is chasing after the mouse.",    // expectedMetadata
+                          0.889669716358  // expectedDistance
   );
-  VerifyNearestNeighbor(searchResult.nearestNeighbors[3],
-                        @"dog",     // expectedMetadata
-                        229.133789  // expectedDistance
+  ValidateNearestNeighbor(searchResult.nearestNeighbors[3],
+                          @"It was a sunny day.",     // expectedMetadata
+                          0.889671087265 // expectedDistance
   );
-  VerifyNearestNeighbor(searchResult.nearestNeighbors[4],
-                        @"cat",     // expectedMetadata
-                        229.718948  // expectedDistance
+  ValidateNearestNeighbor(searchResult.nearestNeighbors[4],
+                          @"He was very happy with his newly bought car.",     // expectedMetadata
+                          0.889671683311  // expectedDistance
   );
 }
 
