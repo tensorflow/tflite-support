@@ -13,10 +13,12 @@ objc_library(
     srcs = ["TFLImageSearcherTests.m"],
     data = [
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_images",
+        "//tensorflow_lite_support/cc/test/testdata/task/vision:test_indices",
         "//tensorflow_lite_support/cc/test/testdata/task/vision:test_models",
     ],
     tags = TFL_DEFAULT_TAGS,
     deps = [
+        "//tensorflow_lite_support/ios:TFLCommon",
         "//tensorflow_lite_support/ios/task/vision:TFLImageSearcher",
         "//tensorflow_lite_support/ios/task/vision/utils:GMLImageUtils",
     ],

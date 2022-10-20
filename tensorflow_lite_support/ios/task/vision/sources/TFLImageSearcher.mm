@@ -14,7 +14,7 @@
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageSearcher.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
-#import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
+#import "tensorflow_lite_support/ios/sources/TFLCommonCppUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+CppHelpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLEmbeddingOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSearchOptions+Helpers.h"
@@ -71,16 +71,17 @@ using ::tflite::support::StatusOr;
 
 @implementation TFLImageSearcher
 
-- (nullable instancetype)initWithCppImageSearcherOptions:(ImageSearcherOptionsCpp)cppOptions {
+- (nullable instancetype)initWithCppImageSearcherOptions:(ImageSearcherOptionsCpp)cppOptions
+                                                   error:(NSError **)error {
   self = [super init];
   if (self) {
     StatusOr<std::unique_ptr<ImageSearcherCpp>> cppImageSearcher =
         ImageSearcherCpp::CreateFromOptions(cppOptions);
-    if (cppImageSearcher.ok()) {
-      _cppImageSearcher = std::move(cppImageSearcher.value());
-    } else {
+    if (![TFLCommonCppUtils checkCppError:cppImageSearcher.status() toError:error]) {
       return nil;
     }
+
+    _cppImageSearcher = std::move(cppImageSearcher.value());
   }
   return self;
 }
@@ -96,7 +97,7 @@ using ::tflite::support::StatusOr;
 
   ImageSearcherOptionsCpp cppOptions = [options cppOptions];
 
-  return [[TFLImageSearcher alloc] initWithCppImageSearcherOptions:cppOptions];
+  return [[TFLImageSearcher alloc] initWithCppImageSearcherOptions:cppOptions error:error];
 }
 
 - (nullable TFLSearchResult *)searchWithGMLImage:(GMLImage *)image error:(NSError **)error {

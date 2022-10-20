@@ -153,6 +153,10 @@ objc_library(
     hdrs = [
         "sources/TFLCommonCppUtils.h",
     ],
+    copts = [
+        "-ObjC++",
+        "-std=c++17",
+    ],
     module_name = "TFLCommonCppUtils",
     deps = [
         ":TFLCommon",
