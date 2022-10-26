@@ -108,13 +108,19 @@ using ::tflite::support::StatusOr;
     return nil;
   }
 
-  std::unique_ptr<FrameBufferCpp> cppFrameBuffer = [image cppFrameBufferWithError:error];
+  uint8_t *buffer = nil;
+  std::unique_ptr<FrameBufferCpp> cppFrameBuffer = [image cppFrameBufferWithUnderlyingBuffer:&buffer
+                                                                                       error:error];
 
   if (!cppFrameBuffer) {
+    free(buffer);
     return nil;
   }
 
   StatusOr<SearchResultCpp> cppSearchResultStatus = _cppImageSearcher->Search(*cppFrameBuffer);
+
+  // Free the underlying buffer
+  free(buffer);
 
   return [TFLSearchResult searchResultWithCppResult:cppSearchResultStatus error:error];
 }
@@ -129,9 +135,12 @@ using ::tflite::support::StatusOr;
     return nil;
   }
 
-  std::unique_ptr<FrameBufferCpp> cppFrameBuffer = [image cppFrameBufferWithError:error];
+  uint8_t *buffer = nil;
+  std::unique_ptr<FrameBufferCpp> cppFrameBuffer = [image cppFrameBufferWithUnderlyingBuffer:&buffer
+                                                                                       error:error];
 
   if (!cppFrameBuffer) {
+    free(buffer);
     return nil;
   }
 
@@ -143,6 +152,9 @@ using ::tflite::support::StatusOr;
 
   StatusOr<SearchResultCpp> cppSearchResultStatus =
       _cppImageSearcher->Search(*cppFrameBuffer, regionOfInterest);
+
+  // Free the underlying buffer
+  free(buffer);
 
   return [TFLSearchResult searchResultWithCppResult:cppSearchResultStatus error:error];
 }
