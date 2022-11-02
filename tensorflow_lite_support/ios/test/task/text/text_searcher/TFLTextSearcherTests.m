@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
   XCTAssertNotNil(self.modelPath);
 }
 
-- (TFLTextSearcher *)testSuccessfulCreationOfTextSearcherWithSearchContent:(NSString *)modelPath {
+- (TFLTextSearcher *)textSearcherWithSearcherModelPath:(NSString *)modelPath {
   TFLTextSearcherOptions *textSearcherOptions =
       [[TFLTextSearcherOptions alloc] initWithModelPath:self.modelPath];
 
@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
   return textSearcher;
 }
 
-- (void)verifySearchResultForInferenceWithSearchContent:(TFLSearchResult *)searchResult {
+- (void)validateSearchResultForInferenceWithSearchContent:(TFLSearchResult *)searchResult {
   ValidateSearchResultCount(searchResult,
                           5  // expectedNearestNeighborsCount
   );
@@ -79,13 +79,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testSuccessfullInferenceWithSearchContentOnText {
   TFLTextSearcher *textSearcher =
-      [self testSuccessfulCreationOfTextSearcherWithSearchContent:self.modelPath];
-  // GMLImage *gmlImage =
-  //     [GMLImage imageFromBundleWithClass:self.class fileName:@"burger" ofType:@"jpg"];
-  // XCTAssertNotNil(gmlImage);
-
+      [self textSearcherWithSearcherModelPath:self.modelPath];
+ 
   TFLSearchResult *searchResult = [textSearcher searchWithText:@"The weather was excellent." error:nil];
-  [self verifySearchResultForInferenceWithSearchContent:searchResult];
+  [self validateSearchResultForInferenceWithSearchContent:searchResult];
 }
 
 @end
