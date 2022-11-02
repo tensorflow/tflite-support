@@ -30,7 +30,7 @@ using ::tflite::support::StatusOr;
 }  // namespace
 
 @interface TFLTextSearcher () {
-  /** TextSearcher backed by C API */
+  /** TextSearcher backed by C++ API */
   std::unique_ptr<TextSearcherCpp> _cppTextSearcher;
 }
 @end
@@ -104,8 +104,9 @@ using ::tflite::support::StatusOr;
     return nil;
   }
 
+  std::string cppTextToBeSearched =  std::string(text.UTF8String, [text lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
   StatusOr<SearchResultCpp> cppSearchResultStatus = _cppTextSearcher->Search(
-    std::string([text UTF8String], [text lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    cppTextToBeSearched);
 
   return [TFLSearchResult searchResultWithCppResult:cppSearchResultStatus error:error];
 }
