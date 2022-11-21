@@ -1,4 +1,5 @@
 load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+load("@org_tensorflow//tensorflow/lite/delegates/flex:build_def.bzl", "tflite_flex_cc_library")
 
 package(
     default_applicable_licenses = ["//tensorflow_lite_support:license"],
@@ -7,6 +8,16 @@ package(
     ],
     licenses = ["notice"],  # Apache 2.0
 )
+
+
+# generate cc_lib for IDDetector
+tflite_flex_cc_library(
+    name = "tf_text_flex_delegate",
+    models = [
+        "2022IDDetectorWithMetadata.tflite",
+    ],
+)
+
 
 # IMPORTANT: in order to use hardware acceleration delegates, configurable through the
 # `compute_settings` field of the ObjectDetectorOptions, you must additionally link to
@@ -68,6 +79,8 @@ cc_library_with_tflite(
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
     ],
     deps = [
+        # adding the following dependency breaks the cc target when build with --config=android_arm64
+        # ":tf_text_flex_delegate",
         "//tensorflow_lite_support/cc:common",
         "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
