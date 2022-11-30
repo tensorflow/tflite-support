@@ -16,7 +16,7 @@
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+CppUtils.h"
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
 
-#include "absl/strings/str_format.h"  // from @com_google_absl
+#include "absl/strings/str_format.h"  // from @com_google_absl  // from @com_google_absl
 #include "tensorflow_lite_support/cc/task/vision/utils/frame_buffer_common_utils.h"
 
 namespace {
