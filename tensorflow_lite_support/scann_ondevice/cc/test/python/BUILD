@@ -1,9 +1,6 @@
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
 
-package(
-    default_applicable_licenses = ["//tensorflow_lite_support:license"],
-    licenses = ["notice"],
-)
+package(licenses = ["notice"])
 
 pybind_extension(
     name = "leveldb_testing_utils",

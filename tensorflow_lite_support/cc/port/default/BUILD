@@ -1,5 +1,4 @@
 package(
-    default_applicable_licenses = ["//tensorflow_lite_support:license"],
     default_visibility = [
         "//tensorflow_lite_support/cc/port:__subpackages__",
         "//tensorflow_lite_support/cc/test:__subpackages__",
