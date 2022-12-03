@@ -26,7 +26,7 @@ def tflite_support_workspace1():
             "org.mockito:mockito-android:jar:3.0.0",
             "org.mockito:mockito-core:jar:3.0.0",
             "org.mockito:mockito-inline:jar:3.0.0",
-            "org.robolectric:robolectric:jar:4.7.3",
+            "org.robolectric:robolectric:jar:4.9",
             "junit:junit:jar:4.13",
         ],
         repositories = [
