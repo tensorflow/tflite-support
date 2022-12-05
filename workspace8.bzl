@@ -77,6 +77,6 @@ def tflite_support_workspace8():
 
     http_archive(
         name = "robolectric",
-        urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.7.3.tar.gz"],
-        strip_prefix = "robolectric-bazel-4.7.3",
+        urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.9.tar.gz"],
+        strip_prefix = "robolectric-bazel-4.9",
     )
