@@ -158,6 +158,7 @@ def tflite_support_workspace9():
         strip_prefix = "protobuf-3.18.0",
         # Patched to give visibility into private targets to pybind11_protobuf
         patches = [Label("//third_party/pybind11_protobuf:com_google_protobuf.patch")],
+        patch_args = ["-p1"],
         urls = [
             "https://github.com/protocolbuffers/protobuf/archive/v3.18.0.zip",
         ],
