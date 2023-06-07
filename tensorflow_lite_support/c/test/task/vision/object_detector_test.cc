@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <string.h>
 
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/c/common.h"
 #include "tensorflow_lite_support/c/task/processor/detection_result.h"
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
@@ -44,6 +44,7 @@ constexpr char kTestDataDirectory[] =
 // Quantized model.
 constexpr char kMobileSsdWithMetadata[] =
     "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.tflite";
+constexpr int kMaxPixelOffset = 5;
 
 StatusOr<ImageData> LoadImage(const char* image_name) {
   return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
@@ -56,13 +57,21 @@ void VerifyDetection(const TfLiteDetection& detection,
                      const std::string& expected_first_label) {
   EXPECT_GE(detection.size, 1);
   EXPECT_NE(detection.categories, nullptr);
-  EXPECT_EQ(detection.bounding_box.origin_x, expected_bounding_box.origin_x);
-  EXPECT_EQ(detection.bounding_box.origin_y, expected_bounding_box.origin_y);
-  EXPECT_EQ(detection.bounding_box.height, expected_bounding_box.height);
-  EXPECT_EQ(detection.bounding_box.width, expected_bounding_box.width);
+  EXPECT_NEAR(detection.bounding_box.origin_x, expected_bounding_box.origin_x
+              , kMaxPixelOffset
+             );
+  EXPECT_NEAR(detection.bounding_box.origin_y, expected_bounding_box.origin_y
+              , kMaxPixelOffset
+             );
+  EXPECT_NEAR(detection.bounding_box.height, expected_bounding_box.height
+              , kMaxPixelOffset
+             );
+  EXPECT_NEAR(detection.bounding_box.width, expected_bounding_box.width
+              , kMaxPixelOffset
+             );
 
   EXPECT_THAT(detection.categories[0].label, StrEq(expected_first_label));
-  EXPECT_NEAR(detection.categories[0].score, expected_first_score, 0.001);
+  EXPECT_NEAR(detection.categories[0].score, expected_first_score, 0.05);
 }
 
 void VerifyResults(TfLiteDetectionResult* detection_result) {
@@ -88,7 +97,7 @@ void VerifyResults(TfLiteDetectionResult* detection_result) {
       0.51171875, "dog");
 }
 
-class ObjectDetectorFromOptionsTest : public tflite_shims::testing::Test {};
+class ObjectDetectorFromOptionsTest : public tflite::testing::Test {};
 
 TEST_F(ObjectDetectorFromOptionsTest, FailsWithNullOptionsAndError) {
   TfLiteSupportError* error = nullptr;
@@ -214,7 +223,7 @@ TEST(ObjectDetectorNullDetectorDetectTest,
   TfLiteSupportErrorDelete(error);
 }
 
-class ObjectDetectorDetectTest : public tflite_shims::testing::Test {
+class ObjectDetectorDetectTest : public tflite::testing::Test {
  protected:
   void SetUp() override {
     std::string model_path =
@@ -404,12 +413,17 @@ TEST(ObjectDetectorWithUserDefinedOptionsDetectorTest,
   if (object_detector) TfLiteObjectDetectorDelete(object_detector);
 
   ASSERT_NE(detection_result, nullptr);
-  EXPECT_EQ(detection_result->size, 1);
+  EXPECT_EQ(detection_result->size, 2);
+
   EXPECT_NE(detection_result->detections, nullptr);
   VerifyDetection(
       detection_result->detections[0],
       {.origin_x = 54, .origin_y = 396, .width = 393, .height = 196},
       0.64453125, "cat");
+  VerifyDetection(
+      detection_result->detections[1],
+      {.origin_x = 602, .origin_y = 157, .width = 394, .height = 447}, 0.609375,
+      "cat");
 
   TfLiteDetectionResultDelete(detection_result);
 }

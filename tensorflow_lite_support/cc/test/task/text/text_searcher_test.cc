@@ -23,7 +23,7 @@ limitations under the License.
 #include "absl/strings/cord.h"  // from @com_google_absl
 #include "absl/strings/str_cat.h"  // from @com_google_absl
 #include "tensorflow/lite/core/api/op_resolver.h"
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
@@ -85,7 +85,7 @@ std::unique_ptr<tflite::OpResolver> GetOpResolver(
   if (is_universal_sentence_encoder) {
     return CreateTextOpResolver();
   } else {
-    return absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>();
+    return absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>();
   }
 }
 

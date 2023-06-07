@@ -19,7 +19,7 @@ limitations under the License.
 
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/string_view.h"  // from @com_google_absl
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
@@ -52,7 +52,7 @@ constexpr float kValueDiffTolerance = 1e-4;
 // Tolerancy for cosine similarity evaluation.
 constexpr double kSimilarityTolerancy = 1e-6;
 
-class CreateFromOptionsTest : public tflite_shims::testing::Test {};
+class CreateFromOptionsTest : public tflite::testing::Test {};
 
 TextEmbedderOptions GetBasicOptions(absl::string_view model_name) {
   TextEmbedderOptions options;
@@ -109,7 +109,7 @@ TEST_F(CreateFromOptionsTest, FailsWithIncorrectNumberOfHeadOptions) {
   EXPECT_EQ(text_embedder_or.status().code(),
             absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(text_embedder_or.status().message(),
-              testing::HasSubstr("Invalid embedding_options"));
+              ::testing::HasSubstr("Invalid embedding_options"));
 }
 
 TEST_F(CreateFromOptionsTest, FailsWithMissingModel) {
@@ -122,7 +122,7 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingModel) {
             absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       text_embedder_or.status().GetPayload(support::kTfLiteSupportPayload),
-      testing::Optional(absl::Cord(
+      ::testing::Optional(absl::Cord(
           absl::StrCat(support::TfLiteSupportStatus::kInvalidArgumentError))));
 }
 

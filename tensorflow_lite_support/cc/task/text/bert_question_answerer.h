@@ -69,7 +69,7 @@ class BertQuestionAnswerer : public QuestionAnswerer {
   CreateFromOptions(
       const BertQuestionAnswererOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   ABSL_DEPRECATED("Prefer using `CreateFromOptions`")
   static tflite::support::StatusOr<std::unique_ptr<QuestionAnswerer>>

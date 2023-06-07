@@ -22,6 +22,7 @@ limitations under the License.
 #include "absl/status/status.h"  // from @com_google_absl
 #include "tensorflow/lite/core/api/op_resolver.h"
 #include "tensorflow/lite/kernels/op_macros.h"
+#include "tensorflow/lite/kernels/register.h"
 #include "tensorflow_lite_support/cc/port/configuration_proto_inc.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
@@ -50,7 +51,7 @@ class TaskAPIFactory {
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromBuffer(
       const char* buffer_data, size_t buffer_size,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
       int num_threads = 1,
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings()) {
@@ -68,7 +69,7 @@ class TaskAPIFactory {
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromFile(
       const std::string& file_name,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
       int num_threads = 1,
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings()) {
@@ -85,7 +86,7 @@ class TaskAPIFactory {
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromFileDescriptor(
       int file_descriptor,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>(),
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
       int num_threads = 1,
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings()) {
@@ -104,7 +105,7 @@ class TaskAPIFactory {
       StatusOr<std::unique_ptr<T>> CreateFromExternalFileProto(
           const ExternalFile* external_file,
           std::unique_ptr<tflite::OpResolver> resolver = absl::make_unique<
-              tflite_shims::ops::builtin::BuiltinOpResolver>(),
+              tflite::ops::builtin::BuiltinOpResolver>(),
           int num_threads = 1,
           const tflite::proto::ComputeSettings& compute_settings =
               tflite::proto::ComputeSettings()) {
@@ -122,7 +123,7 @@ class TaskAPIFactory {
   static tflite::support::StatusOr<std::unique_ptr<T>> CreateFromBaseOptions(
       const BaseOptions* base_options,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>()) {
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>()) {
     if (!base_options->has_model_file()) {
       return CreateStatusWithPayload(
           absl::StatusCode::kInvalidArgument,

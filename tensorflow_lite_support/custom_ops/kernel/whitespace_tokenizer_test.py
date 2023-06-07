@@ -25,7 +25,6 @@ import tensorflow as tf
 import tensorflow_text as tf_text
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.lite.python import interpreter as interpreter_wrapper
-from tensorflow.python.platform import resource_loader
 
 # Force loaded shared object symbols to be globally visible. This is needed so
 # that the interpreter_wrapper, in one .so file, can see the op resolver
@@ -65,7 +64,7 @@ class WhitespaceTokenizerTest(parameterized.TestCase):
   def testToTensorEquivalence(self, test_case):
     tf_output = _call_whitespace_tokenizer_to_tensor(test_case)
 
-    model_filename = resource_loader.get_path_to_datafile(
+    model_filename = tf.compat.v1.resource_loader.get_path_to_datafile(
         'testdata/whitespace_tokenizer_to_tensor.tflite')
     with open(model_filename, 'rb') as file:
       model = file.read()
@@ -73,7 +72,7 @@ class WhitespaceTokenizerTest(parameterized.TestCase):
         model_content=model,
         custom_op_registerers=['AddWhitespaceTokenizerCustomOp'])
 
-    np_test_case = np.array(test_case, dtype=np.str)
+    np_test_case = np.array(test_case, dtype=str)
     interpreter.resize_tensor_input(0, np_test_case.shape)
     interpreter.allocate_tensors()
     interpreter.set_tensor(interpreter.get_input_details()[0]['index'],
@@ -88,10 +87,10 @@ class WhitespaceTokenizerTest(parameterized.TestCase):
   def testToRaggedEquivalence(self, test_case):
     tf_output = _call_whitespace_tokenizer_to_ragged(test_case)
 
-    np_test_case = np.array(test_case, dtype=np.str)
+    np_test_case = np.array(test_case, dtype=str)
     rank = len(np_test_case.shape)
 
-    model_filename = resource_loader.get_path_to_datafile(
+    model_filename = tf.compat.v1.resource_loader.get_path_to_datafile(
         'testdata/whitespace_tokenizer_to_ragged_{}d_input.tflite'.format(rank))
     with open(model_filename, 'rb') as file:
       model = file.read()
@@ -117,7 +116,7 @@ class WhitespaceTokenizerTest(parameterized.TestCase):
     self.assertEqual(tf_output.numpy().tolist(), tflite_output_values.tolist())
 
   def testSingleOpLatency(self):
-    model_filename = resource_loader.get_path_to_datafile(
+    model_filename = tf.compat.v1.resource_loader.get_path_to_datafile(
         'testdata/whitespace_tokenizer_to_tensor.tflite')
     with open(model_filename, 'rb') as file:
       model = file.read()
@@ -127,7 +126,7 @@ class WhitespaceTokenizerTest(parameterized.TestCase):
 
     latency = 0.0
     for test_case in TEST_CASES:
-      np_test_case = np.array(test_case, dtype=np.str)
+      np_test_case = np.array(test_case, dtype=str)
       interpreter.resize_tensor_input(0, np_test_case.shape)
       interpreter.allocate_tensors()
       interpreter.set_tensor(interpreter.get_input_details()[0]['index'],
@@ -141,7 +140,7 @@ class WhitespaceTokenizerTest(parameterized.TestCase):
     logging.info('Latency: %fms', latency * 1000.0)
 
   def testFlexDelegateLatency(self):
-    model_filename = resource_loader.get_path_to_datafile(
+    model_filename = tf.compat.v1.resource_loader.get_path_to_datafile(
         'testdata/whitespace_tokenizer_flex_delegate.tflite')
     with open(model_filename, 'rb') as file:
       model = file.read()
@@ -149,7 +148,7 @@ class WhitespaceTokenizerTest(parameterized.TestCase):
 
     latency = 0.0
     for test_case in TEST_CASES:
-      np_test_case = np.array(test_case, dtype=np.str)
+      np_test_case = np.array(test_case, dtype=str)
       interpreter.resize_tensor_input(0, np_test_case.shape)
       interpreter.allocate_tensors()
       interpreter.set_tensor(interpreter.get_input_details()[0]['index'],

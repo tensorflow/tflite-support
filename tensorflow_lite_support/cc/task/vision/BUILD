@@ -18,7 +18,7 @@ cc_library_with_tflite(
     srcs = ["object_detector.cc"],
     hdrs = ["object_detector.h"],
     tflite_deps = [
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
@@ -61,7 +61,7 @@ cc_library_with_tflite(
     srcs = ["image_classifier.cc"],
     hdrs = ["image_classifier.h"],
     tflite_deps = [
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
@@ -106,7 +106,7 @@ cc_library_with_tflite(
     srcs = ["image_segmenter.cc"],
     hdrs = ["image_segmenter.h"],
     tflite_deps = [
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
@@ -147,7 +147,7 @@ cc_library_with_tflite(
     srcs = ["image_embedder.cc"],
     hdrs = ["image_embedder.h"],
     tflite_deps = [
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
         "//tensorflow_lite_support/cc/task/vision/core:base_vision_task_api",
@@ -185,7 +185,7 @@ cc_library_with_tflite(
     srcs = ["image_searcher.cc"],
     hdrs = ["image_searcher.h"],
     tflite_deps = [
-        "@org_tensorflow//tensorflow/lite/core/shims:builtin_ops",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "//tensorflow_lite_support/cc/task/core:task_api_factory",
         "//tensorflow_lite_support/cc/task/core:tflite_engine",
         "//tensorflow_lite_support/cc/task/processor:search_postprocessor",

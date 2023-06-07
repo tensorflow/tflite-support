@@ -15,9 +15,7 @@ limitations under the License.
 
 package org.tensorflow.lite.support.label;
 
-import android.util.Log;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.tensorflow.lite.support.common.internal.SupportPreconditions;
@@ -46,7 +44,6 @@ public class LabelUtil {
     SupportPreconditions.checkNotNull(tensorBuffer, "Given tensor should not be null");
     SupportPreconditions.checkNotNull(labels, "Given labels should not be null");
     int[] values = tensorBuffer.getIntArray();
-    Log.d("values", Arrays.toString(values));
     List<String> result = new ArrayList<>();
     for (int v : values) {
       int index = v + offset;

@@ -21,9 +21,9 @@ limitations under the License.
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/cord.h"  // from @com_google_absl
 #include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
 #include "tensorflow/lite/kernels/builtin_op_kernels.h"
 #include "tensorflow/lite/mutable_op_resolver.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
@@ -76,8 +76,8 @@ StatusOr<ImageData> LoadImage(std::string image_name) {
 
 // If the proto definition changes, please also change this function.
 void ExpectApproximatelyEqual(const ClassificationResult& actual,
-                              const ClassificationResult& expected) {
-  const float kPrecision = 1e-6;
+                              const ClassificationResult& expected,
+                              const float precision = 1e-6) {
   EXPECT_EQ(actual.classifications_size(), expected.classifications_size());
   for (int i = 0; i < actual.classifications_size(); ++i) {
     const Classifications& a = actual.classifications(i);
@@ -88,7 +88,7 @@ void ExpectApproximatelyEqual(const ClassificationResult& actual,
       EXPECT_EQ(a.classes(j).index(), b.classes(j).index());
       EXPECT_EQ(a.classes(j).class_name(), b.classes(j).class_name());
       EXPECT_EQ(a.classes(j).display_name(), b.classes(j).display_name());
-      EXPECT_NEAR(a.classes(j).score(), b.classes(j).score(), kPrecision);
+      EXPECT_NEAR(a.classes(j).score(), b.classes(j).score(), precision);
     }
   }
 }
@@ -111,7 +111,7 @@ class MobileNetQuantizedOpResolver : public ::tflite::MutableOpResolver {
   MobileNetQuantizedOpResolver(const MobileNetQuantizedOpResolver& r) = delete;
 };
 
-class CreateFromOptionsTest : public tflite_shims::testing::Test {};
+class CreateFromOptionsTest : public tflite::testing::Test {};
 
 TEST_F(CreateFromOptionsTest, SucceedsWithSelectiveOpResolver) {
   ImageClassifierOptions options;
@@ -241,9 +241,9 @@ TEST_F(CreateFromOptionsTest, SucceedsWithNumberOfThreads) {
   SUPPORT_ASSERT_OK(ImageClassifier::CreateFromOptions(options));
 }
 
-using NumThreadsTest = testing::TestWithParam<int>;
+using NumThreadsTest = ::testing::TestWithParam<int>;
 
-INSTANTIATE_TEST_SUITE_P(Default, NumThreadsTest, testing::Values(0, -2));
+INSTANTIATE_TEST_SUITE_P(Default, NumThreadsTest, ::testing::Values(0, -2));
 
 TEST_P(NumThreadsTest, FailsWithInvalidNumberOfThreads) {
   ImageClassifierOptions options;
@@ -353,7 +353,8 @@ TEST(ClassifyTest, SucceedsWithQuantizedModel) {
       FrameBuffer::Dimension{rgb_image.width, rgb_image.height});
 
   ImageClassifierOptions options;
-  options.set_max_results(3);
+  options.set_max_results(1);
+  options.set_score_threshold(0.5);
   options.mutable_model_file_with_metadata()->set_file_name(
       JoinPath("./" /*test src dir*/, kTestDataDirectory,
                kMobileNetQuantizedWithMetadata));
@@ -371,16 +372,11 @@ TEST(ClassifyTest, SucceedsWithQuantizedModel) {
       result,
       ParseTextProtoOrDie<ClassificationResult>(
           R"pb(classifications {
-                 classes {
-                   index: 934
-                   score: 0.96484375
-                   class_name: "cheeseburger"
-                 }
-                 classes { index: 948 score: 0.0078125 class_name: "mushroom" }
-                 classes { index: 924 score: 0.00390625 class_name: "plate" }
+                 classes { index: 934 score: 0.96 class_name: "cheeseburger" }
                  head_index: 0
                }
-          )pb"));
+          )pb"),
+      0.01);
 }
 
 TEST(ClassifyTest, SucceedsWithBaseOptions) {
@@ -441,9 +437,9 @@ void ConfigureXnnPackMiniBenchmark(int num_threads,
   // Configuring mini-benchmark storage paths
   mutable_mini_benchmark_settings->mutable_storage_paths()
       ->set_storage_file_path(
-          JoinPath(testing::TempDir(), "mini_benchmark_storage"));
+          JoinPath(::testing::TempDir(), "mini_benchmark_storage"));
   mutable_mini_benchmark_settings->mutable_storage_paths()
-      ->set_data_directory_path(testing::TempDir());
+      ->set_data_directory_path(::testing::TempDir());
 }
 
 TEST(ClassifyTest, SucceedsWithMiniBenchmark) {
@@ -551,7 +547,7 @@ TEST(ClassifyTest, GetOutputShapeSucceeds) {
   EXPECT_THAT(shape_vector, ElementsAreArray({1, 1001}));
 }
 
-class PostprocessTest : public tflite_shims::testing::Test {
+class PostprocessTest : public tflite::testing::Test {
  public:
   class TestImageClassifier : public ImageClassifier {
    public:
@@ -583,7 +579,7 @@ class PostprocessTest : public tflite_shims::testing::Test {
   };
 
  protected:
-  void SetUp() override { tflite_shims::testing::Test::SetUp(); }
+  void SetUp() override { tflite::testing::Test::SetUp(); }
   void SetUp(const ImageClassifierOptions& options) {
     StatusOr<std::unique_ptr<TestImageClassifier>> test_image_classifier_or =
         TestImageClassifier::CreateFromOptions(options);

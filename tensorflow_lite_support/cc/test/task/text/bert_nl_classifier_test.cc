@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <fcntl.h>
 
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
@@ -53,7 +53,7 @@ std::string GetFullPath(absl::string_view file_name) {
                   file_name);
 }
 
-class BertNLClassifierTest : public tflite_shims::testing::Test {};
+class BertNLClassifierTest : public tflite::testing::Test {};
 
 TEST_F(BertNLClassifierTest, CreateFromOptionsSucceedsWithModelWithMetadata) {
   BertNLClassifierOptions options;
@@ -95,7 +95,7 @@ TEST_F(BertNLClassifierTest, TestNLClassifierCreationFailure) {
   EXPECT_THAT(classifier_or.status().message(),
               HasSubstr("Unable to open file at i/do/not/exist.tflite"));
   EXPECT_THAT(classifier_or.status().GetPayload(kTfLiteSupportPayload),
-              testing::Optional(absl::Cord(
+              ::testing::Optional(absl::Cord(
                   absl::StrCat(TfLiteSupportStatus::kFileNotFoundError))));
 }
 

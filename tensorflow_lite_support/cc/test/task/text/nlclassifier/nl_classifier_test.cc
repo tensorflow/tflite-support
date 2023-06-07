@@ -17,9 +17,9 @@ limitations under the License.
 
 #include <utility>
 
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/string_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
@@ -290,7 +290,7 @@ TEST_F(ProtoOptionsTest, TestInferenceWithAssociatedLabelBuiltinOps) {
 // Parameterized test.
 struct ProtoOptionsTestParamToString {
   std::string operator()(
-      const testing::TestParamInfo<ProtoOptionsTestParam>& info) const {
+      const ::testing::TestParamInfo<ProtoOptionsTestParam>& info) const {
     return info.param.description;
   }
 };
@@ -457,13 +457,13 @@ INSTANTIATE_TEST_SUITE_P(TestClassify, ProtoOptionsTest,
                          ProtoOptionsTestParamToString());
 
 // Tests for struct sNLClassifierOptions.
-class StructOptionsTest : public tflite_shims::testing::Test {};
+class StructOptionsTest : public tflite::testing::Test {};
 
 void AssertStatus(absl::Status status, absl::StatusCode status_code,
                   TfLiteSupportStatus tfls_code) {
   ASSERT_EQ(status.code(), status_code);
   EXPECT_THAT(status.GetPayload(kTfLiteSupportPayload),
-              testing::Optional(absl::Cord(absl::StrCat(tfls_code))));
+              ::testing::Optional(absl::Cord(absl::StrCat(tfls_code))));
 }
 
 TEST_F(StructOptionsTest, TestApiCreationFromBuffer) {

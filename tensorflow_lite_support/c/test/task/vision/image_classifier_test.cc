@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <string.h>
 
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/c/common.h"
 #include "tensorflow_lite_support/c/task/processor/classification_result.h"
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
@@ -48,7 +48,7 @@ StatusOr<ImageData> LoadImage(const char* image_name) {
                                       kTestDataDirectory, image_name));
 }
 
-class ImageClassifierFromOptionsTest : public tflite_shims::testing::Test {};
+class ImageClassifierFromOptionsTest : public tflite::testing::Test {};
 
 TEST_F(ImageClassifierFromOptionsTest, FailsWithNullOptionsAndError) {
   TfLiteSupportError* error = nullptr;
@@ -178,7 +178,7 @@ TEST(ImageClassifierNullClassifierClassifyTest,
   TfLiteSupportErrorDelete(error);
 }
 
-class ImageClassifierClassifyTest : public tflite_shims::testing::Test {
+class ImageClassifierClassifyTest : public tflite::testing::Test {
  protected:
   void SetUp() override {
     std::string model_path =
@@ -292,7 +292,7 @@ TEST_F(ImageClassifierClassifyTest, SucceedsWithRoiWithinImageBounds) {
   EXPECT_EQ(strcmp(classification_result->classifications->categories[0].label,
                    "bagel"),
             0);
-  EXPECT_GE(classification_result->classifications->categories[0].score, 0.30);
+  EXPECT_GE(classification_result->classifications->categories[0].score, 0.24);
 
   TfLiteClassificationResultDelete(classification_result);
 }

@@ -517,7 +517,7 @@ absl::Status FrameBufferUtils::Execute(
   std::unique_ptr<uint8[]> buffer1;
   std::unique_ptr<uint8[]> buffer2;
 
-  for (int i = 0; i < operations.size(); i++) {
+  for (size_t i = 0; i < operations.size(); i++) {
     const FrameBufferOperation& operation = operations[i];
 
     // The first command's input is always passed in `buffer`. Before

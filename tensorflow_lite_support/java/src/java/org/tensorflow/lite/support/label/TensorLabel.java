@@ -15,7 +15,6 @@ limitations under the License.
 
 package org.tensorflow.lite.support.label;
 
-import android.content.Context;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;

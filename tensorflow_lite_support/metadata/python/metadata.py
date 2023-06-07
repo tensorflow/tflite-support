@@ -109,16 +109,16 @@ class MetadataPopulator(object):
   third_party/tensorflow/lite/schema/metadata_schema.fbs
 
   Example usage:
-  Populate metadata and label file into an image classifier model.
+  Populate matadata and label file into an image classifier model.
 
   First, based on metadata_schema.fbs, generate the metadata for this image
-  classifer model using Flatbuffers API. Attach the label file onto the output
+  classifer model using Flatbuffers API. Attach the label file onto the ouput
   tensor (the tensor of probabilities) in the metadata.
 
   Then, pack the metadata and label file into the model as follows.
 
     ```python
-    # Populating a metadata file (or a metadata buffer) and associated files to
+    # Populating a metadata file (or a metadta buffer) and associated files to
     a model file:
     populator = MetadataPopulator.with_model_file(model_file)
     # For metadata buffer (bytearray read from the metadata file), use:
@@ -129,7 +129,7 @@ class MetadataPopulator(object):
     # populator.load_associated_file_buffers({"label.txt": b"file content"})
     populator.populate()
 
-    # Populating a metadata file (or a metadata buffer) and associated files to
+    # Populating a metadata file (or a metadta buffer) and associated files to
     a model buffer:
     populator = MetadataPopulator.with_model_buffer(model_buf)
     populator.load_metadata_file(metadata_file)
@@ -140,19 +140,13 @@ class MetadataPopulator(object):
     with open("updated_model.tflite", "wb") as f:
       f.write(updated_model_buf)
 
-    # Transferring metadata and associated files from another TFLite model (model buffer approach):
+    # Transferring metadata and associated files from another TFLite model:
     populator = MetadataPopulator.with_model_buffer(model_buf)
     populator_dst.load_metadata_and_associated_files(src_model_buf)
     populator_dst.populate()
     updated_model_buf = populator.get_model_buffer()
     with open("updated_model.tflite", "wb") as f:
       f.write(updated_model_buf)
-    
-    # Transferring metadata and associated files from another TFLite model (model file approach):
-    populator = MetadataPopulator.with_model_file(target_model_file)
-    with open(source_model_file, "rb") as f:
-      populator.load_metadata_and_associated_files(f.read())
-    populator.populate()
     ```
 
   Note that existing metadata buffer (if applied) will be overridden by the new
@@ -176,7 +170,7 @@ class MetadataPopulator(object):
 
     Raises:
       IOError: File not found.
-      ValueError: the model does not have the expected flatbuffer identifier.
+      ValueError: the model does not have the expected flatbuffer identifer.
     """
     _assert_model_file_identifier(model_file)
     self._model_file = model_file
@@ -196,7 +190,7 @@ class MetadataPopulator(object):
 
     Raises:
       IOError: File not found.
-      ValueError: the model does not have the expected flatbuffer identifier.
+      ValueError: the model does not have the expected flatbuffer identifer.
     """
     return cls(model_file)
 
@@ -213,7 +207,7 @@ class MetadataPopulator(object):
       A MetadataPopulator(_MetadataPopulatorWithBuffer) object.
 
     Raises:
-      ValueError: the model does not have the expected flatbuffer identifier.
+      ValueError: the model does not have the expected flatbuffer identifer.
     """
     return _MetadataPopulatorWithBuffer(model_buf)
 
@@ -296,7 +290,7 @@ class MetadataPopulator(object):
 
     Raises:
       ValueError: The metadata to be populated is empty.
-      ValueError: The metadata does not have the expected flatbuffer identifier.
+      ValueError: The metadata does not have the expected flatbuffer identifer.
       ValueError: Cannot get minimum metadata parser version.
       ValueError: The number of SubgraphMetadata is not 1.
       ValueError: The number of input/output tensors does not match the number
@@ -335,7 +329,7 @@ class MetadataPopulator(object):
     Raises:
       IOError: File not found.
       ValueError: The metadata to be populated is empty.
-      ValueError: The metadata does not have the expected flatbuffer identifier.
+      ValueError: The metadata does not have the expected flatbuffer identifer.
       ValueError: Cannot get minimum metadata parser version.
       ValueError: The number of SubgraphMetadata is not 1.
       ValueError: The number of input/output tensors does not match the number
@@ -587,7 +581,7 @@ class MetadataPopulator(object):
       metadata_field.buffer = len(model.buffers) - 1
       model.metadata.append(metadata_field)
 
-    # Packs model back to a flatbuffer binary file.
+    # Packs model back to a flatbuffer binaray file.
     b = flatbuffers.Builder(0)
     b.Finish(model.Pack(b), self.TFLITE_FILE_IDENTIFIER)
     model_buf = b.Output()
@@ -649,7 +643,7 @@ class MetadataPopulator(object):
 
 
 class _MetadataPopulatorWithBuffer(MetadataPopulator):
-  """Subclass of MetadataPopulator that populates metadata to a model buffer.
+  """Subclass of MetadtaPopulator that populates metadata to a model buffer.
 
   This class is used to populate metadata into a in-memory model buffer. As we
   use Zip API to concatenate associated files after tflite model file, the
@@ -667,7 +661,7 @@ class _MetadataPopulatorWithBuffer(MetadataPopulator):
 
     Raises:
       ValueError: model_buf is empty.
-      ValueError: model_buf does not have the expected flatbuffer identifier.
+      ValueError: model_buf does not have the expected flatbuffer identifer.
     """
     if not model_buf:
       raise ValueError("model_buf cannot be empty.")

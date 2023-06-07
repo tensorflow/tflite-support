@@ -50,7 +50,7 @@ class AudioEmbedder
   CreateFromOptions(
       const AudioEmbedderOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Performs actual feature vector extraction on the provided AudioBuffer.
   tflite::support::StatusOr<tflite::task::processor::EmbeddingResult> Embed(

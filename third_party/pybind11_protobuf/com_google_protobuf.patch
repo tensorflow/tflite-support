@@ -1,0 +1,22 @@
+--- BUILD
++++ BUILD
+@@ -889,6 +889,8 @@
+         "//conditions:default": [],
+         ":use_fast_cpp_protos": ["//external:python_headers"],
+     }),
++
++    visibility = ["//visibility:public"],
+ )
+
+ config_setting(
+--- a/python/google/protobuf/pyext/descriptor.cc
++++ b/python/google/protobuf/pyext/descriptor.cc
+@@ -100,7 +100,7 @@ PyObject* PyString_FromCppString(const std::string& str) {
+ // TODO(amauryfa): Change the proto2 compiler to remove the assignments, and
+ // remove this hack.
+ bool _CalledFromGeneratedFile(int stacklevel) {
+-#ifndef PYPY_VERSION
++#if 0  // PyFrameObject is not supported by Python 3.11
+   // This check is not critical and is somewhat difficult to implement correctly
+   // in PyPy.
+   PyFrameObject* frame = PyEval_GetFrame();

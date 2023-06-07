@@ -21,7 +21,7 @@ limitations under the License.
 #include "absl/flags/flag.h"  // from @com_google_absl
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/string_view.h"  // from @com_google_absl
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
@@ -125,7 +125,7 @@ void ExpectApproximatelyEqual(const SearchResult& actual,
   }
 }
 
-class CreateFromOptionsTest : public tflite_shims::testing::Test {};
+class CreateFromOptionsTest : public tflite::testing::Test {};
 
 TEST_F(CreateFromOptionsTest, SucceedsWithStandaloneIndex) {
   auto options = std::make_unique<SearchOptions>();

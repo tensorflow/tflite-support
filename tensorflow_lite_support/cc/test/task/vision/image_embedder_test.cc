@@ -20,9 +20,9 @@ limitations under the License.
 #include "absl/flags/flag.h"  // from @com_google_absl
 #include "absl/status/status.h"  // from @com_google_absl
 #include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
 #include "tensorflow/lite/kernels/builtin_op_kernels.h"
 #include "tensorflow/lite/mutable_op_resolver.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
@@ -89,7 +89,7 @@ class MobileNetV3OpResolver : public ::tflite::MutableOpResolver {
   MobileNetV3OpResolver(const MobileNetV3OpResolver& r) = delete;
 };
 
-class CreateFromOptionsTest : public tflite_shims::testing::Test {};
+class CreateFromOptionsTest : public tflite::testing::Test {};
 
 TEST_F(CreateFromOptionsTest, SucceedsWithSelectiveOpResolver) {
   ImageEmbedderOptions options;

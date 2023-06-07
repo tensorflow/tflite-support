@@ -21,9 +21,9 @@ limitations under the License.
 #include "absl/memory/memory.h"  // from @com_google_absl
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/str_format.h"  // from @com_google_absl
-#include "tensorflow/lite/core/shims/c/experimental/acceleration/configuration/delegate_plugin.h"
-#include "tensorflow/lite/core/shims/cc/experimental/acceleration/configuration/delegate_registry.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/c/delegate_plugin.h"
 #include "tensorflow/lite/experimental/acceleration/configuration/delegate_plugin_converter.h"
+#include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 
@@ -35,7 +35,7 @@ namespace {
 using ::absl::StatusCode;
 using ::tflite::proto::Delegate;
 using ::tflite::support::CreateStatusWithPayload;
-using ::tflite_shims::delegates::DelegatePluginRegistry;
+using ::tflite::delegates::DelegatePluginRegistry;
 
 // delegate_name should be one of the following:
 // gpu / hexagon

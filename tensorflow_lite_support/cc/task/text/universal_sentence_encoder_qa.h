@@ -73,7 +73,7 @@ class UniversalSentenceEncoderQA
   CreateFromOption(
       const tflite::task::text::RetrievalOptions& options,
       std::unique_ptr<tflite::OpResolver> resolver =
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
+          absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>());
 
   // Retrieves output from the input by running TFLite engine.
   // Returns an error, if either query_text or responses is empty.

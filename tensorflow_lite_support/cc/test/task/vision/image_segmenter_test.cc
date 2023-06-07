@@ -21,9 +21,9 @@ limitations under the License.
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/cord.h"  // from @com_google_absl
 #include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
 #include "tensorflow/lite/kernels/builtin_op_kernels.h"
 #include "tensorflow/lite/mutable_op_resolver.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
@@ -137,7 +137,7 @@ class DeepLabOpResolver : public ::tflite::MutableOpResolver {
   DeepLabOpResolver(const DeepLabOpResolver& r) = delete;
 };
 
-class CreateFromOptionsTest : public tflite_shims::testing::Test {};
+class CreateFromOptionsTest : public tflite::testing::Test {};
 
 TEST_F(CreateFromOptionsTest, SucceedsWithSelectiveOpResolver) {
   ImageSegmenterOptions options;
@@ -236,9 +236,9 @@ TEST_F(CreateFromOptionsTest, SucceedsWithNumberOfThreads) {
   SUPPORT_ASSERT_OK(ImageSegmenter::CreateFromOptions(options));
 }
 
-using NumThreadsTest = testing::TestWithParam<int>;
+using NumThreadsTest = ::testing::TestWithParam<int>;
 
-INSTANTIATE_TEST_SUITE_P(Default, NumThreadsTest, testing::Values(0, -2));
+INSTANTIATE_TEST_SUITE_P(Default, NumThreadsTest, ::testing::Values(0, -2));
 
 TEST_P(NumThreadsTest, FailsWithInvalidNumberOfThreads) {
   ImageSegmenterOptions options;
@@ -377,7 +377,7 @@ TEST(SegmentTest, SucceedsWithBaseOptions) {
   ImageDataFree(&golden_mask);
 }
 
-class PostprocessTest : public tflite_shims::testing::Test {
+class PostprocessTest : public tflite::testing::Test {
  public:
   class TestImageSegmenter : public ImageSegmenter {
    public:
@@ -409,7 +409,7 @@ class PostprocessTest : public tflite_shims::testing::Test {
   };
 
  protected:
-  void SetUp() override { tflite_shims::testing::Test::SetUp(); }
+  void SetUp() override { tflite::testing::Test::SetUp(); }
   void SetUp(const ImageSegmenterOptions& options) {
     StatusOr<std::unique_ptr<TestImageSegmenter>> test_image_segmenter_or =
         TestImageSegmenter::CreateFromOptions(options);

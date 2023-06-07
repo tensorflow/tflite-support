@@ -22,7 +22,7 @@ limitations under the License.
 #include "absl/flags/flag.h"  // from @com_google_absl
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/string_view.h"  // from @com_google_absl
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
@@ -57,7 +57,7 @@ TEST(CreateFromOptionsTest, Succeeds) {
       Index::CreateFromIndexBuffer(file_contents.data(), file_contents.size()));
 }
 
-class IndexTest : public tflite_shims::testing::Test {
+class IndexTest : public tflite::testing::Test {
  public:
   IndexTest() {
     // Load file in memory using ExternalFile.

@@ -18,7 +18,7 @@ limitations under the License.
 #include <memory>
 
 #include "absl/status/status.h"  // from @com_google_absl
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
@@ -50,7 +50,7 @@ StatusOr<ImageData> LoadImage(std::string image_name) {
                                       kTestDataDirectory, image_name));
 }
 
-class DynamicInputTest : public tflite_shims::testing::Test {
+class DynamicInputTest : public tflite::testing::Test {
  protected:
   void PreprocessImage() {
     engine_ = absl::make_unique<TfLiteEngine>();

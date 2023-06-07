@@ -19,7 +19,7 @@ limitations under the License.
 
 #include <cstdio>
 
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/c/common.h"
 #include "tensorflow_lite_support/c/task/processor/segmentation_result.h"
 #include "tensorflow_lite_support/c/task/vision/core/frame_buffer.h"
@@ -119,7 +119,7 @@ void ExpectPartiallyEqual(const TfLiteSegmentation& actual,
   }
 }
 
-class ImageSegmenterFromOptionsTest : public tflite_shims::testing::Test {};
+class ImageSegmenterFromOptionsTest : public tflite::testing::Test {};
 
 TEST_F(ImageSegmenterFromOptionsTest, FailsWithNullOptionsAndError) {
   TfLiteSupportError* error = nullptr;
@@ -223,7 +223,7 @@ TEST_F(ImageSegmenterFromOptionsTest, FailsWithUnspecifiedOutputTypeAndError) {
   if (error) TfLiteSupportErrorDelete(error);
 }
 
-class ImageSegmenterSegmentTest : public tflite_shims::testing::Test {
+class ImageSegmenterSegmentTest : public tflite::testing::Test {
  protected:
   void SetUp() override {
     std::string model_path = JoinPath("./" /*test src dir*/,

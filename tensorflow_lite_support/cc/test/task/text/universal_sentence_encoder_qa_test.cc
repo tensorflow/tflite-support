@@ -18,7 +18,7 @@ limitations under the License.
 #include <string>
 #include <utility>
 
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/port/status_matchers.h"
@@ -72,7 +72,7 @@ constexpr char kInputProto[] = R"(
 const size_t kExpectedTop[] = {0, 2, 1};
 const float kExpectedScores[] = {14.9595, 7.2148, 8.8094};
 
-class UniversalSentenceEncoderQATest : public tflite_shims::testing::Test {
+class UniversalSentenceEncoderQATest : public tflite::testing::Test {
  public:
   UniversalSentenceEncoderQATest() {
     // Load model file, and create qa client.

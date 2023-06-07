@@ -83,6 +83,9 @@ ExternalFileHandler::CreateFromExternalFile(const ExternalFile* external_file) {
 }
 
 absl::Status ExternalFileHandler::MapExternalFile() {
+  if (!external_file_.file_content().empty()) {
+    return absl::OkStatus();
+  }
 // TODO(b/195588083): Add Windows support
 #ifdef _WIN32
   return CreateStatusWithPayload(
@@ -90,9 +93,6 @@ absl::Status ExternalFileHandler::MapExternalFile() {
       "File loading is not yet supported on Windows",
       TfLiteSupportStatus::kFileReadError);
 #else
-  if (!external_file_.file_content().empty()) {
-    return absl::OkStatus();
-  }
   if (external_file_.file_name().empty() &&
       !external_file_.has_file_descriptor_meta()) {
     return CreateStatusWithPayload(

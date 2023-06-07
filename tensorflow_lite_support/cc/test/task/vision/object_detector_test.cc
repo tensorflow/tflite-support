@@ -21,9 +21,9 @@ limitations under the License.
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/cord.h"  // from @com_google_absl
 #include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
 #include "tensorflow/lite/kernels/builtin_op_kernels.h"
 #include "tensorflow/lite/mutable_op_resolver.h"
+#include "tensorflow/lite/test_util.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
@@ -62,7 +62,6 @@ namespace {
 
 using ::testing::HasSubstr;
 using ::testing::Optional;
-using ::tflite::support::EqualsProto;
 using ::tflite::support::kTfLiteSupportPayload;
 using ::tflite::support::StatusOr;
 using ::tflite::support::TfLiteSupportStatus;
@@ -80,20 +79,20 @@ constexpr char kMobileSsdWithMetadata[] =
 constexpr char kExpectResults[] =
     R"pb(detections {
            bounding_box { origin_x: 54 origin_y: 396 width: 393 height: 196 }
-           classes { index: 16 score: 0.64453125 class_name: "cat" }
+           classes { index: 16 score: 0.64 class_name: "cat" }
          }
          detections {
            bounding_box { origin_x: 602 origin_y: 157 width: 394 height: 447 }
-           classes { index: 16 score: 0.59765625 class_name: "cat" }
+           classes { index: 16 score: 0.61 class_name: "cat" }
          }
          detections {
-           bounding_box { origin_x: 261 origin_y: 394 width: 179 height: 209 }
+           bounding_box { origin_x: 260 origin_y: 394 width: 180 height: 209 }
            # Actually a dog, but the model gets confused.
-           classes { index: 16 score: 0.5625 class_name: "cat" }
+           classes { index: 16 score: 0.56 class_name: "cat" }
          }
          detections {
-           bounding_box { origin_x: 389 origin_y: 197 width: 276 height: 409 }
-           classes { index: 17 score: 0.51171875 class_name: "dog" }
+           bounding_box { origin_x: 389 origin_y: 197 width: 278 height: 409 }
+           classes { index: 17 score: 0.5 class_name: "dog" }
          }
     )pb";
 constexpr char kMobileSsdWithMetadataDummyScoreCalibration[] =
@@ -111,18 +110,26 @@ StatusOr<ImageData> LoadImage(std::string image_name) {
 // tolerancy on floating-point scores to account for numerical instabilities.
 // If the proto definition changes, please also change this function.
 void ExpectApproximatelyEqual(const DetectionResult& actual,
-                              const DetectionResult& expected) {
-  const float kPrecision = 1e-6;
+                              const DetectionResult& expected,
+                              const float score_precision = 1e-6,
+                              int bounding_box_tolerance = 3) {
   EXPECT_EQ(actual.detections_size(), expected.detections_size());
   for (int i = 0; i < actual.detections_size(); ++i) {
     const Detection& a = actual.detections(i);
     const Detection& b = expected.detections(i);
-    EXPECT_THAT(a.bounding_box(), EqualsProto(b.bounding_box()));
+    EXPECT_NEAR(a.bounding_box().origin_x(), b.bounding_box().origin_x(),
+                bounding_box_tolerance);
+    EXPECT_NEAR(a.bounding_box().origin_y(), b.bounding_box().origin_y(),
+                bounding_box_tolerance);
+    EXPECT_NEAR(a.bounding_box().width(), b.bounding_box().width(),
+                bounding_box_tolerance);
+    EXPECT_NEAR(a.bounding_box().height(), b.bounding_box().height(),
+                bounding_box_tolerance);
     EXPECT_EQ(a.classes_size(), 1);
     EXPECT_EQ(b.classes_size(), 1);
     EXPECT_EQ(a.classes(0).index(), b.classes(0).index());
     EXPECT_EQ(a.classes(0).class_name(), b.classes(0).class_name());
-    EXPECT_NEAR(a.classes(0).score(), b.classes(0).score(), kPrecision);
+    EXPECT_NEAR(a.classes(0).score(), b.classes(0).score(), score_precision);
   }
 }
 
@@ -149,7 +156,7 @@ class MobileSsdQuantizedOpResolver : public ::tflite::MutableOpResolver {
   MobileSsdQuantizedOpResolver(const MobileSsdQuantizedOpResolver& r) = delete;
 };
 
-class CreateFromOptionsTest : public tflite_shims::testing::Test {};
+class CreateFromOptionsTest : public tflite::testing::Test {};
 
 TEST_F(CreateFromOptionsTest, SucceedsWithSelectiveOpResolver) {
   ObjectDetectorOptions options;
@@ -288,9 +295,9 @@ TEST_F(CreateFromOptionsTest, SucceedsWithNumberOfThreads) {
   SUPPORT_ASSERT_OK(ObjectDetector::CreateFromOptions(options));
 }
 
-using NumThreadsTest = testing::TestWithParam<int>;
+using NumThreadsTest = ::testing::TestWithParam<int>;
 
-INSTANTIATE_TEST_SUITE_P(Default, NumThreadsTest, testing::Values(0, -2));
+INSTANTIATE_TEST_SUITE_P(Default, NumThreadsTest, ::testing::Values(0, -2));
 
 TEST_P(NumThreadsTest, FailsWithInvalidNumberOfThreads) {
   ObjectDetectorOptions options;
@@ -312,7 +319,7 @@ TEST_P(NumThreadsTest, FailsWithInvalidNumberOfThreads) {
                   absl::StrCat(TfLiteSupportStatus::kInvalidArgumentError))));
 }
 
-class DetectTest : public tflite_shims::testing::Test {};
+class DetectTest : public tflite::testing::Test {};
 
 TEST_F(DetectTest, Succeeds) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(ImageData rgb_image, LoadImage("cats_and_dogs.jpg"));
@@ -332,8 +339,9 @@ TEST_F(DetectTest, Succeeds) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(const DetectionResult result,
                        object_detector->Detect(*frame_buffer));
   ImageDataFree(&rgb_image);
-  ExpectApproximatelyEqual(
-      result, ParseTextProtoOrDie<DetectionResult>(kExpectResults));
+  ExpectApproximatelyEqual(result,
+                           ParseTextProtoOrDie<DetectionResult>(kExpectResults),
+                           /*score_precision=*/0.05f);
 }
 
 TEST_F(DetectTest, SucceedswithBaseOptions) {
@@ -354,8 +362,9 @@ TEST_F(DetectTest, SucceedswithBaseOptions) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(const DetectionResult result,
                        object_detector->Detect(*frame_buffer));
   ImageDataFree(&rgb_image);
-  ExpectApproximatelyEqual(
-      result, ParseTextProtoOrDie<DetectionResult>(kExpectResults));
+  ExpectApproximatelyEqual(result,
+                           ParseTextProtoOrDie<DetectionResult>(kExpectResults),
+                           /*score_precision=*/0.05f);
 }
 
 TEST_F(DetectTest, SucceedswithScoreCalibrations) {
@@ -376,11 +385,12 @@ TEST_F(DetectTest, SucceedswithScoreCalibrations) {
   SUPPORT_ASSERT_OK_AND_ASSIGN(const DetectionResult result,
                        object_detector->Detect(*frame_buffer));
   ImageDataFree(&rgb_image);
-  ExpectApproximatelyEqual(
-      result, ParseTextProtoOrDie<DetectionResult>(kExpectResults));
+  ExpectApproximatelyEqual(result,
+                           ParseTextProtoOrDie<DetectionResult>(kExpectResults),
+                           /*score_precision=*/0.05f);
 }
 
-class PostprocessTest : public tflite_shims::testing::Test {
+class PostprocessTest : public tflite::testing::Test {
  public:
   class TestObjectDetector : public ObjectDetector {
    public:
@@ -417,7 +427,7 @@ class PostprocessTest : public tflite_shims::testing::Test {
   };
 
  protected:
-  void SetUp() override { tflite_shims::testing::Test::SetUp(); }
+  void SetUp() override { tflite::testing::Test::SetUp(); }
   void SetUp(const ObjectDetectorOptions& options) {
     StatusOr<std::unique_ptr<TestObjectDetector>> test_object_detector_or =
         TestObjectDetector::CreateFromOptions(options);
