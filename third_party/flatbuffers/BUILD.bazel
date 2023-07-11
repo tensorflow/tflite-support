@@ -178,7 +178,7 @@ py_library(
 
 filegroup(
     name = "runtime_java_srcs",
-    srcs = glob(["java/com/google/flatbuffers/**/*.java"]),
+    srcs = glob(["java/src/main/java/com/google/flatbuffers/**/*.java"]),
 )
 
 java_library(
