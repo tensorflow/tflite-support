@@ -252,6 +252,11 @@ proto_library(
     srcs = ["search_result.proto"],
 )
 
+java_lite_proto_library(
+    name = "search_result_java_proto_lite",
+    deps = [":search_result_proto"],
+)
+
 cc_proto_library(
     name = "search_result_cc_proto",
     deps = [":search_result_proto"],
