@@ -1,3 +1,5 @@
+load("//tools/build_defs/js/jspb_proto_library:rules.bzl", "jspb_proto_library")
+
 package(
     default_visibility = [
         "//visibility:public",
@@ -13,6 +15,15 @@ proto_library(
     deps = [
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
     ],
+)
+
+jspb_proto_library(
+    name = "audio_classifier_options_jspb_proto",
+    visibility = [
+        "//tensorflow_lite_support/examples/task/audio/web/audio_classifier:__pkg__",
+        "//tensorflow_lite_support/web/task/audio:__pkg__",
+    ],
+    deps = [":audio_classifier_options_proto"],
 )
 
 cc_proto_library(
