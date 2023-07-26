@@ -21,9 +21,9 @@ limitations under the License.
 #include "absl/memory/memory.h"  // from @com_google_absl
 #include "absl/status/status.h"  // from @com_google_absl
 #include "absl/strings/str_format.h"  // from @com_google_absl
-#include "tensorflow/lite/experimental/acceleration/configuration/c/delegate_plugin.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/delegate_plugin_converter.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
+#include "tensorflow/lite/acceleration/configuration/c/delegate_plugin.h"
+#include "tensorflow/lite/acceleration/configuration/delegate_plugin_converter.h"
+#include "tensorflow/lite/acceleration/configuration/delegate_registry.h"
 #include "tensorflow_lite_support/cc/common.h"
 #include "tensorflow_lite_support/cc/port/status_macros.h"
 

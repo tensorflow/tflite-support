@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_PORT_CONFIGURATION_PROTO_INC_H_
 #define THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_PORT_CONFIGURATION_PROTO_INC_H_
 
-#include "tensorflow/lite/experimental/acceleration/configuration/configuration.pb.h"
+#include
+"third_party/tensorflow/lite/acceleration/configuration/configuration.pb.h"
 
 #endif  // THIRD_PARTY_TENSORFLOW_LITE_SUPPORT_CC_PORT_CONFIGURATION_PROTO_INC_H_

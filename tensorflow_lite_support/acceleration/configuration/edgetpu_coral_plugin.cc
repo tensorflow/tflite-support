@@ -21,8 +21,8 @@ limitations under the License.
 #include "absl/strings/match.h"  // from @com_google_absl
 #include "absl/strings/numbers.h"  // from @com_google_absl
 #include "tflite/public/edgetpu_c.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/configuration_generated.h"
-#include "tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h"
+#include "tensorflow/lite/acceleration/configuration/configuration_generated.h"
+#include "tensorflow/lite/acceleration/configuration/delegate_registry.h"
 
 namespace tflite {
 namespace delegates {
