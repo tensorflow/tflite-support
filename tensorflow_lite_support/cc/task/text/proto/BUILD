@@ -1,4 +1,3 @@
-load("//tools/build_defs/js/jspb_proto_library:rules.bzl", "jspb_proto_library")
 load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_py_proto_library")
 
 package(
@@ -36,16 +35,6 @@ proto_library(
     deps = [
         "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
     ],
-)
-
-jspb_proto_library(
-    name = "bert_nl_classifier_options_jspb_proto",
-    visibility = [
-        "//tensorflow_lite_support/examples/task/text/web/bert_nl_classifier:__pkg__",
-        "//tensorflow_lite_support/web:__pkg__",
-        "//tensorflow_lite_support/web/task/text:__pkg__",
-    ],
-    deps = [":bert_nl_classifier_options_proto"],
 )
 
 cc_proto_library(

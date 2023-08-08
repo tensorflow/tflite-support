@@ -1,4 +1,3 @@
-load("//tools/build_defs/js/jspb_proto_library:rules.bzl", "jspb_proto_library")
 load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_py_proto_library")
 
 package(
@@ -13,11 +12,6 @@ package(
 proto_library(
     name = "bounding_box_proto",
     srcs = ["bounding_box.proto"],
-)
-
-jspb_proto_library(
-    name = "bounding_box_jspb_proto",
-    deps = [":bounding_box_proto"],
 )
 
 cc_proto_library(
@@ -43,11 +37,6 @@ cc_library(
 proto_library(
     name = "class_proto",
     srcs = ["class.proto"],
-)
-
-jspb_proto_library(
-    name = "class_jspb_proto",
-    deps = [":class_proto"],
 )
 
 cc_proto_library(
@@ -80,11 +69,6 @@ proto_library(
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
         "@org_tensorflow//tensorflow/lite/acceleration/configuration:configuration_proto",
     ],
-)
-
-jspb_proto_library(
-    name = "object_detector_options_jspb_proto",
-    deps = [":object_detector_options_proto"],
 )
 
 cc_proto_library(
@@ -123,11 +107,6 @@ proto_library(
         ":bounding_box_proto",
         ":class_proto",
     ],
-)
-
-jspb_proto_library(
-    name = "detections_jspb_proto",
-    deps = [":detections_proto"],
 )
 
 cc_proto_library(
@@ -170,11 +149,6 @@ proto_library(
     ],
 )
 
-jspb_proto_library(
-    name = "image_classifier_options_jspb_proto",
-    deps = [":image_classifier_options_proto"],
-)
-
 cc_proto_library(
     name = "image_classifier_options_cc_proto",
     deps = [
@@ -210,11 +184,6 @@ proto_library(
     deps = [
         ":class_proto",
     ],
-)
-
-jspb_proto_library(
-    name = "classifications_jspb_proto",
-    deps = [":classifications_proto"],
 )
 
 cc_proto_library(
@@ -253,18 +222,6 @@ proto_library(
     ],
 )
 
-jspb_proto_library(
-    name = "image_segmenter_options_jspb_proto",
-    visibility = [
-        "//tensorflow_lite_support/examples/task/vision/web/image_segmenter:__pkg__",
-        "//tensorflow_lite_support/examples/task/vision/web/vision_bundle:__pkg__",
-        "//tensorflow_lite_support/examples/task/vision/web/viz_lib:__pkg__",
-        "//tensorflow_lite_support/web:__pkg__",
-        "//tensorflow_lite_support/web/task/vision:__pkg__",
-    ],
-    deps = [":image_segmenter_options_proto"],
-)
-
 cc_proto_library(
     name = "image_segmenter_options_cc_proto",
     deps = [
@@ -285,16 +242,6 @@ cc_library(
 proto_library(
     name = "segmentations_proto",
     srcs = ["segmentations.proto"],
-)
-
-jspb_proto_library(
-    name = "segmentations_jspb_proto",
-    visibility = [
-        "//tensorflow_lite_support/examples/task/vision/web/viz_lib:__pkg__",
-        "//tensorflow_lite_support/web:__pkg__",
-        "//tensorflow_lite_support/web/task/vision:__pkg__",
-    ],
-    deps = [":segmentations_proto"],
 )
 
 cc_proto_library(

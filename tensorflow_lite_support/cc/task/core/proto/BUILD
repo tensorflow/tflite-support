@@ -1,4 +1,3 @@
-load("//tools/build_defs/js/jspb_proto_library:rules.bzl", "jspb_proto_library")
 load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_py_proto_library")
 
 package(
@@ -76,15 +75,6 @@ proto_library(
     deps = [
         ":class_proto",
     ],
-)
-
-jspb_proto_library(
-    name = "classifications_jspb_proto",
-    visibility = [
-        "//tensorflow_lite_support/examples/task/audio/web/audio_classifier:__pkg__",
-        "//tensorflow_lite_support/web/task/audio:__pkg__",
-    ],
-    deps = [":classifications_proto"],
 )
 
 cc_proto_library(
