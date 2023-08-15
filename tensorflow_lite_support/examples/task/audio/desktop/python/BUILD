@@ -1,3 +1,5 @@
+# Placeholder: load py_binary
+
 package(
     licenses = ["notice"],  # Apache 2.0
 )

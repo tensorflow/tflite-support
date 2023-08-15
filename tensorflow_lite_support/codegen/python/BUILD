@@ -1,3 +1,4 @@
+# Placeholder: load py_binary
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
 
 package(
