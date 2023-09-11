@@ -141,11 +141,12 @@ constexpr bool TFLSHasPotentialConditionalOperator(const char* lhs, int index) {
       std::move(statusor).value()
 
 #define TFLITE_ASSIGN_OR_RETURN_IMPL_2(lhs, rexpr) \
-  ASSIGN_OR_RETURN_IMPL_3(lhs, rexpr)
+  TFLITE_ASSIGN_OR_RETURN_IMPL_3(lhs, rexpr)
 
-#define TFLITE_ASSIGN_OR_RETURN_IMPL_3(lhs, rexpr) \
-  TFLITE_ASSIGN_OR_RETURN_IMPL(                    \
-      STATUS_MACROS_CONCAT_NAME(_status_or_value, __COUNTER__), lhs, rexpr)
+#define TFLITE_ASSIGN_OR_RETURN_IMPL_3(lhs, rexpr)                          \
+  TFLITE_ASSIGN_OR_RETURN_IMPL(                                             \
+      TFLITE_STATUS_MACROS_CONCAT_NAME(_status_or_value, __COUNTER__), lhs, \
+      rexpr)
 
 #define TFLITE_ASSIGN_OR_RETURN_IMPL(statusor, lhs, rexpr) \
   auto statusor = (rexpr);                                 \
