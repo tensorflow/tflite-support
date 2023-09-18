@@ -72,9 +72,9 @@ absl::Status ImagePreprocessor::Init(
     const vision::FrameBufferUtils::ProcessEngine& process_engine) {
   frame_buffer_utils_ = vision::FrameBufferUtils::Create(process_engine);
 
-  ASSIGN_OR_RETURN(input_specs_, vision::BuildInputImageTensorSpecs(
-                                     *engine_->interpreter(),
-                                     *engine_->metadata_extractor()));
+  ASSIGN_OR_RETURN(input_specs_, vision::BuildImageTensorSpecs(
+                                     *engine_->metadata_extractor(),
+                                     GetTensorMetadata(), GetTensor()));
 
   if (input_specs_.color_space != tflite::ColorSpaceType_RGB) {
     return tflite::support::CreateStatusWithPayload(

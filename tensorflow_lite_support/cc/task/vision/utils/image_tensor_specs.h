@@ -73,7 +73,7 @@ struct ImageTensorSpecs {
   absl::optional<NormalizationOptions> normalization_options;
 };
 
-// Performs sanity checks on the expected input tensor including consistency
+// Performs sanity checks on the expected input/output tensor including consistency
 // checks against model metadata, if any. For now, a single RGB input with BHWD
 // layout, where B = 1 and D = 3, is expected. Returns the corresponding input
 // specifications if they pass, or an error otherwise (too many input tensors,
@@ -82,9 +82,9 @@ struct ImageTensorSpecs {
 // initialized before calling this function by means of (respectively):
 // - `tflite::InterpreterBuilder`,
 // - `tflite::metadata::ModelMetadataExtractor::CreateFromModelBuffer`.
-tflite::support::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
-    const tflite::task::core::TfLiteEngine::Interpreter& interpreter,
-    const tflite::metadata::ModelMetadataExtractor& metadata_extractor);
+tflite::support::StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
+    const tflite::metadata::ModelMetadataExtractor& metadata_extractor,
+    const TensorMetadata* tensor_metadata, const TfLiteTensor* tensor);
 
 }  // namespace vision
 }  // namespace task
