@@ -23,7 +23,7 @@ limitations under the License.
 
 #include <glog/logging.h>
 #include "absl/types/span.h"  // from @com_google_absl
-#include "Eigen/Core"  // from @eigen
+#include "Eigen/Core"  // from @eigen_archive
 #include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/scann_ondevice/cc/core/index_table_sum.h"
 #include "tensorflow_lite_support/scann_ondevice/cc/core/processor.h"

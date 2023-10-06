@@ -21,7 +21,7 @@ limitations under the License.
 #include <type_traits>
 #include <vector>
 
-#include "Eigen/Core"  // from @eigen
+#include "Eigen/Core"  // from @eigen_archive
 #include "tensorflow_lite_support/scann_ondevice/cc/core/simd_utils.h"
 
 namespace tflite {

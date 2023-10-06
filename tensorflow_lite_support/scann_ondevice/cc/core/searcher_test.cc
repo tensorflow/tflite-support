@@ -22,7 +22,7 @@ limitations under the License.
 
 #include <glog/logging.h>
 #include "absl/synchronization/mutex.h"  // from @com_google_absl
-#include "Eigen/Core"  // from @eigen
+#include "Eigen/Core"  // from @eigen_archive
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
 #include "tensorflow_lite_support/cc/port/integral_types.h"

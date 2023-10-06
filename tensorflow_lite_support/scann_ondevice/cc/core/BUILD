@@ -58,7 +58,7 @@ cc_library(
         "//tensorflow_lite_support/cc/port:integral_types",
         "@com_google_absl//absl/types:span",
         "@com_google_glog//:glog",
-        "@eigen//:eigen3",
+        "@eigen_archive//:eigen3",
     ],
 )
 
@@ -70,7 +70,7 @@ cc_library(
         ":serialized_searcher_cc_proto",
         "@com_google_absl//absl/types:optional",
         "@com_google_glog//:glog",
-        "@eigen//:eigen3",
+        "@eigen_archive//:eigen3",
     ],
 )
 
@@ -87,7 +87,7 @@ cc_library(
         ":top_n_amortized_constant",
         "//tensorflow_lite_support/cc/port:integral_types",
         "@com_google_glog//:glog",
-        "@eigen//:eigen3",
+        "@eigen_archive//:eigen3",
     ],
 )
 
@@ -106,7 +106,7 @@ cc_test(
         "//tensorflow_lite_support/cc/port:proto2",
         "@com_google_absl//absl/synchronization",
         "@com_google_glog//:glog",
-        "@eigen//:eigen3",
+        "@eigen_archive//:eigen3",
     ],
 )
 
