@@ -1,5 +1,5 @@
-load("@build_bazel_rules_android//android:rules.bzl", "android_library", "android_local_test")
 load("//tensorflow_lite_support/tools/build_rules/android_test:android_library_instrumentation_tests.bzl", "android_library_instrumentation_tests")
+load("@build_bazel_rules_android//android:rules.bzl", "android_library", "android_local_test")
 
 package(default_testonly = 1)
 
@@ -43,10 +43,10 @@ android_local_test(
 )
 
 # TODO(138904571): add a bzl file to declare tests automatically for every java test file.
-# Note: This test is not able to be run with --test_strategy=local.
 android_local_test(
     name = "ModelTest",
     srcs = ["model/ModelTest.java"],
+    jvm_flags = ["-Djava.library.path=third_party/tensorflow/lite/java"],
     manifest = "AndroidManifest.xml",
     nocompress_extensions = ["tflite"],
     tags = [
@@ -55,6 +55,7 @@ android_local_test(
         "notsan",
     ],
     test_class = "org.tensorflow.lite.support.model.ModelTest",
+    runtime_deps = ["@org_tensorflow//tensorflow/lite/java:libtensorflowlite_jni_stable.so"],
     deps = [
         ":test_lib",
         "//tensorflow_lite_support/java:tensorflowlite_support",
