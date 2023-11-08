@@ -1,11 +1,6 @@
 load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_py_proto_library")
 
-package(
-    default_visibility = [
-        "//tensorflow_lite_support:__subpackages__",
-    ],
-    licenses = ["notice"],
-)
+package(licenses = ["notice"])
 
 proto_library(
     name = "serialized_searcher_protolib",
