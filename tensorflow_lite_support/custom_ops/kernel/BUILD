@@ -74,6 +74,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":_pywrap_whitespace_tokenizer_op_resolver",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: numpy dep,
         # build rule placeholder: tensorflow dep,
         # build rule placeholder: tensorflow_text dep,
@@ -145,6 +146,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":_pywrap_ngrams_op_resolver",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         # build rule placeholder: tensorflow_text dep,
         "//tensorflow_lite_support/custom_ops/python:tflite_text_api",

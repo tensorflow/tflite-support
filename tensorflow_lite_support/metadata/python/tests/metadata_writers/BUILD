@@ -29,6 +29,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata/python:metadata",
@@ -50,6 +51,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata:schema_py",
@@ -68,6 +70,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:schema_py",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
@@ -83,6 +86,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata/python/metadata_writers:image_classifier",
@@ -100,6 +104,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata/python:metadata",
@@ -117,6 +122,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata/python/metadata_writers:image_segmenter",
         "@flatbuffers//:runtime_py",
@@ -131,6 +137,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata/python:metadata",
         "//tensorflow_lite_support/metadata/python/metadata_writers:metadata_info",
@@ -147,6 +154,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata:metadata_schema_py",
         "//tensorflow_lite_support/metadata/python/metadata_writers:audio_classifier",
@@ -163,6 +171,7 @@ py_test(
     srcs_version = "PY3",
     deps = [
         ":test_utils",
+        # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
         # build rule placeholder: tensorflow dep,
         "//tensorflow_lite_support/metadata/python:metadata",
         "//tensorflow_lite_support/metadata/python/metadata_writers:bert_nl_classifier",
