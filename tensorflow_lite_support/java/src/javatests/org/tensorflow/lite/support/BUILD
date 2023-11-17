@@ -19,6 +19,13 @@ android_library(
     assets = glob(["assets/**"]),
     assets_dir = "assets",
     manifest = "AndroidManifest.xml",
+    visibility = ["//tensorflow_lite_support:__subpackages__"],
+)
+
+filegroup(
+    name = "test_models",
+    srcs = glob(["assets/*.tflite"]),
+    visibility = ["//tensorflow_lite_support:__subpackages__"],
 )
 
 android_local_test(
