@@ -37,7 +37,7 @@ void RearrangeLUT(const LutType* input_data, int batch_elems, int batch_size,
     simd_sizes = {8, 4};
 #elif defined __SSE__
     simd_sizes = {4};
-#elif defined __ARM_NEON__
+#elif defined __ARM_NEON
     simd_sizes = {4};
 #endif
   } else {
@@ -45,7 +45,7 @@ void RearrangeLUT(const LutType* input_data, int batch_elems, int batch_size,
     simd_sizes = {16, 8};
 #elif defined __SSE4_1__
     simd_sizes = {8};
-#elif defined __ARM_NEON__
+#elif defined __ARM_NEON
     simd_sizes = {8};
 #endif
   }
