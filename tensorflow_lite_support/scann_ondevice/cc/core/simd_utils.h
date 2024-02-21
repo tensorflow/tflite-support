@@ -20,7 +20,7 @@ limitations under the License.
 #ifdef __SSE__
 #include <x86intrin.h>
 #endif
-#ifdef __ARM_NEON__
+#ifdef __ARM_NEON
 #include <arm_neon.h>
 #endif
 
@@ -101,7 +101,7 @@ class SimdFloat32x8 {
   }
 };
 #endif
-#ifdef __ARM_NEON__
+#ifdef __ARM_NEON
 class SimdFloat32x4 {
   float32x4_t value_;
 
@@ -198,7 +198,7 @@ class SimdInt16x8 {
   }
 };
 #endif
-#ifdef __ARM_NEON__
+#ifdef __ARM_NEON
 class SimdInt16x8 {
   uint16x8_t value_;
 

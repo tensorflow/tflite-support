@@ -195,7 +195,7 @@ void IndexTableSum(const uint8_t* indices, size_t num_chunks,
       indices, num_chunks, num_outputs, lookup_table, batch_size, num_centers,
       min, max, i, output);
 #endif
-#ifdef __ARM_NEON__
+#ifdef __ARM_NEON
   i = IndexTableSumSimdBatch<SimdInt16x8, LutType>(
       indices, num_chunks, num_outputs, lookup_table, batch_size, num_centers,
       min, max, i, output);
@@ -222,7 +222,7 @@ inline void IndexTableSum<float>(const uint8_t* indices, size_t num_chunks,
       indices, num_chunks, num_outputs, lookup_table, batch_size, num_centers,
       min, max, i, output);
 #endif
-#ifdef __ARM_NEON__
+#ifdef __ARM_NEON
   i = IndexTableSumSimdBatch<SimdFloat32x4, float>(
       indices, num_chunks, num_outputs, lookup_table, batch_size, num_centers,
       min, max, i, output);
