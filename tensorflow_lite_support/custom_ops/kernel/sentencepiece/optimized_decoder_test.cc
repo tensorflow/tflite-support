@@ -19,7 +19,6 @@ limitations under the License.
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "absl/flags/flag.h"  // from @com_google_absl
 #include "absl/strings/str_format.h"  // from @com_google_absl
 #include "src/sentencepiece.pb.h"  // from @com_google_sentencepiece
 #include "src/sentencepiece_processor.h"  // from @com_google_sentencepiece
@@ -67,7 +66,7 @@ TEST(OptimizedEncoder, ConfigConverter) {
   std::string config;
 
   auto status = internal::StdReadFileToString(
-      JoinPath("./" /*test src dir*/, kConfigFilePath), &config);
+      JoinPath(::testing::SrcDir(), kConfigFilePath), &config);
   ASSERT_TRUE(status.ok());
 
   ::sentencepiece::SentencePieceProcessor processor;
