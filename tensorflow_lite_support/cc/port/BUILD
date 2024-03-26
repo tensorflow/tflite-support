@@ -40,13 +40,6 @@ cc_library_with_tflite(
 )
 
 cc_library(
-    name = "integral_types",
-    hdrs = ["integral_types.h"],
-    visibility = ["//tensorflow_lite_support:users"],
-    deps = ["//base:types"],
-)
-
-cc_library(
     name = "gtest_main",
     testonly = 1,
     hdrs = [

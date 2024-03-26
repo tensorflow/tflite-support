@@ -129,7 +129,6 @@ cc_library(
     ],
     deps = [
         "//tensorflow_lite_support/cc:common",
-        "//tensorflow_lite_support/cc/port:integral_types",
         "//tensorflow_lite_support/cc/port:status_macros",
         "//tensorflow_lite_support/cc/port:statusor",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto_inc",

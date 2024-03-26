@@ -27,8 +27,6 @@ limitations under the License.
 #include <cmath>
 #include <memory>
 
-#include "tensorflow_lite_support/cc/port/integral_types.h"
-
 namespace tflite {
 namespace scann_ondevice {
 namespace core {

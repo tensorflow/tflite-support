@@ -17,8 +17,6 @@ limitations under the License.
 
 #include <cstdint>
 
-#include "tensorflow_lite_support/cc/port/integral_types.h"
-
 namespace tflite {
 namespace support {
 namespace text {

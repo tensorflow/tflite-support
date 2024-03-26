@@ -25,7 +25,6 @@ limitations under the License.
 #include "Eigen/Core"  // from @eigen_archive
 #include "tensorflow_lite_support/cc/port/gmock.h"
 #include "tensorflow_lite_support/cc/port/gtest.h"
-#include "tensorflow_lite_support/cc/port/integral_types.h"
 #include "tensorflow_lite_support/cc/port/proto2.h"
 #include "tensorflow_lite_support/scann_ondevice/cc/core/partitioner.h"
 #include "tensorflow_lite_support/scann_ondevice/cc/core/processor.h"
