@@ -1,11 +1,10 @@
+# This package contains C++ support libraries that Java libraries can invoke.
+load("@build_bazel_rules_android//android:rules.bzl", "android_library")
 load(
     "@org_tensorflow//tensorflow/lite:build_def.bzl",
     "tflite_copts",
     "tflite_jni_binary",
 )
-
-# This package contains C++ support libraries that Java libraries can invoke.
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],

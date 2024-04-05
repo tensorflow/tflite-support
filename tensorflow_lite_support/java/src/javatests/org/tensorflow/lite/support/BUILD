@@ -1,5 +1,5 @@
-load("//tensorflow_lite_support/tools/build_rules/android_test:android_library_instrumentation_tests.bzl", "android_library_instrumentation_tests")
 load("@build_bazel_rules_android//android:rules.bzl", "android_library", "android_local_test")
+load("//tensorflow_lite_support/tools/build_rules/android_test:android_library_instrumentation_tests.bzl", "android_library_instrumentation_tests")
 
 package(default_testonly = 1)
 

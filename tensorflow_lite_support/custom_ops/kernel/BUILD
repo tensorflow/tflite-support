@@ -1,5 +1,5 @@
-# Placeholder for internal Python strict test compatibility macro.
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
+# Placeholder for internal Python strict test compatibility macro.
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],

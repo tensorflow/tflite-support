@@ -1,5 +1,5 @@
-# Placeholder: load py_binary
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "pybind_extension")
+# Placeholder: load py_binary
 
 package(
     default_visibility = [
