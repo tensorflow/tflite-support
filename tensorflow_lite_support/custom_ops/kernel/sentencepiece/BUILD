@@ -338,12 +338,6 @@ config_setting(
 )
 
 config_setting(
-    name = "android",
-    values = {"crosstool_top": "//external:android/crosstool"},
-    visibility = ["//visibility:public"],
-)
-
-config_setting(
     name = "macos_i386",
     values = {
         "apple_platform_type": "macos",
@@ -374,7 +368,6 @@ alias(
 config_setting(
     name = "ios",
     values = {
-        "crosstool_top": "@bazel_tools//tools/cpp:toolchain",
         "apple_platform_type": "ios",
     },
     visibility = ["//visibility:public"],
