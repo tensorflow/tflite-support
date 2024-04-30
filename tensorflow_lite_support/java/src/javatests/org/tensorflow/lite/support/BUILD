@@ -19,7 +19,7 @@ android_library(
     assets = glob(["assets/**"]),
     assets_dir = "assets",
     manifest = "AndroidManifest.xml",
-    visibility = ["//tensorflow_lite_support:__subpackages__"],
+    visibility = ["//visibility:private"],
 )
 
 filegroup(
