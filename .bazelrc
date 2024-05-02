@@ -18,11 +18,11 @@ build:macos --copt=-w
 build:windows --copt=/w
 
 # Android workspace configurations. Should be replaced by an interative configure in the future.
-build --action_env ANDROID_NDK_HOME
-build --action_env ANDROID_NDK_API_LEVEL
-build --action_env ANDROID_BUILD_TOOLS_VERSION
-build --action_env ANDROID_SDK_API_LEVEL
-build --action_env ANDROID_SDK_HOME
+build --action_env ANDROID_NDK_HOME="/Users/samyabose/Library/Android/sdk/ndk/25.1.8937393"
+build --action_env ANDROID_NDK_API_LEVEL="21"
+build --action_env ANDROID_BUILD_TOOLS_VERSION="30.0.3"
+build --action_env ANDROID_SDK_API_LEVEL="30"
+build --action_env ANDROID_SDK_HOME="/Users/samyabose/Library/Android/sdk/"
 
 # Android configs. Bazel needs to have --cpu and --fat_apk_cpu both set to the
 # target CPU to build transient dependencies correctly. See
