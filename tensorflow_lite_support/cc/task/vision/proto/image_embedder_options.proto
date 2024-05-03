@@ -17,12 +17,18 @@ syntax = "proto2";
 
 package tflite.task.vision;
 
+import "tensorflow_lite_support/cc/task/core/proto/base_options.proto";
 import "tensorflow/lite/experimental/acceleration/configuration/configuration.proto";
 import "tensorflow_lite_support/cc/task/core/proto/external_file.proto";
 
 // Options for setting up an ImageEmbedder.
-// Next Id: 10.
+// Next Id: 11.
 message ImageEmbedderOptions {
+  // Base options for configuring the ImageEmbedder. This specifies the TFLite
+  // model to use for embedding extraction, as well as hardware acceleration
+  // options to use as inference time.
+  optional tflite.task.core.BaseOptions base_options = 10;
+
   // The external model file, as a single standalone TFLite, optionally packed
   // with TFLite Model Metadata [1]. Those are mandatory only if the model input
   // is of float type (kTfLiteFloat32), which requires `NormalizationOptions` to

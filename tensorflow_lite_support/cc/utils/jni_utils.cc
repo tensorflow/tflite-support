@@ -152,6 +152,13 @@ jbyteArray CreateByteArray(JNIEnv* env, const jbyte* data, int num_bytes) {
   return ret;
 }
 
+jfloatArray CreateFloatArray(JNIEnv* env, const jfloat* data, int num_floats) {
+  jfloatArray ret = env->NewFloatArray(num_floats);
+  env->SetFloatArrayRegion(ret, 0, num_floats, data);
+
+  return ret;
+}
+
 void ThrowException(JNIEnv* env, const char* clazz, const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);

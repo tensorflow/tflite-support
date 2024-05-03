@@ -38,6 +38,7 @@ namespace {
 
 using ::tflite::support::StatusOr;
 using ::tflite::support::utils::ConvertVectorToArrayList;
+using ::tflite::support::utils::CreateFloatArray;
 using ::tflite::support::utils::CreateByteArray;
 using ::tflite::support::utils::GetExceptionClassNameForStatusCode;
 using ::tflite::support::utils::kInvalidPointer;
@@ -85,7 +86,7 @@ jobject ConvertToEmbedResults(JNIEnv* env, const EmbeddingResult& results) {
       env->FindClass("org/tensorflow/lite/task/processor/Embedding");
   jmethodID embedding_create =
       env->GetStaticMethodID(embedding_class, "create",
-                             "(Lorg/tensorflow/lite/task/processor/FeatureVector;I)"
+                             "([Lorg/tensorflow/lite/task/processor/FeatureVector;I)"
                              "Lorg/tensorflow/lite/task/processor/Embedding;");
 
   // jclass and factory create of FeatureVector.
@@ -93,18 +94,21 @@ jobject ConvertToEmbedResults(JNIEnv* env, const EmbeddingResult& results) {
       env->FindClass("org/tensorflow/lite/task/processor/FeatureVector");
   jmethodID feature_vector_create =
       env->GetStaticMethodID(feature_vector_class, "create",
-                             "([F)Lorg/tensorflow/lite/task/processor/FeatureVector;");
+                             "([FB)Lorg/tensorflow/lite/task/processor/FeatureVector;");
 
   
   return ConvertVectorToArrayList(
-      env, result.embeddings().begin(), result.embeddings().end(),
+      env, results.embeddings().begin(), results.embeddings().end(),
       [env, embedding_class, embedding_create, feature_vector_class,
        feature_vector_create](const Embedding& embedding) {
         jobject jfeature_vector = nullptr;
         if (embedding.has_feature_vector()) {
           const FeatureVector& feature_vector = embedding.feature_vector();
           if (feature_vector.value_float_size() > 0) {
-            jfloatArray jfloat_array = CreateFloatArray(env, feature_vector.value_float());
+            // jfloatArray jfloat_array = CreateFloatArray(env, feature_vector.value_float());
+            jfloatArray jfloat_array = CreateFloatArray(
+                env, reinterpret_cast<const jfloat*>(feature_vector.value_float().data()),
+                feature_vector.value_float().size());
             jfeature_vector = env->CallStaticObjectMethod(
                 feature_vector_class, feature_vector_create, jfloat_array);
             env->DeleteLocalRef(jfloat_array);
@@ -124,10 +128,10 @@ jobject ConvertToEmbedResults(JNIEnv* env, const EmbeddingResult& results) {
       });
 }
 
-jlong CreateImagEmbedderFromOptions(JNIEnv* env,
-                                     const ImagEmbedderOptions& options) {
-  StatusOr<std::unique_ptr<ImagEmbedder>> image_embedder_or =
-      ImagEmbedder::CreateFromOptions(options,
+jlong CreateImageEmbedderFromOptions(JNIEnv* env,
+                                     const ImageEmbedderOptions& options) {
+  StatusOr<std::unique_ptr<ImageEmbedder>> image_embedder_or =
+      ImageEmbedder::CreateFromOptions(options,
                                        tflite::task::CreateOpResolver());
   if (image_embedder_or.ok()) {
     return reinterpret_cast<jlong>(image_embedder_or->release());
@@ -162,12 +166,12 @@ Java_org_tensorflow_lite_task_vision_embedder_ImageEmbedder_initJniWithModelFdAn
   auto file_descriptor_meta = proto_options.mutable_base_options()
                                   ->mutable_model_file()
                                   ->mutable_file_descriptor_meta();
-  file_descriptor_meta->set_fd(model_descriptor);
-  if (model_descriptor_length > 0) {
-    file_descriptor_meta->set_length(model_descriptor_length);
+  file_descriptor_meta->set_fd(file_descriptor);
+  if (file_descriptor_length > 0) {
+    file_descriptor_meta->set_length(file_descriptor_length);
   }
-  if (model_descriptor_offset > 0) {
-    file_descriptor_meta->set_offset(model_descriptor_offset);
+  if (file_descriptor_offset > 0) {
+    file_descriptor_meta->set_offset(file_descriptor_offset);
   }
 
   return CreateImageEmbedderFromOptions(env, proto_options);

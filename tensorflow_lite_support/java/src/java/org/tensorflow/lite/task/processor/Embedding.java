@@ -22,10 +22,10 @@ import org.tensorflow.lite.task.core.annotations.UsedByReflection;
 
 /** Represents the embed result of a Embedder model. */
 @AutoValue
-@UsedByReflection("embedder_jni.cc")
+@UsedByReflection("image_embedder_jni.cc")
 public abstract class Embedding {
 
-  @UsedByReflection("embedder_jni.cc")
+  @UsedByReflection("image_embedder_jni.cc")
   static Embedding create(FeatureVector featureVectorArray, int outputIndex) {
     // Ideally, the API should accept a ByteBuffer instead of a byte[]. However, converting byte[]
     // to ByteBuffer in JNI will lead to unnecessarily complex code which involves 6 more reflection

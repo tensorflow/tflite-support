@@ -22,10 +22,10 @@ import org.tensorflow.lite.task.core.annotations.UsedByReflection;
 
 /** Represents the feature vector of a Embedder model. */
 @AutoValue
-@UsedByReflection("embedder_jni.cc")
+@UsedByReflection("image_embedder_jni.cc")
 public abstract class FeatureVector {
 
-  @UsedByReflection("embedder_jni.cc")
+  @UsedByReflection("image_embedder_jni.cc")
   static FeatureVector create(byte[] valueStringArray, float valueFloat) {
     // Convert byte[] valueStringArray to ByteBuffer which handles endianess better.
     //

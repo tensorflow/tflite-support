@@ -270,6 +270,7 @@ proto_library(
     name = "image_embedder_options_proto",
     srcs = ["image_embedder_options.proto"],
     deps = [
+        "//tensorflow_lite_support/cc/task/core/proto:base_options_proto",
         "//tensorflow_lite_support/cc/task/core/proto:external_file_proto",
         "@org_tensorflow//tensorflow/lite/experimental/acceleration/configuration:configuration_proto",
     ],
@@ -343,3 +344,4 @@ cc_proto_library(
         ":image_searcher_options_proto",
     ],
 )
+

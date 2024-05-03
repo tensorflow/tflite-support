@@ -92,6 +92,9 @@ absl::string_view GetMappedFileBuffer(JNIEnv* env, const jobject& file_buffer);
 // Creates a Java byte array object based on the input data.
 jbyteArray CreateByteArray(JNIEnv* env, const jbyte* data, int num_bytes);
 
+// Creates a Java float array object based on the input data.
+jfloatArray CreateFloatArray(JNIEnv* env, const jfloat* data, int num_floats);
+
 void ThrowException(JNIEnv* env, const char* clazz, const char* fmt, ...);
 
 void ThrowExceptionWithMessage(JNIEnv* env, const char* clazz,

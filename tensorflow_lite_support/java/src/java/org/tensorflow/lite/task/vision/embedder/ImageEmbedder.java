@@ -430,8 +430,6 @@ public final class ImageEmbedder extends BaseVisionTaskApi {
   private static native long initJniWithByteBuffer(
       ByteBuffer modelBuffer, ImageEmbedderOptions options, long baseOptionsHandle);
 
-  private static native List<Embedding> detectNative(long nativeHandle, long frameBufferHandle);
-
   /**
    * The native method to embed an image based on the ROI specified.
    *
