@@ -17,6 +17,7 @@ android_library_with_tflite(
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/core:base_vision_api_src",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/detector:object_detector_src",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/searcher:image_searcher_src",
+        "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/embedder:image_embedder_src",
         "//tensorflow_lite_support/java/src/java/org/tensorflow/lite/task/vision/segmenter:image_segmenter_src",
     ],
     manifest = "AndroidManifest.xml",
