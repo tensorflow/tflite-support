@@ -35,9 +35,6 @@ filegroup(
         ":mobilebert_vocab",
         ":mobilebert_with_metadata",
     ],
-    visibility = [
-        "//tensorflow_lite_support:internal",
-    ],
 )
 
 filegroup(
