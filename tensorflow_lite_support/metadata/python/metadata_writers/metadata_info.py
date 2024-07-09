@@ -789,8 +789,8 @@ class BertInputTensorsMd:
 
     self._tokenizer_md = tokenizer_md
 
-  def create_input_tesnor_metadata(self) -> List[_metadata_fb.TensorMetadataT]:
-    """Creates the input metadata for the three input tesnors."""
+  def create_input_tensor_metadata(self) -> List[_metadata_fb.TensorMetadataT]:
+    """Creates the input metadata for the three input tensors."""
     # The order of the three input tensors may vary with each model conversion.
     # We need to order the input metadata according to the tensor order in the
     # model.
