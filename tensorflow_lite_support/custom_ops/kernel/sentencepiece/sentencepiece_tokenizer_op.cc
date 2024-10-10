@@ -86,9 +86,9 @@ class TFSentencepieceOp : public tensorflow::OpKernel {
           ctx,
           res.type ==
               ::tflite::ops::custom::sentencepiece::EncoderResultType::SUCCESS,
-          tensorflow::Status(static_cast<tensorflow::errors::Code>(
-                                 tensorflow::error::INTERNAL),
-                             "Sentencepiece conversion failed"));
+          absl::Status(
+              static_cast<absl::StatusCode>(tensorflow::error::INTERNAL),
+              "Sentencepiece conversion failed"));
       std::copy(res.codes.begin(), res.codes.end(),
                 std::back_inserter(encoded));
       splits.emplace_back(encoded.size());
