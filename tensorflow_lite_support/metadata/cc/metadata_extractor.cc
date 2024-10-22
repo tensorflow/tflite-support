@@ -183,6 +183,9 @@ absl::Status ModelMetadataExtractor::InitFromModelBuffer(
   // Rely on the simplest, base flatbuffers verifier. Here is not the place to
   // e.g. use an OpResolver: we just want to make sure the buffer is valid to
   // access the metadata.
+  // TODO(b/366118885): Remove after the root cause of the crash on Windows
+  // is found.
+#if !defined(_WIN32)
   flatbuffers::Verifier verifier = flatbuffers::Verifier(
       reinterpret_cast<const uint8_t*>(buffer_data), buffer_size);
   if (!tflite::VerifyModelBuffer(verifier)) {
@@ -191,6 +194,8 @@ absl::Status ModelMetadataExtractor::InitFromModelBuffer(
         "The model is not a valid FlatBuffer buffer.",
         TfLiteSupportStatus::kInvalidFlatBufferError);
   }
+#endif
+
   model_ = tflite::GetModel(buffer_data);
   if (model_->metadata() == nullptr) {
     // Not all models have metadata, which is OK. `GetModelMetadata()` then

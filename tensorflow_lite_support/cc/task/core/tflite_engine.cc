@@ -69,7 +69,13 @@ using ::tflite::support::TfLiteSupportStatus;
 
 bool TfLiteEngine::Verifier::Verify(const char* data, int length,
                                     tflite::ErrorReporter* reporter) {
+// TODO(b/366118885): Remove after the root cause of the crash on Windows
+// is found.
+#if defined(_WIN32)
+  return true;
+#else
   return tflite::Verify(data, length, reporter);
+#endif
 }
 
 TfLiteEngine::TfLiteEngine(std::unique_ptr<tflite::OpResolver> resolver)
