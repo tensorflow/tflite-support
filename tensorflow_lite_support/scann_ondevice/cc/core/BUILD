@@ -1,3 +1,6 @@
+# Placeholder: load java_lite_proto_library
+# Placeholder: load java_proto_library
+# Placeholder: load proto_library
 load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_py_proto_library")
 
 package(licenses = ["notice"])
