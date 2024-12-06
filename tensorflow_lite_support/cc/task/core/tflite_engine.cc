@@ -69,13 +69,7 @@ using ::tflite::support::TfLiteSupportStatus;
 
 bool TfLiteEngine::Verifier::Verify(const char* data, int length,
                                     tflite::ErrorReporter* reporter) {
-// TODO(b/366118885): Remove after the root cause of the crash on Windows
-// is found.
-#if defined(_WIN32)
-  return true;
-#else
   return tflite::Verify(data, length, reporter);
-#endif
 }
 
 TfLiteEngine::TfLiteEngine(std::unique_ptr<tflite::OpResolver> resolver)
@@ -106,15 +100,8 @@ std::vector<const TfLiteTensor*> TfLiteEngine::GetOutputs() {
 void TfLiteEngine::VerifyAndBuildModelFromBuffer(
     const char* buffer_data, size_t buffer_size,
     TfLiteVerifier* extra_verifier) {
-// TODO(b/366118885): Remove after the root cause of the crash on Windows
-// is found.
-#if defined(_WIN32)
-  model_ = tflite::FlatBufferModel::BuildFromBuffer(buffer_data, buffer_size,
-                                                    &error_reporter_);
-#else
   model_ = tflite::FlatBufferModel::VerifyAndBuildFromBuffer(
       buffer_data, buffer_size, extra_verifier, &error_reporter_);
-#endif
 }
 
 absl::Status TfLiteEngine::InitializeFromModelFileHandler(
