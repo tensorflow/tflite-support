@@ -406,8 +406,8 @@ StatusOr<ClassificationResult> ImageClassifier::Postprocess(
 
     const TfLiteTensor* output_tensor = output_tensors[i];
     if (has_uint8_outputs_) {
-      ASSIGN_OR_RETURN(const uint8* output_data,
-                       AssertAndReturnTypedTensor<uint8>(output_tensor));
+      ASSIGN_OR_RETURN(const uint8_t* output_data,
+                       AssertAndReturnTypedTensor<uint8_t>(output_tensor));
       for (int j = 0; j < head.label_map_items.size(); ++j) {
         score_pairs.emplace_back(j, output_tensor->params.scale *
                                         (static_cast<int>(output_data[j]) -

@@ -49,11 +49,11 @@ using ::tflite::task::core::TfLiteEngine;
 
 // The maximum number of labels allowed in the labelmap. This is because so far
 // segmentation masks are stored with 8 bit per pixel (flattened byte array).
-constexpr uint32 kMaxNumClasses = 256;
+constexpr uint32_t kMaxNumClasses = 256;
 
 // The colormap used to fill `ColoredLabel`-s, as a flattened array of 256 {R,
 // G, B} components.
-constexpr uint8 kColorMap[768] = {
+constexpr uint8_t kColorMap[768] = {
     0,   0,   0,   128, 0,   0,   0,   128, 0,   128, 128, 0,   0,   0,   128,
     128, 0,   128, 0,   128, 128, 128, 128, 128, 64,  0,   0,   192, 0,   0,
     64,  128, 0,   192, 128, 0,   64,  0,   128, 192, 0,   128, 64,  128, 128,
@@ -434,8 +434,8 @@ StatusOr<float> ImageSegmenter::GetOutputConfidence(
     const TfLiteTensor& output_tensor, int x, int y, int depth) {
   int index = output_width_ * output_depth_ * y + output_depth_ * x + depth;
   if (has_uint8_outputs_) {
-    ASSIGN_OR_RETURN(const uint8* data,
-                     AssertAndReturnTypedTensor<uint8>(&output_tensor));
+    ASSIGN_OR_RETURN(const uint8_t* data,
+                     AssertAndReturnTypedTensor<uint8_t>(&output_tensor));
     return output_tensor.params.scale *
            (static_cast<int>(data[index]) - output_tensor.params.zero_point);
   } else {
