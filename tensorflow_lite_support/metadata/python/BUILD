@@ -20,7 +20,6 @@ py_library(
         ":metadata_parser_py",
     ],
     data = ["//tensorflow_lite_support/metadata:metadata_schema.fbs"],
-    srcs_version = "PY3",
     visibility = ["//visibility:public"],
     deps = [
         # build rule placeholder: numpy dep,
@@ -48,7 +47,6 @@ py_binary(
 py_library(
     name = "metadata_writer_for_task",
     srcs = ["metadata_writer_for_task.py"],
-    srcs_version = "PY3",
     visibility = [
         "//tensorflow_lite_support:users",
     ],

@@ -25,8 +25,6 @@ py_test(
         "//tensorflow_lite_support/metadata/python/tests/testdata/audio_classifier:test_files",
         "//tensorflow_lite_support/metadata/python/tests/testdata/question_answerer:test_files",
     ],
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":test_utils",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
@@ -47,8 +45,6 @@ py_test(
         "//tensorflow_lite_support/metadata/python/tests/testdata/bert_nl_classifier:test_files",
         "//tensorflow_lite_support/metadata/python/tests/testdata/image_classifier:test_files",
     ],
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":test_utils",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
@@ -66,8 +62,6 @@ py_test(
     name = "writer_utils_test",
     srcs = ["writer_utils_test.py"],
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/object_detector:test_files"],
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":test_utils",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
@@ -82,8 +76,6 @@ py_test(
     name = "image_classifier_test",
     srcs = ["image_classifier_test.py"],
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/image_classifier:test_files"],
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":test_utils",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
@@ -100,8 +92,6 @@ py_test(
     name = "object_detector_test",
     srcs = ["object_detector_test.py"],
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/object_detector:test_files"],
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":test_utils",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
@@ -118,8 +108,6 @@ py_test(
     name = "image_segmenter_test",
     srcs = ["image_segmenter_test.py"],
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/image_segmenter:test_files"],
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":test_utils",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
@@ -133,8 +121,6 @@ py_test(
     name = "nl_classifier_test",
     srcs = ["nl_classifier_test.py"],
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/nl_classifier:test_files"],
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":test_utils",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
@@ -150,8 +136,6 @@ py_test(
     name = "audio_classifier_test",
     srcs = ["audio_classifier_test.py"],
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/audio_classifier:test_files"],
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":test_utils",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
@@ -167,8 +151,6 @@ py_test(
     name = "bert_nl_classifier_test",
     srcs = ["bert_nl_classifier_test.py"],
     data = ["//tensorflow_lite_support/metadata/python/tests/testdata/bert_nl_classifier:test_files"],
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":test_utils",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip

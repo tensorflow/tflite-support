@@ -69,8 +69,6 @@ py_test(
         "testdata/whitespace_tokenizer_to_tensor.tflite",
     ],
     main = "whitespace_tokenizer_test.py",
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":_pywrap_whitespace_tokenizer_op_resolver",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
@@ -141,8 +139,6 @@ py_test(
     name = "ngrams_py_test",
     srcs = ["ngrams_test.py"],
     main = "ngrams_test.py",
-    python_version = "PY3",
-    srcs_version = "PY3",
     deps = [
         ":_pywrap_ngrams_op_resolver",
         # build rule placeholder: google/protobuf:use_fast_cpp_protos dep,  # Automatically added go/proto_python_upb_flip
