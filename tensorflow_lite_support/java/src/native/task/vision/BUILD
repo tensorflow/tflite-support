@@ -71,4 +71,5 @@ jni_binary_with_tflite(
         "//tensorflow_lite_support/java/jni",
         "@com_google_absl//absl/strings",
     ],
+    linkopts = [ "-Wl,-z,max-page-size=16384" ]
 )

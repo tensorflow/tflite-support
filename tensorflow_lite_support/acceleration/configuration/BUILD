@@ -108,6 +108,7 @@ tflite_jni_binary(
     deps = [
         "@org_tensorflow//tensorflow/lite/acceleration/configuration/c:gpu_plugin",
     ],
+    linkopts = [ "-Wl,-z,max-page-size=16384" ]
 )
 
 cc_library(
