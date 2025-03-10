@@ -6,10 +6,24 @@ package(
 objc_library(
     name = "TFLStringUtil",
     srcs = [
-        "Sources/TFLStringUtil.mm",
+        "sources/TFLStringUtil.mm",
     ],
     hdrs = [
-        "Sources/TFLStringUtil.h",
+        "sources/TFLStringUtil.h",
     ],
     module_name = "TFLStringUtil",
+)
+
+objc_library(
+    name = "TFLCommonUtils",
+    srcs = [
+        "sources/TFLCommonUtils.m",
+    ],
+    hdrs = [
+        "sources/TFLCommonUtils.h",
+    ],
+    module_name = "TFLCommonUtils",
+    deps = [
+        "//tensorflow_lite_support/ios:TFLCommon",
+    ],
 )
