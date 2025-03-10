@@ -14,6 +14,7 @@
 # ==============================================================================
 
 import numpy
+import numpy.typing
 
 class AudioBuffer:
     def __init__(self, arg0, arg1: int, arg2: AudioFormat) -> None: ...
@@ -22,7 +23,7 @@ class AudioBuffer:
     @property
     def buffer_size(self) -> int: ...
     @property
-    def float_buffer(self) -> numpy.ndarray[numpy.float32]: ...
+    def float_buffer(self) -> numpy.typing.NDArray[numpy.float32]: ...
 
 class AudioFormat:
     def __init__(self, arg0: int, arg1: int) -> None: ...
