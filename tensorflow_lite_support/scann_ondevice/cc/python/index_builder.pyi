@@ -13,4 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
+from typing import Sequence
+
 def create_serialized_index_file(embedding_dim: int, serialized_config: str, userinfo: str, partition_assignment: Sequence[int], metadata: Sequence[str], compression: bool = ..., hashed_database: Sequence[int] | None = ..., float_database: Sequence[float] | None = ...) -> bytes: ...
