@@ -44,6 +44,10 @@ limitations under the License.
 #include <sys/mman.h>
 #endif
 
+#if _WIN32
+typedef void* HANDLE;
+#endif
+
 namespace tflite {
 namespace task {
 namespace core {
@@ -117,11 +121,20 @@ class TfLiteEngine {
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings());
 
+#ifdef _WIN32
+  // Builds the TF Lite model from a HANDLE to an open file. The caller retains
+  // ownership of the handle.
+  absl::Status BuildModelFromFileHandle(
+      HANDLE file_handle,
+      const tflite::proto::ComputeSettings& compute_settings =
+          tflite::proto::ComputeSettings());
+#else
   // Builds the TF Lite model from a given file descriptor using mmap(2).
   absl::Status BuildModelFromFileDescriptor(
       int file_descriptor,
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings());
+#endif
 
   // Builds the TFLite model from the provided ExternalFile proto, which must
   // outlive the current object.
