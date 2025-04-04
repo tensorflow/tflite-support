@@ -189,12 +189,13 @@ absl::Status TfLiteEngine::BuildModelFromFileHandle(
   }
   external_file_->mutable_file_descriptor_meta()->set_handle(
       reinterpret_cast<uint64_t>(file_handle));
-  TFLITE_ASSIGN_OR_RETURN(
+  ASSIGN_OR_RETURN(
       model_file_handler_,
       ExternalFileHandler::CreateFromExternalFile(external_file_.get()));
   return InitializeFromModelFileHandler(compute_settings);
 }
-#else
+#endif
+
 absl::Status TfLiteEngine::BuildModelFromFileDescriptor(
     int file_descriptor,
     const tflite::proto::ComputeSettings& compute_settings) {
@@ -211,7 +212,6 @@ absl::Status TfLiteEngine::BuildModelFromFileDescriptor(
       ExternalFileHandler::CreateFromExternalFile(external_file_.get()));
   return InitializeFromModelFileHandler(compute_settings);
 }
-#endif
 
 absl::Status TfLiteEngine::BuildModelFromExternalFileProto(
     const ExternalFile* external_file,

@@ -132,10 +132,13 @@ absl::Status ExternalFileHandler::MapExternalFile() {
   HANDLE file_handle = nullptr;
 
   if (!external_file_.file_name().empty()) {
-    TFLITE_ASSIGN_OR_RETURN(const std::wstring wide_file_name,
-                            Utf8ToWideChar(external_file_.file_name()));
+    StatusOr<std::wstring> wide_file_name =
+        Utf8ToWideChar(external_file_.file_name());
+    if (!wide_file_name.ok()) {
+      return wide_file_name.status();
+    }
 
-    owned_file_handle_ = ::CreateFile(wide_file_name.c_str(), GENERIC_READ,
+    owned_file_handle_ = ::CreateFileW(wide_file_name->c_str(), GENERIC_READ,
         /*dwShareMode=*/0, NULL, OPEN_EXISTING, /*dwFlagsAndAttributes=*/0,
         NULL);
     if (owned_file_handle_ == INVALID_HANDLE_VALUE) {

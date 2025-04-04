@@ -99,11 +99,18 @@ class TaskAPIFactory {
       int num_threads = 1,
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings()) {
+#ifdef _WIN32
+    return CreateStatusWithPayload(
+        absl::StatusCode::kFailedPrecondition,
+        "CreateFromFileDescriptor is not supported on Windows.",
+        tflite::support::TfLiteSupportStatus::kFileReadError);
+#else
     auto engine = absl::make_unique<TfLiteEngine>(std::move(resolver));
     RETURN_IF_ERROR(engine->BuildModelFromFileDescriptor(file_descriptor,
                                                          compute_settings));
     return CreateFromTfLiteEngine<T>(std::move(engine), num_threads,
                                      compute_settings);
+#endif
   }
 
   template <typename T, EnableIfBaseUntypedTaskApiSubclass<T> = nullptr>

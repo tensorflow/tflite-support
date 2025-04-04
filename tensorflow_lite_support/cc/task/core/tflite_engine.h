@@ -128,13 +128,13 @@ class TfLiteEngine {
       HANDLE file_handle,
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings());
-#else
+#endif
+
   // Builds the TF Lite model from a given file descriptor using mmap(2).
   absl::Status BuildModelFromFileDescriptor(
       int file_descriptor,
       const tflite::proto::ComputeSettings& compute_settings =
           tflite::proto::ComputeSettings());
-#endif
 
   // Builds the TFLite model from the provided ExternalFile proto, which must
   // outlive the current object.
