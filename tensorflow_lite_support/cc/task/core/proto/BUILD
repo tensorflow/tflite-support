@@ -1,4 +1,5 @@
 load("//tensorflow_lite_support/cc/port:build_defs.bzl", "support_py_proto_library")
+load("//third_party/bazel_rules/rules_cc/cc:cc_library.bzl", "cc_library")
 
 # Placeholder: load java_lite_proto_library
 # Placeholder: load proto_library
