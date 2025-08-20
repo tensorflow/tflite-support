@@ -1,5 +1,9 @@
 # TensorFlow Lite Support
 
+*Note for TFLite Tasks users, we encourage you to use 
+[MediaPipe Tasks](https://ai.google.dev/edge/mediapipe/solutions/tasks) 
+for future development.
+
 TFLite Support is a toolkit that helps users to develop ML and deploy TFLite
 models onto mobile devices. It works cross-Platform and is supported on Java,
 C++ (WIP), and Swift (WIP). The TFLite Support project consists of the following
