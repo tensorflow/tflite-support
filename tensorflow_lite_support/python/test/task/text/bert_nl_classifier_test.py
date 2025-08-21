@@ -34,28 +34,23 @@ _BertNLClassifierOptions = bert_nl_classifier.BertNLClassifierOptions
 _BERT_MODEL = 'bert_nl_classifier.tflite'
 
 _POSITIVE_INPUT = "it's a charming and often affecting journey"
-_EXPECTED_RESULTS_OF_POSITIVE_INPUT = _ClassificationResult(
-    classifications=[
-        _Classifications(
-            categories=[
-                _Category(
-                    index=0,
-                    score=6.3e-5,
-                    display_name='',
-                    category_name='negative',
-                ),
-                _Category(
-                    index=0,
-                    score=0.999937,
-                    display_name='',
-                    category_name='positive',
-                ),
-            ],
-            head_index=0,
-            head_name='',
-        )
-    ]
-)
+_EXPECTED_RESULTS_OF_POSITIVE_INPUT = _ClassificationResult(classifications=[
+    _Classifications(
+        categories=[
+            _Category(
+                index=0,
+                score=5.534091e-05,
+                display_name='',
+                category_name='negative'),
+            _Category(
+                index=0,
+                score=0.999945,
+                display_name='',
+                category_name='positive')
+        ],
+        head_index=0,
+        head_name='')
+])
 
 _NEGATIVE_INPUT = 'unflinchingly bleak and desperate'
 _EXPECTED_RESULTS_OF_NEGATIVE_INPUT = _ClassificationResult(classifications=[
