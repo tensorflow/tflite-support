@@ -49,5 +49,4 @@ jni_binary_with_tflite(
         "@org_tensorflow//tensorflow/lite:op_resolver",
         "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
     ],
-    linkopts = [ "-Wl,-z,max-page-size=16384" ]
 )

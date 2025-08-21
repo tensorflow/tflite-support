@@ -18,7 +18,6 @@ jni_binary_with_tflite(
     tflite_deps = [
         ":task_audio_jni_lib",
     ],
-    linkopts = [ "-Wl,-z,max-page-size=16384" ]
 )
 
 cc_library_with_tflite(
