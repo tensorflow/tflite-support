@@ -14,7 +14,7 @@
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/audio/sources/TFLAudioClassifier.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
-#import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
+#import "tensorflow_lite_support/ios/utils/c/sources/TFLCommonCUtils.h"
 #import "tensorflow_lite_support/ios/task/audio/core/audio_tensor/utils/sources/TFLAudioTensor+Utils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions+Helpers.h"
@@ -66,7 +66,7 @@
       TfLiteAudioClassifierGetRequiredInputBufferSize(_audioClassifier, &requiredBufferSizeError);
 
   // Populate iOS error if C Error is not null and afterwards delete it.
-  if (![TFLCommonUtils checkCError:requiredBufferSizeError toError:error]) {
+  if (![TFLCommonCUtils checkCError:requiredBufferSizeError toError:error]) {
     TfLiteSupportErrorDelete(requiredBufferSizeError);
   }
 
@@ -78,7 +78,7 @@
   _requiredCAudioFormat =
       TfLiteAudioClassifierGetRequiredAudioFormat(_audioClassifier, &getAudioFormatError);
 
-  if (![TFLCommonUtils checkCError:getAudioFormatError toError:error]) {
+  if (![TFLCommonCUtils checkCError:getAudioFormatError toError:error]) {
     TfLiteSupportErrorDelete(getAudioFormatError);
   }
 
@@ -129,7 +129,7 @@
       deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
 
   // Populate iOS error if TfliteSupportError is not null and afterwards delete it.
-  if (![TFLCommonUtils checkCError:cCreateClassifierError toError:error]) {
+  if (![TFLCommonCUtils checkCError:cCreateClassifierError toError:error]) {
     TfLiteSupportErrorDelete(cCreateClassifierError);
   }
 
@@ -159,7 +159,7 @@
       TfLiteAudioClassifierClassify(_audioClassifier, &cAudioBuffer, &classifyError);
 
   // Populate iOS error if C Error is not null and afterwards delete it.
-  if (![TFLCommonUtils checkCError:classifyError toError:error]) {
+  if (![TFLCommonCUtils checkCError:classifyError toError:error]) {
     TfLiteSupportErrorDelete(classifyError);
   }
 

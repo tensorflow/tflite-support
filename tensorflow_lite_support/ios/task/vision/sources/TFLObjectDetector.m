@@ -14,7 +14,7 @@
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLObjectDetector.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
-#import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
+#import "tensorflow_lite_support/ios/utils/c/sources/TFLCommonCUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLDetectionResult+Helpers.h"
@@ -91,7 +91,7 @@
       deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
 
   // Populate iOS error if TfliteSupportError is not null and afterwards delete  it.
-  if (![TFLCommonUtils checkCError:cCreateObjectDetectorError toError:error]) {
+  if (![TFLCommonCUtils checkCError:cCreateObjectDetectorError toError:error]) {
     TfLiteSupportErrorDelete(cCreateObjectDetectorError);
   }
 
@@ -130,7 +130,7 @@
   cFrameBuffer = nil;
 
   // Populate iOS error if C Error is not null and afterwards delete it.
-  if (![TFLCommonUtils checkCError:cDetectError toError:error]) {
+  if (![TFLCommonCUtils checkCError:cDetectError toError:error]) {
     TfLiteSupportErrorDelete(cDetectError);
   }
 
