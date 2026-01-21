@@ -76,7 +76,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
     return cls.create_from_metadata(
         model_buffer,
         model_metadata=general_md.create_metadata(),
-        input_metadata=input_md.create_input_tesnor_metadata(),
+        input_metadata=input_md.create_input_tensor_metadata(),
         output_metadata=[output_md.create_metadata()],
         associated_files=[
             file.file_path for file in output_md.associated_files
@@ -108,7 +108,7 @@ class MetadataWriter(metadata_writer.MetadataWriter):
     Args:
       model_buffer: valid buffer of the model file.
       tokenizer_md: information of the tokenizer used to process the input
-        string, if any. Supported tokenziers are: `BertTokenizer` [1] and
+        string, if any. Supported tokenizers are: `BertTokenizer` [1] and
           `SentencePieceTokenizer` [2]. If the tokenizer is `RegexTokenizer`
           [3], refer to `nl_classifier.MetadataWriter`.
         [1]:
