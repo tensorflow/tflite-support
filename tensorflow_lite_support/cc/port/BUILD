@@ -64,6 +64,7 @@ cc_library(
         "proto2.h",
     ],
     deps = [
-        "@com_google_protobuf//:protobuf",
+        "//third_party/protobuf",
+        "//third_party/protobuf:protobuf_lite",
     ],
 )
