@@ -1,4 +1,5 @@
 load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite", "jni_binary_with_tflite")
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_pagesize_linkopts")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -18,6 +19,7 @@ jni_binary_with_tflite(
     tflite_deps = [
         ":task_audio_jni_lib",
     ],
+    linkopts = tflite_pagesize_linkopts(),
 )
 
 cc_library_with_tflite(
