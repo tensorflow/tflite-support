@@ -1,4 +1,5 @@
 load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite", "jni_binary_with_tflite")
+load("@org_tensorflow//tensorflow/lite:build_def.bzl", "tflite_pagesize_linkopts")
 
 package(
     default_visibility = ["//tensorflow_lite_support:users"],
@@ -45,6 +46,7 @@ jni_binary_with_tflite(
         "//tensorflow_lite_support/java/src/native/task/vision/segmenter:image_segmenter_jni.cc",
     ],
     linkscript = "//tensorflow_lite_support/java:default_version_script.lds",
+    linkopts = tflite_pagesize_linkopts(),
     tflite_deps = [
         "//tensorflow_lite_support/java/src/native/task/core:builtin_op_resolver",
         "//tensorflow_lite_support/cc/task/vision:image_classifier",
