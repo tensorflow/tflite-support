@@ -459,7 +459,6 @@ android_library_instrumentation_tests(
         ":test_image_creator",
         ":test_lib",
         "//tensorflow_lite_support/java:tensorflowlite_support",
-        "@maven//:androidx_multidex_multidex",
         "@maven//:androidx_test_core",
         "@maven//:androidx_test_ext_junit",
         "@maven//:androidx_test_runner",
