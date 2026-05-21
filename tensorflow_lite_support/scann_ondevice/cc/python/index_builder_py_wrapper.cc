@@ -36,8 +36,8 @@ PYBIND11_MODULE(index_builder, m) {
          const std::string userinfo,
          absl::Span<const uint32_t> partition_assignment,
          absl::Span<const std::string> metadata, bool compression,
-         absl::optional<absl::Span<const uint8_t>> hashed_database,
-         absl::optional<absl::Span<const float>> float_database)
+         std::optional<absl::Span<const uint8_t>> hashed_database,
+         std::optional<absl::Span<const float>> float_database)
           -> absl::StatusOr<bytes> {
         tflite::scann_ondevice::core::ScannOnDeviceConfig config;
         config.ParseFromString(serialized_config);
