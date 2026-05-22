@@ -265,7 +265,7 @@ OrientParams GetOrientParams(FrameBuffer::Orientation from_orientation,
   int from_index = GetOrientationIndex(from_orientation);
   int to_index = GetOrientationIndex(to_orientation);
   int angle = 0;
-  absl::optional<OrientParams::FlipType> flip;
+  std::optional<OrientParams::FlipType> flip;
 
   TFLITE_DCHECK(from_index > -1 && to_index > -1);
 
@@ -584,7 +584,7 @@ absl::Status FrameBufferUtils::Execute(
 }
 
 absl::Status FrameBufferUtils::Preprocess(
-    const FrameBuffer& buffer, absl::optional<BoundingBox> bounding_box,
+    const FrameBuffer& buffer, std::optional<BoundingBox> bounding_box,
     FrameBuffer* output_buffer, bool uniform_resizing) {
   std::vector<FrameBufferOperation> frame_buffer_operations;
   // Handle cropping and resizing.

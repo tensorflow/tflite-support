@@ -89,7 +89,7 @@ StatusOr<const ImageProperties*> GetImagePropertiesIfAny(
   return tensor_metadata.content()->content_properties_as_ImageProperties();
 }
 
-StatusOr<absl::optional<NormalizationOptions>> GetNormalizationOptionsIfAny(
+StatusOr<std::optional<NormalizationOptions>> GetNormalizationOptionsIfAny(
     const TensorMetadata& tensor_metadata) {
   ASSIGN_OR_RETURN(
       const tflite::ProcessUnit* normalization_process_unit,
@@ -110,7 +110,7 @@ StatusOr<absl::optional<NormalizationOptions>> GetNormalizationOptionsIfAny(
                      mean_values->size(), " and ", std_values->size(), "."),
         TfLiteSupportStatus::kMetadataInvalidProcessUnitsError);
   }
-  absl::optional<NormalizationOptions> normalization_options;
+  std::optional<NormalizationOptions> normalization_options;
   if (mean_values->size() == 1) {
     normalization_options = NormalizationOptions{
         /* mean_values= */ {mean_values->Get(0), mean_values->Get(0),
@@ -145,7 +145,7 @@ StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
                    GetInputTensorMetadataIfAny(metadata_extractor));
 
   const ImageProperties* props = nullptr;
-  absl::optional<NormalizationOptions> normalization_options;
+  std::optional<NormalizationOptions> normalization_options;
   if (metadata != nullptr) {
     ASSIGN_OR_RETURN(props, GetImagePropertiesIfAny(*metadata));
     ASSIGN_OR_RETURN(normalization_options,
