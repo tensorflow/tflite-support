@@ -197,7 +197,7 @@ std::optional<Sigmoid> ScoreCalibration::FindSigmoidParameters(
   } else if (sigmoid_parameters_.default_sigmoid.has_value()) {
     return sigmoid_parameters_.default_sigmoid.value();
   }
-  return absl::nullopt;
+  return std::nullopt;
 }
 
 StatusOr<SigmoidCalibrationParameters> BuildSigmoidCalibrationParams(
