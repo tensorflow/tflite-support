@@ -57,8 +57,8 @@ PYBIND11_MODULE(index_builder, m) {
       },
       arg("embedding_dim"), arg("serialized_config"), arg("userinfo"),
       arg("partition_assignment"), arg("metadata"), arg("compression") = true,
-      arg("hashed_database") = absl::nullopt,
-      arg("float_database") = absl::nullopt);
+      arg("hashed_database") = std::nullopt,
+      arg("float_database") = std::nullopt);
 }
 
 }  // namespace pybind11
