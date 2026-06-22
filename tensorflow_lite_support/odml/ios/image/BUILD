@@ -90,7 +90,7 @@ ios_static_framework(
 ios_unit_test(
     name = "tests",
     size = "small",
-    minimum_os_version = TFL_MINIMUM_OS_VERSION,
+    minimum_os_version = "15.0",
     runner = tflite_ios_lab_runner("IOS_LATEST"),
     deps = [
         ":TestsLibrary",
