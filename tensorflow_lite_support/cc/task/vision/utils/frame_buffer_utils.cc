@@ -487,7 +487,7 @@ absl::Status FrameBufferUtils::Orient(const FrameBuffer& buffer,
 
   // Perform rotation and flip operations.
   // Create a temporary buffer to hold the rotation result.
-  auto tmp_buffer = absl::make_unique<uint8_t[]>(
+  auto tmp_buffer = std::make_unique<uint8_t[]>(
       GetBufferByteSize(output_buffer->dimension(), output_buffer->format()));
   auto tmp_frame_buffer = FrameBuffer::Create(
       GetPlanes(tmp_buffer.get(), output_buffer->dimension(),
@@ -562,13 +562,13 @@ absl::Status FrameBufferUtils::Execute(
       if (i % 2 == 0) {
         if (buffer1_size < byte_size) {
           buffer1_size = byte_size;
-          buffer1 = absl::make_unique<uint8_t[]>(byte_size);
+          buffer1 = std::make_unique<uint8_t[]>(byte_size);
         }
         planes = GetPlanes(buffer1.get(), new_size, new_format);
       } else {
         if (buffer2_size < byte_size) {
           buffer2_size = byte_size;
-          buffer2 = absl::make_unique<uint8_t[]>(byte_size);
+          buffer2 = std::make_unique<uint8_t[]>(byte_size);
         }
         planes = GetPlanes(buffer2.get(), new_size, new_format);
       }
