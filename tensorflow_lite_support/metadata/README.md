@@ -12,4 +12,4 @@ documentation](https://www.tensorflow.org/lite/convert/metadata).
 The first code generator which takes advantage of this metadata format is the
 TensorFlow Lite Android Code Generator. For more information on how to use this
 generator, please refer to the [TensorFlow Lite Android wrapper code generator
-documentation](https://www.tensorflow.org/lite/guide/codegen).
+documentation](https://www.tensorflow.org/lite/inference_with_metadata/codegen).
