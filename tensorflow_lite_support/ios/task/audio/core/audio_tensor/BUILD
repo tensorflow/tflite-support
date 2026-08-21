@@ -16,7 +16,7 @@ objc_library(
     module_name = "TFLAudioTensor",
     deps = [
         "//tensorflow_lite_support/ios:TFLCommon",
-        "//tensorflow_lite_support/ios:TFLCommonUtils",
+        "//tensorflow_lite_support/ios/utils:TFLCommonUtils",
         "//tensorflow_lite_support/ios/task/audio/core:TFLFloatBuffer",
         "//tensorflow_lite_support/ios/task/audio/core:TFLRingBuffer",
         "//tensorflow_lite_support/ios/task/audio/core/audio_record:TFLAudioRecord",

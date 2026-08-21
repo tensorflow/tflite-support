@@ -65,7 +65,7 @@ objc_library(
     ],
     module_name = "TFLSegmentationResult",
     deps = [
-        "//tensorflow_lite_support/ios:TFLCommonUtils",
+        "//tensorflow_lite_support/ios/utils:TFLCommonUtils",
     ],
 )
 
@@ -115,7 +115,7 @@ objc_library(
     deps = [
         "//tensorflow_lite_support/c/task/processor:classification_options",
         "//tensorflow_lite_support/ios:TFLCommon",
-        "//tensorflow_lite_support/ios:TFLCommonUtils",
+        "//tensorflow_lite_support/ios/utils:TFLCommonUtils",
         "//tensorflow_lite_support/ios/task/processor:TFLClassificationOptions",
     ],
 )

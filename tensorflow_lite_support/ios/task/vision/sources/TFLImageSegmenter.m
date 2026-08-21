@@ -14,7 +14,7 @@
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageSegmenter.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
-#import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
+#import "tensorflow_lite_support/ios/utils/c/sources/TFLCommonCUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLSegmentationResult+Helpers.h"
 #import "tensorflow_lite_support/ios/task/vision/utils/sources/GMLImage+Utils.h"
@@ -90,7 +90,7 @@
   // Freeing memory of allocated string.
   free(cOptions.display_names_locale);
 
-  if (![TFLCommonUtils checkCError:cCreateImageSegmenterError toError:error]) {
+  if (![TFLCommonCUtils checkCError:cCreateImageSegmenterError toError:error]) {
     TfLiteSupportErrorDelete(cCreateImageSegmenterError);
   }
 
@@ -128,7 +128,7 @@
   cFrameBuffer = nil;
 
   // Populate iOS error if C Error is not null and afterwards delete it.
-  if (![TFLCommonUtils checkCError:cSegmentError toError:error]) {
+  if (![TFLCommonCUtils checkCError:cSegmentError toError:error]) {
     TfLiteSupportErrorDelete(cSegmentError);
   }
 
