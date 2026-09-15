@@ -43,10 +43,9 @@ namespace text {
 namespace nlclassifier {
 
 // Options to identify input and output tensors of the model
-ABSL_DEPRECATED(
+struct [[deprecated(
     "Prefer using `tflite::task::text::NLClassifierOptions` and "
-    "`CreateFromOptions`")
-struct NLClassifierOptions {
+    "`CreateFromOptions`")]] NLClassifierOptions {
   int input_tensor_index = 0;
   int output_score_tensor_index = 0;
   // By default there is no output label tensor. The label file can be attached
