@@ -14,7 +14,7 @@
  ==============================================================================*/
 #import "tensorflow_lite_support/ios/task/vision/sources/TFLImageClassifier.h"
 #import "tensorflow_lite_support/ios/sources/TFLCommon.h"
-#import "tensorflow_lite_support/ios/sources/TFLCommonUtils.h"
+#import "tensorflow_lite_support/ios/utils/c/sources/TFLCommonCUtils.h"
 #import "tensorflow_lite_support/ios/task/core/sources/TFLBaseOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationOptions+Helpers.h"
 #import "tensorflow_lite_support/ios/task/processor/sources/TFLClassificationResult+Helpers.h"
@@ -91,7 +91,7 @@
       deleteAllocatedMemoryOfClassificationOptions:&(cOptions.classification_options)];
 
   // Populate iOS error if TfliteSupportError is not null and afterwards delete it.
-  if (![TFLCommonUtils checkCError:cCreateClassifierError toError:error]) {
+  if (![TFLCommonCUtils checkCError:cCreateClassifierError toError:error]) {
     TfLiteSupportErrorDelete(cCreateClassifierError);
   }
 
@@ -143,7 +143,7 @@
   cFrameBuffer = NULL;
 
   // Populate iOS error if C Error is not null and afterwards delete it.
-  if (![TFLCommonUtils checkCError:classifyError toError:error]) {
+  if (![TFLCommonCUtils checkCError:classifyError toError:error]) {
     TfLiteSupportErrorDelete(classifyError);
   }
 
