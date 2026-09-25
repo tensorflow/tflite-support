@@ -105,6 +105,7 @@ cc_library(
     ],
     deps = [
         ":tokenizer",
+        "@com_google_absl//absl/log:check",
         "@com_google_sentencepiece//src:sentencepiece_processor",
     ],
 )
