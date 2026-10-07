@@ -33,10 +33,10 @@ from tensorflow_docs.api_generator import toc_processing
 import yaml
 
 try:
-  # pytype: disable=import-error # pylint: disable=g-import-not-at-top
-  import tflite_support
-  import tensorflow_lite_support
-  # pytype: enable=import-error # pylint: enable=g-import-not-at-top
+  # pylint: disable=g-import-not-at-top
+  import tflite_support  # pyrefly: ignore[missing-import]
+  import tensorflow_lite_support  # pyrefly: ignore[missing-import]
+  # pylint: enable=g-import-not-at-top
 except ImportError as e:
   raise ImportError('Please `pip install tflite-support`.') from e
 
