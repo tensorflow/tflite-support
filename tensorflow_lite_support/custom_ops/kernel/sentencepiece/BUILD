@@ -3,6 +3,11 @@
 
 load("@flatbuffers//:build_defs.bzl", "flatbuffer_cc_library")
 load("@org_tensorflow//tensorflow:tensorflow.bzl", "tf_gen_op_wrapper_py")
+load(
+    "@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl",
+    "cc_library_with_tflite",
+    "cc_test_with_tflite",
+)
 load("//third_party/bazel_rules/rules_cc/cc:cc_binary.bzl", "cc_binary")
 load("//third_party/bazel_rules/rules_cc/cc:cc_library.bzl", "cc_library")
 load("//third_party/bazel_rules/rules_cc/cc:cc_test.bzl", "cc_test")
@@ -225,23 +230,47 @@ cc_binary(
     ] + micore_tf_deps(),
 )
 
-cc_library(
+cc_library_with_tflite(
     name = "sentencepiece_tokenizer_tflite",
     srcs = ["sentencepiece_tokenizer_tflite.cc"],
+    hdrs = [
+        "sentencepiece_tokenizer_tflite.h",
+    ],
+    tflite_deps = [
+        "@org_tensorflow//tensorflow/lite/c:c_api_opaque",
+        "@org_tensorflow//tensorflow/lite/c:c_api_nocreate",
+        "@org_tensorflow//tensorflow/lite/c:common",
+    ],
     visibility = [
         "//visibility:public",
     ],
-    deps =
-        [
-            ":optimized_encoder",
-            ":sentencepiece_tokenizer_h",
-            "@flatbuffers",
-            "@org_tensorflow//tensorflow/lite:framework",
-            "@org_tensorflow//tensorflow/lite:string_util",
-            "@org_tensorflow//tensorflow/lite/c:common",
-            "@org_tensorflow//tensorflow/lite/kernels:kernel_util",
-            "@org_tensorflow//tensorflow/lite/kernels/internal:tensor",
-        ],
+    deps = [
+        ":optimized_encoder",
+        ":sentencepiece_tokenizer_h",
+        "@org_tensorflow//tensorflow/lite:builtin_ops",
+    ],
+)
+
+cc_test_with_tflite(
+    name = "sentencepiece_tokenizer_tflite_test",
+    size = "small",
+    srcs = ["sentencepiece_tokenizer_tflite_test.cc"],
+    data = [
+        ":testdata",
+    ],
+    tflite_deps = [
+        ":sentencepiece_tokenizer_tflite",
+        "@org_tensorflow//tensorflow/lite/c:c_api",
+        "@org_tensorflow//tensorflow/lite/c:c_api_types",
+        "@org_tensorflow//tensorflow/lite/c:test_util",
+    ],
+    deps = [
+        ":model_converter",
+        "//tensorflow_lite_support/cc/test:test_utils",
+        "@com_google_googletest//:gtest_main",
+        "@flatbuffers",
+        "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
+    ],
 )
 
 cc_library(

@@ -14,17 +14,23 @@ limitations under the License.
 ==============================================================================*/
 
 /**
- * Sentencepiece tflite tokenizer implementation.
+ * Sentencepiece TFLite tokenizer implementation.
  */
+#include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/sentencepiece_tokenizer_tflite.h"
+
+#include <algorithm>
+#include <cstdint>
+#include <initializer_list>
+#include <iterator>
+#include <string>
+#include <vector>
+
+#include "tensorflow/lite/builtin_ops.h"
+#include "tensorflow/lite/c/c_api.h"
+#include "tensorflow/lite/c/c_api_opaque.h"
+#include "tensorflow/lite/c/common.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/optimized_encoder.h"
 #include "tensorflow_lite_support/custom_ops/kernel/sentencepiece/sentencepiece_tokenizer.h"
-#include "flatbuffers/flexbuffers.h"  // from @flatbuffers
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/context.h"
-#include "tensorflow/lite/kernels/internal/tensor.h"
-#include "tensorflow/lite/kernels/kernel_util.h"
-#include "tensorflow/lite/model.h"
-#include "tensorflow/lite/string_util.h"
 
 namespace tflite {
 namespace ops {
@@ -36,6 +42,7 @@ constexpr int kOutputValuesInd = 0;
 constexpr int kOutputSplitsInd = 1;
 
 namespace {
+
 TfLiteIntArray* CreateSizeArray(const std::initializer_list<int>& sizes) {
   TfLiteIntArray* array_size = TfLiteIntArrayCreate(sizes.size());
   int index = 0;
@@ -44,84 +51,153 @@ TfLiteIntArray* CreateSizeArray(const std::initializer_list<int>& sizes) {
   }
   return array_size;
 }
+
 }  // namespace
 
-// Initializes text encoder object from serialized parameters.
-void* Initialize(TfLiteContext* /*context*/, const char* /*buffer*/,
-                 size_t /*length*/) {
-  return nullptr;
-}
-void Free(TfLiteContext* /*context*/, void* /*buffer*/) {}
+TfLiteStatus Prepare(TfLiteOpaqueContext* context, TfLiteOpaqueNode* node) {
+  // TODO(andram): Enable this validation separately since it is a riskier
+  // change and we should test it separately. Validate that the node has all
+  // required inputs and outputs.
+  // TF_LITE_OPAQUE_ENSURE(context, TfLiteOpaqueNodeNumberOfInputs(node) == 7);
+  // TF_LITE_OPAQUE_ENSURE_EQ(context, TfLiteOpaqueNodeNumberOfOutputs(node),
+  //                         2);
 
-TfLiteStatus Prepare(TfLiteContext* context, TfLiteNode* node) {
-  // TODO(mgubin): Add checks for input and output tensors.
-  TfLiteTensor& output_values =
-      context->tensors[node->outputs->data[kOutputValuesInd]];
-  SetTensorToDynamic(&output_values);
+  // Both output values and splits are dynamic since their shapes depend on the
+  // tokenized string lengths determined at evaluation time.
+  TfLiteOpaqueTensor* output_values =
+      TfLiteOpaqueNodeGetOutput(context, node, kOutputValuesInd);
+  TF_LITE_OPAQUE_ENSURE(context, output_values != nullptr);
+  TfLiteOpaqueTensorSetAllocationTypeToDynamic(output_values);
 
-  TfLiteTensor& output_splits =
-      context->tensors[node->outputs->data[kOutputSplitsInd]];
-  SetTensorToDynamic(&output_splits);
+  TfLiteOpaqueTensor* output_splits =
+      TfLiteOpaqueNodeGetOutput(context, node, kOutputSplitsInd);
+  TF_LITE_OPAQUE_ENSURE(context, output_splits != nullptr);
+  TfLiteOpaqueTensorSetAllocationTypeToDynamic(output_splits);
   return kTfLiteOk;
 }
 
-TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
-  const TfLiteTensor& model_tensor =
-      context->tensors[node->inputs->data[tensorflow::ops::kSPModelIndex]];
-  const auto model_buffer_data = model_tensor.data.data;
-  const TfLiteTensor& input_text =
-      context->tensors[node->inputs->data[tensorflow::ops::kInputIndex]];
+TfLiteStatus Eval(TfLiteOpaqueContext* context, TfLiteOpaqueNode* node) {
+  // Retrieve the serialized SentencePiece model buffer.
+  const TfLiteOpaqueTensor* model_tensor =
+      TfLiteOpaqueNodeGetInput(context, node, tensorflow::ops::kSPModelIndex);
+  TF_LITE_OPAQUE_ENSURE(context, model_tensor != nullptr);
+  const void* model_buffer_data = TfLiteOpaqueTensorData(model_tensor);
+  TF_LITE_OPAQUE_ENSURE(context, model_buffer_data != nullptr);
 
-  const TfLiteTensor add_bos_tensor =
-      context->tensors[node->inputs->data[tensorflow::ops::kAddBOSInput]];
-  const bool add_bos = add_bos_tensor.data.b[0];
-  const TfLiteTensor add_eos_tensor =
-      context->tensors[node->inputs->data[tensorflow::ops::kAddEOSInput]];
-  const bool add_eos = add_eos_tensor.data.b[0];
-  const TfLiteTensor reverse_tensor =
-      context->tensors[node->inputs->data[tensorflow::ops::kReverseInput]];
-  const bool reverse = reverse_tensor.data.b[0];
+  // Retrieve the input text string tensor.
+  const TfLiteOpaqueTensor* input_text =
+      TfLiteOpaqueNodeGetInput(context, node, tensorflow::ops::kInputIndex);
+  TF_LITE_OPAQUE_ENSURE(context, input_text != nullptr);
 
-  std::vector<int32> encoded;
-  std::vector<int32> splits;
-  const int num_strings = tflite::GetStringCount(&input_text);
+  // Retrieve boolean control configuration options.
+  const TfLiteOpaqueTensor* add_bos_tensor =
+      TfLiteOpaqueNodeGetInput(context, node, tensorflow::ops::kAddBOSInput);
+  TF_LITE_OPAQUE_ENSURE(context, add_bos_tensor != nullptr);
+  const bool* add_bos_data =
+      static_cast<const bool*>(TfLiteOpaqueTensorData(add_bos_tensor));
+  TF_LITE_OPAQUE_ENSURE(context, add_bos_data != nullptr);
+  const bool add_bos = add_bos_data[0];
+
+  const TfLiteOpaqueTensor* add_eos_tensor =
+      TfLiteOpaqueNodeGetInput(context, node, tensorflow::ops::kAddEOSInput);
+  TF_LITE_OPAQUE_ENSURE(context, add_eos_tensor != nullptr);
+  const bool* add_eos_data =
+      static_cast<const bool*>(TfLiteOpaqueTensorData(add_eos_tensor));
+  TF_LITE_OPAQUE_ENSURE(context, add_eos_data != nullptr);
+  const bool add_eos = add_eos_data[0];
+
+  const TfLiteOpaqueTensor* reverse_tensor =
+      TfLiteOpaqueNodeGetInput(context, node, tensorflow::ops::kReverseInput);
+  TF_LITE_OPAQUE_ENSURE(context, reverse_tensor != nullptr);
+  const bool* reverse_data =
+      static_cast<const bool*>(TfLiteOpaqueTensorData(reverse_tensor));
+  TF_LITE_OPAQUE_ENSURE(context, reverse_data != nullptr);
+  const bool reverse = reverse_data[0];
+
+  // Tokenize each string in the input tensor using the SentencePiece model.
+  std::vector<int32_t> encoded;
+  std::vector<int32_t> splits;
+  const int num_strings = TfLiteOpaqueTensorGetStringCount(input_text);
+  splits.reserve(num_strings);
   for (int i = 0; i < num_strings; ++i) {
-    const auto strref = tflite::GetString(&input_text, i);
-    const auto res = EncodeString(std::string(strref.str, strref.len),
-                                  model_buffer_data, add_bos, add_eos, reverse);
-    TF_LITE_ENSURE_MSG(context, res.type == EncoderResultType::SUCCESS,
-                       "Sentencepiece conversion failed");
+    const char* str = nullptr;
+    int len = 0;
+    TF_LITE_OPAQUE_ENSURE_EQ(
+        context, TfLiteOpaqueTensorGetString(input_text, i, &str, &len),
+        kTfLiteOk);
+    const auto res = EncodeString(std::string(str, len), model_buffer_data,
+                                  add_bos, add_eos, reverse);
+    TF_LITE_OPAQUE_ENSURE_MSG(context, res.type == EncoderResultType::SUCCESS,
+                              "Sentencepiece conversion failed");
     std::copy(res.codes.begin(), res.codes.end(), std::back_inserter(encoded));
     splits.emplace_back(encoded.size());
   }
 
-  TfLiteTensor& output_values =
-      context->tensors[node->outputs->data[kOutputValuesInd]];
-  TF_LITE_ENSURE_OK(context,
-                    context->ResizeTensor(
-                        context, &output_values,
-                        CreateSizeArray({static_cast<int>(encoded.size())})));
-  int32_t* output_values_flat = output_values.data.i32;
-  std::copy(encoded.begin(), encoded.end(), output_values_flat);
-  TfLiteTensor& output_splits =
-      context->tensors[node->outputs->data[kOutputSplitsInd]];
-  TF_LITE_ENSURE_OK(
-      context, context->ResizeTensor(
-                   context, &output_splits,
-                   CreateSizeArray({static_cast<int>(splits.size() + 1)})));
-  int32_t* output_splits_flat = output_splits.data.i32;
+  // Resize and populate output values tensor.
+  TfLiteOpaqueTensor* output_values =
+      TfLiteOpaqueNodeGetOutput(context, node, kOutputValuesInd);
+  TF_LITE_OPAQUE_ENSURE(context, output_values != nullptr);
+  TF_LITE_OPAQUE_ENSURE_EQ(
+      context,
+      TfLiteOpaqueContextResizeTensor(
+          context, output_values,
+          CreateSizeArray({static_cast<int>(encoded.size())})),
+      kTfLiteOk);
+  if (!encoded.empty()) {
+    int32_t* output_values_flat =
+        static_cast<int32_t*>(TfLiteOpaqueTensorData(output_values));
+    TF_LITE_OPAQUE_ENSURE(context, output_values_flat != nullptr);
+    std::copy(encoded.begin(), encoded.end(), output_values_flat);
+  }
+
+  // Resize and populate output splits tensor.
+  TfLiteOpaqueTensor* output_splits =
+      TfLiteOpaqueNodeGetOutput(context, node, kOutputSplitsInd);
+  TF_LITE_OPAQUE_ENSURE(context, output_splits != nullptr);
+  TF_LITE_OPAQUE_ENSURE_EQ(
+      context,
+      TfLiteOpaqueContextResizeTensor(
+          context, output_splits,
+          CreateSizeArray({static_cast<int>(splits.size() + 1)})),
+      kTfLiteOk);
+  int32_t* output_splits_flat =
+      static_cast<int32_t*>(TfLiteOpaqueTensorData(output_splits));
+  TF_LITE_OPAQUE_ENSURE(context, output_splits_flat != nullptr);
   *output_splits_flat = 0;
   std::copy(splits.begin(), splits.end(), output_splits_flat + 1);
   return kTfLiteOk;
 }
+
 }  // namespace tokenizer
 }  // namespace sentencepiece
 
+TfLiteOperator* RegisterExternal_SENTENCEPIECE_TOKENIZER() {
+  static TfLiteOperator* r = []() {
+    auto* op =
+        TfLiteOperatorCreate(kTfLiteBuiltinCustom, "TFSentencepieceTokenizeOp",
+                             /*version=*/1, /*user_data=*/nullptr);
+    TfLiteOperatorSetPrepare(op, sentencepiece::tokenizer::Prepare);
+    TfLiteOperatorSetInvoke(op, sentencepiece::tokenizer::Eval);
+    return op;
+  }();
+  return r;
+}
+
 TfLiteRegistration* Register_SENTENCEPIECE_TOKENIZER() {
-  static TfLiteRegistration r = {
-      sentencepiece::tokenizer::Initialize, sentencepiece::tokenizer::Free,
-      sentencepiece::tokenizer::Prepare, sentencepiece::tokenizer::Eval};
-  return &r;
+  static TfLiteOperator* reg_external =
+      RegisterExternal_SENTENCEPIECE_TOKENIZER();
+  static TfLiteRegistration reg = {
+      /*.init=*/nullptr,
+      /*.free=*/nullptr,
+      /*.prepare=*/nullptr,
+      /*.invoke=*/nullptr,
+      /*.profiling_string=*/nullptr,
+      /*.builtin_code=*/kTfLiteBuiltinCustom,
+      /*.custom_name=*/"TFSentencepieceTokenizeOp",
+      /*.version=*/1,
+      /*.registration_external=*/reg_external,
+  };
+  return &reg;
 }
 
 }  // namespace custom

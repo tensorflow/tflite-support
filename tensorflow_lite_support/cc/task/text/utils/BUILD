@@ -48,10 +48,10 @@ cc_library_with_tflite(
     hdrs = ["text_op_resolver.h"],
     tflite_deps = [
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_tokenizer_tflite",
     ],
     deps = [
         "//tensorflow_lite_support/custom_ops/kernel/ragged:ragged_tensor_to_tensor_tflite",  # fixdeps: keep
-        "//tensorflow_lite_support/custom_ops/kernel/sentencepiece:sentencepiece_tokenizer_tflite",  # fixdeps: keep
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
