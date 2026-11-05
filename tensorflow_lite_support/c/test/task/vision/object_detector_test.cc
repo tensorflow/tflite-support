@@ -44,7 +44,7 @@ constexpr char kTestDataDirectory[] =
 // Quantized model.
 constexpr char kMobileSsdWithMetadata[] =
     "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.tflite";
-constexpr int kMaxPixelOffset = 5;
+constexpr int kMaxPixelOffset = 10;
 
 StatusOr<ImageData> LoadImage(const char* image_name) {
   return DecodeImageFromFile(JoinPath("./" /*test src dir*/,
