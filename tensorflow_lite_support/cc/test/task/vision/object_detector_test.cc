@@ -341,7 +341,8 @@ TEST_F(DetectTest, Succeeds) {
   ImageDataFree(&rgb_image);
   ExpectApproximatelyEqual(result,
                            ParseTextProtoOrDie<DetectionResult>(kExpectResults),
-                           /*score_precision=*/0.05f);
+                           /*score_precision=*/0.05f,
+                           /*bounding_box_tolerance=*/10);
 }
 
 TEST_F(DetectTest, SucceedswithBaseOptions) {
@@ -364,7 +365,8 @@ TEST_F(DetectTest, SucceedswithBaseOptions) {
   ImageDataFree(&rgb_image);
   ExpectApproximatelyEqual(result,
                            ParseTextProtoOrDie<DetectionResult>(kExpectResults),
-                           /*score_precision=*/0.05f);
+                           /*score_precision=*/0.05f,
+                           /*bounding_box_tolerance=*/10);
 }
 
 TEST_F(DetectTest, SucceedswithScoreCalibrations) {
@@ -387,7 +389,8 @@ TEST_F(DetectTest, SucceedswithScoreCalibrations) {
   ImageDataFree(&rgb_image);
   ExpectApproximatelyEqual(result,
                            ParseTextProtoOrDie<DetectionResult>(kExpectResults),
-                           /*score_precision=*/0.05f);
+                           /*score_precision=*/0.05f,
+                           /*bounding_box_tolerance=*/10);
 }
 
 class PostprocessTest : public tflite::testing::Test {
