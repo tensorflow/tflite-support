@@ -203,7 +203,7 @@ TEST_F(BertQuestionAnswererTest, TestCreateWithMetadataFromBinary) {
 }
 
 TEST_F(BertQuestionAnswererTest, TestCreateWithFileDescriptor2) {
-  std::string model_buffer =
+  [[maybe_unused]] std::string model_buffer =
       LoadBinaryContent(GetFullPath(kTestAlbertWithMetadataModelPath).c_str());
 
   SUPPORT_ASSERT_OK_AND_ASSIGN(
